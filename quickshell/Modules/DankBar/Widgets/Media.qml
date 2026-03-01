@@ -178,8 +178,9 @@ BasePill {
                             if (root.popoutTarget && root.popoutTarget.setTriggerPosition) {
                                 const globalPos = parent.mapToItem(null, 0, 0);
                                 const currentScreen = root.parentScreen || Screen;
-                                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, parent.width);
-                                root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen);
+                                const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+                                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, parent.width, root.barSpacing, barPosition, root.barConfig);
+                                root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
                             }
                             root.clicked();
                         }
@@ -334,8 +335,9 @@ BasePill {
                                 if (root.popoutTarget && root.popoutTarget.setTriggerPosition) {
                                     const globalPos = mapToItem(null, 0, 0);
                                     const currentScreen = root.parentScreen || Screen;
-                                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, root.width);
-                                    root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen);
+                                    const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+                                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, root.width, root.barSpacing, barPosition, root.barConfig);
+                                    root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
                                 }
                                 root.clicked();
                             }

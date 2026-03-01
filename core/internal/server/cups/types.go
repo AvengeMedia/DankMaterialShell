@@ -55,6 +55,16 @@ type PPD struct {
 	Type            string `json:"type"`
 }
 
+type RemotePrinterInfo struct {
+	Reachable bool   `json:"reachable"`
+	MakeModel string `json:"makeModel"`
+	Name      string `json:"name"`
+	Info      string `json:"info"`
+	State     string `json:"state"`
+	URI       string `json:"uri"`
+	Error     string `json:"error,omitempty"`
+}
+
 type PrinterClass struct {
 	Name     string   `json:"name"`
 	URI      string   `json:"uri"`
@@ -77,6 +87,7 @@ type Manager struct {
 	notifierWg        sync.WaitGroup
 	lastNotifiedState *CUPSState
 	baseURL           string
+	probeRemoteFn     func(host string, port int, useTLS bool) (*RemotePrinterInfo, error)
 }
 
 type SubscriptionManagerInterface interface {

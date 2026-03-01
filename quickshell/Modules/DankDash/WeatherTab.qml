@@ -241,14 +241,15 @@ Item {
                             color: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
 
-                            layer.enabled: true
+                            layer.enabled: Theme.elevationEnabled
                             layer.effect: MultiEffect {
-                                shadowEnabled: true
-                                shadowHorizontalOffset: 0
-                                shadowVerticalOffset: 4
-                                shadowBlur: 0.8
-                                shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                                shadowOpacity: 0.2
+                                shadowEnabled: Theme.elevationEnabled
+                                shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel1)
+                                shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel1, 1)
+                                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax)) : 0
+                                blurMax: Theme.elevationBlurMax
+                                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+                                shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
                             }
                         }
 
@@ -812,14 +813,14 @@ Item {
                     x: (pos?.h ?? 0) * skyBox.effectiveWidth - (moonPhase.width / 2) + skyBox.hMargin
                     y: (pos?.v ?? 0) * -(skyBox.effectiveHeight / 2) + skyBox.effectiveHeight / 2 - (moonPhase.height / 2) + skyBox.vMargin
 
-                    layer.enabled: true
+                    layer.enabled: Theme.elevationEnabled
                     layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowHorizontalOffset: 0
-                        shadowVerticalOffset: 4
-                        shadowBlur: 0.8
-                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                        shadowOpacity: 0.2
+                        shadowEnabled: Theme.elevationEnabled
+                        shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
+                        shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
+                        shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+                        blurMax: Theme.elevationBlurMax
+                        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
                     }
                 }
 
@@ -834,14 +835,14 @@ Item {
                     x: (pos?.h ?? 0) * skyBox.effectiveWidth - (sun.width / 2) + skyBox.hMargin
                     y: (pos?.v ?? 0) * -(skyBox.effectiveHeight / 2) + skyBox.effectiveHeight / 2 - (sun.height / 2) + skyBox.vMargin
 
-                    layer.enabled: true
+                    layer.enabled: Theme.elevationEnabled
                     layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowHorizontalOffset: 0
-                        shadowVerticalOffset: 4
-                        shadowBlur: 0.8
-                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                        shadowOpacity: 0.2
+                        shadowEnabled: Theme.elevationEnabled
+                        shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
+                        shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
+                        shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+                        blurMax: Theme.elevationBlurMax
+                        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
                     }
                 }
             }

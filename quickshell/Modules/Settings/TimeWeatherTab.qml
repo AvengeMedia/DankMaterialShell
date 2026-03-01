@@ -9,6 +9,22 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property string _systemDefaultLabel: I18n.tr("System Default")
+
+    function weekStartQt() {
+        if (SettingsData.firstDayOfWeek < 0 || SettingsData.firstDayOfWeek >= 7)
+            return Qt.locale().firstDayOfWeek;
+        return SettingsData.firstDayOfWeek;
+    }
+
+    function weekStartJs() {
+        return weekStartQt() % 7;
+    }
+
+    function _dayNames() {
+        return Array(7).fill(0).map((_, i) => new Date(Date.UTC(2026, 2, 1 + i, 0, 0, 0)).toLocaleDateString(I18n.locale(), "dddd")).map(d => d[0].toUpperCase() + d.slice(1));
+    }
+
     DankFlickable {
         anchors.fill: parent
         clip: true
@@ -68,6 +84,33 @@ Item {
                 title: I18n.tr("Date Format")
                 settingKey: "dateFormat"
                 iconName: "calendar_today"
+
+                SettingsDropdownRow {
+                    tab: "time"
+                    tags: ["first", "day", "week"]
+                    settingKey: "firstDayOfWeek"
+                    text: I18n.tr("First Day of Week")
+                    options: [root._systemDefaultLabel].concat(root._dayNames())
+                    currentValue: {
+                        if (SettingsData.firstDayOfWeek < 0 || SettingsData.firstDayOfWeek >= 7)
+                            return root._systemDefaultLabel;
+                        return root._dayNames()[root.weekStartJs()];
+                    }
+                    onValueChanged: value => {
+                        if (value === root._systemDefaultLabel) {
+                            SettingsData.set("firstDayOfWeek", -1);
+                            return;
+                        }
+                        SettingsData.set("firstDayOfWeek", root._dayNames().indexOf(value));
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                }
 
                 SettingsDropdownRow {
                     tab: "time"
@@ -663,14 +706,15 @@ Item {
                                 anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
 
-                                layer.enabled: true
+                                layer.enabled: Theme.elevationEnabled
                                 layer.effect: MultiEffect {
-                                    shadowEnabled: true
-                                    shadowHorizontalOffset: 0
-                                    shadowVerticalOffset: 4
-                                    shadowBlur: 0.8
-                                    shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                                    shadowOpacity: 0.2
+                                    shadowEnabled: Theme.elevationEnabled
+                                    shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel1)
+                                    shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel1, 1)
+                                    shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax)) : 0
+                                    blurMax: Theme.elevationBlurMax
+                                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+                                    shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
                                 }
                             }
 

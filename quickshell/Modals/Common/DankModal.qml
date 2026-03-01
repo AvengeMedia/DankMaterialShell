@@ -32,9 +32,9 @@ Item {
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
     property color backgroundColor: Theme.surfaceContainer
     property color borderColor: Theme.outlineMedium
-    property real borderWidth: 1
+    property real borderWidth: 0
     property real cornerRadius: Theme.cornerRadius
-    property bool enableShadow: false
+    property bool enableShadow: true
     property alias modalFocusScope: focusScope
     property bool shouldBeVisible: false
     property bool shouldHaveFocus: shouldBeVisible
@@ -142,7 +142,11 @@ Item {
         }
     }
 
-    readonly property real shadowBuffer: 5
+    readonly property var shadowLevel: Theme.elevationLevel3
+    readonly property real shadowFallbackOffset: 6
+    readonly property real shadowRenderPadding: (root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
+    readonly property real shadowMotionPadding: animationType === "slide" ? 30 : Math.max(0, animationOffset)
+    readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
 
@@ -377,12 +381,16 @@ Item {
                         }
                     }
 
-                    Rectangle {
+                    ElevationShadow {
+                        id: modalShadowLayer
                         anchors.fill: parent
-                        color: root.backgroundColor
-                        border.color: root.borderColor
-                        border.width: root.borderWidth
-                        radius: root.cornerRadius
+                        level: root.shadowLevel
+                        fallbackOffset: root.shadowFallbackOffset
+                        targetRadius: root.cornerRadius
+                        targetColor: root.backgroundColor
+                        borderColor: root.borderColor
+                        borderWidth: root.borderWidth
+                        shadowEnabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                     }
 
                     FocusScope {

@@ -87,10 +87,6 @@ Variants {
             Component.onCompleted: {
                 if (typeof blurWallpaperWindow.updatesEnabled !== "undefined")
                     blurWallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
-
-                if (!source) {
-                    root._renderSettling = false;
-                }
                 isInitialized = true;
             }
 
@@ -113,7 +109,7 @@ Variants {
 
             Timer {
                 id: renderSettleTimer
-                interval: 100
+                interval: 1000
                 onTriggered: root._renderSettling = false
             }
 

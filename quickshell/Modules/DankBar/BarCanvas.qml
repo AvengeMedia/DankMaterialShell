@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Shapes
 import qs.Common
 import qs.Services
@@ -53,15 +52,43 @@ Item {
         }
     }
 
-    readonly property real shadowIntensity: barConfig?.shadowIntensity ?? 0
-    readonly property bool shadowEnabled: shadowIntensity > 0
-    readonly property int blurMax: 64
-    readonly property real shadowBlurPx: shadowIntensity * 0.2
-    readonly property real shadowBlur: Math.max(0, Math.min(1, shadowBlurPx / blurMax))
-    readonly property real shadowOpacity: (barConfig?.shadowOpacity ?? 60) / 100
-    readonly property string shadowColorMode: barConfig?.shadowColorMode ?? "text"
-    readonly property color shadowBaseColor: {
-        switch (shadowColorMode) {
+    // M3 elevation shadow — Level 2 baseline (navigation bar), with per-bar override support
+    readonly property bool hasPerBarOverride: (barConfig?.shadowIntensity ?? 0) > 0
+    readonly property var elevLevel: Theme.elevationLevel2
+    readonly property bool shadowEnabled: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || hasPerBarOverride
+    readonly property string autoBarShadowDirection: isTop ? "top" : (isBottom ? "bottom" : (isLeft ? "left" : (isRight ? "right" : "top")))
+    readonly property string globalShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
+    readonly property string perBarShadowDirectionMode: barConfig?.shadowDirectionMode ?? "inherit"
+    readonly property string perBarManualShadowDirection: {
+        switch (barConfig?.shadowDirection) {
+        case "top":
+        case "topLeft":
+        case "topRight":
+        case "bottom":
+            return barConfig.shadowDirection;
+        default:
+            return "top";
+        }
+    }
+    readonly property string effectiveShadowDirection: {
+        if (!hasPerBarOverride)
+            return globalShadowDirection;
+        switch (perBarShadowDirectionMode) {
+        case "autoBar":
+            return autoBarShadowDirection;
+        case "manual":
+            return perBarManualShadowDirection === "autoBar" ? autoBarShadowDirection : perBarManualShadowDirection;
+        default:
+            return globalShadowDirection;
+        }
+    }
+
+    // Per-bar override values (when barConfig.shadowIntensity > 0)
+    readonly property real overrideBlurPx: (barConfig?.shadowIntensity ?? 0) * 0.2
+    readonly property real overrideOpacity: (barConfig?.shadowOpacity ?? 60) / 100
+    readonly property string overrideColorMode: barConfig?.shadowColorMode ?? "default"
+    readonly property color overrideBaseColor: {
+        switch (overrideColorMode) {
         case "surface":
             return Theme.surface;
         case "primary":
@@ -71,10 +98,16 @@ Item {
         case "custom":
             return barConfig?.shadowCustomColor ?? "#000000";
         default:
-            return Theme.surfaceText;
+            return "#000000";
         }
     }
-    readonly property color shadowColor: Theme.withAlpha(shadowBaseColor, shadowOpacity * barWindow._backgroundAlpha)
+
+    // Resolved values — per-bar override wins if set, otherwise use global M3 elevation
+    readonly property real shadowBlurPx: hasPerBarOverride ? overrideBlurPx : (elevLevel.blurPx ?? 8)
+    readonly property color shadowColor: hasPerBarOverride ? Theme.withAlpha(overrideBaseColor, overrideOpacity) : Theme.elevationShadowColor(elevLevel)
+    readonly property real shadowOffsetMagnitude: hasPerBarOverride ? (overrideBlurPx * 0.5) : Theme.elevationOffsetMagnitude(elevLevel, 4, effectiveShadowDirection)
+    readonly property real shadowOffsetX: Theme.elevationOffsetXFor(hasPerBarOverride ? null : elevLevel, effectiveShadowDirection, shadowOffsetMagnitude)
+    readonly property real shadowOffsetY: Theme.elevationOffsetYFor(hasPerBarOverride ? null : elevLevel, effectiveShadowDirection, shadowOffsetMagnitude)
 
     readonly property string mainPath: generatePathForPosition(width, height)
     readonly property string borderFullPath: generateBorderFullPath(width, height)
@@ -118,42 +151,28 @@ Item {
         }
     }
 
-    Loader {
-        id: shadowLoader
-        anchors.fill: parent
-        active: root.shadowEnabled && mainPathCorrectShape
-        asynchronous: false
-        sourceComponent: Item {
-            anchors.fill: parent
+    ElevationShadow {
+        id: barShadow
+        visible: root.shadowEnabled && root.width > 0 && root.height > 0
 
-            layer.enabled: true
-            layer.smooth: true
-            layer.samples: 8
-            layer.textureSize: Qt.size(Math.round(width * barWindow._dpr * 2), Math.round(height * barWindow._dpr * 2))
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowBlur: root.shadowBlur
-                shadowColor: root.shadowColor
-                shadowVerticalOffset: root.isTop ? root.shadowBlurPx * 0.5 : (root.isBottom ? -root.shadowBlurPx * 0.5 : 0)
-                shadowHorizontalOffset: root.isLeft ? root.shadowBlurPx * 0.5 : (root.isRight ? -root.shadowBlurPx * 0.5 : 0)
-                autoPaddingEnabled: true
-            }
+        // Size to the bar's rectangular body, excluding gothic wing extensions
+        x: root.isRight ? root.wing : 0
+        y: root.isBottom ? root.wing : 0
+        width: axis.isVertical ? (parent.width - root.wing) : parent.width
+        height: axis.isVertical ? parent.height : (parent.height - root.wing)
 
-            Shape {
-                anchors.fill: parent
-                preferredRendererType: Shape.CurveRenderer
+        shadowEnabled: root.shadowEnabled
+        level: root.hasPerBarOverride ? null : root.elevLevel
+        direction: root.effectiveShadowDirection
+        fallbackOffset: 4
+        targetRadius: root.rt
+        targetColor: barWindow._bgColor
 
-                ShapePath {
-                    fillColor: barWindow._bgColor
-                    strokeColor: "transparent"
-                    strokeWidth: 0
-
-                    PathSvg {
-                        path: root.mainPath
-                    }
-                }
-            }
-        }
+        shadowBlurPx: root.shadowBlurPx
+        shadowOffsetX: root.shadowOffsetX
+        shadowOffsetY: root.shadowOffsetY
+        shadowColor: root.shadowColor
+        blurMax: Theme.elevationBlurMax
     }
 
     Loader {

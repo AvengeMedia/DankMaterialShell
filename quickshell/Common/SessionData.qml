@@ -129,6 +129,7 @@ Singleton {
     property var hiddenInputDeviceNames: []
 
     property string locale: ""
+    property string timeLocale: ""
 
     property string launcherLastMode: "all"
     property string appDrawerLastMode: "apps"

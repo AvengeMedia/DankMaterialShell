@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  dmsPkgs,
   ...
 }@args:
 let
@@ -13,7 +12,6 @@ let
       config
       pkgs
       lib
-      dmsPkgs
       ;
   };
   hasPluginSettings = lib.any (plugin: plugin.settings != { }) (
@@ -96,7 +94,7 @@ in
       };
 
       Service = {
-        ExecStart = lib.getExe dmsPkgs.dms-shell + " run --session";
+        ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
       };
 

@@ -529,14 +529,15 @@ Item {
                                     onClicked: activePlayer && activePlayer.togglePlaying()
                                 }
 
-                                layer.enabled: true
-                                layer.effect: MultiEffect {
-                                    shadowEnabled: true
-                                    shadowHorizontalOffset: 0
-                                    shadowVerticalOffset: 0
-                                    shadowBlur: 1.0
-                                    shadowColor: Qt.rgba(0, 0, 0, 0.3)
-                                    shadowOpacity: 0.3
+                                ElevationShadow {
+                                    anchors.fill: parent
+                                    z: -1
+                                    level: Theme.elevationLevel1
+                                    fallbackOffset: 1
+                                    targetRadius: parent.radius
+                                    targetColor: parent.color
+                                    shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
+                                    shadowEnabled: Theme.elevationEnabled
                                 }
                             }
                         }

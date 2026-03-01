@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -96,7 +95,6 @@ PanelWindow {
             }
         }
         radius: Theme.cornerRadius
-        layer.enabled: true
         opacity: shouldBeVisible ? 1 : 0
 
         Column {
@@ -406,13 +404,15 @@ PanelWindow {
             onClicked: ToastService.hideToast()
         }
 
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowHorizontalOffset: 0
-            shadowVerticalOffset: 4
-            shadowBlur: 0.8
-            shadowColor: Qt.rgba(0, 0, 0, 0.3)
-            shadowOpacity: 0.3
+        ElevationShadow {
+            anchors.fill: parent
+            z: -1
+            level: Theme.elevationLevel3
+            fallbackOffset: 6
+            targetRadius: toast.radius
+            targetColor: toast.color
+            shadowOpacity: Theme.elevationLevel3 && Theme.elevationLevel3.alpha !== undefined ? Theme.elevationLevel3.alpha : 0.3
+            shadowEnabled: Theme.elevationEnabled
         }
 
         Behavior on opacity {

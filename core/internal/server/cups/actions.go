@@ -2,8 +2,10 @@ package cups
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"net/url"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -275,13 +277,42 @@ func (m *Manager) GetClasses() ([]PrinterClass, error) {
 	return classes, nil
 }
 
+func createPrinterViaLpadmin(name, deviceURI, ppd, information, location string) error {
+	args := []string{"-p", name, "-E", "-v", deviceURI, "-m", ppd}
+	if information != "" {
+		args = append(args, "-D", information)
+	}
+	if location != "" {
+		args = append(args, "-L", location)
+	}
+	out, err := exec.Command("lpadmin", args...).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("lpadmin failed: %s: %w", strings.TrimSpace(string(out)), err)
+	}
+	return nil
+}
+
+func deletePrinterViaLpadmin(name string) error {
+	out, err := exec.Command("lpadmin", "-x", name).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("lpadmin failed: %s: %w", strings.TrimSpace(string(out)), err)
+	}
+	return nil
+}
+
 func (m *Manager) CreatePrinter(name, deviceURI, ppd string, shared bool, errorPolicy, information, location string) error {
 	usedPkHelper := false
 
 	err := m.client.CreatePrinter(name, deviceURI, ppd, shared, errorPolicy, information, location)
 	if isAuthError(err) && m.pkHelper != nil {
 		if err = m.pkHelper.PrinterAdd(name, deviceURI, ppd, information, location); err != nil {
-			return err
+			// pkHelper failed (e.g., no polkit agent), try lpadmin as last resort.
+			// lpadmin -E enables the printer, so no further setup needed.
+			if lpadminErr := createPrinterViaLpadmin(name, deviceURI, ppd, information, location); lpadminErr != nil {
+				return err
+			}
+			m.RefreshState()
+			return nil
 		}
 		usedPkHelper = true
 	} else if err != nil {
@@ -308,6 +339,12 @@ func (m *Manager) DeletePrinter(printerName string) error {
 	err := m.client.DeletePrinter(printerName)
 	if isAuthError(err) && m.pkHelper != nil {
 		err = m.pkHelper.PrinterDelete(printerName)
+		if err != nil {
+			// pkHelper failed, try lpadmin as last resort
+			if lpadminErr := deletePrinterViaLpadmin(printerName); lpadminErr == nil {
+				err = nil
+			}
+		}
 	}
 	if err == nil {
 		m.RefreshState()

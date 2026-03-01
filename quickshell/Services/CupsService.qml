@@ -479,6 +479,21 @@ Singleton {
         });
     }
 
+    function testConnection(host, port, protocol, callback) {
+        if (!cupsAvailable)
+            return;
+        const params = {
+            "host": host,
+            "port": port,
+            "protocol": protocol
+        };
+
+        DMSService.sendRequest("cups.testConnection", params, response => {
+            if (callback)
+                callback(response);
+        });
+    }
+
     function createPrinter(name, deviceURI, ppd, options) {
         if (!cupsAvailable)
             return;

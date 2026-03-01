@@ -14,6 +14,12 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property bool showAddPrinter: false
+    property bool manualEntryMode: false
+    property string manualHost: ""
+    property string manualPort: "631"
+    property string manualProtocol: "ipp"
+    property bool testingConnection: false
+    property var testConnectionResult: null
     property string newPrinterName: ""
     property string selectedDeviceUri: ""
     property var selectedDevice: null
@@ -23,6 +29,12 @@ Item {
     property var suggestedPPDs: []
 
     function resetAddPrinterForm() {
+        manualEntryMode = false;
+        manualHost = "";
+        manualPort = "631";
+        manualProtocol = "ipp";
+        testingConnection = false;
+        testConnectionResult = null;
         newPrinterName = "";
         selectedDeviceUri = "";
         selectedDevice = null;
@@ -30,6 +42,45 @@ Item {
         newPrinterLocation = "";
         newPrinterInfo = "";
         suggestedPPDs = [];
+    }
+
+    Connections {
+        target: CupsService
+        function onPpdsChanged() {
+            if (printerTab.manualEntryMode && printerTab.testConnectionResult?.success)
+                printerTab.selectDriverlessPPD();
+        }
+    }
+
+    function selectDriverlessPPD() {
+        if (printerTab.selectedPpd || CupsService.ppds.length === 0)
+            return;
+
+        const probeModel = printerTab.testConnectionResult?.data?.makeModel || "";
+        let suggested = [];
+
+        // Try to find a model-specific PPD match
+        if (probeModel) {
+            const normalizedModel = probeModel.toLowerCase().replace(/[^a-z0-9]/g, "");
+            const modelMatches = CupsService.ppds.filter(p => {
+                const normalizedPPD = (p.makeModel || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                return normalizedPPD.includes(normalizedModel) || normalizedModel.includes(normalizedPPD);
+            });
+            if (modelMatches.length > 0)
+                suggested = suggested.concat(modelMatches);
+        }
+
+        // Always include driverless as an option
+        const driverless = CupsService.ppds.filter(p => p.name === "driverless" || p.name === "everywhere");
+        for (const d of driverless) {
+            if (!suggested.find(s => s.name === d.name))
+                suggested.push(d);
+        }
+
+        if (suggested.length > 0) {
+            printerTab.selectedPpd = suggested[0].name;
+            printerTab.suggestedPPDs = suggested;
+        }
     }
 
     function selectDevice(device) {
@@ -276,9 +327,93 @@ Item {
                             color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                         }
 
+                        Row {
+                            width: parent.width
+                            spacing: Theme.spacingS
+
+                            Rectangle {
+                                width: discoverRow.width + Theme.spacingM * 2
+                                height: 32
+                                radius: Theme.cornerRadius
+                                color: !printerTab.manualEntryMode ? Theme.primary : (discoverArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight)
+
+                                Row {
+                                    id: discoverRow
+                                    anchors.centerIn: parent
+                                    spacing: Theme.spacingXS
+
+                                    DankIcon {
+                                        name: "search"
+                                        size: 16
+                                        color: !printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
+                                    }
+
+                                    StyledText {
+                                        text: I18n.tr("Discover Devices", "Toggle button to scan for printers via mDNS/Avahi")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: !printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
+                                        font.weight: Font.Medium
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: discoverArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        printerTab.manualEntryMode = false;
+                                        printerTab.testConnectionResult = null;
+                                        printerTab.testingConnection = false;
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: manualRow.width + Theme.spacingM * 2
+                                height: 32
+                                radius: Theme.cornerRadius
+                                color: printerTab.manualEntryMode ? Theme.primary : (manualArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight)
+
+                                Row {
+                                    id: manualRow
+                                    anchors.centerIn: parent
+                                    spacing: Theme.spacingXS
+
+                                    DankIcon {
+                                        name: "edit"
+                                        size: 16
+                                        color: printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
+                                    }
+
+                                    StyledText {
+                                        text: I18n.tr("Add by Address", "Toggle button to manually add a printer by IP or hostname")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
+                                        font.weight: Font.Medium
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: manualArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        printerTab.manualEntryMode = true;
+                                        printerTab.selectedDevice = null;
+                                        printerTab.selectedDeviceUri = "";
+                                        if (CupsService.ppds.length === 0)
+                                            CupsService.getPPDs();
+                                    }
+                                }
+                            }
+                        }
+
                         Column {
                             width: parent.width
                             spacing: Theme.spacingS
+                            visible: !printerTab.manualEntryMode
 
                             Row {
                                 width: parent.width
@@ -351,6 +486,202 @@ Item {
                                     elide: Text.ElideRight
                                 }
                             }
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: Theme.spacingS
+                            visible: printerTab.manualEntryMode
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+
+                                StyledText {
+                                    text: I18n.tr("Host", "Label for printer IP address or hostname input field")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    width: 80
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                DankTextField {
+                                    width: parent.width - 80 - Theme.spacingS
+                                    placeholderText: I18n.tr("IP address or hostname", "Placeholder text for manual printer address input")
+                                    text: printerTab.manualHost
+                                    onTextEdited: {
+                                        printerTab.manualHost = text;
+                                        printerTab.testConnectionResult = null;
+                                    }
+                                }
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+
+                                StyledText {
+                                    text: I18n.tr("Port", "Label for printer port number input field")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    width: 80
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                DankTextField {
+                                    width: 80
+                                    placeholderText: "631"
+                                    text: printerTab.manualPort
+                                    onTextEdited: {
+                                        printerTab.manualPort = text;
+                                        printerTab.testConnectionResult = null;
+                                    }
+                                }
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+
+                                StyledText {
+                                    text: I18n.tr("Protocol", "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    width: 80
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                DankDropdown {
+                                    id: protocolDropdown
+                                    dropdownWidth: 120
+                                    popupWidth: 120
+                                    currentValue: printerTab.manualProtocol
+                                    options: ["ipp", "ipps", "lpd", "socket"]
+                                    onValueChanged: value => {
+                                        printerTab.manualProtocol = value;
+                                        printerTab.testConnectionResult = null;
+                                    }
+                                }
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+
+                                Item {
+                                    width: 80
+                                    height: 1
+                                }
+
+                                DankButton {
+                                    text: printerTab.testingConnection ? I18n.tr("Testing...", "Button state while testing printer connection") : I18n.tr("Test Connection", "Button to test connection to a printer by IP address")
+                                    iconName: printerTab.testingConnection ? "sync" : "lan"
+                                    buttonHeight: 36
+                                    enabled: printerTab.manualHost.length > 0 && !printerTab.testingConnection
+                                    onClicked: {
+                                        printerTab.testingConnection = true;
+                                        printerTab.testConnectionResult = null;
+                                        const port = parseInt(printerTab.manualPort) || 631;
+                                        CupsService.testConnection(printerTab.manualHost, port, printerTab.manualProtocol, response => {
+                                            printerTab.testingConnection = false;
+                                            if (response.error) {
+                                                printerTab.testConnectionResult = {
+                                                    "success": false,
+                                                    "error": response.error
+                                                };
+                                            } else if (response.result) {
+                                                printerTab.testConnectionResult = {
+                                                    "success": response.result.reachable === true,
+                                                    "data": response.result
+                                                };
+                                                if (response.result.reachable) {
+                                                    if (response.result.uri)
+                                                        printerTab.selectedDeviceUri = response.result.uri;
+                                                    if (response.result.name && !printerTab.newPrinterName)
+                                                        printerTab.newPrinterName = response.result.name.replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").substring(0, 32) || "Printer";
+                                                    // Load PPDs if not loaded yet, then select driverless
+                                                    if (CupsService.ppds.length === 0) {
+                                                        CupsService.getPPDs();
+                                                    }
+                                                    selectDriverlessPPD();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+
+                            Column {
+                                width: parent.width
+                                spacing: Theme.spacingXS
+                                visible: printerTab.testConnectionResult !== null
+
+                                Row {
+                                    spacing: Theme.spacingS
+
+                                    Item {
+                                        width: 80
+                                        height: 1
+                                    }
+
+                                    Rectangle {
+                                        width: 8
+                                        height: 8
+                                        radius: 4
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        color: printerTab.testConnectionResult?.success ? Theme.success : Theme.error
+                                    }
+
+                                    StyledText {
+                                        text: printerTab.testConnectionResult?.success ? I18n.tr("Printer reachable", "Status message when test connection to printer succeeds") : I18n.tr("Connection failed", "Status message when test connection to printer fails")
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        font.weight: Font.Medium
+                                        color: printerTab.testConnectionResult?.success ? Theme.success : Theme.error
+                                    }
+                                }
+
+                                Row {
+                                    spacing: Theme.spacingS
+                                    visible: printerTab.testConnectionResult?.success && (printerTab.testConnectionResult?.data?.makeModel || printerTab.testConnectionResult?.data?.info)
+
+                                    Item {
+                                        width: 80
+                                        height: 1
+                                    }
+
+                                    StyledText {
+                                        text: printerTab.testConnectionResult?.data?.makeModel || printerTab.testConnectionResult?.data?.info || ""
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+                                }
+
+                                Row {
+                                    spacing: Theme.spacingS
+                                    visible: !printerTab.testConnectionResult?.success && printerTab.testConnectionResult?.data?.error
+
+                                    Item {
+                                        width: 80
+                                        height: 1
+                                    }
+
+                                    StyledText {
+                                        text: printerTab.testConnectionResult?.data?.error || printerTab.testConnectionResult?.error || ""
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        width: parent.parent.width - 80 - Theme.spacingS
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: Theme.spacingS
 
                             Row {
                                 width: parent.width

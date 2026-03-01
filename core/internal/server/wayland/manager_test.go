@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	mocks_geolocation "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/geolocation"
 	mocks_wlclient "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlclient"
 )
 
@@ -390,18 +391,20 @@ func TestNotifySubscribers_NonBlocking(t *testing.T) {
 
 func TestNewManager_GetRegistryError(t *testing.T) {
 	mockDisplay := mocks_wlclient.NewMockWaylandDisplay(t)
+	mockGeoclient := mocks_geolocation.NewMockClient(t)
 
 	mockDisplay.EXPECT().Context().Return(nil)
 	mockDisplay.EXPECT().GetRegistry().Return(nil, errors.New("failed to get registry"))
 
 	config := DefaultConfig()
-	_, err := NewManager(mockDisplay, config)
+	_, err := NewManager(mockDisplay, mockGeoclient, config)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "get registry")
 }
 
 func TestNewManager_InvalidConfig(t *testing.T) {
 	mockDisplay := mocks_wlclient.NewMockWaylandDisplay(t)
+	mockGeoclient := mocks_geolocation.NewMockClient(t)
 
 	config := Config{
 		LowTemp:  500,
@@ -409,6 +412,6 @@ func TestNewManager_InvalidConfig(t *testing.T) {
 		Gamma:    1.0,
 	}
 
-	_, err := NewManager(mockDisplay, config)
+	_, err := NewManager(mockDisplay, mockGeoclient, config)
 	assert.Error(t, err)
 }

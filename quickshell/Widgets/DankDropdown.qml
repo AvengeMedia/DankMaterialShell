@@ -1,7 +1,6 @@
 import "../Common/fzf.js" as Fzf
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import Quickshell
 import qs.Common
 import qs.Widgets
@@ -254,6 +253,8 @@ Item {
         }
 
         contentItem: Rectangle {
+            id: contentSurface
+
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1)
@@ -261,12 +262,17 @@ Item {
             border.width: 2
             radius: Theme.cornerRadius
 
-            layer.enabled: true
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowBlur: 0.4
-                shadowColor: Theme.shadowStrong
-                shadowVerticalOffset: 4
+            ElevationShadow {
+                id: shadowLayer
+                anchors.fill: parent
+                z: -1
+                level: Theme.elevationLevel2
+                fallbackOffset: 4
+                targetRadius: contentSurface.radius
+                targetColor: contentSurface.color
+                borderColor: contentSurface.border.color
+                borderWidth: contentSurface.border.width
+                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
             }
 
             Column {

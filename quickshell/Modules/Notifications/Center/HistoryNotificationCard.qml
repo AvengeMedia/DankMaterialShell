@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import qs.Common
 import qs.Services
@@ -30,7 +31,21 @@ Rectangle {
     width: parent ? parent.width : 400
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
-    clip: true
+    clip: false
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+
+    ElevationShadow {
+        id: shadowLayer
+        anchors.fill: parent
+        z: -1
+        level: Theme.elevationLevel1
+        fallbackOffset: 1
+        targetRadius: root.radius
+        targetColor: root.color
+        borderColor: root.border.color
+        borderWidth: root.border.width
+        shadowEnabled: root.shadowsAllowed
+    }
 
     color: {
         if (isSelected && keyboardNavigationActive)
@@ -49,7 +64,7 @@ Rectangle {
             return 1.5;
         if (historyItem.urgency === 2)
             return 2;
-        return 1;
+        return 0;
     }
 
     Behavior on border.color {
@@ -122,12 +137,12 @@ Rectangle {
                     return "";
                 const appIcon = historyItem.appIcon;
                 if (!appIcon)
-                    return iconFromImage ? "image://icon/" + iconFromImage : "";
+                    return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
                 if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                     return appIcon;
                 if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
                     return "";
-                return Quickshell.iconPath(appIcon, true);
+                return Paths.resolveIconPath(appIcon);
             }
 
             hasImage: hasNotificationImage

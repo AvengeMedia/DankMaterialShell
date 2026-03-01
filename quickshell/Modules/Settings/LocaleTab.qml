@@ -1,6 +1,5 @@
 import QtQuick
 import qs.Common
-import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -9,17 +8,25 @@ Item {
 
     readonly property string _systemDefaultLabel: I18n.tr("System Default")
 
-    function capitalizeNativeLanguageName(localeCode) {
-        if (I18n.presentLocales[localeCode] == undefined) {
+    function _localeDisplayName(localeCode) {
+        if (!I18n.presentLocales[localeCode])
             return;
-        }
         const nativeName = I18n.presentLocales[localeCode].nativeLanguageName;
         return nativeName[0].toUpperCase() + nativeName.slice(1);
     }
 
-    function _displayValue() {
-        if (!SessionData.locale) return _systemDefaultLabel;
-        return capitalizeNativeLanguageName(SessionData.locale);
+    function _allLocaleOptions() {
+        return [_systemDefaultLabel].concat(Object.keys(I18n.presentLocales).map(_localeDisplayName));
+    }
+
+    function _codeForDisplayName(displayName) {
+        if (displayName === _systemDefaultLabel)
+            return "";
+        for (const code of Object.keys(I18n.presentLocales)) {
+            if (_localeDisplayName(code) === displayName)
+                return code;
+        }
+        return "";
     }
 
     DankFlickable {
@@ -48,24 +55,34 @@ Item {
                     settingKey: "locale"
                     text: I18n.tr("Current Locale")
                     description: I18n.tr("Change the locale used by the DMS interface.")
-                    options: [localeTab._systemDefaultLabel].concat(Object.keys(I18n.presentLocales).map(localeTab.capitalizeNativeLanguageName))
+                    options: localeTab._allLocaleOptions()
                     enableFuzzySearch: true
 
                     Component.onCompleted: {
-                        currentValue = localeTab._displayValue();
+                        currentValue = SessionData.locale ? localeTab._localeDisplayName(SessionData.locale) : localeTab._systemDefaultLabel;
                     }
 
                     onValueChanged: value => {
-                        if (value === localeTab._systemDefaultLabel) {
-                            SessionData.set("locale", "");
-                            return;
-                        }
-                        for (let code of Object.keys(I18n.presentLocales)) {
-                            if (localeTab.capitalizeNativeLanguageName(code) === value) {
-                                SessionData.set("locale", code);
-                                return;
-                            }
-                        }
+                        SessionData.set("locale", localeTab._codeForDisplayName(value));
+                    }
+                }
+
+                SettingsDropdownRow {
+                    id: timeLocaleDropdown
+                    tab: "locale"
+                    tags: ["locale", "time", "date", "format", "region"]
+                    settingKey: "timeLocale"
+                    text: I18n.tr("Time & Date Locale")
+                    description: I18n.tr("Change the locale used for date and time formatting, independent of the interface language.")
+                    options: localeTab._allLocaleOptions()
+                    enableFuzzySearch: true
+
+                    Component.onCompleted: {
+                        currentValue = SessionData.timeLocale ? localeTab._localeDisplayName(SessionData.timeLocale) : localeTab._systemDefaultLabel;
+                    }
+
+                    onValueChanged: value => {
+                        SessionData.set("timeLocale", localeTab._codeForDisplayName(value));
                     }
                 }
             }

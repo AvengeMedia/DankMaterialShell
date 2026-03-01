@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -75,7 +76,7 @@ Item {
             return Theme.primary;
         }
     }
-    readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 1
+    readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
 
     signal dialogClosed
 
@@ -390,12 +391,16 @@ Item {
                 }
             }
 
-            Rectangle {
+            ElevationShadow {
+                id: launcherShadowLayer
                 anchors.fill: parent
-                color: root.backgroundColor
-                border.color: root.borderColor
-                border.width: root.borderWidth
-                radius: root.cornerRadius
+                level: Theme.elevationLevel3
+                fallbackOffset: 6
+                targetColor: root.backgroundColor
+                borderColor: root.borderColor
+                borderWidth: root.borderWidth
+                targetRadius: root.cornerRadius
+                shadowEnabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             }
 
             MouseArea {

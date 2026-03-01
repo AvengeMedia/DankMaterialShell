@@ -1,5 +1,6 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
+
 import QtQuick
 import Qt.labs.folderlistmodel
 import Quickshell
@@ -24,7 +25,9 @@ Singleton {
     readonly property url translationsFolder: Qt.resolvedUrl("../translations/poexports")
 
     readonly property alias folder: dir.folder
-    property var presentLocales: ({ "en": Qt.locale("en") })
+    property var presentLocales: ({
+            "en": Qt.locale("en")
+        })
     property var translations: ({})
     property bool translationsLoaded: false
 
@@ -65,7 +68,9 @@ Singleton {
     }
 
     function locale() {
-        return presentLocales[_resolvedLocale] ?? presentLocales["en"];
+        if (SessionData.timeLocale)
+            return Qt.locale(SessionData.timeLocale);
+        return Qt.locale();
     }
 
     function _loadPresentLocales() {
@@ -84,7 +89,8 @@ Singleton {
     function _pickTranslation() {
         for (let i = 0; i < _candidates.length; i++) {
             const cand = _candidates[i];
-            if (presentLocales[cand] === undefined) continue;
+            if (presentLocales[cand] === undefined)
+                continue;
             _resolvedLocale = cand;
             useLocale(cand, cand.startsWith("en") ? "" : translationsFolder + "/" + cand + ".json");
             return;

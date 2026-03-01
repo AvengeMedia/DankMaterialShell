@@ -660,6 +660,12 @@
     "comment": ""
   },
   {
+    "term": "Add by Address",
+    "context": "Toggle button to manually add a printer by IP or hostname",
+    "reference": "Modules/Settings/PrinterTab.qml:351",
+    "comment": ""
+  },
+  {
     "term": "Adjust the number of columns in grid view mode.",
     "context": "Adjust the number of columns in grid view mode.",
     "reference": "Modules/Settings/LauncherTab.qml:349",
@@ -2430,6 +2436,12 @@
     "comment": ""
   },
   {
+    "term": "Connection failed",
+    "context": "Status message when test connection to printer fails",
+    "reference": "Modules/Settings/PrinterTab.qml:603",
+    "comment": ""
+  },
+  {
     "term": "Contains",
     "context": "notification rule match type option",
     "reference": "Modules/Settings/NotificationsTab.qml:101",
@@ -3291,6 +3303,12 @@
     "term": "Disconnected from WiFi",
     "context": "Disconnected from WiFi",
     "reference": "Services/DMSNetworkService.qml:480",
+    "comment": ""
+  },
+  {
+    "term": "Discover Devices",
+    "context": "Toggle button to scan for printers via mDNS/Avahi",
+    "reference": "Modules/Settings/PrinterTab.qml:313",
     "comment": ""
   },
   {
@@ -5268,6 +5286,12 @@
     "comment": ""
   },
   {
+    "term": "Host",
+    "context": "Label for printer IP address or hostname input field",
+    "reference": "Modules/Settings/PrinterTab.qml:462",
+    "comment": ""
+  },
+  {
     "term": "Hostname",
     "context": "system info label",
     "reference": "Modules/ProcessList/SystemView.qml:60",
@@ -5343,6 +5367,12 @@
     "term": "IP Address:",
     "context": "IP Address:",
     "reference": "Modules/Settings/NetworkTab.qml:943",
+    "comment": ""
+  },
+  {
+    "term": "IP address or hostname",
+    "context": "Placeholder text for manual printer address input",
+    "reference": "Modules/Settings/PrinterTab.qml:472",
     "comment": ""
   },
   {
@@ -8262,6 +8292,12 @@
     "comment": ""
   },
   {
+    "term": "Port",
+    "context": "Label for printer port number input field",
+    "reference": "Modules/Settings/PrinterTab.qml:486",
+    "comment": ""
+  },
+  {
     "term": "Portal",
     "context": "wallpaper transition option",
     "reference": "Modules/Settings/WallpaperTab.qml:1175",
@@ -8481,6 +8517,12 @@
     "term": "Printer name (no spaces)",
     "context": "Printer name (no spaces)",
     "reference": "Modules/Settings/PrinterTab.qml:433",
+    "comment": ""
+  },
+  {
+    "term": "Printer reachable",
+    "context": "Status message when test connection to printer succeeds",
+    "reference": "Modules/Settings/PrinterTab.qml:603",
     "comment": ""
   },
   {
@@ -10776,6 +10818,12 @@
     "comment": ""
   },
   {
+    "term": "Test Connection",
+    "context": "Button to test connection to a printer by IP address",
+    "reference": "Modules/Settings/PrinterTab.qml:541",
+    "comment": ""
+  },
+  {
     "term": "Test Page",
     "context": "Test Page",
     "reference": "Modules/Settings/PrinterTab.qml:941",
@@ -10785,6 +10833,12 @@
     "term": "Test page sent to printer",
     "context": "Test page sent to printer",
     "reference": "Services/CupsService.qml:627",
+    "comment": ""
+  },
+  {
+    "term": "Testing...",
+    "context": "Button state while testing printer connection",
+    "reference": "Modules/Settings/PrinterTab.qml:541",
     "comment": ""
   },
   {

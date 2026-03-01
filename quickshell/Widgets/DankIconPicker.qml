@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import qs.Common
 import qs.Widgets
 
@@ -132,16 +131,20 @@ Rectangle {
         }
 
         contentItem: Rectangle {
+            id: contentSurface
             color: Theme.surface
             radius: Theme.cornerRadius
 
-            layer.enabled: true
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowColor: Theme.shadowStrong
-                shadowBlur: 0.8
-                shadowHorizontalOffset: 0
-                shadowVerticalOffset: 4
+            ElevationShadow {
+                id: shadowLayer
+                anchors.fill: parent
+                z: -1
+                level: Theme.elevationLevel2
+                fallbackOffset: 4
+                targetRadius: contentSurface.radius
+                targetColor: contentSurface.color
+                shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
+                shadowEnabled: Theme.elevationEnabled
             }
 
             Rectangle {

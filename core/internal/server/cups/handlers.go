@@ -70,6 +70,8 @@ func HandleRequest(conn net.Conn, req models.Request, manager *Manager) {
 		handleRestartJob(conn, req, manager)
 	case "cups.holdJob":
 		handleHoldJob(conn, req, manager)
+	case "cups.testConnection":
+		handleTestConnection(conn, req, manager)
 	default:
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
@@ -463,4 +465,23 @@ func handleHoldJob(conn net.Conn, req models.Request, manager *Manager) {
 		return
 	}
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "job held"})
+}
+
+func handleTestConnection(conn net.Conn, req models.Request, manager *Manager) {
+	host, err := params.StringNonEmpty(req.Params, "host")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	port := params.IntOpt(req.Params, "port", 631)
+	protocol := params.StringOpt(req.Params, "protocol", "ipp")
+
+	result, err := manager.TestRemotePrinter(host, port, protocol)
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, result)
 }

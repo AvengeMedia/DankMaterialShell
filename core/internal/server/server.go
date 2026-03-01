@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
@@ -25,6 +26,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
@@ -70,6 +72,7 @@ var clipboardManager *clipboard.Manager
 var dbusManager *serverDbus.Manager
 var wlContext *wlcontext.SharedContext
 var themeModeManager *thememode.Manager
+var locationManager *location.Manager
 
 const dbusClientID = "dms-dbus-client"
 
@@ -188,7 +191,7 @@ func InitializeFreedeskManager() error {
 	return nil
 }
 
-func InitializeWaylandManager() error {
+func InitializeWaylandManager(geoClient geolocation.Client) error {
 	log.Info("Attempting to initialize Wayland gamma control...")
 
 	if wlContext == nil {
@@ -201,7 +204,7 @@ func InitializeWaylandManager() error {
 	}
 
 	config := wayland.DefaultConfig()
-	manager, err := wayland.NewManager(wlContext.Display(), config)
+	manager, err := wayland.NewManager(wlContext.Display(), geoClient, config)
 	if err != nil {
 		log.Errorf("Failed to initialize wayland manager: %v", err)
 		return err
@@ -382,11 +385,24 @@ func InitializeDbusManager() error {
 	return nil
 }
 
-func InitializeThemeModeManager() error {
-	manager := thememode.NewManager()
+func InitializeThemeModeManager(geoClient geolocation.Client) error {
+	manager := thememode.NewManager(geoClient)
 	themeModeManager = manager
 
 	log.Info("Theme mode automation manager initialized")
+	return nil
+}
+
+func InitializeLocationManager(geoClient geolocation.Client) error {
+	manager, err := location.NewManager(geoClient)
+	if err != nil {
+		log.Warnf("Failed to initialize location manager: %v", err)
+		return err
+	}
+
+	locationManager = manager
+
+	log.Info("Location manager initialized")
 	return nil
 }
 
@@ -535,6 +551,10 @@ func getServerInfo() ServerInfo {
 
 	if themeModeManager != nil {
 		caps = append(caps, "theme.auto")
+	}
+
+	if locationManager != nil {
+		caps = append(caps, "location")
 	}
 
 	if dbusManager != nil {
@@ -1307,6 +1327,9 @@ func cleanupManagers() {
 	if wlContext != nil {
 		wlContext.Close()
 	}
+	if locationManager != nil {
+		locationManager.Close()
+	}
 }
 
 func Start(printDocs bool) error {
@@ -1488,6 +1511,9 @@ func Start(printDocs bool) error {
 		log.Info(" clipboard.getConfig                   - Get clipboard configuration")
 		log.Info(" clipboard.setConfig                   - Set configuration (params: maxHistory?, maxEntrySize?, autoClearDays?, clearAtStartup?)")
 		log.Info(" clipboard.subscribe                   - Subscribe to clipboard state changes (streaming)")
+		log.Info("Location:")
+		log.Info(" location.getState                      - Get current location state")
+		log.Info(" location.subscribe                     - Subscribe to location changes (streaming)")
 		log.Info("")
 	}
 	log.Info("Initializing managers...")
@@ -1518,6 +1544,9 @@ func Start(printDocs bool) error {
 
 	loginctlReady := make(chan struct{})
 	freedesktopReady := make(chan struct{})
+
+	geoClient := geolocation.NewClient()
+	defer geoClient.Close()
 
 	go func() {
 		defer close(loginctlReady)
@@ -1563,7 +1592,7 @@ func Start(printDocs bool) error {
 		}
 	}()
 
-	if err := InitializeWaylandManager(); err != nil {
+	if err := InitializeWaylandManager(geoClient); err != nil {
 		log.Warnf("Wayland manager unavailable: %v", err)
 	}
 
@@ -1595,7 +1624,7 @@ func Start(printDocs bool) error {
 		log.Debugf("WlrOutput manager unavailable: %v", err)
 	}
 
-	if err := InitializeThemeModeManager(); err != nil {
+	if err := InitializeThemeModeManager(geoClient); err != nil {
 		log.Warnf("Theme mode manager unavailable: %v", err)
 	} else {
 		notifyCapabilityChange()
@@ -1606,6 +1635,12 @@ func Start(printDocs bool) error {
 			}
 			themeModeManager.WatchLoginctl(loginctlManager)
 		}()
+	}
+
+	if err := InitializeLocationManager(geoClient); err != nil {
+		log.Warnf("Location manager unavailable: %v", err)
+	} else {
+		notifyCapabilityChange()
 	}
 
 	fatalErrChan := make(chan error, 1)

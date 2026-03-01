@@ -480,7 +480,7 @@ Singleton {
         const cityName = SessionData.isGreeterMode ? GreetdSettings.weatherLocation : SettingsData.weatherLocation;
 
         if (useAuto) {
-            getLocationFromIP();
+            getLocationFromService();
             return;
         }
 
@@ -511,8 +511,10 @@ Singleton {
         cityGeocodeFetcher.running = true;
     }
 
-    function getLocationFromIP() {
-        ipLocationFetcher.running = true;
+    function getLocationFromService() {
+        if (!LocationService.valid)
+            return;
+        getLocationFromCoords(LocationService.latitude, LocationService.longitude);
     }
 
     function fetchWeather() {
@@ -580,53 +582,6 @@ Singleton {
             persistentRetryCount++;
             persistentRetryTimer.interval = backoffDelay;
             persistentRetryTimer.start();
-        }
-    }
-
-    Process {
-        id: ipLocationFetcher
-        command: lowPriorityCmd.concat(curlBaseCmd).concat(["http://ip-api.com/json/"])
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const raw = text.trim();
-                if (!raw || raw[0] !== "{") {
-                    root.handleWeatherFailure();
-                    return;
-                }
-
-                try {
-                    const data = JSON.parse(raw);
-
-                    if (data.status === "fail") {
-                        throw new Error("IP location lookup failed");
-                    }
-
-                    const lat = parseFloat(data.lat);
-                    const lon = parseFloat(data.lon);
-                    const city = data.city;
-
-                    if (!city || isNaN(lat) || isNaN(lon)) {
-                        throw new Error("Missing or invalid location data");
-                    }
-
-                    root.location = {
-                        city: city,
-                        latitude: lat,
-                        longitude: lon
-                    };
-                    fetchWeather();
-                } catch (e) {
-                    root.handleWeatherFailure();
-                }
-            }
-        }
-
-        onExited: exitCode => {
-            if (exitCode !== 0) {
-                root.handleWeatherFailure();
-            }
         }
     }
 
@@ -869,6 +824,18 @@ Singleton {
                 root.weather.loading = true;
             }
             root.fetchWeather();
+        }
+    }
+
+    Connections {
+        target: LocationService
+
+        function onLocationChanged(data) {
+            if (!SettingsData.useAutoLocation)
+                return;
+            if (data.latitude === 0 && data.longitude === 0)
+                return;
+            root.getLocationFromCoords(data.latitude, data.longitude);
         }
     }
 

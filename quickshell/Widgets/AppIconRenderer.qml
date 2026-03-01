@@ -49,7 +49,7 @@ Item {
     readonly property string iconPath: {
         if (hasSpecialPrefix || !iconValue)
             return "";
-        return Quickshell.iconPath(iconValue, true) || DesktopService.resolveIconPath(iconValue);
+        return Paths.resolveIconPath(iconValue);
     }
 
     visible: iconValue !== undefined && iconValue !== ""
@@ -98,7 +98,7 @@ Item {
         sourceComponent: IconImage {
             anchors.fill: parent
             source: root.iconPath
-            backer.sourceSize: Qt.size(root.iconSize, root.iconSize)
+            backer.sourceSize: Qt.size(root.iconSize * 2, root.iconSize * 2)
             mipmap: true
             asynchronous: true
             visible: status === Image.Ready

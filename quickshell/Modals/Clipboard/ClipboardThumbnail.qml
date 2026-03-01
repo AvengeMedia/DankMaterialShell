@@ -31,13 +31,13 @@ Item {
         sourceSize.height: 128
 
         function tryLoadImage() {
-            if (loadQueued || entryType !== "image" || cachedImageData) {
+            if (thumbnailImage.loadQueued || entryType !== "image" || thumbnailImage.cachedImageData) {
                 return;
             }
-            loadQueued = true;
+            thumbnailImage.loadQueued = true;
             if (modal.activeImageLoads < modal.maxConcurrentLoads) {
                 modal.activeImageLoads++;
-                loadImage();
+                thumbnailImage.loadImage();
             } else {
                 retryTimer.restart();
             }
@@ -47,7 +47,7 @@ Item {
             DMSService.sendRequest("clipboard.getEntry", {
                 "id": entry.id
             }, function (response) {
-                loadQueued = false;
+                thumbnailImage.loadQueued = false;
                 if (modal.activeImageLoads > 0) {
                     modal.activeImageLoads--;
                 }
@@ -57,7 +57,7 @@ Item {
                 }
                 const data = response.result?.data;
                 if (data) {
-                    cachedImageData = data;
+                    thumbnailImage.cachedImageData = data;
                 }
             });
         }

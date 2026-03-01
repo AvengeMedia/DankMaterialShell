@@ -274,7 +274,7 @@ Item {
                     settingKey: "notificationPopupShadowEnabled"
                     tags: ["notification", "popup", "shadow", "radius", "rounded"]
                     text: I18n.tr("Popup Shadow")
-                    description: I18n.tr("Show drop shadow on notification popups")
+                    description: I18n.tr("Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.")
                     checked: SettingsData.notificationPopupShadowEnabled
                     onToggled: checked => SettingsData.set("notificationPopupShadowEnabled", checked)
                 }
