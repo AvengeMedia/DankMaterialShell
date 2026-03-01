@@ -86,7 +86,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.leftMargin: Theme.spacingM
         anchors.rightMargin: Theme.spacingM
-        anchors.bottomMargin: modal.showKeyboardHints ? (ClipboardConstants.keyboardHintsHeight + Theme.spacingM * 2) : 0
+        anchors.bottomMargin: (modal.showKeyboardHints ? (ClipboardConstants.keyboardHintsHeight + Theme.spacingM * 2) : 0) + Theme.spacingXS
         clip: true
 
         DankListView {
@@ -112,14 +112,7 @@ Item {
                 if (index < 0 || index >= count) {
                     return;
                 }
-                const itemHeight = ClipboardConstants.itemHeight + spacing;
-                const itemY = index * itemHeight;
-                const itemBottom = itemY + itemHeight;
-                if (itemY < contentY) {
-                    contentY = itemY;
-                } else if (itemBottom > contentY + height) {
-                    contentY = itemBottom - height;
-                }
+                positionViewAtIndex(index, ListView.Contain);
             }
 
             onCurrentIndexChanged: {
@@ -178,14 +171,7 @@ Item {
                 if (index < 0 || index >= count) {
                     return;
                 }
-                const itemHeight = ClipboardConstants.itemHeight + spacing;
-                const itemY = index * itemHeight;
-                const itemBottom = itemY + itemHeight;
-                if (itemY < contentY) {
-                    contentY = itemY;
-                } else if (itemBottom > contentY + height) {
-                    contentY = itemBottom - height;
-                }
+                positionViewAtIndex(index, ListView.Contain);
             }
 
             onCurrentIndexChanged: {
