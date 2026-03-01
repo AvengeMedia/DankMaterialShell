@@ -135,7 +135,7 @@ Variants {
 
             Timer {
                 id: renderSettleTimer
-                interval: 100
+                interval: 1000
                 onTriggered: root._renderSettling = false
             }
 
