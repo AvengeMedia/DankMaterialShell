@@ -398,7 +398,7 @@
   {
     "term": "5 seconds",
     "context": "wallpaper interval",
-    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:114, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:140, Modules/Settings/PowerSleepTab.qml:482, Modules/Settings/WallpaperTab.qml:996, Modules/Settings/NotificationsTab.qml:42, Modules/Settings/NotificationsTab.qml:157, Modules/Notifications/Center/NotificationSettings.qml:49",
+    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:114, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:140, Modules/Settings/PowerSleepTab.qml:482, Modules/Settings/WallpaperTab.qml:996, Modules/Settings/NotificationsTab.qml:42, Modules/Settings/NotificationsTab.qml:157, Modules/Notifications/Center/NotificationSettings.qml:49, Modules/Notifications/Center/NotificationSettings.qml:88",
     "comment": ""
   },
   {
@@ -1032,6 +1032,12 @@
     "comment": ""
   },
   {
+    "term": "Authenticating...",
+    "context": "Authenticating...",
+    "reference": "Modules/Greetd/GreeterContent.qml:472",
+    "comment": ""
+  },
+  {
     "term": "Authentication",
     "context": "Authentication",
     "reference": "Modals/PolkitAuthModal.qml:50",
@@ -1041,6 +1047,12 @@
     "term": "Authentication Required",
     "context": "Authentication Required",
     "reference": "Modals/PolkitAuthModal.qml:137",
+    "comment": ""
+  },
+  {
+    "term": "Authentication error - try again",
+    "context": "Authentication error - try again",
+    "reference": "Modules/Greetd/GreeterContent.qml:609",
     "comment": ""
   },
   {
@@ -5462,7 +5474,7 @@
   {
     "term": "Incorrect password",
     "context": "Incorrect password",
-    "reference": "Modals/WifiPasswordModal.qml:369",
+    "reference": "Modals/WifiPasswordModal.qml:369, Modules/Greetd/GreeterContent.qml:611",
     "comment": ""
   },
   {
@@ -6072,6 +6084,12 @@
     "comment": ""
   },
   {
+    "term": "Logging in...",
+    "context": "Logging in...",
+    "reference": "Modules/Greetd/GreeterContent.qml:469",
+    "comment": ""
+  },
+  {
     "term": "Long",
     "context": "Long",
     "reference": "Modules/Settings/TypographyMotionTab.qml:210, Modules/Settings/TypographyMotionTab.qml:313, Modules/Settings/TypographyMotionTab.qml:397, Modules/Settings/NotificationsTab.qml:325",
@@ -6469,7 +6487,7 @@
   },
   {
     "term": "Medium",
-    "context": "Medium",
+    "context": "font weight",
     "reference": "Modules/Settings/TypographyMotionTab.qml:121, Modules/Settings/TypographyMotionTab.qml:138, Modules/Settings/TypographyMotionTab.qml:161, Modules/Settings/TypographyMotionTab.qml:210, Modules/Settings/TypographyMotionTab.qml:313, Modules/Settings/TypographyMotionTab.qml:397, Modules/Settings/WidgetsTabSection.qml:1598, Modules/Settings/NotificationsTab.qml:325",
     "comment": ""
   },
@@ -6836,7 +6854,7 @@
   {
     "term": "Never",
     "context": "Never",
-    "reference": "Modules/Settings/ClipboardTab.qml:99, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:30, Modules/Settings/NotificationsTab.qml:163, Modules/Notifications/Center/NotificationSettings.qml:37",
+    "reference": "Modules/Settings/ClipboardTab.qml:99, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:30, Modules/Settings/NotificationsTab.qml:163, Modules/Notifications/Center/NotificationSettings.qml:37, Modules/Notifications/Center/NotificationSettings.qml:97",
     "comment": ""
   },
   {
@@ -7688,7 +7706,7 @@
   {
     "term": "Open",
     "context": "Open",
-    "reference": "Modules/Notepad/NotepadTextEditor.qml:779, Modules/Settings/NetworkTab.qml:1201, Modules/Settings/NetworkTab.qml:1448, Modules/ControlCenter/Details/NetworkDetail.qml:609, Modals/DankLauncherV2/Controller.qml:1039, Modals/DankLauncherV2/Controller.qml:1043, Modals/DankLauncherV2/Controller.qml:1047",
+    "reference": "Modules/Notepad/NotepadTextEditor.qml:779, Modules/Settings/NetworkTab.qml:1201, Modules/Settings/NetworkTab.qml:1448, Modules/Notifications/Center/NotificationCard.qml:716, Modules/Notifications/Center/NotificationCard.qml:852, Modules/ControlCenter/Details/NetworkDetail.qml:609, Modals/DankLauncherV2/Controller.qml:1039, Modals/DankLauncherV2/Controller.qml:1043, Modals/DankLauncherV2/Controller.qml:1047",
     "comment": ""
   },
   {
@@ -7959,6 +7977,12 @@
     "term": "Password",
     "context": "Password",
     "reference": "Modals/WifiPasswordModal.qml:174, Modals/WifiPasswordModal.qml:184, Modals/WifiPasswordModal.qml:553",
+    "comment": ""
+  },
+  {
+    "term": "Password...",
+    "context": "Password...",
+    "reference": "Modules/Greetd/GreeterContent.qml:475",
     "comment": ""
   },
   {
@@ -11198,7 +11222,7 @@
   {
     "term": "Unknown",
     "context": "battery status | power profile option | unknown author | widget status",
-    "reference": "Common/Theme.qml:1476, Services/BatteryService.qml:148, Services/WeatherService.qml:151, Services/WeatherService.qml:605, Services/WeatherService.qml:606, Services/WeatherService.qml:765, Services/WeatherService.qml:766, Modules/Lock/LockScreenContent.qml:364, Modules/Lock/LockScreenContent.qml:484, Modules/Lock/LockScreenContent.qml:580, Modules/Settings/NetworkTab.qml:175, Modules/Settings/NetworkTab.qml:217, Modules/Settings/NetworkTab.qml:431, Modules/Settings/NetworkTab.qml:454, Modules/Settings/NetworkTab.qml:602, Modules/Settings/NetworkTab.qml:747, Modules/Settings/NetworkTab.qml:1172, Modules/Settings/PluginBrowser.qml:537, Modules/Settings/ThemeBrowser.qml:527, Modules/Settings/NotificationsTab.qml:646, Modules/Settings/PrinterTab.qml:1638, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/ControlCenter/Components/DragDropGrid.qml:325, Modules/ControlCenter/Components/DragDropGrid.qml:626, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Details/BatteryDetail.qml:183",
+    "reference": "Common/Theme.qml:1476, Services/BatteryService.qml:148, Services/WeatherService.qml:151, Services/WeatherService.qml:605, Services/WeatherService.qml:606, Services/WeatherService.qml:765, Services/WeatherService.qml:766, Modules/Lock/LockScreenContent.qml:364, Modules/Lock/LockScreenContent.qml:484, Modules/Lock/LockScreenContent.qml:580, Modules/Settings/NetworkTab.qml:175, Modules/Settings/NetworkTab.qml:217, Modules/Settings/NetworkTab.qml:431, Modules/Settings/NetworkTab.qml:454, Modules/Settings/NetworkTab.qml:602, Modules/Settings/NetworkTab.qml:747, Modules/Settings/NetworkTab.qml:1172, Modules/Settings/PluginBrowser.qml:537, Modules/Settings/ThemeBrowser.qml:527, Modules/Settings/NotificationsTab.qml:646, Modules/Settings/PrinterTab.qml:1638, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/ControlCenter/Components/DragDropGrid.qml:325, Modules/ControlCenter/Components/DragDropGrid.qml:626, Modules/ControlCenter/Details/BatteryDetail.qml:183",
     "comment": ""
   },
   {
@@ -11511,6 +11535,12 @@
     "term": "Username",
     "context": "Username",
     "reference": "Modals/WifiPasswordModal.qml:172, Modals/WifiPasswordModal.qml:520, Widgets/VpnProfileDelegate.qml:45, Modules/Settings/NetworkTab.qml:1910",
+    "comment": ""
+  },
+  {
+    "term": "Username...",
+    "context": "Username...",
+    "reference": "Modules/Greetd/GreeterContent.qml:477",
     "comment": ""
   },
   {
@@ -12302,7 +12332,7 @@
   {
     "term": "minutes",
     "context": "minutes",
-    "reference": "Modules/Settings/NotificationsTab.qml:168",
+    "reference": "Modules/Settings/NotificationsTab.qml:168, Modules/Notifications/Center/NotificationSettings.qml:105",
     "comment": ""
   },
   {
@@ -12410,7 +12440,7 @@
   {
     "term": "seconds",
     "context": "seconds",
-    "reference": "Modules/Settings/NotificationsTab.qml:167",
+    "reference": "Modules/Settings/NotificationsTab.qml:167, Modules/Notifications/Center/NotificationSettings.qml:103",
     "comment": ""
   },
   {
@@ -12428,7 +12458,7 @@
   {
     "term": "up",
     "context": "up",
-    "reference": "Modules/DankDash/Overview/UserInfoCard.qml:102",
+    "reference": "Modules/DankDash/Overview/UserInfoCard.qml:103, Modules/DankDash/Overview/UserInfoCard.qml:104, Modules/ControlCenter/Components/HeaderPane.qml:64, Modules/ControlCenter/Components/HeaderPane.qml:65",
     "comment": ""
   },
   {

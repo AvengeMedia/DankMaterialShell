@@ -1204,6 +1204,13 @@
     "comment": ""
   },
   {
+    "term": "Authenticating...",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Authentication",
     "translation": "",
     "context": "",
@@ -1212,6 +1219,13 @@
   },
   {
     "term": "Authentication Required",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Authentication error - try again",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7084,6 +7098,13 @@
     "comment": ""
   },
   {
+    "term": "Logging in...",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Long",
     "translation": "",
     "context": "",
@@ -7548,7 +7569,7 @@
   {
     "term": "Medium",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -9283,6 +9304,13 @@
   },
   {
     "term": "Password",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Password...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13427,6 +13455,13 @@
   },
   {
     "term": "Username",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Username...",
     "translation": "",
     "context": "",
     "reference": "",
