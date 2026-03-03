@@ -558,9 +558,9 @@ Singleton {
         if (minutes > 0)
             parts.push(`${minutes} minute${minutes === 1 ? "" : "s"}`);
 
-        uptime = parts.length > 0 ? `up ${parts.join(", ")}` : `up ${seconds} seconds`;
+        uptime = parts.length > 0 ? parts.join(", ") : `${seconds} seconds`;
 
-        var shortStr = "up";
+        var shortStr = "";
         if (days > 0)
             shortStr += ` ${days}d`;
         if (hours > 0)
