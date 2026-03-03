@@ -118,7 +118,7 @@ Item {
                         I18n.tr("Extra Light"),
                         I18n.tr("Light"),
                         I18n.tr("Regular"),
-                        I18n.tr("Medium"),
+                        I18n.tr("Medium", "font weight"),
                         I18n.tr("Demi Bold"),
                         I18n.tr("Bold"),
                         I18n.tr("Extra Bold"),
@@ -135,7 +135,7 @@ Item {
                         case Font.Normal:
                             return I18n.tr("Regular");
                         case Font.Medium:
-                            return I18n.tr("Medium");
+                            return I18n.tr("Medium", "font weight");
                         case Font.DemiBold:
                             return I18n.tr("Demi Bold");
                         case Font.Bold:
@@ -158,7 +158,7 @@ Item {
                             weight = Font.Light;
                         else if (value === I18n.tr("Regular"))
                             weight = Font.Normal;
-                        else if (value === I18n.tr("Medium"))
+                        else if (value === I18n.tr("Medium", "font weight"))
                             weight = Font.Medium;
                         else if (value === I18n.tr("Demi Bold"))
                             weight = Font.DemiBold;
