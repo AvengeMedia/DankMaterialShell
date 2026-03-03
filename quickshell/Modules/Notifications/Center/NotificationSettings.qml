@@ -97,7 +97,7 @@ Rectangle {
             return I18n.tr("Never");
         }
         if (value < 1000) {
-            return value + I18n.tr("ms");
+            return value + "ms";
         }
         if (value < 60000) {
             return Math.round(value / 1000) + " " + I18n.tr("seconds");
