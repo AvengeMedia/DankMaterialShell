@@ -566,8 +566,9 @@ PanelWindow {
     readonly property var _leftSection: topBarContent ? (barWindow.isVertical ? topBarContent.vLeftSection : topBarContent.hLeftSection) : null
     readonly property var _centerSection: topBarContent ? (barWindow.isVertical ? topBarContent.vCenterSection : topBarContent.hCenterSection) : null
     readonly property var _rightSection: topBarContent ? (barWindow.isVertical ? topBarContent.vRightSection : topBarContent.hRightSection) : null
+    readonly property real _revealProgress: topBarSlide.x + topBarSlide.y
 
-    function sectionRect(section, isCenter) {
+    function sectionRect(section, isCenter, _dep) {
         if (!section)
             return {
                 "x": 0,
@@ -596,7 +597,7 @@ PanelWindow {
         item: clickThroughEnabled ? null : inputMask
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._leftSection, false) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._leftSection, false, barWindow._revealProgress) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -609,7 +610,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._centerSection, true) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._centerSection, true, barWindow._revealProgress) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -622,7 +623,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._rightSection, false) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._rightSection, false, barWindow._revealProgress) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -632,6 +633,14 @@ PanelWindow {
             y: r.y
             width: r.w
             height: r.h
+        }
+
+        Region {
+            readonly property bool active: barWindow.clickThroughEnabled && !inputMask.showing
+            x: active ? inputMask.x : 0
+            y: active ? inputMask.y : 0
+            width: active ? inputMask.width : 0
+            height: active ? inputMask.height : 0
         }
     }
 
@@ -645,7 +654,7 @@ PanelWindow {
 
         Timer {
             id: revealHold
-            interval: barConfig?.autoHideDelay ?? 250
+            interval: barWindow.clickThroughEnabled ? Math.max((barConfig?.autoHideDelay ?? 250) * 6, 1500) : (barConfig?.autoHideDelay ?? 250)
             repeat: false
             onTriggered: {
                 if (!topBarMouseArea.containsMouse && !topBarCore.hasActivePopout) {
@@ -703,7 +712,6 @@ PanelWindow {
         Connections {
             function onBarConfigChanged() {
                 topBarCore.autoHide = barConfig?.autoHide ?? false;
-                revealHold.interval = barConfig?.autoHideDelay ?? 250;
             }
 
             target: rootWindow

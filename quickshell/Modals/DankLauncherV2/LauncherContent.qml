@@ -496,8 +496,9 @@ FocusScope {
             Row {
                 id: categoryRow
                 width: parent.width
-                height: controller.activePluginCategories.length > 0 ? 36 : 0
-                visible: controller.activePluginCategories.length > 0
+                readonly property bool showPluginCategories: controller.activePluginCategories.length > 0
+                height: showPluginCategories ? 36 : 0
+                visible: showPluginCategories
                 spacing: Theme.spacingS
 
                 clip: true
@@ -511,6 +512,7 @@ FocusScope {
 
                 DankDropdown {
                     id: categoryDropdown
+                    visible: categoryRow.showPluginCategories
                     width: Math.min(200, parent.width)
                     compactMode: true
                     dropdownWidth: 200
@@ -546,6 +548,7 @@ FocusScope {
                         }
                     }
                 }
+
             }
 
             Item {

@@ -687,6 +687,12 @@ Singleton {
             appCategories.forEach(cat => categories.add(cat));
         }
 
+        // Include categories from core apps (e.g. DMS Settings)
+        for (const app of coreApps) {
+            const appCategories = getCategoriesForApp(app);
+            appCategories.forEach(cat => categories.add(cat));
+        }
+
         const pluginCategories = getPluginCategories();
         pluginCategories.forEach(cat => categories.add(cat));
 

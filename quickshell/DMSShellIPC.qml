@@ -21,11 +21,37 @@ Item {
     required property var workspaceRenameModalLoader
     required property var windowRuleModalLoader
 
-    function getFirstBar() {
+    function getPreferredBar(refPropertyName) {
         if (!root.dankBarRepeater || root.dankBarRepeater.count === 0)
             return null;
-        const firstLoader = root.dankBarRepeater.itemAt(0);
-        return firstLoader ? firstLoader.item : null;
+
+        const focusedScreenName = BarWidgetService.getFocusedScreenName();
+
+        const loaders = Array.from({
+            length: root.dankBarRepeater.count
+        }, (_, i) => root.dankBarRepeater.itemAt(i));
+
+        let currentBar = null;
+
+        for (const loader of loaders) {
+            const instances = loader?.item?.barVariants?.instances || [];
+            for (const bar of instances) {
+                if (!bar)
+                    continue;
+
+                const onFocusedScreen = focusedScreenName && bar.modelData?.name === focusedScreenName;
+                const hasRef = !refPropertyName || !!bar[refPropertyName];
+
+                if (hasRef) {
+                    currentBar = bar;
+
+                    if (onFocusedScreen)
+                        break;
+                }
+            }
+        }
+
+        return currentBar;
     }
 
     IpcHandler {
@@ -97,9 +123,9 @@ Item {
 
     IpcHandler {
         function open(): string {
-            const bar = root.getFirstBar();
+            const bar = root.getPreferredBar("controlCenterButtonRef");
             if (bar) {
-                bar.triggerControlCenterOnFocusedScreen();
+                bar.triggerControlCenter();
                 return "CONTROL_CENTER_OPEN_SUCCESS";
             }
             return "CONTROL_CENTER_OPEN_FAILED";
@@ -114,9 +140,14 @@ Item {
         }
 
         function toggle(): string {
-            const bar = root.getFirstBar();
+            if (root.controlCenterLoader.item?.shouldBeVisible) {
+                root.controlCenterLoader.item.close();
+                return "CONTROL_CENTER_TOGGLE_SUCCESS";
+            }
+
+            const bar = root.getPreferredBar("controlCenterButtonRef");
             if (bar) {
-                bar.triggerControlCenterOnFocusedScreen();
+                bar.triggerControlCenter();
                 return "CONTROL_CENTER_TOGGLE_SUCCESS";
             }
             return "CONTROL_CENTER_TOGGLE_FAILED";
@@ -131,27 +162,37 @@ Item {
 
     IpcHandler {
         function open(tab: string): string {
-            root.dankDashPopoutLoader.active = true;
-            if (root.dankDashPopoutLoader.item) {
-                switch (tab.toLowerCase()) {
-                case "media":
-                    root.dankDashPopoutLoader.item.currentTabIndex = 1;
-                    break;
-                case "wallpaper":
-                    root.dankDashPopoutLoader.item.currentTabIndex = 2;
-                    break;
-                case "weather":
-                    root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 3 : 0;
-                    break;
-                default:
-                    root.dankDashPopoutLoader.item.currentTabIndex = 0;
-                    break;
-                }
-                root.dankDashPopoutLoader.item.setTriggerPosition(Screen.width / 2, Theme.barHeight + Theme.spacingS, 100, "center", Screen);
-                root.dankDashPopoutLoader.item.dashVisible = true;
-                return "DASH_OPEN_SUCCESS";
+            const bar = root.getPreferredBar("clockButtonRef");
+            if (!bar)
+                return "DASH_OPEN_FAILED";
+
+            const dash = root.dankDashPopoutLoader.item;
+            const onSameScreen = dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name;
+
+            if (!onSameScreen) {
+                bar.triggerWallpaperBrowser();
             }
-            return "DASH_OPEN_FAILED";
+
+            if (!root.dankDashPopoutLoader.item)
+                return "DASH_OPEN_FAILED";
+
+            switch (tab.toLowerCase()) {
+            case "media":
+                root.dankDashPopoutLoader.item.currentTabIndex = 1;
+                break;
+            case "wallpaper":
+                root.dankDashPopoutLoader.item.currentTabIndex = 2;
+                break;
+            case "weather":
+                root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 3 : 0;
+                break;
+            default:
+                root.dankDashPopoutLoader.item.currentTabIndex = 0;
+                break;
+            }
+
+            root.dankDashPopoutLoader.item.dashVisible = true;
+            return "DASH_OPEN_SUCCESS";
         }
 
         function close(): string {
@@ -163,8 +204,14 @@ Item {
         }
 
         function toggle(tab: string): string {
-            const bar = root.getFirstBar();
-            if (bar && bar.triggerWallpaperBrowserOnFocusedScreen()) {
+            if (root.dankDashPopoutLoader.item?.dashVisible) {
+                root.dankDashPopoutLoader.item.dashVisible = false;
+                return "DASH_TOGGLE_SUCCESS";
+            }
+
+            const bar = root.getPreferredBar("clockButtonRef");
+            if (bar) {
+                bar.triggerWallpaperBrowser();
                 if (root.dankDashPopoutLoader.item) {
                     switch (tab.toLowerCase()) {
                     case "media":
@@ -521,8 +568,9 @@ Item {
 
     IpcHandler {
         function wallpaper(): string {
-            const bar = root.getFirstBar();
-            if (bar && bar.triggerWallpaperBrowserOnFocusedScreen()) {
+            const bar = root.getPreferredBar("clockButtonRef");
+            if (bar) {
+                bar.triggerWallpaperBrowser();
                 return "SUCCESS: Toggled wallpaper browser";
             }
             return "ERROR: Failed to toggle wallpaper browser";

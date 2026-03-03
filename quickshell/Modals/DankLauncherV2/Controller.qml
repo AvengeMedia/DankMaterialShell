@@ -51,6 +51,15 @@ Item {
         }
     }
 
+    onSearchModeChanged: {
+        if (searchMode === "apps") {
+            _loadAppCategories();
+        } else {
+            appCategory = "";
+            appCategories = [];
+        }
+    }
+
     Connections {
         target: SettingsData
         function onSortAppsAlphabeticallyChanged() {
@@ -65,8 +74,12 @@ Item {
             if (!active)
                 return;
             _clearModeCache();
-            if (!searchQuery && searchMode === "all")
+            if (searchMode === "apps") {
+                _loadAppCategories();
                 performSearch();
+            } else if (!searchQuery && searchMode === "all") {
+                performSearch();
+            }
         }
     }
 
@@ -171,6 +184,8 @@ Item {
     property string activePluginName: ""
     property var activePluginCategories: []
     property string activePluginCategory: ""
+    property string appCategory: ""
+    property var appCategories: []
 
     function getSectionViewMode(sectionId) {
         if (sectionId === "browse_plugins")
@@ -364,6 +379,8 @@ Item {
         activePluginName = "";
         activePluginCategories = [];
         activePluginCategory = "";
+        appCategory = "";
+        appCategories = [];
         pluginFilter = "";
         collapsedSections = {};
         _clearModeCache();
@@ -406,6 +423,19 @@ Item {
         activePluginCategory = categoryId;
         AppSearchService.setPluginLauncherCategory(activePluginId, categoryId);
         performSearch();
+    }
+
+    function setAppCategory(category) {
+        if (appCategory === category)
+            return;
+        appCategory = category;
+        _queryDrivenSearch = true;
+        _clearModeCache();
+        performSearch();
+    }
+
+    function _loadAppCategories() {
+        appCategories = AppSearchService.getAllCategories();
     }
 
     function setFileSearchType(type) {
@@ -592,8 +622,9 @@ Item {
         }
 
         if (searchMode === "apps") {
+            var isCategoryFiltered = appCategory && appCategory !== I18n.tr("All");
             var cachedSections = AppSearchService.getCachedDefaultSections();
-            if (cachedSections && !searchQuery) {
+            if (cachedSections && !searchQuery && !isCategoryFiltered) {
                 var modeCache = _getCachedModeData("apps");
                 if (modeCache) {
                     _applyHighlights(modeCache.sections, "");
@@ -623,9 +654,23 @@ Item {
                 return;
             }
 
-            var apps = searchApps(searchQuery);
-            for (var i = 0; i < apps.length; i++) {
-                allItems.push(apps[i]);
+            if (isCategoryFiltered) {
+                var rawApps = AppSearchService.getAppsInCategory(appCategory);
+                for (var i = 0; i < rawApps.length; i++) {
+                    allItems.push(getOrTransformApp(rawApps[i]));
+                }
+                // Also include core apps (DMS Settings etc.) that match this category
+                var allCoreApps = AppSearchService.getCoreApps("");
+                for (var i = 0; i < allCoreApps.length; i++) {
+                    var coreAppCats = AppSearchService.getCategoriesForApp(allCoreApps[i]);
+                    if (coreAppCats.indexOf(appCategory) !== -1)
+                        allItems.push(transformCoreApp(allCoreApps[i]));
+                }
+            } else {
+                var apps = searchApps(searchQuery);
+                for (var i = 0; i < apps.length; i++) {
+                    allItems.push(apps[i]);
+                }
             }
 
             var scoredItems = Scorer.scoreItems(allItems, searchQuery, getFrecencyForItem);
