@@ -72,7 +72,7 @@ DankPopout {
                                     return I18n.tr("Error");
                                 if (SystemUpdateService.updateCount === 0)
                                     return I18n.tr("Up to date");
-                                return I18n.tr("%1 updates").arg(SystemUpdateService.updateCount);
+                                return I18n.ntr("%1 update", "%1 updates", SystemUpdateService.updateCount).arg(SystemUpdateService.updateCount);
                             }
                             font.pixelSize: Theme.fontSizeMedium
                             color: {
@@ -147,7 +147,7 @@ DankPopout {
                                 if (SystemUpdateService.updateCount === 0) {
                                     return I18n.tr("Your system is up to date!");
                                 }
-                                return I18n.tr("Found %1 packages to update:").arg(SystemUpdateService.updateCount);
+                                return I18n.ntr("Found %1 package to update:", "Found %1 packages to update:", SystemUpdateService.updateCount).arg(SystemUpdateService.updateCount);
                             }
                             font.pixelSize: Theme.fontSizeMedium
                             color: {
