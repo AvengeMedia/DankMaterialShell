@@ -85,7 +85,7 @@ Rectangle {
 
     function getTimeoutText(value) {
         if (value === undefined || value === null || isNaN(value)) {
-            return "5 seconds";
+            return I18n.tr("5 seconds");
         }
 
         for (let i = 0; i < timeoutOptions.length; i++) {
@@ -94,15 +94,15 @@ Rectangle {
             }
         }
         if (value === 0) {
-            return "Never";
+            return I18n.tr("Never");
         }
         if (value < 1000) {
-            return value + "ms";
+            return value + I18n.tr("ms");
         }
         if (value < 60000) {
-            return Math.round(value / 1000) + " seconds";
+            return Math.round(value / 1000) + " " + I18n.tr("seconds");
         }
-        return Math.round(value / 60000) + " minutes";
+        return Math.round(value / 60000) + " " + I18n.tr("minutes");
     }
 
     Column {

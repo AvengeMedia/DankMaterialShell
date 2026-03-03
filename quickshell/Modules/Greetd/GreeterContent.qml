@@ -466,15 +466,15 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
                                 if (GreeterState.unlocking) {
-                                    return "Logging in...";
+                                    return I18n.tr("Logging in...");
                                 }
                                 if (Greetd.state !== GreetdState.Inactive) {
-                                    return "Authenticating...";
+                                    return I18n.tr("Authenticating...");
                                 }
                                 if (GreeterState.showPasswordInput) {
-                                    return "Password...";
+                                    return I18n.tr("Password...");
                                 }
-                                return "Username...";
+                                return I18n.tr("Username...");
                             }
                             color: GreeterState.unlocking ? Theme.primary : (Greetd.state !== GreetdState.Inactive ? Theme.primary : Theme.outline)
                             font.pixelSize: Theme.fontSizeMedium
@@ -606,9 +606,9 @@ Item {
                     Layout.bottomMargin: -Theme.spacingS
                     text: {
                         if (GreeterState.pamState === "error")
-                            return "Authentication error - try again";
+                            return I18n.tr("Authentication error - try again");
                         if (GreeterState.pamState === "fail")
-                            return "Incorrect password";
+                            return I18n.tr("Incorrect password");
                         return "";
                     }
                     color: Theme.error
