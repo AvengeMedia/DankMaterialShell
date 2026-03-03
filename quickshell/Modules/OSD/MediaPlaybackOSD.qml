@@ -27,11 +27,11 @@ DankOSD {
         let icon = "music_note";
         switch (player.playbackState) {
         case MprisPlaybackState.Playing:
-            icon = "play_arrow";
+            icon = "pause";
             break;
         case MprisPlaybackState.Paused:
         case MprisPlaybackState.Stopped:
-            icon = "pause";
+            icon = "play_arrow";
             break;
         }
         if (icon === _displayIcon)
