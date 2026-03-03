@@ -166,27 +166,33 @@ Item {
             if (!bar)
                 return "DASH_OPEN_FAILED";
 
-            bar.triggerWallpaperBrowser();
+            const dash = root.dankDashPopoutLoader.item;
+            const onSameScreen = dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name;
 
-            if (root.dankDashPopoutLoader.item) {
-                switch (tab.toLowerCase()) {
-                case "media":
-                    root.dankDashPopoutLoader.item.currentTabIndex = 1;
-                    break;
-                case "wallpaper":
-                    root.dankDashPopoutLoader.item.currentTabIndex = 2;
-                    break;
-                case "weather":
-                    root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 3 : 0;
-                    break;
-                default:
-                    root.dankDashPopoutLoader.item.currentTabIndex = 0;
-                    break;
-                }
-                return "DASH_OPEN_SUCCESS";
+            if (!onSameScreen) {
+                bar.triggerWallpaperBrowser();
             }
 
-            return "DASH_OPEN_FAILED";
+            if (!root.dankDashPopoutLoader.item)
+                return "DASH_OPEN_FAILED";
+
+            switch (tab.toLowerCase()) {
+            case "media":
+                root.dankDashPopoutLoader.item.currentTabIndex = 1;
+                break;
+            case "wallpaper":
+                root.dankDashPopoutLoader.item.currentTabIndex = 2;
+                break;
+            case "weather":
+                root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 3 : 0;
+                break;
+            default:
+                root.dankDashPopoutLoader.item.currentTabIndex = 0;
+                break;
+            }
+
+            root.dankDashPopoutLoader.item.dashVisible = true;
+            return "DASH_OPEN_SUCCESS";
         }
 
         function close(): string {
