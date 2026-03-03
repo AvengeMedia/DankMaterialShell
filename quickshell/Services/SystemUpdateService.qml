@@ -185,7 +185,7 @@ Singleton {
 
     Process {
         id: pkgManagerDetection
-        command: ["sh", "-c", "which which paru || which yay || which pacman || which dnf"]
+        command: ["sh", "-c", "which paru || which yay || which pacman || which dnf"]
 
         onExited: exitCode => {
             if (exitCode === 0) {
