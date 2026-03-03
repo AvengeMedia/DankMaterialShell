@@ -162,7 +162,12 @@ Item {
 
     IpcHandler {
         function open(tab: string): string {
-            root.dankDashPopoutLoader.active = true;
+            const bar = root.getPreferredBar("clockButtonRef");
+            if (!bar)
+                return "DASH_OPEN_FAILED";
+
+            bar.triggerWallpaperBrowser();
+
             if (root.dankDashPopoutLoader.item) {
                 switch (tab.toLowerCase()) {
                 case "media":
@@ -178,10 +183,9 @@ Item {
                     root.dankDashPopoutLoader.item.currentTabIndex = 0;
                     break;
                 }
-                root.dankDashPopoutLoader.item.setTriggerPosition(Screen.width / 2, Theme.barHeight + Theme.spacingS, 100, "center", Screen);
-                root.dankDashPopoutLoader.item.dashVisible = true;
                 return "DASH_OPEN_SUCCESS";
             }
+
             return "DASH_OPEN_FAILED";
         }
 
