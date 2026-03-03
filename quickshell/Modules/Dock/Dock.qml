@@ -447,9 +447,8 @@ Variants {
 
                 height: {
                     if (dock.isVertical) {
-                        if (!dock.reveal)
-                            return Math.min(Math.max(dockBackground.height + 64, 200), screenHeight * 0.5);
-                        return Math.min(dockBackground.height + 8 + dock.borderThickness, maxDockHeight);
+                        // Keep the taller hit area regardless of the reveal state to prevent shrinking loop
+                        return Math.min(Math.max(dockBackground.height + 64, 200), screenHeight * 0.5);
                     }
                     return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1;
                 }
@@ -457,8 +456,7 @@ Variants {
                     if (dock.isVertical) {
                         return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1;
                     }
-                    if (!dock.reveal)
-                        return Math.min(Math.max(dockBackground.width + 64, 200), screenWidth * 0.5);
+                    // Keep the wider hit area regardless of the reveal state to prevent shrinking loop
                     return Math.min(dockBackground.width + 8 + dock.borderThickness, maxDockWidth);
                 }
                 anchors {
