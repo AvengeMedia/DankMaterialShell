@@ -94,9 +94,9 @@ Singleton {
         "checkupdates": archBasedUCSettings
     }
     readonly property var packageManagerParams: {
-        "pacman": archBasedPMSettings(true),
         "yay": archBasedPMSettings(false),
         "paru": archBasedPMSettings(false),
+        "pacman": archBasedPMSettings(true),
         "dnf": fedoraBasedPMSettings
     }
     readonly property list<string> supportedDistributions: ["arch", "artix", "cachyos", "manjaro", "endeavouros", "fedora"]
@@ -185,7 +185,7 @@ Singleton {
 
     Process {
         id: pkgManagerDetection
-        command: ["sh", "-c", "which pacman || which paru || which yay || which dnf"]
+        command: ["sh", "-c", "which which paru || which yay || which pacman || which dnf"]
 
         onExited: exitCode => {
             if (exitCode === 0) {
