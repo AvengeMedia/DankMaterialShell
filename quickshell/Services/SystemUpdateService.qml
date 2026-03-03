@@ -44,24 +44,26 @@ Singleton {
         }
     }
 
-    readonly property var archBasedPMSettings: {
-        "listUpdatesSettings": {
-            "params": ["-Qu"],
-            "correctExitCodes": [0, 1]   // Exit code 0 = updates available, 1 = no updates
-        },
-        "upgradeSettings": {
-            "params": ["-Syu"],
-            "requiresSudo": false
-        },
-        "parserSettings": {
-            "lineRegex": /^(\S+)\s+([^\s]+)\s+->\s+([^\s]+)$/,
-            "entryProducer": function (match) {
-                return {
-                    "name": match[1],
-                    "currentVersion": match[2],
-                    "newVersion": match[3],
-                    "description": `${match[1]} ${match[2]} → ${match[3]}`
-                };
+    readonly property var archBasedPMSettings: function(requiresSudo) {
+        return {
+            "listUpdatesSettings": {
+                "params": ["-Qu"],
+                "correctExitCodes": [0, 1]   // Exit code 0 = updates available, 1 = no updates
+            },
+            "upgradeSettings": {
+                "params": ["-Syu"],
+                "requiresSudo": requiresSudo
+            },
+            "parserSettings": {
+                "lineRegex": /^(\S+)\s+([^\s]+)\s+->\s+([^\s]+)$/,
+                "entryProducer": function (match) {
+                    return {
+                        "name": match[1],
+                        "currentVersion": match[2],
+                        "newVersion": match[3],
+                        "description": `${match[1]} ${match[2]} → ${match[3]}`
+                    };
+                }
             }
         }
     }
@@ -92,9 +94,9 @@ Singleton {
         "checkupdates": archBasedUCSettings
     }
     readonly property var packageManagerParams: {
-        "pacman": archBasedPMSettings,
-        "yay": archBasedPMSettings,
-        "paru": archBasedPMSettings,
+        "pacman": archBasedPMSettings(true),
+        "yay": archBasedPMSettings(false),
+        "paru": archBasedPMSettings(false),
         "dnf": fedoraBasedPMSettings
     }
     readonly property list<string> supportedDistributions: ["arch", "artix", "cachyos", "manjaro", "endeavouros", "fedora"]
