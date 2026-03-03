@@ -92,6 +92,7 @@ Singleton {
         "checkupdates": archBasedUCSettings
     }
     readonly property var packageManagerParams: {
+        "pacman": archBasedPMSettings,
         "yay": archBasedPMSettings,
         "paru": archBasedPMSettings,
         "dnf": fedoraBasedPMSettings
@@ -182,7 +183,7 @@ Singleton {
 
     Process {
         id: pkgManagerDetection
-        command: ["sh", "-c", "which paru || which yay || which dnf"]
+        command: ["sh", "-c", "which pacman || which paru || which yay || which dnf"]
 
         onExited: exitCode => {
             if (exitCode === 0) {
