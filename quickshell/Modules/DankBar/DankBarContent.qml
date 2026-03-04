@@ -1185,6 +1185,7 @@ Item {
                 if (!notificationCenterLoader.item) {
                     return;
                 }
+                notificationCenterLoader.item.triggerScreen = barWindow.screen;
                 const effectiveBarConfig = topBarContent.barConfig;
                 const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
                 if (notificationCenterLoader.item.setBarContext) {

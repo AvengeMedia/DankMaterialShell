@@ -136,9 +136,11 @@ DankPopout {
                 z: 5000
 
                 Behavior on opacity {
+                    enabled: !Theme.isDirectionalEffect
                     NumberAnimation {
-                        duration: 200
-                        easing.type: Easing.OutCubic
+                        duration: Theme.shortDuration
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: root.shouldBeVisible ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
                     }
                 }
             }

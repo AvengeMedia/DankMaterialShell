@@ -16,7 +16,6 @@ DankPopout {
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 500
     triggerWidth: 80
     screen: triggerScreen
-    shouldBeVisible: dashVisible
 
     property bool __focusArmed: false
     property bool __contentReady: false
