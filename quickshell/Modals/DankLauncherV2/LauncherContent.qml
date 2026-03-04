@@ -86,7 +86,7 @@ FocusScope {
 
     Controller {
         id: controller
-        active: root.parentModal?.spotlightOpen ?? true
+        active: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
         viewModeContext: root.viewModeContext
 
         onItemExecuted: {
@@ -462,7 +462,7 @@ FocusScope {
                     showClearButton: true
                     textColor: Theme.surfaceText
                     font.pixelSize: Theme.fontSizeLarge
-                    enabled: root.parentModal ? root.parentModal.spotlightOpen : true
+                    enabled: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
                     placeholderText: ""
                     ignoreUpDownKeys: true
                     ignoreTabKeys: true
@@ -548,7 +548,6 @@ FocusScope {
                         }
                     }
                 }
-
             }
 
             Item {
@@ -697,7 +696,13 @@ FocusScope {
             Item {
                 width: parent.width
                 height: parent.height - searchField.height - categoryRow.height - fileFilterRow.height - actionPanel.height - Theme.spacingXS * ((categoryRow.visible ? 1 : 0) + (fileFilterRow.visible ? 1 : 0) + 2)
-                opacity: root.parentModal?.isClosing ? 0 : 1
+                opacity: {
+                    if (!root.parentModal)
+                        return 1;
+                    if (Theme.isDirectionalEffect && root.parentModal.isClosing)
+                        return 1;
+                    return root.parentModal.isClosing ? 0 : 1;
+                }
 
                 ResultsList {
                     id: resultsList

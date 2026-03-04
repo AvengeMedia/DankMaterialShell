@@ -14,6 +14,7 @@ Item {
     property bool spotlightOpen: false
     property bool keyboardActive: false
     property bool contentVisible: false
+    readonly property bool launcherMotionVisible: Theme.isDirectionalEffect ? spotlightOpen : _motionActive
     property var spotlightContent: launcherContentLoader.item
     property bool openedFromOverview: false
     property bool isClosing: false
@@ -23,8 +24,14 @@ Item {
     property string _pendingMode: ""
     readonly property bool unloadContentOnClose: SettingsData.dankLauncherV2UnloadOnClose
 
+    // Animation state — matches DankPopout/DankModal pattern
+    property bool animationsEnabled: true
+    property bool _motionActive: false
+    property real _frozenMotionX: 0
+    property real _frozenMotionY: 0
+
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
-    readonly property var effectiveScreen: launcherWindow.screen
+    readonly property var effectiveScreen: contentWindow.screen
     readonly property real screenWidth: effectiveScreen?.width ?? 1920
     readonly property real screenHeight: effectiveScreen?.height ?? 1080
     readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
@@ -78,6 +85,34 @@ Item {
     }
     readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
 
+    // Shadow padding for the content window (render padding only, no motion padding)
+    readonly property var shadowLevel: Theme.elevationLevel3
+    readonly property real shadowFallbackOffset: 6
+    readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
+    readonly property real shadowPad: Theme.snap(shadowRenderPadding, dpr)
+    readonly property real alignedWidth: Theme.px(modalWidth, dpr)
+    readonly property real alignedHeight: Theme.px(modalHeight, dpr)
+    readonly property real alignedX: Theme.snap(modalX, dpr)
+    readonly property real alignedY: Theme.snap(modalY, dpr)
+
+    // For directional/depth: window extends from screen top (content slides within)
+    // For standard: small window tightly around the modal + shadow padding
+    readonly property bool _needsExtendedWindow: Theme.isDirectionalEffect || Theme.isDepthEffect
+    // Content window geometry
+    readonly property real _cwMarginLeft: Theme.snap(alignedX - shadowPad, dpr)
+    readonly property real _cwMarginTop: _needsExtendedWindow ? 0 : Theme.snap(alignedY - shadowPad, dpr)
+    readonly property real _cwWidth: alignedWidth + shadowPad * 2
+    readonly property real _cwHeight: {
+        if (Theme.isDirectionalEffect)
+            return screenHeight + shadowPad;
+        if (Theme.isDepthEffect)
+            return alignedY + alignedHeight + shadowPad;
+        return alignedHeight + shadowPad * 2;
+    }
+    // Where the content container sits inside the content window
+    readonly property real _ccX: shadowPad
+    readonly property real _ccY: _needsExtendedWindow ? alignedY : shadowPad
+
     signal dialogClosed
 
     function _ensureContentLoadedAndInitialize(query, mode) {
@@ -97,7 +132,8 @@ Item {
         if (!spotlightContent)
             return;
         contentVisible = true;
-        spotlightContent.searchField.forceActiveFocus();
+        // NOTE: forceActiveFocus() is deliberately NOT called here.
+        // It is deferred to after animation starts to avoid compositor IPC stalls.
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = query;
@@ -130,40 +166,59 @@ Item {
         }
     }
 
-    function show() {
+    function _openCommon(query, mode) {
         closeCleanupTimer.stop();
         isClosing = false;
         openedFromOverview = false;
 
-        var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen)
-            launcherWindow.screen = focusedScreen;
+        // Disable animations so the snap is instant
+        animationsEnabled = false;
 
-        spotlightOpen = true;
-        keyboardActive = true;
+        // Freeze the collapsed offsets (they depend on height which could change)
+        _frozenMotionX = contentContainer ? contentContainer.collapsedMotionX : 0;
+        _frozenMotionY = contentContainer ? contentContainer.collapsedMotionY : (Theme.isDirectionalEffect ? Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1) : -Theme.effectAnimOffset);
+
+        var focusedScreen = CompositorService.getFocusedScreen();
+        if (focusedScreen) {
+            backgroundWindow.screen = focusedScreen;
+            contentWindow.screen = focusedScreen;
+        }
+
+        // _motionActive = false ensures motionX/Y snap to frozen collapsed position
+        _motionActive = false;
+
+        // Make windows visible but do NOT request keyboard focus yet
         ModalManager.openModal(root);
+        spotlightOpen = true;
+        backgroundWindow.visible = true;
+        contentWindow.visible = true;
         if (useHyprlandFocusGrab)
             focusGrab.active = true;
 
-        _ensureContentLoadedAndInitialize("", "");
+        // Load content and initialize (but no forceActiveFocus — that's deferred)
+        _ensureContentLoadedAndInitialize(query || "", mode || "");
+
+        // Frame 1: enable animations and trigger enter motion
+        Qt.callLater(() => {
+            root.animationsEnabled = true;
+            root._motionActive = true;
+
+            // Frame 2: request keyboard focus + activate search field
+            // Double-deferred to avoid compositor IPC competing with animation frames
+            Qt.callLater(() => {
+                root.keyboardActive = true;
+                if (root.spotlightContent && root.spotlightContent.searchField)
+                    root.spotlightContent.searchField.forceActiveFocus();
+            });
+        });
+    }
+
+    function show() {
+        _openCommon("", "");
     }
 
     function showWithQuery(query) {
-        closeCleanupTimer.stop();
-        isClosing = false;
-        openedFromOverview = false;
-
-        var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen)
-            launcherWindow.screen = focusedScreen;
-
-        spotlightOpen = true;
-        keyboardActive = true;
-        ModalManager.openModal(root);
-        if (useHyprlandFocusGrab)
-            focusGrab.active = true;
-
-        _ensureContentLoadedAndInitialize(query, "");
+        _openCommon(query, "");
     }
 
     function hide() {
@@ -171,13 +226,17 @@ Item {
             return;
         openedFromOverview = false;
         isClosing = true;
-        contentVisible = false;
+        // For directional effects, defer contentVisible=false so content stays rendered during exit slide
+        if (!Theme.isDirectionalEffect)
+            contentVisible = false;
+
+        // Trigger exit animation — Behaviors will animate motionX/Y to frozen collapsed position
+        _motionActive = false;
 
         keyboardActive = false;
         spotlightOpen = false;
         focusGrab.active = false;
         ModalManager.closeModal(root);
-
         closeCleanupTimer.start();
     }
 
@@ -186,21 +245,7 @@ Item {
     }
 
     function showWithMode(mode) {
-        closeCleanupTimer.stop();
-        isClosing = false;
-        openedFromOverview = false;
-
-        var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen)
-            launcherWindow.screen = focusedScreen;
-
-        spotlightOpen = true;
-        keyboardActive = true;
-        ModalManager.openModal(root);
-        if (useHyprlandFocusGrab)
-            focusGrab.active = true;
-
-        _ensureContentLoadedAndInitialize("", mode);
+        _openCommon("", mode);
     }
 
     function toggleWithMode(mode) {
@@ -221,10 +266,13 @@ Item {
 
     Timer {
         id: closeCleanupTimer
-        interval: Theme.modalAnimationDuration + 50
+        interval: Theme.variantCloseInterval(Theme.modalAnimationDuration)
         repeat: false
         onTriggered: {
             isClosing = false;
+            contentVisible = false;
+            contentWindow.visible = false;
+            backgroundWindow.visible = false;
             if (root.unloadContentOnClose)
                 launcherContentLoader.active = false;
             dialogClosed();
@@ -242,7 +290,7 @@ Item {
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [launcherWindow]
+        windows: [contentWindow]
         active: false
 
         onCleared: {
@@ -267,7 +315,7 @@ Item {
             if (Quickshell.screens.length === 0)
                 return;
 
-            const screen = launcherWindow.screen;
+            const screen = contentWindow.screen;
             const screenName = screen?.name;
 
             let needsReset = !screen || !screenName;
@@ -289,35 +337,24 @@ Item {
                 return;
 
             root._windowEnabled = false;
-            launcherWindow.screen = newScreen;
+            backgroundWindow.screen = newScreen;
+            contentWindow.screen = newScreen;
             Qt.callLater(() => {
                 root._windowEnabled = true;
             });
         }
     }
 
+    // ── Background window: fullscreen, handles darkening + click-to-dismiss ──
     PanelWindow {
-        id: launcherWindow
-        visible: root._windowEnabled && (spotlightOpen || isClosing)
+        id: backgroundWindow
+        visible: false
         color: "transparent"
-        exclusionMode: ExclusionMode.Ignore
 
-        WlrLayershell.namespace: "dms:spotlight"
-        WlrLayershell.layer: {
-            switch (Quickshell.env("DMS_MODAL_LAYER")) {
-            case "bottom":
-                console.error("DankModal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                console.error("DankModal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
-        WlrLayershell.keyboardFocus: keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
+        WlrLayershell.namespace: "dms:spotlight:bg"
+        WlrLayershell.layer: WlrLayershell.Top
+        WlrLayershell.exclusiveZone: -1
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
         anchors {
             top: true
@@ -327,11 +364,11 @@ Item {
         }
 
         mask: Region {
-            item: spotlightOpen ? fullScreenMask : null
+            item: (spotlightOpen || isClosing) ? bgFullScreenMask : null
         }
 
         Item {
-            id: fullScreenMask
+            id: bgFullScreenMask
             anchors.fill: parent
         }
 
@@ -339,13 +376,14 @@ Item {
             id: backgroundDarken
             anchors.fill: parent
             color: "black"
-            opacity: contentVisible && SettingsData.modalDarkenBackground ? 0.5 : 0
-            visible: contentVisible || opacity > 0
+            opacity: launcherMotionVisible && SettingsData.modalDarkenBackground ? 0.5 : 0
+            visible: launcherMotionVisible || opacity > 0
 
             Behavior on opacity {
+                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
                 DankAnim {
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                    duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                    easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                 }
             }
         }
@@ -353,49 +391,136 @@ Item {
         MouseArea {
             anchors.fill: parent
             enabled: spotlightOpen
-            onClicked: mouse => {
-                var contentX = modalContainer.x;
-                var contentY = modalContainer.y;
-                var contentW = modalContainer.width;
-                var contentH = modalContainer.height;
+            onClicked: root.hide()
+        }
+    }
 
-                if (mouse.x < contentX || mouse.x > contentX + contentW || mouse.y < contentY || mouse.y > contentY + contentH) {
-                    root.hide();
-                }
+    // ── Content window: SMALL, positioned with margins — only renders the modal area ──
+    PanelWindow {
+        id: contentWindow
+        visible: false
+        color: "transparent"
+
+        WlrLayershell.namespace: "dms:spotlight"
+        WlrLayershell.layer: {
+            switch (Quickshell.env("DMS_MODAL_LAYER")) {
+            case "bottom":
+                console.error("DankLauncherV2Modal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
+                return WlrLayershell.Top;
+            case "background":
+                console.error("DankLauncherV2Modal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
+                return WlrLayershell.Top;
+            case "overlay":
+                return WlrLayershell.Overlay;
+            default:
+                return WlrLayershell.Top;
             }
+        }
+        WlrLayershell.exclusiveZone: -1
+        WlrLayershell.keyboardFocus: keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
+
+        anchors {
+            left: true
+            top: true
+        }
+
+        WlrLayershell.margins {
+            left: root._cwMarginLeft
+            top: root._cwMarginTop
+        }
+
+        implicitWidth: root._cwWidth
+        implicitHeight: root._cwHeight
+
+        mask: Region {
+            item: contentInputMask
         }
 
         Item {
-            id: modalContainer
-            x: root.modalX
-            y: root.modalY
-            width: root.modalWidth
-            height: root.modalHeight
-            visible: contentVisible || opacity > 0
+            id: contentInputMask
+            visible: false
+            x: contentContainer.x + contentWrapper.x
+            y: contentContainer.y + contentWrapper.y
+            width: root.alignedWidth
+            height: root.alignedHeight
+        }
 
-            opacity: contentVisible ? 1 : 0
-            scale: contentVisible ? 1 : 0.96
-            transformOrigin: Item.Center
+        Item {
+            id: contentContainer
 
-            Behavior on opacity {
-                DankAnim {
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+            // For directional/depth: contentContainer is at alignedY from window top (window starts at screen top)
+            // For standard: contentContainer is at shadowPad from window top (window starts near modal)
+            x: root._ccX
+            y: root._ccY
+            width: root.alignedWidth
+            height: root.alignedHeight
+
+            readonly property bool directionalEffect: Theme.isDirectionalEffect
+            readonly property bool depthEffect: Theme.isDepthEffect
+            readonly property real collapsedMotionX: depthEffect ? Theme.effectAnimOffset * 0.25 : 0
+            readonly property real collapsedMotionY: {
+                if (directionalEffect)
+                    return Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1);
+                if (depthEffect)
+                    return -Math.max(Theme.effectAnimOffset * 0.85, 34);
+                return 0;
+            }
+
+            // animX/animY are Behavior-animated — DankPopout pattern
+            property real animX: 0
+            property real animY: 0
+            property real scaleValue: Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed
+
+            Component.onCompleted: {
+                animX = Theme.snap(root._motionActive ? 0 : collapsedMotionX, root.dpr);
+                animY = Theme.snap(root._motionActive ? 0 : collapsedMotionY, root.dpr);
+                scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed);
+            }
+
+            Connections {
+                target: root
+                function on_MotionActiveChanged() {
+                    contentContainer.animX = Theme.snap(root._motionActive ? 0 : root._frozenMotionX, root.dpr);
+                    contentContainer.animY = Theme.snap(root._motionActive ? 0 : root._frozenMotionY, root.dpr);
+                    contentContainer.scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed);
                 }
             }
 
-            Behavior on scale {
+            Behavior on animX {
+                enabled: root.animationsEnabled
                 DankAnim {
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                    duration: Theme.variantDuration(Theme.modalAnimationDuration, root._motionActive)
+                    easing.bezierCurve: root._motionActive ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                 }
             }
 
+            Behavior on animY {
+                enabled: root.animationsEnabled
+                DankAnim {
+                    duration: Theme.variantDuration(Theme.modalAnimationDuration, root._motionActive)
+                    easing.bezierCurve: root._motionActive ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                }
+            }
+
+            Behavior on scaleValue {
+                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                DankAnim {
+                    duration: Theme.variantDuration(Theme.modalAnimationDuration, root._motionActive)
+                    easing.bezierCurve: root._motionActive ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                }
+            }
+
+            // Shadow mirrors contentWrapper position/scale/opacity
             ElevationShadow {
                 id: launcherShadowLayer
-                anchors.fill: parent
-                level: Theme.elevationLevel3
-                fallbackOffset: 6
+                width: parent.width
+                height: parent.height
+                opacity: contentWrapper.opacity
+                scale: contentWrapper.scale
+                x: contentWrapper.x
+                y: contentWrapper.y
+                level: root.shadowLevel
+                fallbackOffset: root.shadowFallbackOffset
                 targetColor: root.backgroundColor
                 borderColor: root.borderColor
                 borderWidth: root.borderWidth
@@ -403,36 +528,56 @@ Item {
                 shadowEnabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             }
 
-            MouseArea {
-                anchors.fill: parent
-                onPressed: mouse => mouse.accepted = true
-            }
+            // contentWrapper moves inside static contentContainer — DankPopout pattern
+            Item {
+                id: contentWrapper
+                width: parent.width
+                height: parent.height
+                opacity: Theme.isDirectionalEffect ? 1 : (launcherMotionVisible ? 1 : 0)
+                visible: opacity > 0
+                scale: contentContainer.scaleValue
+                x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+                y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
 
-            FocusScope {
-                anchors.fill: parent
-                focus: keyboardActive
-
-                Loader {
-                    id: launcherContentLoader
-                    anchors.fill: parent
-                    active: !root.unloadContentOnClose || root.spotlightOpen || root.isClosing || root.contentVisible || root._pendingInitialize
-                    asynchronous: false
-                    sourceComponent: LauncherContent {
-                        focus: true
-                        parentModal: root
-                    }
-
-                    onLoaded: {
-                        if (root._pendingInitialize) {
-                            root._initializeAndShow(root._pendingQuery, root._pendingMode);
-                            root._pendingInitialize = false;
-                        }
+                Behavior on opacity {
+                    enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                    DankAnim {
+                        duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                        easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                     }
                 }
 
-                Keys.onEscapePressed: event => {
-                    root.hide();
-                    event.accepted = true;
+                MouseArea {
+                    anchors.fill: parent
+                    onPressed: mouse => mouse.accepted = true
+                }
+
+                FocusScope {
+                    anchors.fill: parent
+                    focus: keyboardActive
+
+                    Loader {
+                        id: launcherContentLoader
+                        anchors.fill: parent
+                        active: !root.unloadContentOnClose || root.spotlightOpen || root.isClosing || root.contentVisible || root._pendingInitialize
+                        asynchronous: false
+                        sourceComponent: LauncherContent {
+                            focus: true
+                            parentModal: root
+                        }
+
+                        onLoaded: {
+                            if (root._pendingInitialize) {
+                                root._initializeAndShow(root._pendingQuery, root._pendingMode);
+                                root._pendingInitialize = false;
+                            }
+                        }
+                    }
+
+                    Keys.onEscapePressed: event => {
+                        root.hide();
+                        event.accepted = true;
+                    }
                 }
             }
         }

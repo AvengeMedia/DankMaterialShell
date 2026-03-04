@@ -44,6 +44,43 @@ Item {
 
     property int __volumeHoverCount: 0
 
+    readonly property bool directionalEffect: Theme.isDirectionalEffect
+    readonly property bool depthEffect: Theme.isDepthEffect
+
+    function panelMotionX(panelWidth, active) {
+        if (active)
+            return 0;
+        if (directionalEffect) {
+            const travel = Math.max(Theme.effectAnimOffset, panelWidth * 0.85);
+            return isRightEdge ? -travel : travel;
+        }
+        if (depthEffect) {
+            const travel = Math.max(Theme.effectAnimOffset * 0.7, panelWidth * 0.32);
+            return isRightEdge ? -travel : travel;
+        }
+        return 0;
+    }
+
+    function panelMotionY(panelType, panelHeight, active) {
+        if (active)
+            return 0;
+        if (directionalEffect) {
+            if (panelType === 2)
+                return panelHeight * 0.08;
+            if (panelType === 3)
+                return -panelHeight * 0.08;
+            return 0;
+        }
+        if (depthEffect) {
+            if (panelType === 2)
+                return panelHeight * 0.04;
+            if (panelType === 3)
+                return -panelHeight * 0.04;
+            return 0;
+        }
+        return 0;
+    }
+
     function volumeAreaEntered() {
         __volumeHoverCount++;
         panelEntered();
@@ -62,30 +99,47 @@ Item {
         visible: dropdownType === 1 && volumeAvailable
         width: 60
         height: 180
-        x: isRightEdge ? anchorPos.x : anchorPos.x - width
-        y: anchorPos.y - height / 2
+        x: (isRightEdge ? anchorPos.x : anchorPos.x - width) + panelMotionX(width, dropdownType === 1)
+        y: anchorPos.y - height / 2 + panelMotionY(1, height, dropdownType === 1)
         radius: Theme.cornerRadius * 2
         color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
         border.width: 1
 
-        opacity: dropdownType === 1 ? 1 : 0
-        scale: dropdownType === 1 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 1 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 1 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+            enabled: !Theme.isDirectionalEffect
+            DankAnim {
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            }
+        }
+
+        Behavior on x {
+            NumberAnimation {
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1)
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            }
+        }
+
+        Behavior on y {
+            NumberAnimation {
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1)
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
@@ -197,33 +251,50 @@ Item {
 
     Rectangle {
         id: audioDevicesPanel
-        visible: dropdownType === 2
+        visible: dropdownType === 2 && activePlayer !== null
         width: 280
         height: Math.max(200, Math.min(280, availableDevices.length * 50 + 100))
-        x: isRightEdge ? anchorPos.x : anchorPos.x - width
-        y: anchorPos.y - height / 2
+        x: (isRightEdge ? anchorPos.x : anchorPos.x - width) + panelMotionX(width, dropdownType === 2)
+        y: anchorPos.y - height / 2 + panelMotionY(2, height, dropdownType === 2)
         radius: Theme.cornerRadius * 2
         color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
         border.width: 2
 
-        opacity: dropdownType === 2 ? 1 : 0
-        scale: dropdownType === 2 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 2 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 2 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+            enabled: !Theme.isDirectionalEffect
+            DankAnim {
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            }
+        }
+
+        Behavior on x {
+            NumberAnimation {
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2)
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            }
+        }
+
+        Behavior on y {
+            NumberAnimation {
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2)
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
@@ -354,30 +425,47 @@ Item {
         visible: dropdownType === 3
         width: 240
         height: Math.max(180, Math.min(240, (allPlayers?.length || 0) * 50 + 80))
-        x: isRightEdge ? anchorPos.x : anchorPos.x - width
-        y: anchorPos.y - height / 2
+        x: (isRightEdge ? anchorPos.x : anchorPos.x - width) + panelMotionX(width, dropdownType === 3)
+        y: anchorPos.y - height / 2 + panelMotionY(3, height, dropdownType === 3)
         radius: Theme.cornerRadius * 2
         color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
         border.width: 2
 
-        opacity: dropdownType === 3 ? 1 : 0
-        scale: dropdownType === 3 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 3 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 3 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+            enabled: !Theme.isDirectionalEffect
+            DankAnim {
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            }
+        }
+
+        Behavior on x {
+            NumberAnimation {
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3)
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            }
+        }
+
+        Behavior on y {
+            NumberAnimation {
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3)
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 

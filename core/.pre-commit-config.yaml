@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/golangci/golangci-lint
-    rev: v2.9.0
+    rev: v2.10.1
     hooks:
       - id: golangci-lint-fmt
         require_serial: true

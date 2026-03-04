@@ -106,7 +106,7 @@ DankPopout {
             QtObject {
                 id: modalAdapter
                 property bool spotlightOpen: appDrawerPopout.shouldBeVisible
-                property bool isClosing: false
+                property bool isClosing: appDrawerPopout.isClosing
 
                 function hide() {
                     appDrawerPopout.close();
