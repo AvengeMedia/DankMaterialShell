@@ -191,6 +191,42 @@ Item {
                         }
                     }
                 }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                    visible: SettingsData.motionEffect === 1
+                }
+
+                SettingsDropdownRow {
+                    visible: SettingsData.motionEffect === 1
+                    tab: "typography"
+                    tags: ["animation", "directional", "behavior", "overlap", "sticky", "roll"]
+                    settingKey: "directionalAnimationMode"
+                    text: I18n.tr("Directional Behavior")
+                    description: I18n.tr("How the popout emerges from the DankBar")
+                    options: [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll")]
+                    currentValue: {
+                        switch (SettingsData.directionalAnimationMode) {
+                        case 1:
+                            return I18n.tr("Slide");
+                        case 2:
+                            return I18n.tr("Roll");
+                        default:
+                            return I18n.tr("Overlap");
+                        }
+                    }
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Slide"))
+                            SettingsData.set("directionalAnimationMode", 1);
+                        else if (value === I18n.tr("Roll"))
+                            SettingsData.set("directionalAnimationMode", 2);
+                        else
+                            SettingsData.set("directionalAnimationMode", 0);
+                    }
+                }
             }
 
             SettingsCard {
