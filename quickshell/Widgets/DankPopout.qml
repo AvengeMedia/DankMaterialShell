@@ -20,10 +20,10 @@ Item {
     property string triggerSection: ""
     property string positioning: "center"
     property int animationDuration: Theme.popoutAnimationDuration
-    property real animationScaleCollapsed: 0.96
-    property real animationOffset: Theme.spacingL
-    property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
-    property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
+    property real animationScaleCollapsed: Theme.effectScaleCollapsed
+    property real animationOffset: Theme.effectAnimOffset
+    property list<real> animationEnterCurve: Theme.variantPopoutEnterCurve
+    property list<real> animationExitCurve: Theme.variantPopoutExitCurve
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
     property var customKeyboardFocus: null
@@ -74,6 +74,7 @@ Item {
     signal backgroundClicked
 
     property var _lastOpenedScreen: null
+    property bool isClosing: false
 
     property int effectiveBarPosition: 0
     property real effectiveBarBottomGap: 0
@@ -156,10 +157,14 @@ Item {
         }
     }
 
+    property bool animationsEnabled: true
+
     function open() {
         if (!screen)
             return;
         closeTimer.stop();
+        isClosing = false;
+        animationsEnabled = false;
 
         // Snapshot mask geometry
         _frozenMaskX = maskX;
@@ -174,12 +179,22 @@ Item {
         }
         _lastOpenedScreen = screen;
 
-        shouldBeVisible = true;
+        if (contentContainer) {
+            contentContainer.animX = Theme.snap(contentContainer.offsetX, root.dpr);
+            contentContainer.animY = Theme.snap(contentContainer.offsetY, root.dpr);
+            contentContainer.scaleValue = root.animationScaleCollapsed;
+        }
+
         if (useBackgroundWindow) {
             _surfaceMarginLeft = alignedX - shadowBuffer;
             _surfaceW = alignedWidth + shadowBuffer * 2;
+            backgroundWindow.visible = true;
         }
+        contentWindow.visible = true;
+
         Qt.callLater(() => {
+            animationsEnabled = true;
+            shouldBeVisible = true;
             if (shouldBeVisible && screen) {
                 if (useBackgroundWindow)
                     backgroundWindow.visible = true;
@@ -191,6 +206,7 @@ Item {
     }
 
     function close() {
+        isClosing = true;
         shouldBeVisible = false;
         _primeContent = false;
         PopoutManager.popoutChanged();
@@ -222,9 +238,10 @@ Item {
 
     Timer {
         id: closeTimer
-        interval: animationDuration
+        interval: Theme.variantCloseInterval(animationDuration)
         onTriggered: {
             if (!shouldBeVisible) {
+                isClosing = false;
                 contentWindow.visible = false;
                 if (useBackgroundWindow)
                     backgroundWindow.visible = false;
@@ -241,7 +258,13 @@ Item {
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.popoutElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, effectiveShadowDirection, shadowFallbackOffset, 8, 16) : 0
-    readonly property real shadowMotionPadding: Math.max(0, animationOffset)
+    readonly property real shadowMotionPadding: {
+        if (Theme.isDirectionalEffect)
+            return Math.max(0, animationOffset) + 16;
+        if (Theme.isDepthEffect)
+            return Math.max(0, animationOffset) + 8;
+        return Math.max(0, animationOffset);
+    }
     readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
@@ -353,6 +376,10 @@ Item {
 
         mask: Region {
             item: maskRect
+            Region {
+                item: contentExclusionRect
+                intersection: Intersection.Subtract
+            }
         }
 
         Rectangle {
@@ -361,26 +388,70 @@ Item {
             color: "transparent"
             x: root._frozenMaskX
             y: root._frozenMaskY
-            width: (shouldBeVisible && backgroundInteractive) ? root._frozenMaskWidth : 0
-            height: (shouldBeVisible && backgroundInteractive) ? root._frozenMaskHeight : 0
+            width: (backgroundWindow.visible && backgroundInteractive) ? root._frozenMaskWidth : 0
+            height: (backgroundWindow.visible && backgroundInteractive) ? root._frozenMaskHeight : 0
         }
 
-        MouseArea {
+        Item {
+            id: contentExclusionRect
+            visible: false
+            x: root.alignedX
+            y: root.alignedY
+            width: root.alignedWidth
+            height: root.alignedHeight
+        }
+
+        Item {
+            id: outsideClickCatcher
             x: root._frozenMaskX
             y: root._frozenMaskY
             width: root._frozenMaskWidth
             height: root._frozenMaskHeight
-            hoverEnabled: false
-            enabled: shouldBeVisible && backgroundInteractive
-            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-            onClicked: mouse => {
-                const clickX = mouse.x + root._frozenMaskX;
-                const clickY = mouse.y + root._frozenMaskY;
-                const outsideContent = clickX < root.alignedX || clickX > root.alignedX + root.alignedWidth || clickY < root.alignedY || clickY > root.alignedY + root.alignedHeight;
+            enabled: root.shouldBeVisible && root.backgroundInteractive
 
-                if (!outsideContent)
-                    return;
-                backgroundClicked();
+            readonly property real contentLeft: Math.max(0, root.alignedX - x)
+            readonly property real contentTop: Math.max(0, root.alignedY - y)
+            readonly property real contentRight: Math.min(width, contentLeft + root.alignedWidth)
+            readonly property real contentBottom: Math.min(height, contentTop + root.alignedHeight)
+
+            MouseArea {
+                x: 0
+                y: 0
+                width: outsideClickCatcher.width
+                height: Math.max(0, outsideClickCatcher.contentTop)
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: root.backgroundClicked()
+            }
+
+            MouseArea {
+                x: 0
+                y: outsideClickCatcher.contentBottom
+                width: outsideClickCatcher.width
+                height: Math.max(0, outsideClickCatcher.height - outsideClickCatcher.contentBottom)
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: root.backgroundClicked()
+            }
+
+            MouseArea {
+                x: 0
+                y: outsideClickCatcher.contentTop
+                width: Math.max(0, outsideClickCatcher.contentLeft)
+                height: Math.max(0, outsideClickCatcher.contentBottom - outsideClickCatcher.contentTop)
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: root.backgroundClicked()
+            }
+
+            MouseArea {
+                x: outsideClickCatcher.contentRight
+                y: outsideClickCatcher.contentTop
+                width: Math.max(0, outsideClickCatcher.width - outsideClickCatcher.contentRight)
+                height: Math.max(0, outsideClickCatcher.contentBottom - outsideClickCatcher.contentTop)
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: root.backgroundClicked()
             }
         }
 
@@ -436,7 +507,6 @@ Item {
         }
 
         readonly property bool _fullHeight: useBackgroundWindow && root.fullHeightSurface
-
         anchors {
             left: true
             top: true
@@ -494,12 +564,64 @@ Item {
             readonly property bool barBottom: effectiveBarPosition === SettingsData.Position.Bottom
             readonly property bool barLeft: effectiveBarPosition === SettingsData.Position.Left
             readonly property bool barRight: effectiveBarPosition === SettingsData.Position.Right
-            readonly property real offsetX: barLeft ? root.animationOffset : (barRight ? -root.animationOffset : 0)
-            readonly property real offsetY: barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0)
+            readonly property bool directionalEffect: Theme.isDirectionalEffect
+            readonly property bool depthEffect: Theme.isDepthEffect
+            readonly property real directionalTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
+            readonly property real directionalTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
+            readonly property real depthTravel: Math.max(root.animationOffset * 0.7, 28)
+            readonly property real sectionTilt: (triggerSection === "left" ? -1 : (triggerSection === "right" ? 1 : 0))
+            readonly property real offsetX: {
+                if (directionalEffect) {
+                    if (barLeft)
+                        return -directionalTravelX;
+                    if (barRight)
+                        return directionalTravelX;
+                    if (barTop || barBottom)
+                        return 0;
+                    return sectionTilt * directionalTravelX * 0.2;
+                }
+                if (depthEffect) {
+                    if (barLeft)
+                        return -depthTravel;
+                    if (barRight)
+                        return depthTravel;
+                    if (barTop || barBottom)
+                        return 0;
+                    return sectionTilt * depthTravel * 0.2;
+                }
+                return barLeft ? root.animationOffset : (barRight ? -root.animationOffset : 0);
+            }
+            readonly property real offsetY: {
+                if (directionalEffect) {
+                    if (barBottom)
+                        return directionalTravelY;
+                    if (barTop)
+                        return -directionalTravelY;
+                    if (barLeft || barRight)
+                        return 0;
+                    return directionalTravelY;
+                }
+                if (depthEffect) {
+                    if (barBottom)
+                        return depthTravel;
+                    if (barTop)
+                        return -depthTravel;
+                    if (barLeft || barRight)
+                        return 0;
+                    return depthTravel;
+                }
+                return barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0);
+            }
 
             property real animX: 0
             property real animY: 0
             property real scaleValue: root.animationScaleCollapsed
+
+            Component.onCompleted: {
+                animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr);
+                animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr);
+                scaleValue = root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed;
+            }
 
             onOffsetXChanged: animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr)
             onOffsetYChanged: animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr)
@@ -514,24 +636,27 @@ Item {
             }
 
             Behavior on animX {
+                enabled: root.animationsEnabled
                 NumberAnimation {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
 
             Behavior on animY {
+                enabled: root.animationsEnabled
                 NumberAnimation {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
 
             Behavior on scaleValue {
+                enabled: root.animationsEnabled
                 NumberAnimation {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
@@ -555,10 +680,9 @@ Item {
 
             Item {
                 id: contentWrapper
-                anchors.centerIn: parent
                 width: parent.width
                 height: parent.height
-                opacity: shouldBeVisible ? 1 : 0
+                opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
                 visible: opacity > 0
                 scale: contentContainer.scaleValue
                 x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
@@ -569,8 +693,9 @@ Item {
                 layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
                 Behavior on opacity {
+                    enabled: !Theme.isDirectionalEffect
                     NumberAnimation {
-                        duration: animationDuration
+                        duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                     }

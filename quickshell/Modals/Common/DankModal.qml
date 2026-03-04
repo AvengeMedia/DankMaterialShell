@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
-import qs.Widgets
 
 Item {
     id: root
@@ -27,11 +26,11 @@ Item {
     property bool closeOnBackgroundClick: true
     property string animationType: "scale"
     property int animationDuration: Theme.modalAnimationDuration
-    property real animationScaleCollapsed: 0.96
-    property real animationOffset: Theme.spacingL
-    property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
-    property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
-    property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    property real animationScaleCollapsed: Theme.effectScaleCollapsed
+    property real animationOffset: Theme.effectAnimOffset
+    property list<real> animationEnterCurve: Theme.variantModalEnterCurve
+    property list<real> animationExitCurve: Theme.variantModalExitCurve
+    property color backgroundColor: Theme.surfaceContainer
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 0
     property real cornerRadius: Theme.cornerRadius
@@ -45,11 +44,14 @@ Item {
     property bool keepPopoutsOpen: false
     property var customKeyboardFocus: null
     property bool useOverlayLayer: false
+    property real frozenMotionOffsetX: 0
+    property real frozenMotionOffsetY: 0
     readonly property alias contentWindow: contentWindow
     readonly property alias clickCatcher: clickCatcher
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
     readonly property bool useBackground: showBackground && SettingsData.modalDarkenBackground
     readonly property bool useSingleWindow: CompositorService.isHyprland || useBackground
+    readonly property bool _needsFullscreenMotion: !useSingleWindow && (Theme.isDirectionalEffect || Theme.isDepthEffect)
 
     signal opened
     signal dialogClosed
@@ -59,33 +61,34 @@ Item {
 
     function open() {
         closeTimer.stop();
-        const focusedScreen = CompositorService.getFocusedScreen();
-        const screenChanged = focusedScreen && contentWindow.screen !== focusedScreen;
-        if (focusedScreen) {
-            if (screenChanged)
-                contentWindow.visible = false;
-            contentWindow.screen = focusedScreen;
-            if (!useSingleWindow) {
-                if (screenChanged)
-                    clickCatcher.visible = false;
-                clickCatcher.screen = focusedScreen;
-            }
-        }
-        if (screenChanged) {
-            Qt.callLater(() => root._finishOpen());
-        } else {
-            _finishOpen();
-        }
-    }
+        animationsEnabled = false;
+        frozenMotionOffsetX = modalContainer ? modalContainer.offsetX : 0;
+        frozenMotionOffsetY = modalContainer ? modalContainer.offsetY : animationOffset;
 
-    function _finishOpen() {
+        const focusedScreen = CompositorService.getFocusedScreen();
+        if (focusedScreen) {
+            contentWindow.screen = focusedScreen;
+            if (!useSingleWindow && !_needsFullscreenMotion)
+                clickCatcher.screen = focusedScreen;
+        }
+
+        if (Theme.isDirectionalEffect) {
+            if (!useSingleWindow && !_needsFullscreenMotion)
+                clickCatcher.visible = true;
+            contentWindow.visible = true;
+        }
         ModalManager.openModal(root);
-        shouldBeVisible = true;
-        if (!useSingleWindow)
-            clickCatcher.visible = true;
-        contentWindow.visible = true;
-        shouldHaveFocus = false;
-        Qt.callLater(() => shouldHaveFocus = Qt.binding(() => shouldBeVisible));
+
+        Qt.callLater(() => {
+            animationsEnabled = true;
+            shouldBeVisible = true;
+            if (!useSingleWindow && !_needsFullscreenMotion && !clickCatcher.visible)
+                clickCatcher.visible = true;
+            if (!contentWindow.visible)
+                contentWindow.visible = true;
+            shouldHaveFocus = false;
+            Qt.callLater(() => shouldHaveFocus = Qt.binding(() => shouldBeVisible));
+        });
     }
 
     function close() {
@@ -102,7 +105,7 @@ Item {
         ModalManager.closeModal(root);
         closeTimer.stop();
         contentWindow.visible = false;
-        if (!useSingleWindow)
+        if (!useSingleWindow && !_needsFullscreenMotion)
             clickCatcher.visible = false;
         dialogClosed();
         Qt.callLater(() => animationsEnabled = true);
@@ -138,7 +141,7 @@ Item {
             const newScreen = CompositorService.getFocusedScreen();
             if (newScreen) {
                 contentWindow.screen = newScreen;
-                if (!useSingleWindow)
+                if (!useSingleWindow && !_needsFullscreenMotion)
                     clickCatcher.screen = newScreen;
             }
         }
@@ -146,12 +149,12 @@ Item {
 
     Timer {
         id: closeTimer
-        interval: animationDuration + 50
+        interval: Theme.variantCloseInterval(animationDuration)
         onTriggered: {
             if (shouldBeVisible)
                 return;
             contentWindow.visible = false;
-            if (!useSingleWindow)
+            if (!useSingleWindow && !_needsFullscreenMotion)
                 clickCatcher.visible = false;
             dialogClosed();
         }
@@ -160,7 +163,17 @@ Item {
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
-    readonly property real shadowMotionPadding: animationType === "slide" ? 30 : Math.max(0, animationOffset)
+    readonly property real shadowMotionPadding: {
+        if (_needsFullscreenMotion)
+            return 0;
+        if (animationType === "slide")
+            return 30;
+        if (Theme.isDirectionalEffect)
+            return Math.max(Math.max(0, animationOffset), Math.max(alignedWidth, alignedHeight) * 0.9);
+        if (Theme.isDepthEffect)
+            return Math.max(Math.max(0, animationOffset), Math.max(alignedWidth, alignedHeight) * 0.35);
+        return Math.max(0, animationOffset);
+    }
     readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
@@ -230,16 +243,6 @@ Item {
         visible: false
         color: "transparent"
 
-        WindowBlur {
-            targetWindow: contentWindow
-            readonly property real s: Math.min(1, modalContainer.scaleValue)
-            blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
-            blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
-            blurWidth: (shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.width * s : 0
-            blurHeight: (shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.height * s : 0
-            blurRadius: root.cornerRadius
-        }
-
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: {
             if (root.useOverlayLayer)
@@ -271,19 +274,22 @@ Item {
         anchors {
             left: true
             top: true
-            right: root.useSingleWindow
-            bottom: root.useSingleWindow
+            right: root.useSingleWindow || root._needsFullscreenMotion
+            bottom: root.useSingleWindow || root._needsFullscreenMotion
         }
 
+        readonly property real actualMarginLeft: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
+        readonly property real actualMarginTop: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
+
         WlrLayershell.margins {
-            left: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
-            top: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
+            left: actualMarginLeft
+            top: actualMarginTop
             right: 0
             bottom: 0
         }
 
-        implicitWidth: root.useSingleWindow ? 0 : root.alignedWidth + (shadowBuffer * 2)
-        implicitHeight: root.useSingleWindow ? 0 : root.alignedHeight + (shadowBuffer * 2)
+        implicitWidth: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : root.alignedWidth + (shadowBuffer * 2)
+        implicitHeight: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
             if (visible) {
@@ -298,7 +304,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            enabled: root.useSingleWindow && root.closeOnBackgroundClick && root.shouldBeVisible
+            enabled: (root.useSingleWindow || root._needsFullscreenMotion) && root.closeOnBackgroundClick && root.shouldBeVisible
             z: -2
             onClicked: root.backgroundClicked()
         }
@@ -311,9 +317,9 @@ Item {
             visible: root.useBackground
 
             Behavior on opacity {
-                enabled: root.animationsEnabled
+                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
                 DankAnim {
-                    duration: root.animationDuration
+                    duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
@@ -321,15 +327,15 @@ Item {
 
         Item {
             id: modalContainer
-            x: root.useSingleWindow ? root.alignedX : shadowBuffer
-            y: root.useSingleWindow ? root.alignedY : shadowBuffer
+            x: (root.useSingleWindow ? root.alignedX : (root.alignedX - contentWindow.actualMarginLeft)) + Theme.snap(animX, root.dpr)
+            y: (root.useSingleWindow ? root.alignedY : (root.alignedY - contentWindow.actualMarginTop)) + Theme.snap(animY, root.dpr)
 
             width: root.alignedWidth
             height: root.alignedHeight
 
             MouseArea {
                 anchors.fill: parent
-                enabled: root.useSingleWindow && root.shouldBeVisible
+                enabled: (root.useSingleWindow || root._needsFullscreenMotion) && root.shouldBeVisible
                 hoverEnabled: false
                 acceptedButtons: Qt.AllButtons
                 onPressed: mouse.accepted = true
@@ -338,29 +344,92 @@ Item {
             }
 
             readonly property bool slide: root.animationType === "slide"
-            readonly property real offsetX: slide ? 15 : 0
-            readonly property real offsetY: slide ? -30 : root.animationOffset
-
-            property real animX: 0
-            property real animY: 0
-            property real scaleValue: root.animationScaleCollapsed
-
-            onOffsetXChanged: animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr)
-            onOffsetYChanged: animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr)
-
-            Connections {
-                target: root
-                function onShouldBeVisibleChanged() {
-                    modalContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : modalContainer.offsetX, root.dpr);
-                    modalContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : modalContainer.offsetY, root.dpr);
-                    modalContainer.scaleValue = root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed;
+            readonly property bool directionalEffect: Theme.isDirectionalEffect
+            readonly property bool depthEffect: Theme.isDepthEffect
+            readonly property real directionalTravel: Math.max(root.animationOffset, Math.max(root.alignedWidth, root.alignedHeight) * 0.8)
+            readonly property real depthTravel: Math.max(root.animationOffset * 0.8, 36)
+            readonly property real customAnchorX: root.alignedX + root.alignedWidth * 0.5
+            readonly property real customAnchorY: root.alignedY + root.alignedHeight * 0.5
+            readonly property real customDistLeft: customAnchorX
+            readonly property real customDistRight: root.screenWidth - customAnchorX
+            readonly property real customDistTop: customAnchorY
+            readonly property real customDistBottom: root.screenHeight - customAnchorY
+            readonly property real offsetX: {
+                if (slide && !directionalEffect && !depthEffect)
+                    return 15;
+                if (directionalEffect) {
+                    switch (root.positioning) {
+                    case "top-right":
+                        return 0;
+                    case "custom":
+                        if (customDistLeft <= customDistRight && customDistLeft <= customDistTop && customDistLeft <= customDistBottom)
+                            return -directionalTravel;
+                        if (customDistRight <= customDistTop && customDistRight <= customDistBottom)
+                            return directionalTravel;
+                        return 0;
+                    default:
+                        return 0;
+                    }
                 }
+                if (depthEffect) {
+                    switch (root.positioning) {
+                    case "top-right":
+                        return 0;
+                    case "custom":
+                        if (customDistLeft <= customDistRight && customDistLeft <= customDistTop && customDistLeft <= customDistBottom)
+                            return -depthTravel;
+                        if (customDistRight <= customDistTop && customDistRight <= customDistBottom)
+                            return depthTravel;
+                        return 0;
+                    default:
+                        return 0;
+                    }
+                }
+                return 0;
             }
+            readonly property real offsetY: {
+                if (slide && !directionalEffect && !depthEffect)
+                    return -30;
+                if (directionalEffect) {
+                    switch (root.positioning) {
+                    case "top-right":
+                        return -Math.max(directionalTravel * 0.65, 96);
+                    case "custom":
+                        if (customDistTop <= customDistBottom && customDistTop <= customDistLeft && customDistTop <= customDistRight)
+                            return -directionalTravel;
+                        if (customDistBottom <= customDistLeft && customDistBottom <= customDistRight)
+                            return directionalTravel;
+                        return 0;
+                    default:
+                        // Default to sliding down from top when centered
+                        return -Math.max(directionalTravel, root.screenHeight * 0.24);
+                    }
+                }
+                if (depthEffect) {
+                    switch (root.positioning) {
+                    case "top-right":
+                        return -depthTravel * 0.75;
+                    case "custom":
+                        if (customDistTop <= customDistBottom && customDistTop <= customDistLeft && customDistTop <= customDistRight)
+                            return -depthTravel;
+                        if (customDistBottom <= customDistLeft && customDistBottom <= customDistRight)
+                            return depthTravel;
+                        return depthTravel * 0.45;
+                    default:
+                        return -depthTravel;
+                    }
+                }
+                return root.animationOffset;
+            }
+
+            property real animX: root.shouldBeVisible ? 0 : root.frozenMotionOffsetX
+            property real animY: root.shouldBeVisible ? 0 : root.frozenMotionOffsetY
+            property real scaleValue: root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed
 
             Behavior on animX {
                 enabled: root.animationsEnabled
                 DankAnim {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
@@ -368,7 +437,7 @@ Item {
             Behavior on animY {
                 enabled: root.animationsEnabled
                 DankAnim {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
@@ -376,7 +445,7 @@ Item {
             Behavior on scaleValue {
                 enabled: root.animationsEnabled
                 DankAnim {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
@@ -392,15 +461,14 @@ Item {
                     id: animatedContent
                     anchors.fill: parent
                     clip: false
-                    opacity: root.shouldBeVisible ? 1 : 0
+                    opacity: Theme.isDirectionalEffect ? 1 : (root.shouldBeVisible ? 1 : 0)
                     scale: modalContainer.scaleValue
-                    x: Theme.snap(modalContainer.animX, root.dpr) + (parent.width - width) * (1 - modalContainer.scaleValue) * 0.5
-                    y: Theme.snap(modalContainer.animY, root.dpr) + (parent.height - height) * (1 - modalContainer.scaleValue) * 0.5
+                    transformOrigin: Item.Center
 
                     Behavior on opacity {
-                        enabled: root.animationsEnabled
+                        enabled: root.animationsEnabled && !Theme.isDirectionalEffect
                         NumberAnimation {
-                            duration: animationDuration
+                            duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                         }
@@ -416,15 +484,6 @@ Item {
                         borderColor: root.borderColor
                         borderWidth: root.borderWidth
                         shadowEnabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: root.cornerRadius
-                        color: "transparent"
-                        border.color: BlurService.borderColor
-                        border.width: BlurService.borderWidth
-                        z: 100
                     }
 
                     FocusScope {

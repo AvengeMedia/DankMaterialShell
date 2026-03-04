@@ -57,6 +57,144 @@ Item {
 
             SettingsCard {
                 tab: "typography"
+                tags: ["animation", "variant", "style", "slide", "fluent", "dynamic", "motion"]
+                title: I18n.tr("Animation Style")
+                settingKey: "animationVariant"
+                iconName: "auto_awesome_motion"
+
+                Item {
+                    width: parent.width
+                    height: animVariantGroup.implicitHeight
+                    clip: true
+
+                    DankButtonGroup {
+                        id: animVariantGroup
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
+                        minButtonWidth: parent.width < 480 ? 64 : 96
+                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                        model: [I18n.tr("Material"), I18n.tr("Fluent"), I18n.tr("Dynamic")]
+                        selectionMode: "single"
+                        currentIndex: SettingsData.animationVariant
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            SettingsData.set("animationVariant", index);
+                        }
+
+                        Connections {
+                            target: SettingsData
+                            function onAnimationVariantChanged() {
+                                animVariantGroup.currentIndex = SettingsData.animationVariant;
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                }
+
+                Item {
+                    width: parent.width
+                    height: variantDescription.implicitHeight + Theme.spacingS * 2
+
+                    StyledText {
+                        id: variantDescription
+                        x: Theme.spacingM
+                        y: Theme.spacingS
+                        width: parent.width - Theme.spacingM * 2
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        text: {
+                            switch (SettingsData.animationVariant) {
+                            case 1:
+                                return I18n.tr("Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.");
+                            case 2:
+                                return I18n.tr("Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.");
+                            default:
+                                return I18n.tr("Material: Material Design 3 Expressive bezier curves. The DMS default feel.");
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "typography"
+                tags: ["animation", "motion", "effect", "slide", "directional", "depth", "spring", "physics"]
+                title: I18n.tr("Motion Effects")
+                settingKey: "motionEffect"
+                iconName: "motion_photos_on"
+
+                Item {
+                    width: parent.width
+                    height: motionEffectGroup.implicitHeight
+                    clip: true
+
+                    DankButtonGroup {
+                        id: motionEffectGroup
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
+                        minButtonWidth: parent.width < 480 ? 64 : 96
+                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                        model: [I18n.tr("Standard"), I18n.tr("Directional"), I18n.tr("Depth")]
+                        selectionMode: "single"
+                        currentIndex: SettingsData.motionEffect
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            SettingsData.set("motionEffect", index);
+                        }
+
+                        Connections {
+                            target: SettingsData
+                            function onMotionEffectChanged() {
+                                motionEffectGroup.currentIndex = SettingsData.motionEffect;
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                }
+
+                Item {
+                    width: parent.width
+                    height: motionEffectDescription.implicitHeight + Theme.spacingS * 2
+
+                    StyledText {
+                        id: motionEffectDescription
+                        x: Theme.spacingM
+                        y: Theme.spacingS
+                        width: parent.width - Theme.spacingM * 2
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        text: {
+                            switch (SettingsData.motionEffect) {
+                            case 1:
+                                return I18n.tr("Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.");
+                            case 2:
+                                return I18n.tr("Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.");
+                            default:
+                                return I18n.tr("Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.");
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "typography"
                 tags: ["font", "family", "text", "typography"]
                 title: I18n.tr("Typography")
                 settingKey: "typography"
