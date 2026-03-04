@@ -356,6 +356,13 @@ Item {
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
+        WlrLayershell.margins {
+            top: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
+            bottom: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
+            left: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
+            right: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
+        }
+
         anchors {
             top: true
             bottom: true
@@ -455,26 +462,49 @@ Item {
             width: root.alignedWidth
             height: root.alignedHeight
 
+            readonly property int dockEdge: typeof SettingsData !== "undefined" ? SettingsData.dockPosition : 1
+            readonly property bool dockTop: dockEdge === 0
+            readonly property bool dockBottom: dockEdge === 1
+            readonly property bool dockLeft: dockEdge === 2
+            readonly property bool dockRight: dockEdge === 3
+
+            readonly property real dockThickness: typeof SettingsData !== "undefined" && SettingsData.showDock ? Theme.px(SettingsData.dockIconSize + (SettingsData.dockMargin * 2) + SettingsData.dockSpacing + 8, root.dpr) : Theme.px(60, root.dpr)
+
             readonly property bool directionalEffect: Theme.isDirectionalEffect
             readonly property bool depthEffect: Theme.isDepthEffect
-            readonly property real collapsedMotionX: depthEffect ? Theme.effectAnimOffset * 0.25 : 0
+            readonly property real collapsedMotionX: {
+                if (directionalEffect) {
+                    if (dockLeft)
+                        return -(root._ccX + root.alignedWidth + Theme.effectAnimOffset);
+                    if (dockRight)
+                        return root.screenWidth - root._ccX + Theme.effectAnimOffset;
+                }
+                if (depthEffect)
+                    return Theme.effectAnimOffset * 0.25;
+                return 0;
+            }
             readonly property real collapsedMotionY: {
-                if (directionalEffect)
-                    return Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1);
+                if (directionalEffect) {
+                    if (dockTop)
+                        return -(root._ccY + root.alignedHeight + Theme.effectAnimOffset);
+                    if (dockBottom)
+                        return root.screenHeight - root._ccY + root.shadowPad + Theme.effectAnimOffset;
+                    return 0;
+                }
                 if (depthEffect)
                     return -Math.max(Theme.effectAnimOffset * 0.85, 34);
-                return 0;
+                return -Math.max((root.shadowPad || 0) + Theme.effectAnimOffset, 40);
             }
 
             // animX/animY are Behavior-animated — DankPopout pattern
             property real animX: 0
             property real animY: 0
-            property real scaleValue: Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed
+            property real scaleValue: Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed)
 
             Component.onCompleted: {
                 animX = Theme.snap(root._motionActive ? 0 : collapsedMotionX, root.dpr);
                 animY = Theme.snap(root._motionActive ? 0 : collapsedMotionY, root.dpr);
-                scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed);
+                scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed));
             }
 
             Connections {
@@ -482,7 +512,7 @@ Item {
                 function on_MotionActiveChanged() {
                     contentContainer.animX = Theme.snap(root._motionActive ? 0 : root._frozenMotionX, root.dpr);
                     contentContainer.animY = Theme.snap(root._motionActive ? 0 : root._frozenMotionY, root.dpr);
-                    contentContainer.scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed);
+                    contentContainer.scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed));
                 }
             }
 
@@ -503,83 +533,105 @@ Item {
             }
 
             Behavior on scaleValue {
-                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2))
                 DankAnim {
                     duration: Theme.variantDuration(Theme.modalAnimationDuration, root._motionActive)
                     easing.bezierCurve: root._motionActive ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                 }
             }
 
-            // Shadow mirrors contentWrapper position/scale/opacity
-            ElevationShadow {
-                id: launcherShadowLayer
-                width: parent.width
-                height: parent.height
-                opacity: contentWrapper.opacity
-                scale: contentWrapper.scale
-                x: contentWrapper.x
-                y: contentWrapper.y
-                level: root.shadowLevel
-                fallbackOffset: root.shadowFallbackOffset
-                targetColor: root.backgroundColor
-                borderColor: root.borderColor
-                borderWidth: root.borderWidth
-                targetRadius: root.cornerRadius
-                shadowEnabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-            }
-
-            // contentWrapper moves inside static contentContainer — DankPopout pattern
             Item {
-                id: contentWrapper
-                width: parent.width
-                height: parent.height
-                opacity: Theme.isDirectionalEffect ? 1 : (launcherMotionVisible ? 1 : 0)
-                visible: opacity > 0
-                scale: contentContainer.scaleValue
-                x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
-                y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+                id: directionalClipMask
+                readonly property bool shouldClip: Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0
+                readonly property real clipOversize: 2000
 
-                Behavior on opacity {
-                    enabled: root.animationsEnabled && !Theme.isDirectionalEffect
-                    DankAnim {
-                        duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
-                        easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                clip: shouldClip
+
+                x: shouldClip ? (contentContainer.dockRight ? -clipOversize : (contentContainer.dockLeft ? contentContainer.dockThickness - root._ccX : -clipOversize)) : 0
+                y: shouldClip ? (contentContainer.dockBottom ? -clipOversize : (contentContainer.dockTop ? contentContainer.dockThickness - root._ccY : -clipOversize)) : 0
+
+                width: shouldClip ? parent.width + clipOversize + (contentContainer.dockRight ? (root.screenWidth - contentContainer.dockThickness - root._ccX - parent.width) : (contentContainer.dockLeft ? clipOversize : clipOversize)) : parent.width
+                height: shouldClip ? parent.height + clipOversize + (contentContainer.dockBottom ? (root.screenHeight - contentContainer.dockThickness - root._ccY - parent.height) : (contentContainer.dockTop ? clipOversize : clipOversize)) : parent.height
+
+                Item {
+                    id: aligner
+                    x: directionalClipMask.x !== 0 ? -directionalClipMask.x : 0
+                    y: directionalClipMask.y !== 0 ? -directionalClipMask.y : 0
+                    width: contentContainer.width
+                    height: contentContainer.height
+
+                    // Shadow mirrors contentWrapper position/scale/opacity
+                    ElevationShadow {
+                        id: launcherShadowLayer
+                        width: parent.width
+                        height: parent.height
+                        opacity: contentWrapper.opacity
+                        scale: contentWrapper.scale
+                        x: contentWrapper.x
+                        y: contentWrapper.y
+                        level: root.shadowLevel
+                        fallbackOffset: root.shadowFallbackOffset
+                        targetColor: root.backgroundColor
+                        borderColor: root.borderColor
+                        borderWidth: root.borderWidth
+                        targetRadius: root.cornerRadius
+                        shadowEnabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                     }
-                }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onPressed: mouse => mouse.accepted = true
-                }
+                    // contentWrapper moves inside static contentContainer — DankPopout pattern
+                    Item {
+                        id: contentWrapper
+                        width: parent.width
+                        height: parent.height
+                        opacity: Theme.isDirectionalEffect ? 1 : (launcherMotionVisible ? 1 : 0)
+                        visible: opacity > 0
+                        scale: contentContainer.scaleValue
+                        x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+                        y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
 
-                FocusScope {
-                    anchors.fill: parent
-                    focus: keyboardActive
-
-                    Loader {
-                        id: launcherContentLoader
-                        anchors.fill: parent
-                        active: !root.unloadContentOnClose || root.spotlightOpen || root.isClosing || root.contentVisible || root._pendingInitialize
-                        asynchronous: false
-                        sourceComponent: LauncherContent {
-                            focus: true
-                            parentModal: root
-                        }
-
-                        onLoaded: {
-                            if (root._pendingInitialize) {
-                                root._initializeAndShow(root._pendingQuery, root._pendingMode);
-                                root._pendingInitialize = false;
+                        Behavior on opacity {
+                            enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                            DankAnim {
+                                duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                                easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                             }
                         }
-                    }
 
-                    Keys.onEscapePressed: event => {
-                        root.hide();
-                        event.accepted = true;
-                    }
-                }
-            }
-        }
-    }
+                        MouseArea {
+                            anchors.fill: parent
+                            onPressed: mouse => mouse.accepted = true
+                        }
+
+                        FocusScope {
+                            anchors.fill: parent
+                            focus: keyboardActive
+
+                            Loader {
+                                id: launcherContentLoader
+                                anchors.fill: parent
+                                active: !root.unloadContentOnClose || root.spotlightOpen || root.isClosing || root.contentVisible || root._pendingInitialize
+                                asynchronous: false
+                                sourceComponent: LauncherContent {
+                                    focus: true
+                                    parentModal: root
+                                }
+
+                                onLoaded: {
+                                    if (root._pendingInitialize) {
+                                        root._initializeAndShow(root._pendingQuery, root._pendingMode);
+                                        root._pendingInitialize = false;
+                                    }
+                                }
+                            }
+
+                            Keys.onEscapePressed: event => {
+                                root.hide();
+                                event.accepted = true;
+                            }
+                        }
+                    } // contentWrapper
+                } // aligner
+            } // directionalClipMask
+        } // contentContainer
+    } // PanelWindow
 }
