@@ -15,9 +15,12 @@ Singleton {
         if (typeof SettingsData === "undefined")
             return Anims.expressiveDefaultSpatial;
         switch (SettingsData.animationVariant) {
-        case 1:  return Anims.standardDecel;
-        case 2:  return Anims.expressiveFastSpatial;
-        default: return Anims.expressiveDefaultSpatial;
+        case 1:
+            return Anims.standardDecel;
+        case 2:
+            return Anims.expressiveFastSpatial;
+        default:
+            return Anims.expressiveDefaultSpatial;
         }
     }
 
@@ -25,9 +28,12 @@ Singleton {
         if (typeof SettingsData === "undefined")
             return Anims.emphasized;
         switch (SettingsData.animationVariant) {
-        case 1:  return Anims.standard;
-        case 2:  return Anims.emphasized;
-        default: return Anims.emphasized;
+        case 1:
+            return Anims.standard;
+        case 2:
+            return Anims.emphasized;
+        default:
+            return Anims.emphasized;
         }
     }
 
@@ -64,7 +70,7 @@ Singleton {
             if (SettingsData.animationVariant === 1)
                 return Anims.standardDecel;
             if (SettingsData.animationVariant === 2)
-                return Anims.standardDecel;
+                return Anims.expressiveFastSpatial;
             return Anims.standardDecel;
         }
         return variantEnterCurve;
@@ -83,26 +89,35 @@ Singleton {
     }
 
     readonly property real variantEnterDurationFactor: {
-        if (typeof SettingsData === "undefined") return 1.0;
+        if (typeof SettingsData === "undefined")
+            return 1.0;
         switch (SettingsData.animationVariant) {
-        case 1:  return 0.9;
-        case 2:  return 1.08;
-        default: return 1.0;
+        case 1:
+            return 0.9;
+        case 2:
+            return 1.08;
+        default:
+            return 1.0;
         }
     }
 
     readonly property real variantExitDurationFactor: {
-        if (typeof SettingsData === "undefined") return 1.0;
+        if (typeof SettingsData === "undefined")
+            return 1.0;
         switch (SettingsData.animationVariant) {
-        case 1:  return 0.85;
-        case 2:  return 0.92;
-        default: return 1.0;
+        case 1:
+            return 0.85;
+        case 2:
+            return 0.92;
+        default:
+            return 1.0;
         }
     }
 
     // Fluent: opacity at ~55% of duration; Material/Dynamic: 1:1 with position
     readonly property real variantOpacityDurationScale: {
-        if (typeof SettingsData === "undefined") return 1.0;
+        if (typeof SettingsData === "undefined")
+            return 1.0;
         return SettingsData.animationVariant === 1 ? 0.55 : 1.0;
     }
 
@@ -112,11 +127,15 @@ Singleton {
     }
 
     function variantExitCleanupPadding() {
-        if (typeof SettingsData === "undefined") return 50;
+        if (typeof SettingsData === "undefined")
+            return 50;
         switch (SettingsData.motionEffect) {
-        case 1: return 8;
-        case 2: return 24;
-        default: return 50;
+        case 1:
+            return 8;
+        case 2:
+            return 24;
+        default:
+            return 50;
         }
     }
 
@@ -128,20 +147,28 @@ Singleton {
     readonly property bool isDepthEffect: typeof SettingsData !== "undefined" && SettingsData.motionEffect === 2
 
     readonly property real effectScaleCollapsed: {
-        if (typeof SettingsData === "undefined") return 0.96;
+        if (typeof SettingsData === "undefined")
+            return 0.96;
         switch (SettingsData.motionEffect) {
-        case 1: return 1.0;
-        case 2: return 0.88;
-        default: return 0.96;
+        case 1:
+            return 1.0;
+        case 2:
+            return 0.88;
+        default:
+            return 0.96;
         }
     }
 
     readonly property real effectAnimOffset: {
-        if (typeof SettingsData === "undefined") return 16;
+        if (typeof SettingsData === "undefined")
+            return 16;
         switch (SettingsData.motionEffect) {
-        case 1: return 144;
-        case 2: return 56;
-        default: return 16;
+        case 1:
+            return 144;
+        case 2:
+            return 56;
+        default:
+            return 16;
         }
     }
 }

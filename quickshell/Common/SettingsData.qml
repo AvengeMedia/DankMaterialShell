@@ -184,6 +184,8 @@ Singleton {
     onAnimationVariantChanged: saveSettings()
     property int motionEffect: SettingsData.AnimationEffect.Standard
     onMotionEffectChanged: saveSettings()
+    property int directionalAnimationMode: 0
+    onDirectionalAnimationModeChanged: saveSettings()
     property bool m3ElevationEnabled: true
     onM3ElevationEnabledChanged: saveSettings()
     property int m3ElevationIntensity: 12
