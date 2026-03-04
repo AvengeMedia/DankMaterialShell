@@ -50,8 +50,7 @@ Item {
     readonly property alias clickCatcher: clickCatcher
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
     readonly property bool useBackground: showBackground && SettingsData.modalDarkenBackground
-    readonly property bool useSingleWindow: CompositorService.isHyprland || useBackground
-    readonly property bool _needsFullscreenMotion: !useSingleWindow && (Theme.isDirectionalEffect || Theme.isDepthEffect)
+    readonly property bool useSingleWindow: CompositorService.isHyprland
 
     signal opened
     signal dialogClosed
@@ -68,12 +67,12 @@ Item {
         const focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen) {
             contentWindow.screen = focusedScreen;
-            if (!useSingleWindow && !_needsFullscreenMotion)
+            if (!useSingleWindow)
                 clickCatcher.screen = focusedScreen;
         }
 
-        if (Theme.isDirectionalEffect) {
-            if (!useSingleWindow && !_needsFullscreenMotion)
+        if (Theme.isDirectionalEffect || root.useBackground) {
+            if (!useSingleWindow)
                 clickCatcher.visible = true;
             contentWindow.visible = true;
         }
@@ -82,7 +81,7 @@ Item {
         Qt.callLater(() => {
             animationsEnabled = true;
             shouldBeVisible = true;
-            if (!useSingleWindow && !_needsFullscreenMotion && !clickCatcher.visible)
+            if (!useSingleWindow && !clickCatcher.visible)
                 clickCatcher.visible = true;
             if (!contentWindow.visible)
                 contentWindow.visible = true;
@@ -105,7 +104,7 @@ Item {
         ModalManager.closeModal(root);
         closeTimer.stop();
         contentWindow.visible = false;
-        if (!useSingleWindow && !_needsFullscreenMotion)
+        if (!useSingleWindow)
             clickCatcher.visible = false;
         dialogClosed();
         Qt.callLater(() => animationsEnabled = true);
@@ -141,7 +140,7 @@ Item {
             const newScreen = CompositorService.getFocusedScreen();
             if (newScreen) {
                 contentWindow.screen = newScreen;
-                if (!useSingleWindow && !_needsFullscreenMotion)
+                if (!useSingleWindow)
                     clickCatcher.screen = newScreen;
             }
         }
@@ -154,7 +153,7 @@ Item {
             if (shouldBeVisible)
                 return;
             contentWindow.visible = false;
-            if (!useSingleWindow && !_needsFullscreenMotion)
+            if (!useSingleWindow)
                 clickCatcher.visible = false;
             dialogClosed();
         }
@@ -164,8 +163,8 @@ Item {
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
-        if (_needsFullscreenMotion)
-            return 0;
+        if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0 && Theme.isDirectionalEffect)
+            return 0; // Wayland native overlap mask
         if (animationType === "slide")
             return 30;
         if (Theme.isDirectionalEffect)
@@ -233,8 +232,25 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            enabled: root.closeOnBackgroundClick && root.shouldBeVisible
+            enabled: !root.useSingleWindow && root.closeOnBackgroundClick && root.shouldBeVisible
             onClicked: root.backgroundClicked()
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            z: -1
+            color: "black"
+            opacity: (!root.useSingleWindow && root.useBackground) ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
+            visible: opacity > 0
+
+            Behavior on opacity {
+                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                NumberAnimation {
+                    duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
         }
     }
 
@@ -274,12 +290,12 @@ Item {
         anchors {
             left: true
             top: true
-            right: root.useSingleWindow || root._needsFullscreenMotion
-            bottom: root.useSingleWindow || root._needsFullscreenMotion
+            right: root.useSingleWindow
+            bottom: root.useSingleWindow
         }
 
-        readonly property real actualMarginLeft: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
-        readonly property real actualMarginTop: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
+        readonly property real actualMarginLeft: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
+        readonly property real actualMarginTop: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
 
         WlrLayershell.margins {
             left: actualMarginLeft
@@ -288,8 +304,8 @@ Item {
             bottom: 0
         }
 
-        implicitWidth: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : root.alignedWidth + (shadowBuffer * 2)
-        implicitHeight: (root.useSingleWindow || root._needsFullscreenMotion) ? 0 : root.alignedHeight + (shadowBuffer * 2)
+        implicitWidth: root.useSingleWindow ? 0 : root.alignedWidth + (shadowBuffer * 2)
+        implicitHeight: root.useSingleWindow ? 0 : root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
             if (visible) {
@@ -304,7 +320,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            enabled: (root.useSingleWindow || root._needsFullscreenMotion) && root.closeOnBackgroundClick && root.shouldBeVisible
+            enabled: root.useSingleWindow && root.closeOnBackgroundClick && root.shouldBeVisible
             z: -2
             onClicked: root.backgroundClicked()
         }
@@ -313,13 +329,14 @@ Item {
             anchors.fill: parent
             z: -1
             color: "black"
-            opacity: root.useBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
-            visible: root.useBackground
+            opacity: (root.useSingleWindow && root.useBackground) ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
+            visible: opacity > 0
 
             Behavior on opacity {
                 enabled: root.animationsEnabled && !Theme.isDirectionalEffect
-                DankAnim {
+                NumberAnimation {
                     duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
+                    easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
@@ -335,7 +352,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: (root.useSingleWindow || root._needsFullscreenMotion) && root.shouldBeVisible
+                enabled: root.useSingleWindow && root.shouldBeVisible
                 hoverEnabled: false
                 acceptedButtons: Qt.AllButtons
                 onPressed: mouse.accepted = true
@@ -355,6 +372,8 @@ Item {
             readonly property real customDistTop: customAnchorY
             readonly property real customDistBottom: root.screenHeight - customAnchorY
             readonly property real offsetX: {
+                if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect)
+                    return 0;
                 if (slide && !directionalEffect && !depthEffect)
                     return 15;
                 if (directionalEffect) {
@@ -388,6 +407,8 @@ Item {
                 return 0;
             }
             readonly property real offsetY: {
+                if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect)
+                    return 0;
                 if (slide && !directionalEffect && !depthEffect)
                     return -30;
                 if (directionalEffect) {
@@ -424,28 +445,33 @@ Item {
 
             property real animX: root.shouldBeVisible ? 0 : root.frozenMotionOffsetX
             property real animY: root.shouldBeVisible ? 0 : root.frozenMotionOffsetY
-            property real scaleValue: root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed
+
+            readonly property real computedScaleCollapsed: (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect) ? 0.0 : root.animationScaleCollapsed
+            property real scaleValue: root.shouldBeVisible ? 1.0 : computedScaleCollapsed
 
             Behavior on animX {
                 enabled: root.animationsEnabled
-                DankAnim {
+                NumberAnimation {
                     duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
+                    easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
 
             Behavior on animY {
                 enabled: root.animationsEnabled
-                DankAnim {
+                NumberAnimation {
                     duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
+                    easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
 
             Behavior on scaleValue {
                 enabled: root.animationsEnabled
-                DankAnim {
+                NumberAnimation {
                     duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
+                    easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
