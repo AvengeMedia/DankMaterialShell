@@ -22,6 +22,64 @@ Scope {
     signal flashMsg
     signal unlockRequested
 
+    function resetAuthFlows(): void {
+        passwd.abort();
+        fprint.abort();
+        u2f.abort();
+        errorRetry.running = false;
+        u2fErrorRetry.running = false;
+        u2fPendingTimeout.running = false;
+        passwdActiveTimeout.running = false;
+        unlockRequestTimeout.running = false;
+        u2fPending = false;
+        u2fState = "";
+        unlockInProgress = false;
+    }
+
+    function recoverFromAuthStall(newState: string): void {
+        resetAuthFlows();
+        state = newState;
+        flashMsg();
+        stateReset.restart();
+        fprint.checkAvail();
+        u2f.checkAvail();
+    }
+
+    function completeUnlock(): void {
+        if (!unlockInProgress) {
+            unlockInProgress = true;
+            passwd.abort();
+            fprint.abort();
+            u2f.abort();
+            errorRetry.running = false;
+            u2fErrorRetry.running = false;
+            u2fPendingTimeout.running = false;
+            u2fPending = false;
+            u2fState = "";
+            unlockRequestTimeout.restart();
+            unlockRequested();
+        }
+    }
+
+    function proceedAfterPrimaryAuth(): void {
+        if (SettingsData.enableU2f && SettingsData.u2fMode === "and" && u2f.available) {
+            u2f.startForSecondFactor();
+        } else {
+            completeUnlock();
+        }
+    }
+
+    function cancelU2fPending(): void {
+        if (!u2fPending)
+            return;
+        u2f.abort();
+        u2fErrorRetry.running = false;
+        u2fPendingTimeout.running = false;
+        u2fPending = false;
+        u2fState = "";
+        fprint.checkAvail();
+    }
+
     FileView {
         id: dankshellConfigWatcher
 
@@ -66,6 +124,13 @@ Scope {
                 return;
             }
 
+            unlockRequestTimeout.running = false;
+            root.unlockInProgress = false;
+            root.u2fPending = false;
+            root.u2fState = "";
+            u2fPendingTimeout.running = false;
+            u2f.abort();
+
             if (res === PamResult.Error)
                 root.state = "error";
             else if (res === PamResult.MaxTries)
@@ -75,6 +140,18 @@ Scope {
 
             root.flashMsg();
             stateReset.restart();
+        }
+    }
+
+    Connections {
+        target: passwd
+
+        function onActiveChanged() {
+            if (passwd.active) {
+                passwdActiveTimeout.restart();
+            } else {
+                passwdActiveTimeout.running = false;
+            }
         }
     }
 
@@ -153,6 +230,40 @@ Scope {
     }
 
     Timer {
+        id: u2fErrorRetry
+
+        interval: 800
+        onTriggered: u2f.start()
+    }
+
+    Timer {
+        id: u2fPendingTimeout
+
+        interval: 30000
+        onTriggered: root.cancelU2fPending()
+    }
+
+    Timer {
+        id: passwdActiveTimeout
+
+        interval: 15000
+        onTriggered: {
+            if (passwd.active)
+                root.recoverFromAuthStall("error");
+        }
+    }
+
+    Timer {
+        id: unlockRequestTimeout
+
+        interval: 8000
+        onTriggered: {
+            if (root.unlockInProgress)
+                root.recoverFromAuthStall("error");
+        }
+    }
+
+    Timer {
         id: stateReset
 
         interval: 4000
@@ -178,11 +289,9 @@ Scope {
             root.state = "";
             root.fprintState = "";
             root.lockMessage = "";
-            root.unlockInProgress = false;
+            root.resetAuthFlows();
         } else {
-            fprint.abort();
-            passwd.abort();
-            root.unlockInProgress = false;
+            root.resetAuthFlows();
         }
     }
 
@@ -191,6 +300,22 @@ Scope {
 
         function onEnableFprintChanged(): void {
             fprint.checkAvail();
+        }
+
+        function onEnableU2fChanged(): void {
+            u2f.checkAvail();
+        }
+
+        function onU2fModeChanged(): void {
+            if (root.lockSecured) {
+                u2f.abort();
+                u2fErrorRetry.running = false;
+                u2fPendingTimeout.running = false;
+                unlockRequestTimeout.running = false;
+                root.u2fPending = false;
+                root.u2fState = "";
+                u2f.checkAvail();
+            }
         }
     }
 }

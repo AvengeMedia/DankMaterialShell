@@ -154,6 +154,8 @@ var SPEC = {
     centeringMode: { def: "index" },
     clockDateFormat: { def: "" },
     lockDateFormat: { def: "" },
+    greeterRememberLastSession: { def: true },
+    greeterRememberLastUser: { def: true },
     mediaSize: { def: 1 },
 
     appLauncherViewMode: { def: "list" },

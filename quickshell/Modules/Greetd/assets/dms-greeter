@@ -6,6 +6,9 @@ COMPOSITOR=""
 COMPOSITOR_CONFIG=""
 DMS_PATH="dms-greeter"
 CACHE_DIR="/var/cache/dms-greeter"
+REMEMBER_LAST_SESSION=""
+REMEMBER_LAST_USER=""
+DEBUG_MODE=0
 
 show_help() {
     cat << EOF
@@ -22,6 +25,15 @@ Options:
                            (default: dms-greeter)
     --cache-dir PATH        Cache directory for greeter data
                            (default: /var/cache/dms-greeter)
+    --remember-last-session BOOL
+                           Persist selected session to greeter memory
+                           (BOOL: true/false, default: from settings.json)
+    --remember-last-user BOOL
+                           Persist last successful username to greeter memory
+                           (BOOL: true/false, default: from settings.json)
+    --no-save-session      Alias for --remember-last-session false
+    --no-save-username     Alias for --remember-last-user false
+    --debug                Enable verbose startup logging to stderr
     -h, --help             Show this help message
 
 Examples:
@@ -30,6 +42,7 @@ Examples:
     dms-greeter --command sway -p /home/user/.config/quickshell/custom-dms
     dms-greeter --command scroll -p /home/user/.config/quickshell/custom-dms
     dms-greeter --command niri --cache-dir /tmp/dmsgreeter
+    dms-greeter --command niri --no-save-session --no-save-username
     dms-greeter --command mango
     dms-greeter --command labwc
 EOF
@@ -41,6 +54,41 @@ require_command() {
         echo "Error: required command '$cmd' was not found in PATH" >&2
         exit 1
     fi
+}
+
+normalize_bool_flag() {
+    local flag_name="$1"
+    local value="$2"
+    local normalized="${value,,}"
+
+    case "$normalized" in
+        1|true|yes|on)
+            echo "1"
+            ;;
+        0|false|no|off)
+            echo "0"
+            ;;
+        *)
+            echo "Error: $flag_name must be true/false (or 1/0, yes/no, on/off)" >&2
+            exit 1
+            ;;
+    esac
+}
+
+exec_compositor() {
+    local log_tag="$1"
+    shift
+
+    if [[ "$DEBUG_MODE" == "1" ]]; then
+        exec "$@"
+    fi
+
+    if command -v systemd-cat >/dev/null 2>&1; then
+        exec "$@" > >(systemd-cat -t "dms-greeter/$log_tag" -p info) 2>&1
+    fi
+
+    local log_file="$CACHE_DIR/$log_tag.log"
+    exec "$@" >> "$log_file" 2>&1
 }
 
 while [[ $# -gt 0 ]]; do
@@ -60,6 +108,26 @@ while [[ $# -gt 0 ]]; do
         --cache-dir)
             CACHE_DIR="$2"
             shift 2
+            ;;
+        --remember-last-session)
+            REMEMBER_LAST_SESSION="$2"
+            shift 2
+            ;;
+        --remember-last-user)
+            REMEMBER_LAST_USER="$2"
+            shift 2
+            ;;
+        --no-save-session)
+            REMEMBER_LAST_SESSION="0"
+            shift
+            ;;
+        --no-save-username)
+            REMEMBER_LAST_USER="0"
+            shift
+            ;;
+        --debug)
+            DEBUG_MODE=1
+            shift
             ;;
         -h|--help)
             show_help
@@ -113,7 +181,37 @@ export EGL_PLATFORM=gbm
 export DMS_RUN_GREETER=1
 export DMS_GREET_CFG_DIR="$CACHE_DIR"
 
+if [[ -n "$REMEMBER_LAST_SESSION" ]]; then
+    DMS_GREET_REMEMBER_LAST_SESSION=$(normalize_bool_flag "--remember-last-session" "$REMEMBER_LAST_SESSION")
+    export DMS_GREET_REMEMBER_LAST_SESSION
+    if [[ "$DMS_GREET_REMEMBER_LAST_SESSION" == "1" ]]; then
+        DMS_SAVE_SESSION=true
+    else
+        DMS_SAVE_SESSION=false
+    fi
+    export DMS_SAVE_SESSION
+fi
+
+if [[ -n "$REMEMBER_LAST_USER" ]]; then
+    DMS_GREET_REMEMBER_LAST_USER=$(normalize_bool_flag "--remember-last-user" "$REMEMBER_LAST_USER")
+    export DMS_GREET_REMEMBER_LAST_USER
+    if [[ "$DMS_GREET_REMEMBER_LAST_USER" == "1" ]]; then
+        DMS_SAVE_USERNAME=true
+    else
+        DMS_SAVE_USERNAME=false
+    fi
+    export DMS_SAVE_USERNAME
+fi
+
 mkdir -p "$CACHE_DIR"
+
+# Keep greeter VT clean by default; callers can override via env or --debug.
+if [[ -z "${RUST_LOG:-}" ]]; then
+    export RUST_LOG=warn
+fi
+if [[ -z "${NIRI_LOG:-}" ]]; then
+    export NIRI_LOG=warn
+fi
 
 if command -v qs >/dev/null 2>&1; then
     QS_BIN="qs"
@@ -130,7 +228,9 @@ if [[ "$DMS_PATH" == /* ]]; then
 else
     RESOLVED_PATH=$(locate_dms_config "$DMS_PATH")
     if [[ $? -eq 0 && -n "$RESOLVED_PATH" ]]; then
-        echo "Located DMS config at: $RESOLVED_PATH" >&2
+        if [[ "$DEBUG_MODE" == "1" ]]; then
+            echo "Located DMS config at: $RESOLVED_PATH" >&2
+        fi
         QS_CMD="$QS_BIN -p $RESOLVED_PATH"
     else
         echo "Error: Could not find DMS config '$DMS_PATH' (shell.qml) in any valid config path" >&2
@@ -192,7 +292,7 @@ NIRI_EOF
 spawn-at-startup "sh" "-c" "$QS_CMD; niri msg action quit --skip-confirmation"
 NIRI_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
-        exec niri -c "$COMPOSITOR_CONFIG"
+        exec_compositor "niri" niri -c "$COMPOSITOR_CONFIG"
         ;;
 
     hyprland)
@@ -222,9 +322,9 @@ HYPRLAND_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         fi
         if command -v start-hyprland >/dev/null 2>&1; then
-            exec start-hyprland -- --config "$COMPOSITOR_CONFIG"
+            exec_compositor "hyprland" start-hyprland -- --config "$COMPOSITOR_CONFIG"
         else
-            exec Hyprland -c "$COMPOSITOR_CONFIG"
+            exec_compositor "hyprland" Hyprland -c "$COMPOSITOR_CONFIG"
         fi
         ;;
 
@@ -245,7 +345,7 @@ exec "$QS_CMD; swaymsg exit"
 SWAY_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         fi
-        exec sway --unsupported-gpu -c "$COMPOSITOR_CONFIG"
+        exec_compositor "sway" sway --unsupported-gpu -c "$COMPOSITOR_CONFIG"
         ;;
 
     scroll)
@@ -265,7 +365,7 @@ exec "$QS_CMD; scrollmsg exit"
 SCROLL_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         fi
-        exec scroll -c "$COMPOSITOR_CONFIG"
+        exec_compositor "scroll" scroll -c "$COMPOSITOR_CONFIG"
         ;;
 
     miracle|miracle-wm)
@@ -285,24 +385,24 @@ exec "$QS_CMD; miraclemsg exit"
 MIRACLE_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         fi
-        exec miracle-wm -c "$COMPOSITOR_CONFIG"
+        exec_compositor "miracle" miracle-wm -c "$COMPOSITOR_CONFIG"
         ;;
 
     labwc)
         require_command "labwc"
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
-            exec labwc --config "$COMPOSITOR_CONFIG" --session "$QS_CMD"
+            exec_compositor "labwc" labwc --config "$COMPOSITOR_CONFIG" --session "$QS_CMD"
         else
-            exec labwc --session "$QS_CMD"
+            exec_compositor "labwc" labwc --session "$QS_CMD"
         fi
         ;;
 
     mango|mangowc)
         require_command "mango"
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
-            exec mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
+            exec_compositor "mango" mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
         else
-            exec mango -s "$QS_CMD && mmsg -d quit"
+            exec_compositor "mango" mango -s "$QS_CMD && mmsg -d quit"
         fi
         ;;
 

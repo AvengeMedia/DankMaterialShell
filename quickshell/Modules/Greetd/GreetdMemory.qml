@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "GreetdEnv.js" as GreetdEnv
 
 Singleton {
     id: root
@@ -11,6 +12,8 @@ Singleton {
     readonly property string greetCfgDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/etc/greetd/.dms"
     readonly property string sessionConfigPath: greetCfgDir + "/session.json"
     readonly property string memoryFile: greetCfgDir + "/memory.json"
+    readonly property bool rememberLastSession: GreetdEnv.readBoolOverride(Quickshell.env, ["DMS_GREET_REMEMBER_LAST_SESSION", "DMS_SAVE_SESSION"], true)
+    readonly property bool rememberLastUser: GreetdEnv.readBoolOverride(Quickshell.env, ["DMS_GREET_REMEMBER_LAST_USER", "DMS_SAVE_USERNAME"], true)
 
     property string lastSessionId: ""
     property string lastSuccessfulUser: ""
@@ -49,26 +52,44 @@ Singleton {
             if (!content || !content.trim())
                 return;
             const memory = JSON.parse(content);
-            lastSessionId = memory.lastSessionId || "";
-            lastSuccessfulUser = memory.lastSuccessfulUser || "";
+            lastSessionId = rememberLastSession ? (memory.lastSessionId || "") : "";
+            lastSuccessfulUser = rememberLastUser ? (memory.lastSuccessfulUser || "") : "";
+            if (!rememberLastSession || !rememberLastUser)
+                saveMemory();
         } catch (e) {
             console.warn("Failed to parse greetd memory:", e);
         }
     }
 
     function saveMemory() {
-        memoryFileView.setText(JSON.stringify({
-            "lastSessionId": lastSessionId,
-            "lastSuccessfulUser": lastSuccessfulUser
-        }, null, 2));
+        let memory = {};
+        if (rememberLastSession && lastSessionId)
+            memory.lastSessionId = lastSessionId;
+        if (rememberLastUser && lastSuccessfulUser)
+            memory.lastSuccessfulUser = lastSuccessfulUser;
+        memoryFileView.setText(JSON.stringify(memory, null, 2));
     }
 
     function setLastSessionId(id) {
+        if (!rememberLastSession) {
+            if (lastSessionId !== "") {
+                lastSessionId = "";
+                saveMemory();
+            }
+            return;
+        }
         lastSessionId = id || "";
         saveMemory();
     }
 
     function setLastSuccessfulUser(username) {
+        if (!rememberLastUser) {
+            if (lastSuccessfulUser !== "") {
+                lastSuccessfulUser = "";
+                saveMemory();
+            }
+            return;
+        }
         lastSuccessfulUser = username || "";
         saveMemory();
     }

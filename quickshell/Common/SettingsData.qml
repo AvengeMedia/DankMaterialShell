@@ -294,6 +294,8 @@ Singleton {
     property string centeringMode: "index"
     property string clockDateFormat: ""
     property string lockDateFormat: ""
+    property bool greeterRememberLastSession: true
+    property bool greeterRememberLastUser: true
     property int mediaSize: 1
 
     property string appLauncherViewMode: "list"

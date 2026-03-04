@@ -745,13 +745,17 @@ Item {
                             }
                         }
                         onAccepted: {
-                            if (!demoMode && !pam.passwd.active) {
-                                console.log("Enter pressed, starting PAM authentication");
+                            if (!demoMode && !root.unlocking && !pam.passwd.active && !pam.u2fPending) {
                                 pam.passwd.start();
                             }
                         }
                         Keys.onPressed: event => {
                             if (demoMode) {
+                                return;
+                            }
+
+                            if (root.unlocking) {
+                                event.accepted = true;
                                 return;
                             }
 
@@ -998,8 +1002,7 @@ Item {
                         visible: (demoMode || (!pam.passwd.active && !root.unlocking))
                         enabled: !demoMode
                         onClicked: {
-                            if (!demoMode) {
-                                console.log("Enter button clicked, starting PAM authentication");
+                            if (!demoMode && !root.unlocking && !pam.u2fPending) {
                                 pam.passwd.start();
                             }
                         }
@@ -1602,10 +1605,20 @@ Item {
         onStateChanged: {
             root.pamState = state;
             if (state !== "") {
+                root.unlocking = false;
                 placeholderDelay.restart();
                 passwordField.text = "";
                 root.passwordBuffer = "";
             }
+        }
+    }
+
+    Connections {
+        target: pam
+
+        function onUnlockInProgressChanged() {
+            if (!pam.unlockInProgress && root.unlocking)
+                root.unlocking = false;
         }
     }
 

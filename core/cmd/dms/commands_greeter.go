@@ -486,22 +486,22 @@ func enableGreeter() error {
 	configPath := "/etc/greetd/config.toml"
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		return fmt.Errorf("greetd config not found at %s\nPlease install greetd first", configPath)
+	} else if err != nil {
+		return fmt.Errorf("failed to access greetd config at %s: %w", configPath, err)
 	}
 
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		return fmt.Errorf("failed to read greetd config: %w", err)
-	}
-
-	configContent := string(data)
 	if greeter.IsGreeterPackaged() && greeter.HasLegacyLocalGreeterWrapper() {
 		return fmt.Errorf("legacy manual wrapper detected at /usr/local/bin/dms-greeter; remove it before using packaged dms-greeter: sudo rm -f /usr/local/bin/dms-greeter")
 	}
 
-	configAlreadyCorrect := strings.Contains(configContent, "dms-greeter")
+	configAlreadyCorrect := isGreeterEnabled()
+	configuredCompositor := detectConfiguredCompositor()
 
 	if configAlreadyCorrect {
 		fmt.Println("✓ Greeter is already configured with dms-greeter")
+		if configuredCompositor != "" {
+			fmt.Printf("✓ Configured compositor: %s\n", configuredCompositor)
+		}
 
 		if err := ensureGraphicalTarget(); err != nil {
 			return err
@@ -548,67 +548,20 @@ func enableGreeter() error {
 		fmt.Printf("✓ Selected compositor: %s\n", selectedCompositor)
 	}
 
-	backupPath := configPath + ".backup"
-	backupCmd := exec.Command("sudo", "cp", configPath, backupPath)
-	if err := backupCmd.Run(); err != nil {
-		return fmt.Errorf("failed to backup config: %w", err)
-	}
-	fmt.Printf("✓ Backed up config to %s\n", backupPath)
-
-	lines := strings.Split(configContent, "\n")
-	var newLines []string
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if !strings.HasPrefix(trimmed, "command =") && !strings.HasPrefix(trimmed, "command=") {
-			newLines = append(newLines, line)
+	greeterPathForConfig := ""
+	if !greeter.IsGreeterPackaged() {
+		dmsPath, err := greeter.DetectDMSPath()
+		if err != nil {
+			return fmt.Errorf("failed to detect DMS path for manual greeter configuration: %w", err)
 		}
+		greeterPathForConfig = dmsPath
 	}
-
-	wrapperCmd, err := findCommandPath("dms-greeter")
-	if err != nil {
-		return fmt.Errorf("dms-greeter not found in PATH. Please ensure it is installed and accessible")
+	logFunc := func(msg string) {
+		fmt.Println(msg)
 	}
-
-	compositorLower := strings.ToLower(selectedCompositor)
-	commandLine := fmt.Sprintf(`command = "%s --command %s"`, wrapperCmd, compositorLower)
-
-	var finalLines []string
-	inDefaultSession := false
-	commandAdded := false
-
-	for _, line := range newLines {
-		finalLines = append(finalLines, line)
-		trimmed := strings.TrimSpace(line)
-
-		if trimmed == "[default_session]" {
-			inDefaultSession = true
-		}
-
-		if inDefaultSession && !commandAdded {
-			if strings.HasPrefix(trimmed, "user =") || strings.HasPrefix(trimmed, "user=") {
-				finalLines = append(finalLines, commandLine)
-				commandAdded = true
-			}
-		}
+	if err := greeter.ConfigureGreetd(greeterPathForConfig, selectedCompositor, logFunc, ""); err != nil {
+		return fmt.Errorf("failed to configure greetd: %w", err)
 	}
-
-	if !commandAdded {
-		finalLines = append(finalLines, commandLine)
-	}
-
-	newConfig := strings.Join(finalLines, "\n")
-
-	tmpFile := "/tmp/greetd-config.toml"
-	if err := os.WriteFile(tmpFile, []byte(newConfig), 0o644); err != nil {
-		return fmt.Errorf("failed to write temp config: %w", err)
-	}
-
-	moveCmd := exec.Command("sudo", "mv", tmpFile, configPath)
-	if err := moveCmd.Run(); err != nil {
-		return fmt.Errorf("failed to update config: %w", err)
-	}
-
-	fmt.Printf("✓ Updated greetd configuration to use %s\n", selectedCompositor)
 
 	if err := ensureGraphicalTarget(); err != nil {
 		return err
@@ -631,32 +584,69 @@ func enableGreeter() error {
 }
 
 func isGreeterEnabled() bool {
-	data, err := os.ReadFile("/etc/greetd/config.toml")
-	if err != nil {
-		return false
-	}
-	return strings.Contains(string(data), "dms-greeter")
+	command := readDefaultSessionCommand("/etc/greetd/config.toml")
+	return command != "" && strings.Contains(command, "dms-greeter")
 }
 
 func detectConfiguredCompositor() string {
-	data, err := os.ReadFile("/etc/greetd/config.toml")
+	command := strings.ToLower(readDefaultSessionCommand("/etc/greetd/config.toml"))
+	switch {
+	case strings.Contains(command, "--command niri"):
+		return "niri"
+	case strings.Contains(command, "--command hyprland"):
+		return "hyprland"
+	case strings.Contains(command, "--command sway"):
+		return "sway"
+	}
+	return ""
+}
+
+func stripTomlComment(line string) string {
+	trimmed := strings.TrimSpace(line)
+	if idx := strings.Index(trimmed, "#"); idx >= 0 {
+		return strings.TrimSpace(trimmed[:idx])
+	}
+	return trimmed
+}
+
+func parseTomlSection(line string) (string, bool) {
+	trimmed := stripTomlComment(line)
+	if len(trimmed) < 3 || !strings.HasPrefix(trimmed, "[") || !strings.HasSuffix(trimmed, "]") {
+		return "", false
+	}
+	return strings.TrimSpace(trimmed[1 : len(trimmed)-1]), true
+}
+
+func readDefaultSessionCommand(configPath string) string {
+	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return ""
 	}
 
-	for _, line := range strings.Split(string(data), "\n") {
-		trimmed := strings.TrimSpace(line)
-		if !strings.HasPrefix(trimmed, "command") || !strings.Contains(trimmed, "dms-greeter") {
+	inDefaultSession := false
+	for line := range strings.SplitSeq(string(data), "\n") {
+		if section, ok := parseTomlSection(line); ok {
+			inDefaultSession = section == "default_session"
 			continue
 		}
 
-		switch {
-		case strings.Contains(trimmed, "--command niri"):
-			return "niri"
-		case strings.Contains(trimmed, "--command hyprland"):
-			return "hyprland"
-		case strings.Contains(trimmed, "--command sway"):
-			return "sway"
+		if !inDefaultSession {
+			continue
+		}
+
+		trimmed := stripTomlComment(line)
+		if !strings.HasPrefix(trimmed, "command =") && !strings.HasPrefix(trimmed, "command=") {
+			continue
+		}
+
+		parts := strings.SplitN(trimmed, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		command := strings.Trim(strings.TrimSpace(parts[1]), `"`)
+		if command != "" {
+			return command
 		}
 	}
 
@@ -742,30 +732,21 @@ func checkGreeterStatus() error {
 
 	configPath := "/etc/greetd/config.toml"
 	fmt.Println("Greeter Configuration:")
-	if data, err := os.ReadFile(configPath); err == nil {
-		configContent := string(data)
-		if strings.Contains(configContent, "dms-greeter") {
-			lines := strings.SplitSeq(configContent, "\n")
-			for line := range lines {
-				trimmed := strings.TrimSpace(line)
-				if strings.HasPrefix(trimmed, "command =") || strings.HasPrefix(trimmed, "command=") {
-					parts := strings.SplitN(trimmed, "=", 2)
-					if len(parts) == 2 {
-						command := strings.Trim(strings.TrimSpace(parts[1]), `"`)
-						fmt.Println("  ✓ Greeter is enabled")
+	if _, err := os.ReadFile(configPath); err == nil {
+		command := readDefaultSessionCommand(configPath)
+		if command != "" && strings.Contains(command, "dms-greeter") {
+			fmt.Println("  ✓ Greeter is enabled")
 
-						if strings.Contains(command, "--command niri") {
-							fmt.Println("  Compositor: niri")
-						} else if strings.Contains(command, "--command hyprland") {
-							fmt.Println("  Compositor: Hyprland")
-						} else if strings.Contains(command, "--command sway") {
-							fmt.Println("  Compositor: sway")
-						} else {
-							fmt.Println("  Compositor: unknown")
-						}
-					}
-					break
-				}
+			compositor := detectConfiguredCompositor()
+			switch compositor {
+			case "niri":
+				fmt.Println("  Compositor: niri")
+			case "hyprland":
+				fmt.Println("  Compositor: Hyprland")
+			case "sway":
+				fmt.Println("  Compositor: sway")
+			default:
+				fmt.Println("  Compositor: unknown")
 			}
 		} else {
 			fmt.Println("  ✗ Greeter is NOT enabled")

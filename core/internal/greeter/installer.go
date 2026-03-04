@@ -36,6 +36,184 @@ func DetectGreeterGroup() string {
 	return "greeter"
 }
 
+func hasPasswdUser(passwdData, user string) bool {
+	prefix := user + ":"
+	for line := range strings.SplitSeq(passwdData, "\n") {
+		if strings.HasPrefix(line, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func findPasswdUser(passwdData string, candidates ...string) (string, bool) {
+	for _, candidate := range candidates {
+		if hasPasswdUser(passwdData, candidate) {
+			return candidate, true
+		}
+	}
+	return "", false
+}
+
+func stripTomlComment(line string) string {
+	trimmed := strings.TrimSpace(line)
+	if idx := strings.Index(trimmed, "#"); idx >= 0 {
+		return strings.TrimSpace(trimmed[:idx])
+	}
+	return trimmed
+}
+
+func parseTomlSection(line string) (string, bool) {
+	trimmed := stripTomlComment(line)
+	if len(trimmed) < 3 || !strings.HasPrefix(trimmed, "[") || !strings.HasSuffix(trimmed, "]") {
+		return "", false
+	}
+	return strings.TrimSpace(trimmed[1 : len(trimmed)-1]), true
+}
+
+func extractDefaultSessionUser(configContent string) string {
+	inDefaultSession := false
+	for line := range strings.SplitSeq(configContent, "\n") {
+		if section, ok := parseTomlSection(line); ok {
+			inDefaultSession = section == "default_session"
+			continue
+		}
+
+		if !inDefaultSession {
+			continue
+		}
+
+		trimmed := stripTomlComment(line)
+		if !strings.HasPrefix(trimmed, "user =") && !strings.HasPrefix(trimmed, "user=") {
+			continue
+		}
+
+		parts := strings.SplitN(trimmed, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		user := strings.Trim(strings.TrimSpace(parts[1]), `"`)
+		if user != "" {
+			return user
+		}
+	}
+
+	return ""
+}
+
+func upsertDefaultSession(configContent, greeterUser, command string) string {
+	lines := strings.Split(configContent, "\n")
+	var out []string
+
+	inDefaultSession := false
+	foundDefaultSession := false
+	defaultSessionUserSet := false
+	defaultSessionCommandSet := false
+
+	appendDefaultSessionFields := func() {
+		if !defaultSessionUserSet {
+			out = append(out, fmt.Sprintf(`user = "%s"`, greeterUser))
+		}
+		if !defaultSessionCommandSet {
+			out = append(out, command)
+		}
+	}
+
+	for _, line := range lines {
+		if section, ok := parseTomlSection(line); ok {
+			if inDefaultSession {
+				appendDefaultSessionFields()
+			}
+
+			inDefaultSession = section == "default_session"
+			if inDefaultSession {
+				foundDefaultSession = true
+				defaultSessionUserSet = false
+				defaultSessionCommandSet = false
+			}
+
+			out = append(out, line)
+			continue
+		}
+
+		if inDefaultSession {
+			trimmed := stripTomlComment(line)
+			if strings.HasPrefix(trimmed, "user =") || strings.HasPrefix(trimmed, "user=") {
+				out = append(out, fmt.Sprintf(`user = "%s"`, greeterUser))
+				defaultSessionUserSet = true
+				continue
+			}
+
+			if strings.HasPrefix(trimmed, "command =") || strings.HasPrefix(trimmed, "command=") {
+				if !defaultSessionCommandSet {
+					out = append(out, command)
+					defaultSessionCommandSet = true
+				}
+				continue
+			}
+		}
+
+		out = append(out, line)
+	}
+
+	if inDefaultSession {
+		appendDefaultSessionFields()
+	}
+
+	if !foundDefaultSession {
+		if len(out) > 0 && strings.TrimSpace(out[len(out)-1]) != "" {
+			out = append(out, "")
+		}
+		out = append(out, "[default_session]")
+		out = append(out, fmt.Sprintf(`user = "%s"`, greeterUser))
+		out = append(out, command)
+	}
+
+	return strings.Join(out, "\n")
+}
+
+func DetectGreeterUser() string {
+	passwdData, err := os.ReadFile("/etc/passwd")
+	if err == nil {
+		passwdContent := string(passwdData)
+
+		if configData, cfgErr := os.ReadFile("/etc/greetd/config.toml"); cfgErr == nil {
+			if configured := extractDefaultSessionUser(string(configData)); configured != "" && hasPasswdUser(passwdContent, configured) {
+				return configured
+			}
+		}
+
+		if user, found := findPasswdUser(passwdContent, "greeter", "_greeter", "greetd"); found {
+			return user
+		}
+	} else {
+		fmt.Fprintln(os.Stderr, "⚠ Warning: could not read /etc/passwd, defaulting greeter user to 'greeter'")
+	}
+
+	if configData, cfgErr := os.ReadFile("/etc/greetd/config.toml"); cfgErr == nil {
+		if configured := extractDefaultSessionUser(string(configData)); configured != "" {
+			return configured
+		}
+	}
+
+	fmt.Fprintln(os.Stderr, "⚠ Warning: no greeter user found, defaulting to 'greeter'")
+	return "greeter"
+}
+
+func resolveGreeterWrapperPath() string {
+	if path, err := exec.LookPath("dms-greeter"); err == nil {
+		return path
+	}
+
+	for _, candidate := range []string{"/usr/local/bin/dms-greeter", "/usr/bin/dms-greeter"} {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+	}
+
+	return "dms-greeter"
+}
+
 func DetectCompositors() []string {
 	var compositors []string
 
@@ -289,9 +467,13 @@ func TryInstallGreeterPackage(logFunc func(string), sudoPassword string) bool {
 
 // CopyGreeterFiles installs the dms-greeter wrapper and sets up cache directory
 func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPassword string) error {
-	if utils.CommandExists("dms-greeter") {
-		logFunc("✓ dms-greeter wrapper already installed")
+	if IsGreeterPackaged() {
+		logFunc("✓ dms-greeter package already installed")
 	} else {
+		if dmsPath == "" {
+			return fmt.Errorf("dms path is required for manual dms-greeter wrapper installs")
+		}
+
 		assetsDir := filepath.Join(dmsPath, "Modules", "Greetd", "assets")
 		wrapperSrc := filepath.Join(assetsDir, "dms-greeter")
 
@@ -300,10 +482,14 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 		}
 
 		wrapperDst := "/usr/local/bin/dms-greeter"
+		action := "Installed"
+		if info, err := os.Stat(wrapperDst); err == nil && !info.IsDir() {
+			action = "Updated"
+		}
 		if err := runSudoCmd(sudoPassword, "cp", wrapperSrc, wrapperDst); err != nil {
 			return fmt.Errorf("failed to copy dms-greeter wrapper: %w", err)
 		}
-		logFunc(fmt.Sprintf("✓ Installed dms-greeter wrapper to %s", wrapperDst))
+		logFunc(fmt.Sprintf("✓ %s dms-greeter wrapper at %s", action, wrapperDst))
 
 		if err := runSudoCmd(sudoPassword, "chmod", "+x", wrapperDst); err != nil {
 			return fmt.Errorf("failed to make wrapper executable: %w", err)
@@ -954,92 +1140,61 @@ func ConfigureGreetd(dmsPath, compositor string, logFunc func(string), sudoPassw
 			return fmt.Errorf("failed to backup config: %w", err)
 		}
 		logFunc(fmt.Sprintf("✓ Backed up existing config to %s", backupPath))
+	} else if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to access %s: %w", configPath, err)
 	}
 
-	greeterUser := DetectGreeterGroup()
+	greeterUser := DetectGreeterUser()
 
 	var configContent string
 	if data, err := os.ReadFile(configPath); err == nil {
 		configContent = string(data)
-	} else {
-		configContent = fmt.Sprintf(`[terminal]
+	} else if os.IsNotExist(err) {
+		configContent = `[terminal]
 vt = 1
 
 [default_session]
-
-user = "%s"
-`, greeterUser)
+`
+	} else {
+		return fmt.Errorf("failed to read greetd config: %w", err)
 	}
 
-	lines := strings.Split(configContent, "\n")
-	var newLines []string
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if !strings.HasPrefix(trimmed, "command =") && !strings.HasPrefix(trimmed, "command=") {
-			if strings.HasPrefix(trimmed, "user =") || strings.HasPrefix(trimmed, "user=") {
-				newLines = append(newLines, fmt.Sprintf(`user = "%s"`, greeterUser))
-			} else {
-				newLines = append(newLines, line)
-			}
-		}
-	}
-
-	// If dmsPath is empty (packaged greeter), omit -p; wrapper finds /usr/share/quickshell/dms-greeter
-	wrapperCmd := "dms-greeter"
-	if !utils.CommandExists("dms-greeter") {
-		wrapperCmd = "/usr/local/bin/dms-greeter"
-	}
+	wrapperCmd := resolveGreeterWrapperPath()
 
 	// Build command based on compositor and dms path
 	// When dmsPath is empty (packaged greeter), omit -p; wrapper finds /usr/share/quickshell/dms-greeter
 	compositorLower := strings.ToLower(compositor)
-	var command string
-	if dmsPath == "" {
-		command = fmt.Sprintf(`command = "%s --command %s"`, wrapperCmd, compositorLower)
-	} else {
-		command = fmt.Sprintf(`command = "%s --command %s -p %s"`, wrapperCmd, compositorLower, dmsPath)
-	}
-
-	var finalLines []string
-	inDefaultSession := false
-	commandAdded := false
-
-	for _, line := range newLines {
-		finalLines = append(finalLines, line)
-		trimmed := strings.TrimSpace(line)
-
-		if trimmed == "[default_session]" {
-			inDefaultSession = true
-		}
-
-		if inDefaultSession && !commandAdded && trimmed != "" && !strings.HasPrefix(trimmed, "[") {
-			if !strings.HasPrefix(trimmed, "#") && !strings.HasPrefix(trimmed, "user") {
-				finalLines = append(finalLines, command)
-				commandAdded = true
-			}
-		}
-	}
-
-	if !commandAdded {
-		finalLines = append(finalLines, command)
-	}
-
-	newConfig := strings.Join(finalLines, "\n")
-
-	tmpFile := "/tmp/greetd-config.toml"
-	if err := os.WriteFile(tmpFile, []byte(newConfig), 0o644); err != nil {
-		return fmt.Errorf("failed to write temp config: %w", err)
-	}
-
-	if err := runSudoCmd(sudoPassword, "mv", tmpFile, configPath); err != nil {
-		return fmt.Errorf("failed to move config to /etc/greetd: %w", err)
-	}
-
-	cmdDesc := fmt.Sprintf("%s --command %s", wrapperCmd, compositorLower)
+	commandValue := fmt.Sprintf("%s --command %s", wrapperCmd, compositorLower)
 	if dmsPath != "" {
-		cmdDesc = fmt.Sprintf("%s -p %s", cmdDesc, dmsPath)
+		commandValue = fmt.Sprintf("%s -p %s", commandValue, dmsPath)
 	}
-	logFunc(fmt.Sprintf("✓ Updated greetd configuration (user: %s, command: %s)", greeterUser, cmdDesc))
+
+	commandLine := fmt.Sprintf(`command = "%s"`, commandValue)
+	newConfig := upsertDefaultSession(configContent, greeterUser, commandLine)
+
+	tmpFile, err := os.CreateTemp("", "greetd-config-*.toml")
+	if err != nil {
+		return fmt.Errorf("failed to create temp greetd config: %w", err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.WriteString(newConfig); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("failed to write temp greetd config: %w", err)
+	}
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("failed to close temp greetd config: %w", err)
+	}
+
+	if err := runSudoCmd(sudoPassword, "mkdir", "-p", "/etc/greetd"); err != nil {
+		return fmt.Errorf("failed to create /etc/greetd: %w", err)
+	}
+
+	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "root", "-m", "0644", tmpFile.Name(), configPath); err != nil {
+		return fmt.Errorf("failed to install greetd config: %w", err)
+	}
+
+	logFunc(fmt.Sprintf("✓ Updated greetd configuration (user: %s, command: %s)", greeterUser, commandValue))
 	return nil
 }
 
