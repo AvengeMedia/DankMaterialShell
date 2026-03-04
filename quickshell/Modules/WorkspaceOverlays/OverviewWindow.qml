@@ -62,30 +62,30 @@ Item {
 
     Behavior on x {
         NumberAnimation {
-            duration: Theme.expressiveDurations.expressiveDefaultSpatial
+            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+            easing.bezierCurve: Theme.variantModalEnterCurve
         }
     }
     Behavior on y {
         NumberAnimation {
-            duration: Theme.expressiveDurations.expressiveDefaultSpatial
+            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+            easing.bezierCurve: Theme.variantModalEnterCurve
         }
     }
     Behavior on width {
         NumberAnimation {
-            duration: Theme.expressiveDurations.expressiveDefaultSpatial
+            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+            easing.bezierCurve: Theme.variantModalEnterCurve
         }
     }
     Behavior on height {
         NumberAnimation {
-            duration: Theme.expressiveDurations.expressiveDefaultSpatial
+            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+            easing.bezierCurve: Theme.variantModalEnterCurve
         }
     }
 
@@ -124,16 +124,16 @@ Item {
 
                 Behavior on width {
                     NumberAnimation {
-                        duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                        duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
                         easing.type: Easing.BezierSpline
-                        easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+                        easing.bezierCurve: Theme.variantModalEnterCurve
                     }
                 }
                 Behavior on height {
                     NumberAnimation {
-                        duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                        duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
                         easing.type: Easing.BezierSpline
-                        easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+                        easing.bezierCurve: Theme.variantModalEnterCurve
                     }
                 }
             }
