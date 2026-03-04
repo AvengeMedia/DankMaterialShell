@@ -259,8 +259,11 @@ Item {
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.popoutElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, effectiveShadowDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
-        if (Theme.isDirectionalEffect)
+        if (Theme.isDirectionalEffect) {
+            if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode !== 0)
+                return 16; // Slide Behind and Roll Out do not add animationOffset, enabling strict Wayland clipping.
             return Math.max(0, animationOffset) + 16;
+        }
         if (Theme.isDepthEffect)
             return Math.max(0, animationOffset) + 8;
         return Math.max(0, animationOffset);
@@ -469,17 +472,6 @@ Item {
         visible: false
         color: "transparent"
 
-        WindowBlur {
-            id: popoutBlur
-            targetWindow: contentWindow
-            readonly property real s: Math.min(1, contentContainer.scaleValue)
-            blurX: contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
-            blurY: contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.width * s : 0
-            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.height * s : 0
-            blurRadius: Theme.cornerRadius
-        }
-
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_POPOUT_LAYER")) {
@@ -534,8 +526,8 @@ Item {
             visible: false
             x: contentContainer.x
             y: contentContainer.y
-            width: shouldBeVisible ? root.alignedWidth : 0
-            height: shouldBeVisible ? root.alignedHeight : 0
+            width: root.alignedWidth
+            height: root.alignedHeight
         }
 
         MouseArea {
@@ -572,6 +564,8 @@ Item {
             readonly property real sectionTilt: (triggerSection === "left" ? -1 : (triggerSection === "right" ? 1 : 0))
             readonly property real offsetX: {
                 if (directionalEffect) {
+                    if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2)
+                        return 0;
                     if (barLeft)
                         return -directionalTravelX;
                     if (barRight)
@@ -593,6 +587,8 @@ Item {
             }
             readonly property real offsetY: {
                 if (directionalEffect) {
+                    if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2)
+                        return 0;
                     if (barBottom)
                         return directionalTravelY;
                     if (barTop)
@@ -615,12 +611,14 @@ Item {
 
             property real animX: 0
             property real animY: 0
-            property real scaleValue: root.animationScaleCollapsed
+
+            readonly property real computedScaleCollapsed: (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect) ? 0.0 : root.animationScaleCollapsed
+            property real scaleValue: computedScaleCollapsed
 
             Component.onCompleted: {
                 animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr);
                 animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr);
-                scaleValue = root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed;
+                scaleValue = root.shouldBeVisible ? 1.0 : computedScaleCollapsed;
             }
 
             onOffsetXChanged: animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr)
@@ -631,7 +629,7 @@ Item {
                 function onShouldBeVisibleChanged() {
                     contentContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetX, root.dpr);
                     contentContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetY, root.dpr);
-                    contentContainer.scaleValue = root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed;
+                    contentContainer.scaleValue = root.shouldBeVisible ? 1.0 : contentContainer.computedScaleCollapsed;
                 }
             }
 
@@ -662,68 +660,100 @@ Item {
                 }
             }
 
-            ElevationShadow {
-                id: shadowSource
-                width: parent.width
-                height: parent.height
-                opacity: contentWrapper.opacity
-                scale: contentWrapper.scale
-                x: contentWrapper.x
-                y: contentWrapper.y
-                level: root.shadowLevel
-                direction: root.effectiveShadowDirection
-                fallbackOffset: root.shadowFallbackOffset
-                targetRadius: Theme.cornerRadius
-                targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
-            }
-
             Item {
-                id: contentWrapper
-                width: parent.width
-                height: parent.height
-                opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
-                visible: opacity > 0
-                scale: contentContainer.scaleValue
-                x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
-                y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+                id: directionalClipMask
 
-                layer.enabled: contentWrapper.opacity < 1
-                layer.smooth: false
-                layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
+                readonly property bool shouldClip: typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0 && Theme.isDirectionalEffect
+                readonly property real clipOversize: 1000
 
-                Behavior on opacity {
-                    enabled: !Theme.isDirectionalEffect
-                    NumberAnimation {
-                        duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                    }
-                }
+                clip: shouldClip
 
-                Loader {
-                    id: contentLoader
-                    anchors.fill: parent
-                    active: root._primeContent || shouldBeVisible || contentWindow.visible
-                    asynchronous: false
-                }
-            }
+                // Bound the clipping strictly to the bar side, allowing massive overflow on the other 3 sides for shadows
+                x: shouldClip ? (contentContainer.barRight ? -clipOversize : (contentContainer.barLeft ? 0 : -clipOversize)) : 0
+                y: shouldClip ? (contentContainer.barBottom ? -clipOversize : (contentContainer.barTop ? 0 : -clipOversize)) : 0
 
-            Rectangle {
-                width: parent.width
-                height: parent.height
-                x: contentWrapper.x
-                y: contentWrapper.y
-                opacity: contentWrapper.opacity
-                scale: contentWrapper.scale
-                visible: contentWrapper.visible
-                radius: Theme.cornerRadius
-                color: "transparent"
-                border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-                border.width: BlurService.borderWidth
-                z: 100
-            }
-        }
+                width: shouldClip ? parent.width + clipOversize + (contentContainer.barLeft || contentContainer.barRight ? 0 : clipOversize) : parent.width
+                height: shouldClip ? parent.height + clipOversize + (contentContainer.barTop || contentContainer.barBottom ? 0 : clipOversize) : parent.height
+
+                Item {
+                    id: aligner
+                    readonly property real baseWidth: contentContainer.width
+                    readonly property real baseHeight: contentContainer.height
+                    readonly property bool isRollOut: typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect
+
+                    x: (directionalClipMask.x !== 0 ? -directionalClipMask.x : 0) + (isRollOut && contentContainer.barRight ? baseWidth * (1 - contentContainer.scaleValue) : 0)
+                    y: (directionalClipMask.y !== 0 ? -directionalClipMask.y : 0) + (isRollOut && contentContainer.barBottom ? baseHeight * (1 - contentContainer.scaleValue) : 0)
+                    width: isRollOut && (contentContainer.barLeft || contentContainer.barRight) ? Math.max(0, baseWidth * contentContainer.scaleValue) : baseWidth
+                    height: isRollOut && (contentContainer.barTop || contentContainer.barBottom) ? Math.max(0, baseHeight * contentContainer.scaleValue) : baseHeight
+
+                    clip: isRollOut
+
+                    Item {
+                        id: unrollCounteract
+                        x: aligner.isRollOut && contentContainer.barRight ? -(aligner.baseWidth * (1 - contentContainer.scaleValue)) : 0
+                        y: aligner.isRollOut && contentContainer.barBottom ? -(aligner.baseHeight * (1 - contentContainer.scaleValue)) : 0
+                        width: aligner.baseWidth
+                        height: aligner.baseHeight
+
+                        ElevationShadow {
+                            id: shadowSource
+                            width: parent.width
+                            height: parent.height
+                            opacity: contentWrapper.opacity
+                            scale: contentWrapper.scale
+                            x: contentWrapper.x
+                            y: contentWrapper.y
+                            level: root.shadowLevel
+                            direction: root.effectiveShadowDirection
+                            fallbackOffset: root.shadowFallbackOffset
+                            targetRadius: Theme.cornerRadius
+                            targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                            shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                        }
+
+                        Item {
+                            id: contentWrapper
+                            width: parent.width
+                            height: parent.height
+                            opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
+                            visible: opacity > 0
+
+                            scale: aligner.isRollOut ? 1.0 : contentContainer.scaleValue
+                            x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - scale) * 0.5, root.dpr)
+                            y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - scale) * 0.5, root.dpr)
+
+                            layer.enabled: contentWrapper.opacity < 1
+                            layer.smooth: false
+                            layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
+
+                            Behavior on opacity {
+                                enabled: !Theme.isDirectionalEffect
+                                NumberAnimation {
+                                    duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                    easing.type: Easing.BezierSpline
+                                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                                }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: Theme.cornerRadius
+                                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                                border.color: Theme.outlineMedium
+                                border.width: 0
+                            }
+
+                            Loader {
+                                id: contentLoader
+                                anchors.fill: parent
+                                active: root._primeContent || shouldBeVisible || contentWindow.visible
+                                asynchronous: false
+                            }
+                        } // closes contentWrapper
+                    } // closes unrollCounteract
+                } // closes aligner
+            } // closes directionalClipMask
+        } // closes contentContainer
 
         Item {
             id: focusHelper

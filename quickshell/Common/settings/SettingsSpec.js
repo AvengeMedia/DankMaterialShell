@@ -51,6 +51,7 @@ var SPEC = {
     enableRippleEffects: { def: true },
     animationVariant: { def: 0 },
     motionEffect: { def: 0 },
+    directionalAnimationMode: { def: 0 },
     m3ElevationEnabled: { def: true },
     m3ElevationIntensity: { def: 12 },
     m3ElevationOpacity: { def: 30 },
