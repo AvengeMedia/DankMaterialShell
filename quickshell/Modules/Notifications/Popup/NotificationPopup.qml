@@ -32,6 +32,29 @@ PanelWindow {
     property real _lastReportedAlignedHeight: -1
     property real _storedTopMargin: 0
     property real _storedBottomMargin: 0
+    readonly property bool directionalEffect: Theme.isDirectionalEffect
+    readonly property bool depthEffect: Theme.isDepthEffect
+    readonly property real entryTravel: {
+        const base = Math.abs(Theme.effectAnimOffset);
+        if (directionalEffect) {
+            if (isCenterPosition)
+                return Math.max(base, Math.round(content.height * 1.1));
+            return Math.max(base, Math.round(content.width * 0.95));
+        }
+        if (depthEffect)
+            return Math.max(base, 44);
+        return base;
+    }
+    readonly property real exitTravel: {
+        if (directionalEffect) {
+            if (isCenterPosition)
+                return content.height + entryTravel;
+            return content.width + entryTravel;
+        }
+        if (depthEffect)
+            return Math.round(entryTravel * 1.35);
+        return Anims.slidePx;
+    }
     readonly property string clearText: I18n.tr("Dismiss")
     property bool descriptionExpanded: false
     readonly property bool hasExpandableBody: (notificationData?.htmlBody || "").replace(/<[^>]*>/g, "").trim().length > 0
@@ -145,9 +168,9 @@ PanelWindow {
         enabled: !exiting && !_isDestroying
         NumberAnimation {
             id: implicitHeightAnim
-            duration: descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
+            duration: Theme.variantDuration(descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration, descriptionExpanded)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasized
+            easing.bezierCurve: descriptionExpanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
         }
     }
 
@@ -929,9 +952,9 @@ PanelWindow {
                     if (isCenterPosition)
                         return 0;
                     const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-                    return isLeft ? -Anims.slidePx : Anims.slidePx;
+                    return isLeft ? -entryTravel : entryTravel;
                 }
-                y: isTopCenter ? -Anims.slidePx : isBottomCenter ? Anims.slidePx : 0
+                y: isTopCenter ? -entryTravel : isBottomCenter ? entryTravel : 0
             }
         ]
     }
@@ -943,16 +966,16 @@ PanelWindow {
         property: isCenterPosition ? "y" : "x"
         from: {
             if (isTopCenter)
-                return -Anims.slidePx;
+                return -entryTravel;
             if (isBottomCenter)
-                return Anims.slidePx;
+                return entryTravel;
             const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-            return isLeft ? -Anims.slidePx : Anims.slidePx;
+            return isLeft ? -entryTravel : entryTravel;
         }
         to: 0
-        duration: Theme.notificationEnterDuration
+        duration: Theme.variantDuration(Theme.notificationEnterDuration, true)
         easing.type: Easing.BezierSpline
-        easing.bezierCurve: isCenterPosition ? Theme.expressiveCurves.standardDecel : Theme.expressiveCurves.emphasizedDecel
+        easing.bezierCurve: Theme.variantPopoutEnterCurve
         onStopped: {
             if (!win.exiting && !win._isDestroying) {
                 if (isCenterPosition) {
@@ -977,35 +1000,35 @@ PanelWindow {
             from: 0
             to: {
                 if (isTopCenter)
-                    return -Anims.slidePx;
+                    return -exitTravel;
                 if (isBottomCenter)
-                    return Anims.slidePx;
+                    return exitTravel;
                 const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-                return isLeft ? -Anims.slidePx : Anims.slidePx;
+                return isLeft ? -exitTravel : exitTravel;
             }
-            duration: Theme.notificationExitDuration
+            duration: Theme.variantDuration(Theme.notificationExitDuration, false)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedAccel
+            easing.bezierCurve: Theme.variantPopoutExitCurve
         }
 
         NumberAnimation {
             target: content
             property: "opacity"
             from: 1
-            to: 0
-            duration: Theme.notificationExitDuration
+            to: Theme.isDirectionalEffect ? 1 : 0
+            duration: Theme.variantDuration(Theme.notificationExitDuration, false)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.standardAccel
+            easing.bezierCurve: Theme.variantPopoutExitCurve
         }
 
         NumberAnimation {
             target: content
             property: "scale"
             from: 1
-            to: 0.98
-            duration: Theme.notificationExitDuration
+            to: Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed
+            duration: Theme.variantDuration(Theme.notificationExitDuration, false)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedAccel
+            easing.bezierCurve: Theme.variantPopoutExitCurve
         }
     }
 

@@ -37,6 +37,18 @@ Singleton {
         Custom
     }
 
+    enum AnimationVariant {
+        Material,
+        Fluent,
+        Dynamic
+    }
+
+    enum AnimationEffect {
+        Standard,     // 0 — M3: scale-in, rises from below
+        Directional,  // 1 — pure large slide, no scale
+        Depth         // 2 — medium slide with deep depth scale pop
+    }
+
     enum SuspendBehavior {
         Suspend,
         Hibernate,
@@ -168,6 +180,10 @@ Singleton {
     property int modalCustomAnimationDuration: 150
     property bool enableRippleEffects: true
     onEnableRippleEffectsChanged: saveSettings()
+    property int animationVariant: SettingsData.AnimationVariant.Material
+    onAnimationVariantChanged: saveSettings()
+    property int motionEffect: SettingsData.AnimationEffect.Standard
+    onMotionEffectChanged: saveSettings()
     property bool m3ElevationEnabled: true
     onM3ElevationEnabledChanged: saveSettings()
     property int m3ElevationIntensity: 12

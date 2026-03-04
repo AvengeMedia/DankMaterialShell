@@ -202,8 +202,18 @@ Scope {
 
                 Item {
                     id: spotlightContainer
-                    x: Theme.snap((parent.width - width) / 2, overlayWindow.dpr)
-                    y: Theme.snap((parent.height - height) / 2, overlayWindow.dpr)
+                    readonly property bool directionalEffect: Theme.isDirectionalEffect
+                    readonly property bool depthEffect: Theme.isDepthEffect
+                    readonly property real collapsedMotionX: depthEffect ? Theme.effectAnimOffset * 0.25 : 0
+                    readonly property real collapsedMotionY: {
+                        if (directionalEffect)
+                            return Math.max(height * 0.85, Theme.effectAnimOffset * 1.1);
+                        if (depthEffect)
+                            return Math.max(Theme.effectAnimOffset * 0.8, 30);
+                        return 0;
+                    }
+                    x: Theme.snap((parent.width - width) / 2 + (overlayWindow.shouldShowSpotlight ? 0 : collapsedMotionX), overlayWindow.dpr)
+                    y: Theme.snap((parent.height - height) / 2 + (overlayWindow.shouldShowSpotlight ? 0 : collapsedMotionY), overlayWindow.dpr)
 
                     readonly property int baseWidth: {
                         switch (SettingsData.dankLauncherV2Size) {
@@ -234,8 +244,8 @@ Scope {
 
                     readonly property bool animatingOut: niriOverviewScope.isClosing && overlayWindow.isSpotlightScreen
 
-                    scale: overlayWindow.shouldShowSpotlight ? 1.0 : 0.96
-                    opacity: overlayWindow.shouldShowSpotlight ? 1 : 0
+                    scale: Theme.isDirectionalEffect ? 1 : (overlayWindow.shouldShowSpotlight ? 1.0 : Theme.effectScaleCollapsed)
+                    opacity: Theme.isDirectionalEffect ? 1 : (overlayWindow.shouldShowSpotlight ? 1 : 0)
                     visible: overlayWindow.shouldShowSpotlight || animatingOut
                     enabled: overlayWindow.shouldShowSpotlight
 
@@ -245,10 +255,11 @@ Scope {
 
                     Behavior on scale {
                         id: scaleAnimation
+                        enabled: !Theme.isDirectionalEffect
                         NumberAnimation {
-                            duration: Theme.expressiveDurations.fast
+                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
                             easing.type: Easing.BezierSpline
-                            easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveFastSpatial : Theme.expressiveCurves.standardAccel
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                             onRunningChanged: {
                                 if (running || !spotlightContainer.animatingOut)
                                     return;
@@ -258,10 +269,27 @@ Scope {
                     }
 
                     Behavior on opacity {
+                        enabled: !Theme.isDirectionalEffect
                         NumberAnimation {
-                            duration: Theme.expressiveDurations.fast
+                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
                             easing.type: Easing.BezierSpline
-                            easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveFastSpatial : Theme.expressiveCurves.standardAccel
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                        }
+                    }
+
+                    Behavior on x {
+                        NumberAnimation {
+                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                        }
+                    }
+
+                    Behavior on y {
+                        NumberAnimation {
+                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                         }
                     }
 

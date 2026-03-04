@@ -49,6 +49,8 @@ var SPEC = {
     modalAnimationSpeed: { def: 1 },
     modalCustomAnimationDuration: { def: 150 },
     enableRippleEffects: { def: true },
+    animationVariant: { def: 0 },
+    motionEffect: { def: 0 },
     m3ElevationEnabled: { def: true },
     m3ElevationIntensity: { def: 12 },
     m3ElevationOpacity: { def: 30 },

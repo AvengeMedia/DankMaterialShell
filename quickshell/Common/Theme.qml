@@ -960,6 +960,24 @@ Singleton {
         "expressiveEffects": [0.34, 0.8, 0.34, 1, 1, 1]
     }
 
+    // Delegates to AnimVariants.qml for curves, timing, scale, and offsets.
+    readonly property list<real> variantEnterCurve: AnimVariants.variantEnterCurve
+    readonly property list<real> variantExitCurve: AnimVariants.variantExitCurve
+    readonly property list<real> variantModalEnterCurve: AnimVariants.variantModalEnterCurve
+    readonly property list<real> variantModalExitCurve: AnimVariants.variantModalExitCurve
+    readonly property list<real> variantPopoutEnterCurve: AnimVariants.variantPopoutEnterCurve
+    readonly property list<real> variantPopoutExitCurve: AnimVariants.variantPopoutExitCurve
+    readonly property real variantEnterDurationFactor: AnimVariants.variantEnterDurationFactor
+    readonly property real variantExitDurationFactor: AnimVariants.variantExitDurationFactor
+    readonly property real variantOpacityDurationScale: AnimVariants.variantOpacityDurationScale
+    readonly property bool isDirectionalEffect: AnimVariants.isDirectionalEffect
+    readonly property bool isDepthEffect: AnimVariants.isDepthEffect
+    readonly property real effectScaleCollapsed: AnimVariants.effectScaleCollapsed
+    readonly property real effectAnimOffset: AnimVariants.effectAnimOffset
+    function variantDuration(baseDuration, entering) { return AnimVariants.variantDuration(baseDuration, entering); }
+    function variantExitCleanupPadding() { return AnimVariants.variantExitCleanupPadding(); }
+    function variantCloseInterval(baseDuration) { return AnimVariants.variantCloseInterval(baseDuration); }
+
     readonly property var animationPresetDurations: {
         "none": 0,
         "short": 250,
