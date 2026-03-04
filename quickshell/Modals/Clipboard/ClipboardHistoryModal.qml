@@ -284,6 +284,47 @@ DankModal {
                             editField.forceActiveFocus();
                         }
                     });
+
+                    if (!newEntry || newEntry.isImage) {
+                        return;
+                    }
+
+                    const requestedId = newEntry.id;
+                    DMSService.sendRequest("clipboard.getEntry", {
+                        "id": requestedId
+                    }, function (response) {
+                        if (response.error) {
+                            return;
+                        }
+                        if (!editorView.entry || editorView.entry.id !== requestedId) {
+                            return;
+                        }
+                        const rawText = response.result?.text ?? response.result?.content ?? response.result?.data ?? "";
+                        let fullText = rawText;
+                        try {
+                            const sanitized = rawText.replace(/\s+/g, "");
+                            const decoder = (typeof Qt !== "undefined" && typeof Qt.atob === "function") ? Qt.atob : (typeof atob === "function" ? atob : null);
+                            if (decoder) {
+                                const decoded = decoder(sanitized);
+                                fullText = decoded;
+                                try {
+                                    fullText = decodeURIComponent(escape(decoded));
+                                } catch (e) {
+                                    fullText = decoded;
+                                }
+                            }
+                        } catch (e) {
+                            fullText = rawText;
+                        }
+
+                        if (!fullText || fullText.length === 0) {
+                            return;
+                        }
+                        editorView.editorText = fullText;
+                        if (editField) {
+                            editField.text = fullText;
+                        }
+                    });
                 }
 
                 function saveEntry(action) {
@@ -297,7 +338,11 @@ DankModal {
                         }
                         if (saveAction === "history") {
                             clipboardHistoryModal.mode = "history";
-                            clipboardHistoryModal.refreshClipboard();
+                            Qt.callLater(function () {
+                                ClipboardService.reset();
+                                ClipboardService.refresh();
+                                keyboardController.reset();
+                            });
                             return;
                         }
                         if (saveAction === "close") {
@@ -341,6 +386,7 @@ DankModal {
                     spacing: Theme.spacingM
 
                     Item {
+                        id: editorHeader
                         width: parent.width
                         height: ClipboardConstants.headerHeight
 
@@ -374,7 +420,7 @@ DankModal {
                     StyledRect {
                         id: editFieldContainer
                         width: parent.width
-                        height: Math.max(Theme.fontSizeMedium * 8, Theme.fontSizeMedium * 3)
+                        height: Math.max(Theme.fontSizeMedium * 8, parent.height - editorHeader.height - editorActions.height - Theme.spacingM * 2)
                         radius: Theme.cornerRadius
                         color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         border.color: editField.activeFocus ? Theme.primary : Theme.outlineMedium
@@ -392,8 +438,8 @@ DankModal {
                             anchors.topMargin: Theme.spacingM
                         }
 
-                        TextEdit {
-                            id: editField
+                        DankFlickable {
+                            id: editScroll
                             anchors.left: editIcon.right
                             anchors.leftMargin: Theme.spacingS
                             anchors.right: parent.right
@@ -402,26 +448,34 @@ DankModal {
                             anchors.rightMargin: Theme.spacingM
                             anchors.topMargin: Theme.spacingS
                             anchors.bottomMargin: Theme.spacingS
-                            text: editorView.editorText
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            wrapMode: TextEdit.Wrap
-                            selectByMouse: true
-                            Keys.forwardTo: [clipboardHistoryModal.modalFocusScope]
-                            onTextChanged: editorView.editorText = text
-                            Keys.onPressed: function (event) {
-                                const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
-                                const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
+                            clip: true
+                            contentWidth: width
+                            contentHeight: editField.height
 
-                                if (hasCtrl && event.key === Qt.Key_S) {
-                                    editorView.saveEntry(hasShift ? "close" : "history");
-                                    event.accepted = true;
-                                    return;
-                                }
-                                if (hasCtrl && hasShift && event.key === Qt.Key_V) {
-                                    editorView.saveEntry("paste");
-                                    event.accepted = true;
-                                    return;
+                            TextEdit {
+                                id: editField
+                                width: editScroll.width
+                                height: Math.max(editScroll.height, contentHeight)
+                                text: editorView.editorText
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceText
+                                wrapMode: TextEdit.Wrap
+                                selectByMouse: true
+                                onTextChanged: editorView.editorText = text
+                                Keys.onPressed: function (event) {
+                                    const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
+                                    const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
+
+                                    if (hasCtrl && event.key === Qt.Key_S) {
+                                        editorView.saveEntry(hasShift ? "close" : "history");
+                                        event.accepted = true;
+                                        return;
+                                    }
+                                    if (hasCtrl && hasShift && event.key === Qt.Key_V) {
+                                        editorView.saveEntry("paste");
+                                        event.accepted = true;
+                                        return;
+                                    }
                                 }
                             }
                         }
@@ -430,16 +484,17 @@ DankModal {
                             text: I18n.tr("Edit clipboard text")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.outlineButton
-                            anchors.left: editField.left
-                            anchors.right: editField.right
-                            anchors.top: editField.top
-                            anchors.bottom: editField.bottom
+                            anchors.left: editScroll.left
+                            anchors.right: editScroll.right
+                            anchors.top: editScroll.top
+                            anchors.bottom: editScroll.bottom
                             visible: editField.text.length === 0 && !editField.activeFocus
                             wrapMode: Text.WordWrap
                         }
                     }
 
                     Row {
+                        id: editorActions
                         width: parent.width
                         spacing: Theme.spacingS
 
