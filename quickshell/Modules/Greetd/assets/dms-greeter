@@ -6,6 +6,8 @@ COMPOSITOR=""
 COMPOSITOR_CONFIG=""
 DMS_PATH="dms-greeter"
 CACHE_DIR="/var/cache/dms-greeter"
+DMS_SAVE_USERNAME=true
+DMS_SAVE_SESSION=true
 
 show_help() {
     cat << EOF
@@ -22,6 +24,8 @@ Options:
                            (default: dms-greeter)
     --cache-dir PATH        Cache directory for greeter data
                            (default: /var/cache/dms-greeter)
+    --no-save-username     Do not save username in greeter data
+    --no-save-session      Do not save session in greeter data
     -h, --help             Show this help message
 
 Examples:
@@ -60,6 +64,14 @@ while [[ $# -gt 0 ]]; do
         --cache-dir)
             CACHE_DIR="$2"
             shift 2
+            ;;
+        --no-save-username)
+            DMS_SAVE_USERNAME=false
+            shift
+            ;;
+        --no-save-session)
+            DMS_SAVE_SESSION=false
+            shift
             ;;
         -h|--help)
             show_help
@@ -112,6 +124,7 @@ export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export EGL_PLATFORM=gbm
 export DMS_RUN_GREETER=1
 export DMS_GREET_CFG_DIR="$CACHE_DIR"
+export DMS_SAVE_USERNAME DMS_SAVE_SESSION
 
 mkdir -p "$CACHE_DIR"
 

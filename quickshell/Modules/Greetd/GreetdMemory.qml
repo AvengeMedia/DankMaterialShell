@@ -11,6 +11,8 @@ Singleton {
     readonly property string greetCfgDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/etc/greetd/.dms"
     readonly property string sessionConfigPath: greetCfgDir + "/session.json"
     readonly property string memoryFile: greetCfgDir + "/memory.json"
+    readonly property bool saveUsername: Quickshell.env("DMS_SAVE_USERNAME") === "1" || Quickshell.env("DMS_SAVE_USERNAME") === "true"
+    readonly property bool saveSession: Quickshell.env("DMS_SAVE_SESSION") === "1" || Quickshell.env("DMS_SAVE_SESSION") === "true"
 
     property string lastSessionId: ""
     property string lastSuccessfulUser: ""
@@ -57,10 +59,12 @@ Singleton {
     }
 
     function saveMemory() {
-        memoryFileView.setText(JSON.stringify({
-            "lastSessionId": lastSessionId,
-            "lastSuccessfulUser": lastSuccessfulUser
-        }, null, 2));
+        let memory = {}
+        if (saveSession)
+            memory.lastSessionId = lastSessionId
+        if (saveUsername)
+            memory.lastSuccessfulUser = lastSuccessfulUser
+        memoryFileView.setText(JSON.stringify(memory, null, 2));
     }
 
     function setLastSessionId(id) {
