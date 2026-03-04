@@ -72,76 +72,82 @@
             "${cleanVersion}${dateSuffix}${revSuffix}";
         in
         {
-          dms-shell = pkgs.buildGoModule (
-            let
-              rootSrc = ./.;
-            in
+          dms-shell = pkgs.lib.makeOverridable (
             {
-              inherit version;
-              pname = "dms-shell";
-              src = ./core;
-              vendorHash = "sha256-dEk7IOd6aQwaxZruxQclN7TGMyb8EJOl6NBWRsoZ9HQ=";
+              extraQtPackages ? [ ],
+            }:
+            pkgs.buildGoModule (
+              let
+                rootSrc = ./.;
+                qtPackages = (qmlPkgs pkgs) ++ extraQtPackages;
+              in
+              {
+                inherit version;
+                pname = "dms-shell";
+                src = ./core;
+                vendorHash = "sha256-dEk7IOd6aQwaxZruxQclN7TGMyb8EJOl6NBWRsoZ9HQ=";
 
-              subPackages = [ "cmd/dms" ];
+                subPackages = [ "cmd/dms" ];
 
-              ldflags = [
-                "-s"
-                "-w"
-                "-X 'main.Version=${version}'"
-              ];
+                ldflags = [
+                  "-s"
+                  "-w"
+                  "-X 'main.Version=${version}'"
+                ];
 
-              nativeBuildInputs = with pkgs; [
-                installShellFiles
-                makeWrapper
-              ];
+                nativeBuildInputs = with pkgs; [
+                  installShellFiles
+                  makeWrapper
+                ];
 
-              postInstall = ''
-                mkdir -p $out/share/quickshell/dms
-                cp -r ${rootSrc}/quickshell/. $out/share/quickshell/dms/
+                postInstall = ''
+                  mkdir -p $out/share/quickshell/dms
+                  cp -r ${rootSrc}/quickshell/. $out/share/quickshell/dms/
 
-                chmod u+w $out/share/quickshell/dms/VERSION
-                echo "${version}" > $out/share/quickshell/dms/VERSION
+                  chmod u+w $out/share/quickshell/dms/VERSION
+                  echo "${version}" > $out/share/quickshell/dms/VERSION
 
-                # Install desktop file and icon
-                install -D ${rootSrc}/assets/dms-open.desktop \
-                  $out/share/applications/dms-open.desktop
-                install -D ${rootSrc}/core/assets/danklogo.svg \
-                  $out/share/hicolor/scalable/apps/danklogo.svg
+                  # Install desktop file and icon
+                  install -D ${rootSrc}/assets/dms-open.desktop \
+                    $out/share/applications/dms-open.desktop
+                  install -D ${rootSrc}/core/assets/danklogo.svg \
+                    $out/share/hicolor/scalable/apps/danklogo.svg
 
-                wrapProgram $out/bin/dms \
-                  --add-flags "-c $out/share/quickshell/dms" \
-                  --prefix "NIXPKGS_QT6_QML_IMPORT_PATH" ":" "${mkQmlImportPath pkgs (qmlPkgs pkgs)}" \
-                  --prefix "QT_PLUGIN_PATH" ":" "${mkQtPluginPath pkgs (qmlPkgs pkgs)}"
+                  wrapProgram $out/bin/dms \
+                    --add-flags "-c $out/share/quickshell/dms" \
+                    --prefix "NIXPKGS_QT6_QML_IMPORT_PATH" ":" "${mkQmlImportPath pkgs qtPackages}" \
+                    --prefix "QT_PLUGIN_PATH" ":" "${mkQtPluginPath pkgs qtPackages}"
 
-                install -Dm644 ${rootSrc}/assets/systemd/dms.service \
-                  $out/lib/systemd/user/dms.service
+                  install -Dm644 ${rootSrc}/assets/systemd/dms.service \
+                    $out/lib/systemd/user/dms.service
 
-                substituteInPlace $out/lib/systemd/user/dms.service \
-                  --replace-fail /usr/bin/dms $out/bin/dms \
-                  --replace-fail /usr/bin/pkill ${pkgs.procps}/bin/pkill
+                  substituteInPlace $out/lib/systemd/user/dms.service \
+                    --replace-fail /usr/bin/dms $out/bin/dms \
+                    --replace-fail /usr/bin/pkill ${pkgs.procps}/bin/pkill
 
-                substituteInPlace $out/share/quickshell/dms/Modules/Greetd/assets/dms-greeter \
-                  --replace-fail /bin/bash ${pkgs.bashInteractive}/bin/bash
+                  substituteInPlace $out/share/quickshell/dms/Modules/Greetd/assets/dms-greeter \
+                    --replace-fail /bin/bash ${pkgs.bashInteractive}/bin/bash
 
-                substituteInPlace $out/share/quickshell/dms/assets/pam/fprint \
-                  --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so
+                  substituteInPlace $out/share/quickshell/dms/assets/pam/fprint \
+                    --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so
 
-                installShellCompletion --cmd dms \
-                  --bash <($out/bin/dms completion bash) \
-                  --fish <($out/bin/dms completion fish) \
-                  --zsh <($out/bin/dms completion zsh)
-              '';
+                  installShellCompletion --cmd dms \
+                    --bash <($out/bin/dms completion bash) \
+                    --fish <($out/bin/dms completion fish) \
+                    --zsh <($out/bin/dms completion zsh)
+                '';
 
-              meta = {
-                description = "Desktop shell for wayland compositors built with Quickshell & GO";
-                homepage = "https://danklinux.com";
-                changelog = "https://github.com/AvengeMedia/DankMaterialShell/releases/tag/v${version}";
-                license = pkgs.lib.licenses.mit;
-                mainProgram = "dms";
-                platforms = pkgs.lib.platforms.linux;
-              };
-            }
-          );
+                meta = {
+                  description = "Desktop shell for wayland compositors built with Quickshell & GO";
+                  homepage = "https://danklinux.com";
+                  changelog = "https://github.com/AvengeMedia/DankMaterialShell/releases/tag/v${version}";
+                  license = pkgs.lib.licenses.mit;
+                  mainProgram = "dms";
+                  platforms = pkgs.lib.platforms.linux;
+                };
+              }
+            )
+          ) { };
 
           quickshell = quickshell.packages.${system}.default;
 
