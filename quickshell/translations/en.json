@@ -462,6 +462,12 @@
     "comment": ""
   },
   {
+    "term": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>",
+    "context": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>",
+    "reference": "Modules/Settings/AboutTab.qml:826",
+    "comment": ""
+  },
+  {
     "term": "A file with this name already exists. Do you want to overwrite it?",
     "context": "A file with this name already exists. Do you want to overwrite it?",
     "reference": "Modals/FileBrowser/FileBrowserOverwriteDialog.qml:61",
@@ -482,7 +488,7 @@
   {
     "term": "API",
     "context": "API",
-    "reference": "Modules/Settings/AboutTab.qml:675",
+    "reference": "Modules/Settings/AboutTab.qml:673",
     "comment": ""
   },
   {
@@ -1280,7 +1286,7 @@
   {
     "term": "Backend",
     "context": "Backend",
-    "reference": "Modules/Settings/NetworkTab.qml:170, Modules/Settings/AboutTab.qml:634",
+    "reference": "Modules/Settings/NetworkTab.qml:170, Modules/Settings/AboutTab.qml:632",
     "comment": ""
   },
   {
@@ -1712,7 +1718,7 @@
   {
     "term": "Capabilities",
     "context": "Capabilities",
-    "reference": "Modules/Settings/AboutTab.qml:734",
+    "reference": "Modules/Settings/AboutTab.qml:732",
     "comment": ""
   },
   {
@@ -2426,7 +2432,7 @@
   {
     "term": "Connected",
     "context": "network status",
-    "reference": "Modules/Settings/NetworkTab.qml:448, Modules/Settings/NetworkTab.qml:1201, Modules/Settings/NetworkTab.qml:1558, Modules/Settings/AboutTab.qml:718, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:21, Modules/ControlCenter/Components/DragDropGrid.qml:337, Modules/ControlCenter/Components/DragDropGrid.qml:340, Modules/ControlCenter/Components/DragDropGrid.qml:342, Modules/ControlCenter/Components/DragDropGrid.qml:345, Modules/ControlCenter/Details/BluetoothDetail.qml:301, Modules/ControlCenter/Details/BluetoothDetail.qml:302, Modules/ControlCenter/Details/NetworkDetail.qml:609",
+    "reference": "Modules/Settings/NetworkTab.qml:448, Modules/Settings/NetworkTab.qml:1201, Modules/Settings/NetworkTab.qml:1558, Modules/Settings/AboutTab.qml:716, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:21, Modules/ControlCenter/Components/DragDropGrid.qml:337, Modules/ControlCenter/Components/DragDropGrid.qml:340, Modules/ControlCenter/Components/DragDropGrid.qml:342, Modules/ControlCenter/Components/DragDropGrid.qml:345, Modules/ControlCenter/Details/BluetoothDetail.qml:301, Modules/ControlCenter/Details/BluetoothDetail.qml:302, Modules/ControlCenter/Details/NetworkDetail.qml:609",
     "comment": ""
   },
   {
@@ -4824,6 +4830,12 @@
     "comment": ""
   },
   {
+    "term": "GPU temperature display",
+    "context": "GPU temperature display",
+    "reference": "Modules/Settings/WidgetsTab.qml:141",
+    "comment": ""
+  },
+  {
     "term": "GTK, Qt, IDEs, more",
     "context": "greeter feature card description",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:99",
@@ -4845,6 +4857,12 @@
     "term": "Gamma control not available. Requires DMS API v6+.",
     "context": "Gamma control not available. Requires DMS API v6+.",
     "reference": "Modules/Settings/GammaControlTab.qml:77",
+    "comment": ""
+  },
+  {
+    "term": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.",
+    "context": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:2754",
     "comment": ""
   },
   {
@@ -10004,7 +10022,7 @@
   {
     "term": "Show Welcome",
     "context": "Show Welcome",
-    "reference": "Modules/Settings/AboutTab.qml:808",
+    "reference": "Modules/Settings/AboutTab.qml:806",
     "comment": ""
   },
   {
@@ -10418,7 +10436,7 @@
   {
     "term": "Status",
     "context": "Status",
-    "reference": "Widgets/DankIconPicker.qml:55, Modules/Settings/NetworkTab.qml:182, Modules/Settings/AboutTab.qml:700, Modules/Settings/PrinterTab.qml:186",
+    "reference": "Widgets/DankIconPicker.qml:55, Modules/Settings/NetworkTab.qml:182, Modules/Settings/AboutTab.qml:698, Modules/Settings/PrinterTab.qml:186",
     "comment": ""
   },
   {
@@ -10568,7 +10586,7 @@
   {
     "term": "System Check",
     "context": "greeter doctor page title",
-    "reference": "Modules/Settings/AboutTab.qml:816, Modals/Greeter/GreeterDoctorPage.qml:157, Modals/Greeter/GreeterDoctorPage.qml:221",
+    "reference": "Modules/Settings/AboutTab.qml:814, Modals/Greeter/GreeterDoctorPage.qml:157, Modals/Greeter/GreeterDoctorPage.qml:221",
     "comment": ""
   },
   {
@@ -11018,7 +11036,7 @@
   {
     "term": "Tools",
     "context": "Tools",
-    "reference": "Modules/Settings/AboutTab.qml:795",
+    "reference": "Modules/Settings/AboutTab.qml:793",
     "comment": ""
   },
   {
@@ -11648,7 +11666,7 @@
   {
     "term": "Version",
     "context": "Version",
-    "reference": "Modules/Settings/AboutTab.qml:650",
+    "reference": "Modules/Settings/AboutTab.qml:648",
     "comment": ""
   },
   {
@@ -12249,6 +12267,12 @@
     "term": "dgop not available",
     "context": "dgop not available",
     "reference": "Modules/ControlCenter/Details/DiskUsageDetail.qml:65, Modules/ControlCenter/Widgets/DiskUsagePill.qml:45",
+    "comment": ""
+  },
+  {
+    "term": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.",
+    "context": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.",
+    "reference": "Modules/Settings/AboutTab.qml:585",
     "comment": ""
   },
   {
