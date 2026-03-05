@@ -9,6 +9,7 @@ A greeter for [greetd](https://github.com/kennylevinsen/greetd) that follows the
 - **Multiple compositors**: Supports niri, Hyprland, Sway, or mangowc.
 - **Custom PAM**: Supports custom PAM configuration in `/etc/pam.d/greetd`
 - **Session Memory**: Remembers last selected session and user
+  - Can be disabled via `settings.json` keys: `greeterRememberLastSession` and `greeterRememberLastUser`
 
 ## Installation
 
@@ -212,6 +213,7 @@ dms-greeter --command hyprland
 dms-greeter --command sway
 dms-greeter --command mangowc
 dms-greeter --command niri -C /path/to/custom-niri.kdl
+dms-greeter --command niri --remember-last-user false --remember-last-session false
 ```
 
 Configure greetd to use it in `/etc/greetd/config.toml`:
