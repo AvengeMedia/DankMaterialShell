@@ -24,9 +24,10 @@ var greeterCmd = &cobra.Command{
 }
 
 var greeterInstallCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install and configure DMS greeter",
-	Long:  "Install greetd and configure it to use DMS as the greeter interface",
+	Use:     "install",
+	Short:   "Install and configure DMS greeter",
+	Long:    "Install greetd and configure it to use DMS as the greeter interface",
+	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := installGreeter(); err != nil {
 			log.Fatalf("Error installing greeter: %v", err)
@@ -35,9 +36,10 @@ var greeterInstallCmd = &cobra.Command{
 }
 
 var greeterSyncCmd = &cobra.Command{
-	Use:   "sync",
-	Short: "Sync DMS theme and settings with greeter",
-	Long:  "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
+	Use:     "sync",
+	Short:   "Sync DMS theme and settings with greeter",
+	Long:    "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
+	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		auth, _ := cmd.Flags().GetBool("auth")
@@ -63,9 +65,10 @@ func init() {
 }
 
 var greeterEnableCmd = &cobra.Command{
-	Use:   "enable",
-	Short: "Enable DMS greeter in greetd config",
-	Long:  "Configure greetd to use DMS as the greeter",
+	Use:     "enable",
+	Short:   "Enable DMS greeter in greetd config",
+	Long:    "Configure greetd to use DMS as the greeter",
+	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := enableGreeter(); err != nil {
 			log.Fatalf("Error enabling greeter: %v", err)
