@@ -75,11 +75,6 @@ Rectangle {
                 "label": I18n.tr("Auth Type"),
                 "value": data["connection-type"]
             });
-        fields.push({
-            "key": "auto",
-            "label": I18n.tr("Autoconnect"),
-            "value": configData.autoconnect ? I18n.tr("Yes") : I18n.tr("No")
-        });
         return fields;
     }
 
@@ -268,6 +263,16 @@ Rectangle {
                             }
                         }
                     }
+                }
+            }
+
+            DankToggle {
+                width: parent.width
+                text: I18n.tr("Autoconnect")
+                checked: configData ? (configData.autoconnect || false) : false
+                visible: !VPNService.configLoading && configData !== null
+                onToggled: checked => {
+                    VPNService.updateConfig(profile.uuid, {autoconnect: checked});
                 }
             }
 
