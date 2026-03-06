@@ -142,6 +142,7 @@ Singleton {
             }
             ToastService.showInfo(I18n.tr("VPN configuration updated"));
             DMSNetworkService.refreshVpnProfiles();
+            getConfig(uuid);
             configUpdated();
         });
     }

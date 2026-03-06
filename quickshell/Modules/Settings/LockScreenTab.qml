@@ -245,7 +245,7 @@ Item {
 
                     StyledText {
                         text: I18n.tr("Path to a video file or folder containing videos")
-                        font.pixelSize: Theme.fontSizeXSmall
+                        font.pixelSize: Theme.fontSizeSmall
                         color: Theme.outlineVariant
                         wrapMode: Text.WordWrap
                         width: parent.width

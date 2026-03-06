@@ -22,8 +22,8 @@ Singleton {
     property bool _hasUnsavedChanges: false
     property var _loadedSessionSnapshot: null
     readonly property var _hooks: ({
-        "updateLocale": updateLocale
-    })
+            "updateLocale": updateLocale
+        })
     readonly property string _stateUrl: StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
     readonly property string _stateDir: Paths.strip(_stateUrl)
 
@@ -1245,7 +1245,7 @@ Singleton {
         id: greeterSessionFile
 
         path: {
-            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/etc/greetd/.dms";
+            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
             return greetCfgDir + "/session.json";
         }
         preload: isGreeterMode

@@ -288,6 +288,12 @@ Rectangle {
                     "tabIndex": 11
                 },
                 {
+                    "id": "greeter",
+                    "text": I18n.tr("Greeter"),
+                    "icon": "login",
+                    "tabIndex": 31
+                },
+                {
                     "id": "power_sleep",
                     "text": I18n.tr("Power & Sleep"),
                     "icon": "power_settings_new",

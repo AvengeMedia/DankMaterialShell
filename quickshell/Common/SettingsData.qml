@@ -315,6 +315,15 @@ Singleton {
     property string lockDateFormat: ""
     property bool greeterRememberLastSession: true
     property bool greeterRememberLastUser: true
+    property bool greeterEnableFprint: false
+    property bool greeterEnableU2f: false
+    property string greeterWallpaperPath: ""
+    property bool greeterUse24HourClock: true
+    property bool greeterShowSeconds: false
+    property bool greeterPadHours12Hour: false
+    property string greeterLockDateFormat: ""
+    property string greeterFontFamily: ""
+    property string greeterWallpaperFillMode: ""
     property int mediaSize: 1
 
     property string appLauncherViewMode: "list"
@@ -1157,7 +1166,7 @@ Singleton {
             "updateCompositorLayout": updateCompositorLayout,
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
-            "updateCompositorCursor": updateCompositorCursor,
+            "updateCompositorCursor": updateCompositorCursor
         })
 
     function set(key, value) {

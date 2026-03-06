@@ -24,9 +24,10 @@ var greeterCmd = &cobra.Command{
 }
 
 var greeterInstallCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install and configure DMS greeter",
-	Long:  "Install greetd and configure it to use DMS as the greeter interface",
+	Use:     "install",
+	Short:   "Install and configure DMS greeter",
+	Long:    "Install greetd and configure it to use DMS as the greeter interface",
+	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := installGreeter(); err != nil {
 			log.Fatalf("Error installing greeter: %v", err)
@@ -35,20 +36,39 @@ var greeterInstallCmd = &cobra.Command{
 }
 
 var greeterSyncCmd = &cobra.Command{
-	Use:   "sync",
-	Short: "Sync DMS theme and settings with greeter",
-	Long:  "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
+	Use:     "sync",
+	Short:   "Sync DMS theme and settings with greeter",
+	Long:    "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
+	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := syncGreeter(); err != nil {
+		yes, _ := cmd.Flags().GetBool("yes")
+		auth, _ := cmd.Flags().GetBool("auth")
+		local, _ := cmd.Flags().GetBool("local")
+		term, _ := cmd.Flags().GetBool("terminal")
+		if term {
+			if err := syncInTerminal(yes, auth, local); err != nil {
+				log.Fatalf("Error launching sync in terminal: %v", err)
+			}
+			return
+		}
+		if err := syncGreeter(yes, auth, local); err != nil {
 			log.Fatalf("Error syncing greeter: %v", err)
 		}
 	},
 }
 
+func init() {
+	greeterSyncCmd.Flags().BoolP("yes", "y", false, "Non-interactive mode: skip prompts, use defaults (for UI)")
+	greeterSyncCmd.Flags().BoolP("terminal", "t", false, "Run sync in a new terminal (for entering sudo password); terminal auto-closes when done")
+	greeterSyncCmd.Flags().BoolP("auth", "a", false, "Configure PAM for fingerprint and U2F (adds both if modules exist); overrides UI toggles")
+	greeterSyncCmd.Flags().BoolP("local", "l", false, "Developer mode: force greetd config to use a local DMS checkout path")
+}
+
 var greeterEnableCmd = &cobra.Command{
-	Use:   "enable",
-	Short: "Enable DMS greeter in greetd config",
-	Long:  "Configure greetd to use DMS as the greeter",
+	Use:     "enable",
+	Short:   "Enable DMS greeter in greetd config",
+	Long:    "Configure greetd to use DMS as the greeter",
+	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := enableGreeter(); err != nil {
 			log.Fatalf("Error enabling greeter: %v", err)
@@ -147,7 +167,7 @@ func installGreeter() error {
 	}
 
 	fmt.Println("\nSynchronizing DMS configurations...")
-	if err := greeter.SyncDMSConfigs(dmsPath, selectedCompositor, logFunc, ""); err != nil {
+	if err := greeter.SyncDMSConfigs(dmsPath, selectedCompositor, logFunc, "", false); err != nil {
 		return err
 	}
 
@@ -171,22 +191,88 @@ func installGreeter() error {
 	return nil
 }
 
-func syncGreeter() error {
-	fmt.Println("=== DMS Greeter Theme Sync ===")
-	fmt.Println()
+func syncInTerminal(nonInteractive bool, forceAuth bool, local bool) error {
+	syncFlags := make([]string, 0, 3)
+	if nonInteractive {
+		syncFlags = append(syncFlags, "--yes")
+	}
+	if forceAuth {
+		syncFlags = append(syncFlags, "--auth")
+	}
+	if local {
+		syncFlags = append(syncFlags, "--local")
+	}
+	shellSyncCmd := "dms greeter sync"
+	if len(syncFlags) > 0 {
+		shellSyncCmd += " " + strings.Join(syncFlags, " ")
+	}
+	shellCmd := shellSyncCmd + `; echo; echo "Sync finished. Closing in 3 seconds..."; sleep 3`
+	terminals := []struct {
+		name string
+		args []string
+	}{
+		{"gnome-terminal", []string{"--", "bash", "-c", shellCmd}},
+		{"konsole", []string{"-e", "bash", "-c", shellCmd}},
+		{"xfce4-terminal", []string{"-e", "bash -c \"" + strings.ReplaceAll(shellCmd, `"`, `\"`) + "\""}},
+		{"ghostty", []string{"-e", "bash", "-c", shellCmd}},
+		{"wezterm", []string{"start", "--", "bash", "-c", shellCmd}},
+		{"alacritty", []string{"-e", "bash", "-c", shellCmd}},
+		{"kitty", []string{"bash", "-c", shellCmd}},
+		{"xterm", []string{"-e", "bash -c \"" + strings.ReplaceAll(shellCmd, `"`, `\"`) + "\""}},
+	}
+	for _, t := range terminals {
+		if _, err := exec.LookPath(t.name); err != nil {
+			continue
+		}
+		cmd := exec.Command(t.name, t.args...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Start(); err != nil {
+			continue
+		}
+		_ = cmd.Process.Release()
+		return nil
+	}
+	return fmt.Errorf("no terminal emulator found (tried: gnome-terminal, konsole, xfce4-terminal, ghostty, wezterm, alacritty, kitty, xterm)")
+}
+
+func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
+	if !nonInteractive {
+		fmt.Println("=== DMS Greeter Theme Sync ===")
+		fmt.Println()
+	}
 
 	logFunc := func(msg string) {
 		fmt.Println(msg)
 	}
 
-	fmt.Println("Detecting DMS installation...")
-	dmsPath, err := greeter.DetectDMSPath()
-	if err != nil {
-		return err
+	if !nonInteractive {
+		fmt.Println("Detecting DMS installation...")
 	}
-	fmt.Printf("✓ Found DMS at: %s\n", dmsPath)
+	var dmsPath string
+	var err error
+	if local {
+		dmsPath, err = resolveLocalDMSPath()
+		if err != nil {
+			return err
+		}
+		if !nonInteractive {
+			fmt.Printf("✓ Using local DMS path: %s\n", dmsPath)
+		}
+	} else {
+		dmsPath, err = greeter.DetectDMSPath()
+		if err != nil {
+			return err
+		}
+		if !nonInteractive {
+			fmt.Printf("✓ Found DMS at: %s\n", dmsPath)
+		}
+	}
 
 	if !isGreeterEnabled() {
+		if nonInteractive {
+			return fmt.Errorf("greeter is not enabled; run 'dms greeter install' or 'dms greeter enable' first")
+		}
 		fmt.Println("\n⚠ DMS greeter is not enabled in greetd config.")
 		fmt.Print("Would you like to enable it now? (Y/n): ")
 
@@ -203,9 +289,12 @@ func syncGreeter() error {
 		}
 	}
 
-	cacheDir := "/var/cache/dms-greeter"
+	cacheDir := greeter.GreeterCacheDir
 	if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
-		return fmt.Errorf("greeter cache directory not found at %s\nPlease install the greeter first", cacheDir)
+		logFunc("Cache directory not found — attempting to create it...")
+		if createErr := greeter.EnsureGreeterCacheDir(logFunc, ""); createErr != nil {
+			return fmt.Errorf("greeter cache directory not found at %s and could not be created: %w\nRun: sudo mkdir -p %s && sudo chown greeter:greeter %s", cacheDir, createErr, cacheDir, cacheDir)
+		}
 	}
 
 	greeterGroup := greeter.DetectGreeterGroup()
@@ -224,6 +313,9 @@ func syncGreeter() error {
 
 		inGreeterGroup := strings.Contains(string(groupsOutput), greeterGroup)
 		if !inGreeterGroup {
+			if nonInteractive {
+				return fmt.Errorf("user must be in the %s group; run 'dms greeter sync' from a terminal to add", greeterGroup)
+			}
 			fmt.Printf("\n⚠ Warning: You are not in the %s group.\n", greeterGroup)
 			fmt.Printf("Would you like to add your user to the %s group? (Y/n): ", greeterGroup)
 
@@ -255,8 +347,14 @@ func syncGreeter() error {
 			return fmt.Errorf("no supported compositors found")
 		case 1:
 			compositor = compositors[0]
-			fmt.Printf("✓ Using compositor: %s\n", compositor)
+			if !nonInteractive {
+				fmt.Printf("✓ Using compositor: %s\n", compositor)
+			}
 		default:
+			if nonInteractive {
+				compositor = compositors[0]
+				break
+			}
 			var err error
 			compositor, err = promptCompositorChoice(compositors)
 			if err != nil {
@@ -264,8 +362,49 @@ func syncGreeter() error {
 			}
 			fmt.Printf("✓ Selected compositor: %s\n", compositor)
 		}
-	} else {
+	} else if !nonInteractive {
 		fmt.Printf("✓ Detected compositor from config: %s\n", compositor)
+	}
+
+	if local {
+		localWrapperScript := filepath.Join(dmsPath, "Modules", "Greetd", "assets", "dms-greeter")
+		restoreWrapperOverride := func() {}
+		if info, statErr := os.Stat(localWrapperScript); statErr == nil && !info.IsDir() {
+			previousWrapperOverride, hadWrapperOverride := os.LookupEnv("DMS_GREETER_WRAPPER_CMD")
+			wrapperCmdOverride := "/usr/bin/bash " + localWrapperScript
+			_ = os.Setenv("DMS_GREETER_WRAPPER_CMD", wrapperCmdOverride)
+			restoreWrapperOverride = func() {
+				if hadWrapperOverride {
+					_ = os.Setenv("DMS_GREETER_WRAPPER_CMD", previousWrapperOverride)
+				} else {
+					_ = os.Unsetenv("DMS_GREETER_WRAPPER_CMD")
+				}
+			}
+			if !nonInteractive {
+				fmt.Printf("✓ Using local greeter wrapper script: %s\n", localWrapperScript)
+			}
+		} else if !nonInteractive {
+			fmt.Printf("ℹ Local wrapper script not found at %s; using system wrapper.\n", localWrapperScript)
+		}
+
+		fmt.Println("\nUpdating greetd command to use local DMS path...")
+		err := greeter.ConfigureGreetd(dmsPath, compositor, logFunc, "")
+		restoreWrapperOverride()
+		if err != nil {
+			return fmt.Errorf("failed to apply local greeter path: %w", err)
+		}
+		if !nonInteractive {
+			fmt.Println("ℹ Local mode applies both DMS path override (-p) and local wrapper behavior when available.")
+		}
+	} else {
+		greeterPathForConfig := ""
+		if !greeter.IsGreeterPackaged() {
+			greeterPathForConfig = dmsPath
+		}
+		fmt.Println("\nUpdating greetd command...")
+		if err := greeter.ConfigureGreetd(greeterPathForConfig, compositor, logFunc, ""); err != nil {
+			return fmt.Errorf("failed to update greetd command: %w", err)
+		}
 	}
 
 	fmt.Println("\nSetting up permissions and ACLs...")
@@ -274,15 +413,106 @@ func syncGreeter() error {
 	}
 
 	fmt.Println("\nSynchronizing DMS configurations...")
-	if err := greeter.SyncDMSConfigs(dmsPath, compositor, logFunc, ""); err != nil {
+	if err := greeter.SyncDMSConfigs(dmsPath, compositor, logFunc, "", forceAuth); err != nil {
 		return err
 	}
 
 	fmt.Println("\n=== Sync Complete ===")
 	fmt.Println("\nYour theme, settings, and wallpaper configuration have been synced with the greeter.")
+	if forceAuth {
+		fmt.Println("PAM has been configured for fingerprint and U2F (where modules exist).")
+	}
 	fmt.Println("The changes will be visible on the next login screen.")
 
 	return nil
+}
+
+func hasDmsShellQml(dir string) bool {
+	info, err := os.Stat(filepath.Join(dir, "shell.qml"))
+	return err == nil && !info.IsDir()
+}
+
+func resolveDMSLocalCandidate(path string) (string, bool) {
+	if path == "" {
+		return "", false
+	}
+	if hasDmsShellQml(path) {
+		abs, err := filepath.Abs(path)
+		if err != nil {
+			return path, true
+		}
+		return abs, true
+	}
+
+	quickshellPath := filepath.Join(path, "quickshell")
+	if hasDmsShellQml(quickshellPath) {
+		abs, err := filepath.Abs(quickshellPath)
+		if err != nil {
+			return quickshellPath, true
+		}
+		return abs, true
+	}
+
+	return "", false
+}
+
+func resolveLocalDMSPath() (string, error) {
+	if override := strings.TrimSpace(os.Getenv("DMS_LOCAL_PATH")); override != "" {
+		if resolved, ok := resolveDMSLocalCandidate(override); ok {
+			return resolved, nil
+		}
+		return "", fmt.Errorf("DMS_LOCAL_PATH is set but does not point to a valid DMS quickshell path: %s", override)
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current directory: %w", err)
+	}
+
+	dir := wd
+	for {
+		if resolved, ok := resolveDMSLocalCandidate(dir); ok {
+			return resolved, nil
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err == nil && homeDir != "" {
+		for _, candidate := range []string{
+			filepath.Join(homeDir, "dms"),
+			filepath.Join(homeDir, "DankMaterialShell"),
+			filepath.Join(homeDir, "dankmaterialshell"),
+			filepath.Join(homeDir, "projects", "dms"),
+			filepath.Join(homeDir, "src", "dms"),
+		} {
+			if resolved, ok := resolveDMSLocalCandidate(candidate); ok {
+				return resolved, nil
+			}
+		}
+
+		if entries, readErr := os.ReadDir(homeDir); readErr == nil {
+			for _, entry := range entries {
+				if !entry.IsDir() {
+					continue
+				}
+				name := strings.ToLower(entry.Name())
+				if !strings.Contains(name, "dms") && !strings.Contains(name, "dank") {
+					continue
+				}
+				if resolved, ok := resolveDMSLocalCandidate(filepath.Join(homeDir, entry.Name())); ok {
+					return resolved, nil
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("could not locate a local DMS checkout from %s; run from repo root or set DMS_LOCAL_PATH=/absolute/path/to/repo", wd)
 }
 
 func disableDisplayManager(dmName string) (bool, error) {
@@ -497,10 +727,18 @@ func enableGreeter() error {
 	configAlreadyCorrect := isGreeterEnabled()
 	configuredCompositor := detectConfiguredCompositor()
 
+	logFunc := func(msg string) {
+		fmt.Println(msg)
+	}
+
 	if configAlreadyCorrect {
 		fmt.Println("✓ Greeter is already configured with dms-greeter")
 		if configuredCompositor != "" {
 			fmt.Printf("✓ Configured compositor: %s\n", configuredCompositor)
+		}
+
+		if err := greeter.EnsureGreeterCacheDir(logFunc, ""); err != nil {
+			fmt.Printf("⚠ Could not create cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown greeter:greeter %s\n", err, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
 		}
 
 		if err := ensureGraphicalTarget(); err != nil {
@@ -556,11 +794,12 @@ func enableGreeter() error {
 		}
 		greeterPathForConfig = dmsPath
 	}
-	logFunc := func(msg string) {
-		fmt.Println(msg)
-	}
 	if err := greeter.ConfigureGreetd(greeterPathForConfig, selectedCompositor, logFunc, ""); err != nil {
 		return fmt.Errorf("failed to configure greetd: %w", err)
+	}
+
+	if err := greeter.EnsureGreeterCacheDir(logFunc, ""); err != nil {
+		fmt.Printf("⚠ Could not create cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown greeter:greeter %s\n", err, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
 	}
 
 	if err := ensureGraphicalTarget(); err != nil {
@@ -653,6 +892,95 @@ func readDefaultSessionCommand(configPath string) string {
 	return ""
 }
 
+func extractGreeterCacheDirFromCommand(command string) string {
+	if command == "" {
+		return greeter.GreeterCacheDir
+	}
+	tokens := strings.Fields(command)
+	for i := 0; i < len(tokens); i++ {
+		token := strings.Trim(tokens[i], "\"")
+		if token == "--cache-dir" && i+1 < len(tokens) {
+			return strings.Trim(tokens[i+1], "\"")
+		}
+		if strings.HasPrefix(token, "--cache-dir=") {
+			value := strings.TrimPrefix(token, "--cache-dir=")
+			value = strings.Trim(value, "\"")
+			if value != "" {
+				return value
+			}
+		}
+	}
+	return greeter.GreeterCacheDir
+}
+
+func extractGreeterWrapperFromCommand(command string) string {
+	if command == "" {
+		return ""
+	}
+	tokens := strings.Fields(command)
+	if len(tokens) == 0 {
+		return ""
+	}
+	return strings.Trim(tokens[0], "\"")
+}
+
+func extractGreeterPathOverrideFromCommand(command string) string {
+	if command == "" {
+		return ""
+	}
+	tokens := strings.Fields(command)
+	for i := 0; i < len(tokens); i++ {
+		token := strings.Trim(tokens[i], "\"")
+		if (token == "-p" || token == "--path") && i+1 < len(tokens) {
+			return strings.Trim(tokens[i+1], "\"")
+		}
+		if strings.HasPrefix(token, "--path=") {
+			value := strings.TrimPrefix(token, "--path=")
+			value = strings.Trim(value, "\"")
+			if value != "" {
+				return value
+			}
+		}
+	}
+	return ""
+}
+
+func parseManagedGreeterPamAuth(pamText string) (managed bool, fingerprint bool, u2f bool, legacy bool) {
+	if pamText == "" {
+		return false, false, false, false
+	}
+
+	lines := strings.Split(pamText, "\n")
+	inManaged := false
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		switch trimmed {
+		case greeter.GreeterPamManagedBlockStart:
+			managed = true
+			inManaged = true
+			continue
+		case greeter.GreeterPamManagedBlockEnd:
+			inManaged = false
+			continue
+		}
+
+		if strings.HasPrefix(trimmed, "# DMS greeter fingerprint") || strings.HasPrefix(trimmed, "# DMS greeter U2F") {
+			legacy = true
+		}
+		if !inManaged {
+			continue
+		}
+		if strings.Contains(trimmed, "pam_fprintd") {
+			fingerprint = true
+		}
+		if strings.Contains(trimmed, "pam_u2f") {
+			u2f = true
+		}
+	}
+
+	return managed, fingerprint, u2f, legacy
+}
+
 func packageInstallHint() string {
 	osInfo, err := distros.GetOSInfo()
 	if err != nil {
@@ -731,11 +1059,19 @@ func checkGreeterStatus() error {
 	}
 
 	configPath := "/etc/greetd/config.toml"
+	configuredCommand := ""
+	allGood := true
 	fmt.Println("Greeter Configuration:")
 	if _, err := os.ReadFile(configPath); err == nil {
-		command := readDefaultSessionCommand(configPath)
-		if command != "" && strings.Contains(command, "dms-greeter") {
+		configuredCommand = readDefaultSessionCommand(configPath)
+		if configuredCommand != "" && strings.Contains(configuredCommand, "dms-greeter") {
 			fmt.Println("  ✓ Greeter is enabled")
+			if wrapper := extractGreeterWrapperFromCommand(configuredCommand); wrapper != "" {
+				fmt.Printf("  Wrapper: %s\n", wrapper)
+			}
+			if pathOverride := extractGreeterPathOverrideFromCommand(configuredCommand); pathOverride != "" {
+				fmt.Printf("  DMS path override: %s\n", pathOverride)
+			}
 
 			compositor := detectConfiguredCompositor()
 			switch compositor {
@@ -751,10 +1087,12 @@ func checkGreeterStatus() error {
 		} else {
 			fmt.Println("  ✗ Greeter is NOT enabled")
 			fmt.Println("    Run 'dms greeter enable' to enable it")
+			allGood = false
 		}
 	} else {
 		fmt.Println("  ✗ Greeter config not found")
 		fmt.Printf("    %s\n", packageInstallHint())
+		allGood = false
 	}
 
 	fmt.Println("\nGroup Membership:")
@@ -773,8 +1111,12 @@ func checkGreeterStatus() error {
 		fmt.Println("    Run 'dms greeter sync' to set up group membership and permissions")
 	}
 
-	cacheDir := "/var/cache/dms-greeter"
+	cacheDir := extractGreeterCacheDirFromCommand(configuredCommand)
 	fmt.Println("\nGreeter Cache Directory:")
+	fmt.Printf("  Effective cache dir: %s\n", cacheDir)
+	if cacheDir != greeter.GreeterCacheDir {
+		fmt.Printf("  ⚠ Non-default cache dir detected (default: %s)\n", greeter.GreeterCacheDir)
+	}
 	if stat, err := os.Stat(cacheDir); err == nil && stat.IsDir() {
 		fmt.Printf("  ✓ %s exists\n", cacheDir)
 	} else {
@@ -806,7 +1148,6 @@ func checkGreeterStatus() error {
 		},
 	}
 
-	allGood := true
 	for _, link := range symlinks {
 		targetInfo, err := os.Lstat(link.target)
 		if err != nil {
@@ -845,11 +1186,80 @@ func checkGreeterStatus() error {
 		fmt.Printf("  ✓ %s: synced correctly\n", link.desc)
 	}
 
+	fmt.Println("\nGreeter Wallpaper Override:")
+	overridePath := filepath.Join(cacheDir, "greeter_wallpaper_override.jpg")
+	if stat, err := os.Stat(overridePath); err == nil && !stat.IsDir() {
+		fmt.Printf("  ✓ Override file present: %s\n", overridePath)
+	} else if os.IsNotExist(err) {
+		fmt.Println("  ℹ Override file not present (desktop/session wallpaper fallback in effect)")
+	} else if err != nil {
+		fmt.Printf("  ✗ Could not inspect override file: %v\n", err)
+		allGood = false
+	} else {
+		fmt.Printf("  ✗ Override path is not a regular file: %s\n", overridePath)
+		allGood = false
+	}
+
+	fmt.Println("\nGreeter PAM Authentication (DMS-managed block):")
+	if greeter.IsNixOS() {
+		fmt.Println("  ℹ NixOS detected: PAM is managed by NixOS modules.")
+		fmt.Println("    Configure fingerprint/U2F via your greetd NixOS module (security.pam.services.greetd).")
+		fmt.Println()
+		if allGood && inGreeterGroup {
+			fmt.Println("✓ All checks passed! Greeter is properly configured.")
+		} else if !allGood {
+			fmt.Println("⚠ Some issues detected. Run 'dms greeter sync' to repair configuration.")
+		} else if !inGreeterGroup {
+			fmt.Printf("⚠ User is not in %s group. Run 'dms greeter sync' after adding group membership.\n", greeterGroup)
+		}
+		return nil
+	}
+	greetdPamPath := "/etc/pam.d/greetd"
+	pamData, err := os.ReadFile(greetdPamPath)
+	if err != nil {
+		fmt.Printf("  ✗ Failed to read %s: %v\n", greetdPamPath, err)
+		allGood = false
+	} else {
+		managed, managedFprint, managedU2f, legacyManaged := parseManagedGreeterPamAuth(string(pamData))
+		if managed {
+			fmt.Println("  ✓ Managed auth block present")
+			if managedFprint {
+				fmt.Println("    - fingerprint: enabled")
+			} else {
+				fmt.Println("    - fingerprint: disabled")
+			}
+			if managedU2f {
+				fmt.Println("    - security key (U2F): enabled")
+			} else {
+				fmt.Println("    - security key (U2F): disabled")
+			}
+		} else {
+			fmt.Println("  ℹ No managed auth block present (fingerprint/U2F disabled for greeter)")
+		}
+		if legacyManaged {
+			fmt.Println("  ⚠ Legacy unmanaged DMS PAM lines detected. Run 'dms greeter sync' to normalize.")
+			allGood = false
+		}
+		includedFprintFile := greeter.DetectIncludedPamModule(string(pamData), "pam_fprintd.so")
+		if managedFprint {
+			if includedFprintFile != "" {
+				fmt.Printf("  ⚠ pam_fprintd found in both DMS managed block and %s.\n", includedFprintFile)
+				fmt.Println("    Double fingerprint auth detected — run 'dms greeter sync' to resolve.")
+				allGood = false
+			}
+		} else if includedFprintFile != "" {
+			fmt.Printf("  ℹ Fingerprint auth is enabled via included %s.\n", includedFprintFile)
+			fmt.Println("    The DMS toggle only controls the managed block; disable fingerprint in authselect/pam-auth-update for password-only greeter login.")
+		}
+	}
+
 	fmt.Println()
 	if allGood && inGreeterGroup {
 		fmt.Println("✓ All checks passed! Greeter is properly configured.")
 	} else if !allGood {
-		fmt.Println("⚠ Some issues detected. Run 'dms greeter sync' to fix symlinks.")
+		fmt.Println("⚠ Some issues detected. Run 'dms greeter sync' to repair configuration.")
+	} else if !inGreeterGroup {
+		fmt.Printf("⚠ User is not in %s group. Run 'dms greeter sync' after adding group membership.\n", greeterGroup)
 	}
 
 	return nil

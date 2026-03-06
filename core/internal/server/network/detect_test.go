@@ -1,6 +1,7 @@
 package network
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,13 @@ func TestDetectResult_HasNetworkdField(t *testing.T) {
 
 func TestDetectNetworkStack_Integration(t *testing.T) {
 	result, err := DetectNetworkStack()
+
+	if err != nil && strings.Contains(err.Error(), "connect system bus") {
+		t.Skipf("system D-Bus unavailable: %v", err)
+	}
+
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
-	assert.NotEmpty(t, result.ChosenReason)
+	if assert.NotNil(t, result) {
+		assert.NotEmpty(t, result.ChosenReason)
+	}
 }

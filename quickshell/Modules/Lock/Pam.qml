@@ -284,7 +284,7 @@ Scope {
     Process {
         id: availProc
 
-        command: ["sh", "-c", "fprintd-list $USER"]
+        command: ["sh", "-c", "fprintd-list \"${USER:-$(id -un)}\""]
         onExited: code => {
             fprint.available = code === 0;
             fprint.checkAvail();
