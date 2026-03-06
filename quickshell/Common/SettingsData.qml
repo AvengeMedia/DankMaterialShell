@@ -479,6 +479,7 @@ Singleton {
     property bool dockAutoHide: false
     property bool dockSmartAutoHide: false
     property bool dockGroupByApp: false
+    property bool dockRestoreSpecialWorkspaceOnClick: false
     property bool dockOpenOnOverview: false
     property int dockPosition: SettingsData.Position.Bottom
     property real dockSpacing: 4

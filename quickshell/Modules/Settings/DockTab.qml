@@ -160,6 +160,16 @@ Item {
                     onToggled: checked => SettingsData.set("dockGroupByApp", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "dockRestoreSpecialWorkspaceOnClick"
+                    tags: ["dock", "hyprland", "special", "workspace", "restore"]
+                    text: I18n.tr("Restore Special Workspace Windows")
+                    description: I18n.tr("When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window")
+                    checked: SettingsData.dockRestoreSpecialWorkspaceOnClick
+                    visible: CompositorService.isHyprland
+                    onToggled: checked => SettingsData.set("dockRestoreSpecialWorkspaceOnClick", checked)
+                }
+
                 SettingsButtonGroupRow {
                     settingKey: "dockIndicatorStyle"
                     tags: ["dock", "indicator", "style", "circle", "line"]
