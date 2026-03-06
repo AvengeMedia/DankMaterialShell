@@ -32,6 +32,9 @@ Item {
 
     property bool weatherInitialized: false
     property bool awaitingExternalAuth: false
+    property bool pendingPasswordResponse: false
+    property bool passwordSubmitRequested: false
+    property bool cancelingExternalAuthForPassword: false
     property int defaultAuthTimeoutMs: 12000
     property int externalAuthTimeoutMs: 45000
     property int passwordFailureCount: 0
@@ -42,6 +45,11 @@ Item {
     property string commonAuthPamText: ""
     property string passwordAuthPamText: ""
     property string faillockConfigText: ""
+    property bool greeterWallpaperOverrideExists: false
+    property string externalAuthAutoStartedForUser: ""
+    readonly property bool greeterPamHasFprint: pamModuleEnabled(greetdPamText, "pam_fprintd") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_fprintd")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_fprintd")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_fprintd"))
+    readonly property bool greeterPamHasU2f: pamModuleEnabled(greetdPamText, "pam_u2f") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_u2f")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_u2f")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_u2f"))
+    readonly property bool greeterExternalAuthAvailable: greeterPamHasFprint || greeterPamHasU2f
 
     function initWeatherService() {
         if (weatherInitialized)
@@ -65,6 +73,20 @@ Item {
         if (hashIdx >= 0)
             return trimmed.substring(0, hashIdx).trim();
         return trimmed;
+    }
+
+    function pamModuleEnabled(pamText, moduleName) {
+        if (!pamText || !moduleName)
+            return false;
+        const lines = pamText.split(/\r?\n/);
+        for (let i = 0; i < lines.length; i++) {
+            const line = stripPamComment(lines[i]);
+            if (!line)
+                continue;
+            if (line.includes(moduleName))
+                return true;
+        }
+        return false;
     }
 
     function usesPamLockoutPolicy(pamText) {
@@ -221,6 +243,7 @@ Item {
         onLoaded: {
             root.greetdPamText = text();
             root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
         }
         onLoadFailed: {
             root.greetdPamText = "";
@@ -304,6 +327,7 @@ Item {
             GreeterState.usernameInput = lastUser;
             GreeterState.showPasswordInput = true;
             PortalService.getGreeterUserProfileImage(lastUser);
+            maybeAutoStartExternalAuth();
         }
     }
 
@@ -314,24 +338,90 @@ Item {
         if (GreeterState.username !== user) {
             passwordFailureCount = 0;
             clearAuthFeedback();
+            externalAuthAutoStartedForUser = "";
         }
         GreeterState.username = user;
         GreeterState.showPasswordInput = true;
         PortalService.getGreeterUserProfileImage(user);
         GreeterState.passwordBuffer = "";
+        pendingPasswordResponse = false;
+        passwordSubmitRequested = false;
+        cancelingExternalAuthForPassword = false;
+        maybeAutoStartExternalAuth();
+    }
+
+    function submitBufferedPassword() {
+        if (!GreeterState.passwordBuffer || GreeterState.passwordBuffer.length === 0)
+            return false;
+        pendingPasswordResponse = false;
+        passwordSubmitRequested = false;
+        cancelingExternalAuthForPassword = false;
+        awaitingExternalAuth = false;
+        authTimeout.interval = defaultAuthTimeoutMs;
+        authTimeout.restart();
+        Greetd.respond(GreeterState.passwordBuffer);
+        GreeterState.passwordBuffer = "";
+        inputField.text = "";
+        return true;
+    }
+
+    function requestPasswordSessionTransition() {
+        if (cancelingExternalAuthForPassword)
+            return;
+        cancelingExternalAuthForPassword = true;
+        awaitingExternalAuth = false;
+        pendingPasswordResponse = false;
+        authTimeout.interval = defaultAuthTimeoutMs;
+        authTimeout.stop();
+        Greetd.cancelSession();
     }
 
     function startAuthSession() {
         if (!GreeterState.showPasswordInput || !GreeterState.username)
             return;
-        if (GreeterState.unlocking || Greetd.state !== GreetdState.Inactive)
+        if (GreeterState.unlocking)
             return;
-        if (!GreeterState.passwordBuffer || GreeterState.passwordBuffer.length === 0)
+        const hasPasswordBuffer = GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0;
+        if (Greetd.state !== GreetdState.Inactive) {
+            if (pendingPasswordResponse && hasPasswordBuffer)
+                submitBufferedPassword();
+            else if (awaitingExternalAuth && hasPasswordBuffer) {
+                passwordSubmitRequested = true;
+            } else if (hasPasswordBuffer)
+                passwordSubmitRequested = true;
             return;
-        awaitingExternalAuth = false;
-        authTimeout.interval = defaultAuthTimeoutMs;
+        }
+        if (cancelingExternalAuthForPassword) {
+            if (hasPasswordBuffer)
+                passwordSubmitRequested = true;
+            return;
+        }
+        if (!hasPasswordBuffer && !root.greeterExternalAuthAvailable)
+            return;
+        pendingPasswordResponse = false;
+        passwordSubmitRequested = hasPasswordBuffer;
+        awaitingExternalAuth = !hasPasswordBuffer && root.greeterExternalAuthAvailable;
+        authTimeout.interval = awaitingExternalAuth ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
         authTimeout.restart();
         Greetd.createSession(GreeterState.username);
+    }
+
+    function maybeAutoStartExternalAuth() {
+        if (!GreeterState.showPasswordInput || !GreeterState.username)
+            return;
+        if (!root.greeterExternalAuthAvailable)
+            return;
+        if (GreeterState.unlocking || Greetd.state !== GreetdState.Inactive)
+            return;
+        if (passwordSubmitRequested || cancelingExternalAuthForPassword)
+            return;
+        if (GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0)
+            return;
+        if (externalAuthAutoStartedForUser === GreeterState.username)
+            return;
+
+        externalAuthAutoStartedForUser = GreeterState.username;
+        startAuthSession();
     }
 
     function isExternalAuthPrompt(message, responseRequired) {
@@ -410,10 +500,39 @@ Item {
         }
     }
 
+    FileView {
+        id: greeterWallpaperOverrideFile
+        path: GreetdSettings.greeterWallpaperOverridePath
+        printErrors: false
+        watchChanges: true
+        onLoaded: root.greeterWallpaperOverrideExists = true
+        onLoadFailed: root.greeterWallpaperOverrideExists = false
+    }
+
+    Connections {
+        target: GreetdSettings
+        function onGreeterWallpaperOverridePathChanged() {
+            if (!GreetdSettings.greeterWallpaperOverridePath) {
+                root.greeterWallpaperOverrideExists = false;
+                return;
+            }
+            greeterWallpaperOverrideFile.reload();
+        }
+        function onGreeterWallpaperPathChanged() {
+            if (!GreetdSettings.greeterWallpaperPath) {
+                root.greeterWallpaperOverrideExists = false;
+                return;
+            }
+            greeterWallpaperOverrideFile.reload();
+        }
+    }
+
     DankBackdrop {
         anchors.fill: parent
         screenName: root.screenName
         visible: {
+            if (GreetdSettings.greeterWallpaperPath !== "" && root.greeterWallpaperOverrideExists)
+                return false;
             var _ = SessionData.perMonitorWallpaper;
             var __ = SessionData.monitorWallpapers;
             var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
@@ -426,12 +545,14 @@ Item {
 
         anchors.fill: parent
         source: {
+            if (GreetdSettings.greeterWallpaperPath !== "" && root.greeterWallpaperOverrideExists)
+                return encodeFileUrl(GreetdSettings.greeterWallpaperOverridePath);
             var _ = SessionData.perMonitorWallpaper;
             var __ = SessionData.monitorWallpapers;
             var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
             return (currentWallpaper && !currentWallpaper.startsWith("#")) ? encodeFileUrl(currentWallpaper) : "";
         }
-        fillMode: Theme.getFillMode(GreetdSettings.wallpaperFillMode)
+        fillMode: Theme.getFillMode(GreetdSettings.getEffectiveWallpaperFillMode())
         smooth: true
         asynchronous: false
         cache: true
@@ -594,10 +715,7 @@ Item {
             anchors.top: clockContainer.bottom
             anchors.topMargin: 4
             text: {
-                if (GreetdSettings.lockDateFormat && GreetdSettings.lockDateFormat.length > 0) {
-                    return systemClock.date.toLocaleDateString(Qt.locale(), GreetdSettings.lockDateFormat);
-                }
-                return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat);
+                return systemClock.date.toLocaleDateString(Qt.locale(), GreetdSettings.getEffectiveLockDateFormat());
             }
             font.pixelSize: Theme.fontSizeXLarge
             color: "white"
@@ -666,6 +784,9 @@ Item {
                                 if (GreeterState.showPasswordInput && revealButton.visible) {
                                     margin += revealButton.width;
                                 }
+                                if (externalAuthButton.visible) {
+                                    margin += externalAuthButton.width;
+                                }
                                 if (virtualKeyboardButton.visible) {
                                     margin += virtualKeyboardButton.width;
                                 }
@@ -682,6 +803,8 @@ Item {
                                     return;
                                 if (GreeterState.showPasswordInput) {
                                     GreeterState.passwordBuffer = text;
+                                    if (!text || text.length === 0)
+                                        root.passwordSubmitRequested = false;
                                 } else {
                                     GreeterState.usernameInput = text;
                                 }
@@ -723,14 +846,14 @@ Item {
 
                             anchors.left: lockIcon.right
                             anchors.leftMargin: Theme.spacingM
-                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)))
+                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (externalAuthButton.visible ? externalAuthButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right))))
                             anchors.rightMargin: 2
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
                                 if (GreeterState.unlocking) {
                                     return "Logging in...";
                                 }
-                                if (Greetd.state !== GreetdState.Inactive) {
+                                if (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse) {
                                     return "Authenticating...";
                                 }
                                 if (GreeterState.showPasswordInput) {
@@ -738,7 +861,7 @@ Item {
                                 }
                                 return "Username...";
                             }
-                            color: GreeterState.unlocking ? Theme.primary : (Greetd.state !== GreetdState.Inactive ? Theme.primary : Theme.outline)
+                            color: (GreeterState.unlocking || (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse)) ? Theme.primary : Theme.outline
                             font.pixelSize: Theme.fontSizeMedium
                             opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length === 0 : GreeterState.usernameInput.length === 0) ? 1 : 0
 
@@ -760,7 +883,7 @@ Item {
                         StyledText {
                             anchors.left: lockIcon.right
                             anchors.leftMargin: Theme.spacingM
-                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)))
+                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (externalAuthButton.visible ? externalAuthButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right))))
                             anchors.rightMargin: 2
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
@@ -790,14 +913,26 @@ Item {
                         DankActionButton {
                             id: revealButton
 
-                            anchors.right: virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)
+                            anchors.right: externalAuthButton.visible ? externalAuthButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right))
                             anchors.rightMargin: 0
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: parent.showPassword ? "visibility_off" : "visibility"
                             buttonSize: 32
-                            visible: GreeterState.showPasswordInput && GreeterState.passwordBuffer.length > 0 && Greetd.state === GreetdState.Inactive && !GreeterState.unlocking
+                            visible: GreeterState.showPasswordInput && GreeterState.passwordBuffer.length > 0 && (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
                             enabled: visible
                             onClicked: parent.showPassword = !parent.showPassword
+                        }
+                        DankActionButton {
+                            id: externalAuthButton
+
+                            anchors.right: virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)
+                            anchors.rightMargin: 0
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: root.greeterPamHasFprint ? "fingerprint" : "key"
+                            buttonSize: 32
+                            visible: GreeterState.showPasswordInput && root.greeterExternalAuthAvailable && GreeterState.passwordBuffer.length === 0 && (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
+                            enabled: visible
+                            onClicked: root.startAuthSession()
                         }
                         DankActionButton {
                             id: virtualKeyboardButton
@@ -807,7 +942,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: "keyboard"
                             buttonSize: 32
-                            visible: Greetd.state === GreetdState.Inactive && !GreeterState.unlocking
+                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
                             enabled: visible
                             onClicked: {
                                 if (keyboard_controller.isKeyboardActive) {
@@ -826,7 +961,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: "keyboard_return"
                             buttonSize: 36
-                            visible: Greetd.state === GreetdState.Inactive && !GreeterState.unlocking
+                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
                             enabled: true
                             onClicked: {
                                 if (GreeterState.showPasswordInput) {
@@ -920,6 +1055,7 @@ Item {
                         enabled: !GreeterState.unlocking && Greetd.state === GreetdState.Inactive && GreeterState.showPasswordInput
                         onClicked: {
                             GreeterState.reset();
+                            root.externalAuthAutoStartedForUser = "";
                             inputField.text = "";
                             PortalService.profileImage = "";
                         }
@@ -1418,28 +1554,45 @@ Item {
         enabled: isPrimaryScreen
 
         function onAuthMessage(message, error, responseRequired, echoResponse) {
-            awaitingExternalAuth = root.isExternalAuthPrompt(message, responseRequired);
-            authTimeout.interval = awaitingExternalAuth ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
-            authTimeout.restart();
             if (responseRequired) {
-                Greetd.respond(GreeterState.passwordBuffer);
-                GreeterState.passwordBuffer = "";
-                inputField.text = "";
+                cancelingExternalAuthForPassword = false;
+                awaitingExternalAuth = false;
+                authTimeout.interval = defaultAuthTimeoutMs;
+                authTimeout.restart();
+                pendingPasswordResponse = true;
+                if (passwordSubmitRequested && !root.submitBufferedPassword())
+                    passwordSubmitRequested = false;
                 return;
             }
+            pendingPasswordResponse = false;
+            if (!passwordSubmitRequested)
+                awaitingExternalAuth = root.isExternalAuthPrompt(message, responseRequired);
+            authTimeout.interval = awaitingExternalAuth ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
+            authTimeout.restart();
             Greetd.respond("");
         }
 
         function onStateChanged() {
             if (Greetd.state === GreetdState.Inactive) {
+                const resumePasswordSubmit = cancelingExternalAuthForPassword && passwordSubmitRequested && GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0;
                 awaitingExternalAuth = false;
+                pendingPasswordResponse = false;
+                cancelingExternalAuthForPassword = false;
                 authTimeout.interval = defaultAuthTimeoutMs;
                 authTimeout.stop();
+                if (resumePasswordSubmit) {
+                    Qt.callLater(root.startAuthSession);
+                    return;
+                }
+                passwordSubmitRequested = false;
             }
         }
 
         function onReadyToLaunch() {
             awaitingExternalAuth = false;
+            pendingPasswordResponse = false;
+            passwordSubmitRequested = false;
+            cancelingExternalAuthForPassword = false;
             authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.stop();
             passwordFailureCount = 0;
@@ -1470,6 +1623,9 @@ Item {
 
         function onAuthFailure(message) {
             awaitingExternalAuth = false;
+            pendingPasswordResponse = false;
+            passwordSubmitRequested = false;
+            cancelingExternalAuthForPassword = false;
             authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.stop();
             launchTimeout.stop();
@@ -1489,6 +1645,9 @@ Item {
 
         function onError(error) {
             awaitingExternalAuth = false;
+            pendingPasswordResponse = false;
+            passwordSubmitRequested = false;
+            cancelingExternalAuthForPassword = false;
             authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.stop();
             launchTimeout.stop();
@@ -1509,6 +1668,9 @@ Item {
             if (GreeterState.unlocking || Greetd.state === GreetdState.Inactive)
                 return;
             awaitingExternalAuth = false;
+            pendingPasswordResponse = false;
+            passwordSubmitRequested = false;
+            cancelingExternalAuthForPassword = false;
             authTimeout.interval = defaultAuthTimeoutMs;
             GreeterState.pamState = "error";
             authFeedbackMessage = currentAuthMessage();
@@ -1525,6 +1687,9 @@ Item {
         onTriggered: {
             if (!GreeterState.unlocking)
                 return;
+            pendingPasswordResponse = false;
+            passwordSubmitRequested = false;
+            cancelingExternalAuthForPassword = false;
             GreeterState.unlocking = false;
             GreeterState.pamState = "error";
             authFeedbackMessage = currentAuthMessage();

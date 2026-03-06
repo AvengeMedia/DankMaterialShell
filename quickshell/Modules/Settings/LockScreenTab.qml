@@ -166,6 +166,114 @@ Item {
                     visible: SettingsData.fprintdAvailable
                     onToggled: checked => SettingsData.set("enableFprint", checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "enableU2f"
+                    tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "fido", "authentication", "hardware"]
+                    text: I18n.tr("Enable security key authentication", "Enable FIDO2/U2F hardware security key for lock screen")
+                    description: SettingsData.u2fAvailable ? I18n.tr("Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)", "lock screen U2F security key setting") : I18n.tr("Not enrolled", "security key not detected status")
+                    descriptionColor: SettingsData.u2fAvailable ? Theme.surfaceVariantText : Theme.warning
+                    checked: SettingsData.enableU2f
+                    enabled: SettingsData.u2fAvailable
+                    onToggled: checked => SettingsData.set("enableU2f", checked)
+                }
+
+                SettingsDropdownRow {
+                    settingKey: "u2fMode"
+                    tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "mode", "factor", "second"]
+                    text: I18n.tr("Security key mode", "lock screen U2F security key mode setting")
+                    description: I18n.tr("'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.", "lock screen U2F security key mode setting")
+                    visible: SettingsData.u2fAvailable && SettingsData.enableU2f
+                    options: [I18n.tr("Alternative (OR)", "U2F mode option: key works as standalone unlock method"), I18n.tr("Second Factor (AND)", "U2F mode option: key required after password or fingerprint")]
+                    currentValue: SettingsData.u2fMode === "and" ? I18n.tr("Second Factor (AND)", "U2F mode option: key required after password or fingerprint") : I18n.tr("Alternative (OR)", "U2F mode option: key works as standalone unlock method")
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Second Factor (AND)", "U2F mode option: key required after password or fingerprint"))
+                            SettingsData.set("u2fMode", "and");
+                        else
+                            SettingsData.set("u2fMode", "or");
+                    }
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "movie"
+                title: I18n.tr("Video Screensaver")
+                settingKey: "videoScreensaver"
+
+                StyledText {
+                    visible: !MultimediaService.available
+                    text: I18n.tr("QtMultimedia is not available - video screensaver requires qt multimedia services")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.warning
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                }
+
+                SettingsToggleRow {
+                    settingKey: "lockScreenVideoEnabled"
+                    tags: ["lock", "screen", "video", "screensaver", "animation", "movie"]
+                    text: I18n.tr("Enable Video Screensaver")
+                    description: I18n.tr("Play a video when the screen locks.")
+                    enabled: MultimediaService.available
+                    checked: SettingsData.lockScreenVideoEnabled
+                    onToggled: checked => SettingsData.set("lockScreenVideoEnabled", checked)
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingXS
+                    visible: SettingsData.lockScreenVideoEnabled && MultimediaService.available
+
+                    StyledText {
+                        text: I18n.tr("Video Path")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Path to a video file or folder containing videos")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.outlineVariant
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        DankTextField {
+                            id: videoPathField
+                            width: parent.width - browseVideoButton.width - Theme.spacingS
+                            placeholderText: I18n.tr("/path/to/videos")
+                            text: SettingsData.lockScreenVideoPath
+                            backgroundColor: Theme.surfaceContainerHighest
+                            onTextChanged: {
+                                if (text !== SettingsData.lockScreenVideoPath) {
+                                    SettingsData.set("lockScreenVideoPath", text);
+                                }
+                            }
+                        }
+
+                        DankButton {
+                            id: browseVideoButton
+                            text: I18n.tr("Browse")
+                            onClicked: videoBrowserModal.open()
+                        }
+                    }
+                }
+
+                SettingsToggleRow {
+                    settingKey: "lockScreenVideoCycling"
+                    tags: ["lock", "screen", "video", "screensaver", "cycling", "random", "shuffle"]
+                    text: I18n.tr("Automatic Cycling")
+                    description: I18n.tr("Pick a different random video each time from the same folder")
+                    visible: SettingsData.lockScreenVideoEnabled && MultimediaService.available
+                    enabled: MultimediaService.available
+                    checked: SettingsData.lockScreenVideoCycling
+                    onToggled: checked => SettingsData.set("lockScreenVideoCycling", checked)
+                }
             }
 
             SettingsCard {

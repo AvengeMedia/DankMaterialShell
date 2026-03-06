@@ -9,7 +9,7 @@ import "GreetdEnv.js" as GreetdEnv
 Singleton {
     id: root
 
-    readonly property string greetCfgDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/etc/greetd/.dms"
+    readonly property string greetCfgDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
     readonly property string sessionConfigPath: greetCfgDir + "/session.json"
     readonly property string memoryFile: greetCfgDir + "/memory.json"
     readonly property bool rememberLastSession: GreetdEnv.readBoolOverride(Quickshell.env, ["DMS_GREET_REMEMBER_LAST_SESSION", "DMS_SAVE_SESSION"], true)

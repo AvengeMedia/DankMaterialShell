@@ -3,6 +3,7 @@ package greeter
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -17,8 +18,27 @@ import (
 	"github.com/sblinch/kdl-go/document"
 )
 
+const (
+	GreeterCacheDir = "/var/cache/dms-greeter"
+
+	GreeterPamManagedBlockStart = "# BEGIN DMS GREETER AUTH (managed by dms greeter sync)"
+	GreeterPamManagedBlockEnd   = "# END DMS GREETER AUTH"
+
+	legacyGreeterPamFprintComment = "# DMS greeter fingerprint"
+	legacyGreeterPamU2FComment    = "# DMS greeter U2F"
+)
+
+var includedPamAuthFiles = []string{"system-auth", "common-auth", "password-auth"}
+
 func DetectDMSPath() (string, error) {
 	return config.LocateDMSConfig()
+}
+
+// IsNixOS returns true when running on NixOS, which manages PAM configs through
+// its module system. The DMS PAM managed block must not be written on NixOS.
+func IsNixOS() bool {
+	_, err := os.Stat("/etc/NIXOS")
+	return err == nil
 }
 
 func DetectGreeterGroup() string {
@@ -201,17 +221,29 @@ func DetectGreeterUser() string {
 }
 
 func resolveGreeterWrapperPath() string {
-	if path, err := exec.LookPath("dms-greeter"); err == nil {
-		return path
+	if override := strings.TrimSpace(os.Getenv("DMS_GREETER_WRAPPER_CMD")); override != "" {
+		return override
 	}
 
-	for _, candidate := range []string{"/usr/local/bin/dms-greeter", "/usr/bin/dms-greeter"} {
-		if _, err := os.Stat(candidate); err == nil {
+	for _, candidate := range []string{"/usr/bin/dms-greeter", "/usr/local/bin/dms-greeter"} {
+		if info, err := os.Stat(candidate); err == nil && !info.IsDir() && (info.Mode()&0o111) != 0 {
 			return candidate
 		}
 	}
 
-	return "dms-greeter"
+	if path, err := exec.LookPath("dms-greeter"); err == nil {
+		resolved := path
+		if realPath, realErr := filepath.EvalSymlinks(path); realErr == nil {
+			resolved = realPath
+		}
+		if strings.HasPrefix(resolved, "/home/") || strings.HasPrefix(resolved, "/tmp/") {
+			fmt.Fprintf(os.Stderr, "⚠ Warning: ignoring non-system dms-greeter on PATH: %s\n", path)
+		} else {
+			return path
+		}
+	}
+
+	return "/usr/bin/dms-greeter"
 }
 
 func DetectCompositors() []string {
@@ -514,7 +546,21 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 		}
 	}
 
-	cacheDir := "/var/cache/dms-greeter"
+	if err := EnsureGreeterCacheDir(logFunc, sudoPassword); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// EnsureGreeterCacheDir creates /var/cache/dms-greeter with correct ownership if it does not exist.
+// It is safe to call multiple times (idempotent).
+func EnsureGreeterCacheDir(logFunc func(string), sudoPassword string) error {
+	cacheDir := GreeterCacheDir
+	if _, err := os.Stat(cacheDir); err == nil {
+		return nil
+	}
+
 	if err := runSudoCmd(sudoPassword, "mkdir", "-p", cacheDir); err != nil {
 		return fmt.Errorf("failed to create cache directory: %w", err)
 	}
@@ -526,11 +572,10 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 		return fmt.Errorf("failed to set cache directory owner: %w", err)
 	}
 
-	if err := runSudoCmd(sudoPassword, "chmod", "755", cacheDir); err != nil {
+	if err := runSudoCmd(sudoPassword, "chmod", "750", cacheDir); err != nil {
 		return fmt.Errorf("failed to set cache directory permissions: %w", err)
 	}
-	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, permissions: 755)", cacheDir, owner))
-
+	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, mode: 750)", cacheDir, owner))
 	return nil
 }
 
@@ -730,13 +775,13 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 	return nil
 }
 
-func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPassword string) error {
+func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPassword string, forceAuth bool) error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("failed to get user home directory: %w", err)
 	}
 
-	cacheDir := "/var/cache/dms-greeter"
+	cacheDir := GreeterCacheDir
 
 	symlinks := []struct {
 		source string
@@ -764,26 +809,31 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 		sourceDir := filepath.Dir(link.source)
 		if _, err := os.Stat(sourceDir); os.IsNotExist(err) {
 			if err := os.MkdirAll(sourceDir, 0o755); err != nil {
-				logFunc(fmt.Sprintf("⚠ Warning: Could not create directory %s: %v", sourceDir, err))
-				continue
+				return fmt.Errorf("failed to create source directory %s for %s: %w", sourceDir, link.desc, err)
 			}
 		}
 
 		if _, err := os.Stat(link.source); os.IsNotExist(err) {
 			if err := os.WriteFile(link.source, []byte("{}"), 0o644); err != nil {
-				logFunc(fmt.Sprintf("⚠ Warning: Could not create %s: %v", link.source, err))
-				continue
+				return fmt.Errorf("failed to create source file %s for %s: %w", link.source, link.desc, err)
 			}
 		}
 
 		_ = runSudoCmd(sudoPassword, "rm", "-f", link.target)
 
 		if err := runSudoCmd(sudoPassword, "ln", "-sf", link.source, link.target); err != nil {
-			logFunc(fmt.Sprintf("⚠ Warning: Failed to create symlink for %s: %v", link.desc, err))
-			continue
+			return fmt.Errorf("failed to create symlink for %s (%s -> %s): %w", link.desc, link.target, link.source, err)
 		}
 
 		logFunc(fmt.Sprintf("✓ Synced %s", link.desc))
+	}
+
+	if err := syncGreeterWallpaperOverride(homeDir, cacheDir, logFunc, sudoPassword); err != nil {
+		return fmt.Errorf("greeter wallpaper override sync failed: %w", err)
+	}
+
+	if err := syncGreeterPamConfig(homeDir, logFunc, sudoPassword, forceAuth); err != nil {
+		return fmt.Errorf("greeter PAM config sync failed: %w", err)
 	}
 
 	if strings.ToLower(compositor) != "niri" {
@@ -794,6 +844,293 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 		logFunc(fmt.Sprintf("⚠ Warning: Failed to sync niri greeter config: %v", err))
 	}
 
+	return nil
+}
+
+func syncGreeterWallpaperOverride(homeDir, cacheDir string, logFunc func(string), sudoPassword string) error {
+	settingsPath := filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
+	data, err := os.ReadFile(settingsPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return fmt.Errorf("failed to read settings at %s: %w", settingsPath, err)
+	}
+	var settings struct {
+		GreeterWallpaperPath string `json:"greeterWallpaperPath"`
+	}
+	if err := json.Unmarshal(data, &settings); err != nil {
+		return fmt.Errorf("failed to parse settings at %s: %w", settingsPath, err)
+	}
+	destPath := filepath.Join(cacheDir, "greeter_wallpaper_override.jpg")
+	if settings.GreeterWallpaperPath == "" {
+		if err := runSudoCmd(sudoPassword, "rm", "-f", destPath); err != nil {
+			return fmt.Errorf("failed to clear override file %s: %w", destPath, err)
+		}
+		logFunc("✓ Cleared greeter wallpaper override")
+		return nil
+	}
+	if err := runSudoCmd(sudoPassword, "rm", "-f", destPath); err != nil {
+		return fmt.Errorf("failed to remove old override file %s: %w", destPath, err)
+	}
+	src := settings.GreeterWallpaperPath
+	if !filepath.IsAbs(src) {
+		src = filepath.Join(homeDir, src)
+	}
+	st, err := os.Stat(src)
+	if err != nil {
+		return fmt.Errorf("configured greeter wallpaper not found at %s: %w", src, err)
+	}
+	if st.IsDir() {
+		return fmt.Errorf("configured greeter wallpaper path points to a directory: %s", src)
+	}
+	if err := runSudoCmd(sudoPassword, "cp", src, destPath); err != nil {
+		return fmt.Errorf("failed to copy override wallpaper to %s: %w", destPath, err)
+	}
+	greeterGroup := DetectGreeterGroup()
+	if err := runSudoCmd(sudoPassword, "chown", "greeter:"+greeterGroup, destPath); err != nil {
+		return fmt.Errorf("failed to set override ownership on %s: %w", destPath, err)
+	}
+	if err := runSudoCmd(sudoPassword, "chmod", "644", destPath); err != nil {
+		return fmt.Errorf("failed to set override permissions on %s: %w", destPath, err)
+	}
+	logFunc("✓ Synced greeter wallpaper override")
+	return nil
+}
+
+func pamModuleExists(module string) bool {
+	for _, libDir := range []string{
+		"/usr/lib64/security",
+		"/usr/lib/security",
+		"/lib/x86_64-linux-gnu/security",
+		"/usr/lib/x86_64-linux-gnu/security",
+		"/usr/lib/aarch64-linux-gnu/security",
+	} {
+		if _, err := os.Stat(filepath.Join(libDir, module)); err == nil {
+			return true
+		}
+	}
+	return false
+}
+
+func stripManagedGreeterPamBlock(content string) (string, bool) {
+	lines := strings.Split(content, "\n")
+	filtered := make([]string, 0, len(lines))
+	inManagedBlock := false
+	removed := false
+
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == GreeterPamManagedBlockStart {
+			inManagedBlock = true
+			removed = true
+			continue
+		}
+		if trimmed == GreeterPamManagedBlockEnd {
+			inManagedBlock = false
+			removed = true
+			continue
+		}
+		if inManagedBlock {
+			removed = true
+			continue
+		}
+		filtered = append(filtered, line)
+	}
+
+	return strings.Join(filtered, "\n"), removed
+}
+
+func stripLegacyGreeterPamLines(content string) (string, bool) {
+	lines := strings.Split(content, "\n")
+	filtered := make([]string, 0, len(lines))
+	removed := false
+
+	for i := 0; i < len(lines); i++ {
+		trimmed := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(trimmed, legacyGreeterPamFprintComment) || strings.HasPrefix(trimmed, legacyGreeterPamU2FComment) {
+			removed = true
+			if i+1 < len(lines) {
+				nextLine := strings.TrimSpace(lines[i+1])
+				if strings.HasPrefix(nextLine, "auth") &&
+					(strings.Contains(nextLine, "pam_fprintd") || strings.Contains(nextLine, "pam_u2f")) {
+					i++
+				}
+			}
+			continue
+		}
+		filtered = append(filtered, lines[i])
+	}
+
+	return strings.Join(filtered, "\n"), removed
+}
+
+func insertManagedGreeterPamBlock(content string, blockLines []string, greetdPamPath string) (string, error) {
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed != "" && !strings.HasPrefix(trimmed, "#") && strings.HasPrefix(trimmed, "auth") {
+			block := strings.Join(blockLines, "\n")
+			prefix := strings.Join(lines[:i], "\n")
+			suffix := strings.Join(lines[i:], "\n")
+			switch {
+			case prefix == "":
+				return block + "\n" + suffix, nil
+			case suffix == "":
+				return prefix + "\n" + block, nil
+			default:
+				return prefix + "\n" + block + "\n" + suffix, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("no auth directive found in %s", greetdPamPath)
+}
+
+func PamTextIncludesFile(pamText, filename string) bool {
+	lines := strings.Split(pamText, "\n")
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		if strings.Contains(trimmed, filename) &&
+			(strings.Contains(trimmed, "include") || strings.Contains(trimmed, "substack") || strings.HasPrefix(trimmed, "@include")) {
+			return true
+		}
+	}
+	return false
+}
+
+func PamFileHasModule(pamFilePath, module string) bool {
+	data, err := os.ReadFile(pamFilePath)
+	if err != nil {
+		return false
+	}
+	lines := strings.Split(string(data), "\n")
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		if strings.Contains(trimmed, module) {
+			return true
+		}
+	}
+	return false
+}
+
+func DetectIncludedPamModule(pamText, module string) string {
+	for _, includedFile := range includedPamAuthFiles {
+		if PamTextIncludesFile(pamText, includedFile) && PamFileHasModule("/etc/pam.d/"+includedFile, module) {
+			return includedFile
+		}
+	}
+	return ""
+}
+
+func syncGreeterPamConfig(homeDir string, logFunc func(string), sudoPassword string, forceAuth bool) error {
+	var wantFprint, wantU2f bool
+	if forceAuth {
+		wantFprint = pamModuleExists("pam_fprintd.so")
+		wantU2f = pamModuleExists("pam_u2f.so")
+	} else {
+		settingsPath := filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
+		data, err := os.ReadFile(settingsPath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				data = []byte("{}")
+			} else {
+				return fmt.Errorf("failed to read settings at %s: %w", settingsPath, err)
+			}
+		}
+		var settings struct {
+			GreeterEnableFprint bool `json:"greeterEnableFprint"`
+			GreeterEnableU2f    bool `json:"greeterEnableU2f"`
+		}
+		if err := json.Unmarshal(data, &settings); err != nil {
+			return fmt.Errorf("failed to parse settings at %s: %w", settingsPath, err)
+		}
+		fprintModule := pamModuleExists("pam_fprintd.so")
+		u2fModule := pamModuleExists("pam_u2f.so")
+		wantFprint = settings.GreeterEnableFprint && fprintModule
+		wantU2f = settings.GreeterEnableU2f && u2fModule
+		if settings.GreeterEnableFprint && !fprintModule {
+			logFunc("⚠ Warning: greeter fingerprint toggle is enabled, but pam_fprintd.so was not found.")
+		}
+		if settings.GreeterEnableU2f && !u2fModule {
+			logFunc("⚠ Warning: greeter security key toggle is enabled, but pam_u2f.so was not found.")
+		}
+	}
+
+	if IsNixOS() {
+		logFunc("ℹ NixOS detected: PAM config is managed by NixOS modules. Skipping DMS PAM block write.")
+		logFunc("  Configure fingerprint/U2F auth via your greetd NixOS module options (e.g. security.pam.services.greetd).")
+		return nil
+	}
+
+	greetdPamPath := "/etc/pam.d/greetd"
+	pamData, err := os.ReadFile(greetdPamPath)
+	if err != nil {
+		return fmt.Errorf("failed to read %s: %w", greetdPamPath, err)
+	}
+	originalContent := string(pamData)
+	content, _ := stripManagedGreeterPamBlock(originalContent)
+	content, _ = stripLegacyGreeterPamLines(content)
+
+	includedFprintFile := DetectIncludedPamModule(content, "pam_fprintd.so")
+	if wantFprint && includedFprintFile != "" {
+		logFunc("⚠ pam_fprintd already present in included " + includedFprintFile + " (managed by authselect/pam-auth-update). Skipping DMS fprint block to avoid double-fingerprint auth.")
+		wantFprint = false
+	}
+	if !wantFprint && includedFprintFile != "" {
+		logFunc("ℹ Fingerprint auth is still enabled via included " + includedFprintFile + ".")
+		logFunc("  Disable fingerprint in your system PAM manager (authselect/pam-auth-update) to force password-only greeter login.")
+	}
+
+	if wantFprint || wantU2f {
+		blockLines := []string{GreeterPamManagedBlockStart}
+		if wantFprint {
+			blockLines = append(blockLines, "auth sufficient pam_fprintd.so max-tries=1 timeout=5")
+		}
+		if wantU2f {
+			blockLines = append(blockLines, "auth sufficient pam_u2f.so cue nouserok timeout=10")
+		}
+		blockLines = append(blockLines, GreeterPamManagedBlockEnd)
+
+		content, err = insertManagedGreeterPamBlock(content, blockLines, greetdPamPath)
+		if err != nil {
+			return err
+		}
+	}
+
+	if content == originalContent {
+		return nil
+	}
+
+	tmpFile, err := os.CreateTemp("", "greetd-pam-*.conf")
+	if err != nil {
+		return err
+	}
+	tmpPath := tmpFile.Name()
+	defer os.Remove(tmpPath)
+	if _, err := tmpFile.WriteString(content); err != nil {
+		tmpFile.Close()
+		return err
+	}
+	if err := tmpFile.Close(); err != nil {
+		return err
+	}
+	if err := runSudoCmd(sudoPassword, "cp", tmpPath, greetdPamPath); err != nil {
+		return fmt.Errorf("failed to install updated PAM config at %s: %w", greetdPamPath, err)
+	}
+	if err := runSudoCmd(sudoPassword, "chmod", "644", greetdPamPath); err != nil {
+		return fmt.Errorf("failed to set permissions on %s: %w", greetdPamPath, err)
+	}
+	if wantFprint || wantU2f {
+		logFunc("✓ Configured greetd PAM for fingerprint/U2F")
+	} else {
+		logFunc("✓ Cleared DMS-managed greeter PAM auth block")
+	}
 	return nil
 }
 
@@ -938,6 +1275,8 @@ func ensureGreetdNiriConfig(logFunc func(string), sudoPassword string, niriConfi
 		}
 		// Strip existing -C or --config and their arguments
 		command = stripConfigFlag(command)
+		command = stripCacheDirFlag(command)
+		command = strings.TrimSpace(command + " --cache-dir " + GreeterCacheDir)
 
 		newCommand := fmt.Sprintf("%s -C %s", command, niriConfigPath)
 		idx := strings.Index(line, "command")
@@ -952,10 +1291,6 @@ func ensureGreetdNiriConfig(logFunc func(string), sudoPassword string, niriConfi
 
 	if !updated {
 		return nil
-	}
-
-	if err := backupFileIfExists(sudoPassword, configPath, ".backup"); err != nil {
-		return fmt.Errorf("failed to backup greetd config: %w", err)
 	}
 
 	tmpFile, err := os.CreateTemp("", "greetd-config-*.toml")
@@ -988,7 +1323,10 @@ func backupFileIfExists(sudoPassword string, path string, suffix string) error {
 	}
 
 	backupPath := fmt.Sprintf("%s%s-%s", path, suffix, time.Now().Format("20060102-150405"))
-	return runSudoCmd(sudoPassword, "cp", "-p", path, backupPath)
+	if err := runSudoCmd(sudoPassword, "cp", path, backupPath); err != nil {
+		return err
+	}
+	return runSudoCmd(sudoPassword, "chmod", "644", backupPath)
 }
 
 func (s *niriGreeterSync) processFile(filePath string) error {
@@ -1134,14 +1472,12 @@ func (s *niriGreeterSync) render() string {
 func ConfigureGreetd(dmsPath, compositor string, logFunc func(string), sudoPassword string) error {
 	configPath := "/etc/greetd/config.toml"
 
+	backupPath := fmt.Sprintf("%s.backup-%s", configPath, time.Now().Format("20060102-150405"))
+	if err := backupFileIfExists(sudoPassword, configPath, ".backup"); err != nil {
+		return fmt.Errorf("failed to backup greetd config: %w", err)
+	}
 	if _, err := os.Stat(configPath); err == nil {
-		backupPath := configPath + ".backup"
-		if err := runSudoCmd(sudoPassword, "cp", configPath, backupPath); err != nil {
-			return fmt.Errorf("failed to backup config: %w", err)
-		}
 		logFunc(fmt.Sprintf("✓ Backed up existing config to %s", backupPath))
-	} else if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("failed to access %s: %w", configPath, err)
 	}
 
 	greeterUser := DetectGreeterUser()
@@ -1164,7 +1500,7 @@ vt = 1
 	// Build command based on compositor and dms path
 	// When dmsPath is empty (packaged greeter), omit -p; wrapper finds /usr/share/quickshell/dms-greeter
 	compositorLower := strings.ToLower(compositor)
-	commandValue := fmt.Sprintf("%s --command %s", wrapperCmd, compositorLower)
+	commandValue := fmt.Sprintf("%s --command %s --cache-dir %s", wrapperCmd, compositorLower, GreeterCacheDir)
 	if dmsPath != "" {
 		commandValue = fmt.Sprintf("%s -p %s", commandValue, dmsPath)
 	}
@@ -1227,6 +1563,30 @@ func stripConfigFlag(command string) string {
 	}
 
 	return command
+}
+
+func stripCacheDirFlag(command string) string {
+	fields := strings.Fields(command)
+	if len(fields) == 0 {
+		return strings.TrimSpace(command)
+	}
+
+	filtered := make([]string, 0, len(fields))
+	for i := 0; i < len(fields); i++ {
+		token := fields[i]
+		if token == "--cache-dir" {
+			if i+1 < len(fields) {
+				i++
+			}
+			continue
+		}
+		if strings.HasPrefix(token, "--cache-dir=") {
+			continue
+		}
+		filtered = append(filtered, token)
+	}
+
+	return strings.Join(filtered, " ")
 }
 
 // getDebianOBSSlug returns the OBS repository slug for the running Debian version.
@@ -1405,7 +1765,7 @@ func AutoSetupGreeter(compositor, sudoPassword string, logFunc func(string)) err
 	}
 
 	logFunc("Synchronizing DMS configurations...")
-	if err := SyncDMSConfigs(dmsPath, compositor, logFunc, sudoPassword); err != nil {
+	if err := SyncDMSConfigs(dmsPath, compositor, logFunc, sudoPassword, false); err != nil {
 		logFunc(fmt.Sprintf("⚠ Warning: config sync error: %v", err))
 	}
 

@@ -48,7 +48,7 @@ Singleton {
     }
 
     property var fprintdDetectionProcess: Process {
-        command: ["sh", "-c", "command -v fprintd-list >/dev/null 2>&1"]
+        command: ["sh", "-c", "command -v fprintd-list >/dev/null 2>&1 && fprintd-list \"${USER:-$(id -un)}\" >/dev/null 2>&1"]
         running: false
         onExited: function (exitCode) {
             if (!settingsRoot)

@@ -204,6 +204,14 @@ if [[ -n "$REMEMBER_LAST_USER" ]]; then
 fi
 
 mkdir -p "$CACHE_DIR"
+mkdir -p "$CACHE_DIR/.local/state"
+mkdir -p "$CACHE_DIR/.local/share"
+mkdir -p "$CACHE_DIR/.cache"
+
+export HOME="$CACHE_DIR"
+export XDG_STATE_HOME="$CACHE_DIR/.local/state"
+export XDG_DATA_HOME="$CACHE_DIR/.local/share"
+export XDG_CACHE_HOME="$CACHE_DIR/.cache"
 
 # Keep greeter VT clean by default; callers can override via env or --debug.
 if [[ -z "${RUST_LOG:-}" ]]; then

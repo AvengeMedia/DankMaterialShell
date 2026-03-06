@@ -1204,7 +1204,7 @@ Singleton {
         id: greeterSessionFile
 
         path: {
-            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/etc/greetd/.dms";
+            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
             return greetCfgDir + "/session.json";
         }
         preload: isGreeterMode
