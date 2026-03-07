@@ -1,10 +1,12 @@
 package clipboard
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"syscall"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/ext_data_control"
@@ -12,17 +14,21 @@ import (
 )
 
 func Copy(data []byte, mimeType string) error {
-	return CopyOpts(data, mimeType, false, false)
+	return CopyReader(bytes.NewReader(data), mimeType, false, false)
 }
 
 func CopyOpts(data []byte, mimeType string, foreground, pasteOnce bool) error {
+	return CopyReader(bytes.NewReader(data), mimeType, foreground, pasteOnce)
+}
+
+func CopyReader(data io.Reader, mimeType string, foreground, pasteOnce bool) error {
 	if !foreground {
 		return copyFork(data, mimeType, pasteOnce)
 	}
-	return copyServe(data, mimeType, pasteOnce)
+	return copyServeReader(data, mimeType, pasteOnce)
 }
 
-func copyFork(data []byte, mimeType string, pasteOnce bool) error {
+func copyFork(data io.Reader, mimeType string, pasteOnce bool) error {
 	args := []string{os.Args[0], "cl", "copy", "--foreground"}
 	if pasteOnce {
 		args = append(args, "--paste-once")
@@ -30,10 +36,14 @@ func copyFork(data []byte, mimeType string, pasteOnce bool) error {
 	args = append(args, "--type", mimeType)
 
 	cmd := exec.Command(args[0], args[1:]...)
-	cmd.Stdin = nil
 	cmd.Stdout = nil
 	cmd.Stderr = nil
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+
+	if stdinSource, ok := data.(*os.File); ok {
+		cmd.Stdin = stdinSource
+		return cmd.Start()
+	}
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -44,16 +54,84 @@ func copyFork(data []byte, mimeType string, pasteOnce bool) error {
 		return fmt.Errorf("start: %w", err)
 	}
 
-	if _, err := stdin.Write(data); err != nil {
+	if _, err := io.Copy(stdin, data); err != nil {
 		stdin.Close()
 		return fmt.Errorf("write stdin: %w", err)
 	}
-	stdin.Close()
+	if err := stdin.Close(); err != nil {
+		return fmt.Errorf("close stdin: %w", err)
+	}
 
 	return nil
 }
 
 func copyServe(data []byte, mimeType string, pasteOnce bool) error {
+	return copyServeWithWriter(func(writer io.Writer) error {
+		total := 0
+
+		for total < len(data) {
+			n, err := writer.Write(data[total:])
+			total += n
+			if err != nil {
+				return err
+			}
+		}
+		if total != len(data) {
+			return io.ErrShortWrite
+		}
+		return nil
+	}, mimeType, pasteOnce)
+}
+
+func copyServeReader(data io.Reader, mimeType string, pasteOnce bool) error {
+	cachedData, err := createClipboardCacheFile()
+	if err != nil {
+		return fmt.Errorf("create clipboard cache file: %w", err)
+	}
+	defer os.Remove(cachedData.Name())
+
+	if _, err := io.Copy(cachedData, data); err != nil {
+		return fmt.Errorf("cache clipboard data: %w", err)
+	}
+	if err := cachedData.Close(); err != nil {
+		return fmt.Errorf("close temp cache file: %w", err)
+	}
+
+	return copyServeWithWriter(func(writer io.Writer) error {
+		cachedFile, err := os.Open(cachedData.Name())
+		if err != nil {
+			return fmt.Errorf("open temp cache file: %w", err)
+		}
+		defer cachedFile.Close()
+
+		if _, err := io.Copy(writer, cachedFile); err != nil {
+			return fmt.Errorf("write clipboard data: %w", err)
+		}
+		return nil
+	}, mimeType, pasteOnce)
+}
+
+func createClipboardCacheFile() (*os.File, error) {
+	preferredDirs := []string{}
+
+	if cacheDir, err := os.UserCacheDir(); err == nil {
+		preferredDirs = append(preferredDirs, filepath.Join(cacheDir, "dms", "clipboard"))
+	}
+	preferredDirs = append(preferredDirs, "/var/tmp/dms/clipboard")
+
+	for _, dir := range preferredDirs {
+		if err := os.MkdirAll(dir, 0o700); err != nil {
+			continue
+		}
+		cachedData, err := os.CreateTemp(dir, "dms-clipboard-*")
+		if err == nil {
+			return cachedData, nil
+		}
+	}
+	return os.CreateTemp("", "dms-clipboard-*")
+}
+
+func copyServeWithWriter(writeTo func(io.Writer) error, mimeType string, pasteOnce bool) error {
 	display, err := wlclient.Connect("")
 	if err != nil {
 		return fmt.Errorf("wayland connect: %w", err)
@@ -139,12 +217,18 @@ func copyServe(data []byte, mimeType string, pasteOnce bool) error {
 
 	cancelled := make(chan struct{})
 	pasted := make(chan struct{}, 1)
+	sendErr := make(chan error, 1)
 
 	source.SetSendHandler(func(e ext_data_control.ExtDataControlSourceV1SendEvent) {
 		defer syscall.Close(e.Fd)
 		file := os.NewFile(uintptr(e.Fd), "pipe")
 		defer file.Close()
-		file.Write(data)
+		if err := writeTo(file); err != nil {
+			select {
+			case sendErr <- err:
+			default:
+			}
+		}
 		select {
 		case pasted <- struct{}{}:
 		default:
@@ -165,6 +249,8 @@ func copyServe(data []byte, mimeType string, pasteOnce bool) error {
 		select {
 		case <-cancelled:
 			return nil
+		case err := <-sendErr:
+			return err
 		case <-pasted:
 			if pasteOnce {
 				return nil

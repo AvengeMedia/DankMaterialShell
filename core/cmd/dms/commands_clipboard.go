@@ -222,16 +222,19 @@ func init() {
 
 func runClipCopy(cmd *cobra.Command, args []string) {
 	var data []byte
+	copyFromStdin := false
 
 	switch {
 	case len(args) > 0:
 		data = []byte(args[0])
-	default:
+	case clipCopyDownload || clipCopyType == "__multi__":
 		var err error
 		data, err = io.ReadAll(os.Stdin)
 		if err != nil {
 			log.Fatalf("read stdin: %v", err)
 		}
+	default:
+		copyFromStdin = true
 	}
 
 	if clipCopyDownload {
@@ -253,6 +256,13 @@ func runClipCopy(cmd *cobra.Command, args []string) {
 		}
 		if err := clipboard.CopyMulti(offers, true, clipCopyPasteOnce); err != nil {
 			log.Fatalf("copy multi: %v", err)
+		}
+		return
+	}
+
+	if copyFromStdin {
+		if err := clipboard.CopyReader(os.Stdin, clipCopyType, clipCopyForeground, clipCopyPasteOnce); err != nil {
+			log.Fatalf("copy: %v", err)
 		}
 		return
 	}
