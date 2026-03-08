@@ -286,19 +286,14 @@ func uninstallGreeter(nonInteractive bool) error {
 		}
 	}
 
-	fmt.Println("\nStopping and disabling greetd...")
-	stopCmd := exec.Command("sudo", "systemctl", "stop", "greetd")
-	stopCmd.Stdout = os.Stdout
-	stopCmd.Stderr = os.Stderr
-	_ = stopCmd.Run() // not fatal — service may already be stopped
-
+	fmt.Println("\nDisabling greetd...")
 	disableCmd := exec.Command("sudo", "systemctl", "disable", "greetd")
 	disableCmd.Stdout = os.Stdout
 	disableCmd.Stderr = os.Stderr
 	if err := disableCmd.Run(); err != nil {
 		fmt.Printf("  ⚠ Could not disable greetd: %v\n", err)
 	} else {
-		fmt.Println("  ✓ greetd stopped and disabled")
+		fmt.Println("  ✓ greetd disabled")
 	}
 
 	fmt.Println("\nRemoving DMS PAM configuration...")
@@ -321,17 +316,12 @@ func uninstallGreeter(nonInteractive bool) error {
 	suggestDisplayManagerRestore(nonInteractive)
 
 	fmt.Println("\n=== Uninstall Complete ===")
-	fmt.Println("\nTo start a display manager, run e.g.:")
-	fmt.Println("  sudo systemctl enable --now gdm  (or lightdm, sddm, etc.)")
-	fmt.Println("\nTo re-enable DMS greeter at any time, run: dms greeter install")
+	fmt.Println("\nReboot to complete the uninstallation and switch to your previous display manager.")
+	fmt.Println("To re-enable DMS greeter at any time, run: dms greeter enable")
 
 	return nil
 }
 
-// restorePreDMSGreetdConfig finds the most recent timestamped backup of
-// /etc/greetd/config.toml that does not reference dms-greeter and restores it.
-// If no such backup exists, a minimal passthrough config is written so greetd
-// can at least be started without error (users must configure it themselves).
 func restorePreDMSGreetdConfig(sudoPassword string) error {
 	const configPath = "/etc/greetd/config.toml"
 	const backupGlob = "/etc/greetd/config.toml.backup-*"
