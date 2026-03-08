@@ -18,6 +18,22 @@ func Copy(data []byte, mimeType string) error {
 }
 
 func CopyOpts(data []byte, mimeType string, foreground, pasteOnce bool) error {
+	if foreground {
+		return copyServeWithWriter(func(writer io.Writer) error {
+			total := 0
+			for total < len(data) {
+				n, err := writer.Write(data[total:])
+				total += n
+				if err != nil {
+					return err
+				}
+			}
+			if total != len(data) {
+				return io.ErrShortWrite
+			}
+			return nil
+		}, mimeType, pasteOnce)
+	}
 	return CopyReader(bytes.NewReader(data), mimeType, foreground, pasteOnce)
 }
 
@@ -63,24 +79,6 @@ func copyFork(data io.Reader, mimeType string, pasteOnce bool) error {
 	}
 
 	return nil
-}
-
-func copyServe(data []byte, mimeType string, pasteOnce bool) error {
-	return copyServeWithWriter(func(writer io.Writer) error {
-		total := 0
-
-		for total < len(data) {
-			n, err := writer.Write(data[total:])
-			total += n
-			if err != nil {
-				return err
-			}
-		}
-		if total != len(data) {
-			return io.ErrShortWrite
-		}
-		return nil
-	}, mimeType, pasteOnce)
 }
 
 func copyServeReader(data io.Reader, mimeType string, pasteOnce bool) error {
