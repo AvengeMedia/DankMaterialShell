@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
@@ -29,7 +31,20 @@ var greeterInstallCmd = &cobra.Command{
 	Long:    "Install greetd and configure it to use DMS as the greeter interface",
 	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := installGreeter(); err != nil {
+		yes, _ := cmd.Flags().GetBool("yes")
+		term, _ := cmd.Flags().GetBool("terminal")
+		if term {
+			installCmd := "dms greeter install"
+			if yes {
+				installCmd += " --yes"
+			}
+			installCmd += "; echo; echo \"Install finished. Closing in 3 seconds...\"; sleep 3"
+			if err := runCommandInTerminal(installCmd); err != nil {
+				log.Fatalf("Error launching install in terminal: %v", err)
+			}
+			return
+		}
+		if err := installGreeter(yes); err != nil {
 			log.Fatalf("Error installing greeter: %v", err)
 		}
 	},
@@ -70,7 +85,20 @@ var greeterEnableCmd = &cobra.Command{
 	Long:    "Configure greetd to use DMS as the greeter",
 	PreRunE: requireMutableSystemCommand,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := enableGreeter(); err != nil {
+		yes, _ := cmd.Flags().GetBool("yes")
+		term, _ := cmd.Flags().GetBool("terminal")
+		if term {
+			enableCmd := "dms greeter enable"
+			if yes {
+				enableCmd += " --yes"
+			}
+			enableCmd += "; echo; echo \"Enable finished. Closing in 3 seconds...\"; sleep 3"
+			if err := runCommandInTerminal(enableCmd); err != nil {
+				log.Fatalf("Error launching enable in terminal: %v", err)
+			}
+			return
+		}
+		if err := enableGreeter(yes); err != nil {
 			log.Fatalf("Error enabling greeter: %v", err)
 		}
 	},
@@ -87,18 +115,62 @@ var greeterStatusCmd = &cobra.Command{
 	},
 }
 
-func installGreeter() error {
+var greeterUninstallCmd = &cobra.Command{
+	Use:     "uninstall",
+	Short:   "Remove DMS greeter configuration and restore previous display manager",
+	Long:    "Disable greetd, remove DMS managed configs, and restore the system to its pre-DMS-greeter state",
+	PreRunE: requireMutableSystemCommand,
+	Run: func(cmd *cobra.Command, args []string) {
+		yes, _ := cmd.Flags().GetBool("yes")
+		term, _ := cmd.Flags().GetBool("terminal")
+		if term {
+			uninstallCmd := "dms greeter uninstall"
+			if yes {
+				uninstallCmd += " --yes"
+			}
+			uninstallCmd += "; echo; echo \"Uninstall finished. Closing in 3 seconds...\"; sleep 3"
+			if err := runCommandInTerminal(uninstallCmd); err != nil {
+				log.Fatalf("Error launching uninstall in terminal: %v", err)
+			}
+			return
+		}
+		if err := uninstallGreeter(yes); err != nil {
+			log.Fatalf("Error uninstalling greeter: %v", err)
+		}
+	},
+}
+
+func init() {
+	greeterInstallCmd.Flags().BoolP("yes", "y", false, "Non-interactive: skip confirmation prompt")
+	greeterInstallCmd.Flags().BoolP("terminal", "t", false, "Run in a new terminal (for entering sudo password)")
+	greeterEnableCmd.Flags().BoolP("yes", "y", false, "Non-interactive: skip confirmation prompt")
+	greeterEnableCmd.Flags().BoolP("terminal", "t", false, "Run in a new terminal (for entering sudo password)")
+	greeterUninstallCmd.Flags().BoolP("yes", "y", false, "Non-interactive: skip confirmation prompt")
+	greeterUninstallCmd.Flags().BoolP("terminal", "t", false, "Run in a new terminal (for entering sudo password)")
+}
+
+func installGreeter(nonInteractive bool) error {
 	fmt.Println("=== DMS Greeter Installation ===")
 
 	logFunc := func(msg string) {
 		fmt.Println(msg)
 	}
 
+	if !nonInteractive {
+		fmt.Print("\nThis will install greetd (if needed), configure the DMS greeter, and enable it. Continue? [Y/n]: ")
+		var response string
+		fmt.Scanln(&response)
+		if strings.ToLower(strings.TrimSpace(response)) == "n" || strings.ToLower(strings.TrimSpace(response)) == "no" {
+			fmt.Println("Aborted.")
+			return nil
+		}
+		fmt.Println()
+	}
+
 	if err := greeter.EnsureGreetdInstalled(logFunc, ""); err != nil {
 		return err
 	}
 
-	// Debian/openSUSE
 	greeter.TryInstallGreeterPackage(logFunc, "")
 	if isPackageOnlyGreeterDistro() && !greeter.IsGreeterPackaged() {
 		return fmt.Errorf("dms-greeter must be installed from distro packages on this distribution. %s", packageInstallHint())
@@ -107,7 +179,6 @@ func installGreeter() error {
 		return fmt.Errorf("legacy manual wrapper detected at /usr/local/bin/dms-greeter; remove it before using packaged dms-greeter: sudo rm -f /usr/local/bin/dms-greeter")
 	}
 
-	// If already fully configured, prompt the user
 	if isGreeterEnabled() {
 		fmt.Print("\nGreeter is already installed and configured. Re-run to re-sync settings and permissions? [Y/n]: ")
 		var response string
@@ -156,8 +227,12 @@ func installGreeter() error {
 		return err
 	}
 
+	fmt.Println("\nConfiguring AppArmor profile...")
+	if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
+		logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
+	}
+
 	fmt.Println("\nConfiguring greetd...")
-	// Use empty path when packaged (greeter finds /usr/share/quickshell/dms-greeter); else use user's DMS path
 	greeterPathForConfig := ""
 	if !greeter.IsGreeterPackaged() {
 		greeterPathForConfig = dmsPath
@@ -191,22 +266,225 @@ func installGreeter() error {
 	return nil
 }
 
-func syncInTerminal(nonInteractive bool, forceAuth bool, local bool) error {
-	syncFlags := make([]string, 0, 3)
-	if nonInteractive {
-		syncFlags = append(syncFlags, "--yes")
+func uninstallGreeter(nonInteractive bool) error {
+	fmt.Println("=== DMS Greeter Uninstall ===")
+
+	logFunc := func(msg string) { fmt.Println(msg) }
+
+	if !isGreeterEnabled() {
+		fmt.Println("ℹ DMS greeter is not currently configured in /etc/greetd/config.toml.")
+		fmt.Println("  Nothing to undo for greetd configuration.")
 	}
-	if forceAuth {
-		syncFlags = append(syncFlags, "--auth")
+
+	if !nonInteractive {
+		fmt.Print("\nThis will:\n  • Stop and disable greetd\n  • Remove the DMS PAM managed block\n  • Remove the DMS AppArmor profile\n  • Restore the most recent pre-DMS greetd config (if available)\n\nContinue? [y/N]: ")
+		var response string
+		fmt.Scanln(&response)
+		if strings.ToLower(strings.TrimSpace(response)) != "y" {
+			fmt.Println("Aborted.")
+			return nil
+		}
 	}
-	if local {
-		syncFlags = append(syncFlags, "--local")
+
+	fmt.Println("\nStopping and disabling greetd...")
+	stopCmd := exec.Command("sudo", "systemctl", "stop", "greetd")
+	stopCmd.Stdout = os.Stdout
+	stopCmd.Stderr = os.Stderr
+	_ = stopCmd.Run() // not fatal — service may already be stopped
+
+	disableCmd := exec.Command("sudo", "systemctl", "disable", "greetd")
+	disableCmd.Stdout = os.Stdout
+	disableCmd.Stderr = os.Stderr
+	if err := disableCmd.Run(); err != nil {
+		fmt.Printf("  ⚠ Could not disable greetd: %v\n", err)
+	} else {
+		fmt.Println("  ✓ greetd stopped and disabled")
 	}
-	shellSyncCmd := "dms greeter sync"
-	if len(syncFlags) > 0 {
-		shellSyncCmd += " " + strings.Join(syncFlags, " ")
+
+	fmt.Println("\nRemoving DMS PAM configuration...")
+	if err := greeter.RemoveGreeterPamManagedBlock(logFunc, ""); err != nil {
+		fmt.Printf("  ⚠ PAM cleanup failed: %v\n", err)
 	}
-	shellCmd := shellSyncCmd + `; echo; echo "Sync finished. Closing in 3 seconds..."; sleep 3`
+
+	fmt.Println("\nRemoving DMS AppArmor profile...")
+	if err := greeter.UninstallAppArmorProfile(logFunc, ""); err != nil {
+		fmt.Printf("  ⚠ AppArmor cleanup failed: %v\n", err)
+	}
+
+	fmt.Println("\nRestoring greetd configuration...")
+	if err := restorePreDMSGreetdConfig(""); err != nil {
+		fmt.Printf("  ⚠ Could not restore previous greetd config: %v\n", err)
+		fmt.Println("  You may need to manually edit /etc/greetd/config.toml.")
+	}
+
+	fmt.Println("\nChecking for other display managers to re-enable...")
+	suggestDisplayManagerRestore(nonInteractive)
+
+	fmt.Println("\n=== Uninstall Complete ===")
+	fmt.Println("\nTo start a display manager, run e.g.:")
+	fmt.Println("  sudo systemctl enable --now gdm  (or lightdm, sddm, etc.)")
+	fmt.Println("\nTo re-enable DMS greeter at any time, run: dms greeter install")
+
+	return nil
+}
+
+// restorePreDMSGreetdConfig finds the most recent timestamped backup of
+// /etc/greetd/config.toml that does not reference dms-greeter and restores it.
+// If no such backup exists, a minimal passthrough config is written so greetd
+// can at least be started without error (users must configure it themselves).
+func restorePreDMSGreetdConfig(sudoPassword string) error {
+	const configPath = "/etc/greetd/config.toml"
+	const backupGlob = "/etc/greetd/config.toml.backup-*"
+
+	matches, _ := filepath.Glob(backupGlob)
+
+	for i := 0; i < len(matches)-1; i++ {
+		for j := i + 1; j < len(matches); j++ {
+			if matches[j] > matches[i] {
+				matches[i], matches[j] = matches[j], matches[i]
+			}
+		}
+	}
+
+	for _, candidate := range matches {
+		data, err := os.ReadFile(candidate)
+		if err != nil {
+			continue
+		}
+		if strings.Contains(string(data), "dms-greeter") {
+			continue
+		}
+		tmp, err := os.CreateTemp("", "greetd-restore-*")
+		if err != nil {
+			return fmt.Errorf("could not create temp file: %w", err)
+		}
+		tmpPath := tmp.Name()
+		defer os.Remove(tmpPath)
+		if _, err := tmp.Write(data); err != nil {
+			tmp.Close()
+			return err
+		}
+		tmp.Close()
+
+		if err := runSudoCommand(sudoPassword, "cp", tmpPath, configPath); err != nil {
+			return fmt.Errorf("failed to restore %s: %w", candidate, err)
+		}
+		if err := runSudoCommand(sudoPassword, "chmod", "644", configPath); err != nil {
+			return err
+		}
+		fmt.Printf("  ✓ Restored greetd config from %s\n", candidate)
+		return nil
+	}
+
+	minimal := `[terminal]
+vt = 1
+
+# DMS greeter has been uninstalled.
+# Configure a greeter command here or re-enable a display manager.
+[default_session]
+user = "greeter"
+command = "agreety --cmd /bin/bash"
+`
+	tmp, err := os.CreateTemp("", "greetd-minimal-*")
+	if err != nil {
+		return fmt.Errorf("could not create temp file: %w", err)
+	}
+	tmpPath := tmp.Name()
+	defer os.Remove(tmpPath)
+	if _, err := tmp.WriteString(minimal); err != nil {
+		tmp.Close()
+		return err
+	}
+	tmp.Close()
+
+	if err := runSudoCommand(sudoPassword, "cp", tmpPath, configPath); err != nil {
+		return fmt.Errorf("failed to write fallback greetd config: %w", err)
+	}
+	_ = runSudoCommand(sudoPassword, "chmod", "644", configPath)
+	fmt.Println("  ✓ Wrote minimal fallback greetd config (configure a greeter command manually if needed)")
+	return nil
+}
+
+func runSudoCommand(_ string, command string, args ...string) error {
+	cmd := exec.Command("sudo", append([]string{command}, args...)...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// suggestDisplayManagerRestore scans for installed DMs and re-enables one
+func suggestDisplayManagerRestore(nonInteractive bool) {
+	knownDMs := []string{"gdm", "gdm3", "lightdm", "sddm", "lxdm", "xdm", "cosmic-greeter"}
+	var found []string
+	for _, dm := range knownDMs {
+		if utils.CommandExists(dm) || isSystemdUnitInstalled(dm) {
+			found = append(found, dm)
+		}
+	}
+	if len(found) == 0 {
+		fmt.Println("  ℹ No other display managers detected.")
+		fmt.Println("  You can install one (e.g. gdm, lightdm, sddm) and then run:")
+		fmt.Println("    sudo systemctl enable --now <dm-name>")
+		return
+	}
+
+	enableDM := func(dm string) {
+		fmt.Printf("  Enabling %s...\n", dm)
+		cmd := exec.Command("sudo", "systemctl", "enable", "--force", dm)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("  ⚠ Failed to enable %s: %v\n", dm, err)
+		} else {
+			fmt.Printf("  ✓ %s enabled (will take effect on next boot).\n", dm)
+		}
+	}
+
+	if len(found) == 1 || nonInteractive {
+		chosen := found[0]
+		if len(found) > 1 {
+			fmt.Printf("  ℹ Multiple display managers found (%s); enabling %s automatically.\n",
+				strings.Join(found, ", "), chosen)
+		} else {
+			fmt.Printf("  ℹ Found display manager: %s\n", chosen)
+		}
+		enableDM(chosen)
+		return
+	}
+
+	fmt.Println("  ℹ Found the following display managers:")
+	for i, dm := range found {
+		fmt.Printf("    %d) %s\n", i+1, dm)
+	}
+	fmt.Print("  Choose a number to re-enable (or press Enter to skip): ")
+
+	scanner := bufio.NewScanner(os.Stdin)
+	if !scanner.Scan() {
+		return
+	}
+	input := strings.TrimSpace(scanner.Text())
+	if input == "" {
+		fmt.Println("  Skipped. You can re-enable a display manager later with:")
+		fmt.Println("    sudo systemctl enable --now <dm-name>")
+		return
+	}
+
+	n, err := strconv.Atoi(input)
+	if err != nil || n < 1 || n > len(found) {
+		fmt.Printf("  Invalid selection %q — skipping.\n", input)
+		return
+	}
+
+	enableDM(found[n-1])
+}
+
+func isSystemdUnitInstalled(unit string) bool {
+	cmd := exec.Command("systemctl", "list-unit-files", unit+".service", "--no-legend", "--no-pager")
+	out, err := cmd.Output()
+	return err == nil && strings.Contains(string(out), unit)
+}
+
+func runCommandInTerminal(shellCmd string) error {
 	terminals := []struct {
 		name string
 		args []string
@@ -227,13 +505,31 @@ func syncInTerminal(nonInteractive bool, forceAuth bool, local bool) error {
 		cmd := exec.Command(t.name, t.args...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		if err := cmd.Start(); err != nil {
-			continue
+		if err := cmd.Run(); err != nil {
+			return err
 		}
-		_ = cmd.Process.Release()
 		return nil
 	}
 	return fmt.Errorf("no terminal emulator found (tried: gnome-terminal, konsole, xfce4-terminal, ghostty, wezterm, alacritty, kitty, xterm)")
+}
+
+func syncInTerminal(nonInteractive bool, forceAuth bool, local bool) error {
+	syncFlags := make([]string, 0, 3)
+	if nonInteractive {
+		syncFlags = append(syncFlags, "--yes")
+	}
+	if forceAuth {
+		syncFlags = append(syncFlags, "--auth")
+	}
+	if local {
+		syncFlags = append(syncFlags, "--local")
+	}
+	shellSyncCmd := "dms greeter sync"
+	if len(syncFlags) > 0 {
+		shellSyncCmd += " " + strings.Join(syncFlags, " ")
+	}
+	shellCmd := shellSyncCmd + `; echo; echo "Sync finished. Closing in 3 seconds..."; sleep 3`
+	return runCommandInTerminal(shellCmd)
 }
 
 func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
@@ -281,7 +577,7 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 		response = strings.ToLower(strings.TrimSpace(response))
 
 		if response != "n" && response != "no" {
-			if err := enableGreeter(); err != nil {
+			if err := enableGreeter(false); err != nil {
 				return err
 			}
 		} else {
@@ -415,6 +711,11 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 	fmt.Println("\nSynchronizing DMS configurations...")
 	if err := greeter.SyncDMSConfigs(dmsPath, compositor, logFunc, "", forceAuth); err != nil {
 		return err
+	}
+
+	fmt.Println("\nConfiguring AppArmor profile...")
+	if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
+		logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
 	}
 
 	fmt.Println("\n=== Sync Complete ===")
@@ -709,7 +1010,7 @@ func handleConflictingDisplayManagers() error {
 	return nil
 }
 
-func enableGreeter() error {
+func enableGreeter(nonInteractive bool) error {
 	fmt.Println("=== DMS Greeter Enable ===")
 	fmt.Println()
 
@@ -762,6 +1063,17 @@ func enableGreeter() error {
 		return nil
 	}
 
+	if !nonInteractive {
+		fmt.Print("\nThis will configure greetd to use the DMS greeter and may disable other display managers. Continue? [Y/n]: ")
+		var response string
+		fmt.Scanln(&response)
+		if strings.ToLower(strings.TrimSpace(response)) == "n" || strings.ToLower(strings.TrimSpace(response)) == "no" {
+			fmt.Println("Aborted.")
+			return nil
+		}
+		fmt.Println()
+	}
+
 	fmt.Println("Detecting installed compositors...")
 	compositors := greeter.DetectCompositors()
 
@@ -800,6 +1112,10 @@ func enableGreeter() error {
 
 	if err := greeter.EnsureGreeterCacheDir(logFunc, ""); err != nil {
 		fmt.Printf("⚠ Could not create cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown greeter:greeter %s\n", err, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
+	}
+
+	if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
+		logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
 	}
 
 	if err := ensureGraphicalTarget(); err != nil {
@@ -1086,7 +1402,7 @@ func checkGreeterStatus() error {
 			}
 		} else {
 			fmt.Println("  ✗ Greeter is NOT enabled")
-			fmt.Println("    Run 'dms greeter enable' to enable it")
+			fmt.Println("    Run 'dms greeter enable' to enable it, or use the Activate button in Settings → Greeter, then Sync.")
 			allGood = false
 		}
 	} else {
@@ -1253,6 +1569,47 @@ func checkGreeterStatus() error {
 		}
 	}
 
+	fmt.Println("\nSecurity (AppArmor):")
+	appArmorEnabled, appArmorErr := isAppArmorEnabled()
+	if appArmorErr != nil {
+		fmt.Printf("  ℹ Could not determine AppArmor status: %v\n", appArmorErr)
+	} else if !appArmorEnabled {
+		fmt.Println("  ℹ AppArmor not enabled")
+	} else {
+		fmt.Println("  ℹ AppArmor is enabled")
+
+		const appArmorProfilePath = "/etc/apparmor.d/usr.bin.dms-greeter"
+		if _, err := os.Stat(appArmorProfilePath); os.IsNotExist(err) {
+			fmt.Println("  ⚠ DMS AppArmor profile not installed")
+			fmt.Println("    Run 'dms greeter sync' to install it and prevent potential TTY fallback")
+			allGood = false
+		} else {
+			mode := appArmorProfileMode("dms-greeter")
+			if mode != "" {
+				fmt.Printf("  ✓ DMS AppArmor profile installed (%s mode)\n", mode)
+			} else {
+				fmt.Println("  ✓ DMS AppArmor profile installed")
+			}
+		}
+
+		denialCount, denialSamples, denialErr := recentAppArmorGreeterDenials(3)
+		if denialErr != nil {
+			fmt.Printf("  ℹ Could not inspect AppArmor denials automatically: %v\n", denialErr)
+			fmt.Println("    If greetd falls back to TTY, run: sudo journalctl -b -k | grep 'apparmor.*DENIED'")
+		} else if denialCount > 0 {
+			fmt.Printf("  ⚠ Found %d recent AppArmor denial(s) related to greeter runtime.\n", denialCount)
+			fmt.Println("    This can cause greetd fallback to TTY (for example: 'Failed to create stream fd: Permission denied').")
+			fmt.Println("    Review denials with: sudo journalctl -b -k | grep 'apparmor.*DENIED'")
+			fmt.Println("    Then refine the profile with: sudo aa-logprof")
+			for i, sample := range denialSamples {
+				fmt.Printf("    %d) %s\n", i+1, sample)
+			}
+			allGood = false
+		} else {
+			fmt.Println("  ✓ No recent AppArmor denials detected for common greeter components")
+		}
+	}
+
 	fmt.Println()
 	if allGood && inGreeterGroup {
 		fmt.Println("✓ All checks passed! Greeter is properly configured.")
@@ -1263,4 +1620,130 @@ func checkGreeterStatus() error {
 	}
 
 	return nil
+}
+
+func isAppArmorEnabled() (bool, error) {
+	data, err := os.ReadFile("/sys/module/apparmor/parameters/enabled")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	value := strings.TrimSpace(strings.ToLower(string(data)))
+	return strings.HasPrefix(value, "y"), nil
+}
+
+func recentAppArmorGreeterDenials(sampleLimit int) (int, []string, error) {
+	if sampleLimit <= 0 {
+		sampleLimit = 3
+	}
+	if !utils.CommandExists("journalctl") {
+		return 0, nil, fmt.Errorf("journalctl not found")
+	}
+
+	queries := [][]string{
+		{"-b", "-k", "--no-pager", "-n", "2000", "-o", "cat"},
+		{"-b", "--no-pager", "-n", "2000", "-o", "cat"},
+	}
+
+	seen := make(map[string]bool)
+	samples := make([]string, 0, sampleLimit)
+	total := 0
+	var lastErr error
+	successfulQuery := false
+
+	for _, query := range queries {
+		cmd := exec.Command("journalctl", query...)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		successfulQuery = true
+		total += collectGreeterAppArmorDenials(string(output), seen, &samples, sampleLimit)
+	}
+
+	if !successfulQuery && lastErr != nil {
+		return 0, nil, lastErr
+	}
+
+	return total, samples, nil
+}
+
+func collectGreeterAppArmorDenials(text string, seen map[string]bool, samples *[]string, sampleLimit int) int {
+	count := 0
+	for _, rawLine := range strings.Split(text, "\n") {
+		line := strings.TrimSpace(rawLine)
+		if line == "" || !isGreeterRelatedAppArmorDenial(line) {
+			continue
+		}
+		if seen[line] {
+			continue
+		}
+		seen[line] = true
+		count++
+		if len(*samples) < sampleLimit {
+			*samples = append(*samples, line)
+		}
+	}
+	return count
+}
+
+func isGreeterRelatedAppArmorDenial(line string) bool {
+	lower := strings.ToLower(line)
+	if !strings.Contains(lower, "apparmor") || !strings.Contains(lower, "denied") {
+		return false
+	}
+
+	greeterTokens := []string{
+		"dms-greeter",
+		"/usr/bin/dms-greeter",
+		"greetd",
+		"quickshell",
+		"/usr/bin/qs",
+		"/usr/bin/quickshell",
+		"niri",
+		"hyprland",
+		"sway",
+		"mango",
+		"miracle",
+		"labwc",
+		"pipewire",
+		"wireplumber",
+		"stream fd",
+	}
+
+	for _, token := range greeterTokens {
+		if strings.Contains(lower, token) {
+			return true
+		}
+	}
+	return false
+}
+
+// appArmorProfileMode returns "complain", "enforce", or "" (unknown) for a named AppArmor
+// profile by reading /sys/kernel/security/apparmor/profiles.
+func appArmorProfileMode(profileName string) string {
+	data, err := os.ReadFile("/sys/kernel/security/apparmor/profiles")
+	if err != nil {
+		return ""
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.Contains(line, profileName) {
+			continue
+		}
+		lower := strings.ToLower(line)
+		if strings.Contains(lower, "(complain)") {
+			return "complain"
+		}
+		if strings.Contains(lower, "(enforce)") {
+			return "enforce"
+		}
+		if strings.Contains(lower, "(kill)") {
+			return "kill"
+		}
+	}
+	return ""
 }

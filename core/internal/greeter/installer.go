@@ -3,6 +3,7 @@ package greeter
 import (
 	"bufio"
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -17,6 +18,10 @@ import (
 	"github.com/sblinch/kdl-go"
 	"github.com/sblinch/kdl-go/document"
 )
+
+var appArmorProfileData []byte
+
+const appArmorProfileDest = "/etc/apparmor.d/usr.bin.dms-greeter"
 
 const (
 	GreeterCacheDir = "/var/cache/dms-greeter"
@@ -527,7 +532,6 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 			return fmt.Errorf("failed to make wrapper executable: %w", err)
 		}
 
-		// Set SELinux context on Fedora and openSUSE
 		osInfo, err := distros.GetOSInfo()
 		if err == nil {
 			if config, exists := distros.Registry[osInfo.Distribution.ID]; exists && (config.Family == distros.FamilyFedora || config.Family == distros.FamilySUSE) {
@@ -576,6 +580,134 @@ func EnsureGreeterCacheDir(logFunc func(string), sudoPassword string) error {
 		return fmt.Errorf("failed to set cache directory permissions: %w", err)
 	}
 	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, mode: 750)", cacheDir, owner))
+	return nil
+}
+
+// InstallAppArmorProfile writes the bundled AppArmor profile for dms-greeter and reloads
+// it with apparmor_parser. It is safe to call multiple times (idempotent reload).
+//
+// Skipped silently when:
+//   - AppArmor kernel module is absent (/sys/module/apparmor does not exist)
+//   - Running on NixOS (profiles are managed via security.apparmor.policies)
+//   - SELinux is active (/sys/fs/selinux/enforce exists and equals "1") — Fedora/RHEL
+func InstallAppArmorProfile(logFunc func(string), sudoPassword string) error {
+	if IsNixOS() {
+		logFunc("  ℹ Skipping AppArmor profile on NixOS (manage via security.apparmor.policies)")
+		return nil
+	}
+
+	if _, err := os.Stat("/sys/module/apparmor"); os.IsNotExist(err) {
+		return nil
+	}
+
+	if data, err := os.ReadFile("/sys/fs/selinux/enforce"); err == nil {
+		if strings.TrimSpace(string(data)) == "1" {
+			return nil
+		}
+	}
+
+	if err := runSudoCmd(sudoPassword, "mkdir", "-p", "/etc/apparmor.d"); err != nil {
+		return fmt.Errorf("failed to create /etc/apparmor.d: %w", err)
+	}
+
+	tmp, err := os.CreateTemp("", "dms-apparmor-*")
+	if err != nil {
+		return fmt.Errorf("failed to create temp file for AppArmor profile: %w", err)
+	}
+	tmpPath := tmp.Name()
+	defer os.Remove(tmpPath)
+
+	if _, err := tmp.Write(appArmorProfileData); err != nil {
+		tmp.Close()
+		return fmt.Errorf("failed to write AppArmor profile: %w", err)
+	}
+	tmp.Close()
+
+	if err := runSudoCmd(sudoPassword, "cp", tmpPath, appArmorProfileDest); err != nil {
+		return fmt.Errorf("failed to install AppArmor profile to %s: %w", appArmorProfileDest, err)
+	}
+	if err := runSudoCmd(sudoPassword, "chmod", "644", appArmorProfileDest); err != nil {
+		return fmt.Errorf("failed to set AppArmor profile permissions: %w", err)
+	}
+
+	if utils.CommandExists("apparmor_parser") {
+		if err := runSudoCmd(sudoPassword, "apparmor_parser", "-r", appArmorProfileDest); err != nil {
+			logFunc(fmt.Sprintf("  ⚠ AppArmor profile installed but reload failed: %v", err))
+			logFunc("    Run: sudo apparmor_parser -r " + appArmorProfileDest)
+		} else {
+			logFunc("  ✓ AppArmor profile installed and loaded (complain mode)")
+		}
+	} else {
+		logFunc("  ✓ AppArmor profile installed at " + appArmorProfileDest)
+		logFunc("    apparmor_parser not found — profile will be loaded on next boot")
+	}
+
+	return nil
+}
+
+// RemoveGreeterPamManagedBlock strips the DMS managed auth block from /etc/pam.d/greetd
+func RemoveGreeterPamManagedBlock(logFunc func(string), sudoPassword string) error {
+	if IsNixOS() {
+		return nil
+	}
+	const greetdPamPath = "/etc/pam.d/greetd"
+	data, err := os.ReadFile(greetdPamPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return fmt.Errorf("failed to read %s: %w", greetdPamPath, err)
+	}
+
+	stripped, removed := stripManagedGreeterPamBlock(string(data))
+	strippedAgain, removedLegacy := stripLegacyGreeterPamLines(stripped)
+	if !removed && !removedLegacy {
+		return nil
+	}
+
+	tmp, err := os.CreateTemp("", "dms-pam-greetd-*")
+	if err != nil {
+		return fmt.Errorf("failed to create temp PAM file: %w", err)
+	}
+	tmpPath := tmp.Name()
+	defer os.Remove(tmpPath)
+
+	if _, err := tmp.WriteString(strippedAgain); err != nil {
+		tmp.Close()
+		return fmt.Errorf("failed to write temp PAM file: %w", err)
+	}
+	tmp.Close()
+
+	if err := runSudoCmd(sudoPassword, "cp", tmpPath, greetdPamPath); err != nil {
+		return fmt.Errorf("failed to write PAM config: %w", err)
+	}
+	if err := runSudoCmd(sudoPassword, "chmod", "644", greetdPamPath); err != nil {
+		return fmt.Errorf("failed to set PAM config permissions: %w", err)
+	}
+	logFunc("  ✓ Removed DMS managed PAM block from " + greetdPamPath)
+	return nil
+}
+
+// UninstallAppArmorProfile removes the DMS AppArmor profile and reloads AppArmor.
+// It is a no-op when AppArmor is not active or the profile does not exist.
+func UninstallAppArmorProfile(logFunc func(string), sudoPassword string) error {
+	if IsNixOS() {
+		return nil
+	}
+	if _, err := os.Stat("/sys/module/apparmor"); os.IsNotExist(err) {
+		return nil
+	}
+	if _, err := os.Stat(appArmorProfileDest); os.IsNotExist(err) {
+		return nil
+	}
+
+	if utils.CommandExists("apparmor_parser") {
+		_ = runSudoCmd(sudoPassword, "apparmor_parser", "--remove", appArmorProfileDest)
+	}
+	if err := runSudoCmd(sudoPassword, "rm", "-f", appArmorProfileDest); err != nil {
+		return fmt.Errorf("failed to remove AppArmor profile: %w", err)
+	}
+	logFunc("  ✓ Removed DMS AppArmor profile")
 	return nil
 }
 
@@ -661,7 +793,6 @@ func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
 		return nil
 	}
 	if !utils.CommandExists("setfacl") {
-		// setfacl still not found after install attempt (e.g. unsupported filesystem)
 		logFunc("⚠ Warning: setfacl still not available after install attempt; skipping ACL setup.")
 		return nil
 	}
@@ -723,7 +854,6 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 
 	group := DetectGreeterGroup()
 
-	// Check if user is already in greeter group
 	groupsCmd := exec.Command("groups", currentUser)
 	groupsOutput, err := groupsCmd.Output()
 	if err == nil && strings.Contains(string(groupsOutput), group) {
@@ -1273,7 +1403,6 @@ func ensureGreetdNiriConfig(logFunc func(string), sudoPassword string, niriConfi
 		if !strings.Contains(command, "--command niri") {
 			continue
 		}
-		// Strip existing -C or --config and their arguments
 		command = stripConfigFlag(command)
 		command = stripCacheDirFlag(command)
 		command = strings.TrimSpace(command + " --cache-dir " + GreeterCacheDir)

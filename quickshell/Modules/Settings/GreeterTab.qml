@@ -1,9 +1,11 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
@@ -11,6 +13,10 @@ import qs.Modules.Settings.Widgets
 
 Item {
     id: root
+
+    ConfirmModal {
+        id: greeterActionConfirm
+    }
 
     FileBrowserModal {
         id: greeterWallpaperBrowserModal
@@ -28,6 +34,7 @@ Item {
     property string greeterStatusText: ""
     property bool greeterStatusRunning: false
     property bool greeterSyncRunning: false
+    property bool greeterInstallActionRunning: false
     property string greeterStatusStdout: ""
     property string greeterStatusStderr: ""
     property string greeterSyncStdout: ""
@@ -37,6 +44,31 @@ Item {
     property bool greeterTerminalFallbackFromPrecheck: false
     property var cachedFontFamilies: []
     property bool fontsEnumerated: false
+    property bool greeterBinaryExists: false
+    property bool greeterEnabled: false
+    readonly property bool greeterInstalled: greeterBinaryExists || greeterEnabled
+
+    readonly property string greeterActionLabel: {
+        if (!root.greeterInstalled) return I18n.tr("Install");
+        if (!root.greeterEnabled) return I18n.tr("Activate");
+        return I18n.tr("Uninstall");
+    }
+    readonly property string greeterActionIcon: {
+        if (!root.greeterInstalled) return "download";
+        if (!root.greeterEnabled) return "login";
+        return "delete";
+    }
+    readonly property var greeterActionCommand: {
+        if (!root.greeterInstalled) return ["dms", "greeter", "install", "--terminal"];
+        if (!root.greeterEnabled) return ["dms", "greeter", "enable", "--terminal"];
+        return ["dms", "greeter", "uninstall", "--terminal", "--yes"];
+    }
+    property string greeterPendingAction: ""
+
+    function checkGreeterInstallState() {
+        greetdEnabledCheckProcess.running = true;
+        greeterBinaryCheckProcess.running = true;
+    }
 
     function runGreeterStatus() {
         greeterStatusText = "";
@@ -44,6 +76,41 @@ Item {
         greeterStatusStderr = "";
         greeterStatusRunning = true;
         greeterStatusProcess.running = true;
+    }
+
+    function runGreeterInstallAction() {
+        root.greeterPendingAction = !root.greeterInstalled ? "install"
+            : !root.greeterEnabled ? "activate"
+            : "uninstall";
+        greeterStatusText = I18n.tr("Opening terminal: ") + root.greeterActionLabel + "…";
+        greeterInstallActionRunning = true;
+        greeterInstallActionProcess.running = true;
+    }
+
+    function promptGreeterActionConfirm() {
+        var title, message, confirmText;
+        if (!root.greeterInstalled) {
+            title = I18n.tr("Install Greeter", "greeter action confirmation");
+            message = I18n.tr("Install the DMS greeter? A terminal will open for sudo authentication.");
+            confirmText = I18n.tr("Install");
+        } else if (!root.greeterEnabled) {
+            title = I18n.tr("Activate Greeter", "greeter action confirmation");
+            message = I18n.tr("Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.");
+            confirmText = I18n.tr("Activate");
+        } else {
+            title = I18n.tr("Uninstall Greeter", "greeter action confirmation");
+            message = I18n.tr("Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.");
+            confirmText = I18n.tr("Uninstall");
+        }
+        greeterActionConfirm.showWithOptions({
+            "title": title,
+            "message": message,
+            "confirmText": confirmText,
+            "cancelText": I18n.tr("Cancel"),
+            "confirmColor": Theme.primary,
+            "onConfirm": () => root.runGreeterInstallAction(),
+            "onCancel": () => {}
+        });
     }
 
     function runGreeterSync() {
@@ -82,7 +149,30 @@ Item {
         fontsEnumerated = true;
     }
 
-    Component.onCompleted: Qt.callLater(enumerateFonts)
+    Component.onCompleted: {
+        Qt.callLater(enumerateFonts);
+        Qt.callLater(checkGreeterInstallState);
+    }
+
+    Process {
+        id: greetdEnabledCheckProcess
+        command: ["systemctl", "is-enabled", "greetd"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: root.greeterEnabled = text.trim() === "enabled"
+        }
+    }
+
+    Process {
+        id: greeterBinaryCheckProcess
+        command: ["sh", "-c", "test -f /usr/bin/dms-greeter || test -f /usr/local/bin/dms-greeter"]
+        running: false
+
+        onExited: exitCode => {
+            root.greeterBinaryExists = (exitCode === 0);
+        }
+    }
 
     Process {
         id: greeterStatusProcess
@@ -202,6 +292,29 @@ Item {
         }
     }
 
+    Process {
+        id: greeterInstallActionProcess
+        command: root.greeterActionCommand
+        running: false
+
+        onExited: exitCode => {
+            root.greeterInstallActionRunning = false;
+            const pending = root.greeterPendingAction;
+            root.greeterPendingAction = "";
+            if (exitCode === 0) {
+                if (pending === "install")
+                    root.greeterStatusText = I18n.tr("Install complete. Greeter has been installed.");
+                else if (pending === "activate")
+                    root.greeterStatusText = I18n.tr("Greeter activated. greetd is now enabled.");
+                else
+                    root.greeterStatusText = I18n.tr("Uninstall complete. Greeter has been removed.");
+            } else {
+                root.greeterStatusText = I18n.tr("Action failed or terminal was closed.") + " (exit " + exitCode + ")";
+            }
+            root.checkGreeterInstallState();
+        }
+    }
+
     readonly property var _lockDateFormatPresets: [
         {
             format: "",
@@ -293,14 +406,26 @@ Item {
                     }
                 }
 
-                Row {
+                Item { width: 1; height: Theme.spacingM }
+
+                RowLayout {
                     width: parent.width
                     spacing: Theme.spacingS
-                    topPadding: Theme.spacingM
+
+                    DankButton {
+                        text: root.greeterActionLabel
+                        iconName: root.greeterActionIcon
+                        horizontalPadding: Theme.spacingL
+                        onClicked: root.promptGreeterActionConfirm()
+                        enabled: !root.greeterInstallActionRunning && !root.greeterSyncRunning
+                    }
+
+                    Item { Layout.fillWidth: true }
 
                     DankButton {
                         text: I18n.tr("Refresh")
                         iconName: "refresh"
+                        horizontalPadding: Theme.spacingL
                         onClicked: root.runGreeterStatus()
                         enabled: !root.greeterStatusRunning
                     }
@@ -308,8 +433,9 @@ Item {
                     DankButton {
                         text: I18n.tr("Sync")
                         iconName: "sync"
+                        horizontalPadding: Theme.spacingL
                         onClicked: root.runGreeterSync()
-                        enabled: !root.greeterSyncRunning
+                        enabled: root.greeterInstalled && !root.greeterSyncRunning && !root.greeterInstallActionRunning
                     }
                 }
             }
@@ -485,6 +611,7 @@ Item {
                     DankButton {
                         id: browseGreeterWallpaperButton
                         text: I18n.tr("Browse")
+                        horizontalPadding: Theme.spacingL
                         onClicked: greeterWallpaperBrowserModal.open()
                     }
                 }

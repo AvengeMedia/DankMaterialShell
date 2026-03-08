@@ -16,19 +16,10 @@ func init() {
 	runCmd.Flags().Bool("session", false, "Session managed (like as a systemd unit)")
 	runCmd.Flags().MarkHidden("daemon-child")
 
-	// Add subcommands to greeter
-	greeterCmd.AddCommand(greeterInstallCmd, greeterSyncCmd, greeterEnableCmd, greeterStatusCmd)
-
-	// Add subcommands to setup
+	greeterCmd.AddCommand(greeterInstallCmd, greeterSyncCmd, greeterEnableCmd, greeterStatusCmd, greeterUninstallCmd)
 	setupCmd.AddCommand(setupBindsCmd, setupLayoutCmd, setupColorsCmd, setupAlttabCmd, setupOutputsCmd, setupCursorCmd, setupWindowrulesCmd)
-
-	// Add subcommands to update
 	updateCmd.AddCommand(updateCheckCmd)
-
-	// Add subcommands to plugins
 	pluginsCmd.AddCommand(pluginsBrowseCmd, pluginsListCmd, pluginsInstallCmd, pluginsUninstallCmd, pluginsUpdateCmd)
-
-	// Add common commands to root
 	rootCmd.AddCommand(getCommonCommands()...)
 
 	rootCmd.AddCommand(updateCmd)
