@@ -440,28 +440,9 @@ func (a *ArchDistribution) installAURPackages(ctx context.Context, packages []st
 	a.log(fmt.Sprintf("Installing AUR packages manually: %s", strings.Join(packages, ", ")))
 
 	hasNiri := false
-	hasQuickshell := false
 	for _, pkg := range packages {
 		if pkg == "niri-git" {
 			hasNiri = true
-		}
-		if pkg == "quickshell" || pkg == "quickshell-git" {
-			hasQuickshell = true
-		}
-	}
-
-	// If quickshell is in the list, always reinstall google-breakpad first
-	if hasQuickshell {
-		progressChan <- InstallProgressMsg{
-			Phase:       PhaseAURPackages,
-			Progress:    0.63,
-			Step:        "Reinstalling google-breakpad for quickshell...",
-			IsComplete:  false,
-			CommandInfo: "Reinstalling prerequisite AUR package for quickshell",
-		}
-
-		if err := a.installSingleAURPackage(ctx, "google-breakpad", sudoPassword, progressChan, 0.63, 0.65); err != nil {
-			return fmt.Errorf("failed to reinstall google-breakpad prerequisite for quickshell: %w", err)
 		}
 	}
 
@@ -616,10 +597,16 @@ func (a *ArchDistribution) installSingleAURPackage(ctx context.Context, pkg, sud
 		return fmt.Errorf("failed to remove optdepends from .SRCINFO for %s: %w", pkg, err)
 	}
 
-	// Skip dependency installation for dms-shell-git and dms-shell-bin
-	// since we manually manage those dependencies
-	if pkg != "dms-shell-git" && pkg != "dms-shell-bin" {
-		// Pre-install dependencies from .SRCINFO
+	srcinfoPath = filepath.Join(packageDir, ".SRCINFO")
+	if pkg == "dms-shell-bin" {
+		progressChan <- InstallProgressMsg{
+			Phase:      PhaseAURPackages,
+			Progress:   startProgress + 0.35*(endProgress-startProgress),
+			Step:       fmt.Sprintf("Skipping dependency installation for %s (manually managed)...", pkg),
+			IsComplete: false,
+			LogOutput:  fmt.Sprintf("Dependencies for %s are installed separately", pkg),
+		}
+	} else {
 		progressChan <- InstallProgressMsg{
 			Phase:       PhaseAURPackages,
 			Progress:    startProgress + 0.3*(endProgress-startProgress),
@@ -628,19 +615,19 @@ func (a *ArchDistribution) installSingleAURPackage(ctx context.Context, pkg, sud
 			CommandInfo: "Installing package dependencies and makedepends",
 		}
 
-		// Install dependencies and makedepends explicitly
-		srcinfoPath = filepath.Join(packageDir, ".SRCINFO")
+		// Install dependencies from .SRCINFO
+		depFilter := ""
+		if pkg == "dms-shell-git" {
+			depFilter = ` | sed -E 's/[[:space:]]*(quickshell|dgop)[[:space:]]*/ /g' | tr -s ' '`
+		}
 
 		depsCmd := exec.CommandContext(ctx, "bash", "-c",
 			fmt.Sprintf(`
-				deps=$(grep "depends = " "%s" | grep -v "makedepends" | sed 's/.*depends = //' | tr '\n' ' ' | sed 's/[[:space:]]*$//')
-				if [[ "%s" == *"quickshell"* ]]; then
-					deps=$(echo "$deps" | sed 's/google-breakpad//g' | sed 's/  / /g' | sed 's/^ *//g' | sed 's/ *$//g')
-				fi
+				deps=$(grep "depends = " "%s" | grep -v "makedepends" | sed 's/.*depends = //' | tr '\n' ' ' %s | sed 's/[[:space:]]*$//')
 				if [ ! -z "$deps" ] && [ "$deps" != " " ]; then
 					echo '%s' | sudo -S pacman -S --needed --noconfirm $deps
 				fi
-			`, srcinfoPath, pkg, sudoPassword))
+				`, srcinfoPath, depFilter, sudoPassword))
 
 		if err := a.runWithProgress(depsCmd, progressChan, PhaseAURPackages, startProgress+0.3*(endProgress-startProgress), startProgress+0.35*(endProgress-startProgress)); err != nil {
 			return fmt.Errorf("FAILED to install runtime dependencies for %s: %w", pkg, err)
@@ -657,14 +644,6 @@ func (a *ArchDistribution) installSingleAURPackage(ctx context.Context, pkg, sud
 		if err := a.runWithProgress(makedepsCmd, progressChan, PhaseAURPackages, startProgress+0.35*(endProgress-startProgress), startProgress+0.4*(endProgress-startProgress)); err != nil {
 			return fmt.Errorf("FAILED to install make dependencies for %s: %w", pkg, err)
 		}
-	} else {
-		progressChan <- InstallProgressMsg{
-			Phase:      PhaseAURPackages,
-			Progress:   startProgress + 0.35*(endProgress-startProgress),
-			Step:       fmt.Sprintf("Skipping dependency installation for %s (manually managed)...", pkg),
-			IsComplete: false,
-			LogOutput:  fmt.Sprintf("Dependencies for %s are installed separately", pkg),
-		}
 	}
 
 	progressChan <- InstallProgressMsg{
@@ -677,7 +656,7 @@ func (a *ArchDistribution) installSingleAURPackage(ctx context.Context, pkg, sud
 
 	buildCmd := exec.CommandContext(ctx, "makepkg", "--noconfirm")
 	buildCmd.Dir = packageDir
-	buildCmd.Env = append(os.Environ(), "PKGEXT=.pkg.tar") // Disable compression for speed
+	buildCmd.Env = append(os.Environ(), "PKGEXT=.pkg.tar")
 
 	if err := a.runWithProgress(buildCmd, progressChan, PhaseAURPackages, startProgress+0.4*(endProgress-startProgress), startProgress+0.7*(endProgress-startProgress)); err != nil {
 		return fmt.Errorf("failed to build %s: %w", pkg, err)
