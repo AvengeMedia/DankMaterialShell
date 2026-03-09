@@ -208,7 +208,7 @@ func DetectGreeterUser() string {
 			}
 		}
 
-		if user, found := findPasswdUser(passwdContent, "greeter", "_greeter", "greetd"); found {
+		if user, found := findPasswdUser(passwdContent, "greeter", "greetd", "_greeter"); found {
 			return user
 		}
 	} else {
@@ -228,6 +228,16 @@ func DetectGreeterUser() string {
 func resolveGreeterWrapperPath() string {
 	if override := strings.TrimSpace(os.Getenv("DMS_GREETER_WRAPPER_CMD")); override != "" {
 		return override
+	}
+
+	// Packaged installs only use the official wrapper; never fall back to /usr/local/bin.
+	if IsGreeterPackaged() {
+		packagedWrapper := "/usr/bin/dms-greeter"
+		if info, err := os.Stat(packagedWrapper); err == nil && !info.IsDir() && (info.Mode()&0o111) != 0 {
+			return packagedWrapper
+		}
+		fmt.Fprintln(os.Stderr, "⚠ Warning: packaged dms-greeter detected, but /usr/bin/dms-greeter is missing or not executable")
+		return packagedWrapper
 	}
 
 	for _, candidate := range []string{"/usr/bin/dms-greeter", "/usr/local/bin/dms-greeter"} {
@@ -558,52 +568,122 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 }
 
 // EnsureGreeterCacheDir creates /var/cache/dms-greeter with correct ownership if it does not exist.
-// It is safe to call multiple times (idempotent).
+// It is safe to call multiple times (idempotent) and will repair ownership/mode
+// when the directory already exists with stale permissions.
 func EnsureGreeterCacheDir(logFunc func(string), sudoPassword string) error {
 	cacheDir := GreeterCacheDir
-	if _, err := os.Stat(cacheDir); err == nil {
-		return nil
-	}
-
-	if err := runSudoCmd(sudoPassword, "mkdir", "-p", cacheDir); err != nil {
-		return fmt.Errorf("failed to create cache directory: %w", err)
+	created := false
+	if info, err := os.Stat(cacheDir); err != nil {
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("failed to stat cache directory: %w", err)
+		}
+		if err := runSudoCmd(sudoPassword, "mkdir", "-p", cacheDir); err != nil {
+			return fmt.Errorf("failed to create cache directory: %w", err)
+		}
+		created = true
+	} else if !info.IsDir() {
+		return fmt.Errorf("cache path exists but is not a directory: %s", cacheDir)
 	}
 
 	group := DetectGreeterGroup()
-	owner := fmt.Sprintf("%s:%s", group, group)
-
+	daemonUser := DetectGreeterUser()
+	preferredOwner := fmt.Sprintf("%s:%s", daemonUser, group)
+	owner := preferredOwner
 	if err := runSudoCmd(sudoPassword, "chown", owner, cacheDir); err != nil {
-		return fmt.Errorf("failed to set cache directory owner: %w", err)
+		// Some setups may not have a matching daemon user at this moment; fall back
+		// to root:<group> while still allowing group-writable greeter runtime access.
+		fallbackOwner := fmt.Sprintf("root:%s", group)
+		if fallbackErr := runSudoCmd(sudoPassword, "chown", fallbackOwner, cacheDir); fallbackErr != nil {
+			return fmt.Errorf("failed to set cache directory owner (preferred %s: %v; fallback %s: %w)", preferredOwner, err, fallbackOwner, fallbackErr)
+		}
+		owner = fallbackOwner
 	}
 
-	if err := runSudoCmd(sudoPassword, "chmod", "750", cacheDir); err != nil {
+	if err := runSudoCmd(sudoPassword, "chmod", "2770", cacheDir); err != nil {
 		return fmt.Errorf("failed to set cache directory permissions: %w", err)
 	}
-	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, mode: 750)", cacheDir, owner))
+
+	runtimeDirs := []string{
+		filepath.Join(cacheDir, ".local"),
+		filepath.Join(cacheDir, ".local", "state"),
+		filepath.Join(cacheDir, ".local", "share"),
+		filepath.Join(cacheDir, ".cache"),
+	}
+	for _, dir := range runtimeDirs {
+		if err := runSudoCmd(sudoPassword, "mkdir", "-p", dir); err != nil {
+			return fmt.Errorf("failed to create cache runtime directory %s: %w", dir, err)
+		}
+		if err := runSudoCmd(sudoPassword, "chown", owner, dir); err != nil {
+			return fmt.Errorf("failed to set owner for cache runtime directory %s: %w", dir, err)
+		}
+		if err := runSudoCmd(sudoPassword, "chmod", "2770", dir); err != nil {
+			return fmt.Errorf("failed to set permissions for cache runtime directory %s: %w", dir, err)
+		}
+	}
+
+	legacyMemoryPath := filepath.Join(cacheDir, "memory.json")
+	stateMemoryPath := filepath.Join(cacheDir, ".local", "state", "memory.json")
+	if err := ensureGreeterMemoryCompatLink(logFunc, sudoPassword, legacyMemoryPath, stateMemoryPath); err != nil {
+		return err
+	}
+
+	if isSELinuxEnforcing() && utils.CommandExists("restorecon") {
+		if err := runSudoCmd(sudoPassword, "restorecon", "-Rv", cacheDir); err != nil {
+			logFunc(fmt.Sprintf("⚠ Warning: Failed to restore SELinux context for %s: %v", cacheDir, err))
+		}
+	}
+
+	if created {
+		logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, mode: 2770)", cacheDir, owner))
+	} else {
+		logFunc(fmt.Sprintf("✓ Ensured cache directory %s permissions (owner: %s, mode: 2770)", cacheDir, owner))
+	}
 	return nil
 }
 
-// InstallAppArmorProfile writes the bundled AppArmor profile for dms-greeter and reloads
-// it with apparmor_parser. It is safe to call multiple times (idempotent reload).
-//
-// Skipped silently when:
-//   - AppArmor kernel module is absent (/sys/module/apparmor does not exist)
-//   - Running on NixOS (profiles are managed via security.apparmor.policies)
-//   - SELinux is active (/sys/fs/selinux/enforce exists and equals "1") — Fedora/RHEL
+func isSELinuxEnforcing() bool {
+	data, err := os.ReadFile("/sys/fs/selinux/enforce")
+	if err != nil {
+		return false
+	}
+	return strings.TrimSpace(string(data)) == "1"
+}
+
+func ensureGreeterMemoryCompatLink(logFunc func(string), sudoPassword, legacyPath, statePath string) error {
+	info, err := os.Lstat(legacyPath)
+	if err == nil && info.Mode().IsRegular() {
+		if _, stateErr := os.Stat(statePath); os.IsNotExist(stateErr) {
+			if copyErr := runSudoCmd(sudoPassword, "cp", "-f", legacyPath, statePath); copyErr != nil {
+				logFunc(fmt.Sprintf("⚠ Warning: Failed to migrate legacy greeter memory file to %s: %v", statePath, copyErr))
+			}
+		}
+	}
+
+	if err := runSudoCmd(sudoPassword, "ln", "-sfn", statePath, legacyPath); err != nil {
+		return fmt.Errorf("failed to create greeter memory compatibility symlink %s -> %s: %w", legacyPath, statePath, err)
+	}
+
+	return nil
+}
+
+// IsAppArmorEnabled reports whether AppArmor is active on the running kernel.
+func IsAppArmorEnabled() bool {
+	data, err := os.ReadFile("/sys/module/apparmor/parameters/enabled")
+	if err != nil {
+		return false
+	}
+	return strings.HasPrefix(strings.TrimSpace(strings.ToLower(string(data))), "y")
+}
+
+// InstallAppArmorProfile installs the bundled AppArmor profile and reloads it. No-op on NixOS or non-AppArmor systems.
 func InstallAppArmorProfile(logFunc func(string), sudoPassword string) error {
 	if IsNixOS() {
 		logFunc("  ℹ Skipping AppArmor profile on NixOS (manage via security.apparmor.policies)")
 		return nil
 	}
 
-	if _, err := os.Stat("/sys/module/apparmor"); os.IsNotExist(err) {
+	if !IsAppArmorEnabled() {
 		return nil
-	}
-
-	if data, err := os.ReadFile("/sys/fs/selinux/enforce"); err == nil {
-		if strings.TrimSpace(string(data)) == "1" {
-			return nil
-		}
 	}
 
 	if err := runSudoCmd(sudoPassword, "mkdir", "-p", "/etc/apparmor.d"); err != nil {
@@ -814,7 +894,7 @@ func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
 		{filepath.Join(homeDir, ".local", "share"), ".local/share directory"},
 	}
 
-	owner := DetectGreeterGroup()
+	group := DetectGreeterGroup()
 
 	logFunc("\nSetting up parent directory ACLs for greeter user access...")
 
@@ -826,9 +906,10 @@ func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
 			}
 		}
 
-		if err := runSudoCmd(sudoPassword, "setfacl", "-m", fmt.Sprintf("u:%s:rx", owner), dir.path); err != nil {
+		// Group ACL covers daemon users regardless of username (e.g. greetd ≠ greeter on Fedora).
+		if err := runSudoCmd(sudoPassword, "setfacl", "-m", fmt.Sprintf("g:%s:rX", group), dir.path); err != nil {
 			logFunc(fmt.Sprintf("⚠ Warning: Failed to set ACL on %s: %v", dir.desc, err))
-			logFunc(fmt.Sprintf("  You may need to run manually: setfacl -m u:%s:x %s", owner, dir.path))
+			logFunc(fmt.Sprintf("  You may need to run manually: setfacl -m g:%s:rX %s", group, dir.path))
 			continue
 		}
 
@@ -836,6 +917,73 @@ func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
 	}
 
 	return nil
+}
+
+// RemediateStaleACLs removes user-based ACLs left by older binary versions. Best-effort.
+func RemediateStaleACLs(logFunc func(string), sudoPassword string) {
+	if !utils.CommandExists("setfacl") {
+		return
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+
+	passwdData, err := os.ReadFile("/etc/passwd")
+	if err != nil {
+		return
+	}
+
+	dirs := []string{
+		homeDir,
+		filepath.Join(homeDir, ".config"),
+		filepath.Join(homeDir, ".config", "DankMaterialShell"),
+		filepath.Join(homeDir, ".cache"),
+		filepath.Join(homeDir, ".cache", "DankMaterialShell"),
+		filepath.Join(homeDir, ".local"),
+		filepath.Join(homeDir, ".local", "state"),
+		filepath.Join(homeDir, ".local", "share"),
+	}
+
+	passwdContent := string(passwdData)
+	staleUsers := []string{"greeter", "greetd", "_greeter"}
+	existingUsers := make([]string, 0, len(staleUsers))
+	for _, user := range staleUsers {
+		if hasPasswdUser(passwdContent, user) {
+			existingUsers = append(existingUsers, user)
+		}
+	}
+	if len(existingUsers) == 0 {
+		return
+	}
+
+	cleaned := false
+	for _, dir := range dirs {
+		if _, err := os.Stat(dir); err != nil {
+			continue
+		}
+		for _, user := range existingUsers {
+			_ = runSudoCmd(sudoPassword, "setfacl", "-x", fmt.Sprintf("u:%s", user), dir)
+			cleaned = true
+		}
+	}
+	if cleaned {
+		logFunc("✓ Cleaned up stale user-based ACLs from previous versions")
+	}
+}
+
+// RemediateStaleAppArmor removes any AppArmor profile installed by an older binary on
+// systems where AppArmor is not active.
+func RemediateStaleAppArmor(logFunc func(string), sudoPassword string) {
+	if IsAppArmorEnabled() {
+		return
+	}
+	if _, err := os.Stat(appArmorProfileDest); os.IsNotExist(err) {
+		return
+	}
+	logFunc("ℹ Removing stale AppArmor profile (AppArmor is not active on this system)")
+	_ = UninstallAppArmorProfile(logFunc, sudoPassword)
 }
 
 func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
@@ -854,6 +1002,14 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 
 	group := DetectGreeterGroup()
 
+	// Create the group if it doesn't exist yet (e.g. before greetd package is installed).
+	if !utils.HasGroup(group) {
+		if err := runSudoCmd(sudoPassword, "groupadd", "-r", group); err != nil {
+			return fmt.Errorf("failed to create %s group: %w", group, err)
+		}
+		logFunc(fmt.Sprintf("✓ Created system group %s", group))
+	}
+
 	groupsCmd := exec.Command("groups", currentUser)
 	groupsOutput, err := groupsCmd.Output()
 	if err == nil && strings.Contains(string(groupsOutput), group) {
@@ -863,6 +1019,24 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 			return fmt.Errorf("failed to add %s to %s group: %w", currentUser, group, err)
 		}
 		logFunc(fmt.Sprintf("✓ Added %s to %s group (logout/login required for changes to take effect)", currentUser, group))
+	}
+
+	// Also add the daemon user (e.g. greetd on Fedora) so group ACLs apply to the running process.
+	daemonUser := DetectGreeterUser()
+	if daemonUser != currentUser {
+		daemonGroupsCmd := exec.Command("groups", daemonUser)
+		daemonGroupsOutput, daemonGroupsErr := daemonGroupsCmd.Output()
+		if daemonGroupsErr == nil {
+			if strings.Contains(string(daemonGroupsOutput), group) {
+				logFunc(fmt.Sprintf("✓ Greeter daemon user %s is already in %s group", daemonUser, group))
+			} else {
+				if err := runSudoCmd(sudoPassword, "usermod", "-aG", group, daemonUser); err != nil {
+					logFunc(fmt.Sprintf("⚠ Warning: could not add %s to %s group: %v", daemonUser, group, err))
+				} else {
+					logFunc(fmt.Sprintf("✓ Added greeter daemon user %s to %s group", daemonUser, group))
+				}
+			}
+		}
 	}
 
 	configDirs := []struct {
@@ -1018,8 +1192,11 @@ func syncGreeterWallpaperOverride(homeDir, cacheDir string, logFunc func(string)
 		return fmt.Errorf("failed to copy override wallpaper to %s: %w", destPath, err)
 	}
 	greeterGroup := DetectGreeterGroup()
-	if err := runSudoCmd(sudoPassword, "chown", "greeter:"+greeterGroup, destPath); err != nil {
-		return fmt.Errorf("failed to set override ownership on %s: %w", destPath, err)
+	daemonUser := DetectGreeterUser()
+	if err := runSudoCmd(sudoPassword, "chown", daemonUser+":"+greeterGroup, destPath); err != nil {
+		if fallbackErr := runSudoCmd(sudoPassword, "chown", "root:"+greeterGroup, destPath); fallbackErr != nil {
+			return fmt.Errorf("failed to set override ownership on %s: %w", destPath, err)
+		}
 	}
 	if err := runSudoCmd(sudoPassword, "chmod", "644", destPath); err != nil {
 		return fmt.Errorf("failed to set override permissions on %s: %w", destPath, err)
@@ -1158,28 +1335,107 @@ func DetectIncludedPamModule(pamText, module string) string {
 	return ""
 }
 
+type greeterAuthSettings struct {
+	GreeterEnableFprint bool `json:"greeterEnableFprint"`
+	GreeterEnableU2f    bool `json:"greeterEnableU2f"`
+}
+
+func readGreeterAuthSettings(homeDir string) (greeterAuthSettings, error) {
+	settingsPath := filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
+	data, err := os.ReadFile(settingsPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return greeterAuthSettings{}, nil
+		}
+		return greeterAuthSettings{}, fmt.Errorf("failed to read settings at %s: %w", settingsPath, err)
+	}
+	if strings.TrimSpace(string(data)) == "" {
+		return greeterAuthSettings{}, nil
+	}
+	var settings greeterAuthSettings
+	if err := json.Unmarshal(data, &settings); err != nil {
+		return greeterAuthSettings{}, fmt.Errorf("failed to parse settings at %s: %w", settingsPath, err)
+	}
+	return settings, nil
+}
+
+func ReadGreeterAuthToggles(homeDir string) (enableFprint bool, enableU2f bool, err error) {
+	settings, err := readGreeterAuthSettings(homeDir)
+	if err != nil {
+		return false, false, err
+	}
+	return settings.GreeterEnableFprint, settings.GreeterEnableU2f, nil
+}
+
+func hasEnrolledFingerprintOutput(output string) bool {
+	lower := strings.ToLower(output)
+	if strings.Contains(lower, "no fingers enrolled") ||
+		strings.Contains(lower, "no fingerprints enrolled") ||
+		strings.Contains(lower, "no prints enrolled") {
+		return false
+	}
+	if strings.Contains(lower, "has fingers enrolled") ||
+		strings.Contains(lower, "has fingerprints enrolled") {
+		return true
+	}
+	for _, line := range strings.Split(lower, "\n") {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "finger:") {
+			return true
+		}
+		if strings.HasPrefix(trimmed, "- ") && strings.Contains(trimmed, "finger") {
+			return true
+		}
+	}
+	return false
+}
+
+func FingerprintAuthAvailableForUser(username string) bool {
+	username = strings.TrimSpace(username)
+	if username == "" {
+		return false
+	}
+	if !pamModuleExists("pam_fprintd.so") {
+		return false
+	}
+	if _, err := exec.LookPath("fprintd-list"); err != nil {
+		return false
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	out, err := exec.CommandContext(ctx, "fprintd-list", username).CombinedOutput()
+	if err != nil {
+		return false
+	}
+	return hasEnrolledFingerprintOutput(string(out))
+}
+
+func FingerprintAuthAvailableForCurrentUser() bool {
+	username := strings.TrimSpace(os.Getenv("SUDO_USER"))
+	if username == "" {
+		username = strings.TrimSpace(os.Getenv("USER"))
+	}
+	if username == "" {
+		out, err := exec.Command("id", "-un").Output()
+		if err == nil {
+			username = strings.TrimSpace(string(out))
+		}
+	}
+	return FingerprintAuthAvailableForUser(username)
+}
+
 func syncGreeterPamConfig(homeDir string, logFunc func(string), sudoPassword string, forceAuth bool) error {
 	var wantFprint, wantU2f bool
+	fprintToggleEnabled := forceAuth
 	if forceAuth {
 		wantFprint = pamModuleExists("pam_fprintd.so")
 		wantU2f = pamModuleExists("pam_u2f.so")
 	} else {
-		settingsPath := filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
-		data, err := os.ReadFile(settingsPath)
+		settings, err := readGreeterAuthSettings(homeDir)
 		if err != nil {
-			if os.IsNotExist(err) {
-				data = []byte("{}")
-			} else {
-				return fmt.Errorf("failed to read settings at %s: %w", settingsPath, err)
-			}
+			return err
 		}
-		var settings struct {
-			GreeterEnableFprint bool `json:"greeterEnableFprint"`
-			GreeterEnableU2f    bool `json:"greeterEnableU2f"`
-		}
-		if err := json.Unmarshal(data, &settings); err != nil {
-			return fmt.Errorf("failed to parse settings at %s: %w", settingsPath, err)
-		}
+		fprintToggleEnabled = settings.GreeterEnableFprint
 		fprintModule := pamModuleExists("pam_fprintd.so")
 		u2fModule := pamModuleExists("pam_u2f.so")
 		wantFprint = settings.GreeterEnableFprint && fprintModule
@@ -1212,7 +1468,8 @@ func syncGreeterPamConfig(homeDir string, logFunc func(string), sudoPassword str
 		logFunc("⚠ pam_fprintd already present in included " + includedFprintFile + " (managed by authselect/pam-auth-update). Skipping DMS fprint block to avoid double-fingerprint auth.")
 		wantFprint = false
 	}
-	if !wantFprint && includedFprintFile != "" {
+	showIncludedFprintNotice := fprintToggleEnabled && FingerprintAuthAvailableForCurrentUser()
+	if !wantFprint && includedFprintFile != "" && showIncludedFprintNotice {
 		logFunc("ℹ Fingerprint auth is still enabled via included " + includedFprintFile + ".")
 		logFunc("  Disable fingerprint in your system PAM manager (authselect/pam-auth-update) to force password-only greeter login.")
 	}
@@ -1272,6 +1529,8 @@ type niriGreeterSync struct {
 	cursorCount int
 	debugCount  int
 	cursorNode  *document.Node
+	inputNode   *document.Node
+	outputNodes map[string]*document.Node
 }
 
 func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
@@ -1289,7 +1548,8 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	}
 
 	extractor := &niriGreeterSync{
-		processed: make(map[string]bool),
+		processed:   make(map[string]bool),
+		outputNodes: make(map[string]*document.Node),
 	}
 
 	if err := extractor.processFile(configPath); err != nil {
@@ -1488,10 +1748,22 @@ func (s *niriGreeterSync) processFile(filePath string) error {
 				return err
 			}
 		case "input":
-			s.nodes = append(s.nodes, node)
+			if s.inputNode == nil {
+				s.inputNode = node
+				s.inputNode.Children = dedupeCursorChildren(s.inputNode.Children)
+				s.nodes = append(s.nodes, node)
+			} else if len(node.Children) > 0 {
+				s.inputNode.Children = mergeInputChildren(s.inputNode.Children, node.Children)
+			}
 			s.inputCount++
 		case "output":
-			s.nodes = append(s.nodes, node)
+			key := outputNodeKey(node)
+			if existing, ok := s.outputNodes[key]; ok {
+				*existing = *node
+			} else {
+				s.outputNodes[key] = node
+				s.nodes = append(s.nodes, node)
+			}
 			s.outputCount++
 		case "cursor":
 			if s.cursorNode == nil {
@@ -1552,6 +1824,36 @@ func dedupeCursorChildren(children []*document.Node) []*document.Node {
 	}
 
 	return result
+}
+
+func mergeInputChildren(existing []*document.Node, incoming []*document.Node) []*document.Node {
+	if len(incoming) == 0 {
+		return existing
+	}
+
+	indexByName := make(map[string]int, len(existing))
+	for i, child := range existing {
+		indexByName[child.Name.String()] = i
+	}
+
+	for _, child := range incoming {
+		name := child.Name.String()
+		if idx, ok := indexByName[name]; ok {
+			existing[idx] = child
+			continue
+		}
+		indexByName[name] = len(existing)
+		existing = append(existing, child)
+	}
+
+	return existing
+}
+
+func outputNodeKey(node *document.Node) string {
+	if len(node.Arguments) > 0 {
+		return strings.Trim(node.Arguments[0].String(), "\"")
+	}
+	return ""
 }
 
 func (s *niriGreeterSync) handleInclude(node *document.Node, baseDir string) error {

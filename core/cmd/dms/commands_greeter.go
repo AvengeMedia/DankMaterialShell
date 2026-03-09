@@ -227,9 +227,11 @@ func installGreeter(nonInteractive bool) error {
 		return err
 	}
 
-	fmt.Println("\nConfiguring AppArmor profile...")
-	if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
-		logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
+	if greeter.IsAppArmorEnabled() {
+		fmt.Println("\nConfiguring AppArmor profile...")
+		if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
+			logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
+		}
 	}
 
 	fmt.Println("\nConfiguring greetd...")
@@ -575,12 +577,13 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 		}
 	}
 
+	if greeter.IsGreeterPackaged() && greeter.HasLegacyLocalGreeterWrapper() {
+		return fmt.Errorf("legacy manual wrapper detected at /usr/local/bin/dms-greeter; remove it before using packaged dms-greeter: sudo rm -f /usr/local/bin/dms-greeter")
+	}
+
 	cacheDir := greeter.GreeterCacheDir
 	if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
 		logFunc("Cache directory not found — attempting to create it...")
-		if createErr := greeter.EnsureGreeterCacheDir(logFunc, ""); createErr != nil {
-			return fmt.Errorf("greeter cache directory not found at %s and could not be created: %w\nRun: sudo mkdir -p %s && sudo chown greeter:greeter %s", cacheDir, createErr, cacheDir, cacheDir)
-		}
 	}
 
 	greeterGroup := greeter.DetectGreeterGroup()
@@ -600,27 +603,28 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 		inGreeterGroup := strings.Contains(string(groupsOutput), greeterGroup)
 		if !inGreeterGroup {
 			if nonInteractive {
-				return fmt.Errorf("user must be in the %s group; run 'dms greeter sync' from a terminal to add", greeterGroup)
-			}
-			fmt.Printf("\n⚠ Warning: You are not in the %s group.\n", greeterGroup)
-			fmt.Printf("Would you like to add your user to the %s group? (Y/n): ", greeterGroup)
-
-			var response string
-			fmt.Scanln(&response)
-			response = strings.ToLower(strings.TrimSpace(response))
-
-			if response != "n" && response != "no" {
-				fmt.Printf("\nAdding user to %s group...\n", greeterGroup)
-				addUserCmd := exec.Command("sudo", "usermod", "-aG", greeterGroup, currentUser.Username)
-				addUserCmd.Stdout = os.Stdout
-				addUserCmd.Stderr = os.Stderr
-				if err := addUserCmd.Run(); err != nil {
-					return fmt.Errorf("failed to add user to %s group: %w", greeterGroup, err)
-				}
-				fmt.Printf("✓ User added to %s group\n", greeterGroup)
-				fmt.Println("⚠ You will need to log out and back in for the group change to take effect")
+				logFunc(fmt.Sprintf("⚠ Not yet in %s group — will be added during sync (logout/login required to take effect).", greeterGroup))
 			} else {
-				return fmt.Errorf("aborted: user must be in the greeter group before syncing")
+				fmt.Printf("\n⚠ Warning: You are not in the %s group.\n", greeterGroup)
+				fmt.Printf("Would you like to add your user to the %s group? (Y/n): ", greeterGroup)
+
+				var response string
+				fmt.Scanln(&response)
+				response = strings.ToLower(strings.TrimSpace(response))
+
+				if response != "n" && response != "no" {
+					fmt.Printf("\nAdding user to %s group...\n", greeterGroup)
+					addUserCmd := exec.Command("sudo", "usermod", "-aG", greeterGroup, currentUser.Username)
+					addUserCmd.Stdout = os.Stdout
+					addUserCmd.Stderr = os.Stderr
+					if err := addUserCmd.Run(); err != nil {
+						return fmt.Errorf("failed to add user to %s group: %w", greeterGroup, err)
+					}
+					fmt.Printf("✓ User added to %s group\n", greeterGroup)
+					fmt.Println("⚠ You will need to log out and back in for the group change to take effect")
+				} else {
+					return fmt.Errorf("aborted: user must be in the greeter group before syncing")
+				}
 			}
 		}
 	}
@@ -694,8 +698,13 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 	}
 
 	fmt.Println("\nSetting up permissions and ACLs...")
+	greeter.RemediateStaleACLs(logFunc, "")
+	greeter.RemediateStaleAppArmor(logFunc, "")
 	if err := greeter.SetupDMSGroup(logFunc, ""); err != nil {
 		return err
+	}
+	if err := greeter.EnsureGreeterCacheDir(logFunc, ""); err != nil {
+		return fmt.Errorf("failed to ensure greeter cache directory at %s: %w\nRun: sudo mkdir -p %s && sudo chown root:%s %s && sudo chmod 2770 %s", cacheDir, err, cacheDir, greeterGroup, cacheDir, cacheDir)
 	}
 
 	fmt.Println("\nSynchronizing DMS configurations...")
@@ -703,9 +712,11 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 		return err
 	}
 
-	fmt.Println("\nConfiguring AppArmor profile...")
-	if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
-		logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
+	if greeter.IsAppArmorEnabled() {
+		fmt.Println("\nConfiguring AppArmor profile...")
+		if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
+			logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
+		}
 	}
 
 	fmt.Println("\n=== Sync Complete ===")
@@ -1021,6 +1032,7 @@ func enableGreeter(nonInteractive bool) error {
 	logFunc := func(msg string) {
 		fmt.Println(msg)
 	}
+	greeterGroup := greeter.DetectGreeterGroup()
 
 	if configAlreadyCorrect {
 		fmt.Println("✓ Greeter is already configured with dms-greeter")
@@ -1028,8 +1040,12 @@ func enableGreeter(nonInteractive bool) error {
 			fmt.Printf("✓ Configured compositor: %s\n", configuredCompositor)
 		}
 
+		fmt.Println("\nSetting up dms-greeter group and permissions...")
+		if err := greeter.SetupDMSGroup(logFunc, ""); err != nil {
+			return err
+		}
 		if err := greeter.EnsureGreeterCacheDir(logFunc, ""); err != nil {
-			fmt.Printf("⚠ Could not create cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown greeter:greeter %s\n", err, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
+			fmt.Printf("⚠ Could not ensure cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown root:%s %s && sudo chmod 2770 %s\n", err, greeter.GreeterCacheDir, greeterGroup, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
 		}
 
 		if err := ensureGraphicalTarget(); err != nil {
@@ -1100,12 +1116,18 @@ func enableGreeter(nonInteractive bool) error {
 		return fmt.Errorf("failed to configure greetd: %w", err)
 	}
 
+	fmt.Println("\nSetting up dms-greeter group and permissions...")
+	if err := greeter.SetupDMSGroup(logFunc, ""); err != nil {
+		return err
+	}
 	if err := greeter.EnsureGreeterCacheDir(logFunc, ""); err != nil {
-		fmt.Printf("⚠ Could not create cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown greeter:greeter %s\n", err, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
+		fmt.Printf("⚠ Could not ensure cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown root:%s %s && sudo chmod 2770 %s\n", err, greeter.GreeterCacheDir, greeterGroup, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
 	}
 
-	if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
-		logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
+	if greeter.IsAppArmorEnabled() {
+		if err := greeter.InstallAppArmorProfile(logFunc, ""); err != nil {
+			logFunc(fmt.Sprintf("⚠ AppArmor profile setup failed: %v", err))
+		}
 	}
 
 	if err := ensureGraphicalTarget(); err != nil {
@@ -1540,30 +1562,33 @@ func checkGreeterStatus() error {
 				fmt.Println("    - security key (U2F): disabled")
 			}
 		} else {
-			fmt.Println("  ℹ No managed auth block present (fingerprint/U2F disabled for greeter)")
+			fmt.Println("  ℹ No managed auth block present (DMS-managed fingerprint/U2F lines are disabled)")
 		}
 		if legacyManaged {
 			fmt.Println("  ⚠ Legacy unmanaged DMS PAM lines detected. Run 'dms greeter sync' to normalize.")
 			allGood = false
 		}
 		includedFprintFile := greeter.DetectIncludedPamModule(string(pamData), "pam_fprintd.so")
+		showIncludedFprintNotice := false
+		if includedFprintFile != "" {
+			if enableFprint, _, settingsErr := greeter.ReadGreeterAuthToggles(homeDir); settingsErr == nil && enableFprint {
+				showIncludedFprintNotice = greeter.FingerprintAuthAvailableForCurrentUser()
+			}
+		}
 		if managedFprint {
 			if includedFprintFile != "" {
 				fmt.Printf("  ⚠ pam_fprintd found in both DMS managed block and %s.\n", includedFprintFile)
 				fmt.Println("    Double fingerprint auth detected — run 'dms greeter sync' to resolve.")
 				allGood = false
 			}
-		} else if includedFprintFile != "" {
+		} else if includedFprintFile != "" && showIncludedFprintNotice {
 			fmt.Printf("  ℹ Fingerprint auth is enabled via included %s.\n", includedFprintFile)
 			fmt.Println("    The DMS toggle only controls the managed block; disable fingerprint in authselect/pam-auth-update for password-only greeter login.")
 		}
 	}
 
 	fmt.Println("\nSecurity (AppArmor):")
-	appArmorEnabled, appArmorErr := isAppArmorEnabled()
-	if appArmorErr != nil {
-		fmt.Printf("  ℹ Could not determine AppArmor status: %v\n", appArmorErr)
-	} else if !appArmorEnabled {
+	if !greeter.IsAppArmorEnabled() {
 		fmt.Println("  ℹ AppArmor not enabled")
 	} else {
 		fmt.Println("  ℹ AppArmor is enabled")
@@ -1610,18 +1635,6 @@ func checkGreeterStatus() error {
 	}
 
 	return nil
-}
-
-func isAppArmorEnabled() (bool, error) {
-	data, err := os.ReadFile("/sys/module/apparmor/parameters/enabled")
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-		return false, err
-	}
-	value := strings.TrimSpace(strings.ToLower(string(data)))
-	return strings.HasPrefix(value, "y"), nil
 }
 
 func recentAppArmorGreeterDenials(sampleLimit int) (int, []string, error) {
@@ -1712,8 +1725,7 @@ func isGreeterRelatedAppArmorDenial(line string) bool {
 	return false
 }
 
-// appArmorProfileMode returns "complain", "enforce", or "" (unknown) for a named AppArmor
-// profile by reading /sys/kernel/security/apparmor/profiles.
+// appArmorProfileMode returns "complain", "enforce", or "" for a named AppArmor profile.
 func appArmorProfileMode(profileName string) string {
 	data, err := os.ReadFile("/sys/kernel/security/apparmor/profiles")
 	if err != nil {

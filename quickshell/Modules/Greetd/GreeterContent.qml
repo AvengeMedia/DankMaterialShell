@@ -37,6 +37,9 @@ Item {
     property bool cancelingExternalAuthForPassword: false
     property int defaultAuthTimeoutMs: 12000
     property int externalAuthTimeoutMs: 45000
+    property int memoryFlushDelayMs: 120
+    property string pendingLaunchCommand: ""
+    property var pendingLaunchEnv: []
     property int passwordFailureCount: 0
     property int passwordAttemptLimitHint: 0
     property string authFeedbackMessage: ""
@@ -49,7 +52,7 @@ Item {
     property string externalAuthAutoStartedForUser: ""
     readonly property bool greeterPamHasFprint: pamModuleEnabled(greetdPamText, "pam_fprintd") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_fprintd")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_fprintd")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_fprintd"))
     readonly property bool greeterPamHasU2f: pamModuleEnabled(greetdPamText, "pam_u2f") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_u2f")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_u2f")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_u2f"))
-    readonly property bool greeterExternalAuthAvailable: greeterPamHasFprint || greeterPamHasU2f
+    readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
 
     function initWeatherService() {
         if (weatherInitialized)
@@ -1618,7 +1621,9 @@ Item {
             } else if (GreetdMemory.lastSuccessfulUser) {
                 GreetdMemory.setLastSuccessfulUser("");
             }
-            Greetd.launch(sessionCmd.split(" "), ["XDG_SESSION_TYPE=wayland"]);
+            pendingLaunchCommand = sessionCmd;
+            pendingLaunchEnv = ["XDG_SESSION_TYPE=wayland"];
+            memoryFlushTimer.restart();
         }
 
         function onAuthFailure(message) {
@@ -1658,6 +1663,20 @@ Item {
             inputField.text = "";
             placeholderDelay.restart();
             Greetd.cancelSession();
+        }
+    }
+
+    Timer {
+        id: memoryFlushTimer
+        interval: memoryFlushDelayMs
+        onTriggered: {
+            if (!pendingLaunchCommand)
+                return;
+            const sessionCommand = pendingLaunchCommand;
+            const launchEnv = pendingLaunchEnv;
+            pendingLaunchCommand = "";
+            pendingLaunchEnv = [];
+            Greetd.launch(sessionCommand.split(" "), launchEnv);
         }
     }
 
