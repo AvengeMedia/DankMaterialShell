@@ -1249,7 +1249,17 @@ func extractGreeterWrapperFromCommand(command string) string {
 	if len(tokens) == 0 {
 		return ""
 	}
-	return strings.Trim(tokens[0], "\"")
+	wrapper := strings.Trim(tokens[0], "\"")
+	if wrapper == "" {
+		return ""
+	}
+	if len(tokens) > 1 {
+		next := strings.Trim(tokens[1], "\"")
+		if next != "" && (filepath.Base(wrapper) == "bash" || filepath.Base(wrapper) == "sh") && strings.Contains(filepath.Base(next), "dms-greeter") {
+			return fmt.Sprintf("%s (script: %s)", wrapper, next)
+		}
+	}
+	return wrapper
 }
 
 func extractGreeterPathOverrideFromCommand(command string) string {
@@ -1332,6 +1342,26 @@ func packageInstallHint() string {
 		return "Install from AUR with 'paru -S greetd-dms-greeter-git' or 'yay -S greetd-dms-greeter-git'"
 	default:
 		return "Run 'dms greeter install' to install greeter"
+	}
+}
+
+func systemPamManagerRemediationHint() string {
+	osInfo, err := distros.GetOSInfo()
+	if err != nil {
+		return "Disable it in your PAM manager (authselect/pam-auth-update) or in the included PAM stack to force password-only greeter login."
+	}
+	config, exists := distros.Registry[osInfo.Distribution.ID]
+	if !exists {
+		return "Disable it in your PAM manager (authselect/pam-auth-update) or in the included PAM stack to force password-only greeter login."
+	}
+
+	switch config.Family {
+	case distros.FamilyFedora:
+		return "Disable it in authselect to force password-only greeter login."
+	case distros.FamilyDebian, distros.FamilyUbuntu:
+		return "Disable it in pam-auth-update to force password-only greeter login."
+	default:
+		return "Disable it in your distro PAM manager (authselect/pam-auth-update) or in the included PAM stack to force password-only greeter login."
 	}
 }
 
@@ -1568,22 +1598,55 @@ func checkGreeterStatus() error {
 			fmt.Println("  ⚠ Legacy unmanaged DMS PAM lines detected. Run 'dms greeter sync' to normalize.")
 			allGood = false
 		}
+		enableFprintToggle, enableU2fToggle := false, false
+		if enableFprint, enableU2f, settingsErr := greeter.ReadGreeterAuthToggles(homeDir); settingsErr == nil {
+			enableFprintToggle = enableFprint
+			enableU2fToggle = enableU2f
+		} else {
+			fmt.Printf("  ℹ Could not read greeter auth toggles from settings: %v\n", settingsErr)
+		}
+
 		includedFprintFile := greeter.DetectIncludedPamModule(string(pamData), "pam_fprintd.so")
-		showIncludedFprintNotice := false
-		if includedFprintFile != "" {
-			if enableFprint, _, settingsErr := greeter.ReadGreeterAuthToggles(homeDir); settingsErr == nil && enableFprint {
-				showIncludedFprintNotice = greeter.FingerprintAuthAvailableForCurrentUser()
+		includedU2fFile := greeter.DetectIncludedPamModule(string(pamData), "pam_u2f.so")
+		fprintAvailableForCurrentUser := greeter.FingerprintAuthAvailableForCurrentUser()
+
+		if managedFprint && includedFprintFile != "" {
+			fmt.Printf("  ⚠ pam_fprintd found in both DMS managed block and %s.\n", includedFprintFile)
+			fmt.Println("    Double fingerprint auth detected — run 'dms greeter sync' to resolve.")
+			allGood = false
+		}
+		if managedU2f && includedU2fFile != "" {
+			fmt.Printf("  ⚠ pam_u2f found in both DMS managed block and %s.\n", includedU2fFile)
+			fmt.Println("    Double security-key auth detected — run 'dms greeter sync' to resolve.")
+			allGood = false
+		}
+
+		if includedFprintFile != "" && !managedFprint {
+			if enableFprintToggle {
+				fmt.Printf("  ℹ Fingerprint auth is enabled via included %s.\n", includedFprintFile)
+				if fprintAvailableForCurrentUser {
+					fmt.Println("    DMS toggle is enabled, and effective auth is coming from the included PAM stack.")
+				} else {
+					fmt.Println("    No enrolled fingerprints detected for the current user; password auth remains the effective path.")
+				}
+			} else {
+				if fprintAvailableForCurrentUser {
+					fmt.Printf("  ⚠ Fingerprint auth is active via included %s while DMS fingerprint toggle is off.\n", includedFprintFile)
+					fmt.Printf("    %s\n", systemPamManagerRemediationHint())
+				} else {
+					fmt.Printf("  ℹ pam_fprintd is present via included %s, but no enrolled fingerprints were detected for user %s.\n", includedFprintFile, currentUser.Username)
+					fmt.Println("    Password auth remains the effective login path.")
+				}
 			}
 		}
-		if managedFprint {
-			if includedFprintFile != "" {
-				fmt.Printf("  ⚠ pam_fprintd found in both DMS managed block and %s.\n", includedFprintFile)
-				fmt.Println("    Double fingerprint auth detected — run 'dms greeter sync' to resolve.")
-				allGood = false
+		if includedU2fFile != "" && !managedU2f {
+			if enableU2fToggle {
+				fmt.Printf("  ℹ Security-key auth is enabled via included %s.\n", includedU2fFile)
+				fmt.Println("    DMS toggle is enabled, but effective auth is coming from the included PAM stack.")
+			} else {
+				fmt.Printf("  ⚠ Security-key auth is active via included %s while DMS security-key toggle is off.\n", includedU2fFile)
+				fmt.Printf("    %s\n", systemPamManagerRemediationHint())
 			}
-		} else if includedFprintFile != "" && showIncludedFprintNotice {
-			fmt.Printf("  ℹ Fingerprint auth is enabled via included %s.\n", includedFprintFile)
-			fmt.Println("    The DMS toggle only controls the managed block; disable fingerprint in authselect/pam-auth-update for password-only greeter login.")
 		}
 	}
 
