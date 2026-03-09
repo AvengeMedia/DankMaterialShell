@@ -179,6 +179,22 @@ export QT_QPA_PLATFORM=wayland
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export EGL_PLATFORM=gbm
 export DMS_RUN_GREETER=1
+
+ensure_cache_tree() {
+    local base="$1"
+    mkdir -p "$base/.local/state" "$base/.local/share" "$base/.cache"
+}
+
+if ! ensure_cache_tree "$CACHE_DIR" 2>/dev/null; then
+    FALLBACK_CACHE_DIR="/tmp/dms-greeter-${UID:-$(id -u)}"
+    echo "Warning: cache directory '$CACHE_DIR' is not writable; falling back to '$FALLBACK_CACHE_DIR'" >&2
+    CACHE_DIR="$FALLBACK_CACHE_DIR"
+    if ! ensure_cache_tree "$CACHE_DIR"; then
+        echo "Error: failed to initialize fallback cache directory '$CACHE_DIR'" >&2
+        exit 1
+    fi
+fi
+
 export DMS_GREET_CFG_DIR="$CACHE_DIR"
 
 if [[ -n "$REMEMBER_LAST_SESSION" ]]; then
@@ -202,11 +218,6 @@ if [[ -n "$REMEMBER_LAST_USER" ]]; then
     fi
     export DMS_SAVE_USERNAME
 fi
-
-mkdir -p "$CACHE_DIR"
-mkdir -p "$CACHE_DIR/.local/state"
-mkdir -p "$CACHE_DIR/.local/share"
-mkdir -p "$CACHE_DIR/.cache"
 
 export HOME="$CACHE_DIR"
 export XDG_STATE_HOME="$CACHE_DIR/.local/state"

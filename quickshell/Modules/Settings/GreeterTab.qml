@@ -49,18 +49,24 @@ Item {
     readonly property bool greeterInstalled: greeterBinaryExists || greeterEnabled
 
     readonly property string greeterActionLabel: {
-        if (!root.greeterInstalled) return I18n.tr("Install");
-        if (!root.greeterEnabled) return I18n.tr("Activate");
+        if (!root.greeterInstalled)
+            return I18n.tr("Install");
+        if (!root.greeterEnabled)
+            return I18n.tr("Activate");
         return I18n.tr("Uninstall");
     }
     readonly property string greeterActionIcon: {
-        if (!root.greeterInstalled) return "download";
-        if (!root.greeterEnabled) return "login";
+        if (!root.greeterInstalled)
+            return "download";
+        if (!root.greeterEnabled)
+            return "login";
         return "delete";
     }
     readonly property var greeterActionCommand: {
-        if (!root.greeterInstalled) return ["dms", "greeter", "install", "--terminal"];
-        if (!root.greeterEnabled) return ["dms", "greeter", "enable", "--terminal"];
+        if (!root.greeterInstalled)
+            return ["dms", "greeter", "install", "--terminal"];
+        if (!root.greeterEnabled)
+            return ["dms", "greeter", "enable", "--terminal"];
         return ["dms", "greeter", "uninstall", "--terminal", "--yes"];
     }
     property string greeterPendingAction: ""
@@ -79,9 +85,7 @@ Item {
     }
 
     function runGreeterInstallAction() {
-        root.greeterPendingAction = !root.greeterInstalled ? "install"
-            : !root.greeterEnabled ? "activate"
-            : "uninstall";
+        root.greeterPendingAction = !root.greeterInstalled ? "install" : !root.greeterEnabled ? "activate" : "uninstall";
         greeterStatusText = I18n.tr("Opening terminal: ") + root.greeterActionLabel + "…";
         greeterInstallActionRunning = true;
         greeterInstallActionProcess.running = true;
@@ -241,6 +245,7 @@ Item {
                 root.greeterStatusText = failure;
                 root.launchGreeterSyncTerminalFallback(false, "");
             }
+            root.checkGreeterInstallState();
         }
     }
 
@@ -406,7 +411,10 @@ Item {
                     }
                 }
 
-                Item { width: 1; height: Theme.spacingM }
+                Item {
+                    width: 1
+                    height: Theme.spacingM
+                }
 
                 RowLayout {
                     width: parent.width
@@ -420,7 +428,9 @@ Item {
                         enabled: !root.greeterInstallActionRunning && !root.greeterSyncRunning
                     }
 
-                    Item { Layout.fillWidth: true }
+                    Item {
+                        Layout.fillWidth: true
+                    }
 
                     DankButton {
                         text: I18n.tr("Refresh")
