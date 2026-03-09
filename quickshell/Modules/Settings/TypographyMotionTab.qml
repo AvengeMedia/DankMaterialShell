@@ -21,7 +21,7 @@ Item {
             fonts.push(fontName);
         }
         fonts.sort();
-        fonts.unshift("Default");
+        fonts.unshift(I18n.tr("Default"));
         cachedFontFamilies = fonts;
         cachedMonoFamilies = fonts;
     }
@@ -68,13 +68,13 @@ Item {
                     settingKey: "fontFamily"
                     text: I18n.tr("Normal Font")
                     description: I18n.tr("Select the font family for UI text")
-                    options: root.fontsEnumerated ? root.cachedFontFamilies : ["Default"]
-                    currentValue: SettingsData.fontFamily === Theme.defaultFontFamily ? "Default" : (SettingsData.fontFamily || "Default")
+                    options: root.fontsEnumerated ? root.cachedFontFamilies : [I18n.tr("Default")]
+                    currentValue: SettingsData.fontFamily === Theme.defaultFontFamily ? I18n.tr("Default") : (SettingsData.fontFamily || I18n.tr("Default"))
                     enableFuzzySearch: true
                     popupWidthOffset: 100
                     maxPopupHeight: 400
                     onValueChanged: value => {
-                        if (value === "Default")
+                        if (value === I18n.tr("Default"))
                             SettingsData.set("fontFamily", Theme.defaultFontFamily);
                         else
                             SettingsData.set("fontFamily", value);
@@ -87,13 +87,13 @@ Item {
                     settingKey: "monoFontFamily"
                     text: I18n.tr("Monospace Font")
                     description: I18n.tr("Select monospace font for process list and technical displays")
-                    options: root.fontsEnumerated ? root.cachedMonoFamilies : ["Default"]
-                    currentValue: SettingsData.monoFontFamily === SettingsData.defaultMonoFontFamily ? "Default" : (SettingsData.monoFontFamily || "Default")
+                    options: root.fontsEnumerated ? root.cachedMonoFamilies : [I18n.tr("Default")]
+                    currentValue: SettingsData.monoFontFamily === SettingsData.defaultMonoFontFamily ? I18n.tr("Default") : (SettingsData.monoFontFamily || I18n.tr("Default"))
                     enableFuzzySearch: true
                     popupWidthOffset: 100
                     maxPopupHeight: 400
                     onValueChanged: value => {
-                        if (value === "Default")
+                        if (value === I18n.tr("Default"))
                             SettingsData.set("monoFontFamily", SettingsData.defaultMonoFontFamily);
                         else
                             SettingsData.set("monoFontFamily", value);
@@ -113,65 +113,63 @@ Item {
                     settingKey: "fontWeight"
                     text: I18n.tr("Font Weight")
                     description: I18n.tr("Select font weight for UI text")
-                    options: ["Thin", "Extra Light", "Light", "Regular", "Medium", "Demi Bold", "Bold", "Extra Bold", "Black"]
+                    options: [
+                        I18n.tr("Thin"),
+                        I18n.tr("Extra Light"),
+                        I18n.tr("Light"),
+                        I18n.tr("Regular"),
+                        I18n.tr("Medium", "font weight"),
+                        I18n.tr("Demi Bold"),
+                        I18n.tr("Bold"),
+                        I18n.tr("Extra Bold"),
+                        I18n.tr("Black")
+                    ]
                     currentValue: {
                         switch (SettingsData.fontWeight) {
                         case Font.Thin:
-                            return "Thin";
+                            return I18n.tr("Thin");
                         case Font.ExtraLight:
-                            return "Extra Light";
+                            return I18n.tr("Extra Light");
                         case Font.Light:
-                            return "Light";
+                            return I18n.tr("Light");
                         case Font.Normal:
-                            return "Regular";
+                            return I18n.tr("Regular");
                         case Font.Medium:
-                            return "Medium";
+                            return I18n.tr("Medium", "font weight");
                         case Font.DemiBold:
-                            return "Demi Bold";
+                            return I18n.tr("Demi Bold");
                         case Font.Bold:
-                            return "Bold";
+                            return I18n.tr("Bold");
                         case Font.ExtraBold:
-                            return "Extra Bold";
+                            return I18n.tr("Extra Bold");
                         case Font.Black:
-                            return "Black";
+                            return I18n.tr("Black");
                         default:
-                            return "Regular";
+                            return I18n.tr("Regular");
                         }
                     }
                     onValueChanged: value => {
                         var weight;
-                        switch (value) {
-                        case "Thin":
+                        if (value === I18n.tr("Thin"))
                             weight = Font.Thin;
-                            break;
-                        case "Extra Light":
+                        else if (value === I18n.tr("Extra Light"))
                             weight = Font.ExtraLight;
-                            break;
-                        case "Light":
+                        else if (value === I18n.tr("Light"))
                             weight = Font.Light;
-                            break;
-                        case "Regular":
+                        else if (value === I18n.tr("Regular"))
                             weight = Font.Normal;
-                            break;
-                        case "Medium":
+                        else if (value === I18n.tr("Medium", "font weight"))
                             weight = Font.Medium;
-                            break;
-                        case "Demi Bold":
+                        else if (value === I18n.tr("Demi Bold"))
                             weight = Font.DemiBold;
-                            break;
-                        case "Bold":
+                        else if (value === I18n.tr("Bold"))
                             weight = Font.Bold;
-                            break;
-                        case "Extra Bold":
+                        else if (value === I18n.tr("Extra Bold"))
                             weight = Font.ExtraBold;
-                            break;
-                        case "Black":
+                        else if (value === I18n.tr("Black"))
                             weight = Font.Black;
-                            break;
-                        default:
+                        else
                             weight = Font.Normal;
-                            break;
-                        }
                         SettingsData.set("fontWeight", weight);
                     }
                 }

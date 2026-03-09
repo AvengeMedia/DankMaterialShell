@@ -88,7 +88,7 @@ Card {
             topPadding: Theme.spacingL
 
             StyledText {
-                text: activePlayer?.trackTitle || "Unknown"
+                text: activePlayer?.trackTitle || I18n.tr("Unknown")
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 color: Theme.surfaceText
@@ -99,7 +99,7 @@ Card {
             }
 
             StyledText {
-                text: activePlayer?.trackArtist || "Unknown Artist"
+                text: activePlayer?.trackArtist || I18n.tr("Unknown Artist")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                 width: parent.width

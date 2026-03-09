@@ -28,7 +28,7 @@ Card {
         }
 
         StyledText {
-            text: WeatherService.weather.loading ? "Loading..." : "No Weather"
+            text: WeatherService.weather.loading ? I18n.tr("Loading...") : I18n.tr("No Weather")
             font.pixelSize: Theme.fontSizeSmall
             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
             anchors.horizontalCenter: parent.horizontalCenter

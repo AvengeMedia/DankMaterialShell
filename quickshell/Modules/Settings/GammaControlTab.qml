@@ -181,11 +181,11 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 model: [
                                     {
-                                        "text": "Time",
+                                        "text": I18n.tr("Time"),
                                         "icon": "access_time"
                                     },
                                     {
-                                        "text": "Location",
+                                        "text": I18n.tr("Location"),
                                         "icon": "place"
                                     }
                                 ]

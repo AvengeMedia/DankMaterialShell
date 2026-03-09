@@ -854,15 +854,15 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
                                 if (GreeterState.unlocking) {
-                                    return "Logging in...";
+                                    return I18n.tr("Logging in...");
                                 }
                                 if (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse) {
                                     return "Authenticating...";
                                 }
                                 if (GreeterState.showPasswordInput) {
-                                    return "Password...";
+                                    return I18n.tr("Password...");
                                 }
-                                return "Username...";
+                                return I18n.tr("Username...");
                             }
                             color: (GreeterState.unlocking || (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse)) ? Theme.primary : Theme.outline
                             font.pixelSize: Theme.fontSizeMedium
@@ -999,7 +999,13 @@ Item {
                     Layout.preferredHeight: 38
                     Layout.topMargin: -Theme.spacingS
                     Layout.bottomMargin: -Theme.spacingS
-                    text: root.authFeedbackMessage
+                    text: {
+                        if (GreeterState.pamState === "error")
+                            return I18n.tr("Authentication error - try again");
+                        if (GreeterState.pamState === "fail")
+                            return I18n.tr("Incorrect password");
+                        return "";
+                    }
                     color: Theme.error
                     font.pixelSize: Theme.fontSizeSmall
                     horizontalAlignment: Text.AlignHCenter

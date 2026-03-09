@@ -66,7 +66,7 @@ DankModal {
                         }
 
                         StyledText {
-                            text: `Details for "${networkID}"`
+                            text: I18n.tr("Details for \"%1\"").arg(networkID)
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceTextMedium
                             width: parent.width
@@ -102,7 +102,7 @@ DankModal {
                             id: detailsText
 
                             width: parent.width
-                            text: NetworkService.networkWiredInfoDetails && NetworkService.networkWiredInfoDetails.replace(/\\n/g, '\n') || "No information available"
+                            text: NetworkService.networkWiredInfoDetails && NetworkService.networkWiredInfoDetails.replace(/\\n/g, '\n') || I18n.tr("No information available")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             wrapMode: Text.WordWrap
