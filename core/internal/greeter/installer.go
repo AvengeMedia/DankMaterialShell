@@ -1424,9 +1424,30 @@ func FingerprintAuthAvailableForCurrentUser() bool {
 	return FingerprintAuthAvailableForUser(username)
 }
 
+func pamManagerHintForCurrentDistro() string {
+	osInfo, err := distros.GetOSInfo()
+	if err != nil {
+		return "Disable it in your PAM manager (authselect/pam-auth-update) or in the included PAM stack to force password-only greeter login."
+	}
+	config, exists := distros.Registry[osInfo.Distribution.ID]
+	if !exists {
+		return "Disable it in your PAM manager (authselect/pam-auth-update) or in the included PAM stack to force password-only greeter login."
+	}
+
+	switch config.Family {
+	case distros.FamilyFedora:
+		return "Disable it in authselect to force password-only greeter login."
+	case distros.FamilyDebian, distros.FamilyUbuntu:
+		return "Disable it in pam-auth-update to force password-only greeter login."
+	default:
+		return "Disable it in your distro PAM manager (authselect/pam-auth-update) or in the included PAM stack to force password-only greeter login."
+	}
+}
+
 func syncGreeterPamConfig(homeDir string, logFunc func(string), sudoPassword string, forceAuth bool) error {
 	var wantFprint, wantU2f bool
 	fprintToggleEnabled := forceAuth
+	u2fToggleEnabled := forceAuth
 	if forceAuth {
 		wantFprint = pamModuleExists("pam_fprintd.so")
 		wantU2f = pamModuleExists("pam_u2f.so")
@@ -1436,6 +1457,7 @@ func syncGreeterPamConfig(homeDir string, logFunc func(string), sudoPassword str
 			return err
 		}
 		fprintToggleEnabled = settings.GreeterEnableFprint
+		u2fToggleEnabled = settings.GreeterEnableU2f
 		fprintModule := pamModuleExists("pam_fprintd.so")
 		u2fModule := pamModuleExists("pam_u2f.so")
 		wantFprint = settings.GreeterEnableFprint && fprintModule
@@ -1464,14 +1486,43 @@ func syncGreeterPamConfig(homeDir string, logFunc func(string), sudoPassword str
 	content, _ = stripLegacyGreeterPamLines(content)
 
 	includedFprintFile := DetectIncludedPamModule(content, "pam_fprintd.so")
+	includedU2fFile := DetectIncludedPamModule(content, "pam_u2f.so")
+	fprintAvailableForCurrentUser := FingerprintAuthAvailableForCurrentUser()
 	if wantFprint && includedFprintFile != "" {
 		logFunc("⚠ pam_fprintd already present in included " + includedFprintFile + " (managed by authselect/pam-auth-update). Skipping DMS fprint block to avoid double-fingerprint auth.")
 		wantFprint = false
 	}
-	showIncludedFprintNotice := fprintToggleEnabled && FingerprintAuthAvailableForCurrentUser()
-	if !wantFprint && includedFprintFile != "" && showIncludedFprintNotice {
-		logFunc("ℹ Fingerprint auth is still enabled via included " + includedFprintFile + ".")
-		logFunc("  Disable fingerprint in your system PAM manager (authselect/pam-auth-update) to force password-only greeter login.")
+	if wantU2f && includedU2fFile != "" {
+		logFunc("⚠ pam_u2f already present in included " + includedU2fFile + " (managed by authselect/pam-auth-update). Skipping DMS U2F block to avoid double security-key auth.")
+		wantU2f = false
+	}
+	if !wantFprint && includedFprintFile != "" {
+		if fprintToggleEnabled {
+			logFunc("ℹ Fingerprint auth is still enabled via included " + includedFprintFile + ".")
+			if fprintAvailableForCurrentUser {
+				logFunc("  DMS toggle is enabled, and effective auth is provided by the included PAM stack.")
+			} else {
+				logFunc("  No enrolled fingerprints detected for the current user; password auth remains the effective path.")
+			}
+		} else {
+			if fprintAvailableForCurrentUser {
+				logFunc("ℹ Fingerprint auth is active via included " + includedFprintFile + " while DMS fingerprint toggle is off.")
+				logFunc("  Password login will work but may be delayed while the fingerprint module runs first.")
+				logFunc("  To eliminate the delay, " + pamManagerHintForCurrentDistro())
+			} else {
+				logFunc("ℹ pam_fprintd is present via included " + includedFprintFile + ", but no enrolled fingerprints were detected for the current user.")
+				logFunc("  Password auth remains the effective login path.")
+			}
+		}
+	}
+	if !wantU2f && includedU2fFile != "" {
+		if u2fToggleEnabled {
+			logFunc("ℹ Security-key auth is still enabled via included " + includedU2fFile + ".")
+			logFunc("  DMS toggle is enabled, but effective auth is provided by the included PAM stack.")
+		} else {
+			logFunc("⚠ Security-key auth is active via included " + includedU2fFile + " while DMS security-key toggle is off.")
+			logFunc("  " + pamManagerHintForCurrentDistro())
+		}
 	}
 
 	if wantFprint || wantU2f {
