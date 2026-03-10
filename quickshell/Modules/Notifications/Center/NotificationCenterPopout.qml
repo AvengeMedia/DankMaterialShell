@@ -7,7 +7,7 @@ DankPopout {
     id: root
 
     layerNamespace: "dms:notification-center-popout"
-    fullHeightSurface: false
+    fullHeightSurface: true
 
     property bool notificationHistoryVisible: false
     property var triggerScreen: null
