@@ -390,10 +390,11 @@ BasePill {
                         anchors.top: parent.top
                     }
 
-                    StyledText {
+                    NumericText {
                         id: audioPercentV
                         visible: root.showAudioPercent
                         text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
+                        reserveText: "100%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -416,10 +417,11 @@ BasePill {
                         anchors.top: parent.top
                     }
 
-                    StyledText {
+                    NumericText {
                         id: micPercentV
                         visible: root.showMicPercent
                         text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
+                        reserveText: "100%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -442,10 +444,11 @@ BasePill {
                         anchors.top: parent.top
                     }
 
-                    StyledText {
+                    NumericText {
                         id: brightnessPercentV
                         visible: root.showBrightnessPercent
                         text: Math.round(getBrightness() * 100) + "%"
+                        reserveText: "100%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -536,7 +539,8 @@ BasePill {
                 }
 
                 Rectangle {
-                    width: audioIcon.implicitWidth + (root.showAudioPercent ? audioPercent.implicitWidth : 0) + 4
+                    width: audioIcon.implicitWidth + (root.showAudioPercent ? audioPercent.reservedWidth : 0) + 4
+                    implicitWidth: width
                     height: root.widgetThickness - root.horizontalPadding * 2
                     color: "transparent"
                     anchors.verticalCenter: parent.verticalCenter
@@ -552,20 +556,23 @@ BasePill {
                         anchors.leftMargin: 2
                     }
 
-                    StyledText {
+                    NumericText {
                         id: audioPercent
                         visible: root.showAudioPercent
                         text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
+                        reserveText: "100%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: audioIcon.right
                         anchors.leftMargin: 2
+                        width: reservedWidth
                     }
                 }
 
                 Rectangle {
-                    width: micIcon.implicitWidth + (root.showMicPercent ? micPercent.implicitWidth : 0) + 4
+                    width: micIcon.implicitWidth + (root.showMicPercent ? micPercent.reservedWidth : 0) + 4
+                    implicitWidth: width
                     height: root.widgetThickness - root.horizontalPadding * 2
                     color: "transparent"
                     anchors.verticalCenter: parent.verticalCenter
@@ -581,20 +588,22 @@ BasePill {
                         anchors.leftMargin: 2
                     }
 
-                    StyledText {
+                    NumericText {
                         id: micPercent
                         visible: root.showMicPercent
                         text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
+                        reserveText: "100%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: micIcon.right
                         anchors.leftMargin: 2
+                        width: reservedWidth
                     }
                 }
 
                 Rectangle {
-                    width: brightnessIcon.implicitWidth + (root.showBrightnessPercent ? brightnessPercent.implicitWidth : 0) + 4
+                    width: brightnessIcon.implicitWidth + (root.showBrightnessPercent ? brightnessPercent.reservedWidth : 0) + 4
                     height: root.widgetThickness - root.horizontalPadding * 2
                     color: "transparent"
                     anchors.verticalCenter: parent.verticalCenter
@@ -610,15 +619,17 @@ BasePill {
                         anchors.leftMargin: 2
                     }
 
-                    StyledText {
+                    NumericText {
                         id: brightnessPercent
                         visible: root.showBrightnessPercent
                         text: Math.round(getBrightness() * 100) + "%"
+                        reserveText: "100%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: brightnessIcon.right
                         anchors.leftMargin: 2
+                        width: reservedWidth
                     }
                 }
 

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
@@ -161,6 +160,23 @@ BasePill {
 
         return 0;
     }
+
+    readonly property string autoBarShadowDirection: {
+        const edge = root.axis?.edge;
+        switch (edge) {
+        case "top":
+            return "top";
+        case "bottom":
+            return "bottom";
+        case "left":
+            return "left";
+        case "right":
+            return "right";
+        default:
+            return "bottom";
+        }
+    }
+    readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
 
     property bool menuOpen: false
     property var currentTrayMenu: null
@@ -940,13 +956,6 @@ BasePill {
                     }
                 })(), overflowMenu.dpr)
 
-            readonly property var elev: Theme.elevationLevel2
-            property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 8
-            property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
-            property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.25
-            readonly property real popupSurfaceAlpha: Theme.popupTransparency
-            readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
-
             opacity: root.menuOpen ? 1 : 0
             scale: root.menuOpen ? 1 : 0.85
 
@@ -967,19 +976,14 @@ BasePill {
             ElevationShadow {
                 id: bgShadowLayer
                 anchors.fill: parent
-                level: menuContainer.elev
-                fallbackOffset: 4
-                shadowBlurPx: menuContainer.shadowBlurPx
-                shadowSpreadPx: menuContainer.shadowSpreadPx
-                shadowColor: {
-                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                    return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
-                }
+                level: Theme.elevationLevel3
+                direction: root.effectiveShadowDirection
+                fallbackOffset: 6
                 targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 targetRadius: Theme.cornerRadius
                 sourceRect.antialiasing: true
                 sourceRect.smooth: true
-                shadowEnabled: Theme.elevationEnabled
+                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
                 layer.smooth: true
                 layer.textureSize: Qt.size(Math.round(width * overflowMenu.dpr * 2), Math.round(height * overflowMenu.dpr * 2))
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
@@ -1402,13 +1406,6 @@ BasePill {
                             }
                         })(), menuWindow.dpr)
 
-                    readonly property var elev: Theme.elevationLevel2
-                    property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 8
-                    property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
-                    property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.25
-                    readonly property real popupSurfaceAlpha: Theme.popupTransparency
-                    readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
-
                     opacity: menuRoot.showMenu ? 1 : 0
                     scale: menuRoot.showMenu ? 1 : 0.85
 
@@ -1429,18 +1426,13 @@ BasePill {
                     ElevationShadow {
                         id: menuBgShadowLayer
                         anchors.fill: parent
-                        level: menuContainer.elev
-                        fallbackOffset: 4
-                        shadowBlurPx: menuContainer.shadowBlurPx
-                        shadowSpreadPx: menuContainer.shadowSpreadPx
-                        shadowColor: {
-                            const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                            return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
-                        }
+                        level: Theme.elevationLevel3
+                        direction: root.effectiveShadowDirection
+                        fallbackOffset: 6
                         targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                         targetRadius: Theme.cornerRadius
                         sourceRect.antialiasing: true
-                        shadowEnabled: Theme.elevationEnabled
+                        shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
                         layer.smooth: true
                         layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically

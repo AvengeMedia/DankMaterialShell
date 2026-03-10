@@ -313,7 +313,7 @@ Item {
     }
 
     Variants {
-        model: SettingsData.getFilteredScreens("notifications")
+        model: SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications")
 
         delegate: NotificationPopupManager {
             modelData: item

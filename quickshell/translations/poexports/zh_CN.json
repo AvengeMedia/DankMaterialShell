@@ -8,6 +8,12 @@
   "%1 adapter(s), none connected": {
     "%1 adapter(s), none connected": "%1 个适配器，未连接"
   },
+  "%1 adapter, none connected": {
+    "%1 adapter, none connected": ""
+  },
+  "%1 adapters, none connected": {
+    "%1 adapters, none connected": ""
+  },
   "%1 characters": {
     "%1 characters": "%1个字符"
   },
@@ -29,8 +35,14 @@
   "%1 disconnected (hidden)": {
     "%1 disconnected (hidden)": "%1已断开连接（隐藏）"
   },
+  "%1 display": {
+    "%1 display": ""
+  },
   "%1 display(s)": {
     "%1 display(s)": "%1 显示"
+  },
+  "%1 displays": {
+    "%1 displays": ""
   },
   "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": {
     "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": "%1存在但并未被包含至配置文件。在此问题修复前，自定义快捷键绑定将不会生效。"
@@ -64,6 +76,9 @@
   },
   "+ %1 more": {
     "+ %1 more": "+%1更多"
+  },
+  "/path/to/videos": {
+    "/path/to/videos": ""
   },
   "0 = square corners": {
     "0 = square corners": "0 = 直角"
@@ -112,6 +127,9 @@
   },
   "24-Hour Format": {
     "24-Hour Format": "24小时制"
+  },
+  "24-hour clock": {
+    "24-hour clock": ""
   },
   "24-hour format": {
     "24-hour format": "24小时制"
@@ -203,11 +221,17 @@
   "Action": {
     "Action": "操作"
   },
+  "Action failed or terminal was closed.": {
+    "Action failed or terminal was closed.": ""
+  },
   "Actions": {
     "Actions": "操作"
   },
   "Activate": {
     "Activate": "激活"
+  },
+  "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": ""
   },
   "Activation": {
     "Activation": "激活"
@@ -571,6 +595,9 @@
   "Backend": {
     "Backend": "后端"
   },
+  "Background": {
+    "Background": ""
+  },
   "Background Opacity": {
     "Background Opacity": "背景透明度"
   },
@@ -583,8 +610,14 @@
   "Bar Configurations": {
     "Bar Configurations": "Bar状态栏"
   },
+  "Bar Shadows": {
+    "Bar Shadows": ""
+  },
   "Bar Transparency": {
     "Bar Transparency": "状态栏透明度"
+  },
+  "Base color for shadows (opacity is applied automatically)": {
+    "Base color for shadows (opacity is applied automatically)": ""
   },
   "Base duration for animations (drag to use Custom)": {
     "Base duration for animations (drag to use Custom)": ""
@@ -706,6 +739,12 @@
   "Button Color": {
     "Button Color": ""
   },
+  "Button state while testing printer connection": {
+    "Testing...": ""
+  },
+  "Button to test connection to a printer by IP address": {
+    "Test Connection": ""
+  },
   "CPU": {
     "CPU": "CPU"
   },
@@ -787,6 +826,12 @@
   "Change bar appearance": {
     "Change bar appearance": "更改状态栏外观"
   },
+  "Change the locale used by the DMS interface.": {
+    "Change the locale used by the DMS interface.": ""
+  },
+  "Change the locale used for date and time formatting, independent of the interface language.": {
+    "Change the locale used for date and time formatting, independent of the interface language.": ""
+  },
   "Channel": {
     "Channel": "频道"
   },
@@ -795,6 +840,12 @@
   },
   "Check for system updates": {
     "Check for system updates": "检查系统更新"
+  },
+  "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
+    "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": ""
+  },
+  "Checking whether sudo authentication is needed…": {
+    "Checking whether sudo authentication is needed…": ""
   },
   "Choose Color": {
     "Choose Color": "选择颜色"
@@ -813,6 +864,9 @@
   },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "选择天气部件的显示方式"
+  },
+  "Choose how this bar resolves shadow direction": {
+    "Choose how this bar resolves shadow direction": ""
   },
   "Choose icon": {
     "Choose icon": "选择图标"
@@ -1126,6 +1180,18 @@
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "控制所有弹出窗口、模态框及其内容层的透明度"
   },
+  "Controls shadow cast direction for elevation layers": {
+    "Controls shadow cast direction for elevation layers": ""
+  },
+  "Controls the base blur radius and offset of shadows": {
+    "Controls the base blur radius and offset of shadows": ""
+  },
+  "Controls the transparency of the shadow": {
+    "Controls the transparency of the shadow": ""
+  },
+  "Convenience options for the login screen. Sync to apply.": {
+    "Convenience options for the login screen. Sync to apply.": ""
+  },
   "Cooldown": {
     "Cooldown": "冷却"
   },
@@ -1216,6 +1282,9 @@
   "Current Items": {
     "Current Items": "当前项目"
   },
+  "Current Locale": {
+    "Current Locale": ""
+  },
   "Current Period": {
     "Current Period": "当前时间"
   },
@@ -1279,6 +1348,12 @@
   "Custom Reboot Command": {
     "Custom Reboot Command": "自定义重启命令"
   },
+  "Custom Shadow Color": {
+    "Custom Shadow Color": ""
+  },
+  "Custom Shadow Override": {
+    "Custom Shadow Override": ""
+  },
   "Custom Suspend Command": {
     "Custom Suspend Command": "自定义挂起命令"
   },
@@ -1305,6 +1380,9 @@
   },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "DMS 插件管理器不可用"
+  },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS 不是最新版本"
@@ -1350,6 +1428,12 @@
   },
   "Date Format": {
     "Date Format": "日期格式"
+  },
+  "Date format": {
+    "Date format": ""
+  },
+  "Date format on greeter": {
+    "Date format on greeter": ""
   },
   "Dawn (Astronomical Twilight)": {
     "Dawn (Astronomical Twilight)": "黎明（天文晨光）"
@@ -1410,6 +1494,9 @@
   },
   "Delete profile \"%1\"?": {
     "Delete profile \"%1\"?": ""
+  },
+  "Dependencies & documentation": {
+    "Dependencies & documentation": ""
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "提取与壁纸高度匹配的颜色。"
@@ -1477,6 +1564,9 @@
   "Disabled": {
     "Disabled": "已关闭"
   },
+  "Disabled.": {
+    "Disabled.": ""
+  },
   "Disabling WiFi...": {
     "Disabling WiFi...": "正在禁用WiFi..."
   },
@@ -1497,6 +1587,9 @@
   },
   "Disk Usage": {
     "Disk Usage": "磁盘占用"
+  },
+  "Disk Usage Display": {
+    "Disk Usage Display": ""
   },
   "Disks": {
     "Disks": "磁盘"
@@ -1652,7 +1745,7 @@
     "Edit App": "编辑应用"
   },
   "Edit Window Rule": {
-    "Edit Window Rule": ""
+    "Edit Window Rule": "编辑窗口规则"
   },
   "Education": {
     "Education": "教育"
@@ -1675,6 +1768,9 @@
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "启用请勿打扰"
   },
+  "Enable FIDO2/U2F hardware security key for lock screen": {
+    "Enable security key authentication": ""
+  },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "显示 GPU 温度"
   },
@@ -1690,17 +1786,29 @@
   "Enable System Sounds": {
     "Enable System Sounds": "启用系统声音"
   },
+  "Enable Video Screensaver": {
+    "Enable Video Screensaver": ""
+  },
   "Enable Weather": {
     "Enable Weather": "显示天气"
   },
   "Enable WiFi": {
     "Enable WiFi": "启用 Wi-Fi"
   },
+  "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
+    "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": ""
+  },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "启用合成器可定位的模糊层（命名空间：dms:blurwallpaper），需要手动配置 niri。"
   },
+  "Enable fingerprint at login": {
+    "Enable fingerprint at login": ""
+  },
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "启用指纹认证"
+  },
+  "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
+    "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": ""
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "启用 loginctl 锁定集成"
@@ -1716,6 +1824,9 @@
   },
   "Enable profile image display on the lock screen window": {
     "Show Profile Image": "显示用户头像"
+  },
+  "Enable security key at login": {
+    "Enable security key at login": ""
   },
   "Enable system date display on the lock screen window": {
     "Show System Date": "显示系统日期"
@@ -1832,7 +1943,7 @@
     "Failed to activate configuration": "无法应用配置"
   },
   "Failed to activate profile - file not found": {
-    "Failed to activate profile - file not found": ""
+    "Failed to activate profile - file not found": "无法激活配置 - 未找到文件"
   },
   "Failed to add binds include": {
     "Failed to add binds include": "添加绑定包含失败"
@@ -1862,7 +1973,7 @@
     "Failed to create printer": "创建打印机失败"
   },
   "Failed to create profiles directory": {
-    "Failed to create profiles directory": ""
+    "Failed to create profiles directory": "无法创建配置目录"
   },
   "Failed to delete VPN": {
     "Failed to delete VPN": "删除 VPN 失败"
@@ -1961,7 +2072,7 @@
     "Failed to save keybind": "保存按键绑定失败"
   },
   "Failed to save profile file": {
-    "Failed to save profile file": ""
+    "Failed to save profile file": "保存配置文件失败"
   },
   "Failed to set brightness": {
     "Failed to set brightness": "设置亮度失败"
@@ -2044,6 +2155,9 @@
   "Fine-tune animation timing in milliseconds": {
     "Fine-tune animation timing in milliseconds": "以毫秒为单位微调动画时间"
   },
+  "First Day of Week": {
+    "First Day of Week": ""
+  },
   "First Time Setup": {
     "First Time Setup": "首次设置"
   },
@@ -2101,6 +2215,9 @@
   "Follow focus": {
     "Follow focus": "跟随焦点"
   },
+  "Font": {
+    "Font": ""
+  },
   "Font Family": {
     "Font Family": "字体"
   },
@@ -2112,6 +2229,9 @@
   },
   "Font Weight": {
     "Font Weight": "字体粗细"
+  },
+  "Font used on the login screen": {
+    "Font used on the login screen": ""
   },
   "Force HDR": {
     "Force HDR": "强制HDR"
@@ -2165,7 +2285,7 @@
     "Frequency": "频率"
   },
   "Fullscreen": {
-    "Fullscreen": ""
+    "Fullscreen": "全屏"
   },
   "Fullscreen Only": {
     "Fullscreen Only": ""
@@ -2220,6 +2340,30 @@
   },
   "Graphics": {
     "Graphics": "图形"
+  },
+  "Greeter": {
+    "Greeter": ""
+  },
+  "Greeter Appearance": {
+    "Greeter Appearance": ""
+  },
+  "Greeter Behavior": {
+    "Greeter Behavior": ""
+  },
+  "Greeter Status": {
+    "Greeter Status": ""
+  },
+  "Greeter activated. greetd is now enabled.": {
+    "Greeter activated. greetd is now enabled.": ""
+  },
+  "Greeter font": {
+    "Greeter font": ""
+  },
+  "Greeter only — does not affect main clock": {
+    "Greeter only — does not affect main clock": ""
+  },
+  "Greeter only — format for the date on the login screen": {
+    "Greeter only — format for the date on the login screen": ""
   },
   "Grid": {
     "Grid": "网格"
@@ -2276,7 +2420,7 @@
     "Heavy Snow Showers": ""
   },
   "Height": {
-    "Height": ""
+    "Height": "高度"
   },
   "Held": {
     "Held": "已暂停"
@@ -2306,7 +2450,7 @@
     "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": "已隐藏应用不会出现在启动器中。右键应用选择“隐藏应用”以隐藏。"
   },
   "Hide": {
-    "Hide": ""
+    "Hide": "隐藏"
   },
   "Hide 3rd Party": {
     "Hide 3rd Party": ""
@@ -2398,6 +2542,9 @@
   "How often to change wallpaper": {
     "How often to change wallpaper": "壁纸轮换频率"
   },
+  "How the background image is scaled": {
+    "How the background image is scaled": ""
+  },
   "Humidity": {
     "Humidity": "湿度"
   },
@@ -2405,7 +2552,7 @@
     "Hyprland Layout Overrides": "Hyprland布局覆盖"
   },
   "Hyprland Options": {
-    "Hyprland Options": ""
+    "Hyprland Options": "Hyprland 选项"
   },
   "I Understand": {
     "I Understand": "我明白以上内容"
@@ -2494,8 +2641,17 @@
   "Input Volume Slider": {
     "Input Volume Slider": "输入音量滑块"
   },
+  "Install complete. Greeter has been installed.": {
+    "Install complete. Greeter has been installed.": ""
+  },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "从 DMS 插件库安装插件"
+  },
+  "Install the DMS greeter? A terminal will open for sudo authentication.": {
+    "Install the DMS greeter? A terminal will open for sudo authentication.": ""
+  },
+  "Installation and PAM setup: see the ": {
+    "Installation and PAM setup: see the ": ""
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "智能自动隐藏"
@@ -2615,7 +2771,7 @@
     "Offline": "离线"
   },
   "KDE Connect offline status | Phone Connect offline status": {
-    "Offline": ""
+    "Offline": "离线"
   },
   "KDE Connect open SMS app button": {
     "Open App": "打开应用"
@@ -2770,6 +2926,15 @@
   "LED device": {
     "LED device": "LED设备"
   },
+  "Label for printer IP address or hostname input field": {
+    "Host": ""
+  },
+  "Label for printer port number input field": {
+    "Port": ""
+  },
+  "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket": {
+    "Protocol": ""
+  },
   "Large": {
     "Large": "大"
   },
@@ -2779,14 +2944,32 @@
   "Last launched %1": {
     "Last launched %1": "上次启动于 %1"
   },
+  "Last launched %1 day ago": {
+    "Last launched %1 day ago": ""
+  },
   "Last launched %1 day%2 ago": {
     "Last launched %1 day%2 ago": "上次启动于 %1 天 前"
+  },
+  "Last launched %1 days ago": {
+    "Last launched %1 days ago": ""
+  },
+  "Last launched %1 hour ago": {
+    "Last launched %1 hour ago": ""
   },
   "Last launched %1 hour%2 ago": {
     "Last launched %1 hour%2 ago": "上次启动于 %1 小时 前"
   },
+  "Last launched %1 hours ago": {
+    "Last launched %1 hours ago": ""
+  },
+  "Last launched %1 minute ago": {
+    "Last launched %1 minute ago": ""
+  },
   "Last launched %1 minute%2 ago": {
     "Last launched %1 minute%2 ago": "上次启动于 %1 分钟 前"
+  },
+  "Last launched %1 minutes ago": {
+    "Last launched %1 minutes ago": ""
   },
   "Last launched just now": {
     "Last launched just now": "刚刚启动"
@@ -2818,11 +3001,17 @@
   "Layout Overrides": {
     "Layout Overrides": "布局覆盖"
   },
+  "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": {
+    "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": ""
+  },
   "Left": {
     "Left": "左"
   },
   "Left Section": {
     "Left Section": "左侧区域"
+  },
+  "Light Direction": {
+    "Light Direction": ""
   },
   "Light Mode": {
     "Light Mode": "浅色模式"
@@ -2872,6 +3061,12 @@
   "Local": {
     "Local": "本地"
   },
+  "Locale": {
+    "Locale": ""
+  },
+  "Locale Settings": {
+    "Locale Settings": ""
+  },
   "Location": {
     "Location": "位置"
   },
@@ -2910,6 +3105,9 @@
   },
   "Log Out": {
     "Log Out": "注销"
+  },
+  "Login Authentication": {
+    "Login Authentication": ""
   },
   "Long": {
     "Long": "长"
@@ -2979,6 +3177,9 @@
   },
   "Material Colors": {
     "Material Colors": "Material 配色"
+  },
+  "Material inspired shadows and elevation on modals, popouts, and dialogs": {
+    "Material inspired shadows and elevation on modals, popouts, and dialogs": ""
   },
   "Matugen Palette": {
     "Matugen Palette": "Matugen 配色方案"
@@ -3133,6 +3334,9 @@
   "Modal Background": {
     "Modal Background": "模态背景"
   },
+  "Modal Shadows": {
+    "Modal Shadows": ""
+  },
   "Modals": {
     "Modals": ""
   },
@@ -3179,7 +3383,7 @@
     "Mouse pointer size in pixels": "鼠标指针的像素尺寸"
   },
   "Move": {
-    "Move": ""
+    "Move": "移动"
   },
   "Move Widget": {
     "Move Widget": "移动部件"
@@ -3238,6 +3442,9 @@
   "Never": {
     "Never": "从不"
   },
+  "Never used": {
+    "Never used": ""
+  },
   "New": {
     "New": "新建"
   },
@@ -3251,7 +3458,7 @@
     "New Notification": "新通知"
   },
   "New Window Rule": {
-    "New Window Rule": ""
+    "New Window Rule": "新窗口规则"
   },
   "New York, NY": {
     "New York, NY": "纽约，美国纽约州"
@@ -3287,7 +3494,7 @@
     "No Active Players": "没有正在播放的音频"
   },
   "No Anim": {
-    "No Anim": ""
+    "No Anim": "无动画"
   },
   "No Background": {
     "No Background": "无背景底色"
@@ -3419,7 +3626,7 @@
     "No printers found": "未找到打印机"
   },
   "No profiles": {
-    "No profiles": ""
+    "No profiles": "无配置"
   },
   "No recent clipboard entries found": {
     "No recent clipboard entries found": "未找到近期剪切板项目"
@@ -3430,11 +3637,17 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": "无已保存剪切板项目"
   },
+  "No status output.": {
+    "No status output.": ""
+  },
   "No trigger": {
     "No trigger": "无触发器"
   },
   "No variants created. Click Add to create a new monitor widget.": {
     "No variants created. Click Add to create a new monitor widget.": "没有任何变体。点击添加以创建新的显示器小部件。"
+  },
+  "No video found in folder": {
+    "No video found in folder": ""
   },
   "No wallpapers found\n\nClick the folder icon below to browse": {
     "No wallpapers found\n\nClick the folder icon below to browse": ""
@@ -3465,6 +3678,12 @@
   },
   "Not available": {
     "Not available": "不可用"
+  },
+  "Not available — install fprintd and enroll fingerprints.": {
+    "Not available — install fprintd and enroll fingerprints.": ""
+  },
+  "Not available — install pam_u2f and enroll keys.": {
+    "Not available — install pam_u2f and enroll keys.": ""
   },
   "Not connected": {
     "Not connected": "未连接"
@@ -3547,6 +3766,9 @@
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "根据时间或位置调节伽马值。"
   },
+  "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": {
+    "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": ""
+  },
   "Only show windows from the current monitor on each dock": {
     "Only show windows from the current monitor on each dock": "在每个程序坞上仅显示当前显示器上的窗口"
   },
@@ -3583,6 +3805,9 @@
   "Open with...": {
     "Open with...": "打开方式..."
   },
+  "Opening terminal: ": {
+    "Opening terminal: ": ""
+  },
   "Optional description": {
     "Optional description": "可选描述"
   },
@@ -3599,7 +3824,7 @@
     "Other": "其他"
   },
   "Output": {
-    "Output": ""
+    "Output": "输出"
   },
   "Output Area Almost Full": {
     "Output Area Almost Full": "出纸盒即将饱和"
@@ -3637,6 +3862,9 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "为此输出覆盖全局布局设置"
   },
+  "Override the global shadow with per-bar settings": {
+    "Override the global shadow with per-bar settings": ""
+  },
   "Overrides": {
     "Overrides": "覆盖"
   },
@@ -3654,6 +3882,9 @@
   },
   "Pad Hours": {
     "Pad Hours": "摸鱼时间"
+  },
+  "Pad hours (02:00 vs 2:00)": {
+    "Pad hours (02:00 vs 2:00)": ""
   },
   "Padding": {
     "Padding": "内边距"
@@ -3684,6 +3915,9 @@
   },
   "Paste": {
     "Paste": ""
+  },
+  "Path to a video file or folder containing videos": {
+    "Path to a video file or folder containing videos": ""
   },
   "Pattern": {
     "Pattern": "模式"
@@ -3722,21 +3956,21 @@
     "Opening SMS app": ""
   },
   "Phone Connect browse action": {
-    "Opening file browser": ""
+    "Opening file browser": "打开文件资源管理器"
   },
   "Phone Connect daemon hint": {
     "Start KDE Connect or Valent to use this plugin": ""
   },
   "Phone Connect error": {
-    "Failed to accept pairing": "",
-    "Failed to browse device": "",
-    "Failed to launch SMS app": "",
-    "Failed to reject pairing": "",
+    "Failed to accept pairing": "接受配对失败",
+    "Failed to browse device": "无法浏览设备",
+    "Failed to launch SMS app": "无法启动SMS应用",
+    "Failed to reject pairing": "拒绝配对失败",
     "Failed to ring device": "",
-    "Failed to send clipboard": "",
-    "Failed to send file": "",
+    "Failed to send clipboard": "发送剪切板失败",
+    "Failed to send file": "文件发送失败",
     "Failed to send ping": "",
-    "Failed to share": "",
+    "Failed to share": "分享失败",
     "Pairing failed": "",
     "Unpair failed": ""
   },
@@ -3783,6 +4017,9 @@
   "Phone Connect unavailable status": {
     "Unavailable": ""
   },
+  "Pick a different random video each time from the same folder": {
+    "Pick a different random video each time from the same folder": ""
+  },
   "Pictures": {
     "Pictures": ""
   },
@@ -3804,6 +4041,12 @@
   "Place plugins in %1": {
     "Place plugins in %1": "将插件放在%1"
   },
+  "Placeholder text for manual printer address input": {
+    "IP address or hostname": ""
+  },
+  "Play a video when the screen locks.": {
+    "Play a video when the screen locks.": ""
+  },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "有新通知时播放声音"
   },
@@ -3818,6 +4061,9 @@
   },
   "Playback": {
     "Playback": "播放"
+  },
+  "Playback error: ": {
+    "Playback error: ": ""
   },
   "Plugged In": {
     "Plugged In": "连接电源"
@@ -3845,6 +4091,9 @@
   },
   "Pointer": {
     "Pointer": "指示器"
+  },
+  "Popout Shadows": {
+    "Popout Shadows": ""
   },
   "Popouts": {
     "Popouts": ""
@@ -3902,6 +4151,12 @@
   },
   "Power source": {
     "Power source": "电源"
+  },
+  "Pre-fill the last successful username on the greeter": {
+    "Pre-fill the last successful username on the greeter": ""
+  },
+  "Pre-select the last used session on the greeter": {
+    "Pre-select the last used session on the greeter": ""
   },
   "Precip": {
     "Precip": "降水"
@@ -4003,13 +4258,19 @@
     "Profile name": ""
   },
   "Profile not found": {
-    "Profile not found": ""
+    "Profile not found": "未找到配置"
   },
   "Profile saved: %1": {
     "Profile saved: %1": ""
   },
   "Protocol": {
     "Protocol": "协议"
+  },
+  "QtMultimedia is not available": {
+    "QtMultimedia is not available": ""
+  },
+  "QtMultimedia is not available - video screensaver requires qt multimedia services": {
+    "QtMultimedia is not available - video screensaver requires qt multimedia services": ""
   },
   "Quick Access": {
     "Quick Access": ""
@@ -4070,6 +4331,18 @@
   },
   "Reload Plugin": {
     "Reload Plugin": "重载插件"
+  },
+  "Remaining": {
+    "Remaining": ""
+  },
+  "Remaining / Total": {
+    "Remaining / Total": ""
+  },
+  "Remember last session": {
+    "Remember last session": ""
+  },
+  "Remember last user": {
+    "Remember last user": ""
   },
   "Remove": {
     "Remove": "移除"
@@ -4191,6 +4464,12 @@
   "Run DMS Templates": {
     "Run DMS Templates": "运行DMS模板"
   },
+  "Run Sync to apply.": {
+    "Run Sync to apply.": ""
+  },
+  "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": {
+    "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": ""
+  },
   "Run User Templates": {
     "Run User Templates": "运行用户模板"
   },
@@ -4214,6 +4493,9 @@
   },
   "Running apps filter: only show apps from the same monitor": {
     "Current Monitor": ""
+  },
+  "Running greeter sync…": {
+    "Running greeter sync…": ""
   },
   "SDR Brightness": {
     "SDR Brightness": "SDR亮度"
@@ -4371,6 +4653,9 @@
   "Select Launcher Logo": {
     "Select Launcher Logo": "选择启动器Logo"
   },
+  "Select Video or Folder": {
+    "Select Video or Folder": ""
+  },
   "Select a color from the palette or use custom sliders": {
     "Select a color from the palette or use custom sliders": "从调色板中选择颜色，或使用自定义滑块"
   },
@@ -4397,6 +4682,9 @@
   },
   "Select font weight for UI text": {
     "Select font weight for UI text": "选择 UI 文本的字体粗细"
+  },
+  "Select greeter background image": {
+    "Select greeter background image": ""
   },
   "Select monitor to configure wallpaper": {
     "Select monitor to configure wallpaper": "选择要设置壁纸的屏幕"
@@ -4448,6 +4736,27 @@
   },
   "Setup": {
     "Setup": "设置"
+  },
+  "Shadow Color": {
+    "Shadow Color": ""
+  },
+  "Shadow Intensity": {
+    "Shadow Intensity": ""
+  },
+  "Shadow Opacity": {
+    "Shadow Opacity": ""
+  },
+  "Shadow elevation on bars and panels": {
+    "Shadow elevation on bars and panels": ""
+  },
+  "Shadow elevation on modals and dialogs": {
+    "Shadow elevation on modals and dialogs": ""
+  },
+  "Shadow elevation on popouts, OSDs, and dropdowns": {
+    "Shadow elevation on popouts, OSDs, and dropdowns": ""
+  },
+  "Shadows": {
+    "Shadows": ""
   },
   "Share Gamma Control Settings": {
     "Share Gamma Control Settings": "共享伽马控制设置"
@@ -4551,6 +4860,9 @@
   "Show Memory Graph": {
     "Show Memory Graph": "显示内存图表"
   },
+  "Show Memory in GB": {
+    "Show Memory in GB": ""
+  },
   "Show Network": {
     "Show Network": "显示网络"
   },
@@ -4590,6 +4902,9 @@
   "Show Suspend": {
     "Show Suspend": "显示挂起"
   },
+  "Show Swap": {
+    "Show Swap": ""
+  },
   "Show Top Processes": {
     "Show Top Processes": "显示占用多的进程"
   },
@@ -4625,6 +4940,12 @@
   },
   "Show drop shadow on notification popups": {
     "Show drop shadow on notification popups": ""
+  },
+  "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
+    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": ""
+  },
+  "Show in GB": {
+    "Show in GB": ""
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "在Niri概览中打字时显示启动器叠加层。禁用该项以使用其他启动器。"
@@ -4682,6 +5003,9 @@
   },
   "Show password": {
     "Show password": "显示密码"
+  },
+  "Show seconds": {
+    "Show seconds": ""
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "在顶栏和控制中心显示天气信息"
@@ -4812,6 +5136,12 @@
   "Status": {
     "Status": "状态"
   },
+  "Status message when test connection to printer fails": {
+    "Connection failed": ""
+  },
+  "Status message when test connection to printer succeeds": {
+    "Printer reachable": ""
+  },
   "Stopped": {
     "Stopped": "已停止"
   },
@@ -4857,6 +5187,9 @@
   "Switch to power profile": {
     "Switch to power profile": "切换至电源配置"
   },
+  "Sync": {
+    "Sync": ""
+  },
   "Sync Mode with Portal": {
     "Sync Mode with Portal": "同步系统深色模式"
   },
@@ -4866,8 +5199,17 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "在显示器间同步位置"
   },
+  "Sync completed successfully.": {
+    "Sync completed successfully.": ""
+  },
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "随系统设置开启深色模式，以适配全局主题"
+  },
+  "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": {
+    "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": ""
+  },
+  "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
+    "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": ""
   },
   "System": {
     "System": "系统工具"
@@ -4925,6 +5267,15 @@
   },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "终端自定义附加参数"
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": ""
+  },
+  "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete sync there; it will close automatically when done.": ""
+  },
+  "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
+    "Terminal opened. Complete sync authentication there; it will close automatically when done.": ""
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "终端总使用暗色主题"
@@ -5001,11 +5352,17 @@
   "Tiling": {
     "Tiling": "平铺"
   },
+  "Time & Date Locale": {
+    "Time & Date Locale": ""
+  },
   "Time & Weather": {
     "Time & Weather": "时间与天气"
   },
   "Time Format": {
     "Time Format": "时间格式"
+  },
+  "Time format": {
+    "Time format": ""
   },
   "Time remaining: %1": {
     "Time remaining: %1": "剩余时间：%1"
@@ -5046,6 +5403,12 @@
   "Today": {
     "Today": "今日"
   },
+  "Toggle button to manually add a printer by IP or hostname": {
+    "Add by Address": ""
+  },
+  "Toggle button to scan for printers via mDNS/Avahi": {
+    "Discover Devices": ""
+  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "显示/隐藏当前状态栏配置"
   },
@@ -5081,6 +5444,9 @@
   },
   "Top Section": {
     "Top Section": "顶部区域"
+  },
+  "Total": {
+    "Total": ""
   },
   "Total Jobs": {
     "Total Jobs": "总任务数"
@@ -5145,6 +5511,12 @@
   "Typography & Motion": {
     "Typography & Motion": "排版与动画"
   },
+  "U2F mode option: key required after password or fingerprint": {
+    "Second Factor (AND)": ""
+  },
+  "U2F mode option: key works as standalone unlock method": {
+    "Alternative (OR)": ""
+  },
   "Unavailable": {
     "Unavailable": "不可用"
   },
@@ -5157,8 +5529,17 @@
   "Uninstall Plugin": {
     "Uninstall Plugin": "卸载插件"
   },
+  "Uninstall complete. Greeter has been removed.": {
+    "Uninstall complete. Greeter has been removed.": ""
+  },
+  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
+    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": ""
+  },
   "Unknown": {
     "Unknown": "未知"
+  },
+  "Unknown App": {
+    "Unknown App": ""
   },
   "Unknown Artist": {
     "Unknown Artist": ""
@@ -5253,6 +5634,12 @@
   "Use System Theme": {
     "Use System Theme": "使用系统主题"
   },
+  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
+    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": ""
+  },
+  "Use a fixed shadow direction for this bar": {
+    "Use a fixed shadow direction for this bar": ""
+  },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "进行媒体播放时显示动画波形进度条"
   },
@@ -5273,6 +5660,9 @@
   },
   "Use custom window rounding instead of theme radius": {
     "Use custom window rounding instead of theme radius": "使用自定义窗口圆角代替主题半径"
+  },
+  "Use desktop wallpaper": {
+    "Use desktop wallpaper": ""
   },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "使用指纹识别进行锁屏验证（需要录入指纹）"
@@ -5388,6 +5778,12 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "充满活力的调色板，有着俏皮的饱和度。"
   },
+  "Video Path": {
+    "Video Path": ""
+  },
+  "Video Screensaver": {
+    "Video Screensaver": ""
+  },
   "Videos": {
     "Videos": ""
   },
@@ -5426,6 +5822,9 @@
   },
   "Wallpaper Monitor": {
     "Wallpaper Monitor": "壁纸监视器"
+  },
+  "Wallpaper fill mode": {
+    "Wallpaper fill mode": ""
   },
   "Wallpapers": {
     "Wallpapers": "壁纸"
@@ -5633,8 +6032,22 @@
   "author attribution": {
     "by %1": "%1"
   },
+  "bar manual shadow direction": {
+    "Manual Direction": ""
+  },
+  "bar shadow direction source": {
+    "Direction Source": ""
+  },
+  "bar shadow direction source option": {
+    "Inherit Global (Default)": "",
+    "Manual": ""
+  },
+  "bar shadow direction source option | shadow direction option": {
+    "Auto (Bar-aware)": ""
+  },
   "bar shadow settings card": {
-    "Shadow": "阴影"
+    "Shadow": "阴影",
+    "Shadow Override": ""
   },
   "battery status": {
     "Charging": "充电",
@@ -5669,11 +6082,17 @@
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "浏览主题"
   },
+  "button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
   "button color option | color option | primary color | tile color option": {
     "Primary": ""
   },
   "button color option | color option | secondary color | tile color option": {
     "Secondary": ""
+  },
+  "button color option | shadow color option | tile color option": {
+    "Surface Variant": ""
   },
   "button color option | tile color option": {
     "Primary Container": "",
@@ -5819,11 +6238,19 @@
   "files": {
     "files": "文件"
   },
+  "fingerprint not detected status | security key not detected status": {
+    "Not enrolled": ""
+  },
   "generic theme description": {
     "Material Design inspired color themes": "受Material设计启发的色彩主题"
   },
   "gpu section header in system monitor": {
     "GPU Monitoring": "GPU监视"
+  },
+  "greeter action confirmation": {
+    "Activate Greeter": "",
+    "Install Greeter": "",
+    "Uninstall Greeter": ""
   },
   "greeter back button": {
     "Back": "返回"
@@ -5856,7 +6283,9 @@
     "No warnings": "无警告"
   },
   "greeter doctor page error count": {
-    "%1 issue(s) found": "发现%1个问题"
+    "%1 issue found": "",
+    "%1 issue(s) found": "发现%1个问题",
+    "%1 issues found": ""
   },
   "greeter doctor page loading text": {
     "Analyzing configuration...": "配置分析中..."
@@ -5950,6 +6379,15 @@
   "greeter skip button tooltip": {
     "Skip setup": "跳过设置"
   },
+  "greeter status error": {
+    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
+  },
+  "greeter status loading": {
+    "Checking…": ""
+  },
+  "greeter status placeholder": {
+    "Click Refresh to check status.": ""
+  },
   "greeter theme description": {
     "Dynamic colors, presets": "动态颜色与预设"
   },
@@ -6006,6 +6444,13 @@
   },
   "loading indicator": {
     "Loading...": "加载中..."
+  },
+  "lock screen U2F security key mode setting": {
+    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "",
+    "Security key mode": ""
+  },
+  "lock screen U2F security key setting": {
+    "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)": ""
   },
   "lock screen notification mode option": {
     "App Names": "仅应用名",
@@ -6183,6 +6628,9 @@
   "open": {
     "open": "打开"
   },
+  "or run ": {
+    "or run ": ""
+  },
   "outline color": {
     "Outline": "轮廓"
   },
@@ -6249,6 +6697,10 @@
     "Top Left": "顶部左侧",
     "Top Right": "顶部右侧"
   },
+  "screen position option | shadow direction option": {
+    "Top Left": "",
+    "Top Right": ""
+  },
   "secondary color": {
     "Secondary": "次选"
   },
@@ -6262,11 +6714,21 @@
     "Widgets": "部件"
   },
   "shadow color option": {
+    "Default (Black)": "",
     "Surface": "表面",
-    "Text": "文本"
+    "Text": "文本",
+    "Text Color": ""
   },
   "shadow color option | text color": {
     "Text": "文本"
+  },
+  "shadow color option | theme category option": {
+    "Custom": ""
+  },
+  "shadow direction option": {
+    "Bottom": "",
+    "Top": "",
+    "Top (Default)": ""
   },
   "shadow intensity slider": {
     "Intensity": "强度"
@@ -6289,6 +6751,9 @@
     "Hostname": "Hostname",
     "Kernel": "内核",
     "Load Average": "平均负载"
+  },
+  "text color": {
+    "Text": ""
   },
   "theme auto mode tab": {
     "Location": ""

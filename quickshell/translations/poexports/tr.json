@@ -8,6 +8,12 @@
   "%1 adapter(s), none connected": {
     "%1 adapter(s), none connected": "%1 bağdaştırıcı, hiçbiri bağlı değil"
   },
+  "%1 adapter, none connected": {
+    "%1 adapter, none connected": ""
+  },
+  "%1 adapters, none connected": {
+    "%1 adapters, none connected": ""
+  },
   "%1 characters": {
     "%1 characters": "%1 karakter"
   },
@@ -29,8 +35,14 @@
   "%1 disconnected (hidden)": {
     "%1 disconnected (hidden)": ""
   },
+  "%1 display": {
+    "%1 display": ""
+  },
   "%1 display(s)": {
     "%1 display(s)": "%1 ekran"
+  },
+  "%1 displays": {
+    "%1 displays": ""
   },
   "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": {
     "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": ""
@@ -64,6 +76,9 @@
   },
   "+ %1 more": {
     "+ %1 more": ""
+  },
+  "/path/to/videos": {
+    "/path/to/videos": ""
   },
   "0 = square corners": {
     "0 = square corners": "0 = kare köşeler"
@@ -112,6 +127,9 @@
   },
   "24-Hour Format": {
     "24-Hour Format": "24-Saat Biçimi"
+  },
+  "24-hour clock": {
+    "24-hour clock": ""
   },
   "24-hour format": {
     "24-hour format": "24-saat biçimi"
@@ -203,11 +221,17 @@
   "Action": {
     "Action": "Eylem"
   },
+  "Action failed or terminal was closed.": {
+    "Action failed or terminal was closed.": ""
+  },
   "Actions": {
     "Actions": "Eylemler"
   },
   "Activate": {
     "Activate": "Etkinleştir"
+  },
+  "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": ""
   },
   "Activation": {
     "Activation": ""
@@ -571,6 +595,9 @@
   "Backend": {
     "Backend": "Arka Uç"
   },
+  "Background": {
+    "Background": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Arkaplan Opaklığı"
   },
@@ -583,8 +610,14 @@
   "Bar Configurations": {
     "Bar Configurations": "Bar Ayarları"
   },
+  "Bar Shadows": {
+    "Bar Shadows": ""
+  },
   "Bar Transparency": {
     "Bar Transparency": "Bar Opaklığı"
+  },
+  "Base color for shadows (opacity is applied automatically)": {
+    "Base color for shadows (opacity is applied automatically)": ""
   },
   "Base duration for animations (drag to use Custom)": {
     "Base duration for animations (drag to use Custom)": ""
@@ -706,6 +739,12 @@
   "Button Color": {
     "Button Color": ""
   },
+  "Button state while testing printer connection": {
+    "Testing...": ""
+  },
+  "Button to test connection to a printer by IP address": {
+    "Test Connection": ""
+  },
   "CPU": {
     "CPU": "CPU"
   },
@@ -787,6 +826,12 @@
   "Change bar appearance": {
     "Change bar appearance": "Bar görünümünü değiştir"
   },
+  "Change the locale used by the DMS interface.": {
+    "Change the locale used by the DMS interface.": ""
+  },
+  "Change the locale used for date and time formatting, independent of the interface language.": {
+    "Change the locale used for date and time formatting, independent of the interface language.": ""
+  },
   "Channel": {
     "Channel": "Kanal"
   },
@@ -795,6 +840,12 @@
   },
   "Check for system updates": {
     "Check for system updates": "Sistem güncellemelerini kontrol et"
+  },
+  "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
+    "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": ""
+  },
+  "Checking whether sudo authentication is needed…": {
+    "Checking whether sudo authentication is needed…": ""
   },
   "Choose Color": {
     "Choose Color": "Renk Seç"
@@ -813,6 +864,9 @@
   },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": ""
+  },
+  "Choose how this bar resolves shadow direction": {
+    "Choose how this bar resolves shadow direction": ""
   },
   "Choose icon": {
     "Choose icon": "Simge seçin"
@@ -1126,6 +1180,18 @@
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "Tüm açılır pencerelerin, modal pencerelerin ve bunların içerik katmanlarının opaklığını kontrol eder."
   },
+  "Controls shadow cast direction for elevation layers": {
+    "Controls shadow cast direction for elevation layers": ""
+  },
+  "Controls the base blur radius and offset of shadows": {
+    "Controls the base blur radius and offset of shadows": ""
+  },
+  "Controls the transparency of the shadow": {
+    "Controls the transparency of the shadow": ""
+  },
+  "Convenience options for the login screen. Sync to apply.": {
+    "Convenience options for the login screen. Sync to apply.": ""
+  },
   "Cooldown": {
     "Cooldown": "Bekleme"
   },
@@ -1216,6 +1282,9 @@
   "Current Items": {
     "Current Items": "Mevcut Öğeler"
   },
+  "Current Locale": {
+    "Current Locale": ""
+  },
   "Current Period": {
     "Current Period": "Mevcut Periyot"
   },
@@ -1279,6 +1348,12 @@
   "Custom Reboot Command": {
     "Custom Reboot Command": "Özel Yeniden Başlat Komutu"
   },
+  "Custom Shadow Color": {
+    "Custom Shadow Color": ""
+  },
+  "Custom Shadow Override": {
+    "Custom Shadow Override": ""
+  },
   "Custom Suspend Command": {
     "Custom Suspend Command": "Özel Askıya Al Komutu"
   },
@@ -1305,6 +1380,9 @@
   },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "DMS Eklenti Yöneticisi Kullanılamıyor"
+  },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS güncel değil"
@@ -1350,6 +1428,12 @@
   },
   "Date Format": {
     "Date Format": "Tarih Biçimi"
+  },
+  "Date format": {
+    "Date format": ""
+  },
+  "Date format on greeter": {
+    "Date format on greeter": ""
   },
   "Dawn (Astronomical Twilight)": {
     "Dawn (Astronomical Twilight)": "Şafak (Astronomik Alacakaranlık)"
@@ -1410,6 +1494,9 @@
   },
   "Delete profile \"%1\"?": {
     "Delete profile \"%1\"?": ""
+  },
+  "Dependencies & documentation": {
+    "Dependencies & documentation": ""
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Altta yatan görüntüye çok yakın renkler türetir"
@@ -1477,6 +1564,9 @@
   "Disabled": {
     "Disabled": "Devre Dışı"
   },
+  "Disabled.": {
+    "Disabled.": ""
+  },
   "Disabling WiFi...": {
     "Disabling WiFi...": "WiFi kapatılıyor..."
   },
@@ -1497,6 +1587,9 @@
   },
   "Disk Usage": {
     "Disk Usage": "Disk Kullanımı"
+  },
+  "Disk Usage Display": {
+    "Disk Usage Display": ""
   },
   "Disks": {
     "Disks": ""
@@ -1675,6 +1768,9 @@
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Rahatsız Etmeyi Etkinleştir"
   },
+  "Enable FIDO2/U2F hardware security key for lock screen": {
+    "Enable security key authentication": ""
+  },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "GPU Sıcaklığını Etkinleştir"
   },
@@ -1690,17 +1786,29 @@
   "Enable System Sounds": {
     "Enable System Sounds": "Sistem Seslerini Etkinleştir"
   },
+  "Enable Video Screensaver": {
+    "Enable Video Screensaver": ""
+  },
   "Enable Weather": {
     "Enable Weather": "Hava Durumunu Etkinleştir"
   },
   "Enable WiFi": {
     "Enable WiFi": "WiFi Etkinleştir"
   },
+  "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
+    "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": ""
+  },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Kompozitör tarafından hedeflenebilir bulanıklık katmanını etkinleştir (isim alanı: dms:blurwallpaper). Manuel Niri yapılandırması gerektirir."
   },
+  "Enable fingerprint at login": {
+    "Enable fingerprint at login": ""
+  },
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "Parmak izi kimlik doğrulamasını etkinleştir"
+  },
+  "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
+    "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": ""
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "loginctl kilit entegrasyonunu etkinleştir"
@@ -1716,6 +1824,9 @@
   },
   "Enable profile image display on the lock screen window": {
     "Show Profile Image": "Profil Fotoğrafını Göster"
+  },
+  "Enable security key at login": {
+    "Enable security key at login": ""
   },
   "Enable system date display on the lock screen window": {
     "Show System Date": "Sistem Tarihini Göster"
@@ -2044,6 +2155,9 @@
   "Fine-tune animation timing in milliseconds": {
     "Fine-tune animation timing in milliseconds": "Animasyon zamanlamasını milisaniye olarak ince ayarla"
   },
+  "First Day of Week": {
+    "First Day of Week": ""
+  },
   "First Time Setup": {
     "First Time Setup": "İlk Kurulum"
   },
@@ -2101,6 +2215,9 @@
   "Follow focus": {
     "Follow focus": "Odağı takip et"
   },
+  "Font": {
+    "Font": ""
+  },
   "Font Family": {
     "Font Family": "Yazı Tipi Ailesi"
   },
@@ -2112,6 +2229,9 @@
   },
   "Font Weight": {
     "Font Weight": "Yazı Tipi Ağırlığı"
+  },
+  "Font used on the login screen": {
+    "Font used on the login screen": ""
   },
   "Force HDR": {
     "Force HDR": "Zorla HDR"
@@ -2220,6 +2340,30 @@
   },
   "Graphics": {
     "Graphics": "Grafik"
+  },
+  "Greeter": {
+    "Greeter": ""
+  },
+  "Greeter Appearance": {
+    "Greeter Appearance": ""
+  },
+  "Greeter Behavior": {
+    "Greeter Behavior": ""
+  },
+  "Greeter Status": {
+    "Greeter Status": ""
+  },
+  "Greeter activated. greetd is now enabled.": {
+    "Greeter activated. greetd is now enabled.": ""
+  },
+  "Greeter font": {
+    "Greeter font": ""
+  },
+  "Greeter only — does not affect main clock": {
+    "Greeter only — does not affect main clock": ""
+  },
+  "Greeter only — format for the date on the login screen": {
+    "Greeter only — format for the date on the login screen": ""
   },
   "Grid": {
     "Grid": "Izgara"
@@ -2398,6 +2542,9 @@
   "How often to change wallpaper": {
     "How often to change wallpaper": "Duvar kağıdı değiştirme sıklığı"
   },
+  "How the background image is scaled": {
+    "How the background image is scaled": ""
+  },
   "Humidity": {
     "Humidity": "Nem"
   },
@@ -2494,8 +2641,17 @@
   "Input Volume Slider": {
     "Input Volume Slider": "Giriş Ses Seviyesi Kaydırıcı"
   },
+  "Install complete. Greeter has been installed.": {
+    "Install complete. Greeter has been installed.": ""
+  },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "DMS eklenti defterinden eklentiler yükle"
+  },
+  "Install the DMS greeter? A terminal will open for sudo authentication.": {
+    "Install the DMS greeter? A terminal will open for sudo authentication.": ""
+  },
+  "Installation and PAM setup: see the ": {
+    "Installation and PAM setup: see the ": ""
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": ""
@@ -2770,6 +2926,15 @@
   "LED device": {
     "LED device": "LED cihazı"
   },
+  "Label for printer IP address or hostname input field": {
+    "Host": ""
+  },
+  "Label for printer port number input field": {
+    "Port": ""
+  },
+  "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket": {
+    "Protocol": ""
+  },
   "Large": {
     "Large": ""
   },
@@ -2779,14 +2944,32 @@
   "Last launched %1": {
     "Last launched %1": "Son başlatma %1"
   },
+  "Last launched %1 day ago": {
+    "Last launched %1 day ago": ""
+  },
   "Last launched %1 day%2 ago": {
     "Last launched %1 day%2 ago": "Son başlatma %1 gün%2 önce"
+  },
+  "Last launched %1 days ago": {
+    "Last launched %1 days ago": ""
+  },
+  "Last launched %1 hour ago": {
+    "Last launched %1 hour ago": ""
   },
   "Last launched %1 hour%2 ago": {
     "Last launched %1 hour%2 ago": "Son başlatma %1 saat%2 önce"
   },
+  "Last launched %1 hours ago": {
+    "Last launched %1 hours ago": ""
+  },
+  "Last launched %1 minute ago": {
+    "Last launched %1 minute ago": ""
+  },
   "Last launched %1 minute%2 ago": {
     "Last launched %1 minute%2 ago": "Son başlatma %1 dakika%2 önce"
+  },
+  "Last launched %1 minutes ago": {
+    "Last launched %1 minutes ago": ""
   },
   "Last launched just now": {
     "Last launched just now": "Son başlatma şimdi"
@@ -2818,11 +3001,17 @@
   "Layout Overrides": {
     "Layout Overrides": "Düzen geçersiz kılmaları"
   },
+  "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": {
+    "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": ""
+  },
   "Left": {
     "Left": "Sol"
   },
   "Left Section": {
     "Left Section": "Sol Bölüm"
+  },
+  "Light Direction": {
+    "Light Direction": ""
   },
   "Light Mode": {
     "Light Mode": "Aydınlık Modu"
@@ -2872,6 +3061,12 @@
   "Local": {
     "Local": "Yerel"
   },
+  "Locale": {
+    "Locale": ""
+  },
+  "Locale Settings": {
+    "Locale Settings": ""
+  },
   "Location": {
     "Location": "Konum"
   },
@@ -2910,6 +3105,9 @@
   },
   "Log Out": {
     "Log Out": "Çıkış"
+  },
+  "Login Authentication": {
+    "Login Authentication": ""
   },
   "Long": {
     "Long": "Uzun"
@@ -2979,6 +3177,9 @@
   },
   "Material Colors": {
     "Material Colors": "Materyal Renkleri"
+  },
+  "Material inspired shadows and elevation on modals, popouts, and dialogs": {
+    "Material inspired shadows and elevation on modals, popouts, and dialogs": ""
   },
   "Matugen Palette": {
     "Matugen Palette": "Matugen Paleti"
@@ -3133,6 +3334,9 @@
   "Modal Background": {
     "Modal Background": "Modal Arkaplanı"
   },
+  "Modal Shadows": {
+    "Modal Shadows": ""
+  },
   "Modals": {
     "Modals": ""
   },
@@ -3237,6 +3441,9 @@
   },
   "Never": {
     "Never": "Hiçbir Zaman"
+  },
+  "Never used": {
+    "Never used": ""
   },
   "New": {
     "New": "Yeni"
@@ -3430,11 +3637,17 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": ""
   },
+  "No status output.": {
+    "No status output.": ""
+  },
   "No trigger": {
     "No trigger": ""
   },
   "No variants created. Click Add to create a new monitor widget.": {
     "No variants created. Click Add to create a new monitor widget.": "Hiçbir varyant oluşturulmadı. Yeni bir monitör widget'ı oluşturmak için Ekle'ye tıklayın."
+  },
+  "No video found in folder": {
+    "No video found in folder": ""
   },
   "No wallpapers found\n\nClick the folder icon below to browse": {
     "No wallpapers found\n\nClick the folder icon below to browse": ""
@@ -3465,6 +3678,12 @@
   },
   "Not available": {
     "Not available": "Mevcut değil"
+  },
+  "Not available — install fprintd and enroll fingerprints.": {
+    "Not available — install fprintd and enroll fingerprints.": ""
+  },
+  "Not available — install pam_u2f and enroll keys.": {
+    "Not available — install pam_u2f and enroll keys.": ""
   },
   "Not connected": {
     "Not connected": "Bağlı değil"
@@ -3547,6 +3766,9 @@
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Gamayı yalnızca zaman veya konum kurallarına göre ayarlayın."
   },
+  "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": {
+    "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": ""
+  },
   "Only show windows from the current monitor on each dock": {
     "Only show windows from the current monitor on each dock": "Her bir dock'ta yalnızca mevcut monitördeki pencereleri göster"
   },
@@ -3582,6 +3804,9 @@
   },
   "Open with...": {
     "Open with...": "... ile aç"
+  },
+  "Opening terminal: ": {
+    "Opening terminal: ": ""
   },
   "Optional description": {
     "Optional description": "Opsiyonel tanım"
@@ -3637,6 +3862,9 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Bu çıkış için genel düzen ayarlarını geçersiz kıl"
   },
+  "Override the global shadow with per-bar settings": {
+    "Override the global shadow with per-bar settings": ""
+  },
   "Overrides": {
     "Overrides": "Geçersiz Kılınanlar"
   },
@@ -3654,6 +3882,9 @@
   },
   "Pad Hours": {
     "Pad Hours": ""
+  },
+  "Pad hours (02:00 vs 2:00)": {
+    "Pad hours (02:00 vs 2:00)": ""
   },
   "Padding": {
     "Padding": "Dolgu"
@@ -3684,6 +3915,9 @@
   },
   "Paste": {
     "Paste": ""
+  },
+  "Path to a video file or folder containing videos": {
+    "Path to a video file or folder containing videos": ""
   },
   "Pattern": {
     "Pattern": ""
@@ -3783,6 +4017,9 @@
   "Phone Connect unavailable status": {
     "Unavailable": ""
   },
+  "Pick a different random video each time from the same folder": {
+    "Pick a different random video each time from the same folder": ""
+  },
   "Pictures": {
     "Pictures": ""
   },
@@ -3804,6 +4041,12 @@
   "Place plugins in %1": {
     "Place plugins in %1": "Eklentileri %1 konumuna yerleştirin"
   },
+  "Placeholder text for manual printer address input": {
+    "IP address or hostname": ""
+  },
+  "Play a video when the screen locks.": {
+    "Play a video when the screen locks.": ""
+  },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Yeni bildirim geldiğinde ses çal"
   },
@@ -3818,6 +4061,9 @@
   },
   "Playback": {
     "Playback": "Oynatma"
+  },
+  "Playback error: ": {
+    "Playback error: ": ""
   },
   "Plugged In": {
     "Plugged In": "Bağlandı"
@@ -3845,6 +4091,9 @@
   },
   "Pointer": {
     "Pointer": "İşaretçi"
+  },
+  "Popout Shadows": {
+    "Popout Shadows": ""
   },
   "Popouts": {
     "Popouts": ""
@@ -3902,6 +4151,12 @@
   },
   "Power source": {
     "Power source": "Güç kaynağı"
+  },
+  "Pre-fill the last successful username on the greeter": {
+    "Pre-fill the last successful username on the greeter": ""
+  },
+  "Pre-select the last used session on the greeter": {
+    "Pre-select the last used session on the greeter": ""
   },
   "Precip": {
     "Precip": ""
@@ -4011,6 +4266,12 @@
   "Protocol": {
     "Protocol": "Protokol"
   },
+  "QtMultimedia is not available": {
+    "QtMultimedia is not available": ""
+  },
+  "QtMultimedia is not available - video screensaver requires qt multimedia services": {
+    "QtMultimedia is not available - video screensaver requires qt multimedia services": ""
+  },
   "Quick Access": {
     "Quick Access": ""
   },
@@ -4070,6 +4331,18 @@
   },
   "Reload Plugin": {
     "Reload Plugin": "Eklentiyi Yeniden Yükle"
+  },
+  "Remaining": {
+    "Remaining": ""
+  },
+  "Remaining / Total": {
+    "Remaining / Total": ""
+  },
+  "Remember last session": {
+    "Remember last session": ""
+  },
+  "Remember last user": {
+    "Remember last user": ""
   },
   "Remove": {
     "Remove": "Kaldır"
@@ -4191,6 +4464,12 @@
   "Run DMS Templates": {
     "Run DMS Templates": "DMS Şablonlarını Çalıştır"
   },
+  "Run Sync to apply.": {
+    "Run Sync to apply.": ""
+  },
+  "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": {
+    "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": ""
+  },
   "Run User Templates": {
     "Run User Templates": "Kullanıcı Şablonlarını Çalıştır"
   },
@@ -4214,6 +4493,9 @@
   },
   "Running apps filter: only show apps from the same monitor": {
     "Current Monitor": ""
+  },
+  "Running greeter sync…": {
+    "Running greeter sync…": ""
   },
   "SDR Brightness": {
     "SDR Brightness": "SDR Parlaklık"
@@ -4371,6 +4653,9 @@
   "Select Launcher Logo": {
     "Select Launcher Logo": "Başlatıcı Logosu Seç"
   },
+  "Select Video or Folder": {
+    "Select Video or Folder": ""
+  },
   "Select a color from the palette or use custom sliders": {
     "Select a color from the palette or use custom sliders": "Paletten bir renk seç veya özel kaydırıcıları kullan"
   },
@@ -4397,6 +4682,9 @@
   },
   "Select font weight for UI text": {
     "Select font weight for UI text": "Arayüz metni için yazı tipi kalınlığını seç"
+  },
+  "Select greeter background image": {
+    "Select greeter background image": ""
   },
   "Select monitor to configure wallpaper": {
     "Select monitor to configure wallpaper": "Duvar kağıdını ayarlamak için monitör seçin"
@@ -4448,6 +4736,27 @@
   },
   "Setup": {
     "Setup": "Kurulum"
+  },
+  "Shadow Color": {
+    "Shadow Color": ""
+  },
+  "Shadow Intensity": {
+    "Shadow Intensity": ""
+  },
+  "Shadow Opacity": {
+    "Shadow Opacity": ""
+  },
+  "Shadow elevation on bars and panels": {
+    "Shadow elevation on bars and panels": ""
+  },
+  "Shadow elevation on modals and dialogs": {
+    "Shadow elevation on modals and dialogs": ""
+  },
+  "Shadow elevation on popouts, OSDs, and dropdowns": {
+    "Shadow elevation on popouts, OSDs, and dropdowns": ""
+  },
+  "Shadows": {
+    "Shadows": ""
   },
   "Share Gamma Control Settings": {
     "Share Gamma Control Settings": ""
@@ -4551,6 +4860,9 @@
   "Show Memory Graph": {
     "Show Memory Graph": "Bellek Grafiğini Göster"
   },
+  "Show Memory in GB": {
+    "Show Memory in GB": ""
+  },
   "Show Network": {
     "Show Network": "Ağı Göster"
   },
@@ -4590,6 +4902,9 @@
   "Show Suspend": {
     "Show Suspend": "Askıya Alı Göster"
   },
+  "Show Swap": {
+    "Show Swap": ""
+  },
   "Show Top Processes": {
     "Show Top Processes": "En Üst İşlemleri Göster"
   },
@@ -4625,6 +4940,12 @@
   },
   "Show drop shadow on notification popups": {
     "Show drop shadow on notification popups": ""
+  },
+  "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
+    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": ""
+  },
+  "Show in GB": {
+    "Show in GB": ""
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Niri genel görünümde yazarken başlatıcı katmanını göster. Başka bir başlatıcı kullanmak için devre dışı bırakın."
@@ -4682,6 +5003,9 @@
   },
   "Show password": {
     "Show password": "Parolayı göster"
+  },
+  "Show seconds": {
+    "Show seconds": ""
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Üst çubuk ve kontrol merkezinde hava durumu bilgisini göster"
@@ -4812,6 +5136,12 @@
   "Status": {
     "Status": "Durum"
   },
+  "Status message when test connection to printer fails": {
+    "Connection failed": ""
+  },
+  "Status message when test connection to printer succeeds": {
+    "Printer reachable": ""
+  },
   "Stopped": {
     "Stopped": "Durduruldu"
   },
@@ -4857,6 +5187,9 @@
   "Switch to power profile": {
     "Switch to power profile": "Güç profiline geç"
   },
+  "Sync": {
+    "Sync": ""
+  },
   "Sync Mode with Portal": {
     "Sync Mode with Portal": "Modu Portal ile Eşitle"
   },
@@ -4866,8 +5199,17 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": ""
   },
+  "Sync completed successfully.": {
+    "Sync completed successfully.": ""
+  },
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "Sistem genelindeki tema ipuçları için karanlık modu ayar portalları ile senkronize et"
+  },
+  "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": {
+    "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": ""
+  },
+  "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
+    "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": ""
   },
   "System": {
     "System": "Sistem"
@@ -4925,6 +5267,15 @@
   },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Terminal özel ek parametreleri"
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": ""
+  },
+  "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete sync there; it will close automatically when done.": ""
+  },
+  "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
+    "Terminal opened. Complete sync authentication there; it will close automatically when done.": ""
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "Terminaller - Her zaman Karanlı Tema kullan"
@@ -5001,11 +5352,17 @@
   "Tiling": {
     "Tiling": "Döşeme"
   },
+  "Time & Date Locale": {
+    "Time & Date Locale": ""
+  },
   "Time & Weather": {
     "Time & Weather": "Zaman & Hava Durumu"
   },
   "Time Format": {
     "Time Format": "Zaman Biçimi"
+  },
+  "Time format": {
+    "Time format": ""
   },
   "Time remaining: %1": {
     "Time remaining: %1": "Kalan zaman: %1"
@@ -5046,6 +5403,12 @@
   "Today": {
     "Today": "Bugün"
   },
+  "Toggle button to manually add a printer by IP or hostname": {
+    "Add by Address": ""
+  },
+  "Toggle button to scan for printers via mDNS/Avahi": {
+    "Discover Devices": ""
+  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Bu bar yapılandırmasının görünürlüğünü değiştir"
   },
@@ -5081,6 +5444,9 @@
   },
   "Top Section": {
     "Top Section": "Üst Bölüm"
+  },
+  "Total": {
+    "Total": ""
   },
   "Total Jobs": {
     "Total Jobs": "Toplam İşler"
@@ -5145,6 +5511,12 @@
   "Typography & Motion": {
     "Typography & Motion": "Tipografi & Hareket"
   },
+  "U2F mode option: key required after password or fingerprint": {
+    "Second Factor (AND)": ""
+  },
+  "U2F mode option: key works as standalone unlock method": {
+    "Alternative (OR)": ""
+  },
   "Unavailable": {
     "Unavailable": "Mevcut Değil"
   },
@@ -5157,8 +5529,17 @@
   "Uninstall Plugin": {
     "Uninstall Plugin": "Eklentiyi Kaldır"
   },
+  "Uninstall complete. Greeter has been removed.": {
+    "Uninstall complete. Greeter has been removed.": ""
+  },
+  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
+    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": ""
+  },
   "Unknown": {
     "Unknown": "Bilinmeyen"
+  },
+  "Unknown App": {
+    "Unknown App": ""
   },
   "Unknown Artist": {
     "Unknown Artist": ""
@@ -5253,6 +5634,12 @@
   "Use System Theme": {
     "Use System Theme": "Sistem Temasını Kullan"
   },
+  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
+    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": ""
+  },
+  "Use a fixed shadow direction for this bar": {
+    "Use a fixed shadow direction for this bar": ""
+  },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Medya oynatımı için animasyonlu dalga ilerleme çubukları kullanın"
   },
@@ -5273,6 +5660,9 @@
   },
   "Use custom window rounding instead of theme radius": {
     "Use custom window rounding instead of theme radius": ""
+  },
+  "Use desktop wallpaper": {
+    "Use desktop wallpaper": ""
   },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "Kilit ekranı doğrulaması için parmak izi okuyucuyu kullan (kayıtlı parmak izleri gereklidir)"
@@ -5388,6 +5778,12 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Oynak doygunluğa sahip canlı palet"
   },
+  "Video Path": {
+    "Video Path": ""
+  },
+  "Video Screensaver": {
+    "Video Screensaver": ""
+  },
   "Videos": {
     "Videos": ""
   },
@@ -5426,6 +5822,9 @@
   },
   "Wallpaper Monitor": {
     "Wallpaper Monitor": "Duvar Kağıdı Monitörü"
+  },
+  "Wallpaper fill mode": {
+    "Wallpaper fill mode": ""
   },
   "Wallpapers": {
     "Wallpapers": "Duvar Kağıtları"
@@ -5633,8 +6032,22 @@
   "author attribution": {
     "by %1": "%1 tarafından"
   },
+  "bar manual shadow direction": {
+    "Manual Direction": ""
+  },
+  "bar shadow direction source": {
+    "Direction Source": ""
+  },
+  "bar shadow direction source option": {
+    "Inherit Global (Default)": "",
+    "Manual": ""
+  },
+  "bar shadow direction source option | shadow direction option": {
+    "Auto (Bar-aware)": ""
+  },
   "bar shadow settings card": {
-    "Shadow": ""
+    "Shadow": "",
+    "Shadow Override": ""
   },
   "battery status": {
     "Charging": "",
@@ -5669,11 +6082,17 @@
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "Temalara Göz At"
   },
+  "button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
   "button color option | color option | primary color | tile color option": {
     "Primary": ""
   },
   "button color option | color option | secondary color | tile color option": {
     "Secondary": ""
+  },
+  "button color option | shadow color option | tile color option": {
+    "Surface Variant": ""
   },
   "button color option | tile color option": {
     "Primary Container": "",
@@ -5819,11 +6238,19 @@
   "files": {
     "files": "dosyalar"
   },
+  "fingerprint not detected status | security key not detected status": {
+    "Not enrolled": ""
+  },
   "generic theme description": {
     "Material Design inspired color themes": "Malzeme Tasarımı'ndan ilham alan renk temaları"
   },
   "gpu section header in system monitor": {
     "GPU Monitoring": ""
+  },
+  "greeter action confirmation": {
+    "Activate Greeter": "",
+    "Install Greeter": "",
+    "Uninstall Greeter": ""
   },
   "greeter back button": {
     "Back": ""
@@ -5856,7 +6283,9 @@
     "No warnings": "Uyarı yok"
   },
   "greeter doctor page error count": {
-    "%1 issue(s) found": ""
+    "%1 issue found": "",
+    "%1 issue(s) found": "",
+    "%1 issues found": ""
   },
   "greeter doctor page loading text": {
     "Analyzing configuration...": ""
@@ -5950,6 +6379,15 @@
   "greeter skip button tooltip": {
     "Skip setup": ""
   },
+  "greeter status error": {
+    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
+  },
+  "greeter status loading": {
+    "Checking…": ""
+  },
+  "greeter status placeholder": {
+    "Click Refresh to check status.": ""
+  },
   "greeter theme description": {
     "Dynamic colors, presets": ""
   },
@@ -6006,6 +6444,13 @@
   },
   "loading indicator": {
     "Loading...": "Yükleniyor..."
+  },
+  "lock screen U2F security key mode setting": {
+    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "",
+    "Security key mode": ""
+  },
+  "lock screen U2F security key setting": {
+    "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)": ""
   },
   "lock screen notification mode option": {
     "App Names": "",
@@ -6183,6 +6628,9 @@
   "open": {
     "open": ""
   },
+  "or run ": {
+    "or run ": ""
+  },
   "outline color": {
     "Outline": ""
   },
@@ -6249,6 +6697,10 @@
     "Top Left": "",
     "Top Right": ""
   },
+  "screen position option | shadow direction option": {
+    "Top Left": "",
+    "Top Right": ""
+  },
   "secondary color": {
     "Secondary": ""
   },
@@ -6262,11 +6714,21 @@
     "Widgets": "Widgetlar"
   },
   "shadow color option": {
+    "Default (Black)": "",
     "Surface": "",
-    "Text": ""
+    "Text": "",
+    "Text Color": ""
   },
   "shadow color option | text color": {
     "Text": ""
+  },
+  "shadow color option | theme category option": {
+    "Custom": ""
+  },
+  "shadow direction option": {
+    "Bottom": "",
+    "Top": "",
+    "Top (Default)": ""
   },
   "shadow intensity slider": {
     "Intensity": ""
@@ -6289,6 +6751,9 @@
     "Hostname": "",
     "Kernel": "",
     "Load Average": ""
+  },
+  "text color": {
+    "Text": ""
   },
   "theme auto mode tab": {
     "Location": ""

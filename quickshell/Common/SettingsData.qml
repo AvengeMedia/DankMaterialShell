@@ -550,6 +550,7 @@ Singleton {
     property bool notificationHistorySaveNormal: true
     property bool notificationHistorySaveCritical: true
     property var notificationRules: []
+    property bool notificationFocusedMonitor: false
 
     property bool osdAlwaysShowValue: false
     property int osdPosition: SettingsData.Position.BottomCenter
