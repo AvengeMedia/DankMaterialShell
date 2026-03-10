@@ -7,14 +7,14 @@
     "comment": ""
   },
   {
-    "term": "%1 DMS bind(s) may be overridden by config binds that come after the include.",
+    "term": "%1 adapter, none connected",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "%1 adapter(s), none connected",
+    "term": "%1 adapters, none connected",
     "translation": "",
     "context": "",
     "reference": "",
@@ -22,13 +22,6 @@
   },
   {
     "term": "%1 characters",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "%1 class(es)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -63,7 +56,14 @@
     "comment": ""
   },
   {
-    "term": "%1 display(s)",
+    "term": "%1 display",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "%1 displays",
     "translation": "",
     "context": "",
     "reference": "",
@@ -91,28 +91,21 @@
     "comment": ""
   },
   {
-    "term": "%1 issue(s) found",
+    "term": "%1 issue found",
     "translation": "",
     "context": "greeter doctor page error count",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "%1 job(s)",
+    "term": "%1 issues found",
     "translation": "",
-    "context": "",
+    "context": "greeter doctor page error count",
     "reference": "",
     "comment": ""
   },
   {
     "term": "%1 notifications",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "%1 printer(s)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -140,6 +133,13 @@
     "comment": ""
   },
   {
+    "term": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
+    "translation": "",
+    "context": "lock screen U2F security key mode setting",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "(Default)",
     "translation": "",
     "context": "default monitor label suffix",
@@ -155,6 +155,13 @@
   },
   {
     "term": "+ %1 more",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "/path/to/videos",
     "translation": "",
     "context": "",
     "reference": "",
@@ -316,6 +323,13 @@
   },
   {
     "term": "24-Hour Format",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "24-hour clock",
     "translation": "",
     "context": "",
     "reference": "",
@@ -623,6 +637,13 @@
     "comment": ""
   },
   {
+    "term": "Action failed or terminal was closed.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Actions",
     "translation": "",
     "context": "",
@@ -631,6 +652,20 @@
   },
   {
     "term": "Activate",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Activate Greeter",
+    "translation": "",
+    "context": "greeter action confirmation",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -850,6 +885,13 @@
     "term": "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Alternative (OR)",
+    "translation": "",
+    "context": "U2F mode option: key works as standalone unlock method",
     "reference": "",
     "comment": ""
   },
@@ -1260,6 +1302,13 @@
     "comment": ""
   },
   {
+    "term": "Auto (Bar-aware)",
+    "translation": "",
+    "context": "bar shadow direction source option | shadow direction option",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Auto (Wide)",
     "translation": "",
     "context": "",
@@ -1491,6 +1540,13 @@
     "comment": ""
   },
   {
+    "term": "Background",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Background Opacity",
     "translation": "",
     "context": "",
@@ -1540,7 +1596,21 @@
     "comment": ""
   },
   {
+    "term": "Bar Shadows",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Bar Transparency",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Base color for shadows (opacity is applied automatically)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1745,7 +1815,7 @@
   {
     "term": "Bottom",
     "translation": "",
-    "context": "",
+    "context": "shadow direction option",
     "reference": "",
     "comment": ""
   },
@@ -2002,13 +2072,6 @@
     "comment": ""
   },
   {
-    "term": "Caps Lock is on",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Center Section",
     "translation": "",
     "context": "",
@@ -2065,6 +2128,13 @@
     "comment": ""
   },
   {
+    "term": "Change the locale used for date and time formatting, independent of the interface language.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Channel",
     "translation": "",
     "context": "",
@@ -2082,6 +2152,27 @@
     "term": "Check for system updates",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Checking whether sudo authentication is needed…",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Checking…",
+    "translation": "",
+    "context": "greeter status loading",
     "reference": "",
     "comment": ""
   },
@@ -2143,6 +2234,13 @@
   },
   {
     "term": "Choose how the weather widget is displayed",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose how this bar resolves shadow direction",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2313,6 +2411,13 @@
     "term": "Click Import to add a .ovpn or .conf",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Click Refresh to check status.",
+    "translation": "",
+    "context": "greeter status placeholder",
     "reference": "",
     "comment": ""
   },
@@ -2940,6 +3045,34 @@
     "comment": ""
   },
   {
+    "term": "Controls shadow cast direction for elevation layers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls the base blur radius and offset of shadows",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls the transparency of the shadow",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Convenience options for the login screen. Sync to apply.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Cooldown",
     "translation": "",
     "context": "",
@@ -3250,7 +3383,7 @@
   {
     "term": "Custom",
     "translation": "",
-    "context": "theme category option",
+    "context": "shadow color option | theme category option",
     "reference": "",
     "comment": ""
   },
@@ -3319,6 +3452,20 @@
   },
   {
     "term": "Custom Reboot Command",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Custom Shadow Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Custom Shadow Override",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3405,6 +3552,13 @@
     "term": "DMS Shortcuts",
     "translation": "",
     "context": "greeter keybinds section header",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -3514,6 +3668,20 @@
     "comment": ""
   },
   {
+    "term": "Date format",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Date format on greeter",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Dawn (Astronomical Twilight)",
     "translation": "",
     "context": "",
@@ -3573,6 +3741,13 @@
     "term": "Default",
     "translation": "",
     "context": "notification rule action option | notification rule urgency option | widget style option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Default (Black)",
+    "translation": "",
+    "context": "shadow color option",
     "reference": "",
     "comment": ""
   },
@@ -3662,6 +3837,13 @@
   },
   {
     "term": "Delete profile \"%1\"?",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dependencies & documentation",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3780,6 +3962,13 @@
     "comment": ""
   },
   {
+    "term": "Direction Source",
+    "translation": "",
+    "context": "bar shadow direction source",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Disable Autoconnect",
     "translation": "",
     "context": "",
@@ -3811,6 +4000,13 @@
     "term": "Disabled",
     "translation": "",
     "context": "bluetooth status | lock screen notification mode option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Disabled.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -4368,6 +4564,13 @@
     "comment": ""
   },
   {
+    "term": "Enable Video Screensaver",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enable Weather",
     "translation": "",
     "context": "",
@@ -4382,7 +4585,21 @@
     "comment": ""
   },
   {
+    "term": "Enable a custom override below to set per-bar shadow intensity, opacity, and color.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enable fingerprint at login",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4396,9 +4613,30 @@
     "comment": ""
   },
   {
+    "term": "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enable loginctl lock integration",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enable security key at login",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enable security key authentication",
+    "translation": "",
+    "context": "Enable FIDO2/U2F hardware security key for lock screen",
     "reference": "",
     "comment": ""
   },
@@ -5019,6 +5257,13 @@
     "comment": ""
   },
   {
+    "term": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
+    "translation": "",
+    "context": "greeter status error",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to save audio config",
     "translation": "",
     "context": "",
@@ -5292,6 +5537,13 @@
     "comment": ""
   },
   {
+    "term": "First Day of Week",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "First Time Setup",
     "translation": "",
     "context": "",
@@ -5432,6 +5684,13 @@
     "comment": ""
   },
   {
+    "term": "Font",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Font Family",
     "translation": "",
     "context": "",
@@ -5454,6 +5713,13 @@
   },
   {
     "term": "Font Weight",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Font used on the login screen",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5740,13 +6006,6 @@
     "comment": ""
   },
   {
-    "term": "Got It",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Goth Corner Radius",
     "translation": "",
     "context": "",
@@ -5783,6 +6042,62 @@
   },
   {
     "term": "Graphics",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter Appearance",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter Behavior",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter Status",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter activated. greetd is now enabled.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter font",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter only — does not affect main clock",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Greeter only — format for the date on the login screen",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6237,6 +6552,13 @@
     "comment": ""
   },
   {
+    "term": "How the background image is scaled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Humidity",
     "translation": "",
     "context": "",
@@ -6468,6 +6790,13 @@
     "comment": ""
   },
   {
+    "term": "Inherit Global (Default)",
+    "translation": "",
+    "context": "bar shadow direction source option",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Inhibitable",
     "translation": "",
     "context": "",
@@ -6496,6 +6825,13 @@
     "comment": ""
   },
   {
+    "term": "Install Greeter",
+    "translation": "",
+    "context": "greeter action confirmation",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Install Plugin",
     "translation": "",
     "context": "plugin installation dialog title",
@@ -6513,6 +6849,13 @@
     "term": "Install color themes from the DMS theme registry",
     "translation": "",
     "context": "theme browser description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Install complete. Greeter has been installed.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -6545,9 +6888,23 @@
     "comment": ""
   },
   {
+    "term": "Install the DMS greeter? A terminal will open for sudo authentication.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Install theme '%1' from the DMS registry?",
     "translation": "",
     "context": "theme installation confirmation",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Installation and PAM setup: see the ",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -6790,21 +7147,42 @@
     "comment": ""
   },
   {
-    "term": "Last launched %1 day%2 ago",
+    "term": "Last launched %1 day ago",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Last launched %1 hour%2 ago",
+    "term": "Last launched %1 days ago",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Last launched %1 minute%2 ago",
+    "term": "Last launched %1 hour ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Last launched %1 hours ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Last launched %1 minute ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Last launched %1 minutes ago",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6881,6 +7259,13 @@
     "comment": ""
   },
   {
+    "term": "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Left",
     "translation": "",
     "context": "",
@@ -6896,6 +7281,13 @@
   },
   {
     "term": "Left Section",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Light Direction",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7112,6 +7504,13 @@
     "comment": ""
   },
   {
+    "term": "Login Authentication",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Long",
     "translation": "",
     "context": "",
@@ -7196,9 +7595,23 @@
     "comment": ""
   },
   {
+    "term": "Manual",
+    "translation": "",
+    "context": "bar shadow direction source option",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Manual Coordinates",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Manual Direction",
+    "translation": "",
+    "context": "bar manual shadow direction",
     "reference": "",
     "comment": ""
   },
@@ -7290,6 +7703,13 @@
     "term": "Material colors generated from wallpaper",
     "translation": "",
     "context": "dynamic theme description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Material inspired shadows and elevation on modals, popouts, and dialogs",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -7693,6 +8113,13 @@
     "comment": ""
   },
   {
+    "term": "Modal Shadows",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Modals",
     "translation": "",
     "context": "",
@@ -7981,6 +8408,13 @@
   },
   {
     "term": "Never",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Never used",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8568,6 +9002,13 @@
     "comment": ""
   },
   {
+    "term": "No status output.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No themes found",
     "translation": "",
     "context": "empty theme list",
@@ -8583,6 +9024,13 @@
   },
   {
     "term": "No trigger",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No video found in folder",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8673,6 +9121,20 @@
     "comment": ""
   },
   {
+    "term": "Not available — install fprintd and enroll fingerprints.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Not available — install pam_u2f and enroll keys.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Not connected",
     "translation": "",
     "context": "network status",
@@ -8683,6 +9145,13 @@
     "term": "Not detected",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Not enrolled",
+    "translation": "",
+    "context": "fingerprint not detected status | security key not detected status",
     "reference": "",
     "comment": ""
   },
@@ -8925,6 +9394,13 @@
     "comment": ""
   },
   {
+    "term": "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Only show windows from the current monitor on each dock",
     "translation": "",
     "context": "",
@@ -9047,6 +9523,13 @@
     "term": "Opening files",
     "translation": "",
     "context": "KDE Connect browse action",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Opening terminal: ",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -9198,6 +9681,13 @@
     "comment": ""
   },
   {
+    "term": "Override the global shadow with per-bar settings",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Overrides",
     "translation": "",
     "context": "",
@@ -9241,6 +9731,13 @@
   },
   {
     "term": "Pad Hours",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Pad hours (02:00 vs 2:00)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9339,6 +9836,13 @@
   },
   {
     "term": "Paste",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Path to a video file or folder containing videos",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9457,6 +9961,13 @@
     "comment": ""
   },
   {
+    "term": "Pick a different random video each time from the same folder",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Pictures",
     "translation": "",
     "context": "",
@@ -9534,6 +10045,13 @@
     "comment": ""
   },
   {
+    "term": "Play a video when the screen locks.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Play sound when new notification arrives",
     "translation": "",
     "context": "",
@@ -9563,6 +10081,13 @@
   },
   {
     "term": "Playback",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Playback error: ",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9633,6 +10158,13 @@
   },
   {
     "term": "Pointer",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Popout Shadows",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9814,6 +10346,20 @@
     "comment": ""
   },
   {
+    "term": "Pre-fill the last successful username on the greeter",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Pre-select the last used session on the greeter",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Precip",
     "translation": "",
     "context": "",
@@ -9893,7 +10439,7 @@
   {
     "term": "Primary",
     "translation": "",
-    "context": "button color option | color option | primary color | tile color option",
+    "context": "button color option | color option | primary color | shadow color option | tile color option",
     "reference": "",
     "comment": ""
   },
@@ -10096,6 +10642,20 @@
   {
     "term": "Protocol",
     "translation": "",
+    "context": "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "QtMultimedia is not available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "QtMultimedia is not available - video screensaver requires qt multimedia services",
+    "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
@@ -10186,20 +10746,6 @@
   },
   {
     "term": "Rate",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Read Full Release Notes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Read Full Release Notes",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10305,6 +10851,20 @@
   },
   {
     "term": "Remaining / Total",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Remember last session",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Remember last user",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10654,6 +11214,20 @@
     "comment": ""
   },
   {
+    "term": "Run Sync to apply.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Run User Templates",
     "translation": "",
     "context": "",
@@ -10683,6 +11257,13 @@
   },
   {
     "term": "Running Apps Settings",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Running greeter sync…",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11018,6 +11599,13 @@
     "comment": ""
   },
   {
+    "term": "Second Factor (AND)",
+    "translation": "",
+    "context": "U2F mode option: key required after password or fingerprint",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Secondary",
     "translation": "",
     "context": "button color option | color option | secondary color | tile color option",
@@ -11042,6 +11630,13 @@
     "term": "Security & privacy",
     "translation": "",
     "context": "greeter feature card description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Security key mode",
+    "translation": "",
+    "context": "lock screen U2F security key mode setting",
     "reference": "",
     "comment": ""
   },
@@ -11098,6 +11693,13 @@
     "term": "Select Profile Image",
     "translation": "",
     "context": "profile image file browser title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select Video or Folder",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -11180,6 +11782,13 @@
   },
   {
     "term": "Select font weight for UI text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select greeter background image",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11382,9 +11991,58 @@
     "comment": ""
   },
   {
-    "term": "Shadow",
+    "term": "Shadow Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shadow Intensity",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shadow Opacity",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shadow Override",
     "translation": "",
     "context": "bar shadow settings card",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shadow elevation on bars and panels",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shadow elevation on modals and dialogs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shadow elevation on popouts, OSDs, and dropdowns",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shadows",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -11900,7 +12558,7 @@
     "comment": ""
   },
   {
-    "term": "Show drop shadow on notification popups",
+    "term": "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12027,6 +12685,13 @@
   },
   {
     "term": "Show on-screen display when volume changes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show seconds",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12427,7 +13092,7 @@
   {
     "term": "Surface Variant",
     "translation": "",
-    "context": "button color option | tile color option",
+    "context": "button color option | shadow color option | tile color option",
     "reference": "",
     "comment": ""
   },
@@ -12474,6 +13139,13 @@
     "comment": ""
   },
   {
+    "term": "Sync",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Sync Mode with Portal",
     "translation": "",
     "context": "",
@@ -12495,7 +13167,28 @@
     "comment": ""
   },
   {
+    "term": "Sync completed successfully.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Sync dark mode with settings portals for system-wide theme hints",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12642,6 +13335,27 @@
     "comment": ""
   },
   {
+    "term": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Terminal fallback opened. Complete sync there; it will close automatically when done.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Terminal opened. Complete sync authentication there; it will close automatically when done.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Terminals - Always use Dark Theme",
     "translation": "",
     "context": "",
@@ -12679,7 +13393,14 @@
   {
     "term": "Text",
     "translation": "",
-    "context": "shadow color option | text color",
+    "context": "text color",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Text Color",
+    "translation": "",
+    "context": "shadow color option",
     "reference": "",
     "comment": ""
   },
@@ -12873,6 +13594,13 @@
     "comment": ""
   },
   {
+    "term": "Time & Date Locale",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Time & Weather",
     "translation": "",
     "context": "",
@@ -12881,6 +13609,13 @@
   },
   {
     "term": "Time Format",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Time format",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13029,7 +13764,14 @@
   {
     "term": "Top",
     "translation": "",
-    "context": "",
+    "context": "shadow direction option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Top (Default)",
+    "translation": "",
+    "context": "shadow direction option",
     "reference": "",
     "comment": ""
   },
@@ -13050,7 +13792,7 @@
   {
     "term": "Top Left",
     "translation": "",
-    "context": "screen position option",
+    "context": "screen position option | shadow direction option",
     "reference": "",
     "comment": ""
   },
@@ -13064,7 +13806,7 @@
   {
     "term": "Top Right",
     "translation": "",
-    "context": "screen position option",
+    "context": "screen position option | shadow direction option",
     "reference": "",
     "comment": ""
   },
@@ -13258,7 +14000,21 @@
     "comment": ""
   },
   {
+    "term": "Uninstall Greeter",
+    "translation": "",
+    "context": "greeter action confirmation",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Uninstall Plugin",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Uninstall complete. Greeter has been removed.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13268,6 +14024,13 @@
     "term": "Uninstall failed: %1",
     "translation": "",
     "context": "uninstallation error",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -13289,6 +14052,13 @@
     "term": "Unknown",
     "translation": "",
     "context": "KDE Connect unknown device status | battery status | power profile option | unknown author | widget status",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Unknown App",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -13538,6 +14308,27 @@
     "comment": ""
   },
   {
+    "term": "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)",
+    "translation": "",
+    "context": "lock screen U2F security key setting",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use a fixed shadow direction for this bar",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
     "translation": "",
     "context": "wallpaper settings disable description",
@@ -13588,6 +14379,13 @@
   },
   {
     "term": "Use custom window rounding instead of theme radius",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use desktop wallpaper",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13839,6 +14637,20 @@
     "comment": ""
   },
   {
+    "term": "Video Path",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Video Screensaver",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Videos",
     "translation": "",
     "context": "",
@@ -13937,6 +14749,13 @@
     "comment": ""
   },
   {
+    "term": "Wallpaper fill mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Wallpaper processing failed",
     "translation": "",
     "context": "wallpaper processing error",
@@ -14010,13 +14829,6 @@
     "term": "Welcome to DankMaterialShell",
     "translation": "",
     "context": "greeter welcome page title",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "What's New",
-    "translation": "",
-    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -14672,6 +15484,13 @@
     "comment": ""
   },
   {
+    "term": "or run ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "procs",
     "translation": "",
     "context": "short for processes",
@@ -14813,13 +15632,6 @@
   },
   {
     "term": "• yyyy - Year (2024)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text",
     "translation": "",
     "context": "",
     "reference": "",
