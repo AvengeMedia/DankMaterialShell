@@ -10,11 +10,28 @@ repo_root="$(
     cd -- "${script_dir}/../.." && pwd
 )"
 quickshell_dir="${repo_root}/quickshell"
-qmllint_bin="${QMLLINT:-qmllint}"
 qmlls_config="${quickshell_dir}/.qmlls.ini"
 
-if ! command -v -- "${qmllint_bin}" >/dev/null 2>&1; then
-    printf 'error: qmllint not found in PATH (override with QMLLINT=/path/to/qmllint)\n' >&2
+# Resolve qmllint: honour QMLLINT, then try qmllint6, then the common Qt 6
+# install path, and finally bare qmllint.  We need the Qt 6 build (>= 6.x)
+# because older Qt 5 qmllint doesn't understand --ignore-settings / -W.
+resolve_qmllint() {
+    if [[ -n "${QMLLINT:-}" ]]; then
+        printf '%s\n' "${QMLLINT}"
+        return
+    fi
+    local candidate
+    for candidate in qmllint6 /usr/lib/qt6/bin/qmllint qmllint; do
+        if command -v -- "${candidate}" >/dev/null 2>&1; then
+            printf '%s\n' "${candidate}"
+            return
+        fi
+    done
+    return 1
+}
+
+if ! qmllint_bin="$(resolve_qmllint)"; then
+    printf 'error: qmllint (Qt 6) not found in PATH (override with QMLLINT=/path/to/qmllint)\n' >&2
     exit 127
 fi
 
