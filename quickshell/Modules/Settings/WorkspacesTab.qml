@@ -126,6 +126,16 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "workspaceActiveAppHighlightEnabled"
+                    tags: ["workspace", "apps", "icons", "highlight", "active", "focused"]
+                    text: I18n.tr("Highlight Active Workspace App")
+                    description: I18n.tr("Highlight the currently focused app inside workspace indicators")
+                    checked: SettingsData.workspaceActiveAppHighlightEnabled
+                    visible: SettingsData.showWorkspaceApps
+                    onToggled: checked => SettingsData.set("workspaceActiveAppHighlightEnabled", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "workspaceFollowFocus"
                     tags: ["workspace", "focus", "follow", "monitor"]
                     text: I18n.tr("Follow Monitor Focus")

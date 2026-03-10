@@ -1470,8 +1470,9 @@ Item {
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
-                                            readonly property color appBorderColor: modelData.active ? focusedBorderColor : Theme.primarySelected
-                                            readonly property color appGlyphColor: modelData.active ? focusedBorderColor : Theme.primary
+                                            readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
+                                            readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
+                                            readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
                                             readonly property real appOpacity: (modelData.active || isActive) ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
 
                                             IconImage {
@@ -1526,7 +1527,7 @@ Item {
                                                 layer.effect: MultiEffect {
                                                     saturation: 0
                                                     colorization: 1
-                                                    colorizationColor: modelData.active ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
+                                                    colorizationColor: appHighlightActive ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
                                                 }
                                             }
 
@@ -1542,14 +1543,14 @@ Item {
                                                 anchors.centerIn: parent
                                                 size: root.appIconSize
                                                 name: "sports_esports"
-                                                color: modelData.active ? focusedBorderColor : Theme.widgetTextColor
+                                                color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
                                                 opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && !modelData.icon
                                             }
 
                                             Rectangle {
                                                 anchors.fill: parent
-                                                visible: (rowAppIcon.visible || rowSteamIcon.visible || modelData.isQuickshell) && modelData.active
+                                                visible: (rowAppIcon.visible || rowSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
                                                 color: "transparent"
                                                 radius: Theme.cornerRadius * (root.appIconSize / 40)
                                                 border.width: 1
@@ -1638,8 +1639,9 @@ Item {
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
-                                            readonly property color appBorderColor: modelData.active ? focusedBorderColor : Theme.primarySelected
-                                            readonly property color appGlyphColor: modelData.active ? focusedBorderColor : Theme.primary
+                                            readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
+                                            readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
+                                            readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
                                             readonly property real appOpacity: (modelData.active || isActive) ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
 
                                             IconImage {
@@ -1694,7 +1696,7 @@ Item {
                                                 layer.effect: MultiEffect {
                                                     saturation: 0
                                                     colorization: 1
-                                                    colorizationColor: modelData.active ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
+                                                    colorizationColor: appHighlightActive ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
                                                 }
                                             }
 
@@ -1710,14 +1712,14 @@ Item {
                                                 anchors.centerIn: parent
                                                 size: root.appIconSize
                                                 name: "sports_esports"
-                                                color: modelData.active ? focusedBorderColor : Theme.widgetTextColor
+                                                color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
                                                 opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && !modelData.icon
                                             }
 
                                             Rectangle {
                                                 anchors.fill: parent
-                                                visible: (colAppIcon.visible || colSteamIcon.visible || modelData.isQuickshell) && modelData.active
+                                                visible: (colAppIcon.visible || colSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
                                                 color: "transparent"
                                                 radius: Theme.cornerRadius * (root.appIconSize / 40)
                                                 border.width: 1
