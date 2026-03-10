@@ -1,0 +1,1523 @@
+{
+    "$schema": "https://zed.dev/schema/themes/v0.2.0.json",
+    "name": "Dynamic Base16 DankShell",
+    "author": "Adarsh219",
+    "themes": [
+        {
+            "name": "DankShell Dark",
+            "appearance": "dark",
+            "style": {
+                "accents": [
+                    "{{colors.primary.dark.hex}}",
+                    "{{colors.secondary.dark.hex}}",
+                    "{{colors.tertiary.dark.hex}}"
+                ],
+                "background.appearance": "opaque",
+                "border": "{{colors.outline_variant.dark.hex}}",
+                "border.variant": "{{colors.outline.dark.hex}}",
+                "border.focused": "{{colors.primary.dark.hex}}",
+                "border.selected": "{{colors.primary.dark.hex}}",
+                "border.transparent": null,
+                "border.disabled": "{{colors.outline_variant.dark.hex}}60",
+                "elevated_surface.background": "{{colors.surface_container_high.dark.hex}}",
+                "surface.background": "{{colors.surface.dark.hex}}",
+                "background": "{{colors.surface_dim.dark.hex}}",
+                "element.background": "{{colors.surface_container.dark.hex}}",
+                "element.hover": "{{colors.surface_container_high.dark.hex}}",
+                "element.active": "{{colors.surface_container_highest.dark.hex}}",
+                "element.selected": "{{colors.secondary_container.dark.hex}}",
+                "element.disabled": "{{colors.surface_variant.dark.hex}}",
+                "drop_target.background": "{{colors.primary_container.dark.hex}}80",
+                "ghost_element.background": null,
+                "ghost_element.hover": "{{colors.surface_container.dark.hex}}80",
+                "ghost_element.active": "{{colors.surface_container_high.dark.hex}}",
+                "ghost_element.selected": "{{colors.secondary_container.dark.hex}}80",
+                "ghost_element.disabled": "{{colors.surface_variant.dark.hex}}60",
+                "text": "{{colors.on_surface.dark.hex}}",
+                "text.muted": "{{colors.on_surface_variant.dark.hex}}",
+                "text.placeholder": "{{colors.on_surface_variant.dark.hex}}99",
+                "text.disabled": "{{colors.on_surface.dark.hex}}60",
+                "text.accent": "{{colors.primary.dark.hex}}",
+                "icon": "{{colors.on_surface.dark.hex}}",
+                "icon.muted": "{{colors.on_surface_variant.dark.hex}}",
+                "icon.disabled": "{{colors.on_surface.dark.hex}}60",
+                "icon.placeholder": "{{colors.on_surface_variant.dark.hex}}80",
+                "icon.accent": "{{colors.primary.dark.hex}}",
+                "status_bar.background": "{{colors.surface_dim.dark.hex}}",
+                "title_bar.background": "{{colors.surface_dim.dark.hex}}",
+                "title_bar.inactive_background": "{{colors.surface_dim.dark.hex}}",
+                "toolbar.background": "{{colors.background.dark.hex}}",
+                "tab_bar.background": "{{colors.surface.dark.hex}}",
+                "tab.inactive_background": "{{colors.surface.dark.hex}}",
+                "tab.active_background": "{{colors.background.dark.hex}}",
+                "search.match_background": "{{dank16.color3.dark.hex}}50",
+                "search.active_match_background": "{{dank16.color9.dark.hex}}66",
+                "panel.background": "{{colors.surface.dark.hex}}",
+                "panel.focused_border": null,
+                "pane.focused_border": null,
+                "scrollbar.thumb.background": "{{colors.on_surface_variant.dark.hex}}50",
+                "scrollbar.thumb.hover_background": "{{colors.on_surface_variant.dark.hex}}80",
+                "scrollbar.thumb.border": "{{colors.outline_variant.dark.hex}}40",
+                "scrollbar.track.background": null,
+                "scrollbar.track.border": "{{colors.outline_variant.dark.hex}}20",
+                "editor.foreground": "{{colors.on_surface.dark.hex}}",
+                "editor.background": "{{colors.background.dark.hex}}",
+                "editor.gutter.background": "{{colors.surface_dim.dark.hex}}",
+                "editor.subheader.background": "{{colors.surface.dark.hex}}",
+                "editor.indent_guide": "{{colors.outline_variant.dark.hex}}22",
+                "editor.indent_guide_active": "{{colors.primary.dark.hex}}99",
+                "editor.active_line.background": "{{colors.surface_container.dark.hex}}66",
+                "editor.highlighted_line.background": "{{colors.surface_container.dark.hex}}66",
+                "editor.line_number": "{{colors.on_surface_variant.dark.hex}}",
+                "editor.active_line_number": "{{colors.primary.dark.hex}}",
+                "editor.invisible": "{{colors.outline_variant.dark.hex}}33",
+                "editor.wrap_guide": "{{colors.outline_variant.dark.hex}}22",
+                "editor.active_wrap_guide": "{{colors.outline.dark.hex}}80",
+                "editor.document_highlight.read_background": "{{colors.primary_container.dark.hex}}60",
+                "editor.document_highlight.write_background": "{{colors.secondary_container.dark.hex}}80",
+                "terminal.background": "{{colors.background.dark.hex}}",
+                "terminal.foreground": "{{colors.on_surface.dark.hex}}",
+                "terminal.bright_foreground": "{{dank16.color15.dark.hex}}",
+                "terminal.dim_foreground": "{{colors.on_surface_variant.dark.hex}}",
+                "terminal.ansi.black": "{{dank16.color0.dark.hex}}",
+                "terminal.ansi.bright_black": "{{dank16.color8.dark.hex}}",
+                "terminal.ansi.dim_black": "{{dank16.color0.dark.hex}}",
+                "terminal.ansi.red": "{{dank16.color1.dark.hex}}",
+                "terminal.ansi.bright_red": "{{dank16.color9.dark.hex}}",
+                "terminal.ansi.dim_red": "{{dank16.color1.dark.hex}}",
+                "terminal.ansi.green": "{{dank16.color2.dark.hex}}",
+                "terminal.ansi.bright_green": "{{dank16.color10.dark.hex}}",
+                "terminal.ansi.dim_green": "{{dank16.color2.dark.hex}}",
+                "terminal.ansi.yellow": "{{dank16.color3.dark.hex}}",
+                "terminal.ansi.bright_yellow": "{{dank16.color11.dark.hex}}",
+                "terminal.ansi.dim_yellow": "{{dank16.color3.dark.hex}}",
+                "terminal.ansi.blue": "{{dank16.color4.dark.hex}}",
+                "terminal.ansi.bright_blue": "{{dank16.color12.dark.hex}}",
+                "terminal.ansi.dim_blue": "{{dank16.color4.dark.hex}}",
+                "terminal.ansi.magenta": "{{dank16.color5.dark.hex}}",
+                "terminal.ansi.bright_magenta": "{{dank16.color13.dark.hex}}",
+                "terminal.ansi.dim_magenta": "{{dank16.color5.dark.hex}}",
+                "terminal.ansi.cyan": "{{dank16.color6.dark.hex}}",
+                "terminal.ansi.bright_cyan": "{{dank16.color14.dark.hex}}",
+                "terminal.ansi.dim_cyan": "{{dank16.color6.dark.hex}}",
+                "terminal.ansi.white": "{{dank16.color7.dark.hex}}",
+                "terminal.ansi.bright_white": "{{dank16.color15.dark.hex}}",
+                "terminal.ansi.dim_white": "{{dank16.color7.dark.hex}}",
+                "link_text.hover": "{{colors.primary.dark.hex}}",
+                "version_control.added": "{{dank16.color2.dark.hex}}",
+                "version_control.modified": "{{dank16.color3.dark.hex}}",
+                "version_control.word_added": "{{dank16.color2.dark.hex}}33",
+                "version_control.word_deleted": "{{dank16.color1.dark.hex}}33",
+                "version_control.deleted": "{{dank16.color1.dark.hex}}",
+                "conflict": "{{colors.error.dark.hex}}",
+                "conflict.background": "{{colors.error_container.dark.hex}}80",
+                "conflict.border": "{{colors.on_error_container.dark.hex}}",
+                "created": "{{dank16.color2.dark.hex}}",
+                "created.background": "{{dank16.color2.dark.hex}}1A",
+                "created.border": "{{dank16.color2.dark.hex}}",
+                "deleted": "{{dank16.color1.dark.hex}}",
+                "deleted.background": "{{dank16.color1.dark.hex}}1A",
+                "deleted.border": "{{dank16.color1.dark.hex}}",
+                "error": "{{colors.error.dark.hex}}",
+                "error.background": "{{colors.error_container.dark.hex}}",
+                "error.border": "{{colors.on_error_container.dark.hex}}",
+                "hidden": "{{colors.outline_variant.dark.hex}}",
+                "hidden.background": "{{colors.outline_variant.dark.hex}}1A",
+                "hidden.border": "{{colors.outline_variant.dark.hex}}60",
+                "hint": "{{colors.primary.dark.hex}}",
+                "hint.background": "{{colors.primary_container.dark.hex}}80",
+                "hint.border": "{{colors.on_primary_container.dark.hex}}",
+                "ignored": "{{colors.on_surface_variant.dark.hex}}60",
+                "ignored.background": "{{colors.surface_variant.dark.hex}}40",
+                "ignored.border": "{{colors.outline_variant.dark.hex}}40",
+                "info": "{{colors.primary.dark.hex}}",
+                "info.background": "{{colors.primary_container.dark.hex}}80",
+                "info.border": "{{colors.on_primary_container.dark.hex}}",
+                "modified": "{{dank16.color3.dark.hex}}",
+                "modified.background": "{{dank16.color3.dark.hex}}1A",
+                "modified.border": "{{dank16.color3.dark.hex}}",
+                "predictive": "{{colors.on_surface_variant.dark.hex}}80",
+                "predictive.border": "{{colors.outline.dark.hex}}",
+                "predictive.background": "{{colors.surface_container_highest.dark.hex}}80",
+                "renamed": "{{dank16.color4.dark.hex}}",
+                "renamed.border": "{{dank16.color4.dark.hex}}",
+                "renamed.background": "{{dank16.color4.dark.hex}}1A",
+                "success": "{{dank16.color2.dark.hex}}",
+                "success.background": "{{dank16.color2.dark.hex}}1A",
+                "success.border": "{{dank16.color2.dark.hex}}",
+                "unreachable": "{{colors.on_surface_variant.dark.hex}}60",
+                "unreachable.background": "{{colors.surface_variant.dark.hex}}40",
+                "unreachable.border": "{{colors.outline_variant.dark.hex}}60",
+                "warning": "{{colors.tertiary_fixed_dim.dark.hex}}",
+                "warning.background": "{{colors.tertiary_container.dark.hex}}80",
+                "warning.border": "{{colors.on_tertiary_container.dark.hex}}",
+                "players": [
+                    {
+                        "cursor": "{{dank16.color4.dark.hex}}",
+                        "background": "{{dank16.color4.dark.hex}}80",
+                        "selection": "{{dank16.color4.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color1.dark.hex}}",
+                        "background": "{{dank16.color1.dark.hex}}80",
+                        "selection": "{{dank16.color1.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color3.dark.hex}}",
+                        "background": "{{dank16.color3.dark.hex}}80",
+                        "selection": "{{dank16.color3.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color5.dark.hex}}",
+                        "background": "{{dank16.color5.dark.hex}}80",
+                        "selection": "{{dank16.color5.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color6.dark.hex}}",
+                        "background": "{{dank16.color6.dark.hex}}80",
+                        "selection": "{{dank16.color6.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color9.dark.hex}}",
+                        "background": "{{dank16.color9.dark.hex}}80",
+                        "selection": "{{dank16.color9.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color10.dark.hex}}",
+                        "background": "{{dank16.color10.dark.hex}}80",
+                        "selection": "{{dank16.color10.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color2.dark.hex}}",
+                        "background": "{{dank16.color2.dark.hex}}80",
+                        "selection": "{{dank16.color2.dark.hex}}3D"
+                    }
+                ],
+                "syntax": {
+                    "attribute": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "boolean": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "comment": {
+                        "color": "{{dank16.color8.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "comment.doc": {
+                        "color": "{{dank16.color8.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "constant": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "constructor": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "embedded": {
+                        "color": "{{colors.on_surface.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "emphasis": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "emphasis.strong": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "enum": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "function": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "keyword": {
+                        "color": "{{dank16.color5.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "label": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "link_text": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "link_uri": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": "normal",
+                        "font_weight": null
+                    },
+                    "number": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "operator": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "property": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation": {
+                        "color": "{{colors.on_surface_variant.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.bracket": {
+                        "color": "{{colors.outline.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.delimiter": {
+                        "color": "{{colors.outline.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.list_marker": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.special": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector": {
+                        "color": "{{dank16.color3.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector.pseudo": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string": {
+                        "color": "{{dank16.color2.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.escape": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.regex": {
+                        "color": "{{dank16.color10.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special.symbol": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "tag": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "text.literal": {
+                        "color": "{{dank16.color2.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "title": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "type": {
+                        "color": "{{dank16.color3.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "variable": {
+                        "color": "{{colors.on_surface.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variable.special": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variant": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    }
+                }
+            }
+        },
+        {
+            "name": "DankShell Light",
+            "appearance": "light",
+            "style": {
+                "accents": [
+                    "{{colors.primary.light.hex}}",
+                    "{{colors.secondary.light.hex}}",
+                    "{{colors.tertiary.light.hex}}"
+                ],
+                "background.appearance": "opaque",
+                "border": "{{colors.outline_variant.light.hex}}",
+                "border.variant": "{{colors.outline.light.hex}}",
+                "border.focused": "{{colors.primary.light.hex}}",
+                "border.selected": "{{colors.primary.light.hex}}",
+                "border.transparent": null,
+                "border.disabled": "{{colors.outline_variant.light.hex}}60",
+                "elevated_surface.background": "{{colors.surface_container_high.light.hex}}",
+                "surface.background": "{{colors.surface.light.hex}}",
+                "background": "{{colors.surface_dim.light.hex}}",
+                "element.background": "{{colors.surface_container.light.hex}}",
+                "element.hover": "{{colors.surface_container_high.light.hex}}",
+                "element.active": "{{colors.surface_container_highest.light.hex}}",
+                "element.selected": "{{colors.secondary_container.light.hex}}",
+                "element.disabled": "{{colors.surface_variant.light.hex}}",
+                "drop_target.background": "{{colors.primary_container.light.hex}}80",
+                "ghost_element.background": null,
+                "ghost_element.hover": "{{colors.surface_container.light.hex}}80",
+                "ghost_element.active": "{{colors.surface_container_high.light.hex}}",
+                "ghost_element.selected": "{{colors.secondary_container.light.hex}}80",
+                "ghost_element.disabled": "{{colors.surface_variant.light.hex}}60",
+                "text": "{{colors.on_surface.light.hex}}",
+                "text.muted": "{{colors.on_surface_variant.light.hex}}",
+                "text.placeholder": "{{colors.on_surface_variant.light.hex}}99",
+                "text.disabled": "{{colors.on_surface.light.hex}}60",
+                "text.accent": "{{colors.primary.light.hex}}",
+                "icon": "{{colors.on_surface.light.hex}}",
+                "icon.muted": "{{colors.on_surface_variant.light.hex}}",
+                "icon.disabled": "{{colors.on_surface.light.hex}}60",
+                "icon.placeholder": "{{colors.on_surface_variant.light.hex}}80",
+                "icon.accent": "{{colors.primary.light.hex}}",
+                "status_bar.background": "{{colors.surface_dim.light.hex}}",
+                "title_bar.background": "{{colors.surface_dim.light.hex}}",
+                "title_bar.inactive_background": "{{colors.surface_dim.light.hex}}",
+                "toolbar.background": "{{colors.background.light.hex}}",
+                "tab_bar.background": "{{colors.surface.light.hex}}",
+                "tab.inactive_background": "{{colors.surface.light.hex}}",
+                "tab.active_background": "{{colors.background.light.hex}}",
+                "search.match_background": "{{dank16.color3.light.hex}}50",
+                "search.active_match_background": "{{dank16.color9.light.hex}}66",
+                "panel.background": "{{colors.surface.light.hex}}",
+                "panel.focused_border": null,
+                "pane.focused_border": null,
+                "scrollbar.thumb.background": "{{colors.on_surface_variant.light.hex}}50",
+                "scrollbar.thumb.hover_background": "{{colors.on_surface_variant.light.hex}}C0",
+                "scrollbar.thumb.border": "{{colors.outline_variant.light.hex}}40",
+                "scrollbar.track.background": null,
+                "scrollbar.track.border": "{{colors.outline_variant.light.hex}}20",
+                "editor.foreground": "{{colors.on_surface.light.hex}}",
+                "editor.background": "{{colors.background.light.hex}}",
+                "editor.gutter.background": "{{colors.surface_dim.light.hex}}",
+                "editor.subheader.background": "{{colors.surface.light.hex}}",
+                "editor.indent_guide": "{{colors.outline_variant.light.hex}}22",
+                "editor.indent_guide_active": "{{colors.outline.light.hex}}99",
+                "editor.active_line.background": "{{colors.surface_container.light.hex}}66",
+                "editor.highlighted_line.background": "{{colors.surface_container.light.hex}}66",
+                "editor.line_number": "{{colors.on_surface_variant.light.hex}}",
+                "editor.active_line_number": "{{colors.primary.light.hex}}",
+                "editor.invisible": "{{colors.outline_variant.light.hex}}33",
+                "editor.wrap_guide": "{{colors.outline_variant.light.hex}}22",
+                "editor.active_wrap_guide": "{{colors.outline.light.hex}}80",
+                "editor.document_highlight.read_background": "{{colors.primary_container.light.hex}}60",
+                "editor.document_highlight.write_background": "{{colors.secondary_container.light.hex}}80",
+                "terminal.background": "{{colors.background.light.hex}}",
+                "terminal.foreground": "{{colors.on_surface.light.hex}}",
+                "terminal.bright_foreground": "{{dank16.color15.light.hex}}",
+                "terminal.dim_foreground": "{{colors.on_surface_variant.light.hex}}",
+                "terminal.ansi.black": "{{dank16.color0.light.hex}}",
+                "terminal.ansi.bright_black": "{{dank16.color8.light.hex}}",
+                "terminal.ansi.dim_black": "{{dank16.color0.light.hex}}",
+                "terminal.ansi.red": "{{dank16.color1.light.hex}}",
+                "terminal.ansi.bright_red": "{{dank16.color9.light.hex}}",
+                "terminal.ansi.dim_red": "{{dank16.color1.light.hex}}",
+                "terminal.ansi.green": "{{dank16.color2.light.hex}}",
+                "terminal.ansi.bright_green": "{{dank16.color10.light.hex}}",
+                "terminal.ansi.dim_green": "{{dank16.color2.light.hex}}",
+                "terminal.ansi.yellow": "{{dank16.color3.light.hex}}",
+                "terminal.ansi.bright_yellow": "{{dank16.color11.light.hex}}",
+                "terminal.ansi.dim_yellow": "{{dank16.color3.light.hex}}",
+                "terminal.ansi.blue": "{{dank16.color4.light.hex}}",
+                "terminal.ansi.bright_blue": "{{dank16.color12.light.hex}}",
+                "terminal.ansi.dim_blue": "{{dank16.color4.light.hex}}",
+                "terminal.ansi.magenta": "{{dank16.color5.light.hex}}",
+                "terminal.ansi.bright_magenta": "{{dank16.color13.light.hex}}",
+                "terminal.ansi.dim_magenta": "{{dank16.color5.light.hex}}",
+                "terminal.ansi.cyan": "{{dank16.color6.light.hex}}",
+                "terminal.ansi.bright_cyan": "{{dank16.color14.light.hex}}",
+                "terminal.ansi.dim_cyan": "{{dank16.color6.light.hex}}",
+                "terminal.ansi.white": "{{dank16.color7.light.hex}}",
+                "terminal.ansi.bright_white": "{{dank16.color15.light.hex}}",
+                "terminal.ansi.dim_white": "{{dank16.color7.light.hex}}",
+                "link_text.hover": "{{colors.primary.light.hex}}",
+                "version_control.added": "{{dank16.color2.light.hex}}",
+                "version_control.modified": "{{dank16.color3.light.hex}}",
+                "version_control.word_added": "{{dank16.color2.light.hex}}33",
+                "version_control.word_deleted": "{{dank16.color1.light.hex}}33",
+                "version_control.deleted": "{{dank16.color1.light.hex}}",
+                "conflict": "{{colors.error.light.hex}}",
+                "conflict.background": "{{colors.error_container.light.hex}}80",
+                "conflict.border": "{{colors.on_error_container.light.hex}}",
+                "created": "{{dank16.color2.light.hex}}",
+                "created.background": "{{dank16.color2.light.hex}}1A",
+                "created.border": "{{dank16.color2.light.hex}}",
+                "deleted": "{{dank16.color1.light.hex}}",
+                "deleted.background": "{{dank16.color1.light.hex}}1A",
+                "deleted.border": "{{dank16.color1.light.hex}}",
+                "error": "{{colors.error.light.hex}}",
+                "error.background": "{{colors.error_container.light.hex}}",
+                "error.border": "{{colors.on_error_container.light.hex}}",
+                "hidden": "{{colors.outline_variant.light.hex}}",
+                "hidden.background": "{{colors.outline_variant.light.hex}}1A",
+                "hidden.border": "{{colors.outline_variant.light.hex}}60",
+                "hint": "{{colors.primary.light.hex}}",
+                "hint.background": "{{colors.primary_container.light.hex}}80",
+                "hint.border": "{{colors.on_primary_container.light.hex}}",
+                "ignored": "{{colors.on_surface_variant.light.hex}}60",
+                "ignored.background": "{{colors.surface_variant.light.hex}}40",
+                "ignored.border": "{{colors.outline_variant.light.hex}}40",
+                "info": "{{colors.primary.light.hex}}",
+                "info.background": "{{colors.primary_container.light.hex}}80",
+                "info.border": "{{colors.on_primary_container.light.hex}}",
+                "modified": "{{dank16.color3.light.hex}}",
+                "modified.background": "{{dank16.color3.light.hex}}1A",
+                "modified.border": "{{dank16.color3.light.hex}}",
+                "predictive": "{{colors.on_surface_variant.light.hex}}80",
+                "predictive.border": "{{colors.outline.light.hex}}",
+                "predictive.background": "{{colors.surface_container_highest.light.hex}}80",
+                "renamed": "{{dank16.color4.light.hex}}",
+                "renamed.border": "{{dank16.color4.light.hex}}",
+                "renamed.background": "{{dank16.color4.light.hex}}1A",
+                "success": "{{dank16.color2.light.hex}}",
+                "success.background": "{{dank16.color2.light.hex}}1A",
+                "success.border": "{{dank16.color2.light.hex}}",
+                "unreachable": "{{colors.on_surface_variant.light.hex}}60",
+                "unreachable.background": "{{colors.surface_variant.light.hex}}40",
+                "unreachable.border": "{{colors.outline_variant.light.hex}}60",
+                "warning": "{{colors.tertiary_fixed_dim.light.hex}}",
+                "warning.background": "{{colors.tertiary_container.light.hex}}80",
+                "warning.border": "{{colors.on_tertiary_container.light.hex}}",
+                "players": [
+                    {
+                        "cursor": "{{dank16.color4.light.hex}}",
+                        "background": "{{dank16.color4.light.hex}}80",
+                        "selection": "{{dank16.color4.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color1.light.hex}}",
+                        "background": "{{dank16.color1.light.hex}}80",
+                        "selection": "{{dank16.color1.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color3.light.hex}}",
+                        "background": "{{dank16.color3.light.hex}}80",
+                        "selection": "{{dank16.color3.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color5.light.hex}}",
+                        "background": "{{dank16.color5.light.hex}}80",
+                        "selection": "{{dank16.color5.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color6.light.hex}}",
+                        "background": "{{dank16.color6.light.hex}}80",
+                        "selection": "{{dank16.color6.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color9.light.hex}}",
+                        "background": "{{dank16.color9.light.hex}}80",
+                        "selection": "{{dank16.color9.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color10.light.hex}}",
+                        "background": "{{dank16.color10.light.hex}}80",
+                        "selection": "{{dank16.color10.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color2.light.hex}}",
+                        "background": "{{dank16.color2.light.hex}}80",
+                        "selection": "{{dank16.color2.light.hex}}3D"
+                    }
+                ],
+                "syntax": {
+                    "attribute": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "boolean": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "comment": {
+                        "color": "{{dank16.color8.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "comment.doc": {
+                        "color": "{{dank16.color8.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "constant": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "constructor": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "embedded": {
+                        "color": "{{colors.on_surface.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "emphasis": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "emphasis.strong": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "enum": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "function": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "keyword": {
+                        "color": "{{dank16.color5.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "label": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "link_text": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "link_uri": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": "normal",
+                        "font_weight": null
+                    },
+                    "number": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "operator": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "property": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation": {
+                        "color": "{{colors.on_surface_variant.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.bracket": {
+                        "color": "{{colors.outline.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.delimiter": {
+                        "color": "{{colors.outline.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.list_marker": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.special": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector": {
+                        "color": "{{dank16.color3.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector.pseudo": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string": {
+                        "color": "{{dank16.color2.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.escape": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.regex": {
+                        "color": "{{dank16.color10.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special.symbol": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "tag": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "text.literal": {
+                        "color": "{{dank16.color2.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "title": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "type": {
+                        "color": "{{dank16.color3.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "variable": {
+                        "color": "{{colors.on_surface.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variable.special": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variant": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    }
+                }
+            }
+        },
+        {
+            "name": "DankShell Dark Transparent",
+            "appearance": "dark",
+            "style": {
+                "accents": [
+                    "{{colors.primary.dark.hex}}",
+                    "{{colors.secondary.dark.hex}}",
+                    "{{colors.tertiary.dark.hex}}"
+                ],
+                "background.appearance": "blurred",
+                "border": "{{colors.outline_variant.dark.hex}}",
+                "border.variant": "{{colors.outline.dark.hex}}",
+                "border.focused": "{{colors.primary.dark.hex}}",
+                "border.selected": "{{colors.primary.dark.hex}}",
+                "border.transparent": null,
+                "border.disabled": "{{colors.outline_variant.dark.hex}}60",
+                "elevated_surface.background": "{{colors.surface_container_high.dark.hex}}B6",
+                "surface.background": "{{colors.surface.dark.hex}}B6",
+                "background": null,
+                "element.background": "{{colors.surface_container.dark.hex}}B6",
+                "element.hover": "{{colors.surface_container_high.dark.hex}}B6",
+                "element.active": "{{colors.surface_container_highest.dark.hex}}B6",
+                "element.selected": "{{colors.secondary_container.dark.hex}}B6",
+                "element.disabled": "{{colors.surface_variant.dark.hex}}B6",
+                "drop_target.background": "{{colors.primary_container.dark.hex}}80",
+                "ghost_element.background": null,
+                "ghost_element.hover": "{{colors.surface_container.dark.hex}}80",
+                "ghost_element.active": "{{colors.surface_container_high.dark.hex}}B6",
+                "ghost_element.selected": "{{colors.secondary_container.dark.hex}}80",
+                "ghost_element.disabled": "{{colors.surface_variant.dark.hex}}60",
+                "text": "{{colors.on_surface.dark.hex}}",
+                "text.muted": "{{colors.on_surface_variant.dark.hex}}",
+                "text.placeholder": "{{colors.on_surface_variant.dark.hex}}99",
+                "text.disabled": "{{colors.on_surface.dark.hex}}60",
+                "text.accent": "{{colors.primary.dark.hex}}",
+                "icon": "{{colors.on_surface.dark.hex}}",
+                "icon.muted": "{{colors.on_surface_variant.dark.hex}}",
+                "icon.disabled": "{{colors.on_surface.dark.hex}}60",
+                "icon.placeholder": "{{colors.on_surface_variant.dark.hex}}80",
+                "icon.accent": "{{colors.primary.dark.hex}}",
+                "status_bar.background": "{{colors.surface_dim.dark.hex}}B6",
+                "title_bar.background": "{{colors.surface_dim.dark.hex}}B6",
+                "title_bar.inactive_background": "{{colors.surface_dim.dark.hex}}B6",
+                "toolbar.background": "{{colors.background.dark.hex}}B6",
+                "tab_bar.background": "{{colors.surface.dark.hex}}B6",
+                "tab.inactive_background": "{{colors.surface.dark.hex}}B6",
+                "tab.active_background": "{{colors.background.dark.hex}}B6",
+                "search.match_background": "{{dank16.color3.dark.hex}}50",
+                "search.active_match_background": "{{dank16.color9.dark.hex}}66",
+                "panel.background": "{{colors.surface.dark.hex}}B6",
+                "panel.focused_border": null,
+                "pane.focused_border": null,
+                "scrollbar.thumb.background": "{{colors.on_surface_variant.dark.hex}}50",
+                "scrollbar.thumb.hover_background": "{{colors.on_surface_variant.dark.hex}}80",
+                "scrollbar.thumb.border": "{{colors.outline_variant.dark.hex}}40",
+                "scrollbar.track.background": null,
+                "scrollbar.track.border": "{{colors.outline_variant.dark.hex}}20",
+                "editor.foreground": "{{colors.on_surface.dark.hex}}",
+                "editor.background": "{{colors.background.dark.hex}}B6",
+                "editor.gutter.background": "{{colors.surface_dim.dark.hex}}B6",
+                "editor.subheader.background": "{{colors.surface.dark.hex}}B6",
+                "editor.indent_guide": "{{colors.outline_variant.dark.hex}}22",
+                "editor.indent_guide_active": "{{colors.primary.dark.hex}}99",
+                "editor.active_line.background": "{{colors.surface_container.dark.hex}}66",
+                "editor.highlighted_line.background": "{{colors.surface_container.dark.hex}}66",
+                "editor.line_number": "{{colors.on_surface_variant.dark.hex}}",
+                "editor.active_line_number": "{{colors.primary.dark.hex}}",
+                "editor.invisible": "{{colors.outline_variant.dark.hex}}33",
+                "editor.wrap_guide": "{{colors.outline_variant.dark.hex}}22",
+                "editor.active_wrap_guide": "{{colors.outline.dark.hex}}80",
+                "editor.document_highlight.read_background": "{{colors.primary_container.dark.hex}}60",
+                "editor.document_highlight.write_background": "{{colors.secondary_container.dark.hex}}80",
+                "terminal.background": "{{colors.background.dark.hex}}B6",
+                "terminal.foreground": "{{colors.on_surface.dark.hex}}",
+                "terminal.bright_foreground": "{{dank16.color15.dark.hex}}",
+                "terminal.dim_foreground": "{{colors.on_surface_variant.dark.hex}}",
+                "terminal.ansi.black": "{{dank16.color0.dark.hex}}",
+                "terminal.ansi.bright_black": "{{dank16.color8.dark.hex}}",
+                "terminal.ansi.dim_black": "{{dank16.color0.dark.hex}}",
+                "terminal.ansi.red": "{{dank16.color1.dark.hex}}",
+                "terminal.ansi.bright_red": "{{dank16.color9.dark.hex}}",
+                "terminal.ansi.dim_red": "{{dank16.color1.dark.hex}}",
+                "terminal.ansi.green": "{{dank16.color2.dark.hex}}",
+                "terminal.ansi.bright_green": "{{dank16.color10.dark.hex}}",
+                "terminal.ansi.dim_green": "{{dank16.color2.dark.hex}}",
+                "terminal.ansi.yellow": "{{dank16.color3.dark.hex}}",
+                "terminal.ansi.bright_yellow": "{{dank16.color11.dark.hex}}",
+                "terminal.ansi.dim_yellow": "{{dank16.color3.dark.hex}}",
+                "terminal.ansi.blue": "{{dank16.color4.dark.hex}}",
+                "terminal.ansi.bright_blue": "{{dank16.color12.dark.hex}}",
+                "terminal.ansi.dim_blue": "{{dank16.color4.dark.hex}}",
+                "terminal.ansi.magenta": "{{dank16.color5.dark.hex}}",
+                "terminal.ansi.bright_magenta": "{{dank16.color13.dark.hex}}",
+                "terminal.ansi.dim_magenta": "{{dank16.color5.dark.hex}}",
+                "terminal.ansi.cyan": "{{dank16.color6.dark.hex}}",
+                "terminal.ansi.bright_cyan": "{{dank16.color14.dark.hex}}",
+                "terminal.ansi.dim_cyan": "{{dank16.color6.dark.hex}}",
+                "terminal.ansi.white": "{{dank16.color7.dark.hex}}",
+                "terminal.ansi.bright_white": "{{dank16.color15.dark.hex}}",
+                "terminal.ansi.dim_white": "{{dank16.color7.dark.hex}}",
+                "link_text.hover": "{{colors.primary.dark.hex}}",
+                "version_control.added": "{{dank16.color2.dark.hex}}",
+                "version_control.modified": "{{dank16.color3.dark.hex}}",
+                "version_control.word_added": "{{dank16.color2.dark.hex}}33",
+                "version_control.word_deleted": "{{dank16.color1.dark.hex}}33",
+                "version_control.deleted": "{{dank16.color1.dark.hex}}",
+                "conflict": "{{colors.error.dark.hex}}",
+                "conflict.background": "{{colors.error_container.dark.hex}}80",
+                "conflict.border": "{{colors.on_error_container.dark.hex}}",
+                "created": "{{dank16.color2.dark.hex}}",
+                "created.background": "{{dank16.color2.dark.hex}}1A",
+                "created.border": "{{dank16.color2.dark.hex}}",
+                "deleted": "{{dank16.color1.dark.hex}}",
+                "deleted.background": "{{dank16.color1.dark.hex}}1A",
+                "deleted.border": "{{dank16.color1.dark.hex}}",
+                "error": "{{colors.error.dark.hex}}",
+                "error.background": "{{colors.error_container.dark.hex}}",
+                "error.border": "{{colors.on_error_container.dark.hex}}",
+                "hidden": "{{colors.outline_variant.dark.hex}}",
+                "hidden.background": "{{colors.outline_variant.dark.hex}}1A",
+                "hidden.border": "{{colors.outline_variant.dark.hex}}60",
+                "hint": "{{colors.primary.dark.hex}}",
+                "hint.background": "{{colors.primary_container.dark.hex}}80",
+                "hint.border": "{{colors.on_primary_container.dark.hex}}",
+                "ignored": "{{colors.on_surface_variant.dark.hex}}60",
+                "ignored.background": "{{colors.surface_variant.dark.hex}}40",
+                "ignored.border": "{{colors.outline_variant.dark.hex}}40",
+                "info": "{{colors.primary.dark.hex}}",
+                "info.background": "{{colors.primary_container.dark.hex}}80",
+                "info.border": "{{colors.on_primary_container.dark.hex}}",
+                "modified": "{{dank16.color3.dark.hex}}",
+                "modified.background": "{{dank16.color3.dark.hex}}1A",
+                "modified.border": "{{dank16.color3.dark.hex}}",
+                "predictive": "{{colors.on_surface_variant.dark.hex}}80",
+                "predictive.border": "{{colors.outline.dark.hex}}",
+                "predictive.background": "{{colors.surface_container_highest.dark.hex}}80",
+                "renamed": "{{dank16.color4.dark.hex}}",
+                "renamed.border": "{{dank16.color4.dark.hex}}",
+                "renamed.background": "{{dank16.color4.dark.hex}}1A",
+                "success": "{{dank16.color2.dark.hex}}",
+                "success.background": "{{dank16.color2.dark.hex}}1A",
+                "success.border": "{{dank16.color2.dark.hex}}",
+                "unreachable": "{{colors.on_surface_variant.dark.hex}}60",
+                "unreachable.background": "{{colors.surface_variant.dark.hex}}40",
+                "unreachable.border": "{{colors.outline_variant.dark.hex}}60",
+                "warning": "{{colors.tertiary_fixed_dim.dark.hex}}",
+                "warning.background": "{{colors.tertiary_container.dark.hex}}80",
+                "warning.border": "{{colors.on_tertiary_container.dark.hex}}",
+                "players": [
+                    {
+                        "cursor": "{{dank16.color4.dark.hex}}",
+                        "background": "{{dank16.color4.dark.hex}}80",
+                        "selection": "{{dank16.color4.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color1.dark.hex}}",
+                        "background": "{{dank16.color1.dark.hex}}80",
+                        "selection": "{{dank16.color1.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color3.dark.hex}}",
+                        "background": "{{dank16.color3.dark.hex}}80",
+                        "selection": "{{dank16.color3.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color5.dark.hex}}",
+                        "background": "{{dank16.color5.dark.hex}}80",
+                        "selection": "{{dank16.color5.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color6.dark.hex}}",
+                        "background": "{{dank16.color6.dark.hex}}80",
+                        "selection": "{{dank16.color6.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color9.dark.hex}}",
+                        "background": "{{dank16.color9.dark.hex}}80",
+                        "selection": "{{dank16.color9.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color10.dark.hex}}",
+                        "background": "{{dank16.color10.dark.hex}}80",
+                        "selection": "{{dank16.color10.dark.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color2.dark.hex}}",
+                        "background": "{{dank16.color2.dark.hex}}80",
+                        "selection": "{{dank16.color2.dark.hex}}3D"
+                    }
+                ],
+                "syntax": {
+                    "attribute": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "boolean": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "comment": {
+                        "color": "{{dank16.color8.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "comment.doc": {
+                        "color": "{{dank16.color8.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "constant": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "constructor": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "embedded": {
+                        "color": "{{colors.on_surface.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "emphasis": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "emphasis.strong": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "enum": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "function": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "keyword": {
+                        "color": "{{dank16.color5.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "label": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "link_text": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "link_uri": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": "normal",
+                        "font_weight": null
+                    },
+                    "number": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "operator": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "property": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation": {
+                        "color": "{{colors.on_surface_variant.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.bracket": {
+                        "color": "{{colors.outline.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.delimiter": {
+                        "color": "{{colors.outline.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.list_marker": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.special": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector": {
+                        "color": "{{dank16.color3.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector.pseudo": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string": {
+                        "color": "{{dank16.color2.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.escape": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.regex": {
+                        "color": "{{dank16.color10.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special.symbol": {
+                        "color": "{{dank16.color6.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "tag": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "text.literal": {
+                        "color": "{{dank16.color2.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "title": {
+                        "color": "{{dank16.color1.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "type": {
+                        "color": "{{dank16.color3.dark.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "variable": {
+                        "color": "{{colors.on_surface.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variable.special": {
+                        "color": "{{dank16.color9.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variant": {
+                        "color": "{{dank16.color4.dark.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    }
+                }
+            }
+        },
+        {
+            "name": "DankShell Light Transparent",
+            "appearance": "light",
+            "style": {
+                "accents": [
+                    "{{colors.primary.light.hex}}",
+                    "{{colors.secondary.light.hex}}",
+                    "{{colors.tertiary.light.hex}}"
+                ],
+                "background.appearance": "blurred",
+                "border": "{{colors.outline_variant.light.hex}}",
+                "border.variant": "{{colors.outline.light.hex}}",
+                "border.focused": "{{colors.primary.light.hex}}",
+                "border.selected": "{{colors.primary.light.hex}}",
+                "border.transparent": null,
+                "border.disabled": "{{colors.outline_variant.light.hex}}60",
+                "elevated_surface.background": "{{colors.surface_container_high.light.hex}}B6",
+                "surface.background": "{{colors.surface.light.hex}}B6",
+                "background": null,
+                "element.background": "{{colors.surface_container.light.hex}}B6",
+                "element.hover": "{{colors.surface_container_high.light.hex}}B6",
+                "element.active": "{{colors.surface_container_highest.light.hex}}B6",
+                "element.selected": "{{colors.secondary_container.light.hex}}B6",
+                "element.disabled": "{{colors.surface_variant.light.hex}}B6",
+                "drop_target.background": "{{colors.primary_container.light.hex}}80",
+                "ghost_element.background": null,
+                "ghost_element.hover": "{{colors.surface_container.light.hex}}80",
+                "ghost_element.active": "{{colors.surface_container_high.light.hex}}B6",
+                "ghost_element.selected": "{{colors.secondary_container.light.hex}}80",
+                "ghost_element.disabled": "{{colors.surface_variant.light.hex}}60",
+                "text": "{{colors.on_surface.light.hex}}",
+                "text.muted": "{{colors.on_surface_variant.light.hex}}",
+                "text.placeholder": "{{colors.on_surface_variant.light.hex}}99",
+                "text.disabled": "{{colors.on_surface.light.hex}}60",
+                "text.accent": "{{colors.primary.light.hex}}",
+                "icon": "{{colors.on_surface.light.hex}}",
+                "icon.muted": "{{colors.on_surface_variant.light.hex}}",
+                "icon.disabled": "{{colors.on_surface.light.hex}}60",
+                "icon.placeholder": "{{colors.on_surface_variant.light.hex}}80",
+                "icon.accent": "{{colors.primary.light.hex}}",
+                "status_bar.background": "{{colors.surface_dim.light.hex}}B6",
+                "title_bar.background": "{{colors.surface_dim.light.hex}}B6",
+                "title_bar.inactive_background": "{{colors.surface_dim.light.hex}}B6",
+                "toolbar.background": "{{colors.background.light.hex}}B6",
+                "tab_bar.background": "{{colors.surface.light.hex}}B6",
+                "tab.inactive_background": "{{colors.surface.light.hex}}B6",
+                "tab.active_background": "{{colors.background.light.hex}}B6",
+                "search.match_background": "{{dank16.color3.light.hex}}50",
+                "search.active_match_background": "{{dank16.color9.light.hex}}66",
+                "panel.background": "{{colors.surface.light.hex}}B6",
+                "panel.focused_border": null,
+                "pane.focused_border": null,
+                "scrollbar.thumb.background": "{{colors.on_surface_variant.light.hex}}50",
+                "scrollbar.thumb.hover_background": "{{colors.on_surface_variant.light.hex}}C0",
+                "scrollbar.thumb.border": "{{colors.outline_variant.light.hex}}40",
+                "scrollbar.track.background": null,
+                "scrollbar.track.border": "{{colors.outline_variant.light.hex}}20",
+                "editor.foreground": "{{colors.on_surface.light.hex}}",
+                "editor.background": "{{colors.background.light.hex}}B6",
+                "editor.gutter.background": "{{colors.surface_dim.light.hex}}B6",
+                "editor.subheader.background": "{{colors.surface.light.hex}}B6",
+                "editor.indent_guide": "{{colors.outline_variant.light.hex}}22",
+                "editor.indent_guide_active": "{{colors.outline.light.hex}}99",
+                "editor.active_line.background": "{{colors.surface_container.light.hex}}66",
+                "editor.highlighted_line.background": "{{colors.surface_container.light.hex}}66",
+                "editor.line_number": "{{colors.on_surface_variant.light.hex}}",
+                "editor.active_line_number": "{{colors.primary.light.hex}}",
+                "editor.invisible": "{{colors.outline_variant.light.hex}}33",
+                "editor.wrap_guide": "{{colors.outline_variant.light.hex}}22",
+                "editor.active_wrap_guide": "{{colors.outline.light.hex}}80",
+                "editor.document_highlight.read_background": "{{colors.primary_container.light.hex}}60",
+                "editor.document_highlight.write_background": "{{colors.secondary_container.light.hex}}80",
+                "terminal.background": "{{colors.background.light.hex}}B6",
+                "terminal.foreground": "{{colors.on_surface.light.hex}}",
+                "terminal.bright_foreground": "{{dank16.color15.light.hex}}",
+                "terminal.dim_foreground": "{{colors.on_surface_variant.light.hex}}",
+                "terminal.ansi.black": "{{dank16.color0.light.hex}}",
+                "terminal.ansi.bright_black": "{{dank16.color8.light.hex}}",
+                "terminal.ansi.dim_black": "{{dank16.color0.light.hex}}",
+                "terminal.ansi.red": "{{dank16.color1.light.hex}}",
+                "terminal.ansi.bright_red": "{{dank16.color9.light.hex}}",
+                "terminal.ansi.dim_red": "{{dank16.color1.light.hex}}",
+                "terminal.ansi.green": "{{dank16.color2.light.hex}}",
+                "terminal.ansi.bright_green": "{{dank16.color10.light.hex}}",
+                "terminal.ansi.dim_green": "{{dank16.color2.light.hex}}",
+                "terminal.ansi.yellow": "{{dank16.color3.light.hex}}",
+                "terminal.ansi.bright_yellow": "{{dank16.color11.light.hex}}",
+                "terminal.ansi.dim_yellow": "{{dank16.color3.light.hex}}",
+                "terminal.ansi.blue": "{{dank16.color4.light.hex}}",
+                "terminal.ansi.bright_blue": "{{dank16.color12.light.hex}}",
+                "terminal.ansi.dim_blue": "{{dank16.color4.light.hex}}",
+                "terminal.ansi.magenta": "{{dank16.color5.light.hex}}",
+                "terminal.ansi.bright_magenta": "{{dank16.color13.light.hex}}",
+                "terminal.ansi.dim_magenta": "{{dank16.color5.light.hex}}",
+                "terminal.ansi.cyan": "{{dank16.color6.light.hex}}",
+                "terminal.ansi.bright_cyan": "{{dank16.color14.light.hex}}",
+                "terminal.ansi.dim_cyan": "{{dank16.color6.light.hex}}",
+                "terminal.ansi.white": "{{dank16.color7.light.hex}}",
+                "terminal.ansi.bright_white": "{{dank16.color15.light.hex}}",
+                "terminal.ansi.dim_white": "{{dank16.color7.light.hex}}",
+                "link_text.hover": "{{colors.primary.light.hex}}",
+                "version_control.added": "{{dank16.color2.light.hex}}",
+                "version_control.modified": "{{dank16.color3.light.hex}}",
+                "version_control.word_added": "{{dank16.color2.light.hex}}33",
+                "version_control.word_deleted": "{{dank16.color1.light.hex}}33",
+                "version_control.deleted": "{{dank16.color1.light.hex}}",
+                "conflict": "{{colors.error.light.hex}}",
+                "conflict.background": "{{colors.error_container.light.hex}}80",
+                "conflict.border": "{{colors.on_error_container.light.hex}}",
+                "created": "{{dank16.color2.light.hex}}",
+                "created.background": "{{dank16.color2.light.hex}}1A",
+                "created.border": "{{dank16.color2.light.hex}}",
+                "deleted": "{{dank16.color1.light.hex}}",
+                "deleted.background": "{{dank16.color1.light.hex}}1A",
+                "deleted.border": "{{dank16.color1.light.hex}}",
+                "error": "{{colors.error.light.hex}}",
+                "error.background": "{{colors.error_container.light.hex}}",
+                "error.border": "{{colors.on_error_container.light.hex}}",
+                "hidden": "{{colors.outline_variant.light.hex}}",
+                "hidden.background": "{{colors.outline_variant.light.hex}}1A",
+                "hidden.border": "{{colors.outline_variant.light.hex}}60",
+                "hint": "{{colors.primary.light.hex}}",
+                "hint.background": "{{colors.primary_container.light.hex}}80",
+                "hint.border": "{{colors.on_primary_container.light.hex}}",
+                "ignored": "{{colors.on_surface_variant.light.hex}}60",
+                "ignored.background": "{{colors.surface_variant.light.hex}}40",
+                "ignored.border": "{{colors.outline_variant.light.hex}}40",
+                "info": "{{colors.primary.light.hex}}",
+                "info.background": "{{colors.primary_container.light.hex}}80",
+                "info.border": "{{colors.on_primary_container.light.hex}}",
+                "modified": "{{dank16.color3.light.hex}}",
+                "modified.background": "{{dank16.color3.light.hex}}1A",
+                "modified.border": "{{dank16.color3.light.hex}}",
+                "predictive": "{{colors.on_surface_variant.light.hex}}80",
+                "predictive.border": "{{colors.outline.light.hex}}",
+                "predictive.background": "{{colors.surface_container_highest.light.hex}}80",
+                "renamed": "{{dank16.color4.light.hex}}",
+                "renamed.border": "{{dank16.color4.light.hex}}",
+                "renamed.background": "{{dank16.color4.light.hex}}1A",
+                "success": "{{dank16.color2.light.hex}}",
+                "success.background": "{{dank16.color2.light.hex}}1A",
+                "success.border": "{{dank16.color2.light.hex}}",
+                "unreachable": "{{colors.on_surface_variant.light.hex}}60",
+                "unreachable.background": "{{colors.surface_variant.light.hex}}40",
+                "unreachable.border": "{{colors.outline_variant.light.hex}}60",
+                "warning": "{{colors.tertiary_fixed_dim.light.hex}}",
+                "warning.background": "{{colors.tertiary_container.light.hex}}80",
+                "warning.border": "{{colors.on_tertiary_container.light.hex}}",
+                "players": [
+                    {
+                        "cursor": "{{dank16.color4.light.hex}}",
+                        "background": "{{dank16.color4.light.hex}}80",
+                        "selection": "{{dank16.color4.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color1.light.hex}}",
+                        "background": "{{dank16.color1.light.hex}}80",
+                        "selection": "{{dank16.color1.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color3.light.hex}}",
+                        "background": "{{dank16.color3.light.hex}}80",
+                        "selection": "{{dank16.color3.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color5.light.hex}}",
+                        "background": "{{dank16.color5.light.hex}}80",
+                        "selection": "{{dank16.color5.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color6.light.hex}}",
+                        "background": "{{dank16.color6.light.hex}}80",
+                        "selection": "{{dank16.color6.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color9.light.hex}}",
+                        "background": "{{dank16.color9.light.hex}}80",
+                        "selection": "{{dank16.color9.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color10.light.hex}}",
+                        "background": "{{dank16.color10.light.hex}}80",
+                        "selection": "{{dank16.color10.light.hex}}3D"
+                    },
+                    {
+                        "cursor": "{{dank16.color2.light.hex}}",
+                        "background": "{{dank16.color2.light.hex}}80",
+                        "selection": "{{dank16.color2.light.hex}}3D"
+                    }
+                ],
+                "syntax": {
+                    "attribute": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "boolean": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "comment": {
+                        "color": "{{dank16.color8.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "comment.doc": {
+                        "color": "{{dank16.color8.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "constant": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "constructor": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "embedded": {
+                        "color": "{{colors.on_surface.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "emphasis": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "emphasis.strong": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "enum": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "function": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "keyword": {
+                        "color": "{{dank16.color5.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "label": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "link_text": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "link_uri": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": "normal",
+                        "font_weight": null
+                    },
+                    "number": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "operator": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "property": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation": {
+                        "color": "{{colors.on_surface_variant.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.bracket": {
+                        "color": "{{colors.outline.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.delimiter": {
+                        "color": "{{colors.outline.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.list_marker": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "punctuation.special": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector": {
+                        "color": "{{dank16.color3.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "selector.pseudo": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string": {
+                        "color": "{{dank16.color2.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.escape": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.regex": {
+                        "color": "{{dank16.color10.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "string.special.symbol": {
+                        "color": "{{dank16.color6.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "tag": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "text.literal": {
+                        "color": "{{dank16.color2.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "title": {
+                        "color": "{{dank16.color1.light.hex}}",
+                        "font_style": null,
+                        "font_weight": 700
+                    },
+                    "type": {
+                        "color": "{{dank16.color3.light.hex}}",
+                        "font_style": "italic",
+                        "font_weight": null
+                    },
+                    "variable": {
+                        "color": "{{colors.on_surface.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variable.special": {
+                        "color": "{{dank16.color9.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    },
+                    "variant": {
+                        "color": "{{dank16.color4.light.hex}}",
+                        "font_style": null,
+                        "font_weight": null
+                    }
+                }
+            }
+        }
+    ]
+}

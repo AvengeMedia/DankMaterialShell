@@ -1,0 +1,3 @@
+[templates.dmszed]
+input_path = "SHELL_DIR/matugen/templates/dank-zed.json"
+output_path = "CONFIG_DIR/zed/themes/dank-zed-theme.json"
