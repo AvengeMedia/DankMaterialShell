@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Common
@@ -132,6 +133,40 @@ Item {
 
     function getGroupedToplevels() {
         return appData?.allWindows?.map(w => w.toplevel).filter(t => t !== null) || [];
+    }
+
+    function getHyprToplevelForWayland(waylandToplevel) {
+        if (!waylandToplevel || !CompositorService.isHyprland || !Hyprland.toplevels)
+            return null;
+        const hyprToplevels = Array.from(Hyprland.toplevels.values);
+        for (let i = 0; i < hyprToplevels.length; i++) {
+            if (hyprToplevels[i].wayland === waylandToplevel)
+                return hyprToplevels[i];
+        }
+        return null;
+    }
+
+    function getSpecialWorkspaceName(waylandToplevel) {
+        const hyprToplevel = getHyprToplevelForWayland(waylandToplevel);
+        if (!hyprToplevel)
+            return "";
+        const wsName = String(hyprToplevel.lastIpcObject?.workspace?.name || hyprToplevel.workspace?.name || "");
+        if (!wsName.startsWith("special:"))
+            return "";
+        return wsName.slice("special:".length);
+    }
+
+    function restoreSpecialWorkspaceWindow(waylandToplevel) {
+        if (!SettingsData.dockRestoreSpecialWorkspaceOnClick || !CompositorService.isHyprland || !waylandToplevel)
+            return false;
+
+        const specialName = getSpecialWorkspaceName(waylandToplevel);
+        if (!specialName)
+            return false;
+
+        Hyprland.dispatch("togglespecialworkspace " + specialName);
+        Qt.callLater(() => waylandToplevel.activate());
+        return true;
     }
     onIsHoveredChanged: {
         if (mouseArea.pressed || dragging)
@@ -276,8 +311,11 @@ Item {
                 break;
             case "window":
                 const windowToplevel = getToplevelObject();
-                if (windowToplevel)
+                if (windowToplevel) {
+                    if (restoreSpecialWorkspaceWindow(windowToplevel))
+                        return;
                     windowToplevel.activate();
+                }
                 break;
             case "grouped":
                 if (appData.windowCount === 0) {
@@ -300,8 +338,11 @@ Item {
                     SessionService.launchDesktopEntry(groupedEntry);
                 } else if (appData.windowCount === 1) {
                     const groupedToplevel = getToplevelObject();
-                    if (groupedToplevel)
+                    if (groupedToplevel) {
+                        if (restoreSpecialWorkspaceWindow(groupedToplevel))
+                            return;
                         groupedToplevel.activate();
+                    }
                 } else if (contextMenu) {
                     const shouldHidePin = appData.appId === "org.quickshell";
                     contextMenu.showForButton(root, appData, root.height + 25, shouldHidePin, cachedDesktopEntry, parentDockScreen, dockApps);
