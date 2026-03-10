@@ -35,8 +35,8 @@ Item {
     property bool pendingPasswordResponse: false
     property bool passwordSubmitRequested: false
     property bool cancelingExternalAuthForPassword: false
-    property int defaultAuthTimeoutMs: 12000
-    property int externalAuthTimeoutMs: 45000
+    property int defaultAuthTimeoutMs: 10000
+    property int externalAuthTimeoutMs: 36000
     property int memoryFlushDelayMs: 120
     property string pendingLaunchCommand: ""
     property var pendingLaunchEnv: []
@@ -50,9 +50,12 @@ Item {
     property string faillockConfigText: ""
     property bool greeterWallpaperOverrideExists: false
     property string externalAuthAutoStartedForUser: ""
+    property int passwordSessionTransitionRetryCount: 0
+    property int maxPasswordSessionTransitionRetries: 2
     readonly property bool greeterPamHasFprint: pamModuleEnabled(greetdPamText, "pam_fprintd") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_fprintd")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_fprintd")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_fprintd"))
     readonly property bool greeterPamHasU2f: pamModuleEnabled(greetdPamText, "pam_u2f") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_u2f")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_u2f")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_u2f"))
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
+    readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
 
     function initWeatherService() {
         if (weatherInitialized)
@@ -208,6 +211,13 @@ Item {
         authFeedbackMessage = "";
     }
 
+    function resetPasswordSessionTransition(clearSubmitRequest) {
+        cancelingExternalAuthForPassword = false;
+        passwordSessionTransitionRetryCount = 0;
+        if (clearSubmitRequest)
+            passwordSubmitRequested = false;
+    }
+
     Connections {
         target: GreetdSettings
         function onSettingsLoadedChanged() {
@@ -348,8 +358,7 @@ Item {
         PortalService.getGreeterUserProfileImage(user);
         GreeterState.passwordBuffer = "";
         pendingPasswordResponse = false;
-        passwordSubmitRequested = false;
-        cancelingExternalAuthForPassword = false;
+        resetPasswordSessionTransition(true);
         maybeAutoStartExternalAuth();
     }
 
@@ -357,8 +366,7 @@ Item {
         if (!GreeterState.passwordBuffer || GreeterState.passwordBuffer.length === 0)
             return false;
         pendingPasswordResponse = false;
-        passwordSubmitRequested = false;
-        cancelingExternalAuthForPassword = false;
+        resetPasswordSessionTransition(true);
         awaitingExternalAuth = false;
         authTimeout.interval = defaultAuthTimeoutMs;
         authTimeout.restart();
@@ -369,9 +377,24 @@ Item {
     }
 
     function requestPasswordSessionTransition() {
+        if (!GreeterState.passwordBuffer || GreeterState.passwordBuffer.length === 0)
+            return;
         if (cancelingExternalAuthForPassword)
             return;
+        if (passwordSessionTransitionRetryCount >= maxPasswordSessionTransitionRetries) {
+            pendingPasswordResponse = false;
+            awaitingExternalAuth = false;
+            authTimeout.interval = defaultAuthTimeoutMs;
+            authTimeout.stop();
+            resetPasswordSessionTransition(true);
+            GreeterState.pamState = "error";
+            authFeedbackMessage = currentAuthMessage();
+            placeholderDelay.restart();
+            Greetd.cancelSession();
+            return;
+        }
         cancelingExternalAuthForPassword = true;
+        passwordSessionTransitionRetryCount = passwordSessionTransitionRetryCount + 1;
         awaitingExternalAuth = false;
         pendingPasswordResponse = false;
         authTimeout.interval = defaultAuthTimeoutMs;
@@ -388,9 +411,7 @@ Item {
         if (Greetd.state !== GreetdState.Inactive) {
             if (pendingPasswordResponse && hasPasswordBuffer)
                 submitBufferedPassword();
-            else if (awaitingExternalAuth && hasPasswordBuffer) {
-                passwordSubmitRequested = true;
-            } else if (hasPasswordBuffer)
+            else if (hasPasswordBuffer)
                 passwordSubmitRequested = true;
             return;
         }
@@ -404,7 +425,10 @@ Item {
         pendingPasswordResponse = false;
         passwordSubmitRequested = hasPasswordBuffer;
         awaitingExternalAuth = !hasPasswordBuffer && root.greeterExternalAuthAvailable;
-        authTimeout.interval = awaitingExternalAuth ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
+        // Included PAM stacks (system-auth/common-auth/password-auth) may still run
+        // biometric/U2F modules before password even when DMS toggles are off.
+        const waitingOnPamExternalBeforePassword = hasPasswordBuffer && root.greeterPamHasExternalAuth;
+        authTimeout.interval = (awaitingExternalAuth || waitingOnPamExternalBeforePassword) ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
         authTimeout.restart();
         Greetd.createSession(GreeterState.username);
     }
@@ -1559,18 +1583,30 @@ Item {
         function onAuthMessage(message, error, responseRequired, echoResponse) {
             if (responseRequired) {
                 cancelingExternalAuthForPassword = false;
+                passwordSessionTransitionRetryCount = 0;
                 awaitingExternalAuth = false;
-                authTimeout.interval = defaultAuthTimeoutMs;
-                authTimeout.restart();
                 pendingPasswordResponse = true;
+                const hasPasswordBuffer = GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0;
+                if (!passwordSubmitRequested && hasPasswordBuffer)
+                    passwordSubmitRequested = true;
                 if (passwordSubmitRequested && !root.submitBufferedPassword())
                     passwordSubmitRequested = false;
+                if (passwordSubmitRequested || hasPasswordBuffer) {
+                    authTimeout.interval = defaultAuthTimeoutMs;
+                    authTimeout.restart();
+                } else {
+                    authTimeout.stop();
+                }
                 return;
             }
             pendingPasswordResponse = false;
+            const externalPrompt = root.isExternalAuthPrompt(message, responseRequired);
             if (!passwordSubmitRequested)
-                awaitingExternalAuth = root.isExternalAuthPrompt(message, responseRequired);
-            authTimeout.interval = awaitingExternalAuth ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
+                awaitingExternalAuth = root.greeterExternalAuthAvailable && externalPrompt;
+            if (awaitingExternalAuth || (passwordSubmitRequested && externalPrompt && root.greeterPamHasExternalAuth))
+                authTimeout.interval = externalAuthTimeoutMs;
+            else
+                authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.restart();
             Greetd.respond("");
         }
@@ -1587,15 +1623,14 @@ Item {
                     Qt.callLater(root.startAuthSession);
                     return;
                 }
-                passwordSubmitRequested = false;
+                resetPasswordSessionTransition(true);
             }
         }
 
         function onReadyToLaunch() {
             awaitingExternalAuth = false;
             pendingPasswordResponse = false;
-            passwordSubmitRequested = false;
-            cancelingExternalAuthForPassword = false;
+            resetPasswordSessionTransition(true);
             authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.stop();
             passwordFailureCount = 0;
@@ -1629,8 +1664,7 @@ Item {
         function onAuthFailure(message) {
             awaitingExternalAuth = false;
             pendingPasswordResponse = false;
-            passwordSubmitRequested = false;
-            cancelingExternalAuthForPassword = false;
+            resetPasswordSessionTransition(true);
             authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.stop();
             launchTimeout.stop();
@@ -1651,8 +1685,7 @@ Item {
         function onError(error) {
             awaitingExternalAuth = false;
             pendingPasswordResponse = false;
-            passwordSubmitRequested = false;
-            cancelingExternalAuthForPassword = false;
+            resetPasswordSessionTransition(true);
             authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.stop();
             launchTimeout.stop();
@@ -1688,8 +1721,7 @@ Item {
                 return;
             awaitingExternalAuth = false;
             pendingPasswordResponse = false;
-            passwordSubmitRequested = false;
-            cancelingExternalAuthForPassword = false;
+            resetPasswordSessionTransition(true);
             authTimeout.interval = defaultAuthTimeoutMs;
             GreeterState.pamState = "error";
             authFeedbackMessage = currentAuthMessage();
@@ -1707,8 +1739,7 @@ Item {
             if (!GreeterState.unlocking)
                 return;
             pendingPasswordResponse = false;
-            passwordSubmitRequested = false;
-            cancelingExternalAuthForPassword = false;
+            resetPasswordSessionTransition(true);
             GreeterState.unlocking = false;
             GreeterState.pamState = "error";
             authFeedbackMessage = currentAuthMessage();
