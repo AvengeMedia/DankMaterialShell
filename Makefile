@@ -18,7 +18,7 @@ SHELL_INSTALL_DIR=$(DATA_DIR)/quickshell/dms
 ASSETS_DIR=assets
 APPLICATIONS_DIR=$(DATA_DIR)/applications
 
-.PHONY: all build clean install install-bin install-shell install-completions install-systemd install-icon install-desktop uninstall uninstall-bin uninstall-shell uninstall-completions uninstall-systemd uninstall-icon uninstall-desktop help
+.PHONY: all build clean lint-qml install install-bin install-shell install-completions install-systemd install-icon install-desktop uninstall uninstall-bin uninstall-shell uninstall-completions uninstall-systemd uninstall-icon uninstall-desktop help
 
 all: build
 
@@ -31,6 +31,9 @@ clean:
 	@echo "Cleaning build artifacts..."
 	@$(MAKE) -C $(CORE_DIR) clean
 	@echo "Clean complete"
+
+lint-qml:
+	@./quickshell/scripts/qmllint-entrypoints.sh
 
 # Installation targets
 install-bin:
@@ -130,6 +133,7 @@ help:
 	@echo "  all (default)        - Build the DMS binary"
 	@echo "  build                - Same as 'all'"
 	@echo "  clean                - Clean build artifacts"
+	@echo "  lint-qml             - Run qmllint on shell entrypoints using the Quickshell tooling VFS"
 	@echo ""
 	@echo "Install:"
 	@echo "  install              - Build and install everything (requires sudo)"

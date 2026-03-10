@@ -99,7 +99,7 @@ qs -v -p shell.qml   # Verbose debugging
 
 # Code formatting and linting
 qmlfmt -t 4 -i 4 -b 250 -w /path/to/file.qml  # Format QML (don't use qmlformat)
-qmllint **/*.qml     # Lint all QML files
+make -C .. lint-qml  # From quickshell/, call the repo-root lint target; requires the generated .qmlls.ini VFS from `qs -p .`
 ./qmlformat-all.sh   # Format all QML files
 ```
 
@@ -783,7 +783,7 @@ When modifying the shell:
 
 **QML Frontend:**
 1. **Test changes**: `qs -p .` (automatic reload on file changes)
-2. **Code quality**: Run `./qmlformat-all.sh` or `qmlformat -i **/*.qml` and `qmllint **/*.qml`
+2. **Code quality**: Run `./qmlformat-all.sh` or `qmlformat -i **/*.qml`, then from repo root run `make lint-qml` after Quickshell has generated the local `.qmlls.ini` VFS with `qs -p .`
 3. **Performance**: Ensure animations remain smooth (60 FPS target)
 4. **Theming**: Use `Theme.propertyName` for Material Design 3 consistency
 
