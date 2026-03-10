@@ -35,8 +35,8 @@ Item {
     property bool pendingPasswordResponse: false
     property bool passwordSubmitRequested: false
     property bool cancelingExternalAuthForPassword: false
-    property int defaultAuthTimeoutMs: 12000
-    property int externalAuthTimeoutMs: 45000
+    property int defaultAuthTimeoutMs: 10000
+    property int externalAuthTimeoutMs: 36000
     property int memoryFlushDelayMs: 120
     property string pendingLaunchCommand: ""
     property var pendingLaunchEnv: []
@@ -54,9 +54,8 @@ Item {
     property int maxPasswordSessionTransitionRetries: 2
     readonly property bool greeterPamHasFprint: pamModuleEnabled(greetdPamText, "pam_fprintd") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_fprintd")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_fprintd")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_fprintd"))
     readonly property bool greeterPamHasU2f: pamModuleEnabled(greetdPamText, "pam_u2f") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_u2f")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_u2f")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_u2f"))
-    readonly property bool greeterExternalAuthCapable: greeterPamHasFprint || greeterPamHasU2f
-    readonly property bool greeterExternalAuthEnabledByToggle: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
-    readonly property bool greeterExternalAuthAvailable: greeterExternalAuthCapable
+    readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
+    readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
 
     function initWeatherService() {
         if (weatherInitialized)
@@ -412,10 +411,7 @@ Item {
         if (Greetd.state !== GreetdState.Inactive) {
             if (pendingPasswordResponse && hasPasswordBuffer)
                 submitBufferedPassword();
-            else if (awaitingExternalAuth && hasPasswordBuffer) {
-                passwordSubmitRequested = true;
-                requestPasswordSessionTransition();
-            } else if (hasPasswordBuffer)
+            else if (hasPasswordBuffer)
                 passwordSubmitRequested = true;
             return;
         }
@@ -424,11 +420,11 @@ Item {
                 passwordSubmitRequested = true;
             return;
         }
-        if (!hasPasswordBuffer && !root.greeterExternalAuthEnabledByToggle)
+        if (!hasPasswordBuffer && !root.greeterExternalAuthAvailable)
             return;
         pendingPasswordResponse = false;
         passwordSubmitRequested = hasPasswordBuffer;
-        awaitingExternalAuth = !hasPasswordBuffer && root.greeterExternalAuthEnabledByToggle;
+        awaitingExternalAuth = !hasPasswordBuffer && root.greeterExternalAuthAvailable;
         authTimeout.interval = awaitingExternalAuth ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
         authTimeout.restart();
         Greetd.createSession(GreeterState.username);
@@ -437,7 +433,7 @@ Item {
     function maybeAutoStartExternalAuth() {
         if (!GreeterState.showPasswordInput || !GreeterState.username)
             return;
-        if (!root.greeterExternalAuthEnabledByToggle)
+        if (!root.greeterExternalAuthAvailable)
             return;
         if (GreeterState.unlocking || Greetd.state !== GreetdState.Inactive)
             return;
@@ -958,7 +954,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: root.greeterPamHasFprint ? "fingerprint" : "key"
                             buttonSize: 32
-                            visible: GreeterState.showPasswordInput && root.greeterExternalAuthEnabledByToggle && GreeterState.passwordBuffer.length === 0 && (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
+                            visible: GreeterState.showPasswordInput && root.greeterExternalAuthAvailable && GreeterState.passwordBuffer.length === 0 && (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
                             enabled: visible
                             onClicked: root.startAuthSession()
                         }
@@ -1594,13 +1590,12 @@ Item {
                 return;
             }
             pendingPasswordResponse = false;
-            if (passwordSubmitRequested && GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0 && awaitingExternalAuth && !cancelingExternalAuthForPassword) {
-                requestPasswordSessionTransition();
-                return;
-            }
             if (!passwordSubmitRequested)
                 awaitingExternalAuth = root.isExternalAuthPrompt(message, responseRequired);
-            authTimeout.interval = awaitingExternalAuth ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
+            if (awaitingExternalAuth || (passwordSubmitRequested && root.isExternalAuthPrompt(message, responseRequired)))
+                authTimeout.interval = externalAuthTimeoutMs;
+            else
+                authTimeout.interval = defaultAuthTimeoutMs;
             authTimeout.restart();
             Greetd.respond("");
         }

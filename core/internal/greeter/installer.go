@@ -1506,8 +1506,9 @@ func syncGreeterPamConfig(homeDir string, logFunc func(string), sudoPassword str
 			}
 		} else {
 			if fprintAvailableForCurrentUser {
-				logFunc("⚠ Fingerprint auth is active via included " + includedFprintFile + " while DMS fingerprint toggle is off.")
-				logFunc("  " + pamManagerHintForCurrentDistro())
+				logFunc("ℹ Fingerprint auth is active via included " + includedFprintFile + " while DMS fingerprint toggle is off.")
+				logFunc("  Password login will work but may be delayed while the fingerprint module runs first.")
+				logFunc("  To eliminate the delay, " + pamManagerHintForCurrentDistro())
 			} else {
 				logFunc("ℹ pam_fprintd is present via included " + includedFprintFile + ", but no enrolled fingerprints were detected for the current user.")
 				logFunc("  Password auth remains the effective login path.")

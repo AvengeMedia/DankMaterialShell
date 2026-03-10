@@ -1631,8 +1631,9 @@ func checkGreeterStatus() error {
 				}
 			} else {
 				if fprintAvailableForCurrentUser {
-					fmt.Printf("  ⚠ Fingerprint auth is active via included %s while DMS fingerprint toggle is off.\n", includedFprintFile)
-					fmt.Printf("    %s\n", systemPamManagerRemediationHint())
+					fmt.Printf("  ℹ Fingerprint auth is active via included %s while DMS fingerprint toggle is off.\n", includedFprintFile)
+					fmt.Println("    Password login will work but may be delayed while the fingerprint module runs first.")
+					fmt.Printf("    To eliminate the delay, %s\n", systemPamManagerRemediationHint())
 				} else {
 					fmt.Printf("  ℹ pam_fprintd is present via included %s, but no enrolled fingerprints were detected for user %s.\n", includedFprintFile, currentUser.Username)
 					fmt.Println("    Password auth remains the effective login path.")
