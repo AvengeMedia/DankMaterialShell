@@ -419,6 +419,15 @@ Item {
 
                                     DankToggle {
                                         width: parent.width
+                                        text: I18n.tr("Focused monitor only")
+                                        description: I18n.tr("Show notifications only on the currently focused monitor")
+                                        visible: parent.componentId === "notifications"
+                                        checked: SettingsData.notificationFocusedMonitor
+                                        onToggled: checked => SettingsData.set("notificationFocusedMonitor", checked)
+                                    }
+
+                                    DankToggle {
+                                        width: parent.width
                                         text: I18n.tr("Show on Last Display")
                                         description: I18n.tr("Always show when there's only one connected display")
                                         checked: root.getShowOnLastDisplay(parent.componentId)

@@ -288,6 +288,15 @@ Item {
                     onToggled: checked => SettingsData.set("notificationPopupPrivacyMode", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "notificationFocusedMonitor"
+                    tags: ["notification", "popup", "focused", "monitor", "display", "screen", "active"]
+                    text: I18n.tr("Focused Monitor Only")
+                    description: I18n.tr("Show notification popups only on the currently focused monitor")
+                    checked: SettingsData.notificationFocusedMonitor
+                    onToggled: checked => SettingsData.set("notificationFocusedMonitor", checked)
+                }
+
                 Item {
                     width: parent.width
                     height: notificationAnimationColumn.implicitHeight + Theme.spacingM * 2

@@ -108,6 +108,13 @@ QtObject {
         return p && p.status !== Component.Null && !p._isDestroying && p.hasValidData;
     }
 
+    function _isFocusedScreen() {
+        if (!SettingsData.notificationFocusedMonitor)
+            return true;
+        const focused = CompositorService.getFocusedScreen();
+        return focused && manager.modelData && focused.name === manager.modelData.name;
+    }
+
     function _sync(newWrappers) {
         for (const p of popupWindows.slice()) {
             if (!_isValidWindow(p) || p.exiting)
@@ -118,7 +125,7 @@ QtObject {
             }
         }
         for (const w of newWrappers) {
-            if (w && !_hasWindowFor(w))
+            if (w && !_hasWindowFor(w) && _isFocusedScreen())
                 _insertAtTop(w);
         }
     }
