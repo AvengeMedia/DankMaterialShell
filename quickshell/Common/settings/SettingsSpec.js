@@ -294,6 +294,7 @@ var SPEC = {
     dockAutoHide: { def: false },
     dockSmartAutoHide: { def: false },
     dockGroupByApp: { def: false },
+    dockRestoreSpecialWorkspaceOnClick: { def: false },
     dockOpenOnOverview: { def: false },
     dockPosition: { def: 1 },
     dockSpacing: { def: 4 },
