@@ -239,7 +239,7 @@ Item {
             StyledRect {
                 id: valueTooltip
 
-                width: tooltipText.contentWidth + Theme.spacingS * 2
+                width: tooltipText.reservedWidth + Theme.spacingS * 2
                 height: tooltipText.contentHeight + Theme.spacingXS * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainer
@@ -251,10 +251,22 @@ Item {
                 visible: slider.alwaysShowValue ? slider.showValue : ((sliderMouseArea.containsMouse && slider.showValue) || (slider.isDragging && slider.showValue))
                 opacity: visible ? 1 : 0
 
-                StyledText {
+                NumericText {
                     id: tooltipText
 
                     text: (slider.valueOverride >= 0 ? Math.round(slider.valueOverride) : slider.value) + slider.unit
+                    reserveText: {
+                        let widest = "";
+                        const samples = [slider.minimum, slider.maximum];
+                        if (slider.valueOverride >= 0)
+                            samples.push(slider.valueOverride);
+                        for (let i = 0; i < samples.length; i++) {
+                            const candidate = Math.round(samples[i]) + slider.unit;
+                            if (candidate.length > widest.length)
+                                widest = candidate;
+                        }
+                        return widest;
+                    }
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     font.weight: Font.Medium
