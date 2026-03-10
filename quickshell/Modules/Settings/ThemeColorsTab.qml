@@ -2638,6 +2638,18 @@ Item {
                     checked: SettingsData.matugenTemplateEmacs
                     onToggled: checked => SettingsData.set("matugenTemplateEmacs", checked)
                 }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["matugen", "zed", "template"]
+                    settingKey: "matugenTemplateZed"
+                    text: "Zed"
+                    description: getTemplateDescription("zed", "")
+                    descriptionColor: getTemplateDescriptionColor("zed")
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateZed
+                    onToggled: checked => SettingsData.set("matugenTemplateZed", checked)
+                }
             }
 
             Rectangle {

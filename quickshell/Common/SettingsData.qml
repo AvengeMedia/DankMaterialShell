@@ -474,6 +474,7 @@ Singleton {
     property bool matugenTemplateKcolorscheme: true
     property bool matugenTemplateVscode: true
     property bool matugenTemplateEmacs: true
+    property bool matugenTemplateZed: true
 
     property bool showDock: false
     property bool dockAutoHide: false

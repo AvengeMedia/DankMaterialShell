@@ -2572,6 +2572,23 @@
     ]
   },
   {
+    "section": "matugenTemplateZed",
+    "label": "Zed",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme",
+      "zed"
+    ]
+  },
+  {
     "section": "matugenTemplateFirefox",
     "label": "Firefox",
     "tabIndex": 10,
