@@ -1470,6 +1470,9 @@ Item {
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
+                                            readonly property color appBorderColor: modelData.active ? focusedBorderColor : Theme.primarySelected
+                                            readonly property color appGlyphColor: modelData.active ? focusedBorderColor : Theme.primary
+                                            readonly property real appOpacity: (modelData.active || isActive) ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
 
                                             IconImage {
                                                 id: rowAppIcon
@@ -1485,14 +1488,14 @@ Item {
                                                 color: Theme.surfaceContainer
                                                 radius: Theme.cornerRadius * (root.appIconSize / 40)
                                                 border.width: 1
-                                                border.color: Theme.primarySelected
-                                                opacity: (modelData.active || isActive) ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                border.color: appBorderColor
+                                                opacity: appOpacity
 
                                                 StyledText {
                                                     anchors.centerIn: parent
                                                     text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
                                                     font.pixelSize: parent.width * 0.45
-                                                    color: Theme.primary
+                                                    color: appGlyphColor
                                                     font.weight: Font.Bold
                                                 }
                                             }
@@ -1503,14 +1506,14 @@ Item {
                                                 color: Theme.surfaceContainer
                                                 radius: Theme.cornerRadius * (root.appIconSize / 40)
                                                 border.width: 1
-                                                border.color: Theme.primarySelected
-                                                opacity: (modelData.active || isActive) ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                border.color: appBorderColor
+                                                opacity: appOpacity
 
                                                 DankIcon {
                                                     anchors.centerIn: parent
                                                     size: parent.width * 0.7
                                                     name: "sports_esports"
-                                                    color: Theme.primary
+                                                    color: appGlyphColor
                                                 }
                                             }
 
@@ -1523,11 +1526,12 @@ Item {
                                                 layer.effect: MultiEffect {
                                                     saturation: 0
                                                     colorization: 1
-                                                    colorizationColor: isActive ? quickshellIconActiveColor : quickshellIconInactiveColor
+                                                    colorizationColor: modelData.active ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
                                                 }
                                             }
 
                                             IconImage {
+                                                id: rowSteamIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon
                                                 opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
@@ -1538,9 +1542,19 @@ Item {
                                                 anchors.centerIn: parent
                                                 size: root.appIconSize
                                                 name: "sports_esports"
-                                                color: Theme.widgetTextColor
+                                                color: modelData.active ? focusedBorderColor : Theme.widgetTextColor
                                                 opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && !modelData.icon
+                                            }
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                visible: (rowAppIcon.visible || rowSteamIcon.visible || modelData.isQuickshell) && modelData.active
+                                                color: "transparent"
+                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
+                                                border.width: 1
+                                                border.color: focusedBorderColor
+                                                z: 1
                                             }
 
                                             MouseArea {
@@ -1624,6 +1638,9 @@ Item {
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
+                                            readonly property color appBorderColor: modelData.active ? focusedBorderColor : Theme.primarySelected
+                                            readonly property color appGlyphColor: modelData.active ? focusedBorderColor : Theme.primary
+                                            readonly property real appOpacity: (modelData.active || isActive) ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
 
                                             IconImage {
                                                 id: colAppIcon
@@ -1639,14 +1656,14 @@ Item {
                                                 color: Theme.surfaceContainer
                                                 radius: Theme.cornerRadius * (root.appIconSize / 40)
                                                 border.width: 1
-                                                border.color: Theme.primarySelected
-                                                opacity: (modelData.active || isActive) ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                border.color: appBorderColor
+                                                opacity: appOpacity
 
                                                 StyledText {
                                                     anchors.centerIn: parent
                                                     text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
                                                     font.pixelSize: parent.width * 0.45
-                                                    color: Theme.primary
+                                                    color: appGlyphColor
                                                     font.weight: Font.Bold
                                                 }
                                             }
@@ -1657,14 +1674,14 @@ Item {
                                                 color: Theme.surfaceContainer
                                                 radius: Theme.cornerRadius * (root.appIconSize / 40)
                                                 border.width: 1
-                                                border.color: Theme.primarySelected
-                                                opacity: (modelData.active || isActive) ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                border.color: appBorderColor
+                                                opacity: appOpacity
 
                                                 DankIcon {
                                                     anchors.centerIn: parent
                                                     size: parent.width * 0.7
                                                     name: "sports_esports"
-                                                    color: Theme.primary
+                                                    color: appGlyphColor
                                                 }
                                             }
 
@@ -1677,11 +1694,12 @@ Item {
                                                 layer.effect: MultiEffect {
                                                     saturation: 0
                                                     colorization: 1
-                                                    colorizationColor: isActive ? quickshellIconActiveColor : quickshellIconInactiveColor
+                                                    colorizationColor: modelData.active ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
                                                 }
                                             }
 
                                             IconImage {
+                                                id: colSteamIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon
                                                 opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
@@ -1692,9 +1710,19 @@ Item {
                                                 anchors.centerIn: parent
                                                 size: root.appIconSize
                                                 name: "sports_esports"
-                                                color: Theme.widgetTextColor
+                                                color: modelData.active ? focusedBorderColor : Theme.widgetTextColor
                                                 opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && !modelData.icon
+                                            }
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                visible: (colAppIcon.visible || colSteamIcon.visible || modelData.isQuickshell) && modelData.active
+                                                color: "transparent"
+                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
+                                                border.width: 1
+                                                border.color: focusedBorderColor
+                                                z: 1
                                             }
 
                                             MouseArea {
