@@ -154,18 +154,18 @@ Item {
 
     property string _barLayoutStateJson: {
         const configs = SettingsData.barConfigs;
-        const mapped = configs.map(c => ({
+        const mapped = configs.map((c, i) => ({
                     id: c.id,
                     position: c.position,
                     autoHide: c.autoHide,
-                    visible: c.visible
+                    visible: c.visible,
+                    _origIndex: i
                 })).sort((a, b) => {
             const aVertical = a.position === SettingsData.Position.Left || a.position === SettingsData.Position.Right;
             const bVertical = b.position === SettingsData.Position.Left || b.position === SettingsData.Position.Right;
-            if (aVertical !== bVertical) {
+            if (aVertical !== bVertical)
                 return aVertical - bVertical;
-            }
-            return String(a.id).localeCompare(String(b.id));
+            return a._origIndex - b._origIndex;
         });
         return JSON.stringify(mapped);
     }
