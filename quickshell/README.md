@@ -27,7 +27,7 @@ quickshell -p quickshell/
 **Code formatting:**
 ```bash
 qmlfmt -t 4 -i 4 -b 250 -w path/to/file.qml
-qmllint **/*.qml
+make lint-qml  # Run from repo root; requires a generated quickshell/.qmlls.ini VFS from `qs -p quickshell/`
 ```
 
 ## Components
