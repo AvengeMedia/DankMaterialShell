@@ -21,7 +21,6 @@ Item {
         SettingsData.refreshAuthAvailability();
     }
 
-    Component.onCompleted: refreshAuthDetection()
     onVisibleChanged: {
         if (visible)
             refreshAuthDetection();
@@ -167,6 +166,7 @@ Item {
     }
 
     Component.onCompleted: {
+        refreshAuthDetection();
         Qt.callLater(enumerateFonts);
         Qt.callLater(checkGreeterInstallState);
     }
