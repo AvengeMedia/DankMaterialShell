@@ -1269,10 +1269,47 @@ Singleton {
         return JSON.stringify(Store.toJson(root), null, 2);
     }
 
+    function _resetPluginSettings() {
+        _pluginParseError = false;
+        pluginSettings = {};
+    }
+
+    function _pluginSettingsErrorCode(error) {
+        if (typeof error === "number")
+            return error;
+        if (error && typeof error === "object") {
+            if (typeof error.code === "number")
+                return error.code;
+            if (typeof error.errno === "number")
+                return error.errno;
+        }
+
+        const msg = String(error || "").trim();
+        if (/^\d+$/.test(msg))
+            return Number(msg);
+
+        return -1;
+    }
+
+    function _isMissingPluginSettingsError(error) {
+        if (_pluginSettingsErrorCode(error) === 2)
+            return true;
+
+        const msg = String(error || "").toLowerCase();
+        return msg.indexOf("file does not exist") !== -1
+                || msg.indexOf("no such file") !== -1
+                || msg.indexOf("enoent") !== -1;
+    }
+
     function loadPluginSettings() {
-        _pluginSettingsLoading = true;
-        parsePluginSettings(pluginSettingsFile.text());
-        _pluginSettingsLoading = false;
+        try {
+            parsePluginSettings(pluginSettingsFile.text());
+        } catch (e) {
+            const msg = e.message || String(e);
+            if (!_isMissingPluginSettingsError(e))
+                console.warn("SettingsData: Failed to load plugin_settings.json. Error:", msg);
+            _resetPluginSettings();
+        }
     }
 
     function parsePluginSettings(content) {
@@ -2708,6 +2745,7 @@ Singleton {
         blockLoading: true
         blockWrites: true
         atomicWrites: true
+        printErrors: false
         watchChanges: !isGreeterMode
         onLoaded: {
             if (!isGreeterMode) {
@@ -2716,7 +2754,10 @@ Singleton {
         }
         onLoadFailed: error => {
             if (!isGreeterMode) {
-                pluginSettings = {};
+                const msg = String(error || "");
+                if (!_isMissingPluginSettingsError(error))
+                    console.warn("SettingsData: Failed to load plugin_settings.json. Error:", msg);
+                _resetPluginSettings();
             }
         }
     }
