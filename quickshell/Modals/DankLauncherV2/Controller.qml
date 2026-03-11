@@ -875,9 +875,7 @@ Item {
             _applyHighlights(newSections, searchQuery);
             flatModel = Scorer.flattenSections(newSections);
             sections = newSections;
-            if (selectedFlatIndex >= flatModel.length) {
-                selectedFlatIndex = getFirstItemIndex();
-            }
+            selectedFlatIndex = getFirstItemIndex();
             updateSelectedItem();
         });
     }
