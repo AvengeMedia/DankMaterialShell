@@ -988,12 +988,20 @@ Singleton {
     signal widgetDataChanged
     signal workspaceIconsUpdated
 
+    function refreshAuthAvailability() {
+        if (isGreeterMode)
+            return;
+        Processes.settingsRoot = root;
+        Processes.detectFprintd();
+        Processes.detectU2f();
+    }
+
     Component.onCompleted: {
         if (!isGreeterMode) {
             Processes.settingsRoot = root;
             loadSettings();
             initializeListModels();
-            Processes.detectFprintd();
+            refreshAuthAvailability();
             Processes.checkPluginSettings();
         }
     }

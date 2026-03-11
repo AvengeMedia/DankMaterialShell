@@ -14,6 +14,19 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property bool greeterFprintToggleAvailable: SettingsData.fprintdAvailable || SettingsData.greeterEnableFprint
+    readonly property bool greeterU2fToggleAvailable: SettingsData.u2fAvailable || SettingsData.greeterEnableU2f
+
+    function refreshAuthDetection() {
+        SettingsData.refreshAuthAvailability();
+    }
+
+    Component.onCompleted: refreshAuthDetection()
+    onVisibleChanged: {
+        if (visible)
+            refreshAuthDetection();
+    }
+
     ConfirmModal {
         id: greeterActionConfirm
     }
@@ -469,13 +482,16 @@ Item {
                     tags: ["greeter", "fingerprint", "fprintd", "login", "auth"]
                     text: I18n.tr("Enable fingerprint at login")
                     description: {
-                        if (!SettingsData.fprintdAvailable)
+                        if (!SettingsData.fprintdAvailable) {
+                            if (SettingsData.greeterEnableFprint)
+                                return I18n.tr("Enabled in settings, but fingerprint availability could not yet be confirmed. Re-open after enrolling fingerprints or reconnecting the reader.");
                             return I18n.tr("Not available — install fprintd and enroll fingerprints.");
+                        }
                         return SettingsData.greeterEnableFprint ? I18n.tr("Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.") : I18n.tr("Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.");
                     }
                     descriptionColor: SettingsData.fprintdAvailable ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.greeterEnableFprint
-                    enabled: SettingsData.fprintdAvailable
+                    enabled: root.greeterFprintToggleAvailable
                     onToggled: checked => SettingsData.set("greeterEnableFprint", checked)
                 }
 
@@ -484,13 +500,16 @@ Item {
                     tags: ["greeter", "u2f", "security", "key", "login", "auth"]
                     text: I18n.tr("Enable security key at login")
                     description: {
-                        if (!SettingsData.u2fAvailable)
+                        if (!SettingsData.u2fAvailable) {
+                            if (SettingsData.greeterEnableU2f)
+                                return I18n.tr("Enabled in settings, but security key availability could not yet be confirmed. Re-open after enrolling keys or updating pam_u2f.");
                             return I18n.tr("Not available — install pam_u2f and enroll keys.");
+                        }
                         return SettingsData.greeterEnableU2f ? I18n.tr("Run Sync to apply.") : I18n.tr("Disabled.");
                     }
                     descriptionColor: SettingsData.u2fAvailable ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.greeterEnableU2f
-                    enabled: SettingsData.u2fAvailable
+                    enabled: root.greeterU2fToggleAvailable
                     onToggled: checked => SettingsData.set("greeterEnableU2f", checked)
                 }
             }
