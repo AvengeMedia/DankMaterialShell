@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Determine version
         id: version
@@ -134,7 +134,7 @@ jobs:
           rpm -qpi "$SRPM"
 
       - name: Upload SRPM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.package }}-stable-srpm-${{ steps.version.outputs.version }}
           path: ${{ steps.build.outputs.srpm_path }}

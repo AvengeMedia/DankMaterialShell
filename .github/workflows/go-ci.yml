@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install flatpak
         run: sudo apt update && sudo apt install -y flatpak
@@ -38,7 +38,7 @@ jobs:
         run: sudo flatpak install -y org.freedesktop.Platform/x86_64/24.08 app.zen_browser.zen
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
 

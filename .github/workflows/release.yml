@@ -32,13 +32,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
 
@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload artifacts (${{ matrix.arch }})
         if: matrix.arch == 'arm64'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: core-assets-${{ matrix.arch }}
           path: |
@@ -120,7 +120,7 @@ jobs:
 
       - name: Upload artifacts with completions
         if: matrix.arch == 'amd64'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: core-assets-${{ matrix.arch }}
           path: |
@@ -147,7 +147,7 @@ jobs:
   #         private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
   #     - name: Checkout
-  #       uses: actions/checkout@v4
+  #       uses: actions/checkout@v6
   #       with:
   #         token: ${{ steps.app_token.outputs.token }}
   #         fetch-depth: 0
@@ -181,7 +181,7 @@ jobs:
       TAG: ${{ inputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
@@ -192,12 +192,12 @@ jobs:
           git checkout ${TAG}
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
 
       - name: Download core artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: core-assets-*
           merge-multiple: true
