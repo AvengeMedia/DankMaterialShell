@@ -8,6 +8,9 @@ DankPopout {
 
     layerNamespace: "dms:app-launcher"
 
+    readonly property real screenWidth: screen?.width ?? 1920
+    readonly property real screenHeight: screen?.height ?? 1080
+
     property string _pendingMode: ""
     property string _pendingQuery: ""
 
@@ -41,8 +44,35 @@ DankPopout {
         openWithQuery(query);
     }
 
-    popupWidth: 560
-    popupHeight: 640
+    readonly property int _baseWidth: {
+        switch (SettingsData.dankLauncherV2Size) {
+        case "micro":
+            return 500;
+        case "medium":
+            return 720;
+        case "large":
+            return 860;
+        default:
+            return 620;
+        }
+    }
+
+    readonly property int _baseHeight: {
+        switch (SettingsData.dankLauncherV2Size) {
+        case "micro":
+            return 480;
+        case "medium":
+            return 720;
+        case "large":
+            return 860;
+        default:
+            return 600;
+        }
+    }
+
+    popupWidth: Math.min(_baseWidth, screenWidth - 100)
+    popupHeight: Math.min(_baseHeight, screenHeight - 100)
+
     triggerWidth: 40
     positioning: ""
     contentHandlesKeys: contentLoader.item?.launcherContent?.editMode ?? false
