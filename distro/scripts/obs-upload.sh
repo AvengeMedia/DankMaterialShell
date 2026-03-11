@@ -1071,7 +1071,6 @@ if [[ -n "$OBS_FILES" ]]; then
         if osc api -X DELETE "/source/$OBS_PROJECT/$PACKAGE/$old_file" 2>/dev/null; then
             ((DELETED_COUNT++)) || true
         fi
-        sleep 1
     done
 
     # Remove service-generated download_url artifacts so new ones are created
@@ -1080,7 +1079,6 @@ if [[ -n "$OBS_FILES" ]]; then
         if osc api -X DELETE "/source/$OBS_PROJECT/$PACKAGE/$old_file" 2>/dev/null; then
             ((DELETED_COUNT++)) || true
         fi
-        sleep 1
     done
 
     if [[ $DELETED_COUNT -gt 0 ]]; then

@@ -200,7 +200,7 @@ jobs:
           fetch-depth: 0
 
       - name: Wait before OBS upload
-        run: sleep 8
+        run: sleep 3
 
       - name: Determine packages to update
         id: packages
