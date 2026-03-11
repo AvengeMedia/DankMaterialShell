@@ -363,21 +363,21 @@ Item {
     }
 
     function submitBufferedPassword() {
-        if (!GreeterState.passwordBuffer || GreeterState.passwordBuffer.length === 0)
-            return false;
         pendingPasswordResponse = false;
         resetPasswordSessionTransition(true);
         awaitingExternalAuth = false;
         authTimeout.interval = defaultAuthTimeoutMs;
         authTimeout.restart();
-        Greetd.respond(GreeterState.passwordBuffer);
+        // Some PAM stacks expect an explicit empty response to advance U2F/fprint or fail normally.
+        Greetd.respond(GreeterState.passwordBuffer || "");
         GreeterState.passwordBuffer = "";
         inputField.text = "";
         return true;
     }
 
     function requestPasswordSessionTransition() {
-        if (!GreeterState.passwordBuffer || GreeterState.passwordBuffer.length === 0)
+        const hasPasswordBuffer = GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0;
+        if (!passwordSubmitRequested && !hasPasswordBuffer)
             return;
         if (cancelingExternalAuthForPassword)
             return;
@@ -402,32 +402,33 @@ Item {
         Greetd.cancelSession();
     }
 
-    function startAuthSession() {
+    function startAuthSession(submitPassword) {
+        submitPassword = submitPassword === true;
         if (!GreeterState.showPasswordInput || !GreeterState.username)
             return;
         if (GreeterState.unlocking)
             return;
         const hasPasswordBuffer = GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0;
         if (Greetd.state !== GreetdState.Inactive) {
-            if (pendingPasswordResponse && hasPasswordBuffer)
+            if (pendingPasswordResponse && submitPassword)
                 submitBufferedPassword();
-            else if (hasPasswordBuffer)
+            else if (submitPassword)
                 passwordSubmitRequested = true;
             return;
         }
         if (cancelingExternalAuthForPassword) {
-            if (hasPasswordBuffer)
+            if (submitPassword)
                 passwordSubmitRequested = true;
             return;
         }
-        if (!hasPasswordBuffer && !root.greeterExternalAuthAvailable)
+        if (!submitPassword && !hasPasswordBuffer && !root.greeterExternalAuthAvailable)
             return;
         pendingPasswordResponse = false;
-        passwordSubmitRequested = hasPasswordBuffer;
-        awaitingExternalAuth = !hasPasswordBuffer && root.greeterExternalAuthAvailable;
+        passwordSubmitRequested = submitPassword;
+        awaitingExternalAuth = !submitPassword && !hasPasswordBuffer && root.greeterExternalAuthAvailable;
         // Included PAM stacks (system-auth/common-auth/password-auth) may still run
         // biometric/U2F modules before password even when DMS toggles are off.
-        const waitingOnPamExternalBeforePassword = hasPasswordBuffer && root.greeterPamHasExternalAuth;
+        const waitingOnPamExternalBeforePassword = submitPassword && root.greeterPamHasExternalAuth;
         authTimeout.interval = (awaitingExternalAuth || waitingOnPamExternalBeforePassword) ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
         authTimeout.restart();
         Greetd.createSession(GreeterState.username);
@@ -448,7 +449,7 @@ Item {
             return;
 
         externalAuthAutoStartedForUser = GreeterState.username;
-        startAuthSession();
+        startAuthSession(false);
     }
 
     function isExternalAuthPrompt(message, responseRequired) {
@@ -838,7 +839,7 @@ Item {
                             }
                             onAccepted: {
                                 if (GreeterState.showPasswordInput) {
-                                    root.startAuthSession();
+                                    root.startAuthSession(true);
                                 } else {
                                     if (text.trim()) {
                                         root.submitUsername(text);
@@ -959,7 +960,7 @@ Item {
                             buttonSize: 32
                             visible: GreeterState.showPasswordInput && root.greeterExternalAuthAvailable && GreeterState.passwordBuffer.length === 0 && (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
                             enabled: visible
-                            onClicked: root.startAuthSession()
+                            onClicked: root.startAuthSession(false)
                         }
                         DankActionButton {
                             id: virtualKeyboardButton
@@ -992,7 +993,7 @@ Item {
                             enabled: true
                             onClicked: {
                                 if (GreeterState.showPasswordInput) {
-                                    root.startAuthSession();
+                                    root.startAuthSession(true);
                                 } else {
                                     if (inputField.text.trim()) {
                                         root.submitUsername(inputField.text);
@@ -1613,14 +1614,16 @@ Item {
 
         function onStateChanged() {
             if (Greetd.state === GreetdState.Inactive) {
-                const resumePasswordSubmit = cancelingExternalAuthForPassword && passwordSubmitRequested && GreeterState.passwordBuffer && GreeterState.passwordBuffer.length > 0;
+                const resumePasswordSubmit = cancelingExternalAuthForPassword && passwordSubmitRequested;
                 awaitingExternalAuth = false;
                 pendingPasswordResponse = false;
                 cancelingExternalAuthForPassword = false;
                 authTimeout.interval = defaultAuthTimeoutMs;
                 authTimeout.stop();
                 if (resumePasswordSubmit) {
-                    Qt.callLater(root.startAuthSession);
+                    Qt.callLater(function() {
+                        root.startAuthSession(true);
+                    });
                     return;
                 }
                 resetPasswordSessionTransition(true);
