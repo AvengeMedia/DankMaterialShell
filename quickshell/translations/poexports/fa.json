@@ -2023,11 +2023,11 @@
   "File Information": {
     "File Information": "اطلاعات فایل"
   },
-  "File search requires dsearch\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\nInstall from github.com/morelazers/dsearch": "جستجوی فایل به dsearch نیاز دارد\nاز github.com/morelazers/dsearch نصب کنید"
+  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "جستجوی فایل به dsearch نیاز دارد\nاز github.com/AvengeMedia/danksearch نصب کنید"
   },
-  "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": "جستجوی نیاز به dsearch دارد\\nاز github.com/morelazers/dsearch نصب کنید"
+  "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": "جستجوی نیاز به dsearch دارد\\nاز github.com/AvengeMedia/danksearch نصب کنید"
   },
   "Files": {
     "Files": "فایل‌ها"

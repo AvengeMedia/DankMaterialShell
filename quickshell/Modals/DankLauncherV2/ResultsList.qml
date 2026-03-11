@@ -460,7 +460,7 @@ Item {
                     switch (mode) {
                     case "files":
                         if (!DSearchService.dsearchAvailable)
-                            return I18n.tr("File search requires dsearch\nInstall from github.com/morelazers/dsearch");
+                            return I18n.tr("File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch");
                         if (!hasQuery)
                             return I18n.tr("Type to search files");
                         if (root.controller.searchQuery.length < 2)
