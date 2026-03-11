@@ -4704,8 +4704,8 @@
     "comment": ""
   },
   {
-    "term": "File search requires dsearch\nInstall from github.com/morelazers/dsearch",
-    "context": "File search requires dsearch\nInstall from github.com/morelazers/dsearch",
+    "term": "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch",
+    "context": "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch",
     "reference": "Modals/DankLauncherV2/ResultsList.qml:471",
     "comment": ""
   },

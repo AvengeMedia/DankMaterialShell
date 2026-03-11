@@ -2134,11 +2134,11 @@
   "File Information": {
     "File Information": "Informations sur le fichier"
   },
-  "File search requires dsearch\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\nInstall from github.com/morelazers/dsearch": "La recherche de fichiers nécessite dsearch\nInstallez-le depuis github.com/morelazers/dsearch"
+  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "La recherche de fichiers nécessite dsearch\nInstallez-le depuis github.com/AvengeMedia/danksearch"
   },
-  "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": "La recherche de fichiers nécessite dsearch\\nInstallez-le depuis github.com/morelazers/dsearch"
+  "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": "La recherche de fichiers nécessite dsearch\\nInstallez-le depuis github.com/AvengeMedia/danksearch"
   },
   "Files": {
     "Files": "Fichiers"

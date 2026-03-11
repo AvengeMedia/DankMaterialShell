@@ -2134,11 +2134,11 @@
   "File Information": {
     "File Information": "Fájlinformáció"
   },
-  "File search requires dsearch\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\nInstall from github.com/morelazers/dsearch": "A fájlkereséshez dsearch szükséges\nTelepítsd innen: github.com/morelazers/dsearch"
+  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "A fájlkereséshez dsearch szükséges\nTelepítsd innen: github.com/AvengeMedia/danksearch"
   },
-  "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": "A fájlkereséshez dsearch szükséges\\nTelepítsd innen: github.com/morelazers/dsearch"
+  "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": "A fájlkereséshez dsearch szükséges\\nTelepítsd innen: github.com/AvengeMedia/danksearch"
   },
   "Files": {
     "Files": "Fájlok"

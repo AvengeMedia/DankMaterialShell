@@ -2134,11 +2134,11 @@
   "File Information": {
     "File Information": "פרטי קובץ"
   },
-  "File search requires dsearch\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\nInstall from github.com/morelazers/dsearch": "חיפוש קבצים הכלי dsearch נדרש כדי לבצע חיפוש של קבצים.\nהתקן/י אותו מ: github.com/morelazers/dsearch"
+  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "חיפוש קבצים הכלי dsearch נדרש כדי לבצע חיפוש של קבצים.\nהתקן/י אותו מ: github.com/AvengeMedia/danksearch"
   },
-  "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": {
-    "File search requires dsearch\\nInstall from github.com/morelazers/dsearch": "חיפוש קבצים הכלי dsearch נדרש כדי לבצע חיפוש של קבצים.\\nהתקן/י אותו מ: github.com/morelazers/dsearch"
+  "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": {
+    "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": "חיפוש קבצים הכלי dsearch נדרש כדי לבצע חיפוש של קבצים.\\nהתקן/י אותו מ: github.com/AvengeMedia/danksearch"
   },
   "Files": {
     "Files": "קבצים"
