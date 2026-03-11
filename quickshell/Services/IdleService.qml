@@ -93,9 +93,9 @@ Singleton {
             `;
 
             monitorOffMonitor = Qt.createQmlObject(qmlString, root, "IdleService.MonitorOffMonitor");
-            monitorOffMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.monitorTimeout > 0);
+            monitorOffMonitor.timeout = Qt.binding(() => root.monitorTimeout > 0 ? root.monitorTimeout : 86400);
             monitorOffMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            monitorOffMonitor.timeout = Qt.binding(() => root.monitorTimeout);
+            monitorOffMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.monitorTimeout > 0);
             monitorOffMonitor.isIdleChanged.connect(function () {
                 if (monitorOffMonitor.isIdle) {
                     if (SettingsData.fadeToDpmsEnabled) {
@@ -112,9 +112,9 @@ Singleton {
             });
 
             lockMonitor = Qt.createQmlObject(qmlString, root, "IdleService.LockMonitor");
-            lockMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.lockTimeout > 0);
+            lockMonitor.timeout = Qt.binding(() => root.lockTimeout > 0 ? root.lockTimeout : 86400);
             lockMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            lockMonitor.timeout = Qt.binding(() => root.lockTimeout);
+            lockMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.lockTimeout > 0);
             lockMonitor.isIdleChanged.connect(function () {
                 if (lockMonitor.isIdle) {
                     if (SettingsData.fadeToLockEnabled) {
@@ -130,9 +130,9 @@ Singleton {
             });
 
             suspendMonitor = Qt.createQmlObject(qmlString, root, "IdleService.SuspendMonitor");
-            suspendMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.suspendTimeout > 0);
+            suspendMonitor.timeout = Qt.binding(() => root.suspendTimeout > 0 ? root.suspendTimeout : 86400);
             suspendMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            suspendMonitor.timeout = Qt.binding(() => root.suspendTimeout);
+            suspendMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.suspendTimeout > 0);
             suspendMonitor.isIdleChanged.connect(function () {
                 if (suspendMonitor.isIdle) {
                     root.requestSuspend();
