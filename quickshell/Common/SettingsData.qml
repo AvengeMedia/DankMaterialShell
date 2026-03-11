@@ -280,6 +280,7 @@ Singleton {
     property bool showOccupiedWorkspacesOnly: false
     property bool reverseScrolling: false
     property bool dwlShowAllTags: false
+    property bool workspaceActiveAppHighlightEnabled: false
     property string workspaceColorMode: "default"
     property string workspaceOccupiedColorMode: "none"
     property string workspaceUnfocusedColorMode: "default"

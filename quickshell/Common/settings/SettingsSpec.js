@@ -123,6 +123,7 @@ var SPEC = {
     showOccupiedWorkspacesOnly: { def: false },
     reverseScrolling: { def: false },
     dwlShowAllTags: { def: false },
+    workspaceActiveAppHighlightEnabled: { def: false },
     workspaceColorMode: { def: "default" },
     workspaceOccupiedColorMode: { def: "none" },
     workspaceUnfocusedColorMode: { def: "default" },
