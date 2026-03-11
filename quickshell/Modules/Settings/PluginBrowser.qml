@@ -408,6 +408,8 @@ FloatingWindow {
                     }
                     clip: true
                     visible: !root.isLoading
+                    add: null
+                    displaced: null
 
                     ScrollBar.vertical: DankScrollbar {
                         id: browserScrollbar
