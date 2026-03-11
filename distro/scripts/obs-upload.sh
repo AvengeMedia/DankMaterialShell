@@ -102,6 +102,19 @@ if [[ ! -d "distro/debian" ]]; then
     echo "Error: Run this script from the repository root"
     exit 1
 fi
+
+# Retry wrapper for osc commands (mitigates SSL "Connection reset by peer" from api.opensuse.org)
+osc_retry() {
+    local max=3 attempt=1
+    while true; do
+        if osc "$@"; then return 0; fi
+        ((attempt >= max)) && return 1
+        echo "Retrying in $((5*attempt))s (attempt $attempt/$max)..."
+        sleep $((5*attempt))
+        ((attempt++))
+    done
+}
+
 # Parameters:
 #   $1 = PROJECT
 #   $2 = PACKAGE
@@ -309,7 +322,7 @@ mkdir -p "$OBS_BASE"
 if [[ ! -d "$OBS_BASE/$OBS_PROJECT/$PACKAGE" ]]; then
     echo "Checking out $OBS_PROJECT/$PACKAGE..."
     cd "$OBS_BASE"
-    osc co "$OBS_PROJECT/$PACKAGE"
+    osc_retry co "$OBS_PROJECT/$PACKAGE"
     cd "$REPO_ROOT"
 fi
 
@@ -1043,6 +1056,7 @@ if [[ -n "$OBS_FILES" ]]; then
         if osc api -X DELETE "/source/$OBS_PROJECT/$PACKAGE/$old_file" 2>/dev/null; then
             ((DELETED_COUNT++)) || true
         fi
+        sleep 1
     done
 
     # Remove service-generated download_url artifacts so new ones are created
@@ -1051,6 +1065,7 @@ if [[ -n "$OBS_FILES" ]]; then
         if osc api -X DELETE "/source/$OBS_PROJECT/$PACKAGE/$old_file" 2>/dev/null; then
             ((DELETED_COUNT++)) || true
         fi
+        sleep 1
     done
 
     if [[ $DELETED_COUNT -gt 0 ]]; then
@@ -1064,7 +1079,7 @@ fi
 
 # Update working copy to latest revision (without expanding service files to avoid revision conflicts)
 echo "==> Updating working copy"
-if ! osc up 2>/dev/null; then
+if ! osc_retry up 2>/dev/null; then
     echo "Error: Failed to update working copy"
     exit 1
 fi
@@ -1145,7 +1160,7 @@ if ! osc status 2>/dev/null | grep -qE '^[MAD]|^[?]'; then
 else
     echo "==> Committing to OBS"
     set +e
-    osc commit --skip-local-service-run -m "$MESSAGE" 2>&1 | grep -v "Git SCM package" | grep -v "apiurl\|project\|_ObsPrj\|_manifest\|git-obs"
+    osc_retry commit --skip-local-service-run -m "$MESSAGE" 2>&1 | grep -v "Git SCM package" | grep -v "apiurl\|project\|_ObsPrj\|_manifest\|git-obs"
     COMMIT_EXIT=${PIPESTATUS[0]}
     set -e
     if [[ $COMMIT_EXIT -ne 0 ]]; then
