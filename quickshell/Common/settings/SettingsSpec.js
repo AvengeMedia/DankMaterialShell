@@ -283,7 +283,7 @@ var SPEC = {
     matugenTemplateKitty: { def: true },
     matugenTemplateFoot: { def: true },
     matugenTemplateAlacritty: { def: true },
-    matugenTemplateNeovim: { def: true },
+    matugenTemplateNeovim: { def: false },
     matugenTemplateWezterm: { def: true },
     matugenTemplateDgop: { def: true },
     matugenTemplateKcolorscheme: { def: true },
