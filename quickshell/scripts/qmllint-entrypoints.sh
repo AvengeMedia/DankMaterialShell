@@ -12,8 +12,8 @@ repo_root="$(
 quickshell_dir="${repo_root}/quickshell"
 qmlls_config="${quickshell_dir}/.qmlls.ini"
 
-# Resolve qmllint: honour QMLLINT, then try qmllint6, then the common Qt 6
-# install path, and finally bare qmllint.  We need the Qt 6 build (>= 6.x)
+# Resolve qmllint: honour QMLLINT, then try common Qt 6 binary names and
+# install paths, and finally bare qmllint. We need the Qt 6 build (>= 6.x)
 # because older Qt 5 qmllint doesn't understand --ignore-settings / -W.
 resolve_qmllint() {
     if [[ -n "${QMLLINT:-}" ]]; then
@@ -21,7 +21,7 @@ resolve_qmllint() {
         return
     fi
     local candidate
-    for candidate in qmllint6 /usr/lib/qt6/bin/qmllint qmllint; do
+    for candidate in qmllint6 qmllint-qt6 /usr/lib/qt6/bin/qmllint qmllint; do
         if command -v -- "${candidate}" >/dev/null 2>&1; then
             printf '%s\n' "${candidate}"
             return
@@ -34,6 +34,16 @@ if ! qmllint_bin="$(resolve_qmllint)"; then
     printf 'error: qmllint (Qt 6) not found in PATH (override with QMLLINT=/path/to/qmllint)\n' >&2
     exit 127
 fi
+
+print_broken_qmlls_link() {
+    local target=""
+    target="$(readlink -- "${qmlls_config}" 2>/dev/null || true)"
+    printf 'error: %s is a broken symlink. lint-qml requires a live Quickshell tooling VFS.\n' "${qmlls_config}" >&2
+    if [[ -n "${target}" ]]; then
+        printf 'Broken target: %s\n' "${target}" >&2
+    fi
+    print_vfs_recovery
+}
 
 trim_ini_value() {
     local value="$1"
@@ -60,6 +70,11 @@ print_vfs_recovery() {
     printf '  dms -c %q run\n' "${quickshell_dir}" >&2
     printf '  qs -p %q\n' "${quickshell_dir}" >&2
 }
+
+if [[ -L "${qmlls_config}" && ! -e "${qmlls_config}" ]]; then
+    print_broken_qmlls_link
+    exit 1
+fi
 
 if [[ ! -e "${qmlls_config}" ]]; then
     printf 'error: %s is missing. lint-qml requires the Quickshell tooling VFS.\n' "${qmlls_config}" >&2
