@@ -322,8 +322,23 @@ mkdir -p "$OBS_BASE"
 if [[ ! -d "$OBS_BASE/$OBS_PROJECT/$PACKAGE" ]]; then
     echo "Checking out $OBS_PROJECT/$PACKAGE..."
     cd "$OBS_BASE"
-    osc_retry co "$OBS_PROJECT/$PACKAGE"
+    CHECKOUT_OK=false
+    for attempt in 1 2 3; do
+        if osc co "$OBS_PROJECT/$PACKAGE"; then
+            CHECKOUT_OK=true
+            break
+        fi
+        if [[ $attempt -lt 3 ]]; then
+            echo "Checkout failed (attempt $attempt/3). Removing partial copy and retrying in $((5*attempt))s..."
+            rm -rf "${OBS_BASE:?}/${OBS_PROJECT:?}"
+            sleep $((5*attempt))
+        fi
+    done
     cd "$REPO_ROOT"
+    if [[ "$CHECKOUT_OK" != "true" ]]; then
+        echo "Error: Checkout failed after 3 attempts"
+        exit 1
+    fi
 fi
 
 WORK_DIR="$OBS_BASE/$OBS_PROJECT/$PACKAGE"
