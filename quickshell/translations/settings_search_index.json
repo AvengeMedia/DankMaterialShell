@@ -979,6 +979,32 @@
     "description": "Group repeated application icons in unfocused workspaces"
   },
   {
+    "section": "workspaceActiveAppHighlightEnabled",
+    "label": "Highlight Active Workspace App",
+    "tabIndex": 4,
+    "category": "Workspaces",
+    "keywords": [
+      "active",
+      "app",
+      "apps",
+      "currently",
+      "day",
+      "desktop",
+      "focused",
+      "highlight",
+      "icons",
+      "indicators",
+      "inside",
+      "light mode",
+      "spaces",
+      "virtual",
+      "virtual desktops",
+      "workspace",
+      "workspaces"
+    ],
+    "description": "Highlight the currently focused app inside workspace indicators"
+  },
+  {
     "section": "workspaceIcons",
     "label": "Named Workspace Icons",
     "tabIndex": 4,
@@ -1281,7 +1307,8 @@
       "windows"
     ],
     "icon": "apps",
-    "description": "Only show windows from the current monitor on each dock"
+    "description": "Only show windows from the current monitor on each dock",
+    "conditionKey": "isHyprland"
   },
   {
     "section": "dockBorder",
@@ -1549,6 +1576,33 @@
       "taskbar"
     ],
     "icon": "swap_vert"
+  },
+  {
+    "section": "dockRestoreSpecialWorkspaceOnClick",
+    "label": "Restore Special Workspace Windows",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "back",
+      "before",
+      "bring",
+      "clicking",
+      "desktop",
+      "dock",
+      "focusing",
+      "hyprland",
+      "launcher bar",
+      "panel",
+      "restore",
+      "special",
+      "taskbar",
+      "virtual",
+      "window",
+      "windows",
+      "workspace"
+    ],
+    "description": "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window",
+    "conditionKey": "isHyprland"
   },
   {
     "section": "showDock",
@@ -2569,23 +2623,6 @@
       "style",
       "template",
       "theme"
-    ]
-  },
-  {
-    "section": "matugenTemplateZed",
-    "label": "Zed",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "look",
-      "matugen",
-      "scheme",
-      "style",
-      "template",
-      "theme",
-      "zed"
     ]
   },
   {
@@ -3797,6 +3834,23 @@
       "windows"
     ],
     "description": "Rounded corners for windows (decoration.rounding)"
+  },
+  {
+    "section": "matugenTemplateZed",
+    "label": "Zed",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme",
+      "zed"
+    ]
   },
   {
     "section": "matugenTemplateDgop",
@@ -5183,6 +5237,31 @@
       "toast"
     ],
     "description": "Save dismissed notifications to history"
+  },
+  {
+    "section": "notificationFocusedMonitor",
+    "label": "Focused Monitor Only",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "active",
+      "alert",
+      "alerts",
+      "currently",
+      "display",
+      "focused",
+      "messages",
+      "monitor",
+      "notif",
+      "notification",
+      "notifications",
+      "popup",
+      "popups",
+      "screen",
+      "show",
+      "toast"
+    ],
+    "description": "Show notification popups only on the currently focused monitor"
   },
   {
     "section": "notificationHistoryMaxAgeDays",
@@ -6845,5 +6924,16 @@
       "time"
     ],
     "description": "Change the locale used for date and time formatting, independent of the interface language."
+  },
+  {
+    "section": "_tab_31",
+    "label": "Greeter",
+    "tabIndex": 31,
+    "category": "Settings",
+    "keywords": [
+      "greeter",
+      "settings"
+    ],
+    "icon": "login"
   }
 ]
