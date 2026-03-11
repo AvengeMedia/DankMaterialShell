@@ -121,7 +121,12 @@ Item {
                     dropdownMenu.close();
                     return;
                 }
+
                 dropdownMenu.open();
+
+                let currentIndex = root.options.indexOf(root.currentValue);
+                listView.positionViewAtIndex(currentIndex, ListView.Beginning);
+
                 const pos = dropdown.mapToItem(Overlay.overlay, 0, 0);
                 const popupW = dropdownMenu.width;
                 const popupH = dropdownMenu.height;
