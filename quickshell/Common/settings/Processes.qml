@@ -10,15 +10,39 @@ Singleton {
 
     property var settingsRoot: null
 
+    function envFlag(name) {
+        const value = (Quickshell.env(name) || "").trim().toLowerCase();
+        if (value === "1" || value === "true" || value === "yes" || value === "on")
+            return true;
+        if (value === "0" || value === "false" || value === "no" || value === "off")
+            return false;
+        return null;
+    }
+
+    readonly property var forcedFprintAvailable: envFlag("DMS_FORCE_FPRINT_AVAILABLE")
+    readonly property var forcedU2fAvailable: envFlag("DMS_FORCE_U2F_AVAILABLE")
+
     function detectQtTools() {
         qtToolsDetectionProcess.running = true;
     }
 
     function detectFprintd() {
+        if (!settingsRoot)
+            return;
+        if (forcedFprintAvailable !== null) {
+            settingsRoot.fprintdAvailable = forcedFprintAvailable;
+            return;
+        }
         fprintdDetectionProcess.running = true;
     }
 
     function detectU2f() {
+        if (!settingsRoot)
+            return;
+        if (forcedU2fAvailable !== null) {
+            settingsRoot.u2fAvailable = forcedU2fAvailable;
+            return;
+        }
         u2fDetectionProcess.running = true;
     }
 
