@@ -50,14 +50,18 @@ func Send(n Notification) error {
 	}
 
 	var actions []string
+	        actions = []string{"copy", "Copy Text"}
+
 	if n.FilePath != "" {
-		actions = []string{
-			"open", "Open",
-			"folder", "Open Folder",
-		}
+		actions = append(actions, "open", "Open", "folder", "Open Folder")
 	}
 
 	hints := map[string]dbus.Variant{}
+	if n.FilePath != "" {
+		hints["image_path"] = dbus.MakeVariant(n.FilePath)
+	}
+
+	hints = map[string]dbus.Variant{}
 	if n.FilePath != "" {
 		hints["image_path"] = dbus.MakeVariant(n.FilePath)
 	}
@@ -85,20 +89,20 @@ func Send(n Notification) error {
 		return fmt.Errorf("failed to get notification id: %w", err)
 	}
 
-	if len(actions) > 0 && n.FilePath != "" {
-		spawnActionListener(notificationID, n.FilePath)
+	if len(actions) > 0 {
+		spawnActionListener(notificationID, n.FilePath, n.Body)
 	}
 
 	return nil
 }
 
-func spawnActionListener(notificationID uint32, filePath string) {
+func spawnActionListener(notificationID uint32, filePath, bodyText string) {
 	exe, err := os.Executable()
 	if err != nil {
 		return
 	}
 
-	cmd := exec.Command(exe, "notify-action-generic", fmt.Sprintf("%d", notificationID), filePath)
+	cmd := exec.Command(exe, "notify-action-generic", fmt.Sprintf("%d", notificationID), filePath, bodyText)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setsid: true,
 	}
@@ -116,6 +120,10 @@ func RunActionListener(args []string) {
 	}
 
 	filePath := args[1]
+	bodyText := ""
+	if len(args) >= 3 {
+		bodyText = args[2]
+	}
 
 	conn, err := dbus.SessionBus()
 	if err != nil {
@@ -135,18 +143,12 @@ func RunActionListener(args []string) {
 	for sig := range signals {
 		switch sig.Name {
 		case notifyInterface + ".ActionInvoked":
-			if len(sig.Body) < 2 {
-				continue
-			}
-			id, ok := sig.Body[0].(uint32)
-			if !ok || id != uint32(notificationID) {
-				continue
-			}
 			action, ok := sig.Body[1].(string)
 			if !ok {
 				continue
 			}
-			handleAction(action, filePath)
+			
+			handleAction(action, filePath, bodyText) 
 			return
 
 		case notifyInterface + ".NotificationClosed":
@@ -162,8 +164,14 @@ func RunActionListener(args []string) {
 	}
 }
 
-func handleAction(action, filePath string) {
+func handleAction(action, filePath, bodyText string) {
 	switch action {
+	case "copy":
+		exe, err := os.Executable()
+		if err == nil {
+			cmd := exec.Command(exe, "cl", "copy", bodyText) 
+			cmd.Start()
+			}
 	case "open", "default":
 		openPath(filePath)
 	case "folder":
