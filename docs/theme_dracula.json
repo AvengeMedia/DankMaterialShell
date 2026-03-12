@@ -1,0 +1,53 @@
+{
+  "id": "dracula",
+  "name": "Dracula",
+  "author": "Graplo",
+  "description": "Dracula theme for Dank Material Shell with optional Alucard light variant",
+  "version": "1.0",
+
+  "dark": {
+    "name": "Dracula Dark",
+    "primary": "#bd93f9",
+    "primaryText": "#282A36",
+    "primaryContainer": "#7c5ac7",
+    "secondary": "#ff79c6",
+    "surface": "#282A36",
+    "surfaceText": "#F8F8F2",
+    "surfaceVariant": "#44475A",
+    "surfaceVariantText": "#d6d8e0",
+    "surfaceTint": "#bd93f9",
+    "background": "#21222c",
+    "backgroundText": "#F8F8F2",
+    "outline": "#5a5e77",
+    "surfaceContainer": "#282A36",
+    "surfaceContainerHigh": "#313442",
+    "surfaceContainerHighest": "#44475A",
+    "error": "#FF5555",
+    "warning": "#f1fa8c",
+    "info": "#8be9fd",
+    "matugen_type": "scheme-tonal-spot"
+  },
+  "light": {
+    "name": "Dracula Light",
+    "primary": "#8332f4",
+    "primaryText": "#f8f8f2",
+    "primaryContainer": "#c9a4ff",
+    "secondary": "#ff79c6",
+    "surface": "#f8f8f2",
+    "surfaceText": "#282a36",
+    "surfaceVariant": "#e9e9f0",
+    "surfaceVariantText": "#44475a",
+    "surfaceTint": "#8332f4",
+    "background": "#f5f6fa",
+    "backgroundText": "#282a36",
+    "outline": "#c8c8d2",
+    "surfaceContainer": "#f2f2f7",
+    "surfaceContainerHigh": "#ececf2",
+    "surfaceContainerHighest": "#e6e6ee",
+    "error": "#ff5555",
+    "warning": "#f1fa8c",
+    "info": "#8be9fd",
+
+    "matugen_type": "scheme-tonal-spot"
+   }
+}
