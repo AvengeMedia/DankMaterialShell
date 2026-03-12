@@ -20,7 +20,10 @@ Item {
         var out = [];
         for (var i = 0; i < rules.length; i++) {
             if ((rules[i].action || "").toString().toLowerCase() === "mute")
-                out.push({ rule: rules[i], index: i });
+                out.push({
+                    rule: rules[i],
+                    index: i
+                });
         }
         return out;
     }
@@ -340,6 +343,7 @@ Item {
                         }
 
                         SettingsSliderRow {
+                            id: animationDurationSlider
                             settingKey: "notificationCustomAnimationDuration"
                             tags: ["notification", "animation", "duration", "custom", "speed"]
                             text: I18n.tr("Duration")
@@ -354,6 +358,13 @@ Item {
                                     SettingsData.set("notificationAnimationSpeed", SettingsData.AnimationSpeed.Custom);
                                 }
                                 SettingsData.set("notificationCustomAnimationDuration", newValue);
+                            }
+
+                            Connections {
+                                target: Theme
+                                function onNotificationAnimationBaseDurationChanged() {
+                                    animationDurationSlider.value = Theme.notificationAnimationBaseDuration;
+                                }
                             }
                         }
                     }
