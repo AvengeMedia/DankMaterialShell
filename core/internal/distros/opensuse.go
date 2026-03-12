@@ -29,6 +29,8 @@ type OpenSUSEDistribution struct {
 	config DistroConfig
 }
 
+const openSUSENiriWaylandServerPackage = "libwayland-server0"
+
 func NewOpenSUSEDistribution(config DistroConfig, logChan chan<- string) *OpenSUSEDistribution {
 	base := NewBaseDistribution(logChan)
 	return &OpenSUSEDistribution{
@@ -199,35 +201,7 @@ func (o *OpenSUSEDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (o *OpenSUSEDistribution) getPrerequisites() []string {
-	return []string{
-		"make",
-		"unzip",
-		"gcc",
-		"gcc-c++",
-		"cmake",
-		"ninja",
-		"pkgconf-pkg-config",
-		"git",
-		"qt6-base-devel",
-		"qt6-declarative-devel",
-		"qt6-declarative-private-devel",
-		"qt6-shadertools",
-		"qt6-shadertools-devel",
-		"qt6-wayland-devel",
-		"qt6-waylandclient-private-devel",
-		"spirv-tools-devel",
-		"cli11-devel",
-		"wayland-protocols-devel",
-		"libgbm-devel",
-		"libdrm-devel",
-		"pipewire-devel",
-		"jemalloc-devel",
-		"wayland-utils",
-		"Mesa-libGLESv3-devel",
-		"pam-devel",
-		"glib2-devel",
-		"polkit-devel",
-	}
+	return []string{}
 }
 
 func (o *OpenSUSEDistribution) InstallPrerequisites(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
@@ -297,6 +271,10 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		LogOutput:  "Starting prerequisite check...",
 	}
 
+	if err := o.disableInstallMediaRepos(ctx, sudoPassword, progressChan); err != nil {
+		return fmt.Errorf("failed to disable install media repositories: %w", err)
+	}
+
 	if err := o.InstallPrerequisites(ctx, sudoPassword, progressChan); err != nil {
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
@@ -327,7 +305,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 			NeedsSudo:  true,
 			LogOutput:  fmt.Sprintf("Installing system packages: %s", strings.Join(systemPkgs, ", ")),
 		}
-		if err := o.installZypperPackages(ctx, systemPkgs, sudoPassword, progressChan); err != nil {
+		if err := o.installZypperPackages(ctx, systemPkgs, sudoPassword, progressChan, PhaseSystemPackages, "Installing system packages...", 0.40, 0.60); err != nil {
 			return fmt.Errorf("failed to install zypper packages: %w", err)
 		}
 	}
@@ -342,7 +320,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 			IsComplete: false,
 			LogOutput:  fmt.Sprintf("Installing OBS packages: %s", strings.Join(obsPkgNames, ", ")),
 		}
-		if err := o.installZypperPackages(ctx, obsPkgNames, sudoPassword, progressChan); err != nil {
+		if err := o.installZypperPackages(ctx, obsPkgNames, sudoPassword, progressChan, PhaseAURPackages, "Installing OBS packages...", 0.70, 0.85); err != nil {
 			return fmt.Errorf("failed to install OBS packages: %w", err)
 		}
 	}
@@ -432,7 +410,30 @@ func (o *OpenSUSEDistribution) categorizePackages(dependencies []deps.Dependency
 		}
 	}
 
+	systemPkgs = o.appendMissingSystemPackages(systemPkgs, openSUSENiriRuntimePackages(wm, disabledFlags))
+
 	return systemPkgs, obsPkgs, manualPkgs, variantMap
+}
+
+func openSUSENiriRuntimePackages(wm deps.WindowManager, disabledFlags map[string]bool) []string {
+	if wm != deps.WindowManagerNiri || disabledFlags["niri"] {
+		return nil
+	}
+
+	return []string{openSUSENiriWaylandServerPackage}
+}
+
+func (o *OpenSUSEDistribution) appendMissingSystemPackages(systemPkgs []string, extraPkgs []string) []string {
+	for _, pkg := range extraPkgs {
+		if containsString(systemPkgs, pkg) || o.packageInstalled(pkg) {
+			continue
+		}
+
+		o.log(fmt.Sprintf("Adding openSUSE runtime package: %s", pkg))
+		systemPkgs = append(systemPkgs, pkg)
+	}
+
+	return systemPkgs
 }
 
 func (o *OpenSUSEDistribution) extractPackageNames(packages []PackageMapping) []string {
@@ -514,27 +515,146 @@ func (o *OpenSUSEDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Pac
 	return nil
 }
 
-func (o *OpenSUSEDistribution) installZypperPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func isOpenSUSEInstallMediaURI(uri string) bool {
+	normalizedURI := strings.ToLower(strings.TrimSpace(uri))
+
+	return strings.HasPrefix(normalizedURI, "cd:/") ||
+		strings.HasPrefix(normalizedURI, "dvd:/") ||
+		strings.HasPrefix(normalizedURI, "hd:/") ||
+		strings.HasPrefix(normalizedURI, "iso:/")
+}
+
+func parseZypperInstallMediaAliases(output string) []string {
+	var aliases []string
+
+	for _, line := range strings.Split(output, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || !strings.Contains(line, "|") {
+			continue
+		}
+
+		parts := strings.Split(line, "|")
+		if len(parts) < 7 {
+			continue
+		}
+
+		for i := range parts {
+			parts[i] = strings.TrimSpace(parts[i])
+		}
+
+		alias := parts[1]
+		enabled := strings.ToLower(parts[3])
+		uri := parts[len(parts)-1]
+
+		if alias == "" || strings.EqualFold(alias, "alias") {
+			continue
+		}
+		if enabled != "" && enabled != "yes" {
+			continue
+		}
+		if !isOpenSUSEInstallMediaURI(uri) {
+			continue
+		}
+
+		aliases = append(aliases, alias)
+	}
+
+	return aliases
+}
+
+func (o *OpenSUSEDistribution) disableInstallMediaRepos(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	listCmd := exec.CommandContext(ctx, "zypper", "repos", "-u")
+	output, err := listCmd.CombinedOutput()
+	if err != nil {
+		o.log(fmt.Sprintf("Warning: failed to list zypper repositories: %s", strings.TrimSpace(string(output))))
+		return fmt.Errorf("failed to list zypper repositories: %w", err)
+	}
+
+	aliases := parseZypperInstallMediaAliases(string(output))
+	if len(aliases) == 0 {
+		return nil
+	}
+
+	o.log(fmt.Sprintf("Disabling install media repositories: %s", strings.Join(aliases, ", ")))
+	progressChan <- InstallProgressMsg{
+		Phase:       PhasePrerequisites,
+		Progress:    0.055,
+		Step:        "Disabling install media repositories...",
+		IsComplete:  false,
+		NeedsSudo:   true,
+		CommandInfo: fmt.Sprintf("sudo zypper modifyrepo -d %s", strings.Join(aliases, " ")),
+		LogOutput:   fmt.Sprintf("Disabling install media repositories: %s", strings.Join(aliases, ", ")),
+	}
+
+	for _, alias := range aliases {
+		cmd := ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("zypper modifyrepo -d '%s'", escapeSingleQuotes(alias)))
+		repoOutput, err := cmd.CombinedOutput()
+		if err != nil {
+			o.log(fmt.Sprintf("Failed to disable install media repo %s: %s", alias, strings.TrimSpace(string(repoOutput))))
+			return fmt.Errorf("failed to disable install media repo %s: %w", alias, err)
+		}
+		o.log(fmt.Sprintf("Disabled install media repo %s: %s", alias, strings.TrimSpace(string(repoOutput))))
+	}
+
+	return nil
+}
+
+func (o *OpenSUSEDistribution) zypperInstallArgs(packages []string, minimal bool) []string {
+	args := []string{"zypper", "install", "-y"}
+	if minimal {
+		args = append(args, "--no-recommends")
+	}
+	return append(args, packages...)
+}
+
+func (o *OpenSUSEDistribution) installZypperPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg, phase InstallPhase, step string, startProgress float64, endProgress float64) error {
 	if len(packages) == 0 {
 		return nil
 	}
 
 	o.log(fmt.Sprintf("Installing zypper packages: %s", strings.Join(packages, ", ")))
 
-	args := []string{"zypper", "install", "-y"}
-	args = append(args, packages...)
+	groups := orderedMinimalInstallGroups(packages)
+	totalGroups := len(groups)
 
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.40,
-		Step:        "Installing system packages...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
+	groupIndex := 0
+	installGroup := func(groupPackages []string, minimal bool) error {
+		if len(groupPackages) == 0 {
+			return nil
+		}
+
+		groupIndex++
+		groupStart := startProgress
+		groupEnd := endProgress
+		if totalGroups > 1 {
+			midpoint := startProgress + ((endProgress - startProgress) / 2)
+			if groupIndex == 1 {
+				groupEnd = midpoint
+			} else {
+				groupStart = midpoint
+			}
+		}
+
+		args := o.zypperInstallArgs(groupPackages, minimal)
+		progressChan <- InstallProgressMsg{
+			Phase:       phase,
+			Progress:    groupStart,
+			Step:        step,
+			IsComplete:  false,
+			NeedsSudo:   true,
+			CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
+		}
+
+		cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+		return o.runWithProgress(cmd, progressChan, phase, groupStart, groupEnd)
 	}
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
-	return o.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.40, 0.60)
+	for _, group := range groups {
+		if err := installGroup(group.packages, group.minimal); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (o *OpenSUSEDistribution) installQuickshell(ctx context.Context, variant deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {

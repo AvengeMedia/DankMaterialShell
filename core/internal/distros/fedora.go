@@ -484,28 +484,7 @@ func (f *FedoraDistribution) installDNFPackages(ctx context.Context, packages []
 
 	f.log(fmt.Sprintf("Installing DNF packages: %s", strings.Join(packages, ", ")))
 
-	args := []string{"dnf", "install", "-y"}
-
-	for _, pkg := range packages {
-		if pkg == "niri" || pkg == "niri-git" {
-			args = append(args, "--setopt=install_weak_deps=False")
-			break
-		}
-	}
-
-	args = append(args, packages...)
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.40,
-		Step:        "Installing system packages...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
-	}
-
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
-	return f.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.40, 0.60)
+	return f.installDNFGroups(ctx, packages, sudoPassword, progressChan, PhaseSystemPackages, "Installing system packages...", 0.40, 0.60)
 }
 
 func (f *FedoraDistribution) installCOPRPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
@@ -515,26 +494,57 @@ func (f *FedoraDistribution) installCOPRPackages(ctx context.Context, packages [
 
 	f.log(fmt.Sprintf("Installing COPR packages: %s", strings.Join(packages, ", ")))
 
-	args := []string{"dnf", "install", "-y"}
+	return f.installDNFGroups(ctx, packages, sudoPassword, progressChan, PhaseAURPackages, "Installing COPR packages...", 0.70, 0.85)
+}
 
-	for _, pkg := range packages {
-		if pkg == "niri" || pkg == "niri-git" {
-			args = append(args, "--setopt=install_weak_deps=False")
-			break
+func (f *FedoraDistribution) dnfInstallArgs(packages []string, minimal bool) []string {
+	args := []string{"dnf", "install", "-y"}
+	if minimal {
+		args = append(args, "--setopt=install_weak_deps=False")
+	}
+	return append(args, packages...)
+}
+
+func (f *FedoraDistribution) installDNFGroups(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg, phase InstallPhase, step string, startProgress float64, endProgress float64) error {
+	groups := orderedMinimalInstallGroups(packages)
+	totalGroups := len(groups)
+
+	groupIndex := 0
+	installGroup := func(groupPackages []string, minimal bool) error {
+		if len(groupPackages) == 0 {
+			return nil
+		}
+
+		groupIndex++
+		groupStart := startProgress
+		groupEnd := endProgress
+		if totalGroups > 1 {
+			midpoint := startProgress + ((endProgress - startProgress) / 2)
+			if groupIndex == 1 {
+				groupEnd = midpoint
+			} else {
+				groupStart = midpoint
+			}
+		}
+
+		args := f.dnfInstallArgs(groupPackages, minimal)
+		progressChan <- InstallProgressMsg{
+			Phase:       phase,
+			Progress:    groupStart,
+			Step:        step,
+			IsComplete:  false,
+			NeedsSudo:   true,
+			CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
+		}
+
+		cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+		return f.runWithProgress(cmd, progressChan, phase, groupStart, groupEnd)
+	}
+
+	for _, group := range groups {
+		if err := installGroup(group.packages, group.minimal); err != nil {
+			return err
 		}
 	}
-
-	args = append(args, packages...)
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseAURPackages,
-		Progress:    0.70,
-		Step:        "Installing COPR packages...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
-	}
-
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
-	return f.runWithProgress(cmd, progressChan, PhaseAURPackages, 0.70, 0.85)
+	return nil
 }

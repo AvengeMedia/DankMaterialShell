@@ -100,9 +100,7 @@ func (u *UbuntuDistribution) detectDMSGreeter() deps.Dependency {
 }
 
 func (u *UbuntuDistribution) packageInstalled(pkg string) bool {
-	cmd := exec.Command("dpkg", "-l", pkg)
-	err := cmd.Run()
-	return err == nil
+	return debianPackageInstalledPrecisely(pkg)
 }
 
 func (u *UbuntuDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
@@ -454,21 +452,7 @@ func (u *UbuntuDistribution) installAPTPackages(ctx context.Context, packages []
 	}
 
 	u.log(fmt.Sprintf("Installing APT packages: %s", strings.Join(packages, ", ")))
-
-	args := []string{"apt-get", "install", "-y"}
-	args = append(args, packages...)
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.40,
-		Step:        "Installing system packages...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
-	}
-
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
-	return u.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.40, 0.60)
+	return u.installAPTGroups(ctx, packages, sudoPassword, progressChan, PhaseSystemPackages, "Installing system packages...", 0.40, 0.60)
 }
 
 func (u *UbuntuDistribution) installPPAPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
@@ -477,21 +461,59 @@ func (u *UbuntuDistribution) installPPAPackages(ctx context.Context, packages []
 	}
 
 	u.log(fmt.Sprintf("Installing PPA packages: %s", strings.Join(packages, ", ")))
+	return u.installAPTGroups(ctx, packages, sudoPassword, progressChan, PhaseAURPackages, "Installing PPA packages...", 0.70, 0.85)
+}
 
-	args := []string{"apt-get", "install", "-y"}
-	args = append(args, packages...)
+func (u *UbuntuDistribution) aptInstallArgs(packages []string, minimal bool) []string {
+	args := []string{"DEBIAN_FRONTEND=noninteractive", "apt-get", "install", "-y"}
+	if minimal {
+		args = append(args, "--no-install-recommends")
+	}
+	return append(args, packages...)
+}
 
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseAURPackages,
-		Progress:    0.70,
-		Step:        "Installing PPA packages...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
+func (u *UbuntuDistribution) installAPTGroups(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg, phase InstallPhase, step string, startProgress float64, endProgress float64) error {
+	groups := orderedMinimalInstallGroups(packages)
+	totalGroups := len(groups)
+
+	groupIndex := 0
+	installGroup := func(groupPackages []string, minimal bool) error {
+		if len(groupPackages) == 0 {
+			return nil
+		}
+
+		groupIndex++
+		groupStart := startProgress
+		groupEnd := endProgress
+		if totalGroups > 1 {
+			midpoint := startProgress + ((endProgress - startProgress) / 2)
+			if groupIndex == 1 {
+				groupEnd = midpoint
+			} else {
+				groupStart = midpoint
+			}
+		}
+
+		args := u.aptInstallArgs(groupPackages, minimal)
+		progressChan <- InstallProgressMsg{
+			Phase:       phase,
+			Progress:    groupStart,
+			Step:        step,
+			IsComplete:  false,
+			NeedsSudo:   true,
+			CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
+		}
+
+		cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+		return u.runWithProgress(cmd, progressChan, phase, groupStart, groupEnd)
 	}
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
-	return u.runWithProgress(cmd, progressChan, PhaseAURPackages, 0.70, 0.85)
+	for _, group := range groups {
+		if err := installGroup(group.packages, group.minimal); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *UbuntuDistribution) installBuildDependencies(ctx context.Context, manualPkgs []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
