@@ -99,10 +99,12 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         radius: Theme.cornerRadius
 
-        color: (checked && enabled) ? Theme.primary : Theme.surfaceVariantAlpha
-        opacity: toggling ? 0.6 : (enabled ? 1 : 0.4)
+        // M3 disabled track: on surface 12% opacity
+        color: !toggle.enabled ? Qt.alpha(Theme.surfaceText, 0.12) : (toggle.checked ? Theme.primary : Theme.surfaceVariantAlpha)
+        opacity: toggle.toggling ? 0.6 : 1
 
-        border.color: (!checked || !enabled) ? Theme.outline : "transparent"
+        // M3 disabled unchecked border: on surface 12% opacity
+        border.color: toggle.checked ? "transparent" : (!toggle.enabled ? Qt.alpha(Theme.surfaceText, 0.12) : Theme.outline)
 
         readonly property int pad: Math.round((height - thumb.width) / 2)
         readonly property int edgeLeft: pad
@@ -111,16 +113,18 @@ Item {
         StyledRect {
             id: thumb
 
-            width: (checked && enabled) ? insetCircle : insetCircle - 4
-            height: (checked && enabled) ? insetCircle : insetCircle - 4
+            width: toggle.checked ? insetCircle : insetCircle - 4
+            height: toggle.checked ? insetCircle : insetCircle - 4
             radius: Theme.cornerRadius
             anchors.verticalCenter: parent.verticalCenter
 
-            color: (checked && enabled) ? Theme.surface : Theme.outline
-            border.color: (checked && enabled) ? Theme.outline : Theme.outline
-            border.width: (checked && enabled) ? 1 : 2
+            // M3 disabled thumb:
+            // checked = solid surface | unchecked = on surface 38%
+            color: !toggle.enabled ? (toggle.checked ? Theme.surface : Qt.alpha(Theme.surfaceText, 0.38)) : (toggle.checked ? Theme.surface : Theme.outline)
+            border.color: !toggle.enabled ? (toggle.checked ? "transparent" : Qt.alpha(Theme.surfaceText, 0.38)) : Theme.outline
+            border.width: (toggle.checked && toggle.enabled) ? 1 : 2
 
-            x: (checked && enabled) ? toggleTrack.edgeRight : toggleTrack.edgeLeft
+            x: toggle.checked ? toggleTrack.edgeRight : toggleTrack.edgeLeft
 
             Behavior on x {
                 SequentialAnimation {
@@ -158,10 +162,11 @@ Item {
                 anchors.centerIn: parent
                 name: "check"
                 size: 20
-                color: Theme.surfaceText
+                // M3 disabled icon: on surface 38%
+                color: toggle.enabled ? Theme.surfaceText : Qt.alpha(Theme.surfaceText, 0.38)
                 filled: true
-                opacity: checked && enabled ? 1 : 0
-                scale: checked && enabled ? 1 : 0.6
+                opacity: toggle.checked ? 1 : 0
+                scale: toggle.checked ? 1 : 0.6
 
                 Behavior on opacity {
                     NumberAnimation {
