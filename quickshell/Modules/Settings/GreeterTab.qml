@@ -14,8 +14,63 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    readonly property bool greeterFprintToggleAvailable: SettingsData.fprintdAvailable || SettingsData.greeterEnableFprint
-    readonly property bool greeterU2fToggleAvailable: SettingsData.u2fAvailable || SettingsData.greeterEnableU2f
+    readonly property bool greeterFprintToggleAvailable: SettingsData.greeterFingerprintCanEnable || SettingsData.greeterEnableFprint
+    readonly property bool greeterU2fToggleAvailable: SettingsData.greeterU2fCanEnable || SettingsData.greeterEnableU2f
+
+    function greeterFingerprintDescription() {
+        const source = SettingsData.greeterFingerprintSource;
+        const reason = SettingsData.greeterFingerprintReason;
+
+        if (source === "pam") {
+            switch (reason) {
+            case "configured_externally":
+                return SettingsData.greeterEnableFprint ? I18n.tr("Enabled. PAM already provides fingerprint auth.") : I18n.tr("PAM already provides fingerprint auth. Enable this to show it at login.");
+            case "missing_enrollment":
+                return SettingsData.greeterEnableFprint ? I18n.tr("Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.") : I18n.tr("PAM provides fingerprint auth, but no prints are enrolled yet.");
+            case "missing_reader":
+                return I18n.tr("PAM provides fingerprint auth, but no reader was detected.");
+            default:
+                return I18n.tr("PAM provides fingerprint auth, but availability could not be confirmed.");
+            }
+        }
+
+        switch (reason) {
+        case "ready":
+            return SettingsData.greeterEnableFprint ? I18n.tr("Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.") : I18n.tr("Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.");
+        case "missing_enrollment":
+            if (SettingsData.greeterEnableFprint)
+                return I18n.tr("Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.");
+            return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.");
+        case "missing_reader":
+            return SettingsData.greeterEnableFprint ? I18n.tr("Enabled, but no fingerprint reader was detected.") : I18n.tr("No fingerprint reader detected.");
+        case "missing_pam_support":
+            return I18n.tr("Not available — install fprintd and pam_fprintd, or configure greetd PAM.");
+        default:
+            return SettingsData.greeterEnableFprint ? I18n.tr("Enabled, but fingerprint availability could not be confirmed.") : I18n.tr("Fingerprint availability could not be confirmed.");
+        }
+    }
+
+    function greeterU2fDescription() {
+        const source = SettingsData.greeterU2fSource;
+        const reason = SettingsData.greeterU2fReason;
+
+        if (source === "pam") {
+            return SettingsData.greeterEnableU2f ? I18n.tr("Enabled. PAM already provides security-key auth.") : I18n.tr("PAM already provides security-key auth. Enable this to show it at login.");
+        }
+
+        switch (reason) {
+        case "ready":
+            return SettingsData.greeterEnableU2f ? I18n.tr("Run Sync to apply.") : I18n.tr("Available.");
+        case "missing_key_registration":
+            if (SettingsData.greeterEnableU2f)
+                return I18n.tr("Enabled, but no registered security key was found yet. Register a key and run Sync.");
+            return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.");
+        case "missing_pam_support":
+            return I18n.tr("Not available — install or configure pam_u2f, or configure greetd PAM.");
+        default:
+            return SettingsData.greeterEnableU2f ? I18n.tr("Enabled, but security-key availability could not be confirmed.") : I18n.tr("Security-key availability could not be confirmed.");
+        }
+    }
 
     function refreshAuthDetection() {
         SettingsData.refreshAuthAvailability();
@@ -481,15 +536,8 @@ Item {
                     settingKey: "greeterEnableFprint"
                     tags: ["greeter", "fingerprint", "fprintd", "login", "auth"]
                     text: I18n.tr("Enable fingerprint at login")
-                    description: {
-                        if (!SettingsData.fprintdAvailable) {
-                            if (SettingsData.greeterEnableFprint)
-                                return I18n.tr("Enabled in settings, but fingerprint availability could not yet be confirmed. Re-open after enrolling fingerprints or reconnecting the reader.");
-                            return I18n.tr("Not available — install fprintd and enroll fingerprints.");
-                        }
-                        return SettingsData.greeterEnableFprint ? I18n.tr("Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.") : I18n.tr("Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.");
-                    }
-                    descriptionColor: SettingsData.fprintdAvailable ? Theme.surfaceVariantText : Theme.warning
+                    description: root.greeterFingerprintDescription()
+                    descriptionColor: (SettingsData.greeterFingerprintReason === "ready" || SettingsData.greeterFingerprintReason === "configured_externally") ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.greeterEnableFprint
                     enabled: root.greeterFprintToggleAvailable
                     onToggled: checked => SettingsData.set("greeterEnableFprint", checked)
@@ -499,15 +547,8 @@ Item {
                     settingKey: "greeterEnableU2f"
                     tags: ["greeter", "u2f", "security", "key", "login", "auth"]
                     text: I18n.tr("Enable security key at login")
-                    description: {
-                        if (!SettingsData.u2fAvailable) {
-                            if (SettingsData.greeterEnableU2f)
-                                return I18n.tr("Enabled in settings, but security key availability could not yet be confirmed. Re-open after enrolling keys or updating pam_u2f.");
-                            return I18n.tr("Not available — install pam_u2f and enroll keys.");
-                        }
-                        return SettingsData.greeterEnableU2f ? I18n.tr("Run Sync to apply.") : I18n.tr("Disabled.");
-                    }
-                    descriptionColor: SettingsData.u2fAvailable ? Theme.surfaceVariantText : Theme.warning
+                    description: root.greeterU2fDescription()
+                    descriptionColor: (SettingsData.greeterU2fReason === "ready" || SettingsData.greeterU2fReason === "configured_externally") ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.greeterEnableU2f
                     enabled: root.greeterU2fToggleAvailable
                     onToggled: checked => SettingsData.set("greeterEnableU2f", checked)

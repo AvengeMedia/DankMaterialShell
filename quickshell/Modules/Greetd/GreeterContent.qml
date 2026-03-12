@@ -36,7 +36,7 @@ Item {
     property bool passwordSubmitRequested: false
     property bool cancelingExternalAuthForPassword: false
     property int defaultAuthTimeoutMs: 10000
-    property int externalAuthTimeoutMs: 36000
+    property int externalAuthTimeoutMs: 30000
     property int memoryFlushDelayMs: 120
     property string pendingLaunchCommand: ""
     property var pendingLaunchEnv: []
@@ -47,13 +47,17 @@ Item {
     property string systemAuthPamText: ""
     property string commonAuthPamText: ""
     property string passwordAuthPamText: ""
+    property string systemLoginPamText: ""
+    property string systemLocalLoginPamText: ""
+    property string commonAuthPcPamText: ""
+    property string loginPamText: ""
     property string faillockConfigText: ""
     property bool greeterWallpaperOverrideExists: false
     property string externalAuthAutoStartedForUser: ""
     property int passwordSessionTransitionRetryCount: 0
     property int maxPasswordSessionTransitionRetries: 2
-    readonly property bool greeterPamHasFprint: pamModuleEnabled(greetdPamText, "pam_fprintd") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_fprintd")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_fprintd")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_fprintd"))
-    readonly property bool greeterPamHasU2f: pamModuleEnabled(greetdPamText, "pam_u2f") || (greetdPamText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_u2f")) || (greetdPamText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_u2f")) || (greetdPamText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_u2f"))
+    readonly property bool greeterPamHasFprint: greeterPamStackHasModule("pam_fprintd")
+    readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
     readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
 
@@ -90,6 +94,40 @@ Item {
             if (!line)
                 continue;
             if (line.includes(moduleName))
+                return true;
+        }
+        return false;
+    }
+
+    function pamTextIncludesFile(pamText, filename) {
+        if (!pamText || !filename)
+            return false;
+        const lines = pamText.split(/\r?\n/);
+        for (let i = 0; i < lines.length; i++) {
+            const line = stripPamComment(lines[i]);
+            if (!line)
+                continue;
+            if (line.includes(filename) && (line.includes("include") || line.includes("substack") || line.startsWith("@include")))
+                return true;
+        }
+        return false;
+    }
+
+    function greeterPamStackHasModule(moduleName) {
+        if (pamModuleEnabled(greetdPamText, moduleName))
+            return true;
+        const includedPamStacks = [
+            ["system-auth", systemAuthPamText],
+            ["common-auth", commonAuthPamText],
+            ["password-auth", passwordAuthPamText],
+            ["system-login", systemLoginPamText],
+            ["system-local-login", systemLocalLoginPamText],
+            ["common-auth-pc", commonAuthPcPamText],
+            ["login", loginPamText]
+        ];
+        for (let i = 0; i < includedPamStacks.length; i++) {
+            const stack = includedPamStacks[i];
+            if (pamTextIncludesFile(greetdPamText, stack[0]) && pamModuleEnabled(stack[1], moduleName))
                 return true;
         }
         return false;
@@ -148,7 +186,7 @@ Item {
     }
 
     function refreshPasswordAttemptPolicyHint() {
-        const pamSources = [greetdPamText, systemAuthPamText, commonAuthPamText, passwordAuthPamText];
+        const pamSources = [greetdPamText, systemAuthPamText, commonAuthPamText, passwordAuthPamText, systemLoginPamText, systemLocalLoginPamText, commonAuthPcPamText, loginPamText];
         let lockoutConfigured = false;
         let denyFromPam = -1;
         for (let i = 0; i < pamSources.length; i++) {
@@ -271,6 +309,7 @@ Item {
         onLoaded: {
             root.systemAuthPamText = text();
             root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
         }
         onLoadFailed: {
             root.systemAuthPamText = "";
@@ -285,6 +324,7 @@ Item {
         onLoaded: {
             root.commonAuthPamText = text();
             root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
         }
         onLoadFailed: {
             root.commonAuthPamText = "";
@@ -299,9 +339,70 @@ Item {
         onLoaded: {
             root.passwordAuthPamText = text();
             root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
         }
         onLoadFailed: {
             root.passwordAuthPamText = "";
+            root.refreshPasswordAttemptPolicyHint();
+        }
+    }
+
+    FileView {
+        id: systemLoginPamWatcher
+        path: "/etc/pam.d/system-login"
+        printErrors: false
+        onLoaded: {
+            root.systemLoginPamText = text();
+            root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
+        }
+        onLoadFailed: {
+            root.systemLoginPamText = "";
+            root.refreshPasswordAttemptPolicyHint();
+        }
+    }
+
+    FileView {
+        id: systemLocalLoginPamWatcher
+        path: "/etc/pam.d/system-local-login"
+        printErrors: false
+        onLoaded: {
+            root.systemLocalLoginPamText = text();
+            root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
+        }
+        onLoadFailed: {
+            root.systemLocalLoginPamText = "";
+            root.refreshPasswordAttemptPolicyHint();
+        }
+    }
+
+    FileView {
+        id: commonAuthPcPamWatcher
+        path: "/etc/pam.d/common-auth-pc"
+        printErrors: false
+        onLoaded: {
+            root.commonAuthPcPamText = text();
+            root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
+        }
+        onLoadFailed: {
+            root.commonAuthPcPamText = "";
+            root.refreshPasswordAttemptPolicyHint();
+        }
+    }
+
+    FileView {
+        id: loginPamWatcher
+        path: "/etc/pam.d/login"
+        printErrors: false
+        onLoaded: {
+            root.loginPamText = text();
+            root.refreshPasswordAttemptPolicyHint();
+            root.maybeAutoStartExternalAuth();
+        }
+        onLoadFailed: {
+            root.loginPamText = "";
             root.refreshPasswordAttemptPolicyHint();
         }
     }

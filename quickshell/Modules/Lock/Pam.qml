@@ -158,7 +158,7 @@ Scope {
     PamContext {
         id: fprint
 
-        property bool available
+        property bool available: SettingsData.lockFingerprintReady
         property int tries
         property int errorTries
 
@@ -212,13 +212,71 @@ Scope {
         }
     }
 
-    Process {
-        id: availProc
+    PamContext {
+        id: u2f
 
-        command: ["sh", "-c", "fprintd-list \"${USER:-$(id -un)}\""]
-        onExited: code => {
-            fprint.available = code === 0;
-            fprint.checkAvail();
+        property bool available: SettingsData.lockU2fReady
+
+        function checkAvail(): void {
+            if (!available || !SettingsData.enableU2f || !root.lockSecured) {
+                abort();
+                return;
+            }
+
+            if (SettingsData.u2fMode === "or") {
+                start();
+            }
+        }
+
+        function startForSecondFactor(): void {
+            if (!available || !SettingsData.enableU2f) {
+                root.completeUnlock();
+                return;
+            }
+            abort();
+            root.u2fPending = true;
+            root.u2fState = "";
+            u2fPendingTimeout.restart();
+            start();
+        }
+
+        config: u2fConfigWatcher.loaded ? "dankshell-u2f" : "u2f"
+        configDirectory: u2fConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
+
+        onMessageChanged: {
+            if (message.toLowerCase().includes("touch"))
+                root.u2fState = "waiting";
+        }
+
+        onCompleted: res => {
+            if (!available || root.unlockInProgress)
+                return;
+
+            if (res === PamResult.Success) {
+                root.completeUnlock();
+                return;
+            }
+
+            if (res === PamResult.Error || res === PamResult.MaxTries || res === PamResult.Failed) {
+                abort();
+
+                if (root.u2fPending) {
+                    if (root.u2fState === "waiting") {
+                        // AND mode: device was found but auth failed → back to password
+                        root.u2fPending = false;
+                        root.u2fState = "";
+                        fprint.checkAvail();
+                    } else {
+                        // AND mode: no device found → keep pending, show "Insert...", retry
+                        root.u2fState = "insert";
+                        u2fErrorRetry.restart();
+                    }
+                } else {
+                    // OR mode: prompt to insert key, silently retry
+                    root.u2fState = "insert";
+                    u2fErrorRetry.restart();
+                }
+            }
         }
     }
 
@@ -285,11 +343,13 @@ Scope {
 
     onLockSecuredChanged: {
         if (lockSecured) {
-            availProc.running = true;
+            SettingsData.refreshAuthAvailability();
             root.state = "";
             root.fprintState = "";
             root.lockMessage = "";
             root.resetAuthFlows();
+            fprint.checkAvail();
+            u2f.checkAvail();
         } else {
             root.resetAuthFlows();
         }
@@ -302,7 +362,15 @@ Scope {
             fprint.checkAvail();
         }
 
+        function onLockFingerprintReadyChanged(): void {
+            fprint.checkAvail();
+        }
+
         function onEnableU2fChanged(): void {
+            u2f.checkAvail();
+        }
+
+        function onLockU2fReadyChanged(): void {
             u2f.checkAvail();
         }
 

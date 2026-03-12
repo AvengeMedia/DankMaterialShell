@@ -524,6 +524,16 @@ func syncInTerminal(nonInteractive bool, forceAuth bool, local bool) error {
 	return runCommandInTerminal(shellCmd)
 }
 
+func resolveLocalWrapperShell() (string, error) {
+	for _, shellName := range []string{"bash", "sh"} {
+		shellPath, err := exec.LookPath(shellName)
+		if err == nil {
+			return shellPath, nil
+		}
+	}
+	return "", fmt.Errorf("could not find bash or sh in PATH for local greeter wrapper")
+}
+
 func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 	if !nonInteractive {
 		fmt.Println("=== DMS Greeter Theme Sync ===")
@@ -660,8 +670,12 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 		localWrapperScript := filepath.Join(dmsPath, "Modules", "Greetd", "assets", "dms-greeter")
 		restoreWrapperOverride := func() {}
 		if info, statErr := os.Stat(localWrapperScript); statErr == nil && !info.IsDir() {
+			wrapperShell, shellErr := resolveLocalWrapperShell()
+			if shellErr != nil {
+				return shellErr
+			}
 			previousWrapperOverride, hadWrapperOverride := os.LookupEnv("DMS_GREETER_WRAPPER_CMD")
-			wrapperCmdOverride := "/usr/bin/bash " + localWrapperScript
+			wrapperCmdOverride := wrapperShell + " " + localWrapperScript
 			_ = os.Setenv("DMS_GREETER_WRAPPER_CMD", wrapperCmdOverride)
 			restoreWrapperOverride = func() {
 				if hadWrapperOverride {
