@@ -9,8 +9,40 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    readonly property bool lockFprintToggleAvailable: SettingsData.fprintdAvailable || SettingsData.enableFprint
-    readonly property bool lockU2fToggleAvailable: SettingsData.u2fAvailable || SettingsData.enableU2f
+    readonly property bool lockFprintToggleAvailable: SettingsData.lockFingerprintCanEnable || SettingsData.enableFprint
+    readonly property bool lockU2fToggleAvailable: SettingsData.lockU2fCanEnable || SettingsData.enableU2f
+
+    function lockFingerprintDescription() {
+        switch (SettingsData.lockFingerprintReason) {
+        case "ready":
+            return I18n.tr("Use fingerprint authentication for the lock screen.");
+        case "missing_enrollment":
+            if (SettingsData.enableFprint)
+                return I18n.tr("Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.");
+            return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.");
+        case "missing_reader":
+            return SettingsData.enableFprint ? I18n.tr("Enabled, but no fingerprint reader was detected.") : I18n.tr("No fingerprint reader detected.");
+        case "missing_pam_support":
+            return I18n.tr("Not available — install fprintd and pam_fprintd.");
+        default:
+            return SettingsData.enableFprint ? I18n.tr("Enabled, but fingerprint availability could not be confirmed.") : I18n.tr("Fingerprint availability could not be confirmed.");
+        }
+    }
+
+    function lockU2fDescription() {
+        switch (SettingsData.lockU2fReason) {
+        case "ready":
+            return I18n.tr("Use a security key for lock screen authentication.", "lock screen U2F security key setting");
+        case "missing_key_registration":
+            if (SettingsData.enableU2f)
+                return I18n.tr("Enabled, but no registered security key was found yet. Register a key or update your U2F config.");
+            return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.");
+        case "missing_pam_support":
+            return I18n.tr("Not available — install or configure pam_u2f.");
+        default:
+            return SettingsData.enableU2f ? I18n.tr("Enabled, but security-key availability could not be confirmed.") : I18n.tr("Security-key availability could not be confirmed.");
+        }
+    }
 
     function refreshAuthDetection() {
         SettingsData.refreshAuthAvailability();
@@ -185,14 +217,8 @@ Item {
                     settingKey: "enableFprint"
                     tags: ["lock", "screen", "fingerprint", "authentication", "biometric", "fprint"]
                     text: I18n.tr("Enable fingerprint authentication")
-                    description: {
-                        if (SettingsData.fprintdAvailable)
-                            return I18n.tr("Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)");
-                        if (SettingsData.enableFprint)
-                            return I18n.tr("Enabled in settings, but fingerprint availability could not yet be confirmed. Re-open after enrolling fingerprints or reconnecting the reader.");
-                        return I18n.tr("Not available — install fprintd and enroll fingerprints.");
-                    }
-                    descriptionColor: SettingsData.fprintdAvailable ? Theme.surfaceVariantText : Theme.warning
+                    description: root.lockFingerprintDescription()
+                    descriptionColor: SettingsData.lockFingerprintReason === "ready" ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.enableFprint
                     enabled: root.lockFprintToggleAvailable
                     onToggled: checked => SettingsData.set("enableFprint", checked)
@@ -202,14 +228,8 @@ Item {
                     settingKey: "enableU2f"
                     tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "fido", "authentication", "hardware"]
                     text: I18n.tr("Enable security key authentication", "Enable FIDO2/U2F hardware security key for lock screen")
-                    description: {
-                        if (SettingsData.u2fAvailable)
-                            return I18n.tr("Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)", "lock screen U2F security key setting");
-                        if (SettingsData.enableU2f)
-                            return I18n.tr("Enabled in settings, but security key availability could not yet be confirmed. Re-open after enrolling keys or updating pam_u2f.");
-                        return I18n.tr("Not available — install pam_u2f and enroll keys.");
-                    }
-                    descriptionColor: SettingsData.u2fAvailable ? Theme.surfaceVariantText : Theme.warning
+                    description: root.lockU2fDescription()
+                    descriptionColor: SettingsData.lockU2fReason === "ready" ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.enableU2f
                     enabled: root.lockU2fToggleAvailable
                     onToggled: checked => SettingsData.set("enableU2f", checked)

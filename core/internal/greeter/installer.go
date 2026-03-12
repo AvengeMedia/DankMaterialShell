@@ -33,14 +33,23 @@ const (
 	legacyGreeterPamU2FComment    = "# DMS greeter U2F"
 )
 
-var includedPamAuthFiles = []string{"system-auth", "common-auth", "password-auth"}
+// Common PAM auth stack names referenced by greetd across supported distros.
+var includedPamAuthFiles = []string{
+	"system-auth",
+	"common-auth",
+	"password-auth",
+	"system-login",
+	"system-local-login",
+	"common-auth-pc",
+	"login",
+}
 
 func DetectDMSPath() (string, error) {
 	return config.LocateDMSConfig()
 }
 
 // IsNixOS returns true when running on NixOS, which manages PAM configs through
-// its module system. The DMS PAM managed block must not be written on NixOS.
+// its module system. The DMS PAM managed block won't be written on NixOS.
 func IsNixOS() bool {
 	_, err := os.Stat("/etc/NIXOS")
 	return err == nil
@@ -440,8 +449,21 @@ func TryInstallGreeterPackage(logFunc func(string), sudoPassword string) bool {
 		obsSlug := getDebianOBSSlug(osInfo)
 		keyURL := fmt.Sprintf("https://download.opensuse.org/repositories/home:AvengeMedia:danklinux/%s/Release.key", obsSlug)
 		repoLine := fmt.Sprintf("deb [signed-by=/etc/apt/keyrings/danklinux.gpg] https://download.opensuse.org/repositories/home:/AvengeMedia:/danklinux/%s/ /", obsSlug)
-		failHint = fmt.Sprintf("⚠ dms-greeter install failed. Add OBS repo manually:\ncurl -fsSL %s | sudo gpg --dearmor -o /etc/apt/keyrings/danklinux.gpg\necho '%s' | sudo tee /etc/apt/sources.list.d/danklinux.list\nsudo apt update && sudo apt install dms-greeter", keyURL, repoLine)
+		failHint = fmt.Sprintf("⚠ dms-greeter install failed. Add OBS repo manually:\nsudo apt-get install -y gnupg\nsudo mkdir -p /etc/apt/keyrings\ncurl -fsSL %s | sudo gpg --dearmor -o /etc/apt/keyrings/danklinux.gpg\necho '%s' | sudo tee /etc/apt/sources.list.d/danklinux.list\nsudo apt update && sudo apt-get install -y dms-greeter", keyURL, repoLine)
 		logFunc(fmt.Sprintf("Adding DankLinux OBS repository (%s)...", obsSlug))
+		if _, err := exec.LookPath("gpg"); err != nil {
+			logFunc("Installing gnupg for OBS repository key import...")
+			installGPGCmd := exec.CommandContext(ctx, "sudo", "apt-get", "install", "-y", "gnupg")
+			installGPGCmd.Stdout = os.Stdout
+			installGPGCmd.Stderr = os.Stderr
+			if err := installGPGCmd.Run(); err != nil {
+				logFunc(fmt.Sprintf("⚠ Failed to install gnupg: %v", err))
+			}
+		}
+		mkdirCmd := exec.CommandContext(ctx, "sudo", "mkdir", "-p", "/etc/apt/keyrings")
+		mkdirCmd.Stdout = os.Stdout
+		mkdirCmd.Stderr = os.Stderr
+		mkdirCmd.Run()
 		addKeyCmd := exec.CommandContext(ctx, "bash", "-c",
 			fmt.Sprintf(`curl -fsSL %s | sudo gpg --dearmor -o /etc/apt/keyrings/danklinux.gpg`, keyURL))
 		addKeyCmd.Stdout = os.Stdout
@@ -465,7 +487,7 @@ func TryInstallGreeterPackage(logFunc func(string), sudoPassword string) bool {
 		exec.CommandContext(ctx, "sudo", "zypper", "refresh").Run()
 		installCmd = exec.CommandContext(ctx, "sudo", "zypper", "install", "-y", "dms-greeter")
 	case distros.FamilyUbuntu:
-		failHint = "⚠ dms-greeter install failed. Add PPA manually: sudo add-apt-repository ppa:avengemedia/danklinux && sudo apt-get update && sudo apt-get install dms-greeter"
+		failHint = "⚠ dms-greeter install failed. Add PPA manually: sudo add-apt-repository ppa:avengemedia/danklinux && sudo apt-get update && sudo apt-get install -y dms-greeter"
 		logFunc("Enabling PPA ppa:avengemedia/danklinux...")
 		ppacmd := exec.CommandContext(ctx, "sudo", "add-apt-repository", "-y", "ppa:avengemedia/danklinux")
 		ppacmd.Stdout = os.Stdout
@@ -834,7 +856,14 @@ func EnsureACLInstalled(logFunc func(string), sudoPassword string) error {
 			installCmd = exec.CommandContext(ctx, "sudo", "zypper", "install", "-y", "acl")
 		}
 
-	case distros.FamilyUbuntu, distros.FamilyDebian:
+	case distros.FamilyUbuntu:
+		if sudoPassword != "" {
+			installCmd = distros.ExecSudoCommand(ctx, sudoPassword, "apt-get install -y acl")
+		} else {
+			installCmd = exec.CommandContext(ctx, "sudo", "apt-get", "install", "-y", "acl")
+		}
+
+	case distros.FamilyDebian:
 		if sudoPassword != "" {
 			installCmd = distros.ExecSudoCommand(ctx, sudoPassword, "apt-get install -y acl")
 		} else {
@@ -1209,9 +1238,14 @@ func pamModuleExists(module string) bool {
 	for _, libDir := range []string{
 		"/usr/lib64/security",
 		"/usr/lib/security",
+		"/lib64/security",
+		"/lib/security",
 		"/lib/x86_64-linux-gnu/security",
 		"/usr/lib/x86_64-linux-gnu/security",
+		"/lib/aarch64-linux-gnu/security",
 		"/usr/lib/aarch64-linux-gnu/security",
+		"/run/current-system/sw/lib64/security",
+		"/run/current-system/sw/lib/security",
 	} {
 		if _, err := os.Stat(filepath.Join(libDir, module)); err == nil {
 			return true
@@ -2147,7 +2181,7 @@ func DisableConflictingDisplayManagers(sudoPassword string, logFunc func(string)
 		switch state {
 		case "enabled", "enabled-runtime", "static", "indirect", "alias":
 			logFunc(fmt.Sprintf("Disabling conflicting display manager: %s", dm))
-			if err := runSudoCmd(sudoPassword, "systemctl", "disable", "--now", dm); err != nil {
+			if err := runSudoCmd(sudoPassword, "systemctl", "disable", dm); err != nil {
 				logFunc(fmt.Sprintf("⚠ Warning: Failed to disable %s: %v", dm, err))
 			} else {
 				logFunc(fmt.Sprintf("✓ Disabled %s", dm))

@@ -527,9 +527,23 @@ Singleton {
     property bool enableFprint: false
     property int maxFprintTries: 15
     property bool fprintdAvailable: false
+    property bool lockFingerprintCanEnable: false
+    property bool lockFingerprintReady: false
+    property string lockFingerprintReason: "probe_failed"
+    property bool greeterFingerprintCanEnable: false
+    property bool greeterFingerprintReady: false
+    property string greeterFingerprintReason: "probe_failed"
+    property string greeterFingerprintSource: "none"
     property bool enableU2f: false
     property string u2fMode: "or"
     property bool u2fAvailable: false
+    property bool lockU2fCanEnable: false
+    property bool lockU2fReady: false
+    property string lockU2fReason: "probe_failed"
+    property bool greeterU2fCanEnable: false
+    property bool greeterU2fReady: false
+    property string greeterU2fReason: "probe_failed"
+    property string greeterU2fSource: "none"
     property string lockScreenActiveMonitor: "all"
     property string lockScreenInactiveColor: "#000000"
     property int lockScreenNotificationMode: 0
@@ -1020,8 +1034,7 @@ Singleton {
         if (isGreeterMode)
             return;
         Processes.settingsRoot = root;
-        Processes.detectFprintd();
-        Processes.detectU2f();
+        Processes.detectAuthCapabilities();
     }
 
     Component.onCompleted: {
