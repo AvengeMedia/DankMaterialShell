@@ -2,7 +2,6 @@ import QtCore
 import QtQuick
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
@@ -742,234 +741,6 @@ Item {
                             }
                         }
 
-                        Column {
-                            id: variantSelector
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            visible: activeThemeId !== "" && activeThemeVariants !== null && (isMultiVariant || (activeThemeVariants.options && activeThemeVariants.options.length > 0))
-
-                            property string activeThemeId: {
-                                if (Theme.currentThemeCategory !== "registry" || Theme.currentTheme !== "custom")
-                                    return "";
-                                for (var i = 0; i < themeColorsTab.installedRegistryThemes.length; i++) {
-                                    var t = themeColorsTab.installedRegistryThemes[i];
-                                    if (SettingsData.customThemeFile && SettingsData.customThemeFile.endsWith((t.sourceDir || t.id) + "/theme.json"))
-                                        return t.id;
-                                }
-                                return "";
-                            }
-                            property var activeThemeVariants: {
-                                if (!activeThemeId)
-                                    return null;
-                                for (var i = 0; i < themeColorsTab.installedRegistryThemes.length; i++) {
-                                    var t = themeColorsTab.installedRegistryThemes[i];
-                                    if (t.id === activeThemeId && t.hasVariants)
-                                        return t.variants;
-                                }
-                                return null;
-                            }
-                            property bool isMultiVariant: activeThemeVariants?.type === "multi"
-                            property string colorMode: Theme.isLightMode ? "light" : "dark"
-                            property var multiDefaults: {
-                                if (!isMultiVariant || !activeThemeVariants?.defaults)
-                                    return {};
-                                return activeThemeVariants.defaults[colorMode] || activeThemeVariants.defaults.dark || {};
-                            }
-                            property var storedMulti: activeThemeId ? SettingsData.getRegistryThemeMultiVariant(activeThemeId, multiDefaults, colorMode) : multiDefaults
-                            property string selectedFlavor: {
-                                var sf = storedMulti.flavor || multiDefaults.flavor || "";
-                                for (var i = 0; i < flavorOptions.length; i++) {
-                                    if (flavorOptions[i].id === sf)
-                                        return sf;
-                                }
-                                if (flavorOptions.length > 0)
-                                    return flavorOptions[0].id;
-                                return sf;
-                            }
-                            property string selectedAccent: storedMulti.accent || multiDefaults.accent || ""
-                            property var flavorOptions: {
-                                if (!isMultiVariant || !activeThemeVariants?.flavors)
-                                    return [];
-                                return activeThemeVariants.flavors.filter(f => {
-                                    if (f.mode)
-                                        return f.mode === colorMode || f.mode === "both";
-                                    return !!f[colorMode];
-                                });
-                            }
-                            property var flavorNames: flavorOptions.map(f => f.name)
-                            property int flavorIndex: {
-                                for (var i = 0; i < flavorOptions.length; i++) {
-                                    if (flavorOptions[i].id === selectedFlavor)
-                                        return i;
-                                }
-                                return 0;
-                            }
-                            property string selectedVariant: activeThemeId ? SettingsData.getRegistryThemeVariant(activeThemeId, activeThemeVariants?.default || "") : ""
-                            property var variantNames: {
-                                if (!activeThemeVariants?.options)
-                                    return [];
-                                return activeThemeVariants.options.map(v => v.name);
-                            }
-                            property int selectedIndex: {
-                                if (!activeThemeVariants?.options || !selectedVariant)
-                                    return 0;
-                                for (var i = 0; i < activeThemeVariants.options.length; i++) {
-                                    if (activeThemeVariants.options[i].id === selectedVariant)
-                                        return i;
-                                }
-                                return 0;
-                            }
-
-                            Item {
-                                width: parent.width
-                                height: flavorButtonGroup.implicitHeight
-                                clip: true
-                                visible: variantSelector.isMultiVariant && variantSelector.flavorOptions.length > 1
-
-                                DankButtonGroup {
-                                    id: flavorButtonGroup
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    property int _count: variantSelector.flavorNames.length
-                                    property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
-                                    buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)
-                                    minButtonWidth: Math.min(_maxPerItem < 55 ? 28 : (_maxPerItem < 75 ? 44 : 64), Math.max(28, Math.floor(_maxPerItem)))
-                                    textSize: _maxPerItem < 55 ? Theme.fontSizeSmall - 2 : (_maxPerItem < 75 ? Theme.fontSizeSmall : Theme.fontSizeMedium)
-                                    checkEnabled: _maxPerItem >= 55
-                                    property int pendingIndex: -1
-                                    model: variantSelector.flavorNames
-                                    currentIndex: pendingIndex >= 0 ? pendingIndex : variantSelector.flavorIndex
-                                    selectionMode: "single"
-                                    onSelectionChanged: (index, selected) => {
-                                        if (!selected)
-                                            return;
-                                        pendingIndex = index;
-                                    }
-                                    onAnimationCompleted: {
-                                        if (pendingIndex < 0 || pendingIndex >= variantSelector.flavorOptions.length)
-                                            return;
-                                        const flavorId = variantSelector.flavorOptions[pendingIndex]?.id;
-                                        const idx = pendingIndex;
-                                        pendingIndex = -1;
-                                        if (!flavorId || flavorId === variantSelector.selectedFlavor)
-                                            return;
-                                        Theme.screenTransition();
-                                        SettingsData.setRegistryThemeMultiVariant(variantSelector.activeThemeId, flavorId, variantSelector.selectedAccent, variantSelector.colorMode);
-                                    }
-                                }
-                            }
-
-                            Item {
-                                width: parent.width
-                                height: accentColorsGrid.implicitHeight
-                                visible: variantSelector.isMultiVariant && variantSelector.activeThemeVariants?.accents?.length > 0
-
-                                Grid {
-                                    id: accentColorsGrid
-                                    property int accentCount: variantSelector.activeThemeVariants?.accents?.length ?? 0
-                                    property int dotSize: parent.width < 300 ? 28 : 32
-                                    columns: accentCount > 0 ? Math.ceil(accentCount / 2) : 1
-                                    rowSpacing: Theme.spacingS
-                                    columnSpacing: Theme.spacingS
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    Repeater {
-                                        model: variantSelector.activeThemeVariants?.accents || []
-
-                                        Rectangle {
-                                            required property var modelData
-                                            required property int index
-                                            property string accentId: modelData.id
-                                            property bool isSelected: accentId === variantSelector.selectedAccent
-                                            width: accentColorsGrid.dotSize
-                                            height: accentColorsGrid.dotSize
-                                            radius: width / 2
-                                            color: modelData.color || Theme.primary
-                                            border.color: Theme.outline
-                                            border.width: isSelected ? 2 : 1
-                                            scale: isSelected ? 1.1 : 1
-
-                                            Rectangle {
-                                                width: accentNameText.contentWidth + Theme.spacingS * 2
-                                                height: accentNameText.contentHeight + Theme.spacingXS * 2
-                                                color: Theme.surfaceContainer
-                                                radius: Theme.cornerRadius
-                                                anchors.bottom: parent.top
-                                                anchors.bottomMargin: Theme.spacingXS
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                visible: accentMouseArea.containsMouse
-
-                                                StyledText {
-                                                    id: accentNameText
-                                                    text: modelData.name
-                                                    font.pixelSize: Theme.fontSizeSmall
-                                                    color: Theme.surfaceText
-                                                    anchors.centerIn: parent
-                                                }
-                                            }
-
-                                            MouseArea {
-                                                id: accentMouseArea
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    if (parent.isSelected)
-                                                        return;
-                                                    Theme.screenTransition();
-                                                    SettingsData.setRegistryThemeMultiVariant(variantSelector.activeThemeId, variantSelector.selectedFlavor, parent.accentId, variantSelector.colorMode);
-                                                }
-                                            }
-
-                                            Behavior on scale {
-                                                NumberAnimation {
-                                                    duration: Theme.shortDuration
-                                                    easing.type: Theme.emphasizedEasing
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Item {
-                                width: parent.width
-                                height: variantButtonGroup.implicitHeight
-                                clip: true
-                                visible: !variantSelector.isMultiVariant && variantSelector.variantNames.length > 0
-
-                                DankButtonGroup {
-                                    id: variantButtonGroup
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    property int _count: variantSelector.variantNames.length
-                                    property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
-                                    buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)
-                                    minButtonWidth: Math.min(_maxPerItem < 55 ? 28 : (_maxPerItem < 75 ? 44 : 64), Math.max(28, Math.floor(_maxPerItem)))
-                                    textSize: _maxPerItem < 55 ? Theme.fontSizeSmall - 2 : (_maxPerItem < 75 ? Theme.fontSizeSmall : Theme.fontSizeMedium)
-                                    checkEnabled: _maxPerItem >= 55
-                                    property int pendingIndex: -1
-                                    model: variantSelector.variantNames
-                                    currentIndex: pendingIndex >= 0 ? pendingIndex : variantSelector.selectedIndex
-                                    selectionMode: "single"
-                                    onSelectionChanged: (index, selected) => {
-                                        if (!selected)
-                                            return;
-                                        pendingIndex = index;
-                                    }
-                                    onAnimationCompleted: {
-                                        if (pendingIndex < 0 || !variantSelector.activeThemeVariants?.options)
-                                            return;
-                                        const variantId = variantSelector.activeThemeVariants.options[pendingIndex]?.id;
-                                        const idx = pendingIndex;
-                                        pendingIndex = -1;
-                                        if (!variantId || variantId === variantSelector.selectedVariant)
-                                            return;
-                                        Theme.screenTransition();
-                                        SettingsData.setRegistryThemeVariant(variantSelector.activeThemeId, variantId);
-                                    }
-                                }
-                            }
-                        }
-
                         StyledText {
                             text: I18n.tr("No themes installed. Browse themes to install from the registry.", "no registry themes installed hint")
                             font.pixelSize: Theme.fontSizeSmall
@@ -985,6 +756,248 @@ Item {
                             iconName: "store"
                             anchors.horizontalCenter: parent.horizontalCenter
                             onClicked: showThemeBrowser()
+                        }
+                    }
+
+                    Column {
+                        id: variantSelector
+                        width: parent.width
+                        spacing: Theme.spacingS
+                        visible: activeThemeId !== "" && activeThemeVariants !== null && (isMultiVariant || (activeThemeVariants.options && activeThemeVariants.options.length > 0))
+
+                        property string activeThemeId: {
+                            switch (Theme.currentThemeCategory) {
+                            case "registry":
+                                if (Theme.currentTheme !== "custom")
+                                    return "";
+                                for (var i = 0; i < themeColorsTab.installedRegistryThemes.length; i++) {
+                                    var t = themeColorsTab.installedRegistryThemes[i];
+                                    if (SettingsData.customThemeFile && SettingsData.customThemeFile.endsWith((t.sourceDir || t.id) + "/theme.json"))
+                                        return t.id;
+                                }
+                                return "";
+                            case "custom":
+                                return Theme.currentThemeId || "";
+                            default:
+                                return "";
+                            }
+                        }
+                        property var activeThemeVariants: {
+                            if (!activeThemeId)
+                                return null;
+                            switch (Theme.currentThemeCategory) {
+                            case "registry":
+                                for (var i = 0; i < themeColorsTab.installedRegistryThemes.length; i++) {
+                                    var t = themeColorsTab.installedRegistryThemes[i];
+                                    if (t.id === activeThemeId && t.hasVariants)
+                                        return t.variants;
+                                }
+                                return null;
+                            case "custom":
+                                return Theme.currentThemeVariants || null;
+                            default:
+                                return null;
+                            }
+                        }
+                        property bool isMultiVariant: activeThemeVariants?.type === "multi"
+                        property string colorMode: Theme.isLightMode ? "light" : "dark"
+                        property var multiDefaults: {
+                            if (!isMultiVariant || !activeThemeVariants?.defaults)
+                                return {};
+                            return activeThemeVariants.defaults[colorMode] || activeThemeVariants.defaults.dark || {};
+                        }
+                        property var storedMulti: activeThemeId ? SettingsData.getRegistryThemeMultiVariant(activeThemeId, multiDefaults, colorMode) : multiDefaults
+                        property string selectedFlavor: {
+                            var sf = storedMulti.flavor || multiDefaults.flavor || "";
+                            for (var i = 0; i < flavorOptions.length; i++) {
+                                if (flavorOptions[i].id === sf)
+                                    return sf;
+                            }
+                            if (flavorOptions.length > 0)
+                                return flavorOptions[0].id;
+                            return sf;
+                        }
+                        property string selectedAccent: storedMulti.accent || multiDefaults.accent || ""
+                        property var flavorOptions: {
+                            if (!isMultiVariant || !activeThemeVariants?.flavors)
+                                return [];
+                            return activeThemeVariants.flavors.filter(f => {
+                                if (f.mode)
+                                    return f.mode === colorMode || f.mode === "both";
+                                return !!f[colorMode];
+                            });
+                        }
+                        property var flavorNames: flavorOptions.map(f => f.name)
+                        property int flavorIndex: {
+                            for (var i = 0; i < flavorOptions.length; i++) {
+                                if (flavorOptions[i].id === selectedFlavor)
+                                    return i;
+                            }
+                            return 0;
+                        }
+                        property string selectedVariant: activeThemeId ? SettingsData.getRegistryThemeVariant(activeThemeId, activeThemeVariants?.default || "") : ""
+                        property var variantNames: {
+                            if (!activeThemeVariants?.options)
+                                return [];
+                            return activeThemeVariants.options.map(v => v.name);
+                        }
+                        property int selectedIndex: {
+                            if (!activeThemeVariants?.options || !selectedVariant)
+                                return 0;
+                            for (var i = 0; i < activeThemeVariants.options.length; i++) {
+                                if (activeThemeVariants.options[i].id === selectedVariant)
+                                    return i;
+                            }
+                            return 0;
+                        }
+
+                        Item {
+                            width: parent.width
+                            height: flavorButtonGroup.implicitHeight
+                            clip: true
+                            visible: variantSelector.isMultiVariant && variantSelector.flavorOptions.length > 1
+
+                            DankButtonGroup {
+                                id: flavorButtonGroup
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                property int _count: variantSelector.flavorNames.length
+                                property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
+                                buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)
+                                minButtonWidth: Math.min(_maxPerItem < 55 ? 28 : (_maxPerItem < 75 ? 44 : 64), Math.max(28, Math.floor(_maxPerItem)))
+                                textSize: _maxPerItem < 55 ? Theme.fontSizeSmall - 2 : (_maxPerItem < 75 ? Theme.fontSizeSmall : Theme.fontSizeMedium)
+                                checkEnabled: _maxPerItem >= 55
+                                property int pendingIndex: -1
+                                model: variantSelector.flavorNames
+                                currentIndex: pendingIndex >= 0 ? pendingIndex : variantSelector.flavorIndex
+                                selectionMode: "single"
+                                onSelectionChanged: (index, selected) => {
+                                    if (!selected)
+                                        return;
+                                    pendingIndex = index;
+                                }
+                                onAnimationCompleted: {
+                                    if (pendingIndex < 0 || pendingIndex >= variantSelector.flavorOptions.length)
+                                        return;
+                                    const flavorId = variantSelector.flavorOptions[pendingIndex]?.id;
+                                    const idx = pendingIndex;
+                                    pendingIndex = -1;
+                                    if (!flavorId || flavorId === variantSelector.selectedFlavor)
+                                        return;
+                                    Theme.screenTransition();
+                                    SettingsData.setRegistryThemeMultiVariant(variantSelector.activeThemeId, flavorId, variantSelector.selectedAccent, variantSelector.colorMode);
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: parent.width
+                            height: accentColorsGrid.implicitHeight
+                            visible: variantSelector.isMultiVariant && variantSelector.activeThemeVariants?.accents?.length > 0
+
+                            Grid {
+                                id: accentColorsGrid
+                                property int accentCount: variantSelector.activeThemeVariants?.accents?.length ?? 0
+                                property int dotSize: parent.width < 300 ? 28 : 32
+                                columns: accentCount > 0 ? Math.ceil(accentCount / 2) : 1
+                                rowSpacing: Theme.spacingS
+                                columnSpacing: Theme.spacingS
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                Repeater {
+                                    model: variantSelector.activeThemeVariants?.accents || []
+
+                                    Rectangle {
+                                        required property var modelData
+                                        required property int index
+                                        property string accentId: modelData.id
+                                        property bool isSelected: accentId === variantSelector.selectedAccent
+                                        width: accentColorsGrid.dotSize
+                                        height: accentColorsGrid.dotSize
+                                        radius: width / 2
+                                        color: modelData.color || modelData[variantSelector.selectedFlavor]?.primary || Theme.primary
+                                        border.color: Theme.outline
+                                        border.width: isSelected ? 2 : 1
+                                        scale: isSelected ? 1.1 : 1
+
+                                        Rectangle {
+                                            width: accentNameText.contentWidth + Theme.spacingS * 2
+                                            height: accentNameText.contentHeight + Theme.spacingXS * 2
+                                            color: Theme.surfaceContainer
+                                            radius: Theme.cornerRadius
+                                            anchors.bottom: parent.top
+                                            anchors.bottomMargin: Theme.spacingXS
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            visible: accentMouseArea.containsMouse
+
+                                            StyledText {
+                                                id: accentNameText
+                                                text: modelData.name
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                anchors.centerIn: parent
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            id: accentMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (parent.isSelected)
+                                                    return;
+                                                Theme.screenTransition();
+                                                SettingsData.setRegistryThemeMultiVariant(variantSelector.activeThemeId, variantSelector.selectedFlavor, parent.accentId, variantSelector.colorMode);
+                                            }
+                                        }
+
+                                        Behavior on scale {
+                                            NumberAnimation {
+                                                duration: Theme.shortDuration
+                                                easing.type: Theme.emphasizedEasing
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: parent.width
+                            height: variantButtonGroup.implicitHeight
+                            clip: true
+                            visible: !variantSelector.isMultiVariant && variantSelector.variantNames.length > 0
+
+                            DankButtonGroup {
+                                id: variantButtonGroup
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                property int _count: variantSelector.variantNames.length
+                                property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
+                                buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)
+                                minButtonWidth: Math.min(_maxPerItem < 55 ? 28 : (_maxPerItem < 75 ? 44 : 64), Math.max(28, Math.floor(_maxPerItem)))
+                                textSize: _maxPerItem < 55 ? Theme.fontSizeSmall - 2 : (_maxPerItem < 75 ? Theme.fontSizeSmall : Theme.fontSizeMedium)
+                                checkEnabled: _maxPerItem >= 55
+                                property int pendingIndex: -1
+                                model: variantSelector.variantNames
+                                currentIndex: pendingIndex >= 0 ? pendingIndex : variantSelector.selectedIndex
+                                selectionMode: "single"
+                                onSelectionChanged: (index, selected) => {
+                                    if (!selected)
+                                        return;
+                                    pendingIndex = index;
+                                }
+                                onAnimationCompleted: {
+                                    if (pendingIndex < 0 || !variantSelector.activeThemeVariants?.options)
+                                        return;
+                                    const variantId = variantSelector.activeThemeVariants.options[pendingIndex]?.id;
+                                    const idx = pendingIndex;
+                                    pendingIndex = -1;
+                                    if (!variantId || variantId === variantSelector.selectedVariant)
+                                        return;
+                                    Theme.screenTransition();
+                                    SettingsData.setRegistryThemeVariant(variantSelector.activeThemeId, variantId);
+                                }
+                            }
                         }
                     }
                 }
