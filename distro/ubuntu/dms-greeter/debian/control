@@ -13,7 +13,7 @@ Architecture: any
 Depends: ${misc:Depends},
   greetd,
   quickshell-git | quickshell
-Recommends: niri | hyprland | sway
+Suggests: niri | hyprland | sway
 Description: DankMaterialShell greeter for greetd
   DankMaterialShell greeter for greetd login manager. A modern, Material Design 3
   inspired greeter interface built with Quickshell for Wayland compositors.
