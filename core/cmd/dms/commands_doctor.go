@@ -1079,14 +1079,14 @@ func formatResultsPlain(results []checkResult) string {
 			if currentCategory != -1 {
 				sb.WriteString("\n")
 			}
-			sb.WriteString(fmt.Sprintf("**%s**\n", r.category.String()))
+			fmt.Fprintf(&sb, "**%s**\n", r.category.String())
 			currentCategory = r.category
 		}
 
-		sb.WriteString(fmt.Sprintf("- [%s] %s: %s\n", r.status, r.name, r.message))
+		fmt.Fprintf(&sb, "- [%s] %s: %s\n", r.status, r.name, r.message)
 
 		if doctorVerbose && r.details != "" {
-			sb.WriteString(fmt.Sprintf("  - %s\n", r.details))
+			fmt.Fprintf(&sb, "  - %s\n", r.details)
 		}
 	}
 
@@ -1096,8 +1096,8 @@ func formatResultsPlain(results []checkResult) string {
 	}
 
 	sb.WriteString("\n---\n")
-	sb.WriteString(fmt.Sprintf("**Summary:** %d error(s), %d warning(s), %d ok\n",
-		ds.ErrorCount(), ds.WarningCount(), ds.OKCount()))
+	fmt.Fprintf(&sb, "**Summary:** %d error(s), %d warning(s), %d ok\n",
+		ds.ErrorCount(), ds.WarningCount(), ds.OKCount())
 
 	return sb.String()
 }

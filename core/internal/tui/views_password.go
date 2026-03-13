@@ -75,7 +75,7 @@ func (m Model) viewFingerprintAuth() string {
 
 		spinner := m.spinner.View()
 		status := m.styles.Normal.Render("Waiting for fingerprint...")
-		b.WriteString(fmt.Sprintf("%s %s", spinner, status))
+		fmt.Fprintf(&b, "%s %s", spinner, status)
 	}
 
 	return b.String()

@@ -40,7 +40,7 @@ func (m Model) viewDeployingConfigs() string {
 
 	spinner := m.spinner.View()
 	status := m.styles.Normal.Render("Setting up configuration files...")
-	b.WriteString(fmt.Sprintf("%s %s", spinner, status))
+	fmt.Fprintf(&b, "%s %s", spinner, status)
 	b.WriteString("\n\n")
 
 	// Show progress information

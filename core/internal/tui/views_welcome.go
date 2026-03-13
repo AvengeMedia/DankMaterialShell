@@ -132,9 +132,9 @@ func (m Model) viewWelcome() string {
 					contentStyle = contentStyle.Bold(true)
 				}
 
-				b.WriteString(fmt.Sprintf("  %s %s\n",
+				fmt.Fprintf(&b, "  %s %s\n",
 					prefixStyle.Render(prefix),
-					contentStyle.Render(content)))
+					contentStyle.Render(content))
 			}
 
 			b.WriteString("\n")
@@ -158,7 +158,7 @@ func (m Model) viewWelcome() string {
 	} else if m.isLoading {
 		spinner := m.spinner.View()
 		loading := m.styles.Normal.Render("Detecting system...")
-		b.WriteString(fmt.Sprintf("%s %s\n\n", spinner, loading))
+		fmt.Fprintf(&b, "%s %s\n\n", spinner, loading)
 	}
 
 	// Footer with better visual separation

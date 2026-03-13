@@ -1,6 +1,6 @@
 module github.com/AvengeMedia/DankMaterialShell/core
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/Wifx/gonetworkmanager/v2 v2.2.0

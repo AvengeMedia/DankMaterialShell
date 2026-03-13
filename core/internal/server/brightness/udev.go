@@ -6,10 +6,18 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/pilebones/go-udev/netlink"
+)
+
+const (
+	udevRecvBufSize = 8 * 1024 * 1024
+	udevMaxRetries  = 5
+	udevBaseDelay   = 2 * time.Second
+	udevMaxDelay    = 60 * time.Second
 )
 
 type UdevMonitor struct {
@@ -29,13 +37,6 @@ func NewUdevMonitor(manager *Manager) *UdevMonitor {
 }
 
 func (m *UdevMonitor) run(manager *Manager) {
-	conn := &netlink.UEventConn{}
-	if err := conn.Connect(netlink.UdevEvent); err != nil {
-		log.Errorf("Failed to connect to udev netlink: %v", err)
-		return
-	}
-	defer conn.Close()
-
 	matcher := &netlink.RuleDefinitions{
 		Rules: []netlink.RuleDefinition{
 			{Env: map[string]string{"SUBSYSTEM": "backlight"}},
@@ -48,6 +49,46 @@ func (m *UdevMonitor) run(manager *Manager) {
 		return
 	}
 
+	failures := 0
+	for {
+		if err := m.monitorLoop(manager, matcher); err != nil {
+			log.Errorf("Udev monitor error: %v", err)
+		}
+
+		select {
+		case <-m.stop:
+			return
+		default:
+		}
+
+		failures++
+		if failures > udevMaxRetries {
+			log.Errorf("Udev monitor exceeded %d retries, giving up", udevMaxRetries)
+			return
+		}
+
+		delay := min(udevBaseDelay*time.Duration(1<<(failures-1)), udevMaxDelay)
+		log.Infof("Udev monitor reconnecting in %v (attempt %d/%d)", delay, failures, udevMaxRetries)
+
+		select {
+		case <-m.stop:
+			return
+		case <-time.After(delay):
+		}
+	}
+}
+
+func (m *UdevMonitor) monitorLoop(manager *Manager, matcher *netlink.RuleDefinitions) error {
+	conn := &netlink.UEventConn{}
+	if err := conn.Connect(netlink.UdevEvent); err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	if err := syscall.SetsockoptInt(conn.Fd, syscall.SOL_SOCKET, syscall.SO_RCVBUF, udevRecvBufSize); err != nil {
+		log.Warnf("Failed to set udev socket receive buffer: %v", err)
+	}
+
 	events := make(chan netlink.UEvent)
 	errs := make(chan error)
 	conn.Monitor(events, errs, matcher)
@@ -57,10 +98,9 @@ func (m *UdevMonitor) run(manager *Manager) {
 	for {
 		select {
 		case <-m.stop:
-			return
+			return nil
 		case err := <-errs:
-			log.Errorf("Udev monitor error: %v", err)
-			return
+			return err
 		case event := <-events:
 			m.handleEvent(manager, event)
 		}

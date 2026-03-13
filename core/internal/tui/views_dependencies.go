@@ -23,7 +23,7 @@ func (m Model) viewDetectingDeps() string {
 
 	spinner := m.spinner.View()
 	status := m.styles.Normal.Render("Scanning system for existing packages and configurations...")
-	b.WriteString(fmt.Sprintf("%s %s", spinner, status))
+	fmt.Fprintf(&b, "%s %s", spinner, status)
 
 	return b.String()
 }

@@ -52,7 +52,7 @@ func (m Model) viewInstallingPackages() string {
 	if !m.packageProgress.isComplete {
 		spinner := m.spinner.View()
 		status := m.styles.Normal.Render(m.packageProgress.step)
-		b.WriteString(fmt.Sprintf("%s %s", spinner, status))
+		fmt.Fprintf(&b, "%s %s", spinner, status)
 		b.WriteString("\n\n")
 
 		// Show progress bar
@@ -387,7 +387,7 @@ func (m Model) viewDebugLogs() string {
 
 		for i := startIdx; i < len(allLogs); i++ {
 			if allLogs[i] != "" {
-				b.WriteString(fmt.Sprintf("%d: %s\n", i, allLogs[i]))
+				fmt.Fprintf(&b, "%d: %s\n", i, allLogs[i])
 			}
 		}
 
