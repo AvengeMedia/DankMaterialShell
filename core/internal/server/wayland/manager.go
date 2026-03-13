@@ -20,7 +20,7 @@ import (
 
 const animKelvinStep = 25
 
-func NewManager(display wlclient.WaylandDisplay, geoClient geolocation.Client, config Config) (*Manager, error) {
+func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -41,7 +41,6 @@ func NewManager(display wlclient.WaylandDisplay, geoClient geolocation.Client, c
 		updateTrigger: make(chan struct{}, 1),
 		dirty:         make(chan struct{}, 1),
 		dbusSignal:    make(chan *dbus.Signal, 16),
-		geoClient:     geoClient,
 	}
 
 	if err := m.setupRegistry(); err != nil {
@@ -422,6 +421,10 @@ func (m *Manager) recalcSchedule(now time.Time) {
 	}
 }
 
+func (m *Manager) SetGeoClient(client geolocation.Client) {
+	m.geoClient = client
+}
+
 func (m *Manager) getLocation() (*float64, *float64) {
 	m.configMutex.RLock()
 	config := m.config
@@ -430,27 +433,31 @@ func (m *Manager) getLocation() (*float64, *float64) {
 	if config.Latitude != nil && config.Longitude != nil {
 		return config.Latitude, config.Longitude
 	}
-	if config.UseIPLocation {
-		m.locationMutex.RLock()
-		if m.cachedIPLat != nil && m.cachedIPLon != nil {
-			lat, lon := m.cachedIPLat, m.cachedIPLon
-			m.locationMutex.RUnlock()
-			return lat, lon
-		}
-		m.locationMutex.RUnlock()
-
-		location, err := m.geoClient.GetLocation()
-		if err != nil {
-			return nil, nil
-		}
-
-		m.locationMutex.Lock()
-		m.cachedIPLat = &location.Latitude
-		m.cachedIPLon = &location.Longitude
-		m.locationMutex.Unlock()
-		return m.cachedIPLat, m.cachedIPLon
+	if !config.UseIPLocation {
+		return nil, nil
 	}
-	return nil, nil
+	if m.geoClient == nil {
+		return nil, nil
+	}
+
+	m.locationMutex.RLock()
+	if m.cachedIPLat != nil && m.cachedIPLon != nil {
+		lat, lon := m.cachedIPLat, m.cachedIPLon
+		m.locationMutex.RUnlock()
+		return lat, lon
+	}
+	m.locationMutex.RUnlock()
+
+	location, err := m.geoClient.GetLocation()
+	if err != nil {
+		return nil, nil
+	}
+
+	m.locationMutex.Lock()
+	m.cachedIPLat = &location.Latitude
+	m.cachedIPLon = &location.Longitude
+	m.locationMutex.Unlock()
+	return m.cachedIPLat, m.cachedIPLon
 }
 
 func (m *Manager) hasValidSchedule() bool {

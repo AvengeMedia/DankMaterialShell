@@ -40,7 +40,7 @@ type Manager struct {
 	wg            sync.WaitGroup
 }
 
-func NewManager(geoClient geolocation.Client) *Manager {
+func NewManager() *Manager {
 	m := &Manager{
 		config: Config{
 			Enabled:           false,
@@ -54,7 +54,6 @@ func NewManager(geoClient geolocation.Client) *Manager {
 		},
 		stopChan:      make(chan struct{}),
 		updateTrigger: make(chan struct{}, 1),
-		geoClient:     geoClient,
 	}
 
 	m.updateState(time.Now())
@@ -315,11 +314,18 @@ func (m *Manager) getConfig() Config {
 	return m.config
 }
 
+func (m *Manager) SetGeoClient(client geolocation.Client) {
+	m.geoClient = client
+}
+
 func (m *Manager) getLocation(config Config) (*float64, *float64) {
 	if config.Latitude != nil && config.Longitude != nil {
 		return config.Latitude, config.Longitude
 	}
 	if !config.UseIPLocation {
+		return nil, nil
+	}
+	if m.geoClient == nil {
 		return nil, nil
 	}
 

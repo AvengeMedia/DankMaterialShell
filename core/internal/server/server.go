@@ -73,6 +73,7 @@ var dbusManager *serverDbus.Manager
 var wlContext *wlcontext.SharedContext
 var themeModeManager *thememode.Manager
 var locationManager *location.Manager
+var geoClientInstance geolocation.Client
 
 const dbusClientID = "dms-dbus-client"
 
@@ -191,7 +192,7 @@ func InitializeFreedeskManager() error {
 	return nil
 }
 
-func InitializeWaylandManager(geoClient geolocation.Client) error {
+func InitializeWaylandManager() error {
 	log.Info("Attempting to initialize Wayland gamma control...")
 
 	if wlContext == nil {
@@ -204,7 +205,7 @@ func InitializeWaylandManager(geoClient geolocation.Client) error {
 	}
 
 	config := wayland.DefaultConfig()
-	manager, err := wayland.NewManager(wlContext.Display(), geoClient, config)
+	manager, err := wayland.NewManager(wlContext.Display(), config)
 	if err != nil {
 		log.Errorf("Failed to initialize wayland manager: %v", err)
 		return err
@@ -385,8 +386,8 @@ func InitializeDbusManager() error {
 	return nil
 }
 
-func InitializeThemeModeManager(geoClient geolocation.Client) error {
-	manager := thememode.NewManager(geoClient)
+func InitializeThemeModeManager() error {
+	manager := thememode.NewManager()
 	themeModeManager = manager
 
 	log.Info("Theme mode automation manager initialized")
@@ -1330,6 +1331,9 @@ func cleanupManagers() {
 	if locationManager != nil {
 		locationManager.Close()
 	}
+	if geoClientInstance != nil {
+		geoClientInstance.Close()
+	}
 }
 
 func Start(printDocs bool) error {
@@ -1545,9 +1549,6 @@ func Start(printDocs bool) error {
 	loginctlReady := make(chan struct{})
 	freedesktopReady := make(chan struct{})
 
-	geoClient := geolocation.NewClient()
-	defer geoClient.Close()
-
 	go func() {
 		defer close(loginctlReady)
 		if err := InitializeLoginctlManager(); err != nil {
@@ -1592,9 +1593,40 @@ func Start(printDocs bool) error {
 		}
 	}()
 
-	if err := InitializeWaylandManager(geoClient); err != nil {
+	if err := InitializeWaylandManager(); err != nil {
 		log.Warnf("Wayland manager unavailable: %v", err)
 	}
+
+	if err := InitializeThemeModeManager(); err != nil {
+		log.Warnf("Theme mode manager unavailable: %v", err)
+	} else {
+		notifyCapabilityChange()
+		go func() {
+			<-loginctlReady
+			if loginctlManager == nil {
+				return
+			}
+			themeModeManager.WatchLoginctl(loginctlManager)
+		}()
+	}
+
+	go func() {
+		geoClient := geolocation.NewClient()
+		geoClientInstance = geoClient
+
+		if waylandManager != nil {
+			waylandManager.SetGeoClient(geoClient)
+		}
+		if themeModeManager != nil {
+			themeModeManager.SetGeoClient(geoClient)
+		}
+
+		if err := InitializeLocationManager(geoClient); err != nil {
+			log.Warnf("Location manager unavailable: %v", err)
+		} else {
+			notifyCapabilityChange()
+		}
+	}()
 
 	go func() {
 		if err := InitializeBluezManager(); err != nil {
@@ -1622,25 +1654,6 @@ func Start(printDocs bool) error {
 
 	if err := InitializeWlrOutputManager(); err != nil {
 		log.Debugf("WlrOutput manager unavailable: %v", err)
-	}
-
-	if err := InitializeThemeModeManager(geoClient); err != nil {
-		log.Warnf("Theme mode manager unavailable: %v", err)
-	} else {
-		notifyCapabilityChange()
-		go func() {
-			<-loginctlReady
-			if loginctlManager == nil {
-				return
-			}
-			themeModeManager.WatchLoginctl(loginctlManager)
-		}()
-	}
-
-	if err := InitializeLocationManager(geoClient); err != nil {
-		log.Warnf("Location manager unavailable: %v", err)
-	} else {
-		notifyCapabilityChange()
 	}
 
 	fatalErrChan := make(chan error, 1)
