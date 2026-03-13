@@ -2578,7 +2578,7 @@ Item {
                     tags: ["matugen", "neovim", "terminal", "template"]
                     settingKey: "matugenTemplateNeovim"
                     text: "neovim"
-                    description: getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "https://github.com/Silzinc/base46")
+                    description: getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "https://github.com/AvengeMedia/base46")
                     descriptionColor: getTemplateDescriptionColor("nvim")
                     visible: SettingsData.runDmsMatugenTemplates
                     checked: SettingsData.matugenTemplateNeovim

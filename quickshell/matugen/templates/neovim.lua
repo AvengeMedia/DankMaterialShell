@@ -1,7 +1,7 @@
 local present, base46 = pcall(require, "base46")
-if not present or base46._AUTHOR ~= "Silzinc" then
+if not present or not base46._DMS_SUPPORT then
 	vim.notify(
-		"base46 plugin not found or incorrect, make sure to install Silzinc/base46",
+		"base46 plugin not found or incorrect, make sure to install AvengeMedia/base46",
 		vim.log.levels.ERROR,
 		{ title = "dms integration" }
 	)
