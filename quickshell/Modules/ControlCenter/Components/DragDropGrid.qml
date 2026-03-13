@@ -841,6 +841,12 @@ Column {
                     }
                     builtinInstance = Qt.binding(() => root.model?.cupsBuiltinInstance);
                 }
+                if (id === "builtin_tailscale") {
+                    if (root.model?.tailscaleLoader) {
+                        root.model.tailscaleLoader.active = true;
+                    }
+                    builtinInstance = Qt.binding(() => root.model?.tailscaleBuiltinInstance);
+                }
             }
 
             sourceComponent: {
