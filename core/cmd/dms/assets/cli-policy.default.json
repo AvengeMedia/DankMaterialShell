@@ -3,7 +3,6 @@
   "blocked_commands": [
     "greeter install",
     "greeter enable",
-    "greeter sync",
     "greeter uninstall",
     "setup"
   ],

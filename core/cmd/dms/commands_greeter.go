@@ -51,10 +51,9 @@ var greeterInstallCmd = &cobra.Command{
 }
 
 var greeterSyncCmd = &cobra.Command{
-	Use:     "sync",
-	Short:   "Sync DMS theme and settings with greeter",
-	Long:    "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
-	PreRunE: requireMutableSystemCommand,
+	Use:   "sync",
+	Short: "Sync DMS theme and settings with greeter",
+	Long:  "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		auth, _ := cmd.Flags().GetBool("auth")

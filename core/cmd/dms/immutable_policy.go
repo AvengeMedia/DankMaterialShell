@@ -213,7 +213,7 @@ func getImmutablePolicy() (*immutableCommandPolicy, error) {
 		immutablePolicy = immutableCommandPolicy{
 			ImmutableSystem: detectedImmutable,
 			ImmutableReason: reason,
-			BlockedCommands: []string{"greeter install", "greeter enable", "greeter sync", "setup"},
+			BlockedCommands: []string{"greeter install", "greeter enable", "setup"},
 			Message:         "This command is disabled on immutable/image-based systems. Use your distro-native workflow for system-level changes.",
 		}
 
