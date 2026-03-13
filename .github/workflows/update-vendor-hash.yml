@@ -40,7 +40,7 @@ jobs:
             echo "Build succeeded, no hash update needed"
             exit 0
           fi
-          new_hash=$(echo "$output" | grep -oP "got:\s+\K\S+" | head -n1)
+          new_hash=$(echo "$output" | grep -oP "got:\s+\K\S+" | head -n1 || true)
           [ -n "$new_hash" ] || { echo "Could not extract new vendorHash"; echo "$output"; exit 1; }
           current_hash=$(grep -oP 'vendorHash = "\K[^"]+' flake.nix)
           [ "$current_hash" = "$new_hash" ] && { echo "vendorHash already up to date"; exit 0; }
