@@ -2,6 +2,8 @@ module github.com/AvengeMedia/DankMaterialShell/core
 
 go 1.26.0
 
+toolchain go1.26.1
+
 require (
 	github.com/Wifx/gonetworkmanager/v2 v2.2.0
 	github.com/alecthomas/chroma/v2 v2.23.1
