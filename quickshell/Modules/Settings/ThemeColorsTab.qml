@@ -2578,7 +2578,7 @@ Item {
                     tags: ["matugen", "neovim", "terminal", "template"]
                     settingKey: "matugenTemplateNeovim"
                     text: "neovim"
-                    description: getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "<a href=\"https://github.com/Silzinc/base46\" style=\"text-decoration:none; color:${Theme.primary};\">Silzinc/base46</a>")
+                    description: getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "https://github.com/Silzinc/base46")
                     descriptionColor: getTemplateDescriptionColor("nvim")
                     visible: SettingsData.runDmsMatugenTemplates
                     checked: SettingsData.matugenTemplateNeovim
@@ -2591,6 +2591,7 @@ Item {
                     tab: "theme"
                     tags: ["matugen", "neovim", "terminal", "template"]
                     settingKey: "matugenTemplateNeovimSettings"
+                    description: "Base to derive dark theme from"
                     visible: neovimThemeToggle.visible && neovimThemeToggle.checked
                     currentValue: SettingsData.matugenTemplateNeovimSettings?.dark?.baseTheme ?? "github_dark"
                     options: ["aquarium", "ashes", "aylin", "ayu_dark", "bearded-arc", "carbonfox", "catppuccin", "chadracula", "chadracula-evondev", "chadtain", "chocolate", "darcula-dark", "dark_horizon", "decay", "default-dark", "doomchad", "eldritch", "embark", "everblush", "everforest", "falcon", "flexoki", "flouromachine", "gatekeeper", "github_dark", "gruvbox", "gruvchad", "hiberbee", "horizon", "jabuti", "jellybeans", "kanagawa", "kanagawa-dragon", "material-darker", "material-deep-ocean", "melange", "midnight_breeze", "mito-laser", "monekai", "monochrome", "mountain", "neofusion", "nightfox", "nightlamp", "nightowl", "nord", "obsidian-ember", "oceanic-next", "onedark", "onenord", "oxocarbon", "palenight", "pastelDark", "pastelbeans", "penumbra_dark", "poimandres", "radium", "rosepine", "rxyhn", "scaryforest", "seoul256_dark", "solarized_dark", "solarized_osaka", "starlight", "sweetpastel", "tokyodark", "tokyonight", "tomorrow_night", "tundra", "vesper", "vscode_dark", "wombat", "yoru", "zenburn"]
@@ -2607,6 +2608,7 @@ Item {
                     tab: "theme"
                     tags: ["matugen", "neovim", "terminal", "template"]
                     settingKey: "matugenTemplateNeovimSettings"
+                    description: "Base to derive light theme from"
                     visible: neovimThemeToggle.visible && neovimThemeToggle.checked
                     currentValue: SettingsData.matugenTemplateNeovimSettings?.light?.baseTheme ?? "github_light"
                     options: ["ayu_light", "blossom_light", "catppuccin-latte", "default-light", "everforest_light", "flex-light", "flexoki-light", "github_light", "gruvbox_light", "material-lighter", "nano-light", "oceanic-light", "one_light", "onenord_light", "penumbra_light", "rosepine-dawn", "seoul256_light", "solarized_light", "sunrise_breeze", "vscode_light"]
@@ -2622,6 +2624,7 @@ Item {
                     text: I18n.tr("Dark mode harmony")
                     tags: ["matugen", "neovim", "terminal", "template"]
                     settingKey: "matugenTemplateNeovimSettings"
+                    description: "How much should the base dark theme be tinted"
                     visible: neovimThemeToggle.visible && neovimThemeToggle.checked
                     minimum: 0
                     maximum: 100
@@ -2638,6 +2641,7 @@ Item {
                     text: I18n.tr("Light mode harmony")
                     tags: ["matugen", "neovim", "terminal", "template"]
                     settingKey: "matugenTemplateNeovimSettings"
+                    description: "How much should the base light theme be tinted"
                     visible: neovimThemeToggle.visible && neovimThemeToggle.checked
                     minimum: 0
                     maximum: 100
