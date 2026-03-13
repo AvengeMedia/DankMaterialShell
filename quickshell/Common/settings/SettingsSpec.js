@@ -292,6 +292,13 @@ var SPEC = {
     matugenTemplateEmacs: { def: true },
     matugenTemplateZed: { def: true },
 
+    matugenTemplateNeovimSettings: {
+      def: {
+        dark: { baseTheme: "github_dark", harmony: 0.5 },
+        light: { baseTheme: "github_light", harmony: 0.5 }
+      }
+    },
+
     showDock: { def: false },
     dockAutoHide: { def: false },
     dockSmartAutoHide: { def: false },

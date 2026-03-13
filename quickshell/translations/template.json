@@ -1519,6 +1519,13 @@
     "comment": ""
   },
   {
+    "term": "Available.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "BSSID",
     "translation": "",
     "context": "",
@@ -3654,6 +3661,20 @@
     "comment": ""
   },
   {
+    "term": "Dark mode base",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dark mode harmony",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Darken Modal Background",
     "translation": "",
     "context": "",
@@ -4000,13 +4021,6 @@
     "term": "Disabled",
     "translation": "",
     "context": "bluetooth status | lock screen notification mode option",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Disabled.",
-    "translation": "",
-    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -4644,6 +4658,76 @@
     "term": "Enabled",
     "translation": "",
     "context": "bluetooth status",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled, but fingerprint availability could not be confirmed.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled, but no fingerprint reader was detected.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled, but no registered security key was found yet. Register a key and run Sync.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled, but no registered security key was found yet. Register a key or update your U2F config.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled, but security-key availability could not be confirmed.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled. PAM already provides fingerprint auth.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled. PAM already provides security-key auth.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -5530,6 +5614,27 @@
     "comment": ""
   },
   {
+    "term": "Fingerprint availability could not be confirmed.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Finish",
     "translation": "",
     "context": "greeter finish button",
@@ -5642,7 +5747,21 @@
     "comment": ""
   },
   {
+    "term": "Focused Monitor Only",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Focused Window",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Focused monitor only",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6420,6 +6539,20 @@
   },
   {
     "term": "High-fidelity palette that preserves source hues.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Highlight Active Workspace App",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Highlight the currently focused app inside workspace indicators",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7316,6 +7449,20 @@
   },
   {
     "term": "Light Snow Showers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Light mode base",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Light mode harmony",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8827,6 +8974,13 @@
     "comment": ""
   },
   {
+    "term": "No fingerprint reader detected.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No folders found",
     "translation": "",
     "context": "",
@@ -9121,14 +9275,28 @@
     "comment": ""
   },
   {
-    "term": "Not available — install fprintd and enroll fingerprints.",
+    "term": "Not available — install fprintd and pam_fprintd, or configure greetd PAM.",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Not available — install pam_u2f and enroll keys.",
+    "term": "Not available — install fprintd and pam_fprintd.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Not available — install or configure pam_u2f, or configure greetd PAM.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Not available — install or configure pam_u2f.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9145,13 +9313,6 @@
     "term": "Not detected",
     "translation": "",
     "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Not enrolled",
-    "translation": "",
-    "context": "fingerprint not detected status | security key not detected status",
     "reference": "",
     "comment": ""
   },
@@ -9394,7 +9555,7 @@
     "comment": ""
   },
   {
-    "term": "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.",
+    "term": "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9710,6 +9871,41 @@
   },
   {
     "term": "Overwrite",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "PAM already provides fingerprint auth. Enable this to show it at login.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "PAM already provides security-key auth. Enable this to show it at login.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "PAM provides fingerprint auth, but availability could not be confirmed.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "PAM provides fingerprint auth, but no prints are enrolled yet.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "PAM provides fingerprint auth, but no reader was detected.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10941,6 +11137,13 @@
     "comment": ""
   },
   {
+    "term": "Required plugin: ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Requires %1",
     "translation": "",
     "context": "version requirement",
@@ -10965,13 +11168,6 @@
     "term": "Requires DWL compositor",
     "translation": "",
     "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Requires lazy plugin manager",
-    "translation": "",
-    "context": "neovim template description",
     "reference": "",
     "comment": ""
   },
@@ -11049,6 +11245,13 @@
     "term": "Restarting audio system...",
     "translation": "",
     "context": "Loading overlay while WirePlumber restarts",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Restore Special Workspace Windows",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -11637,6 +11840,20 @@
     "term": "Security key mode",
     "translation": "",
     "context": "lock screen U2F security key mode setting",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Security-key availability could not be confirmed.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -12582,6 +12799,20 @@
     "term": "Show mode tabs and keyboard hints at the bottom.",
     "translation": "",
     "context": "launcher footer description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show notification popups only on the currently focused monitor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show notifications only on the currently focused monitor",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -14308,13 +14539,6 @@
     "comment": ""
   },
   {
-    "term": "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)",
-    "translation": "",
-    "context": "lock screen U2F security key setting",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.",
     "translation": "",
     "context": "",
@@ -14325,6 +14549,13 @@
     "term": "Use a fixed shadow direction for this bar",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use a security key for lock screen authentication.",
+    "translation": "",
+    "context": "lock screen U2F security key setting",
     "reference": "",
     "comment": ""
   },
@@ -14392,7 +14623,7 @@
     "comment": ""
   },
   {
-    "term": "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)",
+    "term": "Use fingerprint authentication for the lock screen.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14829,6 +15060,13 @@
     "term": "Welcome to DankMaterialShell",
     "translation": "",
     "context": "greeter welcome page title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },

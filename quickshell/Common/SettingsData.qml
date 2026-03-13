@@ -477,6 +477,11 @@ Singleton {
     property bool matugenTemplateEmacs: true
     property bool matugenTemplateZed: true
 
+    property var matugenTemplateNeovimSettings: ({
+        "dark": { "baseTheme": "github_dark", "harmony": 0.5 },
+        "light": { "baseTheme": "github_light", "harmony": 0.5 }
+    })
+
     property bool showDock: false
     property bool dockAutoHide: false
     property bool dockSmartAutoHide: false
