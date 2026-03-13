@@ -150,6 +150,7 @@ Singleton {
     property int mangoLayoutBorderSize: -1
 
     property int firstDayOfWeek: -1
+    property bool showWeekNumber: false
     property bool use24HourClock: true
     property bool showSeconds: false
     property bool padHours12Hour: false
