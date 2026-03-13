@@ -60,7 +60,7 @@ func init() {
 	}
 
 	matugenQueueCmd.Flags().Bool("wait", true, "Wait for completion")
-	matugenQueueCmd.Flags().Duration("timeout", 30*time.Second, "Timeout for waiting")
+	matugenQueueCmd.Flags().Duration("timeout", 90*time.Second, "Timeout for waiting")
 }
 
 func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
