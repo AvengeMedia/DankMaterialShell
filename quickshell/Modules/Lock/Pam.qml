@@ -244,7 +244,7 @@ Scope {
         configDirectory: u2fConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
-            if (message.toLowerCase().includes("touch"))
+            if (message !== "")
                 root.u2fState = "waiting";
         }
 
