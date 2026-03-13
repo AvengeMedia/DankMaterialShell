@@ -20,7 +20,10 @@
       goModVersion =
         let
           content = builtins.readFile ./core/go.mod;
-          matched = builtins.match ".*\ngo ([0-9]+)\.([0-9]+).*" content;
+          lines = builtins.filter builtins.isString (builtins.split "\n" content);
+          goLines = builtins.filter (l: builtins.match "go [0-9]+\\..*" l != null) lines;
+          matched =
+            if goLines != [ ] then builtins.match "go ([0-9]+)\\.([0-9]+).*" (builtins.head goLines) else null;
         in
         if matched != null then
           {
