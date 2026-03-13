@@ -95,7 +95,7 @@
             {
               extraQtPackages ? [ ],
             }:
-            pkgs.buildGoModule (
+            (pkgs.buildGoModule.override { go = goForPkgs pkgs; }) (
               let
                 rootSrc = ./.;
                 qtPackages = (qmlPkgs pkgs) ++ extraQtPackages;
@@ -104,7 +104,6 @@
                 inherit version;
                 pname = "dms-shell";
                 src = ./core;
-                go = goForPkgs pkgs;
                 vendorHash = "sha256-dEk7IOd6aQwaxZruxQclN7TGMyb8EJOl6NBWRsoZ9HQ=";
 
                 subPackages = [ "cmd/dms" ];
