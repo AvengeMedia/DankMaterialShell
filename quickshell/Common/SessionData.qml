@@ -575,14 +575,7 @@ Singleton {
             }
         }
 
-        if (!newSettings[identifier]) {
-            newSettings[identifier] = {
-                "enabled": false,
-                "mode": "interval",
-                "interval": 300,
-                "time": "06:00"
-            };
-        }
+        newSettings[identifier] = getMonitorCyclingSettings(screenName);
         newSettings[identifier].enabled = enabled;
         monitorCyclingSettings = newSettings;
         saveSettings();
@@ -613,14 +606,7 @@ Singleton {
             }
         }
 
-        if (!newSettings[identifier]) {
-            newSettings[identifier] = {
-                "enabled": false,
-                "mode": "interval",
-                "interval": 300,
-                "time": "06:00"
-            };
-        }
+        newSettings[identifier] = getMonitorCyclingSettings(screenName);
         newSettings[identifier].mode = mode;
         monitorCyclingSettings = newSettings;
         saveSettings();
@@ -651,14 +637,7 @@ Singleton {
             }
         }
 
-        if (!newSettings[identifier]) {
-            newSettings[identifier] = {
-                "enabled": false,
-                "mode": "interval",
-                "interval": 300,
-                "time": "06:00"
-            };
-        }
+        newSettings[identifier] = getMonitorCyclingSettings(screenName);
         newSettings[identifier].interval = interval;
         monitorCyclingSettings = newSettings;
         saveSettings();
@@ -689,14 +668,7 @@ Singleton {
             }
         }
 
-        if (!newSettings[identifier]) {
-            newSettings[identifier] = {
-                "enabled": false,
-                "mode": "interval",
-                "interval": 300,
-                "time": "06:00"
-            };
-        }
+        newSettings[identifier] = getMonitorCyclingSettings(screenName);
         newSettings[identifier].time = time;
         monitorCyclingSettings = newSettings;
         saveSettings();
@@ -1205,7 +1177,7 @@ Singleton {
             "time": "06:00"
         };
         var value = _findMonitorValue(monitorCyclingSettings, screenName);
-        return value !== undefined ? value : defaults;
+        return Object.assign({}, defaults, value !== undefined ? value : {});
     }
 
     FileView {
