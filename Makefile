@@ -79,7 +79,7 @@ install-desktop:
 	@update-desktop-database -q $(APPLICATIONS_DIR) 2>/dev/null || true
 	@echo "Desktop entry installed"
 
-install: build install-bin install-shell install-completions install-systemd install-icon install-desktop
+install: install-bin install-shell install-completions install-systemd install-icon install-desktop
 	@echo ""
 	@echo "Installation complete!"
 	@echo ""

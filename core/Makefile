@@ -63,19 +63,19 @@ endif
 
 build-all: build dankinstall
 
-install: build
+install:
 	@echo "Installing $(BINARY_NAME) to $(INSTALL_DIR)..."
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "Installation complete"
 
-install-all: build-all
+install-all:
 	@echo "Installing $(BINARY_NAME) to $(INSTALL_DIR)..."
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "Installing $(BINARY_NAME_INSTALL) to $(INSTALL_DIR)..."
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME_INSTALL) $(INSTALL_DIR)/$(BINARY_NAME_INSTALL)
 	@echo "Installation complete"
 
-install-dankinstall: dankinstall
+install-dankinstall:
 	@echo "Installing $(BINARY_NAME_INSTALL) to $(INSTALL_DIR)..."
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME_INSTALL) $(INSTALL_DIR)/$(BINARY_NAME_INSTALL)
 	@echo "Installation complete"
