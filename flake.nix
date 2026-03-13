@@ -17,6 +17,22 @@
       ...
     }:
     let
+      goModVersion =
+        let
+          content = builtins.readFile ./core/go.mod;
+          matched = builtins.match ".*\ngo ([0-9]+)\.([0-9]+).*" content;
+        in
+        if matched != null then
+          {
+            major = builtins.elemAt matched 0;
+            minor = builtins.elemAt matched 1;
+          }
+        else
+          {
+            major = "1";
+            minor = "25";
+          };
+      goForPkgs = pkgs: pkgs.${"go_${goModVersion.major}_${goModVersion.minor}"};
       forEachSystem =
         fn:
         nixpkgs.lib.genAttrs [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ] (
@@ -85,6 +101,7 @@
                 inherit version;
                 pname = "dms-shell";
                 src = ./core;
+                go = goForPkgs pkgs;
                 vendorHash = "sha256-dEk7IOd6aQwaxZruxQclN7TGMyb8EJOl6NBWRsoZ9HQ=";
 
                 subPackages = [ "cmd/dms" ];
@@ -187,7 +204,7 @@
             buildInputs =
               with pkgs;
               [
-                go_1_26
+                (goForPkgs pkgs)
                 go-mockery_2
                 gopls
                 delve
