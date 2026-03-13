@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtCore
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import qs.Common
 
 Singleton {
