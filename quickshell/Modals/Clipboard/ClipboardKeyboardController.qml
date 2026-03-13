@@ -56,7 +56,9 @@ QtObject {
     function handleKey(event) {
         switch (event.key) {
         case Qt.Key_Escape:
-            if (ClipboardService.keyboardNavigationActive) {
+            if (modal.mode === "editor") {
+                modal.mode = "history";
+            } else if (ClipboardService.keyboardNavigationActive) {
                 ClipboardService.keyboardNavigationActive = false;
             } else {
                 modal.hide();
