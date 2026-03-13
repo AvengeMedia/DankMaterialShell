@@ -7,6 +7,12 @@ import qs.Widgets
 Rectangle {
     id: root
 
+    readonly property real baseGridWidth: 668
+    readonly property real weekColWidth: SettingsData.showWeekNumber ? 28 : 0
+    readonly property real innerSpacing: SettingsData.showWeekNumber ? Theme.spacingS : 0
+
+    implicitWidth: baseGridWidth + weekColWidth + innerSpacing + (Theme.spacingM * 2)
+
     property bool showEventDetails: false
     property date selectedDate: systemClock.date
     property var selectedDateEvents: []
@@ -269,10 +275,12 @@ Rectangle {
             width: parent.width
             height: parent.height - 28 - Theme.spacingS
             visible: !showEventDetails
-            spacing: Theme.spacingS
+            spacing: root.innerSpacing
 
             Column {
-                width: 28
+                id: weekNumberColumn
+                visible: SettingsData.showWeekNumber
+                width: root.weekColWidth
                 height: parent.height
                 spacing: Theme.spacingS
 
@@ -311,7 +319,7 @@ Rectangle {
             }
 
             Column {
-                width: parent.width - 28 - parent.spacing
+                width: SettingsData.showWeekNumber ? (parent.width - weekNumberColumn.width - parent.spacing) : parent.width
                 height: parent.height
                 spacing: Theme.spacingS
 
