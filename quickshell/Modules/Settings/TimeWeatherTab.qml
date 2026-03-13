@@ -85,6 +85,16 @@ Item {
                 settingKey: "dateFormat"
                 iconName: "calendar_today"
 
+                SettingsToggleRow {
+                    tab: "time"
+                    tags: ["show", "week"]
+                    settingKey: "showWeekNumber"
+                    text: I18n.tr("Show Week Number")
+                    description: I18n.tr("Show week number in the calendar")
+                    checked: SettingsData.showWeekNumber
+                    onToggled: checked => SettingsData.set("showWeekNumber", checked)
+                }
+
                 SettingsDropdownRow {
                     tab: "time"
                     tags: ["first", "day", "week"]
