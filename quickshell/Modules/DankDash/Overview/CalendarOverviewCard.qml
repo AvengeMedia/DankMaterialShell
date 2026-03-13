@@ -41,6 +41,48 @@ Rectangle {
         return d;
     }
 
+    function getWeekNumber(dateObj) {
+        // Copy date and set to noon (12, 0, 0, 0) to avoid potential Daylight Saving Time boundary related bugs
+        const d = new Date(dateObj.getTime());
+        d.setHours(12, 0, 0, 0);
+
+        const weekStartDay = new Date(startOfWeek(d));
+        weekStartDay.setHours(12, 0, 0, 0);
+
+        let yearTarget;
+        let week1Start;
+
+        if (weekStartJs() === 1) {
+            // ISO 8601 Standard, week start on Monday
+            // A week belongs to the year its Thursday falls in
+            // So we have to get the yearTarget from weekStartDay instead of dateObj
+            yearTarget = new Date(weekStartDay);
+            yearTarget.setDate(yearTarget.getDate() + 3); // Monday + 3 = Thursday
+
+            // Week 1 is the week containing Jan 4th
+            const jan4 = new Date(yearTarget.getFullYear(), 0, 4);
+            jan4.setHours(12, 0, 0, 0);
+
+            week1Start = new Date(startOfWeek(jan4));
+            week1Start.setHours(12, 0, 0, 0);
+        } else {
+            // Traditional / US Stadnard, week start on Sunday
+            // A week belongs to the year its Sunday falls in
+            yearTarget = new Date(weekStartDay);
+            yearTarget.setDate(yearTarget.getDate() + 6); // Monday + 6 = Sunday
+
+            // Week 1 is the week containing Jan4
+            const jan1 = new Date(yearTarget.getFullYear(), 0, 1);
+            jan1.setHours(12, 0, 0, 0);
+
+            week1Start = new Date(startOfWeek(jan1));
+            week1Start.setHours(12, 0, 0, 0);
+        }
+
+        const diffDays = Math.round((weekStartDay.getTime() - week1Start.getTime()) / 86400000);
+        return Math.floor(diffDays / 7) + 1;
+    }
+
     function updateSelectedDateEvents() {
         if (CalendarService && CalendarService.khalAvailable) {
             const events = CalendarService.getEventsForDate(selectedDate);
