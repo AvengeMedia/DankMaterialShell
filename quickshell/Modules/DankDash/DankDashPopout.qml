@@ -12,7 +12,7 @@ DankPopout {
     property var triggerScreen: null
     property int currentTabIndex: 0
 
-    popupWidth: 700
+    popupWidth: 736
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 500
     triggerWidth: 80
     screen: triggerScreen

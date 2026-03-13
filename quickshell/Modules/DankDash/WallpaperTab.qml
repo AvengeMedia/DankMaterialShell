@@ -12,7 +12,7 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    implicitWidth: 700
+    implicitWidth: 736
     implicitHeight: 410
 
     property string wallpaperDir: ""

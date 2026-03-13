@@ -105,7 +105,7 @@ Item {
         return Math.max(0, Math.min(1, calculatedRatio));
     }
 
-    implicitWidth: 700
+    implicitWidth: 736
     implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
 
     Connections {
