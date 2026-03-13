@@ -187,7 +187,7 @@
             buildInputs =
               with pkgs;
               [
-                go_1_25
+                go_1_26
                 gopls
                 delve
                 go-tools
