@@ -196,6 +196,17 @@ Singleton {
                 defaultTrigger: "",
                 isLauncher: false
             },
+            "dms_colorpicker": {
+                id: "dms_colorpicker",
+                name: I18n.tr("Color Picker"),
+                icon: "svg+corner:" + dmsLogoPath + "|palette",
+                cornerIcon: "palette",
+                comment: "DMS",
+                action: "ipc:color-picker",
+                categories: ["Graphics", "Utility"],
+                defaultTrigger: "",
+                isLauncher: false
+            },
             "dms_settings_search": {
                 id: "dms_settings_search",
                 name: I18n.tr("Settings", "settings window title"),
@@ -333,6 +344,9 @@ Singleton {
             return true;
         case "processlist":
             PopoutService.toggleProcessListModal();
+            return true;
+        case "color-picker":
+            PopoutService.showColorPicker();
             return true;
         }
         return false;
