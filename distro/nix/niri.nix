@@ -2,11 +2,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   cfg = config.programs.dank-material-shell;
-in
-{
+in {
   imports = [
     ./dms-rename.nix
   ];
@@ -16,9 +14,11 @@ in
       enableKeybinds = lib.mkEnableOption "DankMaterialShell niri keybinds";
       enableSpawn = lib.mkEnableOption "DankMaterialShell niri spawn-at-startup";
       includes = {
-        enable = (lib.mkEnableOption "includes for niri-flake") // {
-          default = true;
-        };
+        enable =
+          (lib.mkEnableOption "includes for niri-flake")
+          // {
+            default = true;
+          };
         override = lib.mkOption {
           type = lib.types.bool;
           description = ''
@@ -44,8 +44,10 @@ in
             "alttab"
             "binds"
             "colors"
+            "cursor"
             "layout"
             "outputs"
+            "windowrules"
             "wpblur"
           ];
           example = [
@@ -70,24 +72,21 @@ in
       let
         cfg' = cfg.niri.includes;
 
-        withOriginalConfig =
-          dmsFiles:
-          if cfg'.override then
-            [ cfg'.originalFileName ] ++ dmsFiles
-          else
-            dmsFiles ++ [ cfg'.originalFileName ];
+        withOriginalConfig = dmsFiles:
+          if cfg'.override
+          then [cfg'.originalFileName] ++ dmsFiles
+          else dmsFiles ++ [cfg'.originalFileName];
 
         fixes = map (fix: "\n${fix}") (
           lib.optional (cfg'.enable && config.programs.niri.settings.layout.border.enable)
-            # kdl
-            ''
-              // Border fix
-              // See https://yalter.github.io/niri/Configuration%3A-Include.html#border-special-case for details
-              layout { border { on; }; }
-            ''
+          # kdl
+          ''
+            // Border fix
+            // See https://yalter.github.io/niri/Configuration%3A-Include.html#border-special-case for details
+            layout { border { on; }; }
+          ''
         );
-      in
-      {
+      in {
         niri-config.target = lib.mkForce "niri/${cfg'.originalFileName}.kdl";
         niri-config-dms = {
           target = "niri/config.kdl";
@@ -104,11 +103,9 @@ in
 
     programs.niri.settings = lib.mkMerge [
       (lib.mkIf cfg.niri.enableKeybinds {
-        binds =
-          with config.lib.niri.actions;
-          let
-            dms-ipc = spawn "dms" "ipc";
-          in
+        binds = with config.lib.niri.actions; let
+          dms-ipc = spawn "dms" "ipc";
+        in
           {
             "Mod+Space" = {
               action = dms-ipc "spotlight" "toggle";
