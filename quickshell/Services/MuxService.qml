@@ -12,6 +12,10 @@ Singleton {
     property var sessions: []
     property bool loading: false
 
+    property bool tmuxAvailable: false
+    property bool zellijAvailable: false
+    readonly property bool currentMuxAvailable: muxType === "zellij" ? zellijAvailable : tmuxAvailable
+
     readonly property string muxType: SettingsData.muxType
     readonly property string displayName: muxType === "zellij" ? "Zellij" : "Tmux"
 
@@ -38,6 +42,27 @@ Singleton {
     function _terminalPrefix() {
         return [terminal].concat(getTerminalFlag(terminal))
     }
+
+    Process {
+        id: tmuxCheckProcess
+        command: ["which", "tmux"]
+        running: false
+        onExited: (code) => { root.tmuxAvailable = (code === 0) }
+    }
+
+    Process {
+        id: zellijCheckProcess
+        command: ["which", "zellij"]
+        running: false
+        onExited: (code) => { root.zellijAvailable = (code === 0) }
+    }
+
+    function checkAvailability() {
+        tmuxCheckProcess.running = true
+        zellijCheckProcess.running = true
+    }
+
+    Component.onCompleted: checkAvailability()
 
     Process {
         id: listProcess
@@ -75,6 +100,11 @@ Singleton {
     }
 
     function refreshSessions() {
+        if (!root.currentMuxAvailable) {
+            root.sessions = []
+            return
+        }
+
         root.loading = true
 
         if (listProcess.running)
@@ -90,6 +120,29 @@ Singleton {
         })
     }
 
+    function _isSessionExcluded(name) {
+        var filter = SettingsData.muxSessionFilter.trim()
+        if (filter.length === 0)
+            return false
+        var parts = filter.split(",")
+        for (var i = 0; i < parts.length; i++) {
+            var pattern = parts[i].trim()
+            if (pattern.length === 0)
+                continue
+            if (pattern.startsWith("/") && pattern.endsWith("/") && pattern.length > 2) {
+                try {
+                    var re = new RegExp(pattern.slice(1, -1))
+                    if (re.test(name))
+                        return true
+                } catch (e) {}
+            } else {
+                if (name.toLowerCase() === pattern.toLowerCase())
+                    return true
+            }
+        }
+        return false
+    }
+
     function _parseTmuxSessions(output) {
         var sessionList = []
         var lines = output.trim().split('\n')
@@ -100,7 +153,7 @@ Singleton {
                 continue
 
             var parts = line.split('|')
-            if (parts.length >= 3) {
+            if (parts.length >= 3 && !_isSessionExcluded(parts[0])) {
                 sessionList.push({
                     name: parts[0],
                     windows: parts[1],
@@ -108,9 +161,6 @@ Singleton {
                 })
             }
         }
-
-        if (sessionList.length !== root.sessions.length)
-            sessionsChanged()
 
         root.sessions = sessionList
     }
@@ -126,17 +176,16 @@ Singleton {
 
             var exited = line.includes("(EXITED")
             var bracketIdx = line.indexOf(" [")
-            var name = bracketIdx > 0 ? line.substring(0, bracketIdx) : line
+            var name = (bracketIdx > 0 ? line.substring(0, bracketIdx) : line).trim()
 
-            sessionList.push({
-                name: name.trim(),
-                windows: "N/A",
-                attached: !exited
-            })
+            if (!_isSessionExcluded(name)) {
+                sessionList.push({
+                    name: name,
+                    windows: "N/A",
+                    attached: !exited
+                })
+            }
         }
-
-        if (sessionList.length !== root.sessions.length)
-            sessionsChanged()
 
         root.sessions = sessionList
     }

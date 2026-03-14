@@ -20,36 +20,11 @@ DankModal {
     property string searchText: ""
     property var filteredSessions: []
 
-    function isSessionExcluded(name) {
-        var filter = SettingsData.muxSessionFilter.trim()
-        if (filter.length === 0)
-            return false
-        var parts = filter.split(",")
-        for (var i = 0; i < parts.length; i++) {
-            var pattern = parts[i].trim()
-            if (pattern.length === 0)
-                continue
-            if (pattern.startsWith("/") && pattern.endsWith("/") && pattern.length > 2) {
-                try {
-                    var re = new RegExp(pattern.slice(1, -1))
-                    if (re.test(name))
-                        return true
-                } catch (e) {}
-            } else {
-                if (name.toLowerCase() === pattern.toLowerCase())
-                    return true
-            }
-        }
-        return false
-    }
-
     function updateFilteredSessions() {
         var filtered = []
         var lowerSearch = searchText.trim().toLowerCase()
         for (var i = 0; i < MuxService.sessions.length; i++) {
             var session = MuxService.sessions[i]
-            if (isSessionExcluded(session.name))
-                continue
             if (lowerSearch.length > 0 && !session.name.toLowerCase().includes(lowerSearch))
                 continue
             filtered.push(session)
@@ -432,7 +407,9 @@ DankModal {
                         spacing: Theme.spacingXS
 
                         Repeater {
-                            model: muxModal.filteredSessions
+                            model: ScriptModel {
+                                values: muxModal.filteredSessions
+                            }
 
                             delegate: Rectangle {
                                 required property var modelData

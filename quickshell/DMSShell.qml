@@ -284,10 +284,6 @@ Item {
         }
     }
 
-    MuxModal {
-        id: muxModal
-    }
-
     LazyLoader {
         id: dockContextMenuLoader
 
@@ -622,6 +618,10 @@ Item {
                 PopoutService.clipboardHistoryPopout = clipboardHistoryPopout;
             }
         }
+    }
+
+    MuxModal {
+        id: muxModal
     }
 
     ClipboardHistoryModal {

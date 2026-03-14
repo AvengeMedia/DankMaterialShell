@@ -18,6 +18,7 @@ BasePill {
     readonly property int maxNormalWidth: 456
     readonly property int maxCompactWidth: 288
     readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
+    property Toplevel monitorActiveWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
@@ -52,7 +53,32 @@ BasePill {
     Connections {
         target: root
         function onActiveWindowChanged() {
+            if (!activeWindow) {
+                monitorActiveWindow = null;
+            } else if (parentScreen && activeWindow.screens.length > 0 && activeWindow.screens[0].name === parentScreen.name) {
+                monitorActiveWindow = activeWindow;
+            }
+        }
+    }
+
+    Connections {
+        target: root
+        function onMonitorActiveWindowChanged() {
             root.updateDesktopEntry();
+        }
+    }
+
+    Connections {
+        target: NiriService
+        function onAllWorkspacesChanged() {
+            root.validateMonitorActiveWindow();
+        }
+    }
+
+    Connections {
+        target: Hyprland
+        function onFocusedWorkspaceChanged() {
+            root.validateMonitorActiveWindow();
         }
     }
 
@@ -63,9 +89,46 @@ BasePill {
         }
     }
 
+    function validateMonitorActiveWindow() {
+        if (!monitorActiveWindow || !parentScreen)
+            return;
+
+        if (CompositorService.isNiri) {
+            let currentWorkspaceId = null;
+            for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
+                const ws = NiriService.allWorkspaces[i];
+                if (ws.output === parentScreen.name && ws.is_active) {
+                    currentWorkspaceId = ws.id;
+                    break;
+                }
+            }
+
+            if (!currentWorkspaceId) {
+                monitorActiveWindow = null;
+                return;
+            }
+
+            const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId);
+            if (workspaceWindows.length === 0) {
+                monitorActiveWindow = null;
+            }
+        } else if (CompositorService.isHyprland) {
+            if (!Hyprland.monitors || !Hyprland.toplevels)
+                return;
+            const monitor = Hyprland.monitors.values.find(m => m.name === parentScreen.name);
+            if (!monitor || !monitor.activeWorkspace)
+                return;
+            const hyprlandToplevels = Array.from(Hyprland.toplevels.values);
+            const toplevel = hyprlandToplevels.find(t => t?.wayland === monitorActiveWindow);
+            if (!toplevel || !toplevel.workspace || toplevel.workspace.id !== monitor.activeWorkspace.id) {
+                monitorActiveWindow = null;
+            }
+        }
+    }
+
     function updateDesktopEntry() {
-        if (activeWindow && activeWindow.appId) {
-            const moddedId = Paths.moddedAppId(activeWindow.appId);
+        if (monitorActiveWindow && monitorActiveWindow.appId) {
+            const moddedId = Paths.moddedAppId(monitorActiveWindow.appId);
             activeDesktopEntry = DesktopEntries.heuristicLookup(moddedId);
         } else {
             activeDesktopEntry = null;
@@ -73,10 +136,13 @@ BasePill {
     }
     readonly property bool hasWindowsOnCurrentWorkspace: {
         if (CompositorService.isNiri) {
+            if (!parentScreen)
+                return false;
+
             let currentWorkspaceId = null;
             for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
                 const ws = NiriService.allWorkspaces[i];
-                if (ws.is_focused) {
+                if (ws.output === parentScreen.name && ws.is_active) {
                     currentWorkspaceId = ws.id;
                     break;
                 }
@@ -87,31 +153,36 @@ BasePill {
             }
 
             const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId);
-            return workspaceWindows.length > 0 && activeWindow && activeWindow.title;
+            return workspaceWindows.length > 0 && monitorActiveWindow && monitorActiveWindow.title;
         }
 
         if (CompositorService.isHyprland) {
-            if (!Hyprland.focusedWorkspace || !activeWindow || !activeWindow.title) {
+            if (!monitorActiveWindow || !monitorActiveWindow.title || !parentScreen) {
                 return false;
             }
 
             try {
-                if (!Hyprland.toplevels)
+                if (!Hyprland.toplevels || !Hyprland.monitors)
                     return false;
+
+                const monitor = Hyprland.monitors.values.find(m => m.name === parentScreen.name);
+                if (!monitor || !monitor.activeWorkspace)
+                    return false;
+
                 const hyprlandToplevels = Array.from(Hyprland.toplevels.values);
-                const activeHyprToplevel = hyprlandToplevels.find(t => t?.wayland === activeWindow);
+                const activeHyprToplevel = hyprlandToplevels.find(t => t?.wayland === monitorActiveWindow);
 
                 if (!activeHyprToplevel || !activeHyprToplevel.workspace) {
                     return false;
                 }
 
-                return activeHyprToplevel.workspace.id === Hyprland.focusedWorkspace.id;
+                return activeHyprToplevel.workspace.id === monitor.activeWorkspace.id;
             } catch (e) {
                 return false;
             }
         }
 
-        return activeWindow && activeWindow.title;
+        return monitorActiveWindow && monitorActiveWindow.title;
     }
 
     width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : visualWidth) : 0
@@ -136,16 +207,16 @@ BasePill {
                 anchors.centerIn: parent
                 width: 18
                 height: 18
-                visible: root.isVerticalOrientation && activeWindow && status === Image.Ready
+                visible: root.isVerticalOrientation && monitorActiveWindow && status === Image.Ready
                 source: {
-                    if (!activeWindow || !activeWindow.appId)
+                    if (!monitorActiveWindow || !monitorActiveWindow.appId)
                         return "";
-                    return Paths.getAppIcon(activeWindow.appId, activeDesktopEntry);
+                    return Paths.getAppIcon(monitorActiveWindow.appId, activeDesktopEntry);
                 }
                 smooth: true
                 mipmap: true
                 asynchronous: true
-                layer.enabled: activeWindow && activeWindow.appId === "org.quickshell"
+                layer.enabled: monitorActiveWindow && monitorActiveWindow.appId === "org.quickshell"
                 layer.smooth: true
                 layer.mipmap: true
                 layer.effect: MultiEffect {
@@ -160,16 +231,16 @@ BasePill {
                 size: 18
                 name: "sports_esports"
                 color: Theme.widgetTextColor
-                visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
+                visible: root.isVerticalOrientation && monitorActiveWindow && monitorActiveWindow.appId && appIcon.status !== Image.Ready && Paths.isSteamApp(monitorActiveWindow.appId)
             }
 
             Text {
                 anchors.centerIn: parent
-                visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && !Paths.isSteamApp(activeWindow.appId)
+                visible: root.isVerticalOrientation && monitorActiveWindow && monitorActiveWindow.appId && appIcon.status !== Image.Ready && !Paths.isSteamApp(monitorActiveWindow.appId)
                 text: {
-                    if (!activeWindow || !activeWindow.appId)
+                    if (!monitorActiveWindow || !monitorActiveWindow.appId)
                         return "?";
-                    const appName = Paths.getAppName(activeWindow.appId, activeDesktopEntry);
+                    const appName = Paths.getAppName(monitorActiveWindow.appId, activeDesktopEntry);
                     return appName.charAt(0).toUpperCase();
                 }
                 font.pixelSize: 10
@@ -185,9 +256,9 @@ BasePill {
                 StyledText {
                     id: appText
                     text: {
-                        if (!activeWindow || !activeWindow.appId)
+                        if (!monitorActiveWindow || !monitorActiveWindow.appId)
                             return "";
-                        return Paths.getAppName(activeWindow.appId, activeDesktopEntry);
+                        return Paths.getAppName(monitorActiveWindow.appId, activeDesktopEntry);
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
@@ -209,7 +280,7 @@ BasePill {
                 StyledText {
                     id: titleText
                     text: {
-                        const title = activeWindow && activeWindow.title ? activeWindow.title : "";
+                        const title = monitorActiveWindow && monitorActiveWindow.title ? monitorActiveWindow.title : "";
                         const appName = appText.text;
 
                         if (compactMode && title === appName) {
@@ -244,7 +315,7 @@ BasePill {
         hoverEnabled: root.isVerticalOrientation
         acceptedButtons: Qt.NoButton
         onEntered: {
-            if (root.isVerticalOrientation && activeWindow && activeWindow.appId && root.parentScreen) {
+            if (root.isVerticalOrientation && monitorActiveWindow && monitorActiveWindow.appId && root.parentScreen) {
                 tooltipLoader.active = true;
                 if (tooltipLoader.item) {
                     const globalPos = mapToGlobal(width / 2, height / 2);
@@ -256,8 +327,8 @@ BasePill {
                     const adjustedY = relativeY + root.minTooltipY;
                     const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + (barConfig?.spacing ?? 4) + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - (barConfig?.spacing ?? 4) - Theme.spacingXS);
 
-                    const appName = Paths.getAppName(activeWindow.appId, activeDesktopEntry);
-                    const title = activeWindow.title || "";
+                    const appName = Paths.getAppName(monitorActiveWindow.appId, activeDesktopEntry);
+                    const title = monitorActiveWindow.title || "";
                     const tooltipText = appName + (title ? " • " + title : "");
 
                     const isLeft = root.axis?.edge === "left";
