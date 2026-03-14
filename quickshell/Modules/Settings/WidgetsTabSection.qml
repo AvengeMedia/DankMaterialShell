@@ -27,6 +27,7 @@ Column {
     signal gpuSelectionChanged(string sectionId, int widgetIndex, int selectedIndex)
     signal diskMountSelectionChanged(string sectionId, int widgetIndex, string mountPath)
     signal controlCenterSettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
+    signal controlCenterGroupOrderChanged(string sectionId, int widgetIndex, var groupOrder)
     signal privacySettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
     signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
@@ -39,7 +40,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -89,7 +90,6 @@ Column {
                 width: itemsList.width
                 height: 70
                 z: held ? 2 : 1
-
 
                 Rectangle {
                     id: itemBackground
@@ -587,6 +587,7 @@ Column {
                                 controlCenterContextMenu.widgetData = modelData;
                                 controlCenterContextMenu.sectionId = root.sectionId;
                                 controlCenterContextMenu.widgetIndex = index;
+                                controlCenterContextMenu.controlCenterGroups = controlCenterContextMenu.getOrderedControlCenterGroups();
 
                                 var buttonPos = ccMenuButton.mapToItem(root, 0, 0);
                                 var popupWidth = controlCenterContextMenu.width;
@@ -1060,7 +1061,7 @@ Column {
         readonly property real controlCenterGroupVerticalPadding: Theme.spacingXS * 2
         readonly property real controlCenterMenuSpacing: 2
         width: Math.max(220, minimumContentWidth)
-        height: menuColumn.implicitHeight + Theme.spacingS * 2
+        height: getControlCenterPopupHeight(controlCenterGroups)
         padding: 0
         modal: true
         focus: true
@@ -1224,11 +1225,64 @@ Column {
 
             groups.splice(toIndex, 0, moved);
             controlCenterGroups = groups;
+            const reorderedGroupIds = groups.map(group => group.id);
+            root.controlCenterGroupOrderChanged(sectionId, widgetIndex, reorderedGroupIds);
         }
 
         function cancelControlCenterDrag() {
             draggedControlCenterGroupIndex = -1;
             controlCenterGroupDropIndex = -1;
+        }
+
+        function getControlCenterGroupHeight(group) {
+            const rowCount = group?.rows?.length ?? 0;
+            if (rowCount <= 0)
+                return controlCenterGroupVerticalPadding;
+
+            return rowCount * controlCenterRowHeight + Math.max(0, rowCount - 1) * controlCenterRowSpacing + controlCenterGroupVerticalPadding;
+        }
+
+        function getControlCenterPopupHeight(groups) {
+            const orderedGroups = groups || [];
+            let totalHeight = Theme.spacingS * 2;
+
+            for (let i = 0; i < orderedGroups.length; i++) {
+                totalHeight += getControlCenterGroupHeight(orderedGroups[i]);
+                if (i < orderedGroups.length - 1)
+                    totalHeight += controlCenterMenuSpacing;
+            }
+
+            return totalHeight;
+        }
+
+        function getOrderedControlCenterGroups() {
+            const baseGroups = defaultControlCenterGroups.slice();
+            const currentWidget = contentItem.getCurrentWidgetData();
+            const savedOrder = currentWidget?.controlCenterGroupOrder;
+            if (!savedOrder || !savedOrder.length)
+                return baseGroups;
+
+            const groupMap = {};
+            for (let i = 0; i < baseGroups.length; i++)
+                groupMap[baseGroups[i].id] = baseGroups[i];
+
+            const orderedGroups = [];
+            for (let i = 0; i < savedOrder.length; i++) {
+                const groupId = savedOrder[i];
+                const group = groupMap[groupId];
+                if (group) {
+                    orderedGroups.push(group);
+                    delete groupMap[groupId];
+                }
+            }
+
+            for (let i = 0; i < baseGroups.length; i++) {
+                const group = baseGroups[i];
+                if (groupMap[group.id])
+                    orderedGroups.push(group);
+            }
+
+            return orderedGroups;
         }
 
         background: Rectangle {
@@ -1239,6 +1293,13 @@ Column {
         }
 
         contentItem: Item {
+            function getCurrentWidgetData() {
+                const widgets = root.items || [];
+                if (controlCenterContextMenu.widgetIndex >= 0 && controlCenterContextMenu.widgetIndex < widgets.length)
+                    return widgets[controlCenterContextMenu.widgetIndex];
+                return controlCenterContextMenu.widgetData;
+            }
+
             Column {
                 id: menuColumn
                 anchors.fill: parent
@@ -1288,11 +1349,7 @@ Column {
                         required property int index
 
                         function getCheckedState(settingName) {
-                            var widgets = root.items || [];
-                            var currentWidget = controlCenterContextMenu.widgetData;
-                            if (controlCenterContextMenu.widgetIndex >= 0 && controlCenterContextMenu.widgetIndex < widgets.length)
-                                currentWidget = widgets[controlCenterContextMenu.widgetIndex];
-                            var wd = currentWidget;
+                            const wd = controlCenterContextMenu.contentItem.getCurrentWidgetData();
                             switch (settingName) {
                             case "showNetworkIcon":
                                 return wd?.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
