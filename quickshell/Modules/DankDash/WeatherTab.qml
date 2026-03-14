@@ -11,7 +11,7 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    implicitWidth: 736
+    implicitWidth: SettingsData.showWeekNumber ? 376 : 700
     implicitHeight: 410
     property bool syncing: false
     property bool showHourly: false

@@ -8,7 +8,7 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    implicitWidth: calendarOverviewCard.implicitWidth
+    implicitWidth: SettingsData.showWeekNumber ? 736 : 700
     implicitHeight: 410
 
     signal switchToWeatherTab
@@ -54,7 +54,6 @@ Item {
 
         // Calendar - bottom middle (wider and taller)
         CalendarOverviewCard {
-            id: calendarOverviewCard
             x: parent.width * 0.2 - Theme.spacingM
             y: 100 + Theme.spacingM
             width: parent.width * 0.6

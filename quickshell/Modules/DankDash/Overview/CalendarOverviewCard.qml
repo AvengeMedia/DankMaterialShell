@@ -7,11 +7,7 @@ import qs.Widgets
 Rectangle {
     id: root
 
-    readonly property real baseGridWidth: 668
-    readonly property real weekColWidth: SettingsData.showWeekNumber ? 28 : 0
-    readonly property real innerSpacing: SettingsData.showWeekNumber ? Theme.spacingS : 0
-
-    implicitWidth: baseGridWidth + weekColWidth + innerSpacing + (Theme.spacingM * 2)
+    implicitWidth: SettingsData.showWeekNumber ? 736 : 700
 
     property bool showEventDetails: false
     property date selectedDate: systemClock.date
@@ -48,44 +44,36 @@ Rectangle {
     }
 
     function getWeekNumber(dateObj) {
-        // Copy date and set to noon (12, 0, 0, 0) to avoid potential Daylight Saving Time boundary related bugs
-        const d = new Date(dateObj.getTime());
-        d.setHours(12, 0, 0, 0);
-
-        const weekStartDay = new Date(startOfWeek(d));
+        // Set time to noon to avoid potential Daylight Saving Time related bugs
+        const weekStartDay = startOfWeek(dateObj);
         weekStartDay.setHours(12, 0, 0, 0);
 
-        let yearTarget;
         let week1Start;
 
         if (weekStartJs() === 1) {
             // ISO 8601 Standard, week start on Monday
             // A week belongs to the year its Thursday falls in
             // So we have to get the yearTarget from weekStartDay instead of dateObj
-            yearTarget = new Date(weekStartDay);
+            let yearTarget = weekStartDay;
             yearTarget.setDate(yearTarget.getDate() + 3); // Monday + 3 = Thursday
 
             // Week 1 is the week containing Jan 4th
             const jan4 = new Date(yearTarget.getFullYear(), 0, 4);
-            jan4.setHours(12, 0, 0, 0);
-
-            week1Start = new Date(startOfWeek(jan4));
-            week1Start.setHours(12, 0, 0, 0);
+            week1Start = startOfWeek(jan4);
         } else {
-            // Traditional / US Stadnard, week start on Sunday
+            // Traditional / US Standard, week start on Sunday
             // A week belongs to the year its Sunday falls in
-            yearTarget = new Date(weekStartDay);
+            let yearTarget = weekStartDay;
             yearTarget.setDate(yearTarget.getDate() + 6); // Monday + 6 = Sunday
 
-            // Week 1 is the week containing Jan4
+            // Week 1 is the week containing Jan 1st
             const jan1 = new Date(yearTarget.getFullYear(), 0, 1);
-            jan1.setHours(12, 0, 0, 0);
-
-            week1Start = new Date(startOfWeek(jan1));
-            week1Start.setHours(12, 0, 0, 0);
+            week1Start = startOfWeek(jan1);
         }
 
-        const diffDays = Math.round((weekStartDay.getTime() - week1Start.getTime()) / 86400000);
+        week1Start.setHours(12, 0, 0, 0);
+
+        const diffDays = Math.round((weekStartDay.getTime() - week1Start.getTime()) / 86400000); // Number of miliseconds in a day
         return Math.floor(diffDays / 7) + 1;
     }
 
@@ -203,7 +191,7 @@ Rectangle {
         Row {
             width: parent.width
             height: 28
-            visible: !showEventDetail.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+            visible: !showEventDetail
 
             Rectangle {
                 width: 28
@@ -275,12 +263,12 @@ Rectangle {
             width: parent.width
             height: parent.height - 28 - Theme.spacingS
             visible: !showEventDetails
-            spacing: root.innerSpacing
+            spacing: SettingsData.showWeekNumber ? Theme.spacingS : 0
 
             Column {
                 id: weekNumberColumn
                 visible: SettingsData.showWeekNumber
-                width: root.weekColWidth
+                width: SettingsData.showWeekNumber ? 28 : 0
                 height: parent.height
                 spacing: Theme.spacingS
 
