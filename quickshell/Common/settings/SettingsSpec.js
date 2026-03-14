@@ -33,6 +33,7 @@ var SPEC = {
     mangoLayoutBorderSize: { def: -1, onChange: "updateCompositorLayout" },
 
     firstDayOfWeek: { def: -1 },
+    showWeekNumber: { def: false },
     use24HourClock: { def: true },
     showSeconds: { def: false },
     padHours12Hour: { def: false },
