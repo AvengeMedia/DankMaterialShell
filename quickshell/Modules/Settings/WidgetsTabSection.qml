@@ -1054,12 +1054,182 @@ Column {
         property string sectionId: ""
         property int widgetIndex: -1
 
-        width: 220
+        readonly property real minimumContentWidth: controlCenterContentMetrics.implicitWidth + Theme.spacingS * 2
+        readonly property real controlCenterRowHeight: 32
+        readonly property real controlCenterRowSpacing: 1
+        readonly property real controlCenterGroupVerticalPadding: Theme.spacingXS * 2
+        readonly property real controlCenterMenuSpacing: 2
+        width: Math.max(220, minimumContentWidth)
         height: menuColumn.implicitHeight + Theme.spacingS * 2
         padding: 0
         modal: true
         focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        onClosed: {
+            cancelControlCenterDrag();
+        }
+
+        readonly property var defaultControlCenterGroups: [
+            {
+                id: "network",
+                rows: [
+                    {
+                        icon: "lan",
+                        label: I18n.tr("Network"),
+                        setting: "showNetworkIcon"
+                    }
+                ]
+            },
+            {
+                id: "vpn",
+                rows: [
+                    {
+                        icon: "vpn_lock",
+                        label: I18n.tr("VPN"),
+                        setting: "showVpnIcon"
+                    }
+                ]
+            },
+            {
+                id: "bluetooth",
+                rows: [
+                    {
+                        icon: "bluetooth",
+                        label: I18n.tr("Bluetooth"),
+                        setting: "showBluetoothIcon"
+                    }
+                ]
+            },
+            {
+                id: "audio",
+                rows: [
+                    {
+                        icon: "volume_up",
+                        label: I18n.tr("Audio"),
+                        setting: "showAudioIcon"
+                    },
+                    {
+                        icon: "percent",
+                        label: I18n.tr("Volume"),
+                        setting: "showAudioPercent"
+                    }
+                ]
+            },
+            {
+                id: "microphone",
+                rows: [
+                    {
+                        icon: "mic",
+                        label: I18n.tr("Microphone"),
+                        setting: "showMicIcon"
+                    },
+                    {
+                        icon: "percent",
+                        label: I18n.tr("Microphone Volume"),
+                        setting: "showMicPercent"
+                    }
+                ]
+            },
+            {
+                id: "brightness",
+                rows: [
+                    {
+                        icon: "brightness_high",
+                        label: I18n.tr("Brightness"),
+                        setting: "showBrightnessIcon"
+                    },
+                    {
+                        icon: "percent",
+                        label: I18n.tr("Brightness Value"),
+                        setting: "showBrightnessPercent"
+                    }
+                ]
+            },
+            {
+                id: "battery",
+                rows: [
+                    {
+                        icon: "battery_full",
+                        label: I18n.tr("Battery"),
+                        setting: "showBatteryIcon"
+                    }
+                ]
+            },
+            {
+                id: "printer",
+                rows: [
+                    {
+                        icon: "print",
+                        label: I18n.tr("Printer"),
+                        setting: "showPrinterIcon"
+                    }
+                ]
+            },
+            {
+                id: "screenSharing",
+                rows: [
+                    {
+                        icon: "screen_record",
+                        label: I18n.tr("Screen Sharing"),
+                        setting: "showScreenSharingIcon"
+                    }
+                ]
+            }
+        ]
+        property var controlCenterGroups: defaultControlCenterGroups
+        property int draggedControlCenterGroupIndex: -1
+        property int controlCenterGroupDropIndex: -1
+
+        function updateControlCenterGroupDropIndex(draggedIndex, localY) {
+            const totalGroups = controlCenterGroups.length;
+            let dropIndex = totalGroups;
+
+            for (let i = 0; i < totalGroups; i++) {
+                const delegate = groupRepeater.itemAt(i);
+                if (!delegate)
+                    continue;
+
+                const midpoint = delegate.y + delegate.height / 2;
+                if (localY < midpoint) {
+                    dropIndex = i;
+                    break;
+                }
+            }
+
+            controlCenterGroupDropIndex = Math.max(0, Math.min(totalGroups, dropIndex));
+            draggedControlCenterGroupIndex = draggedIndex;
+        }
+
+        function finishControlCenterDrag() {
+            if (draggedControlCenterGroupIndex < 0) {
+                controlCenterGroupDropIndex = -1;
+                return;
+            }
+
+            const fromIndex = draggedControlCenterGroupIndex;
+            let toIndex = controlCenterGroupDropIndex;
+
+            draggedControlCenterGroupIndex = -1;
+            controlCenterGroupDropIndex = -1;
+
+            if (toIndex < 0 || toIndex > controlCenterGroups.length || toIndex === fromIndex || toIndex === fromIndex + 1)
+                return;
+
+            const groups = controlCenterGroups.slice();
+            const moved = groups.splice(fromIndex, 1)[0];
+
+            if (toIndex > fromIndex)
+                toIndex -= 1;
+
+            groups.splice(toIndex, 0, moved);
+            controlCenterGroups = groups;
+        }
+
+        function cancelControlCenterDrag() {
+            draggedControlCenterGroupIndex = -1;
+            controlCenterGroupDropIndex = -1;
+        }
 
         background: Rectangle {
             color: Theme.surfaceContainer
@@ -1075,77 +1245,55 @@ Column {
                 anchors.margins: Theme.spacingS
                 spacing: 2
 
-                Repeater {
-                    model: [
-                        {
-                            icon: "lan",
-                            label: I18n.tr("Network"),
-                            setting: "showNetworkIcon"
-                        },
-                        {
-                            icon: "vpn_lock",
-                            label: I18n.tr("VPN"),
-                            setting: "showVpnIcon"
-                        },
-                        {
-                            icon: "bluetooth",
-                            label: I18n.tr("Bluetooth"),
-                            setting: "showBluetoothIcon"
-                        },
-                        {
-                            icon: "volume_up",
-                            label: I18n.tr("Audio"),
-                            setting: "showAudioIcon"
-                        },
-                        {
-                            icon: "percent",
-                            label: I18n.tr("Volume"),
-                            setting: "showAudioPercent"
-                        },
-                        {
-                            icon: "mic",
-                            label: I18n.tr("Microphone"),
-                            setting: "showMicIcon"
-                        },
-                        {
-                            icon: "percent",
-                            label: I18n.tr("Microphone Volume"),
-                            setting: "showMicPercent"
-                        },
-                        {
-                            icon: "brightness_high",
-                            label: I18n.tr("Brightness"),
-                            setting: "showBrightnessIcon"
-                        },
-                        {
-                            icon: "percent",
-                            label: I18n.tr("Brightness Value"),
-                            setting: "showBrightnessPercent"
-                        },
-                        {
-                            icon: "battery_full",
-                            label: I18n.tr("Battery"),
-                            setting: "showBatteryIcon"
-                        },
-                        {
-                            icon: "print",
-                            label: I18n.tr("Printer"),
-                            setting: "showPrinterIcon"
-                        },
-                        {
-                            icon: "screen_record",
-                            label: I18n.tr("Screen Sharing"),
-                            setting: "showScreenSharingIcon"
-                        }
-                    ]
+                Item {
+                    id: controlCenterContentMetrics
+                    visible: false
+                    implicitWidth: 16 + Theme.spacingS + 16 + Theme.spacingS + longestControlCenterLabelMetrics.advanceWidth + Theme.spacingM + 40 + Theme.spacingS * 2 + Theme.spacingM
+                }
 
-                    delegate: Rectangle {
+                TextMetrics {
+                    id: longestControlCenterLabelMetrics
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: {
+                        const labels = [
+                            I18n.tr("Network"),
+                            I18n.tr("VPN"),
+                            I18n.tr("Bluetooth"),
+                            I18n.tr("Audio"),
+                            I18n.tr("Volume"),
+                            I18n.tr("Microphone"),
+                            I18n.tr("Microphone Volume"),
+                            I18n.tr("Brightness"),
+                            I18n.tr("Brightness Value"),
+                            I18n.tr("Battery"),
+                            I18n.tr("Printer"),
+                            I18n.tr("Screen Sharing")
+                        ];
+                        let longest = "";
+                        for (let i = 0; i < labels.length; i++) {
+                            if (labels[i].length > longest.length)
+                                longest = labels[i];
+                        }
+                        return longest;
+                    }
+                }
+
+                Repeater {
+                    model: controlCenterContextMenu.controlCenterGroups
+
+                    delegate: Item {
+                        id: delegateRoot
+
                         required property var modelData
                         required property int index
 
-                        function getCheckedState() {
-                            var wd = controlCenterContextMenu.widgetData;
-                            switch (modelData.setting) {
+                        function getCheckedState(settingName) {
+                            var widgets = root.items || [];
+                            var currentWidget = controlCenterContextMenu.widgetData;
+                            if (controlCenterContextMenu.widgetIndex >= 0 && controlCenterContextMenu.widgetIndex < widgets.length)
+                                currentWidget = widgets[controlCenterContextMenu.widgetIndex];
+                            var wd = currentWidget;
+                            switch (settingName) {
                             case "showNetworkIcon":
                                 return wd?.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
                             case "showVpnIcon":
@@ -1175,57 +1323,197 @@ Column {
                             }
                         }
 
+                        readonly property string rootSetting: modelData.rows[0]?.setting ?? ""
+                        readonly property bool rootEnabled: rootSetting ? getCheckedState(rootSetting) : true
+                        readonly property bool isDragged: controlCenterContextMenu.draggedControlCenterGroupIndex === index
+                        readonly property bool showDropIndicatorAbove: controlCenterContextMenu.controlCenterGroupDropIndex === index
+                        readonly property bool showDropIndicatorBelow: controlCenterContextMenu.controlCenterGroupDropIndex === controlCenterContextMenu.controlCenterGroups.length && index === controlCenterContextMenu.controlCenterGroups.length - 1
+
                         width: menuColumn.width
-                        height: 32
-                        radius: Theme.cornerRadius
-                        color: toggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        height: groupBackground.height
 
-                        Row {
+                        Rectangle {
+                            id: groupBackground
                             anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: modelData.icon
-                                size: 16
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: modelData.label
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                font.weight: Font.Normal
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        DankToggle {
-                            id: toggle
                             anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 40
-                            height: 20
-                            checked: getCheckedState()
-                            onToggled: {
-                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, modelData.setting, toggled);
-                            }
+                            anchors.top: parent.top
+                            height: groupContent.implicitHeight + Theme.spacingXS * 2
+                            radius: Theme.cornerRadius
+                            color: isDragged ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18) : (groupHoverArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent")
+                            opacity: isDragged ? 0.75 : 1.0
                         }
 
-                        MouseArea {
-                            id: toggleArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onPressed: {
-                                toggle.checked = !toggle.checked;
-                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, modelData.setting, toggle.checked);
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.topMargin: -1
+                            height: 2
+                            radius: 1
+                            color: Theme.primary
+                            visible: showDropIndicatorAbove
+                            z: 3
+                        }
+
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: -1
+                            height: 2
+                            radius: 1
+                            color: Theme.primary
+                            visible: showDropIndicatorBelow
+                            z: 3
+                        }
+
+                        Item {
+                            id: groupContent
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.topMargin: Theme.spacingXS
+                            implicitHeight: groupColumn.implicitHeight
+
+                            Column {
+                                id: groupColumn
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                spacing: 1
+
+                                Repeater {
+                                    id: groupColumnRepeater
+                                    model: modelData.rows
+
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        required property int index
+
+                                        readonly property var rowData: modelData
+                                        readonly property bool isFirstRow: index === 0
+                                        readonly property bool rowEnabled: isFirstRow ? true : delegateRoot.rootEnabled
+                                        readonly property bool computedCheckedState: rowEnabled ? getCheckedState(rowData.setting) : false
+                                        readonly property bool rowHovered: rowEnabled && (toggleArea.containsMouse || (isFirstRow && groupDragHandleArea.containsMouse))
+
+                                        width: groupColumn.width
+                                        height: 32
+                                        radius: Theme.cornerRadius
+                                        opacity: rowEnabled ? 1.0 : 0.5
+                                        color: rowHovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+
+                                        Row {
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: Theme.spacingS
+                                            anchors.right: toggle.left
+                                            anchors.rightMargin: Theme.spacingM
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            spacing: Theme.spacingS
+
+                                            Item {
+                                                width: 16
+                                                height: 16
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                DankIcon {
+                                                    anchors.centerIn: parent
+                                                    name: "drag_indicator"
+                                                    size: 16
+                                                    color: groupDragHandleArea.pressed || isDragged ? Theme.primary : Theme.outline
+                                                    visible: isFirstRow
+                                                }
+
+                                                MouseArea {
+                                                    id: groupDragHandleArea
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    preventStealing: true
+                                                    enabled: isFirstRow
+                                                    cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+
+                                                    onPressed: mouse => {
+                                                        mouse.accepted = true;
+                                                        const point = mapToItem(menuColumn, mouse.x, mouse.y);
+                                                        controlCenterContextMenu.updateControlCenterGroupDropIndex(delegateRoot.index, point.y);
+                                                    }
+                                                    onPositionChanged: mouse => {
+                                                        if (!pressed)
+                                                            return;
+                                                        mouse.accepted = true;
+                                                        const point = mapToItem(menuColumn, mouse.x, mouse.y);
+                                                        controlCenterContextMenu.updateControlCenterGroupDropIndex(delegateRoot.index, point.y);
+                                                    }
+                                                    onReleased: mouse => {
+                                                        mouse.accepted = true;
+                                                        const point = mapToItem(menuColumn, mouse.x, mouse.y);
+                                                        controlCenterContextMenu.updateControlCenterGroupDropIndex(delegateRoot.index, point.y);
+                                                        controlCenterContextMenu.finishControlCenterDrag();
+                                                    }
+                                                    onCanceled: {
+                                                        controlCenterContextMenu.cancelControlCenterDrag();
+                                                    }
+                                                }
+                                            }
+
+                                            DankIcon {
+                                                name: rowData.icon
+                                                size: 16
+                                                color: Theme.surfaceText
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            StyledText {
+                                                text: rowData.label
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                font.weight: Font.Normal
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+
+                                        DankToggle {
+                                            id: toggle
+                                            anchors.right: parent.right
+                                            anchors.rightMargin: Theme.spacingS
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: 40
+                                            height: 20
+                                            enabled: rowEnabled
+                                            checked: computedCheckedState
+
+                                            onToggled: {
+                                                if (!rowEnabled)
+                                                    return;
+                                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, rowData.setting, toggled);
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            id: toggleArea
+                                            anchors.fill: parent
+                                            anchors.leftMargin: 16 + Theme.spacingS * 2
+                                            hoverEnabled: true
+                                            cursorShape: rowEnabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                            enabled: rowEnabled && controlCenterContextMenu.draggedControlCenterGroupIndex < 0
+                                            onPressed: {
+                                                if (!rowEnabled)
+                                                    return;
+                                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, rowData.setting, !computedCheckedState);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            MouseArea {
+                                id: groupHoverArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                enabled: false
                             }
                         }
                     }
+
+                    id: groupRepeater
                 }
             }
         }

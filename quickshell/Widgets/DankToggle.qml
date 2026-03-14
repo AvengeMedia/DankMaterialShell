@@ -99,8 +99,8 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         radius: Theme.cornerRadius
 
-        // M3 disabled track: on surface 12% opacity
-        color: !toggle.enabled ? Qt.alpha(Theme.surfaceText, 0.12) : (toggle.checked ? Theme.primary : Theme.surfaceVariantAlpha)
+        // Distinguish disabled checked vs unchecked so unchecked disabled switches don't look enabled
+        color: !toggle.enabled ? (toggle.checked ? Qt.alpha(Theme.surfaceText, 0.12) : "transparent") : (toggle.checked ? Theme.primary : Theme.surfaceVariantAlpha)
         opacity: toggle.toggling ? 0.6 : 1
 
         // M3 disabled unchecked border: on surface 12% opacity
@@ -119,8 +119,8 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
 
             // M3 disabled thumb:
-            // checked = solid surface | unchecked = on surface 38%
-            color: !toggle.enabled ? (toggle.checked ? Theme.surface : Qt.alpha(Theme.surfaceText, 0.38)) : (toggle.checked ? Theme.surface : Theme.outline)
+            // checked = solid surface | unchecked = outlined off-state thumb
+            color: !toggle.enabled ? (toggle.checked ? Theme.surface : "transparent") : (toggle.checked ? Theme.surface : Theme.outline)
             border.color: !toggle.enabled ? (toggle.checked ? "transparent" : Qt.alpha(Theme.surfaceText, 0.38)) : Theme.outline
             border.width: (toggle.checked && toggle.enabled) ? 1 : 2
 
@@ -165,8 +165,8 @@ Item {
                 // M3 disabled icon: on surface 38%
                 color: toggle.enabled ? Theme.surfaceText : Qt.alpha(Theme.surfaceText, 0.38)
                 filled: true
-                opacity: toggle.checked ? 1 : 0
-                scale: toggle.checked ? 1 : 0.6
+                opacity: (toggle.checked && toggle.enabled) ? 1 : 0
+                scale: (toggle.checked && toggle.enabled) ? 1 : 0.6
 
                 Behavior on opacity {
                     NumberAnimation {

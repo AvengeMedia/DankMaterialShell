@@ -498,6 +498,21 @@ Item {
             return;
         var newWidget = cloneWidgetData(widgets[widgetIndex]);
         newWidget[settingName] = value;
+
+        if (!value) {
+            switch (settingName) {
+            case "showAudioIcon":
+                newWidget.showAudioPercent = false;
+                break;
+            case "showMicIcon":
+                newWidget.showMicPercent = false;
+                break;
+            case "showBrightnessIcon":
+                newWidget.showBrightnessPercent = false;
+                break;
+            }
+        }
+
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
