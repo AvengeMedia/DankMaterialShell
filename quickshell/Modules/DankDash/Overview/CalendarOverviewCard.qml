@@ -191,7 +191,7 @@ Rectangle {
         Row {
             width: parent.width
             height: 28
-            visible: !showEventDetail
+            visible: !showEventDetails
 
             Rectangle {
                 width: 28
