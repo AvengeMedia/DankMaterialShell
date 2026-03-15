@@ -56,7 +56,10 @@ Item {
     property string externalAuthAutoStartedForUser: ""
     property int passwordSessionTransitionRetryCount: 0
     property int maxPasswordSessionTransitionRetries: 2
-    readonly property bool greeterPamHasFprint: greeterPamStackHasModule("pam_fprintd")
+    property bool fprintdProbeComplete: false
+    property bool fprintdHasDevice: false
+    // Falls back to PAM-only detection until the fprintd D-Bus probe completes.
+    readonly property bool greeterPamHasFprint: greeterPamStackHasModule("pam_fprintd") && (!fprintdProbeComplete || fprintdHasDevice)
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
     readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
@@ -430,6 +433,8 @@ Item {
 
         if (CompositorService.isHyprland)
             updateHyprlandLayout();
+
+        fprintdDeviceProbe.running = true;
     }
 
     function applyLastSuccessfulUser() {
@@ -527,9 +532,8 @@ Item {
         pendingPasswordResponse = false;
         passwordSubmitRequested = submitPassword;
         awaitingExternalAuth = !submitPassword && !hasPasswordBuffer && root.greeterExternalAuthAvailable;
-        // Included PAM stacks (system-auth/common-auth/password-auth) may still run
-        // biometric/U2F modules before password even when DMS toggles are off.
-        const waitingOnPamExternalBeforePassword = submitPassword && root.greeterPamHasExternalAuth;
+        // Use greeterExternalAuthAvailable so systems with pam_fprintd but no hardware don't incur the 30 s wait.
+        const waitingOnPamExternalBeforePassword = submitPassword && root.greeterExternalAuthAvailable;
         authTimeout.interval = (awaitingExternalAuth || waitingOnPamExternalBeforePassword) ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
         authTimeout.restart();
         Greetd.createSession(GreeterState.username);
@@ -596,6 +600,34 @@ Item {
                     hyprlandLayoutCount = 0;
                 }
             }
+        }
+    }
+
+    // Probe fprintd D-Bus for physically enrolled scanners to eliminate PAM stack false-positives.
+    Process {
+        id: fprintdDeviceProbe
+        running: false
+        // sh wrapper: emits PROBE_UNAVAILABLE if gdbus is absent or fprintd unreachable,
+        // keeping the PAM-only fallback active in those cases.
+        command: ["sh", "-c",
+                  "command -v gdbus >/dev/null 2>&1 || { echo PROBE_UNAVAILABLE; exit 0; }; " +
+                  "gdbus call --system " +
+                  "--dest net.reactivated.Fprint " +
+                  "--object-path /net/reactivated/Fprint/Manager " +
+                  "--method net.reactivated.Fprint.Manager.GetDevices 2>/dev/null " +
+                  "|| echo PROBE_UNAVAILABLE"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.includes("PROBE_UNAVAILABLE"))
+                    return; // PAM-only fallback stays active
+                root.fprintdHasDevice = text.includes("objectpath");
+                root.fprintdProbeComplete = true;
+                root.maybeAutoStartExternalAuth();
+            }
+        }
+        onExited: function(exitCode, exitStatus) {
+            if (!root.fprintdProbeComplete)
+                root.maybeAutoStartExternalAuth(); // PAM-only fallback stays active
         }
     }
 
