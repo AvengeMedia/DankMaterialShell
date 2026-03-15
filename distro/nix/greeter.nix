@@ -24,6 +24,7 @@ let
       lib.makeBinPath [
         cfg.quickshell.package
         compositorPackage
+        pkgs.glib  # provides gdbus, used by the fprintd hardware probe in GreeterContent.qml
       ]
     }
     ${
