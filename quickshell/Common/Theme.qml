@@ -1248,7 +1248,11 @@ Singleton {
             if (themeData.variants.type === "multi" && themeData.variants.flavors && themeData.variants.accents) {
                 const defaults = themeData.variants.defaults || {};
                 const modeDefaults = defaults[colorMode] || defaults.dark || {};
-                const stored = typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, modeDefaults, colorMode) : modeDefaults;
+                const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
+		const stored = isGreeterMode ?
+		      (GreetdSettings.registryThemeVariants[themeId]?.[colorMode] || modeDefaults) :
+		      (typeof SettingsData !== "undefined" ?
+		       SettingsData.getRegistryThemeMultiVariant(themeId, modeDefaults, colorMode) : modeDefaults);
                 var flavorId = stored.flavor || modeDefaults.flavor || "";
                 const accentId = stored.accent || modeDefaults.accent || "";
                 var flavor = findVariant(themeData.variants.flavors, flavorId);
