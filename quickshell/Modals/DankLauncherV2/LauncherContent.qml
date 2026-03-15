@@ -158,6 +158,10 @@ FocusScope {
             controller.selectPageUp(8);
             return;
         case Qt.Key_Right:
+            if (hasCtrl) {
+                controller.cycleMode();
+                return;
+            }
             if (controller.getCurrentSectionViewMode() !== "list") {
                 controller.selectRight();
                 return;
@@ -165,8 +169,21 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Left:
+            if (hasCtrl) {
+                const reverse = true;
+                controller.cycleMode(reverse);
+                return;
+            }
             if (controller.getCurrentSectionViewMode() !== "list") {
                 controller.selectLeft();
+                return;
+            }
+            event.accepted = false;
+            return;
+        case Qt.Key_H:
+            if (hasCtrl) {
+                const reverse = true;
+                controller.cycleMode(reverse);
                 return;
             }
             event.accepted = false;
@@ -181,6 +198,13 @@ FocusScope {
         case Qt.Key_K:
             if (hasCtrl) {
                 controller.selectPrevious();
+                return;
+            }
+            event.accepted = false;
+            return;
+        case Qt.Key_L:
+            if (hasCtrl) {
+                controller.cycleMode();
                 return;
             }
             event.accepted = false;

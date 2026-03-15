@@ -353,10 +353,13 @@ Item {
         performSearch();
     }
 
-    function cycleMode() {
+    function cycleMode(reverse = false) {
         var modes = ["all", "apps", "files", "plugins"];
         var currentIndex = modes.indexOf(searchMode);
-        var nextIndex = (currentIndex + 1) % modes.length;
+        if (!reverse)
+            var nextIndex = (currentIndex + 1) % modes.length;
+        else
+            var nextIndex = (currentIndex - 1 + modes.length) % modes.length;
         setMode(modes[nextIndex]);
     }
 
