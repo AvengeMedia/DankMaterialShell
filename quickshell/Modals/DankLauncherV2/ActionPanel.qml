@@ -207,9 +207,12 @@ Rectangle {
         selectedActionIndex = 0;
     }
 
-    function cycleAction() {
+    function cycleAction(reverse = false) {
         if (actions.length > 0) {
-            selectedActionIndex = (selectedActionIndex + 1) % actions.length;
+            if (! reverse)
+                selectedActionIndex = (selectedActionIndex + 1) % actions.length;
+            else
+                selectedActionIndex = (selectedActionIndex - 1) % actions.length;
             ensureSelectedVisible();
         }
     }

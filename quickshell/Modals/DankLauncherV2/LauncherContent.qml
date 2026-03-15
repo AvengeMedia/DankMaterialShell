@@ -200,13 +200,19 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Tab:
-            if (actionPanel.hasActions) {
+            if (hasCtrl && actionPanel.hasActions) {
                 actionPanel.expanded ? actionPanel.cycleAction() : actionPanel.show();
+                return;
             }
+            controller.selectNext();
             return;
         case Qt.Key_Backtab:
-            if (actionPanel.expanded)
-                actionPanel.hide();
+            if (hasCtrl && actionPanel.expanded) {
+                const reverse = true
+                actionPanel.expanded ? actionPanel.cycleAction(reverse) : actionPanel.show();
+                return;
+            }
+            controller.selectPrevious();
             return;
         case Qt.Key_Return:
         case Qt.Key_Enter:
@@ -388,7 +394,7 @@ FocusScope {
 
                 StyledText {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Tab " + I18n.tr("actions")
+                    text: "Ctrl-Tab " + I18n.tr("actions")
                     font.pixelSize: Theme.fontSizeSmall - 1
                     color: Theme.surfaceVariantText
                     visible: actionPanel.hasActions
