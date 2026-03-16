@@ -17225,5 +17225,124 @@
     "context": "Keyboard hints when enter-to-paste is enabled",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Tailscale",
+    "translation": "",
+    "context": "Tailscale mesh VPN widget title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tailscale Network",
+    "translation": "",
+    "context": "Tailscale control center widget description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tailscale not available",
+    "translation": "",
+    "context": "Warning when Tailscale service is not running",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "%1 online",
+    "translation": "",
+    "context": "Number of online Tailscale peers",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Search devices...",
+    "translation": "",
+    "context": "Tailscale device search placeholder",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This device",
+    "translation": "",
+    "context": "Label for the user's own device in Tailscale",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Network: %1",
+    "translation": "",
+    "context": "Tailscale network name",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Version: %1",
+    "translation": "",
+    "context": "Tailscale version",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No matching devices",
+    "translation": "",
+    "context": "No Tailscale devices match search",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No peers found",
+    "translation": "",
+    "context": "No Tailscale peers found",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "relay: %1",
+    "translation": "",
+    "context": "Tailscale relay server name",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "direct",
+    "translation": "",
+    "context": "Tailscale direct connection",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "last seen %1",
+    "translation": "",
+    "context": "Tailscale peer last seen time",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tags: %1",
+    "translation": "",
+    "context": "Tailscale device tags",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Owner: %1",
+    "translation": "",
+    "context": "Tailscale device owner",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show my online devices",
+    "translation": "",
+    "context": "Toggle to show only online devices owned by the user",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show all devices (%1)",
+    "translation": "",
+    "context": "Toggle to show all Tailscale devices",
+    "reference": "",
+    "comment": ""
   }
 ]

@@ -31,6 +31,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/trayrecovery"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
@@ -65,6 +66,7 @@ var waylandManager *wayland.Manager
 var bluezManager *bluez.Manager
 var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
+var tailscaleManager *tailscale.Manager
 var dwlManager *dwl.Manager
 var extWorkspaceManager *extworkspace.Manager
 var brightnessManager *brightness.Manager
@@ -84,6 +86,7 @@ const dbusClientID = "dms-dbus-client"
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsSubscribers syncmap.Map[string, bool]
 var cupsSubscriberCount atomic.Int32
+var tailscaleManagerMu sync.Mutex
 var extWorkspaceAvailable atomic.Bool
 var extWorkspaceInitMutex sync.Mutex
 
@@ -489,6 +492,10 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "cups")
 	}
 
+	if tailscaleManager != nil {
+		caps = append(caps, "tailscale")
+	}
+
 	if dwlManager != nil {
 		caps = append(caps, "dwl")
 	}
@@ -557,6 +564,10 @@ func getServerInfo() ServerInfo {
 
 	if cupsManager != nil {
 		caps = append(caps, "cups")
+	}
+
+	if tailscaleManager != nil {
+		caps = append(caps, "tailscale")
 	}
 
 	if dwlManager != nil {
@@ -1039,6 +1050,38 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}
 	}
 
+	if shouldSubscribe("tailscale") && tailscaleManager != nil {
+		wg.Add(1)
+		tailscaleChan := tailscaleManager.Subscribe(clientID + "-tailscale")
+		go func() {
+			defer wg.Done()
+			defer tailscaleManager.Unsubscribe(clientID + "-tailscale")
+
+			initialState := tailscaleManager.GetState()
+			select {
+			case eventChan <- ServiceEvent{Service: "tailscale", Data: initialState}:
+			case <-stopChan:
+				return
+			}
+
+			for {
+				select {
+				case state, ok := <-tailscaleChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "tailscale", Data: state}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
 	if shouldSubscribe("dwl") && dwlManager != nil {
 		wg.Add(1)
 		dwlChan := dwlManager.Subscribe(clientID + "-dwl")
@@ -1409,10 +1452,18 @@ func cleanupManagers() {
 	if geoClientInstance != nil {
 		geoClientInstance.Close()
 	}
+	if tailscaleManager != nil {
+		tailscaleManager.Close()
+	}
 }
 
 func Start(printDocs bool) error {
 	cleanupStaleSockets()
+
+	// Tailscale manager always starts — reconnects internally via WatchIPNBus
+	tailscaleManagerMu.Lock()
+	tailscaleManager = tailscale.NewManager("")
+	tailscaleManagerMu.Unlock()
 
 	socketPath := GetSocketPath()
 	os.Remove(socketPath)

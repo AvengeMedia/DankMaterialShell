@@ -64,6 +64,7 @@ Singleton {
     signal clipboardStateUpdate(var data)
     signal locationStateUpdate(var data)
     signal sysupdateStateUpdate(var data)
+    signal tailscaleStateUpdate(var data)
 
     property bool capsLockState: false
     property bool screensaverInhibited: false
@@ -398,6 +399,8 @@ Singleton {
             locationStateUpdate(data);
         } else if (service === "sysupdate") {
             sysupdateStateUpdate(data);
+        } else if (service === "tailscale") {
+            tailscaleStateUpdate(data);
         }
     }
 
