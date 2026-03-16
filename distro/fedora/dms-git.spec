@@ -3,7 +3,7 @@
 %global debug_package %{nil}
 %global version {{{ git_repo_version }}}
 %global pkg_summary DankMaterialShell - Material 3 inspired shell for Wayland compositors
-%global go_toolchain_version 1.25.7
+%global go_toolchain_version 1.26.1
 
 Name:           dms
 Epoch:          2
