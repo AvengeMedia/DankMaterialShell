@@ -407,8 +407,8 @@ Item {
             visible: false
             x: contentContainer.x - root.shadowBuffer
             y: contentContainer.y - root.shadowBuffer
-            width: root.alignedWidth + root.shadowBuffer * 2
-            height: root.alignedHeight + root.shadowBuffer * 2
+            width: shouldBeVisible ? root.alignedWidth + root.shadowBuffer * 2 : 0
+            height: shouldBeVisible ? root.alignedHeight + root.shadowBuffer * 2 : 0
         }
 
         MouseArea {

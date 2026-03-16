@@ -70,6 +70,16 @@ DankPopout {
 
     backgroundInteractive: !anyModalOpen
 
+    onCredentialsPromptOpenChanged: {
+        if (credentialsPromptOpen && shouldBeVisible)
+            close();
+    }
+
+    onPolkitModalOpenChanged: {
+        if (polkitModalOpen && shouldBeVisible)
+            close();
+    }
+
     customKeyboardFocus: {
         if (!shouldBeVisible)
             return WlrKeyboardFocus.None;
