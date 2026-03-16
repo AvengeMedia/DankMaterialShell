@@ -458,11 +458,11 @@ BasePill {
                         height: {
                             switch (modelData.id) {
                             case "audio":
-                                return root.vIconSize + (root.showAudioPercent ? audioPercentV.implicitHeight + 2 : 0);
+                                return root.vIconSize + (audioPercentV.visible ? audioPercentV.implicitHeight + 2 : 0);
                             case "microphone":
-                                return root.vIconSize + (root.showMicPercent ? micPercentV.implicitHeight + 2 : 0);
+                                return root.vIconSize + (micPercentV.visible ? micPercentV.implicitHeight + 2 : 0);
                             case "brightness":
-                                return root.vIconSize + (root.showBrightnessPercent ? brightnessPercentV.implicitHeight + 2 : 0);
+                                return root.vIconSize + (brightnessPercentV.visible ? brightnessPercentV.implicitHeight + 2 : 0);
                             default:
                                 return root.vIconSize;
                             }
@@ -538,7 +538,7 @@ BasePill {
 
                         NumericText {
                             id: audioPercentV
-                            visible: verticalGroupItem.modelData.id === "audio" && root.showAudioPercent
+                            visible: verticalGroupItem.modelData.id === "audio" && root.showAudioPercent && isFinite(AudioService.sink?.audio?.volume)
                             text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
                             reserveText: "100%"
                             font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -560,7 +560,7 @@ BasePill {
 
                         NumericText {
                             id: micPercentV
-                            visible: verticalGroupItem.modelData.id === "microphone" && root.showMicPercent
+                            visible: verticalGroupItem.modelData.id === "microphone" && root.showMicPercent && isFinite(AudioService.source?.audio?.volume)
                             text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
                             reserveText: "100%"
                             font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -582,7 +582,7 @@ BasePill {
 
                         NumericText {
                             id: brightnessPercentV
-                            visible: verticalGroupItem.modelData.id === "brightness" && root.showBrightnessPercent
+                            visible: verticalGroupItem.modelData.id === "brightness" && root.showBrightnessPercent && isFinite(getBrightness())
                             text: Math.round(getBrightness() * 100) + "%"
                             reserveText: "100%"
                             font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -724,7 +724,7 @@ BasePill {
 
                                 NumericText {
                                     id: audioPercent
-                                    visible: root.showAudioPercent
+                                    visible: root.showAudioPercent && isFinite(AudioService.sink?.audio?.volume)
                                     text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
                                     reserveText: "100%"
                                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -761,7 +761,7 @@ BasePill {
 
                                 NumericText {
                                     id: micPercent
-                                    visible: root.showMicPercent
+                                    visible: root.showMicPercent && isFinite(AudioService.source?.audio?.volume)
                                     text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
                                     reserveText: "100%"
                                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -798,7 +798,7 @@ BasePill {
 
                                 NumericText {
                                     id: brightnessPercent
-                                    visible: root.showBrightnessPercent
+                                    visible: root.showBrightnessPercent && isFinite(getBrightness())
                                     text: Math.round(getBrightness() * 100) + "%"
                                     reserveText: "100%"
                                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
