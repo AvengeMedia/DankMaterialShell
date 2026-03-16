@@ -68,22 +68,22 @@ Item {
 
     property string compositorTooltip: {
         if (isHyprland)
-            return "Hyprland Website";
+            return I18n.tr("Hyprland Website");
         if (isSway)
-            return "Sway Website";
+            return I18n.tr("Sway Website");
         if (isScroll)
-            return "Scroll Github";
+            return I18n.tr("Scroll GitHub");
         if (isMiracle)
-            return "Miracle WM GitHub";
+            return I18n.tr("Scroll GitHub");
         if (isDwl)
-            return "mangowc GitHub";
+            return I18n.tr("mangowc GitHub");
         if (isLabwc)
-            return "LabWC Website";
-        return "niri GitHub";
+            return I18n.tr("LabWC Website");
+        return I18n.tr("niri GitHub");
     }
 
     property string dmsDiscordUrl: "https://discord.gg/ppWTpKmPgT"
-    property string dmsDiscordTooltip: "niri/dms Discord"
+    property string dmsDiscordTooltip: I18n.tr("niri/dms Discord")
 
     property string compositorDiscordUrl: {
         if (isHyprland)
@@ -95,17 +95,17 @@ Item {
 
     property string compositorDiscordTooltip: {
         if (isHyprland)
-            return "Hyprland Discord Server";
+            return I18n.tr("Hyprland Discord Server");
         if (isDwl)
-            return "mangowc Discord Server";
+            return I18n.tr("mangowc Discord Server");
         return "";
     }
 
     property string redditUrl: "https://reddit.com/r/niri"
-    property string redditTooltip: "r/niri Subreddit"
+    property string redditTooltip: I18n.tr("r/niri Subreddit")
 
     property string ircUrl: "https://web.libera.chat/gamja/?channels=#labwc"
-    property string ircTooltip: "LabWC IRC Channel"
+    property string ircTooltip: I18n.tr("LabWC IRC Channel")
 
     property bool showMatrix: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isDwl && !isLabwc
     property bool showCompositorDiscord: isHyprland || isDwl
@@ -396,7 +396,7 @@ Item {
                             visible: showMatrix
 
                             property bool hovered: false
-                            property string tooltipText: "niri Matrix Chat"
+                            property string tooltipText: I18n.tr("niri Matrix Chat")
 
                             Image {
                                 anchors.fill: parent
@@ -582,9 +582,7 @@ Item {
                     }
 
                     StyledText {
-                        text: I18n.tr(`dms is a highly customizable, modern desktop shell with a <a href="https://m3.material.io/" style="text-decoration:none; color:${Theme.primary};">material 3 inspired</a> design.
-                        <br /><br/>It is built with <a href="https://quickshell.org" style="text-decoration:none; color:${Theme.primary};">Quickshell</a>, a QT6 framework for building desktop shells, and <a href="https://go.dev" style="text-decoration:none; color:${Theme.primary};">Go</a>, a statically typed, compiled programming language.
-                        `)
+                        text: I18n.tr('dms is a highly customizable, modern desktop shell with a <a href="https://m3.material.io/" style="text-decoration:none; color:%1;">material 3 inspired</a> design.<br /><br/>It is built with <a href="https://quickshell.org" style="text-decoration:none; color:%1;">Quickshell</a>, a QT6 framework for building desktop shells, and <a href="https://go.dev" style="text-decoration:none; color:%1;">Go</a>, a statically typed, compiled programming language.').arg(Theme.primary)
                         textFormat: Text.RichText
                         font.pixelSize: Theme.fontSizeMedium
                         linkColor: Theme.primary
@@ -825,7 +823,7 @@ Item {
 
             StyledText {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: `<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE" style="text-decoration:none; color:${Theme.surfaceVariantText};">MIT License</a>`
+                text: I18n.tr('<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE" style="text-decoration:none; color:%1;">MIT License</a>').arg(Theme.surfaceVariantText)
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
                 textFormat: Text.RichText
