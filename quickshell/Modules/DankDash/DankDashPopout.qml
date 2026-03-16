@@ -12,7 +12,7 @@ DankPopout {
     property var triggerScreen: null
     property int currentTabIndex: 0
 
-    popupWidth: 700
+    popupWidth: SettingsData.showWeekNumber ? 736 : 700
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 500
     triggerWidth: 80
     screen: triggerScreen
@@ -168,6 +168,7 @@ DankPopout {
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
+            implicitWidth: Math.max(700, pages.implicitWidth + (Theme.spacingM * 2))
             implicitHeight: contentColumn.height + Theme.spacingM * 2
             color: "transparent"
             focus: true
@@ -316,6 +317,7 @@ DankPopout {
                     id: pages
                     width: parent.width
                     height: implicitHeight
+                    implicitWidth: currentItem && currentItem.implicitWidth > 0 ? currentItem.implicitWidth : (700 - Theme.spacingM * 2)
                     implicitHeight: {
                         if (root.currentTabIndex === 0)
                             return overviewLoader.item?.implicitHeight ?? 410;

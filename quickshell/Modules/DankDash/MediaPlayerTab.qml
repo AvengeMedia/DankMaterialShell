@@ -105,7 +105,7 @@ Item {
         return Math.max(0, Math.min(1, calculatedRatio));
     }
 
-    implicitWidth: 700
+    implicitWidth: SettingsData.showWeekNumber ? 736 : 700
     implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
 
     Connections {

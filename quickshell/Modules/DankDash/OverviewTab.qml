@@ -8,7 +8,7 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    implicitWidth: 700
+    implicitWidth: SettingsData.showWeekNumber ? 736 : 700
     implicitHeight: 410
 
     signal switchToWeatherTab
