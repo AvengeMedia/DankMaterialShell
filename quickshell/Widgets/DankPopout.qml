@@ -453,8 +453,8 @@ Item {
             visible: false
             x: contentContainer.x
             y: contentContainer.y
-            width: root.alignedWidth
-            height: root.alignedHeight
+            width: shouldBeVisible ? root.alignedWidth : 0
+            height: shouldBeVisible ? root.alignedHeight : 0
         }
 
         MouseArea {
