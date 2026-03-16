@@ -542,7 +542,14 @@ Item {
                         }
 
                         StyledText {
-                            text: KeybindsService.loading ? I18n.tr("Shortcuts") : I18n.tr("Shortcuts (%1)").arg(keybindsTab._filteredBinds.length)
+                            text: {
+                            if (KeybindsService.loading)
+                                return I18n.tr("Shortcuts");
+                            const count = keybindsTab._filteredBinds.length;
+                            return count === 1
+                                ? I18n.tr("Shortcut (%1)").arg(count)
+                                : I18n.tr("Shortcuts (%1)").arg(count);
+                        }
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText

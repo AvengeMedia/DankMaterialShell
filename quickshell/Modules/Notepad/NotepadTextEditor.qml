@@ -832,13 +832,21 @@ Column {
             spacing: Theme.spacingL
 
             StyledText {
-                text: textArea.text.length > 0 ? I18n.tr("%1 characters").arg(textArea.text.length) : I18n.tr("Empty")
+                text: {
+                    const len = textArea.text.length;
+                    if (len === 0) return I18n.tr("Empty");
+                    return len === 1
+                        ? I18n.tr("%1 character").arg(len)
+                        : I18n.tr("%1 characters").arg(len);
+                }
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
             }
 
             StyledText {
-                text: I18n.tr("Lines: %1").arg(textArea.lineCount)
+                text: textArea.lineCount === 1
+                    ? I18n.tr("Line: %1").arg(textArea.lineCount)
+                    : I18n.tr("Lines: %1").arg(textArea.lineCount)
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 visible: textArea.text.length > 0
