@@ -22,12 +22,12 @@ DankPopout {
 
     function setProfile(profile) {
         if (typeof PowerProfiles === "undefined") {
-            ToastService.showError("power-profiles-daemon not available");
+            ToastService.showError(I18n.tr("power-profiles-daemon not available"));
             return;
         }
         PowerProfiles.profile = profile;
         if (PowerProfiles.profile !== profile) {
-            ToastService.showError("Failed to set power profile");
+            ToastService.showError(I18n.tr("Failed to set power profile"));
         }
     }
 
@@ -173,10 +173,10 @@ DankPopout {
                         width: parent.width - Theme.iconSizeLarge - 32 - Theme.spacingM * 2
                         readonly property string timeInfoText: {
                             if (!BatteryService.batteryAvailable)
-                                return "Power profile management available";
+                                return I18n.tr("Power profile management available");
                             const time = BatteryService.formatTimeRemaining();
                             if (time !== "Unknown") {
-                                return BatteryService.isCharging ? `Time until full: ${time}` : `Time remaining: ${time}`;
+                                return BatteryService.isCharging ? I18n.tr("Time until full: %1").arg(time) : I18n.tr("Time remaining: %1").arg(time);
                             }
                             return "";
                         }
@@ -188,7 +188,7 @@ DankPopout {
                             spacing: Theme.spacingS
 
                             StyledText {
-                                text: BatteryService.batteryAvailable ? `${BatteryService.batteryLevel}%` : "Power"
+                                text: BatteryService.batteryAvailable ? `${BatteryService.batteryLevel}%` : I18n.tr("Power")
                                 font.pixelSize: Theme.fontSizeXLarge
                                 color: {
                                     if (BatteryService.isLowBattery && !BatteryService.isCharging) {
@@ -338,7 +338,7 @@ DankPopout {
                             }
 
                             StyledText {
-                                text: BatteryService.batteryCapacity > 0 ? `${BatteryService.batteryCapacity.toFixed(1)} Wh` : "Unknown"
+                                text: BatteryService.batteryCapacity > 0 ? `${BatteryService.batteryCapacity.toFixed(1)} Wh` : I18n.tr("Unknown")
                                 font.pixelSize: Theme.fontSizeLarge
                                 color: Theme.surfaceText
                                 font.weight: Font.Bold
@@ -393,7 +393,7 @@ DankPopout {
                                         width: parent.width - percentText.width - chargingIcon.width - Theme.spacingM * 2
 
                                         StyledText {
-                                            text: modelData.model || `Battery ${index + 1}`
+                                            text: modelData.model || I18n.tr("Battery %1").arg(index + 1)
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceText
                                             font.weight: Font.Medium

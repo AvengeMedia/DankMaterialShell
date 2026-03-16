@@ -67,12 +67,14 @@ DankPopout {
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
                                 if (SystemUpdateService.isChecking)
-                                    return "Checking...";
+                                    return I18n.tr("Checking...");
                                 if (SystemUpdateService.hasError)
-                                    return "Error";
+                                    return I18n.tr("Error");
                                 if (SystemUpdateService.updateCount === 0)
-                                    return "Up to date";
-                                return SystemUpdateService.updateCount + " updates";
+                                    return I18n.tr("Up to date");
+                                return SystemUpdateService.updateCount === 1
+                                    ? I18n.tr("%1 update").arg(SystemUpdateService.updateCount)
+                                    : I18n.tr("%1 updates").arg(SystemUpdateService.updateCount);
                             }
                             font.pixelSize: Theme.fontSizeMedium
                             color: {
@@ -136,18 +138,20 @@ DankPopout {
                             width: parent.width
                             text: {
                                 if (SystemUpdateService.hasError) {
-                                    return "Failed to check for updates:\n" + SystemUpdateService.errorMessage;
+                                    return I18n.tr("Failed to check for updates:\n%1").arg(SystemUpdateService.errorMessage);
                                 }
                                 if (!SystemUpdateService.helperAvailable) {
-                                    return "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.";
+                                    return I18n.tr("No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.");
                                 }
                                 if (SystemUpdateService.isChecking) {
-                                    return "Checking for updates...";
+                                    return I18n.tr("Checking for updates...");
                                 }
                                 if (SystemUpdateService.updateCount === 0) {
-                                    return "Your system is up to date!";
+                                    return I18n.tr("Your system is up to date!");
                                 }
-                                return `Found ${SystemUpdateService.updateCount} packages to update:`;
+                                return SystemUpdateService.updateCount === 1
+                                    ? I18n.tr("Found %1 package to update:").arg(SystemUpdateService.updateCount)
+                                    : I18n.tr("Found %1 packages to update:").arg(SystemUpdateService.updateCount);
                             }
                             font.pixelSize: Theme.fontSizeMedium
                             color: {
