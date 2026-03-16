@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
@@ -38,11 +39,19 @@ BasePill {
     property var _vAudio: null
     property var _vBrightness: null
     property var _vMic: null
+    property var _interactionDelegates: []
+    readonly property var defaultControlCenterGroupOrder: ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing"]
+    readonly property var effectiveControlCenterGroupOrder: getEffectiveControlCenterGroupOrder()
+    readonly property var controlCenterRenderModel: getControlCenterRenderModel()
+
+    onIsVerticalOrientationChanged: root.clearInteractionRefs()
 
     onWheel: function (wheelEvent) {
         const delta = wheelEvent.angleDelta.y;
         if (delta === 0)
             return;
+
+        root.refreshInteractionRefs();
 
         const rootX = wheelEvent.x - root.leftMargin;
         const rootY = wheelEvent.y - root.topMargin;
@@ -72,6 +81,8 @@ BasePill {
     }
 
     onRightClicked: function (rootX, rootY) {
+        root.refreshInteractionRefs();
+
         if (root.isVerticalOrientation && _vCol) {
             const pos = root.mapToItem(_vCol, rootX, rootY);
             if (_vAudio?.visible && pos.y >= _vAudio.y && pos.y < _vAudio.y + _vAudio.height) {
@@ -279,26 +290,142 @@ BasePill {
         return CupsService.getTotalJobsNum() > 0;
     }
 
+    function getControlCenterIconSize() {
+        return Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale);
+    }
+
+    function getEffectiveControlCenterGroupOrder() {
+        const knownIds = root.defaultControlCenterGroupOrder;
+        const savedOrder = root.widgetData?.controlCenterGroupOrder;
+        const result = [];
+        const seen = {};
+
+        if (savedOrder && typeof savedOrder.length === "number") {
+            for (let i = 0; i < savedOrder.length; ++i) {
+                const groupId = savedOrder[i];
+                if (knownIds.indexOf(groupId) === -1 || seen[groupId])
+                    continue;
+
+                seen[groupId] = true;
+                result.push(groupId);
+            }
+        }
+
+        for (let i = 0; i < knownIds.length; ++i) {
+            const groupId = knownIds[i];
+            if (seen[groupId])
+                continue;
+
+            seen[groupId] = true;
+            result.push(groupId);
+        }
+
+        return result;
+    }
+
+    function isGroupVisible(groupId) {
+        switch (groupId) {
+        case "screenSharing":
+            return root.showScreenSharingIcon && NiriService.hasCasts;
+        case "network":
+            return root.showNetworkIcon && NetworkService.networkAvailable;
+        case "vpn":
+            return root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected;
+        case "bluetooth":
+            return root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled;
+        case "audio":
+            return root.showAudioIcon;
+        case "microphone":
+            return root.showMicIcon;
+        case "brightness":
+            return root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice();
+        case "battery":
+            return root.showBatteryIcon && BatteryService.batteryAvailable;
+        case "printer":
+            return root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs();
+        default:
+            return false;
+        }
+    }
+
+    function isCompositeGroup(groupId) {
+        return groupId === "audio" || groupId === "microphone" || groupId === "brightness";
+    }
+
+    function getControlCenterRenderModel() {
+        return root.effectiveControlCenterGroupOrder.map(groupId => ({
+                    "id": groupId,
+                    "visible": root.isGroupVisible(groupId),
+                    "composite": root.isCompositeGroup(groupId)
+                }));
+    }
+
+    function clearInteractionRefs() {
+        root._hAudio = null;
+        root._hBrightness = null;
+        root._hMic = null;
+        root._vAudio = null;
+        root._vBrightness = null;
+        root._vMic = null;
+    }
+
+    function registerInteractionDelegate(isVertical, item) {
+        if (!item)
+            return;
+
+        for (let i = 0; i < root._interactionDelegates.length; ++i) {
+            const entry = root._interactionDelegates[i];
+            if (entry && entry.item === item) {
+                entry.isVertical = isVertical;
+                return;
+            }
+        }
+
+        root._interactionDelegates = root._interactionDelegates.concat([
+            {
+                "isVertical": isVertical,
+                "item": item
+            }
+        ]);
+    }
+
+    function unregisterInteractionDelegate(item) {
+        if (!item)
+            return;
+
+        root._interactionDelegates = root._interactionDelegates.filter(entry => entry && entry.item !== item);
+    }
+
+    function refreshInteractionRefs() {
+        root.clearInteractionRefs();
+
+        for (let i = 0; i < root._interactionDelegates.length; ++i) {
+            const entry = root._interactionDelegates[i];
+            const item = entry?.item;
+            if (!item || !item.visible)
+                continue;
+
+            const groupId = item.interactionGroupId;
+            if (entry.isVertical) {
+                if (groupId === "audio")
+                    root._vAudio = item;
+                else if (groupId === "microphone")
+                    root._vMic = item;
+                else if (groupId === "brightness")
+                    root._vBrightness = item;
+            } else {
+                if (groupId === "audio")
+                    root._hAudio = item;
+                else if (groupId === "microphone")
+                    root._hMic = item;
+                else if (groupId === "brightness")
+                    root._hBrightness = item;
+            }
+        }
+    }
+
     function hasNoVisibleIcons() {
-        if (root.showScreenSharingIcon && NiriService.hasCasts)
-            return false;
-        if (root.showNetworkIcon && NetworkService.networkAvailable)
-            return false;
-        if (root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected)
-            return false;
-        if (root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled)
-            return false;
-        if (root.showAudioIcon)
-            return false;
-        if (root.showMicIcon)
-            return false;
-        if (root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice())
-            return false;
-        if (root.showBatteryIcon && BatteryService.batteryAvailable)
-            return false;
-        if (root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs())
-            return false;
-        return true;
+        return !root.controlCenterRenderModel.some(entry => entry.visible);
     }
 
     content: Component {
@@ -309,12 +436,7 @@ BasePill {
             Component.onCompleted: {
                 root._hRow = controlIndicators;
                 root._vCol = controlColumn;
-                root._hAudio = audioIcon.parent;
-                root._hBrightness = brightnessIcon.parent;
-                root._hMic = micIcon.parent;
-                root._vAudio = audioIconV.parent;
-                root._vBrightness = brightnessIconV.parent;
-                root._vMic = micIconV.parent;
+                root.clearInteractionRefs();
             }
 
             Column {
@@ -324,162 +446,151 @@ BasePill {
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: Theme.spacingXS
 
-                Item {
-                    width: parent.width
-                    height: root.vIconSize
-                    visible: root.showScreenSharingIcon && NiriService.hasCasts
+                Repeater {
+                    model: root.controlCenterRenderModel
+                    Item {
+                        id: verticalGroupItem
+                        required property var modelData
+                        required property int index
+                        property string interactionGroupId: modelData.id
 
-                    DankIcon {
-                        name: "screen_record"
-                        size: root.vIconSize
-                        color: NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText
-                        anchors.centerIn: parent
-                    }
-                }
+                        width: parent.width
+                        height: {
+                            switch (modelData.id) {
+                            case "audio":
+                                return root.vIconSize + (audioPercentV.visible ? audioPercentV.implicitHeight + 2 : 0);
+                            case "microphone":
+                                return root.vIconSize + (micPercentV.visible ? micPercentV.implicitHeight + 2 : 0);
+                            case "brightness":
+                                return root.vIconSize + (brightnessPercentV.visible ? brightnessPercentV.implicitHeight + 2 : 0);
+                            default:
+                                return root.vIconSize;
+                            }
+                        }
+                        visible: modelData.visible
 
-                Item {
-                    width: parent.width
-                    height: root.vIconSize
-                    visible: root.showNetworkIcon && NetworkService.networkAvailable
+                        Component.onCompleted: {
+                            root.registerInteractionDelegate(true, verticalGroupItem);
+                            root.refreshInteractionRefs();
+                        }
+                        Component.onDestruction: {
+                            if (root) {
+                                root.unregisterInteractionDelegate(verticalGroupItem);
+                                root.refreshInteractionRefs();
+                            }
+                        }
+                        onVisibleChanged: root.refreshInteractionRefs()
+                        onInteractionGroupIdChanged: {
+                            root.refreshInteractionRefs();
+                        }
 
-                    DankIcon {
-                        name: root.getNetworkIconName()
-                        size: root.vIconSize
-                        color: root.getNetworkIconColor()
-                        anchors.centerIn: parent
-                    }
-                }
+                        DankIcon {
+                            anchors.centerIn: parent
+                            visible: !verticalGroupItem.modelData.composite
+                            name: {
+                                switch (verticalGroupItem.modelData.id) {
+                                case "screenSharing":
+                                    return "screen_record";
+                                case "network":
+                                    return root.getNetworkIconName();
+                                case "vpn":
+                                    return "vpn_lock";
+                                case "bluetooth":
+                                    return "bluetooth";
+                                case "battery":
+                                    return Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable);
+                                case "printer":
+                                    return "print";
+                                default:
+                                    return "settings";
+                                }
+                            }
+                            size: root.vIconSize
+                            color: {
+                                switch (verticalGroupItem.modelData.id) {
+                                case "screenSharing":
+                                    return NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText;
+                                case "network":
+                                    return root.getNetworkIconColor();
+                                case "vpn":
+                                    return NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText;
+                                case "bluetooth":
+                                    return BluetoothService.connected ? Theme.primary : Theme.surfaceText;
+                                case "battery":
+                                    return root.getBatteryIconColor();
+                                case "printer":
+                                    return Theme.primary;
+                                default:
+                                    return Theme.widgetIconColor;
+                                }
+                            }
+                        }
 
-                Item {
-                    width: parent.width
-                    height: root.vIconSize
-                    visible: root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected
+                        DankIcon {
+                            id: audioIconV
+                            visible: verticalGroupItem.modelData.id === "audio"
+                            name: root.getVolumeIconName()
+                            size: root.vIconSize
+                            color: Theme.widgetIconColor
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: parent.top
+                        }
 
-                    DankIcon {
-                        name: "vpn_lock"
-                        size: root.vIconSize
-                        color: NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText
-                        anchors.centerIn: parent
-                    }
-                }
+                        NumericText {
+                            id: audioPercentV
+                            visible: verticalGroupItem.modelData.id === "audio" && root.showAudioPercent && isFinite(AudioService.sink?.audio?.volume)
+                            text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
+                            reserveText: "100%"
+                            font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                            color: Theme.widgetTextColor
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: audioIconV.bottom
+                            anchors.topMargin: 2
+                        }
 
-                Item {
-                    width: parent.width
-                    height: root.vIconSize
-                    visible: root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled
+                        DankIcon {
+                            id: micIconV
+                            visible: verticalGroupItem.modelData.id === "microphone"
+                            name: root.getMicIconName()
+                            size: root.vIconSize
+                            color: root.getMicIconColor()
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: parent.top
+                        }
 
-                    DankIcon {
-                        name: "bluetooth"
-                        size: root.vIconSize
-                        color: BluetoothService.connected ? Theme.primary : Theme.surfaceText
-                        anchors.centerIn: parent
-                    }
-                }
+                        NumericText {
+                            id: micPercentV
+                            visible: verticalGroupItem.modelData.id === "microphone" && root.showMicPercent && isFinite(AudioService.source?.audio?.volume)
+                            text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
+                            reserveText: "100%"
+                            font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                            color: Theme.widgetTextColor
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: micIconV.bottom
+                            anchors.topMargin: 2
+                        }
 
-                Item {
-                    width: parent.width
-                    height: root.vIconSize + (root.showAudioPercent ? audioPercentV.implicitHeight + 2 : 0)
-                    visible: root.showAudioIcon
+                        DankIcon {
+                            id: brightnessIconV
+                            visible: verticalGroupItem.modelData.id === "brightness"
+                            name: root.getBrightnessIconName()
+                            size: root.vIconSize
+                            color: Theme.widgetIconColor
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: parent.top
+                        }
 
-                    DankIcon {
-                        id: audioIconV
-                        name: root.getVolumeIconName()
-                        size: root.vIconSize
-                        color: Theme.widgetIconColor
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                    }
-
-                    NumericText {
-                        id: audioPercentV
-                        visible: root.showAudioPercent
-                        text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
-                        reserveText: "100%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: audioIconV.bottom
-                        anchors.topMargin: 2
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: root.vIconSize + (root.showMicPercent ? micPercentV.implicitHeight + 2 : 0)
-                    visible: root.showMicIcon
-
-                    DankIcon {
-                        id: micIconV
-                        name: root.getMicIconName()
-                        size: root.vIconSize
-                        color: root.getMicIconColor()
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                    }
-
-                    NumericText {
-                        id: micPercentV
-                        visible: root.showMicPercent
-                        text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
-                        reserveText: "100%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: micIconV.bottom
-                        anchors.topMargin: 2
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: root.vIconSize + (root.showBrightnessPercent ? brightnessPercentV.implicitHeight + 2 : 0)
-                    visible: root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice()
-
-                    DankIcon {
-                        id: brightnessIconV
-                        name: root.getBrightnessIconName()
-                        size: root.vIconSize
-                        color: Theme.widgetIconColor
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                    }
-
-                    NumericText {
-                        id: brightnessPercentV
-                        visible: root.showBrightnessPercent
-                        text: Math.round(getBrightness() * 100) + "%"
-                        reserveText: "100%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: brightnessIconV.bottom
-                        anchors.topMargin: 2
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: root.vIconSize
-                    visible: root.showBatteryIcon && BatteryService.batteryAvailable
-
-                    DankIcon {
-                        name: Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable)
-                        size: root.vIconSize
-                        color: root.getBatteryIconColor()
-                        anchors.centerIn: parent
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: root.vIconSize
-                    visible: root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs()
-
-                    DankIcon {
-                        name: "print"
-                        size: root.vIconSize
-                        color: Theme.primary
-                        anchors.centerIn: parent
+                        NumericText {
+                            id: brightnessPercentV
+                            visible: verticalGroupItem.modelData.id === "brightness" && root.showBrightnessPercent && isFinite(getBrightness())
+                            text: Math.round(getBrightness() * 100) + "%"
+                            reserveText: "100%"
+                            font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                            color: Theme.widgetTextColor
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: brightnessIconV.bottom
+                            anchors.topMargin: 2
+                        }
                     }
                 }
 
@@ -503,157 +614,206 @@ BasePill {
                 anchors.centerIn: parent
                 spacing: Theme.spacingXS
 
-                DankIcon {
-                    name: "screen_record"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showScreenSharingIcon && NiriService.hasCasts
-                }
+                Repeater {
+                    model: root.controlCenterRenderModel
 
-                DankIcon {
-                    id: networkIcon
-                    name: root.getNetworkIconName()
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: root.getNetworkIconColor()
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showNetworkIcon && NetworkService.networkAvailable
-                }
+                    Item {
+                        id: horizontalGroupItem
+                        required property var modelData
+                        required property int index
+                        property string interactionGroupId: modelData.id
 
-                DankIcon {
-                    id: vpnIcon
-                    name: "vpn_lock"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected
-                }
+                        width: {
+                            switch (modelData.id) {
+                            case "audio":
+                                return audioGroup.width;
+                            case "microphone":
+                                return micGroup.width;
+                            case "brightness":
+                                return brightnessGroup.width;
+                            default:
+                                return root.getControlCenterIconSize();
+                            }
+                        }
+                        implicitWidth: width
+                        height: root.widgetThickness - root.horizontalPadding * 2
+                        visible: modelData.visible
 
-                DankIcon {
-                    id: bluetoothIcon
-                    name: "bluetooth"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: BluetoothService.connected ? Theme.primary : Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled
-                }
+                        Component.onCompleted: {
+                            root.registerInteractionDelegate(false, horizontalGroupItem);
+                            root.refreshInteractionRefs();
+                        }
+                        Component.onDestruction: {
+                            if (root) {
+                                root.unregisterInteractionDelegate(horizontalGroupItem);
+                                root.refreshInteractionRefs();
+                            }
+                        }
+                        onVisibleChanged: root.refreshInteractionRefs()
+                        onInteractionGroupIdChanged: {
+                            root.refreshInteractionRefs();
+                        }
 
-                Rectangle {
-                    width: audioIcon.implicitWidth + (root.showAudioPercent ? audioPercent.reservedWidth : 0) + 4
-                    implicitWidth: width
-                    height: root.widgetThickness - root.horizontalPadding * 2
-                    color: "transparent"
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showAudioIcon
+                        DankIcon {
+                            id: iconOnlyItem
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            visible: !horizontalGroupItem.modelData.composite
+                            name: {
+                                switch (horizontalGroupItem.modelData.id) {
+                                case "screenSharing":
+                                    return "screen_record";
+                                case "network":
+                                    return root.getNetworkIconName();
+                                case "vpn":
+                                    return "vpn_lock";
+                                case "bluetooth":
+                                    return "bluetooth";
+                                case "battery":
+                                    return Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable);
+                                case "printer":
+                                    return "print";
+                                default:
+                                    return "settings";
+                                }
+                            }
+                            size: root.getControlCenterIconSize()
+                            color: {
+                                switch (horizontalGroupItem.modelData.id) {
+                                case "screenSharing":
+                                    return NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText;
+                                case "network":
+                                    return root.getNetworkIconColor();
+                                case "vpn":
+                                    return NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText;
+                                case "bluetooth":
+                                    return BluetoothService.connected ? Theme.primary : Theme.surfaceText;
+                                case "battery":
+                                    return root.getBatteryIconColor();
+                                case "printer":
+                                    return Theme.primary;
+                                default:
+                                    return Theme.widgetIconColor;
+                                }
+                            }
+                        }
 
-                    DankIcon {
-                        id: audioIcon
-                        name: root.getVolumeIconName()
-                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                        color: Theme.widgetIconColor
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 2
+                        Rectangle {
+                            id: audioGroup
+                            width: audioContent.implicitWidth + 2
+                            implicitWidth: width
+                            height: parent.height
+                            color: "transparent"
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: horizontalGroupItem.modelData.id === "audio"
+
+                            Row {
+                                id: audioContent
+                                anchors.left: parent.left
+                                anchors.leftMargin: 1
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
+
+                                DankIcon {
+                                    id: audioIcon
+                                    name: root.getVolumeIconName()
+                                    size: root.getControlCenterIconSize()
+                                    color: Theme.widgetIconColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                NumericText {
+                                    id: audioPercent
+                                    visible: root.showAudioPercent && isFinite(AudioService.sink?.audio?.volume)
+                                    text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
+                                    reserveText: "100%"
+                                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                                    color: Theme.widgetTextColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: visible ? implicitWidth : 0
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            id: micGroup
+                            width: micContent.implicitWidth + 2
+                            implicitWidth: width
+                            height: parent.height
+                            color: "transparent"
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: horizontalGroupItem.modelData.id === "microphone"
+
+                            Row {
+                                id: micContent
+                                anchors.left: parent.left
+                                anchors.leftMargin: 1
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
+
+                                DankIcon {
+                                    id: micIcon
+                                    name: root.getMicIconName()
+                                    size: root.getControlCenterIconSize()
+                                    color: root.getMicIconColor()
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                NumericText {
+                                    id: micPercent
+                                    visible: root.showMicPercent && isFinite(AudioService.source?.audio?.volume)
+                                    text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
+                                    reserveText: "100%"
+                                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                                    color: Theme.widgetTextColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: visible ? implicitWidth : 0
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            id: brightnessGroup
+                            width: brightnessContent.implicitWidth + 2
+                            implicitWidth: width
+                            height: parent.height
+                            color: "transparent"
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: horizontalGroupItem.modelData.id === "brightness"
+
+                            Row {
+                                id: brightnessContent
+                                anchors.left: parent.left
+                                anchors.leftMargin: 1
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
+
+                                DankIcon {
+                                    id: brightnessIcon
+                                    name: root.getBrightnessIconName()
+                                    size: root.getControlCenterIconSize()
+                                    color: Theme.widgetIconColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                NumericText {
+                                    id: brightnessPercent
+                                    visible: root.showBrightnessPercent && isFinite(getBrightness())
+                                    text: Math.round(getBrightness() * 100) + "%"
+                                    reserveText: "100%"
+                                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                                    color: Theme.widgetTextColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: visible ? implicitWidth : 0
+                                }
+                            }
+                        }
                     }
-
-                    NumericText {
-                        id: audioPercent
-                        visible: root.showAudioPercent
-                        text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
-                        reserveText: "100%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: audioIcon.right
-                        anchors.leftMargin: 2
-                        width: reservedWidth
-                    }
-                }
-
-                Rectangle {
-                    width: micIcon.implicitWidth + (root.showMicPercent ? micPercent.reservedWidth : 0) + 4
-                    implicitWidth: width
-                    height: root.widgetThickness - root.horizontalPadding * 2
-                    color: "transparent"
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showMicIcon
-
-                    DankIcon {
-                        id: micIcon
-                        name: root.getMicIconName()
-                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                        color: root.getMicIconColor()
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 2
-                    }
-
-                    NumericText {
-                        id: micPercent
-                        visible: root.showMicPercent
-                        text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
-                        reserveText: "100%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: micIcon.right
-                        anchors.leftMargin: 2
-                        width: reservedWidth
-                    }
-                }
-
-                Rectangle {
-                    width: brightnessIcon.implicitWidth + (root.showBrightnessPercent ? brightnessPercent.reservedWidth : 0) + 4
-                    height: root.widgetThickness - root.horizontalPadding * 2
-                    color: "transparent"
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice()
-
-                    DankIcon {
-                        id: brightnessIcon
-                        name: root.getBrightnessIconName()
-                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                        color: Theme.widgetIconColor
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 2
-                    }
-
-                    NumericText {
-                        id: brightnessPercent
-                        visible: root.showBrightnessPercent
-                        text: Math.round(getBrightness() * 100) + "%"
-                        reserveText: "100%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: brightnessIcon.right
-                        anchors.leftMargin: 2
-                        width: reservedWidth
-                    }
-                }
-
-                DankIcon {
-                    id: batteryIcon
-                    name: Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable)
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: root.getBatteryIconColor()
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showBatteryIcon && BatteryService.batteryAvailable
-                }
-
-                DankIcon {
-                    id: printerIcon
-                    name: "print"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: Theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs()
                 }
 
                 DankIcon {
                     name: "settings"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: root.getControlCenterIconSize()
                     color: root.isActive ? Theme.primary : Theme.widgetIconColor
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.hasNoVisibleIcons()

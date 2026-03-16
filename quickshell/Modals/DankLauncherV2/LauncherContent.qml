@@ -158,6 +158,10 @@ FocusScope {
             controller.selectPageUp(8);
             return;
         case Qt.Key_Right:
+            if (hasCtrl) {
+                controller.cycleMode();
+                return;
+            }
             if (controller.getCurrentSectionViewMode() !== "list") {
                 controller.selectRight();
                 return;
@@ -165,8 +169,21 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Left:
+            if (hasCtrl) {
+                const reverse = true;
+                controller.cycleMode(reverse);
+                return;
+            }
             if (controller.getCurrentSectionViewMode() !== "list") {
                 controller.selectLeft();
+                return;
+            }
+            event.accepted = false;
+            return;
+        case Qt.Key_H:
+            if (hasCtrl) {
+                const reverse = true;
+                controller.cycleMode(reverse);
                 return;
             }
             event.accepted = false;
@@ -181,6 +198,13 @@ FocusScope {
         case Qt.Key_K:
             if (hasCtrl) {
                 controller.selectPrevious();
+                return;
+            }
+            event.accepted = false;
+            return;
+        case Qt.Key_L:
+            if (hasCtrl) {
+                controller.cycleMode();
                 return;
             }
             event.accepted = false;
@@ -200,13 +224,19 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Tab:
-            if (actionPanel.hasActions) {
+            if (hasCtrl && actionPanel.hasActions) {
                 actionPanel.expanded ? actionPanel.cycleAction() : actionPanel.show();
+                return;
             }
+            controller.selectNext();
             return;
         case Qt.Key_Backtab:
-            if (actionPanel.expanded)
-                actionPanel.hide();
+            if (hasCtrl && actionPanel.expanded) {
+                const reverse = true
+                actionPanel.expanded ? actionPanel.cycleAction(reverse) : actionPanel.show();
+                return;
+            }
+            controller.selectPrevious();
             return;
         case Qt.Key_Return:
         case Qt.Key_Enter:
@@ -388,7 +418,7 @@ FocusScope {
 
                 StyledText {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Tab " + I18n.tr("actions")
+                    text: "Ctrl-Tab " + I18n.tr("actions")
                     font.pixelSize: Theme.fontSizeSmall - 1
                     color: Theme.surfaceVariantText
                     visible: actionPanel.hasActions

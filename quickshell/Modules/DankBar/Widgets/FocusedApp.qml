@@ -87,11 +87,11 @@ BasePill {
             }
 
             const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId);
-            return workspaceWindows.length > 0 && activeWindow && activeWindow.title;
+            return workspaceWindows.length > 0 && activeWindow && (activeWindow.title || activeWindow.appId);
         }
 
         if (CompositorService.isHyprland) {
-            if (!Hyprland.focusedWorkspace || !activeWindow || !activeWindow.title) {
+            if (!Hyprland.focusedWorkspace || !activeWindow || !(activeWindow.title || activeWindow.appId)) {
                 return false;
             }
 
@@ -111,7 +111,7 @@ BasePill {
             }
         }
 
-        return activeWindow && activeWindow.title;
+        return activeWindow && (activeWindow.title || activeWindow.appId);
     }
 
     width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : visualWidth) : 0
@@ -212,17 +212,19 @@ BasePill {
                         const title = activeWindow && activeWindow.title ? activeWindow.title : "";
                         const appName = appText.text;
 
-                        if (compactMode && title === appName) {
+                        if (compactMode) {
+                            if (!title || title === appName)
+                                return title || appName;
+                            if (title.endsWith(appName))
+                                return title.substring(0, title.length - appName.length).replace(/ (-|—) $/, "") || appName;
                             return title;
                         }
 
-                        if (!title || !appName) {
+                        if (!title || !appName)
                             return title;
-                        }
 
-                        if (title.endsWith(appName)) {
+                        if (title.endsWith(appName))
                             return title.substring(0, title.length - appName.length).replace(/ (-|—) $/, "");
-                        }
 
                         return title;
                     }

@@ -289,7 +289,7 @@ PanelWindow {
             const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
             if (!onThisScreen)
                 return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screen.name)
+            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
                 return false;
             return true;
         });
@@ -312,7 +312,7 @@ PanelWindow {
             const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
             if (!onThisScreen)
                 return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screen.name)
+            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
                 return false;
             return true;
         });
@@ -336,7 +336,7 @@ PanelWindow {
             const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
             if (!onThisScreen)
                 return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screen.name)
+            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
                 return false;
             return true;
         });
@@ -360,7 +360,7 @@ PanelWindow {
             const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
             if (!onThisScreen)
                 return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screen.name)
+            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
                 return false;
             return true;
         });
@@ -686,6 +686,7 @@ PanelWindow {
         onHasActivePopoutChanged: evaluateReveal()
 
         function updateActivePopoutState() {
+            if (!barWindow.screen) return;
             const screenName = barWindow.screen.name;
             const activePopout = PopoutManager.currentPopoutsByScreen[screenName];
             const activeTrayMenu = TrayMenuManager.activeTrayMenus[screenName];

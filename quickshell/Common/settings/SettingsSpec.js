@@ -33,6 +33,7 @@ var SPEC = {
     mangoLayoutBorderSize: { def: -1, onChange: "updateCompositorLayout" },
 
     firstDayOfWeek: { def: -1 },
+    showWeekNumber: { def: false },
     use24HourClock: { def: true },
     showSeconds: { def: false },
     padHours12Hour: { def: false },
@@ -267,6 +268,11 @@ var SPEC = {
     qtThemingEnabled: { def: false, onChange: "regenSystemThemes" },
     syncModeWithPortal: { def: true },
     terminalsAlwaysDark: { def: false, onChange: "regenSystemThemes" },
+
+    muxType: { def: "tmux" },
+    muxUseCustomCommand: { def: false },
+    muxCustomCommand: { def: "" },
+    muxSessionFilter: { def: "" },
 
     runDmsMatugenTemplates: { def: true },
     matugenTemplateGtk: { def: true },

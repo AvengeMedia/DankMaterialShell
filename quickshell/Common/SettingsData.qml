@@ -14,7 +14,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 6
+    readonly property int settingsConfigVersion: 5
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -150,6 +150,7 @@ Singleton {
     property int mangoLayoutBorderSize: -1
 
     property int firstDayOfWeek: -1
+    property bool showWeekNumber: false
     property bool use24HourClock: true
     property bool showSeconds: false
     property bool padHours12Hour: false
@@ -452,6 +453,11 @@ Singleton {
     property bool qtThemingEnabled: false
     property bool syncModeWithPortal: true
     property bool terminalsAlwaysDark: false
+
+    property string muxType: "tmux"
+    property bool muxUseCustomCommand: false
+    property string muxCustomCommand: ""
+    property string muxSessionFilter: ""
 
     property bool runDmsMatugenTemplates: true
     property bool matugenTemplateGtk: true
