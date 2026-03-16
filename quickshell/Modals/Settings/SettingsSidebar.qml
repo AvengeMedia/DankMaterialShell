@@ -261,6 +261,12 @@ Rectangle {
                     "cupsOnly": true
                 },
                 {
+                    "id": "multiplexers",
+                    "text": I18n.tr("Multiplexers"),
+                    "icon": "terminal",
+                    "tabIndex": 30
+                },
+                {
                     "id": "window_rules",
                     "text": I18n.tr("Window Rules"),
                     "icon": "select_window",
