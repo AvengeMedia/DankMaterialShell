@@ -378,7 +378,7 @@ BasePill {
 
                 Item {
                     width: parent.width
-                    height: root.vIconSize + (root.showAudioPercent ? audioPercentV.implicitHeight + 2 : 0)
+                    height: root.vIconSize + (audioPercentV.visible ? audioPercentV.implicitHeight + 2 : 0)
                     visible: root.showAudioIcon
 
                     DankIcon {
@@ -392,7 +392,7 @@ BasePill {
 
                     StyledText {
                         id: audioPercentV
-                        visible: root.showAudioPercent
+                        visible: root.showAudioPercent && isFinite(AudioService.sink?.audio?.volume)
                         text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
@@ -404,7 +404,7 @@ BasePill {
 
                 Item {
                     width: parent.width
-                    height: root.vIconSize + (root.showMicPercent ? micPercentV.implicitHeight + 2 : 0)
+                    height: root.vIconSize + (micPercentV.visible ? micPercentV.implicitHeight + 2 : 0)
                     visible: root.showMicIcon
 
                     DankIcon {
@@ -418,7 +418,7 @@ BasePill {
 
                     StyledText {
                         id: micPercentV
-                        visible: root.showMicPercent
+                        visible: root.showMicPercent && isFinite(AudioService.source?.audio?.volume)
                         text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
@@ -430,7 +430,7 @@ BasePill {
 
                 Item {
                     width: parent.width
-                    height: root.vIconSize + (root.showBrightnessPercent ? brightnessPercentV.implicitHeight + 2 : 0)
+                    height: root.vIconSize + (brightnessPercentV.visible ? brightnessPercentV.implicitHeight + 2 : 0)
                     visible: root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice()
 
                     DankIcon {
@@ -444,7 +444,7 @@ BasePill {
 
                     StyledText {
                         id: brightnessPercentV
-                        visible: root.showBrightnessPercent
+                        visible: root.showBrightnessPercent && isFinite(getBrightness())
                         text: Math.round(getBrightness() * 100) + "%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
@@ -554,7 +554,7 @@ BasePill {
 
                     StyledText {
                         id: audioPercent
-                        visible: root.showAudioPercent
+                        visible: root.showAudioPercent && isFinite(AudioService.sink?.audio?.volume)
                         text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
@@ -583,7 +583,7 @@ BasePill {
 
                     StyledText {
                         id: micPercent
-                        visible: root.showMicPercent
+                        visible: root.showMicPercent && isFinite(AudioService.source?.audio?.volume)
                         text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
@@ -612,7 +612,7 @@ BasePill {
 
                     StyledText {
                         id: brightnessPercent
-                        visible: root.showBrightnessPercent
+                        visible: root.showBrightnessPercent && isFinite(getBrightness())
                         text: Math.round(getBrightness() * 100) + "%"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
