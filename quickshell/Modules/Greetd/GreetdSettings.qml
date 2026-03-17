@@ -24,6 +24,7 @@ Singleton {
     property string currentThemeName: "purple"
     property bool settingsLoaded: false
     property string customThemeFile: ""
+    property var registryThemeVariants: ({})
     property string matugenScheme: "scheme-tonal-spot"
     property bool use24HourClock: true
     property bool showSeconds: false
@@ -80,6 +81,8 @@ Singleton {
 
             currentThemeName = settings.currentThemeName !== undefined ? settings.currentThemeName : "purple";
             customThemeFile = settings.customThemeFile !== undefined ? settings.customThemeFile : "";
+	    registryThemeVariants = settings.registryThemeVariants !== undefined ?
+		settings.registryThemeVariants : ({});
             matugenScheme = settings.matugenScheme !== undefined ? settings.matugenScheme : "scheme-tonal-spot";
             use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true;
             showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : false;
