@@ -182,7 +182,7 @@ export DMS_RUN_GREETER=1
 
 ensure_cache_tree() {
     local base="$1"
-    mkdir -p "$base/.local/state" "$base/.local/state/wireplumber" "$base/.local/share" "$base/.cache"
+    mkdir -p "$base/.local/state" "$base/.local/share" "$base/.cache"
 }
 
 if ! ensure_cache_tree "$CACHE_DIR" 2>/dev/null; then
@@ -224,18 +224,6 @@ export XDG_STATE_HOME="$CACHE_DIR/.local/state"
 export XDG_DATA_HOME="$CACHE_DIR/.local/share"
 export XDG_CACHE_HOME="$CACHE_DIR/.cache"
 
-# Propagate correct XDG dirs into the systemd user session so socket-activated
-# services (e.g. wireplumber) don't inherit HOME=/ from /etc/passwd.
-if command -v systemctl >/dev/null 2>&1; then
-    systemctl --user set-environment \
-        HOME="$CACHE_DIR" \
-        XDG_STATE_HOME="$CACHE_DIR/.local/state" \
-        XDG_DATA_HOME="$CACHE_DIR/.local/share" \
-        XDG_CACHE_HOME="$CACHE_DIR/.cache" 2>/dev/null || true
-    if systemctl --user is-active --quiet wireplumber.service 2>/dev/null; then
-        systemctl --user restart wireplumber.service 2>/dev/null || true
-    fi
-fi
 
 # Keep greeter VT clean by default; callers can override via env or --debug.
 if [[ -z "${RUST_LOG:-}" ]]; then

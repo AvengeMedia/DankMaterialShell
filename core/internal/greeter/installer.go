@@ -628,7 +628,6 @@ func EnsureGreeterCacheDir(logFunc func(string), sudoPassword string) error {
 	runtimeDirs := []string{
 		filepath.Join(cacheDir, ".local"),
 		filepath.Join(cacheDir, ".local", "state"),
-		filepath.Join(cacheDir, ".local", "state", "wireplumber"),
 		filepath.Join(cacheDir, ".local", "share"),
 		filepath.Join(cacheDir, ".cache"),
 	}
