@@ -5,6 +5,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/matugen"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/sblinch/kdl-go"
 	"github.com/sblinch/kdl-go/document"
@@ -1074,6 +1076,7 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 	}{
 		{filepath.Join(homeDir, ".config", "DankMaterialShell"), "DankMaterialShell config"},
 		{filepath.Join(homeDir, ".local", "state", "DankMaterialShell"), "DankMaterialShell state"},
+		{filepath.Join(homeDir, ".cache", "DankMaterialShell"), "DankMaterialShell cache"},
 		{filepath.Join(homeDir, ".cache", "quickshell"), "quickshell cache"},
 		{filepath.Join(homeDir, ".config", "quickshell"), "quickshell config"},
 		{filepath.Join(homeDir, ".local", "share", "wayland-sessions"), "wayland sessions"},
@@ -1108,6 +1111,217 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 	return nil
 }
 
+type GreeterColorSyncInfo struct {
+	SourcePath                   string
+	ThemeName                    string
+	UsesDynamicWallpaperOverride bool
+}
+
+type greeterThemeSyncSettings struct {
+	CurrentThemeName     string `json:"currentThemeName"`
+	GreeterWallpaperPath string `json:"greeterWallpaperPath"`
+	MatugenScheme        string `json:"matugenScheme"`
+	IconTheme            string `json:"iconTheme"`
+}
+
+type greeterThemeSyncSession struct {
+	IsLightMode bool `json:"isLightMode"`
+}
+
+type greeterThemeSyncState struct {
+	ThemeName                    string
+	GreeterWallpaperPath         string
+	ResolvedGreeterWallpaperPath string
+	MatugenScheme                string
+	IconTheme                    string
+	IsLightMode                  bool
+	UsesDynamicWallpaperOverride bool
+}
+
+func defaultGreeterColorsSource(homeDir string) string {
+	return filepath.Join(homeDir, ".cache", "DankMaterialShell", "dms-colors.json")
+}
+
+func greeterOverrideColorsStateDir(homeDir string) string {
+	return filepath.Join(homeDir, ".cache", "DankMaterialShell", "greeter-colors")
+}
+
+func greeterOverrideColorsSource(homeDir string) string {
+	return filepath.Join(greeterOverrideColorsStateDir(homeDir), "dms-colors.json")
+}
+
+func readOptionalJSONFile(path string, dst any) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	if strings.TrimSpace(string(data)) == "" {
+		return nil
+	}
+	return json.Unmarshal(data, dst)
+}
+
+func readGreeterThemeSyncSettings(homeDir string) (greeterThemeSyncSettings, error) {
+	settings := greeterThemeSyncSettings{
+		CurrentThemeName: "purple",
+		MatugenScheme:    "scheme-tonal-spot",
+		IconTheme:        "System Default",
+	}
+	settingsPath := filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
+	if err := readOptionalJSONFile(settingsPath, &settings); err != nil {
+		return greeterThemeSyncSettings{}, fmt.Errorf("failed to parse settings at %s: %w", settingsPath, err)
+	}
+	return settings, nil
+}
+
+func readGreeterThemeSyncSession(homeDir string) (greeterThemeSyncSession, error) {
+	session := greeterThemeSyncSession{}
+	sessionPath := filepath.Join(homeDir, ".local", "state", "DankMaterialShell", "session.json")
+	if err := readOptionalJSONFile(sessionPath, &session); err != nil {
+		return greeterThemeSyncSession{}, fmt.Errorf("failed to parse session at %s: %w", sessionPath, err)
+	}
+	return session, nil
+}
+
+func resolveGreeterThemeSyncState(homeDir string) (greeterThemeSyncState, error) {
+	settings, err := readGreeterThemeSyncSettings(homeDir)
+	if err != nil {
+		return greeterThemeSyncState{}, err
+	}
+	session, err := readGreeterThemeSyncSession(homeDir)
+	if err != nil {
+		return greeterThemeSyncState{}, err
+	}
+
+	resolvedWallpaperPath := ""
+	if settings.GreeterWallpaperPath != "" {
+		resolvedWallpaperPath = settings.GreeterWallpaperPath
+		if !filepath.IsAbs(resolvedWallpaperPath) {
+			resolvedWallpaperPath = filepath.Join(homeDir, resolvedWallpaperPath)
+		}
+	}
+
+	usesDynamicWallpaperOverride := strings.EqualFold(strings.TrimSpace(settings.CurrentThemeName), "dynamic") && resolvedWallpaperPath != ""
+
+	return greeterThemeSyncState{
+		ThemeName:                    settings.CurrentThemeName,
+		GreeterWallpaperPath:         settings.GreeterWallpaperPath,
+		ResolvedGreeterWallpaperPath: resolvedWallpaperPath,
+		MatugenScheme:                settings.MatugenScheme,
+		IconTheme:                    settings.IconTheme,
+		IsLightMode:                  session.IsLightMode,
+		UsesDynamicWallpaperOverride: usesDynamicWallpaperOverride,
+	}, nil
+}
+
+func (s greeterThemeSyncState) effectiveColorsSource(homeDir string) string {
+	if s.UsesDynamicWallpaperOverride {
+		return greeterOverrideColorsSource(homeDir)
+	}
+	return defaultGreeterColorsSource(homeDir)
+}
+
+func ResolveGreeterColorSyncInfo(homeDir string) (GreeterColorSyncInfo, error) {
+	state, err := resolveGreeterThemeSyncState(homeDir)
+	if err != nil {
+		return GreeterColorSyncInfo{}, err
+	}
+	return GreeterColorSyncInfo{
+		SourcePath:                   state.effectiveColorsSource(homeDir),
+		ThemeName:                    state.ThemeName,
+		UsesDynamicWallpaperOverride: state.UsesDynamicWallpaperOverride,
+	}, nil
+}
+
+func ensureGreeterSyncSourceFile(path string) error {
+	sourceDir := filepath.Dir(path)
+	if err := os.MkdirAll(sourceDir, 0o755); err != nil {
+		return fmt.Errorf("failed to create source directory %s: %w", sourceDir, err)
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.WriteFile(path, []byte("{}"), 0o644); err != nil {
+			return fmt.Errorf("failed to create source file %s: %w", path, err)
+		}
+	} else if err != nil {
+		return fmt.Errorf("failed to inspect source file %s: %w", path, err)
+	}
+
+	return nil
+}
+
+func syncGreeterDynamicOverrideColors(dmsPath, homeDir string, state greeterThemeSyncState, logFunc func(string)) error {
+	if !state.UsesDynamicWallpaperOverride {
+		return nil
+	}
+
+	st, err := os.Stat(state.ResolvedGreeterWallpaperPath)
+	if err != nil {
+		return fmt.Errorf("configured greeter wallpaper not found at %s: %w", state.ResolvedGreeterWallpaperPath, err)
+	}
+	if st.IsDir() {
+		return fmt.Errorf("configured greeter wallpaper path points to a directory: %s", state.ResolvedGreeterWallpaperPath)
+	}
+
+	mode := matugen.ColorModeDark
+	if state.IsLightMode {
+		mode = matugen.ColorModeLight
+	}
+
+	opts := matugen.Options{
+		StateDir:         greeterOverrideColorsStateDir(homeDir),
+		ShellDir:         dmsPath,
+		ConfigDir:        filepath.Join(homeDir, ".config"),
+		Kind:             "image",
+		Value:            state.ResolvedGreeterWallpaperPath,
+		Mode:             mode,
+		IconTheme:        state.IconTheme,
+		MatugenType:      state.MatugenScheme,
+		RunUserTemplates: false,
+		ColorsOnly:       true,
+	}
+
+	err = matugen.Run(opts)
+	switch {
+	case errors.Is(err, matugen.ErrNoChanges):
+		logFunc("✓ Greeter dynamic override colors already up to date")
+		return nil
+	case err != nil:
+		return fmt.Errorf("failed to generate greeter dynamic colors from wallpaper override: %w", err)
+	default:
+		logFunc("✓ Generated greeter dynamic colors from wallpaper override")
+		return nil
+	}
+}
+
+func syncGreeterColorSource(homeDir, cacheDir string, state greeterThemeSyncState, logFunc func(string), sudoPassword string) error {
+	source := state.effectiveColorsSource(homeDir)
+	if !state.UsesDynamicWallpaperOverride {
+		if err := ensureGreeterSyncSourceFile(source); err != nil {
+			return err
+		}
+	} else if _, err := os.Stat(source); err != nil {
+		return fmt.Errorf("expected generated greeter colors at %s: %w", source, err)
+	}
+
+	target := filepath.Join(cacheDir, "colors.json")
+	_ = runSudoCmd(sudoPassword, "rm", "-f", target)
+	if err := runSudoCmd(sudoPassword, "ln", "-sf", source, target); err != nil {
+		return fmt.Errorf("failed to create symlink for wallpaper based theming (%s -> %s): %w", target, source, err)
+	}
+
+	if state.UsesDynamicWallpaperOverride {
+		logFunc("✓ Synced wallpaper based theming (greeter wallpaper override)")
+	} else {
+		logFunc("✓ Synced wallpaper based theming")
+	}
+
+	return nil
+}
+
 func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPassword string, forceAuth bool) error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -1130,11 +1344,6 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 			source: filepath.Join(homeDir, ".local", "state", "DankMaterialShell", "session.json"),
 			target: filepath.Join(cacheDir, "session.json"),
 			desc:   "state (wallpaper configuration)",
-		},
-		{
-			source: filepath.Join(homeDir, ".cache", "DankMaterialShell", "dms-colors.json"),
-			target: filepath.Join(cacheDir, "colors.json"),
-			desc:   "wallpaper based theming",
 		},
 	}
 
@@ -1161,7 +1370,20 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 		logFunc(fmt.Sprintf("✓ Synced %s", link.desc))
 	}
 
-	if err := syncGreeterWallpaperOverride(homeDir, cacheDir, logFunc, sudoPassword); err != nil {
+	state, err := resolveGreeterThemeSyncState(homeDir)
+	if err != nil {
+		return fmt.Errorf("failed to resolve greeter color source: %w", err)
+	}
+
+	if err := syncGreeterDynamicOverrideColors(dmsPath, homeDir, state, logFunc); err != nil {
+		return err
+	}
+
+	if err := syncGreeterColorSource(homeDir, cacheDir, state, logFunc, sudoPassword); err != nil {
+		return err
+	}
+
+	if err := syncGreeterWallpaperOverride(cacheDir, logFunc, sudoPassword, state); err != nil {
 		return fmt.Errorf("greeter wallpaper override sync failed: %w", err)
 	}
 
@@ -1180,23 +1402,9 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 	return nil
 }
 
-func syncGreeterWallpaperOverride(homeDir, cacheDir string, logFunc func(string), sudoPassword string) error {
-	settingsPath := filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
-	data, err := os.ReadFile(settingsPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return fmt.Errorf("failed to read settings at %s: %w", settingsPath, err)
-	}
-	var settings struct {
-		GreeterWallpaperPath string `json:"greeterWallpaperPath"`
-	}
-	if err := json.Unmarshal(data, &settings); err != nil {
-		return fmt.Errorf("failed to parse settings at %s: %w", settingsPath, err)
-	}
+func syncGreeterWallpaperOverride(cacheDir string, logFunc func(string), sudoPassword string, state greeterThemeSyncState) error {
 	destPath := filepath.Join(cacheDir, "greeter_wallpaper_override.jpg")
-	if settings.GreeterWallpaperPath == "" {
+	if state.ResolvedGreeterWallpaperPath == "" {
 		if err := runSudoCmd(sudoPassword, "rm", "-f", destPath); err != nil {
 			return fmt.Errorf("failed to clear override file %s: %w", destPath, err)
 		}
@@ -1206,10 +1414,7 @@ func syncGreeterWallpaperOverride(homeDir, cacheDir string, logFunc func(string)
 	if err := runSudoCmd(sudoPassword, "rm", "-f", destPath); err != nil {
 		return fmt.Errorf("failed to remove old override file %s: %w", destPath, err)
 	}
-	src := settings.GreeterWallpaperPath
-	if !filepath.IsAbs(src) {
-		src = filepath.Join(homeDir, src)
-	}
+	src := state.ResolvedGreeterWallpaperPath
 	st, err := os.Stat(src)
 	if err != nil {
 		return fmt.Errorf("configured greeter wallpaper not found at %s: %w", src, err)

@@ -100,6 +100,7 @@ type Options struct {
 	IconTheme           string
 	MatugenType         string
 	RunUserTemplates    bool
+	ColorsOnly          bool
 	StockColors         string
 	SyncModeWithPortal  bool
 	TerminalsAlwaysDark bool
@@ -274,6 +275,10 @@ func buildOnce(opts *Options) (bool, error) {
 		return false, nil
 	}
 
+	if opts.ColorsOnly {
+		return true, nil
+	}
+
 	if isDMSGTKActive(opts.ConfigDir) {
 		switch opts.Mode {
 		case ColorModeLight:
@@ -330,6 +335,10 @@ input_path = '%s/matugen/templates/dank.json'
 output_path = '%s'
 
 `, opts.ShellDir, opts.ColorsOutput())
+
+	if opts.ColorsOnly {
+		return nil
+	}
 
 	homeDir, _ := os.UserHomeDir()
 	for _, tmpl := range templateRegistry {
@@ -597,10 +606,10 @@ func detectMatugenVersionLocked() (matugenFlags, error) {
 	matugenVersionOK = true
 
 	if matugenSupportsCOE {
-		log.Infof("Matugen %s supports --continue-on-error", versionStr)
+		log.Debugf("Matugen %s detected: continue-on-error support enabled", versionStr)
 	}
 	if matugenIsV4 {
-		log.Infof("Matugen %s: using v4 flags", versionStr)
+		log.Debugf("Matugen %s detected: using v4 compatibility flags", versionStr)
 	}
 	return matugenFlags{matugenSupportsCOE, matugenIsV4}, nil
 }

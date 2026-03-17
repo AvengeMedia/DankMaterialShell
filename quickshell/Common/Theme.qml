@@ -1278,7 +1278,10 @@ Singleton {
             }
 
             if (themeData.variants.options && themeData.variants.options.length > 0) {
-                const selectedVariantId = typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, themeData.variants.default) : themeData.variants.default;
+                const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
+                const selectedVariantId = isGreeterMode
+                    ? (typeof GreetdSettings.registryThemeVariants[themeId] === "string" ? GreetdSettings.registryThemeVariants[themeId] : themeData.variants.default)
+                    : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, themeData.variants.default) : themeData.variants.default);
                 const variant = findVariant(themeData.variants.options, selectedVariantId);
                 if (variant) {
                     const variantColors = variant[colorMode] || variant.dark || variant.light || {};
@@ -1650,8 +1653,13 @@ Singleton {
                         const defaults = customThemeRawData.variants.defaults || {};
                         const darkDefaults = defaults.dark || {};
                         const lightDefaults = defaults.light || defaults.dark || {};
-                        const storedDark = typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, darkDefaults, "dark") : darkDefaults;
-                        const storedLight = typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, lightDefaults, "light") : lightDefaults;
+                        const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
+                        const storedDark = isGreeterMode
+                            ? (GreetdSettings.registryThemeVariants[themeId]?.dark || darkDefaults)
+                            : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, darkDefaults, "dark") : darkDefaults);
+                        const storedLight = isGreeterMode
+                            ? (GreetdSettings.registryThemeVariants[themeId]?.light || lightDefaults)
+                            : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, lightDefaults, "light") : lightDefaults);
                         const darkFlavorId = storedDark.flavor || darkDefaults.flavor || "";
                         const lightFlavorId = storedLight.flavor || lightDefaults.flavor || "";
                         const accentId = storedDark.accent || darkDefaults.accent || "";
@@ -1669,7 +1677,10 @@ Singleton {
                                 lightTheme = mergeColors(lightTheme, accent[lightFlavor.id] || {});
                         }
                     } else if (customThemeRawData.variants.options) {
-                        const selectedVariantId = typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, customThemeRawData.variants.default) : customThemeRawData.variants.default;
+                        const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
+                        const selectedVariantId = isGreeterMode
+                            ? (typeof GreetdSettings.registryThemeVariants[themeId] === "string" ? GreetdSettings.registryThemeVariants[themeId] : customThemeRawData.variants.default)
+                            : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, customThemeRawData.variants.default) : customThemeRawData.variants.default);
                         const variant = findVariant(customThemeRawData.variants.options, selectedVariantId);
                         if (variant) {
                             darkTheme = mergeColors(darkTheme, variant.dark || {});
@@ -1997,6 +2008,7 @@ Singleton {
             const colorsPath = SessionData.isGreeterMode ? greetCfgDir + "/colors.json" : stateDir + "/dms-colors.json";
             return colorsPath;
         }
+        blockLoading: false
         watchChanges: !SessionData.isGreeterMode
 
         function parseAndLoadColors() {

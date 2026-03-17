@@ -3,6 +3,7 @@ package matugen
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	mocks_utils "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/utils"
@@ -391,4 +392,52 @@ func TestSubstituteVars(t *testing.T) {
 			assert.Equal(t, tc.expected, result)
 		})
 	}
+}
+
+func TestBuildMergedConfigColorsOnly(t *testing.T) {
+	tempDir := t.TempDir()
+
+	shellDir := filepath.Join(tempDir, "shell")
+	configsDir := filepath.Join(shellDir, "matugen", "configs")
+	if err := os.MkdirAll(configsDir, 0o755); err != nil {
+		t.Fatalf("failed to create configs dir: %v", err)
+	}
+
+	baseConfig := "[config]\ncustom_keywords = []\n"
+	if err := os.WriteFile(filepath.Join(configsDir, "base.toml"), []byte(baseConfig), 0o644); err != nil {
+		t.Fatalf("failed to write base config: %v", err)
+	}
+
+	cfgFile, err := os.CreateTemp(tempDir, "merged-*.toml")
+	if err != nil {
+		t.Fatalf("failed to create temp config: %v", err)
+	}
+	defer os.Remove(cfgFile.Name())
+	defer cfgFile.Close()
+
+	opts := &Options{
+		ShellDir:   shellDir,
+		ConfigDir:  filepath.Join(tempDir, "config"),
+		StateDir:   filepath.Join(tempDir, "state"),
+		ColorsOnly: true,
+	}
+
+	if err := buildMergedConfig(opts, cfgFile, filepath.Join(tempDir, "templates")); err != nil {
+		t.Fatalf("buildMergedConfig failed: %v", err)
+	}
+
+	if err := cfgFile.Close(); err != nil {
+		t.Fatalf("failed to close merged config: %v", err)
+	}
+
+	output, err := os.ReadFile(cfgFile.Name())
+	if err != nil {
+		t.Fatalf("failed to read merged config: %v", err)
+	}
+
+	content := string(output)
+	assert.Contains(t, content, "[templates.dank]")
+	assert.Contains(t, content, "output_path = '"+filepath.Join(opts.StateDir, "dms-colors.json")+"'")
+	assert.NotContains(t, content, "[templates.gtk]")
+	assert.False(t, strings.Contains(content, "output_path = 'CONFIG_DIR/"), "colors-only config should not emit app template outputs")
 }

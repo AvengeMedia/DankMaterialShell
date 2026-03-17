@@ -1497,6 +1497,20 @@ func checkGreeterStatus() error {
 	}
 
 	fmt.Println("\nConfiguration Symlinks:")
+	colorSyncInfo, colorSyncErr := greeter.ResolveGreeterColorSyncInfo(homeDir)
+	if colorSyncErr != nil {
+		fmt.Printf("  ✗ Failed to resolve expected greeter color source: %v\n", colorSyncErr)
+		allGood = false
+		colorSyncInfo = greeter.GreeterColorSyncInfo{
+			SourcePath: filepath.Join(homeDir, ".cache", "DankMaterialShell", "dms-colors.json"),
+		}
+	}
+
+	colorThemeDesc := "Color theme"
+	if colorSyncInfo.UsesDynamicWallpaperOverride {
+		colorThemeDesc = "Color theme (greeter wallpaper override)"
+	}
+
 	symlinks := []struct {
 		source string
 		target string
@@ -1513,9 +1527,9 @@ func checkGreeterStatus() error {
 			desc:   "Session state",
 		},
 		{
-			source: filepath.Join(homeDir, ".cache", "DankMaterialShell", "dms-colors.json"),
+			source: colorSyncInfo.SourcePath,
 			target: filepath.Join(cacheDir, "colors.json"),
-			desc:   "Color theme",
+			desc:   colorThemeDesc,
 		},
 	}
 
@@ -1555,6 +1569,10 @@ func checkGreeterStatus() error {
 		}
 
 		fmt.Printf("  ✓ %s: synced correctly\n", link.desc)
+	}
+
+	if colorSyncInfo.UsesDynamicWallpaperOverride {
+		fmt.Printf("  ℹ Dynamic theme uses greeter override colors from %s\n", colorSyncInfo.SourcePath)
 	}
 
 	fmt.Println("\nGreeter Wallpaper Override:")
