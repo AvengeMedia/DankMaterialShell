@@ -113,6 +113,17 @@ Singleton {
         });
     }
 
+    function pasteClipboard(closeCallback) {
+        if (!wtypeAvailable) {
+            ToastService.showError(I18n.tr("wtype not available - install wtype for paste support"));
+            return;
+        }
+        if (closeCallback) {
+            closeCallback();
+        }
+        pasteTimer.start();
+    }
+
     function pasteEntry(entry, closeCallback) {
         if (!wtypeAvailable) {
             ToastService.showError(I18n.tr("wtype not available - install wtype for paste support"));
