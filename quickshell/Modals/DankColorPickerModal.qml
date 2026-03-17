@@ -147,6 +147,13 @@ DankModal {
         return "COLOR_PICKER_MODAL_OPEN_SUCCESS";
       }
 
+      function openColor(color: string): string {
+        root.selectedColor = Qt.color(color);
+        root.currentColor = Qt.color(color);
+        root.updateFromColor(Qt.color(color));
+        return open();
+      }
+
       function close(): string {
         root.hide();
         return "COLOR_PICKER_MODAL_CLOSE_SUCCESS";
