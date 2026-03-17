@@ -304,7 +304,17 @@ DankModal {
                     anchors.right: parent.right
                     anchors.rightMargin: Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    text: I18n.tr("%1 active, %2 filtered").arg(MuxService.sessions.length).arg(muxModal.filteredSessions.length)
+                    text: {
+                        const total = MuxService.sessions.length;
+                        const filtered = muxModal.filteredSessions.length;
+                        const activePart = total === 1
+                            ? I18n.tr("%1 active session").arg(total)
+                            : I18n.tr("%1 active sessions").arg(total);
+                        const filteredPart = filtered === 1
+                            ? I18n.tr("%1 filtered").arg(filtered)
+                            : I18n.tr("%1 filtered").arg(filtered);
+                        return activePart + ", " + filteredPart;
+                    }
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceVariantText
                 }
@@ -468,7 +478,9 @@ DankModal {
                                             text: {
                                                 var parts = []
                                                 if (modelData.windows !== "N/A")
-                                                    parts.push(I18n.tr("%1 windows").arg(modelData.windows))
+                                                    parts.push(modelData.windows === 1
+                                                        ? I18n.tr("%1 window").arg(modelData.windows)
+                                                        : I18n.tr("%1 windows").arg(modelData.windows))
                                                 parts.push(modelData.attached ? I18n.tr("attached") : I18n.tr("detached"))
                                                 return parts.join(" \u2022 ")
                                             }

@@ -713,7 +713,7 @@ Rectangle {
                                                 StyledText {
                                                     id: expandedActionText
                                                     text: {
-                                                        const baseText = modelData.text || "Open";
+                                                        const baseText = modelData.text || I18n.tr("Open");
                                                         if (keyboardNavigationActive && (isGroupSelected || selectedNotificationIndex >= 0))
                                                             return `${baseText} (${index + 1})`;
                                                         return baseText;
@@ -849,7 +849,7 @@ Rectangle {
                 StyledText {
                     id: collapsedActionText
                     text: {
-                        const baseText = modelData.text || "Open";
+                        const baseText = modelData.text || I18n.tr("Open");
                         if (keyboardNavigationActive && isGroupSelected) {
                             return `${baseText} (${index + 1})`;
                         }

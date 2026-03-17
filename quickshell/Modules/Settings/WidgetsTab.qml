@@ -138,7 +138,7 @@ Item {
             {
                 "id": "gpuTemp",
                 "text": I18n.tr("GPU Temperature"),
-                "description": "",
+                "description": I18n.tr("GPU temperature display"),
                 "icon": "auto_awesome_mosaic",
                 "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : I18n.tr("This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics."),
                 "enabled": DgopService.dgopAvailable

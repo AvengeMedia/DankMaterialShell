@@ -320,7 +320,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     StyledText {
-                        text: activePlayer?.trackTitle || "Unknown Track"
+                        text: activePlayer?.trackTitle || I18n.tr("Unknown Track")
                         font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Bold
                         color: Theme.surfaceText
@@ -332,7 +332,7 @@ Item {
                     }
 
                     StyledText {
-                        text: activePlayer?.trackArtist || "Unknown Artist"
+                        text: activePlayer?.trackTitle || I18n.tr("Unknown Artist")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.8)
                         width: parent.width
@@ -669,7 +669,7 @@ Item {
                 const screenY = popoutY + contentOffsetY + btnY;
                 showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
             }
-            onEntered: sharedTooltip.show("Media Players", playerSelectorButton, 0, 0, isRightEdge ? "right" : "left")
+            onEntered: sharedTooltip.show(I18n.tr("Media Players"), playerSelectorButton, 0, 0, isRightEdge ? "right" : "left")
             onExited: sharedTooltip.hide()
         }
     }
@@ -788,7 +788,7 @@ Item {
                 const screenY = popoutY + contentOffsetY + btnY;
                 showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
             }
-            onEntered: sharedTooltip.show("Output Device", audioDevicesButton, 0, 0, isRightEdge ? "right" : "left")
+            onEntered: sharedTooltip.show(I18n.tr("Output Device"), audioDevicesButton, 0, 0, isRightEdge ? "right" : "left")
             onExited: sharedTooltip.hide()
         }
     }
