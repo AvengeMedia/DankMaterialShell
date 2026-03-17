@@ -538,6 +538,8 @@ Color picker modal control.
 
 **Functions:**
 - `open` - Show color picker modal
+- `openColor <color>` - Show color picker modal with a pre-selected color
+  - Parameters: `color` - Color string (e.g. "#ff0000", "#3f51b5")
 - `close` - Hide color picker modal
 - `closeInstant` - Hide color picker modal without animation
 - `toggle` - Toggle color picker modal visibility
