@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -17,7 +16,6 @@ Item {
     property var spotlightContent: launcherContentLoader.item
     property bool openedFromOverview: false
     property bool isClosing: false
-    property bool _windowEnabled: true
     property bool _pendingInitialize: false
     property string _pendingQuery: ""
     property string _pendingMode: ""
@@ -267,38 +265,26 @@ Item {
             if (Quickshell.screens.length === 0)
                 return;
 
-            const screen = launcherWindow.screen;
-            const screenName = screen?.name;
-
-            let needsReset = !screen || !screenName;
-            if (!needsReset) {
-                needsReset = true;
+            const screenName = launcherWindow.screen?.name;
+            if (screenName) {
                 for (let i = 0; i < Quickshell.screens.length; i++) {
-                    if (Quickshell.screens[i].name === screenName) {
-                        needsReset = false;
-                        break;
-                    }
+                    if (Quickshell.screens[i].name === screenName)
+                        return;
                 }
             }
 
-            if (!needsReset)
-                return;
+            if (spotlightOpen)
+                hide();
 
             const newScreen = CompositorService.getFocusedScreen() ?? Quickshell.screens[0];
-            if (!newScreen)
-                return;
-
-            root._windowEnabled = false;
-            launcherWindow.screen = newScreen;
-            Qt.callLater(() => {
-                root._windowEnabled = true;
-            });
+            if (newScreen)
+                launcherWindow.screen = newScreen;
         }
     }
 
     PanelWindow {
         id: launcherWindow
-        visible: root._windowEnabled && (spotlightOpen || isClosing)
+        visible: spotlightOpen || isClosing
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
 
