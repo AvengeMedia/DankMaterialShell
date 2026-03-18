@@ -31,6 +31,7 @@ Column {
     property string previewMode: "split" // split | full
     property string pluginHighlightedHtml: ""
     property string lastPluginContent: ""
+    property int loadRequestId: 0
 
     signal saveRequested()
     signal openRequested()
@@ -54,10 +55,18 @@ Column {
     function loadCurrentTabContent() {
         if (!currentTab) return
 
+        const requestedTabId = currentTab.id
+        const requestId = ++loadRequestId
         contentLoaded = false
         NotepadStorageService.loadTabContent(
             NotepadStorageService.currentTabIndex,
             (content) => {
+                const activeTab = NotepadStorageService.tabs.length > NotepadStorageService.currentTabIndex
+                    ? NotepadStorageService.tabs[NotepadStorageService.currentTabIndex]
+                    : null
+                if (requestId !== loadRequestId || !activeTab || activeTab.id !== requestedTabId)
+                    return
+
                 lastSavedContent = content
                 textArea.text = content
                 contentLoaded = true

@@ -102,6 +102,14 @@ Singleton {
         metadataFile.setText(JSON.stringify(metadata, null, 2))
     }
 
+    function getTabById(tabId) {
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].id === tabId)
+                return tabs[i]
+        }
+        return null
+    }
+
     function loadTabContent(tabIndex, callback) {
         if (tabIndex < 0 || tabIndex >= tabs.length) {
             callback("")
@@ -109,6 +117,7 @@ Singleton {
         }
 
         var tab = tabs[tabIndex]
+        var requestTabId = tab.id
         var fullPath = tab.isTemporary
                         ? baseDir + "/" + tab.filePath
                         : tab.filePath
@@ -123,6 +132,16 @@ Singleton {
         var fileChecker = fileExistsComponent.createObject(root, {
             path: fullPath,
             callback: (exists) => {
+                var currentTab = root.getTabById(requestTabId)
+                var currentPath = currentTab
+                    ? (currentTab.isTemporary ? baseDir + "/" + currentTab.filePath : currentTab.filePath)
+                    : ""
+
+                if (!currentTab || currentPath !== fullPath) {
+                    callback("")
+                    return
+                }
+
                 if (exists) {
                     var loader = tabFileLoaderComponent.createObject(root, {
                         path: fullPath,
