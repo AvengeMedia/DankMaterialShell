@@ -9,7 +9,7 @@ Vcs-Browser: https://github.com/AvengeMedia/DankMaterialShell
 Vcs-Git: https://github.com/AvengeMedia/DankMaterialShell.git
 
 Package: dms
-Architecture: amd64
+Architecture: amd64 arm64
 Depends: ${misc:Depends},
          quickshell | quickshell-git,
          accountsservice,

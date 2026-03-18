@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
-	"runtime"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -95,6 +94,17 @@ func (d *DebianDistribution) packageInstalled(pkg string) bool {
 	cmd := exec.Command("dpkg", "-l", pkg)
 	err := cmd.Run()
 	return err == nil
+}
+
+func debianRepoArchitecture(arch string) string {
+	switch arch {
+	case "amd64", "x86_64":
+		return "amd64"
+	case "arm64", "aarch64":
+		return "arm64"
+	default:
+		return arch
+	}
 }
 
 func (d *DebianDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
@@ -436,7 +446,7 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 			}
 
 			// Add repository
-			repoLine := fmt.Sprintf("deb [signed-by=%s arch=%s] %s/ /", keyringPath, runtime.GOARCH, baseURL)
+			repoLine := fmt.Sprintf("deb [signed-by=%s arch=%s] %s/ /", keyringPath, debianRepoArchitecture(osInfo.Architecture), baseURL)
 
 			progressChan <- InstallProgressMsg{
 				Phase:       PhaseSystemPackages,
