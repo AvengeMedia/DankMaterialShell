@@ -7,7 +7,6 @@ import qs.Modals.Clipboard
 import qs.Modals.Greeter
 import qs.Modals.Settings
 import qs.Modals.DankLauncherV2
-import qs.Modals
 import qs.Modules
 import qs.Modules.AppDrawer
 import qs.Modules.DankDash
