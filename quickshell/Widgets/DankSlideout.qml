@@ -25,6 +25,7 @@ PanelWindow {
     property string title: ""
     property alias container: contentContainer
     property real customTransparency: -1
+    signal aboutToHide
 
     function show() {
         visible = true
@@ -32,6 +33,7 @@ PanelWindow {
     }
 
     function hide() {
+        aboutToHide()
         isVisible = false
     }
 

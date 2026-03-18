@@ -555,7 +555,9 @@ Column {
                                 })
                             }
                             function onTabsChanged() {
-                                if (NotepadStorageService.tabs.length > 0 && !contentLoaded) {/* Lines 444-445 omitted */}
+                                if (NotepadStorageService.tabs.length > 0 && !contentLoaded) {
+                                    loadCurrentTabContent()
+                                }
                             }
                         }
 

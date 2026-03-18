@@ -798,9 +798,8 @@ Item {
 
             content: Component {
                 Notepad {
-                    onHideRequested: {
-                        notepadSlideout.hide();
-                    }
+                    slideout: notepadSlideout
+                    onHideRequested: notepadSlideout.hide()
                 }
             }
 
