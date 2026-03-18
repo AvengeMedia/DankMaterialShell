@@ -5,6 +5,15 @@
   "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
     "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 комбинаций клавиш DMS могут быть переопределены комбинациями из конфигурации, которые идут после include."
   },
+  "%1 Sessions": {
+    "%1 Sessions": ""
+  },
+  "%1 active session": {
+    "%1 active session": ""
+  },
+  "%1 active sessions": {
+    "%1 active sessions": ""
+  },
   "%1 adapter(s), none connected": {
     "%1 adapter(s), none connected": "%1 адаптер(ов), ни один не подключен"
   },
@@ -13,6 +22,9 @@
   },
   "%1 adapters, none connected": {
     "%1 adapters, none connected": ""
+  },
+  "%1 character": {
+    "%1 character": ""
   },
   "%1 characters": {
     "%1 characters": "%1 символов"
@@ -50,6 +62,9 @@
   "%1 exists but is not included. Window rules won't apply.": {
     "%1 exists but is not included. Window rules won't apply.": "%1 существует, но не включен. Правила окон не будут применены."
   },
+  "%1 filtered": {
+    "%1 filtered": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 теперь включен в конфигурацию"
   },
@@ -62,11 +77,29 @@
   "%1 printer(s)": {
     "%1 printer(s)": "%1 принтер(ов)"
   },
+  "%1 update": {
+    "%1 update": ""
+  },
+  "%1 updates": {
+    "%1 updates": ""
+  },
   "%1 variants": {
     "%1 variants": "%1 вариант(ов)"
   },
+  "%1 wallpaper  •  %2 / %3": {
+    "%1 wallpaper  •  %2 / %3": ""
+  },
+  "%1 wallpapers  •  %2 / %3": {
+    "%1 wallpapers  •  %2 / %3": ""
+  },
   "%1 widgets": {
     "%1 widgets": "%1 виджет(ов)"
+  },
+  "%1 window": {
+    "%1 window": ""
+  },
+  "%1 windows": {
+    "%1 windows": ""
   },
   "%1m ago": {
     "%1m ago": "%1 мин. назад"
@@ -184,6 +217,9 @@
   },
   "90°": {
     "90°": "90°"
+  },
+  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
+    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": ""
   },
   "A file with this name already exists. Do you want to overwrite it?": {
     "A file with this name already exists. Do you want to overwrite it?": "Файл с таким именем уже существует. Хотите его перезаписать?"
@@ -407,8 +443,14 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Приложения с отключёнными всплывающими уведомлениями. Включите звук или удалите для удаления."
   },
+  "Are you sure you want to kill session \"%1\"?": {
+    "Are you sure you want to kill session \"%1\"?": ""
+  },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Расположить дисплеи и настроить разрешение, частоту обновления и VRR"
+  },
+  "Attach": {
+    "Attach": ""
   },
   "Audio": {
     "Audio": "Аудио"
@@ -478,11 +520,17 @@
   "Authenticate": {
     "Authenticate": "Аутентифицировать"
   },
+  "Authenticating...": {
+    "Authenticating...": ""
+  },
   "Authentication": {
     "Authentication": "Аутентификация"
   },
   "Authentication Required": {
     "Authentication Required": "Требуется авторизация"
+  },
+  "Authentication error - try again": {
+    "Authentication error - try again": ""
   },
   "Authentication failed, please try again": {
     "Authentication failed, please try again": "Аутентификация не удалась, попробуйте снова"
@@ -586,6 +634,9 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Доступно в режимах просмотра 'Подробно' и 'Прогноз'"
   },
+  "Available.": {
+    "Available.": ""
+  },
   "BSSID": {
     "BSSID": "BSSID"
   },
@@ -624,6 +675,9 @@
   },
   "Battery": {
     "Battery": "Батарея"
+  },
+  "Battery %1": {
+    "Battery %1": ""
   },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Батарея Заряда Ограничение"
@@ -844,8 +898,14 @@
   "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
     "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": ""
   },
+  "Checking for updates...": {
+    "Checking for updates...": ""
+  },
   "Checking whether sudo authentication is needed…": {
     "Checking whether sudo authentication is needed…": ""
+  },
+  "Checking...": {
+    "Checking...": ""
   },
   "Choose Color": {
     "Choose Color": "Выбрать Цвет"
@@ -1053,6 +1113,9 @@
   },
   "Column Width": {
     "Column Width": "Ширина столбца"
+  },
+  "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
+    "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": ""
   },
   "Command": {
     "Command": "Команда"
@@ -1264,6 +1327,9 @@
   "Create Window Rule": {
     "Create Window Rule": "Создать правило окна"
   },
+  "Create a new %1 session (n)": {
+    "Create a new %1 session (n)": ""
+  },
   "Create rule for:": {
     "Create rule for:": "Создать правило для:"
   },
@@ -1423,6 +1489,12 @@
   "Dark Mode": {
     "Dark Mode": "Тёмный режим"
   },
+  "Dark mode base": {
+    "Dark mode base": ""
+  },
+  "Dark mode harmony": {
+    "Dark mode harmony": ""
+  },
   "Darken Modal Background": {
     "Darken Modal Background": "Затемнение фона модальных окон"
   },
@@ -1527,6 +1599,9 @@
   },
   "Detailed": {
     "Detailed": "Подробно"
+  },
+  "Details for \"%1": {
+    "Details for \"%1\"": ""
   },
   "Development": {
     "Development": "Разработка"
@@ -1840,6 +1915,36 @@
   "Enabled": {
     "Enabled": "Включено"
   },
+  "Enabled, but fingerprint availability could not be confirmed.": {
+    "Enabled, but fingerprint availability could not be confirmed.": ""
+  },
+  "Enabled, but no fingerprint reader was detected.": {
+    "Enabled, but no fingerprint reader was detected.": ""
+  },
+  "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
+    "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": ""
+  },
+  "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
+    "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": ""
+  },
+  "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
+    "Enabled, but no registered security key was found yet. Register a key and run Sync.": ""
+  },
+  "Enabled, but no registered security key was found yet. Register a key or update your U2F config.": {
+    "Enabled, but no registered security key was found yet. Register a key or update your U2F config.": ""
+  },
+  "Enabled, but security-key availability could not be confirmed.": {
+    "Enabled, but security-key availability could not be confirmed.": ""
+  },
+  "Enabled. PAM already provides fingerprint auth.": {
+    "Enabled. PAM already provides fingerprint auth.": ""
+  },
+  "Enabled. PAM already provides security-key auth.": {
+    "Enabled. PAM already provides security-key auth.": ""
+  },
+  "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.": {
+    "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.": ""
+  },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Включение Wi-Fi…"
   },
@@ -1861,11 +1966,17 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Введите PIN для "
   },
+  "Enter a new name for session \"%1": {
+    "Enter a new name for session \"%1\"": ""
+  },
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "Введите новое имя для этого рабочего пространства"
   },
   "Enter a search query": {
     "Enter a search query": "Введите поисковый запрос"
+  },
+  "Enter command or script path": {
+    "Enter command or script path": ""
   },
   "Enter credentials for ": {
     "Enter credentials for ": "Введите учётные данные для "
@@ -1956,6 +2067,9 @@
   },
   "Failed to cancel selected job": {
     "Failed to cancel selected job": "Не удалось отменить выбранное задание"
+  },
+  "Failed to check for updates:\n%1": {
+    "Failed to check for updates:\n%1": ""
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "Не удалось проверить лимит закрепления"
@@ -2086,6 +2200,9 @@
   "Failed to set night mode temperature": {
     "Failed to set night mode temperature": "Не удалось установить температуру ночного режима"
   },
+  "Failed to set power profile": {
+    "Failed to set power profile": ""
+  },
   "Failed to set profile image": {
     "Failed to set profile image": "Не удалось установить изображение профиля"
   },
@@ -2135,10 +2252,10 @@
     "File Information": "Информация о Файле"
   },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
-    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "Поиск файлов требует dsearch. Установите с github.com/AvengeMedia/danksearch"
+    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "Поиск файлов требует dsearch. Установите с github.com/morelazers/dsearch"
   },
   "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": {
-    "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": "Поиск файлов требует dsearch\\nУстановите с github.com/AvengeMedia/danksearch"
+    "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": "Поиск файлов требует dsearch\\nУстановите с github.com/morelazers/dsearch"
   },
   "Files": {
     "Files": "Файлы"
@@ -2154,6 +2271,15 @@
   },
   "Fine-tune animation timing in milliseconds": {
     "Fine-tune animation timing in milliseconds": "Точная настройка времени анимации в миллисекундах"
+  },
+  "Fingerprint availability could not be confirmed.": {
+    "Fingerprint availability could not be confirmed.": ""
+  },
+  "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
+    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": ""
+  },
+  "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": {
+    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": ""
   },
   "First Day of Week": {
     "First Day of Week": ""
@@ -2197,8 +2323,14 @@
   "Focused Color": {
     "Focused Color": "Цвет активного"
   },
+  "Focused Monitor Only": {
+    "Focused Monitor Only": ""
+  },
   "Focused Window": {
     "Focused Window": "Используемое Окно"
+  },
+  "Focused monitor only": {
+    "Focused monitor only": ""
   },
   "Fog": {
     "Fog": "Туман"
@@ -2275,6 +2407,12 @@
   "Format Legend": {
     "Format Legend": "Условные Обозначения"
   },
+  "Found %1 package to update:": {
+    "Found %1 package to update:": ""
+  },
+  "Found %1 packages to update:": {
+    "Found %1 packages to update:": ""
+  },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Освободить VRAM/память при закрытии лаунчера. Может вызвать небольшую задержку при повторном открытии."
   },
@@ -2299,6 +2437,9 @@
   "GPU Temperature": {
     "GPU Temperature": "Температура ГП"
   },
+  "GPU temperature display": {
+    "GPU temperature display": ""
+  },
   "Games": {
     "Games": "Игры"
   },
@@ -2307,6 +2448,9 @@
   },
   "Gamma control not available. Requires DMS API v6+.": {
     "Gamma control not available. Requires DMS API v6+.": "Управление Gamma недоступно. Требуется DMS API v6+."
+  },
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": ""
   },
   "Generic device name | Generic device name fallback": {
     "device": "устройство"
@@ -2497,6 +2641,12 @@
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Высокоточная палитра, сохраняющая исходные оттенки."
   },
+  "Highlight Active Workspace App": {
+    "Highlight Active Workspace App": ""
+  },
+  "Highlight the currently focused app inside workspace indicators": {
+    "Highlight the currently focused app inside workspace indicators": ""
+  },
   "History Settings": {
     "History Settings": "Историю Настройки"
   },
@@ -2548,11 +2698,17 @@
   "Humidity": {
     "Humidity": "Влажность"
   },
+  "Hyprland Discord Server": {
+    "Hyprland Discord Server": ""
+  },
   "Hyprland Layout Overrides": {
     "Hyprland Layout Overrides": "Переопределения макета Hyprland"
   },
   "Hyprland Options": {
     "Hyprland Options": "Опции Hyprland"
+  },
+  "Hyprland Website": {
+    "Hyprland Website": ""
   },
   "I Understand": {
     "I Understand": "Я Понимаю"
@@ -2619,6 +2775,12 @@
   },
   "Incorrect password": {
     "Incorrect password": "Неправильный пароль"
+  },
+  "Incorrect password - attempt %1 of %2 (lockout may follow)": {
+    "Incorrect password - attempt %1 of %2 (lockout may follow)": ""
+  },
+  "Incorrect password - next failures may trigger account lockout": {
+    "Incorrect password - next failures may trigger account lockout": ""
   },
   "Indicator Style": {
     "Indicator Style": "Индикатор Стиль"
@@ -2917,14 +3079,26 @@
   "Keys": {
     "Keys": "Ключи"
   },
+  "Kill": {
+    "Kill": ""
+  },
   "Kill Process": {
     "Kill Process": "Завершить Процесс"
+  },
+  "Kill Session": {
+    "Kill Session": ""
   },
   "Ko-fi": {
     "Ko-fi": "Ko-fi"
   },
   "LED device": {
     "LED device": "LED устройство"
+  },
+  "LabWC IRC Channel": {
+    "LabWC IRC Channel": ""
+  },
+  "LabWC Website": {
+    "LabWC Website": ""
   },
   "Label for printer IP address or hostname input field": {
     "Host": ""
@@ -3025,6 +3199,15 @@
   "Light Snow Showers": {
     "Light Snow Showers": "Лёгкий снегопад"
   },
+  "Light mode base": {
+    "Light mode base": ""
+  },
+  "Light mode harmony": {
+    "Light mode harmony": ""
+  },
+  "Line: %1": {
+    "Line: %1": ""
+  },
   "Linear": {
     "Linear": "Линейный"
   },
@@ -3105,6 +3288,9 @@
   },
   "Log Out": {
     "Log Out": "Выйти"
+  },
+  "Logging in...": {
+    "Logging in...": ""
   },
   "Login Authentication": {
     "Login Authentication": ""
@@ -3277,6 +3463,9 @@
   "Media Player Settings": {
     "Media Player Settings": "Настройки Медиаплеера"
   },
+  "Media Players": {
+    "Media Players": ""
+  },
   "Media Players (": {
     "Media Players (": "Медиаплееры ("
   },
@@ -3391,6 +3580,15 @@
   "Moving to Paused": {
     "Moving to Paused": "Перемещение в Paused"
   },
+  "Multiplexer": {
+    "Multiplexer": ""
+  },
+  "Multiplexer Type": {
+    "Multiplexer Type": ""
+  },
+  "Multiplexers": {
+    "Multiplexers": ""
+  },
   "Music": {
     "Music": "Музыка"
   },
@@ -3411,6 +3609,9 @@
   },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Значки Именованных Рабочих Пространств"
+  },
+  "Navigate": {
+    "Navigate": ""
   },
   "Navigation": {
     "Navigation": "Навигация"
@@ -3456,6 +3657,9 @@
   },
   "New Notification": {
     "New Notification": "Новое уведомление"
+  },
+  "New Session": {
+    "New Session": ""
   },
   "New Window Rule": {
     "New Window Rule": "Новое правило окна"
@@ -3532,6 +3736,9 @@
   "No VPN profiles": {
     "No VPN profiles": "Нет профилей VPN"
   },
+  "No Weather": {
+    "No Weather": ""
+  },
   "No Weather Data": {
     "No Weather Data": "Нету данных о погоде"
   },
@@ -3540,6 +3747,9 @@
   },
   "No action": {
     "No action": "Нет действия"
+  },
+  "No active %1 sessions": {
+    "No active %1 sessions": ""
   },
   "No adapters": {
     "No adapters": "Нет адаптеров"
@@ -3586,11 +3796,17 @@
   "No files found": {
     "No files found": "Файлы не найдены"
   },
+  "No fingerprint reader detected.": {
+    "No fingerprint reader detected.": ""
+  },
   "No folders found": {
     "No folders found": "Папки не найдены"
   },
   "No hidden apps.": {
     "No hidden apps.": "Нет скрытых приложений."
+  },
+  "No information available": {
+    "No information available": ""
   },
   "No items added yet": {
     "No items added yet": "Ни один элемент ещё не добавлен"
@@ -3606,6 +3822,9 @@
   },
   "No matches": {
     "No matches": "Нет совпадений"
+  },
+  "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
+    "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": ""
   },
   "No plugin results": {
     "No plugin results": "Нет результатов плагинов"
@@ -3637,6 +3856,9 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": "Сохранённые записи буфера обмена отсутствуют"
   },
+  "No sessions found": {
+    "No sessions found": ""
+  },
   "No status output.": {
     "No status output.": ""
   },
@@ -3648,6 +3870,9 @@
   },
   "No video found in folder": {
     "No video found in folder": ""
+  },
+  "No wallpapers": {
+    "No wallpapers": ""
   },
   "No wallpapers found\n\nClick the folder icon below to browse": {
     "No wallpapers found\n\nClick the folder icon below to browse": "Обои не найдены\n\nНажмите на значок папки ниже для просмотра"
@@ -3681,6 +3906,18 @@
   },
   "Not available — install fprintd and enroll fingerprints.": {
     "Not available — install fprintd and enroll fingerprints.": ""
+  },
+  "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
+    "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": ""
+  },
+  "Not available — install fprintd and pam_fprintd.": {
+    "Not available — install fprintd and pam_fprintd.": ""
+  },
+  "Not available — install or configure pam_u2f, or configure greetd PAM.": {
+    "Not available — install or configure pam_u2f, or configure greetd PAM.": ""
+  },
+  "Not available — install or configure pam_u2f.": {
+    "Not available — install or configure pam_u2f.": ""
   },
   "Not available — install pam_u2f and enroll keys.": {
     "Not available — install pam_u2f and enroll keys.": ""
@@ -3766,6 +4003,9 @@
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Регулировать цветовую температуру только на основе правил времени или местоположения."
   },
+  "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": {
+    "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": ""
+  },
   "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": {
     "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": ""
   },
@@ -3832,6 +4072,9 @@
   "Output Area Full": {
     "Output Area Full": "Область вывода заполнена"
   },
+  "Output Device": {
+    "Output Device": ""
+  },
   "Output Tray Missing": {
     "Output Tray Missing": "Выходной лоток отсутствует"
   },
@@ -3862,6 +4105,9 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Переопределить глобальные настройки макета для этого выхода"
   },
+  "Override terminal with a custom command or script": {
+    "Override terminal with a custom command or script": ""
+  },
   "Override the global shadow with per-bar settings": {
     "Override the global shadow with per-bar settings": ""
   },
@@ -3876,6 +4122,21 @@
   },
   "Overwrite": {
     "Overwrite": "Перезаписать"
+  },
+  "PAM already provides fingerprint auth. Enable this to show it at login.": {
+    "PAM already provides fingerprint auth. Enable this to show it at login.": ""
+  },
+  "PAM already provides security-key auth. Enable this to show it at login.": {
+    "PAM already provides security-key auth. Enable this to show it at login.": ""
+  },
+  "PAM provides fingerprint auth, but availability could not be confirmed.": {
+    "PAM provides fingerprint auth, but availability could not be confirmed.": ""
+  },
+  "PAM provides fingerprint auth, but no prints are enrolled yet.": {
+    "PAM provides fingerprint auth, but no prints are enrolled yet.": ""
+  },
+  "PAM provides fingerprint auth, but no reader was detected.": {
+    "PAM provides fingerprint auth, but no reader was detected.": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -3912,6 +4173,9 @@
   },
   "Password": {
     "Password": "Пароль"
+  },
+  "Password...": {
+    "Password...": ""
   },
   "Paste": {
     "Paste": "Вставить"
@@ -4065,6 +4329,9 @@
   "Playback error: ": {
     "Playback error: ": ""
   },
+  "Please write a name for your new %1 session": {
+    "Please write a name for your new %1 session": ""
+  },
   "Plugged In": {
     "Plugged In": "Подключено"
   },
@@ -4172,6 +4439,9 @@
   },
   "Preset Widths (%)": {
     "Preset Widths (%)": "Предустановленные ширины (%)"
+  },
+  "Press 'n' or click 'New Session' to create one": {
+    "Press 'n' or click 'New Session' to create one": ""
   },
   "Press key...": {
     "Press key...": "Нажмите клавишу..."
@@ -4356,6 +4626,9 @@
   "Rename": {
     "Rename": "Переименовать"
   },
+  "Rename Session": {
+    "Rename Session": ""
+  },
   "Rename Workspace": {
     "Rename Workspace": "Переименовать рабочую область"
   },
@@ -4370,6 +4643,9 @@
   },
   "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": {
     "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "Требовать удержания кнопки/клавиши для подтверждения выключения, перезапуска, приостановки, гибернации и выхода"
+  },
+  "Required plugin: ": {
+    "Required plugin: ": ""
   },
   "Requires 'dgop' tool": {
     "Requires 'dgop' tool": "Требуется инструмент 'dgop'"
@@ -4406,6 +4682,9 @@
   },
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "Перезагрузить DankMaterialShell"
+  },
+  "Restore Special Workspace Windows": {
+    "Restore Special Workspace Windows": ""
   },
   "Resume": {
     "Resume": "Продолжить"
@@ -4572,6 +4851,9 @@
   "Scroll Factor": {
     "Scroll Factor": "Фактор прокрутки"
   },
+  "Scroll GitHub": {
+    "Scroll GitHub": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "Колесо прокрутки"
   },
@@ -4620,6 +4902,9 @@
   "Search plugins...": {
     "Search plugins...": "Поиск дополнений..."
   },
+  "Search sessions...": {
+    "Search sessions...": ""
+  },
   "Search widgets...": {
     "Search widgets...": "Поиск виджетов..."
   },
@@ -4637,6 +4922,12 @@
   },
   "Security": {
     "Security": "Безопасность"
+  },
+  "Security-key availability could not be confirmed.": {
+    "Security-key availability could not be confirmed.": ""
+  },
+  "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
+    "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": ""
   },
   "Select": {
     "Select": "Выбрать"
@@ -4719,6 +5010,9 @@
   "Server": {
     "Server": "Сервер"
   },
+  "Session Filter": {
+    "Session Filter": ""
+  },
   "Set custom name": {
     "Set custom name": "Установить пользовательское имя"
   },
@@ -4775,6 +5069,9 @@
   },
   "Short": {
     "Short": "Короткий"
+  },
+  "Shortcut (%1)": {
+    "Shortcut (%1)": ""
   },
   "Shortcuts": {
     "Shortcuts": "Ярлыки"
@@ -4911,6 +5208,9 @@
   "Show Weather Condition": {
     "Show Weather Condition": "Показать условие погоды"
   },
+  "Show Week Number": {
+    "Show Week Number": ""
+  },
   "Show Welcome": {
     "Show Welcome": "Показать приветствие"
   },
@@ -4949,6 +5249,12 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показывать наложение лаунчера при вводе в обзоре Niri. Отключите для использования другого лаунчера."
+  },
+  "Show notification popups only on the currently focused monitor": {
+    "Show notification popups only on the currently focused monitor": ""
+  },
+  "Show notifications only on the currently focused monitor": {
+    "Show notifications only on the currently focused monitor": ""
   },
   "Show on Last Display": {
     "Show on Last Display": "Показать на последнем дисплее"
@@ -5009,6 +5315,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Показывать информацию о погоде в верхней панели и центре управления"
+  },
+  "Show week number in the calendar": {
+    "Show week number in the calendar": ""
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Показывать номера индексов рабочих пространств в переключателе рабочих пространств верхней панели"
@@ -5181,6 +5490,9 @@
   "Swap": {
     "Swap": "Подкачка"
   },
+  "Sway Website": {
+    "Sway Website": ""
+  },
   "Switch User": {
     "Switch User": "Переключить пользователя"
   },
@@ -5265,6 +5577,9 @@
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Навигация • ←→↑↓: Навигация сетки • Enter/Space: Выбрать"
   },
+  "Terminal": {
+    "Terminal": ""
+  },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Пользовательские дополнительные параметры терминала"
   },
@@ -5273,6 +5588,9 @@
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": ""
+  },
+  "Terminal multiplexer backend to use": {
+    "Terminal multiplexer backend to use": ""
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": ""
@@ -5297,6 +5615,9 @@
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Приведённые ниже настройки изменят ваши настройки GTK и Qt. Если вы хотите сохранить текущие конфигурации, сделайте их резервную копию (qt5ct.conf|qt6ct.conf и ~/.config/gtk-3.0|gtk-4.0)."
+  },
+  "The custom command used when attaching to sessions (receives the session name as the first argument)": {
+    "The custom command used when attaching to sessions (receives the session name as the first argument)": ""
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "Очередь заданий этого принтера пуста"
@@ -5423,6 +5744,9 @@
   },
   "Toner Low": {
     "Toner Low": "Тонер заканчивается"
+  },
+  "Too many failed attempts - account may be locked": {
+    "Too many failed attempts - account may be locked": ""
   },
   "Tools": {
     "Tools": "Инструменты"
@@ -5559,6 +5883,9 @@
   "Unknown Title": {
     "Unknown Title": "Неизвестный заголовок"
   },
+  "Unknown Track": {
+    "Unknown Track": ""
+  },
   "Unload on Close": {
     "Unload on Close": "Выгрузить при закрытии"
   },
@@ -5591,6 +5918,9 @@
   },
   "Untrust": {
     "Untrust": "Не доверять"
+  },
+  "Up to date": {
+    "Up to date": ""
   },
   "Update": {
     "Update": "Обновление"
@@ -5664,6 +5994,9 @@
   "Use desktop wallpaper": {
     "Use desktop wallpaper": ""
   },
+  "Use fingerprint authentication for the lock screen.": {
+    "Use fingerprint authentication for the lock screen.": ""
+  },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "Использовать сканер отпечатков пальцев для аутентификации на Lock Screen (требуется регистрация отпечатков)"
   },
@@ -5699,6 +6032,9 @@
   },
   "Username": {
     "Username": "Имя пользователя"
+  },
+  "Username...": {
+    "Username...": ""
   },
   "Uses sunrise/sunset times based on your location.": {
     "Uses sunrise/sunset times based on your location.": "Использует время восхода/заката солнца на основе вашего местоположения."
@@ -5843,6 +6179,9 @@
   },
   "Weather Widget": {
     "Weather Widget": "Виджет погоды"
+  },
+  "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": {
+    "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": ""
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Когда включено, приложения сортируются по алфавиту. Когда отключено, приложения сортируются по частоте использования."
@@ -6017,11 +6356,17 @@
   "You have unsaved changes. Save before opening a file?": {
     "You have unsaved changes. Save before opening a file?": "У вас есть несохранённые изменения. Сохранить изменения перед открытием файла?"
   },
+  "Your system is up to date!": {
+    "Your system is up to date!": ""
+  },
   "actions": {
     "actions": "действия"
   },
   "apps": {
     "apps": "приложения"
+  },
+  "attached": {
+    "attached": ""
   },
   "audio status": {
     "Muted": "Выбрать устройство",
@@ -6152,6 +6497,9 @@
   "default monitor label suffix": {
     "(Default)": "(По умолчанию)"
   },
+  "detached": {
+    "detached": ""
+  },
   "dgop not available": {
     "dgop not available": "dgop недоступен"
   },
@@ -6167,6 +6515,9 @@
   },
   "disk write label": {
     "Write:": "Запись:"
+  },
+  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
+    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
   },
   "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
     "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": "Файл dms/binds.kdl существует, но не включен в config.kdl. Пользовательские сочетания клавиш не будут работать, пока это не будет исправлено."
@@ -6207,6 +6558,9 @@
   },
   "e.g., notify-send 'Hello' && sleep 1": {
     "e.g., notify-send 'Hello' && sleep 1": "например, notify-send 'Hello' && sleep 1"
+  },
+  "e.g., scratch, /^tmp_.*/, build": {
+    "e.g., scratch, /^tmp_.*/, build": ""
   },
   "empty plugin list": {
     "No plugins found": "Дополнения не найдены"
@@ -6450,7 +6804,8 @@
     "Security key mode": ""
   },
   "lock screen U2F security key setting": {
-    "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)": ""
+    "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)": "",
+    "Use a security key for lock screen authentication.": ""
   },
   "lock screen notification mode option": {
     "App Names": "Имена приложений",
@@ -6470,6 +6825,12 @@
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl недоступен — интеграция блокировки требует подключения к сокету DMS"
+  },
+  "mangowc Discord Server": {
+    "mangowc Discord Server": ""
+  },
+  "mangowc GitHub": {
+    "mangowc GitHub": ""
   },
   "matugen color scheme option": {
     "Content": "Яркий",
@@ -6520,6 +6881,15 @@
     "Please wait...": "Пожалуйста, подождите…",
     "Select network": "Подключено",
     "WiFi off": "Подключено"
+  },
+  "niri GitHub": {
+    "niri GitHub": ""
+  },
+  "niri Matrix Chat": {
+    "niri Matrix Chat": ""
+  },
+  "niri/dms Discord": {
+    "niri/dms Discord": ""
   },
   "no custom theme file status": {
     "No custom theme file": "Нет пользовательского файла темы"
@@ -6660,6 +7030,9 @@
     "Performance": "Производительность",
     "Power Saver": "Экономия энергии"
   },
+  "power-profiles-daemon not available": {
+    "power-profiles-daemon not available": ""
+  },
   "primary color": {
     "Primary": "Основной"
   },
@@ -6680,6 +7053,9 @@
   },
   "qt theme env error title": {
     "Missing Environment Variables": "Отсутствующие переменные окружения"
+  },
+  "r/niri Subreddit": {
+    "r/niri Subreddit": ""
   },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "Настройки доступны только для чтения. Изменения не будут сохранены."
@@ -6945,5 +7321,8 @@
   },
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
     "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Навигация • Пробел: Развернуть • Enter: Действие/Развернуть • E: Текст"
+  },
+  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": {
+    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": ""
   }
 }

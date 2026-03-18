@@ -103,15 +103,6 @@ func debianPackageInstalledPrecisely(pkg string) bool {
 	return strings.TrimSpace(string(output)) == "installed"
 }
 
-func containsString(values []string, target string) bool {
-	for _, value := range values {
-		if value == target {
-			return true
-		}
-	}
-	return false
-}
-
 func debianRepoArchitecture(arch string) string {
 	switch arch {
 	case "amd64", "x86_64":

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -425,7 +426,7 @@ func openSUSENiriRuntimePackages(wm deps.WindowManager, disabledFlags map[string
 
 func (o *OpenSUSEDistribution) appendMissingSystemPackages(systemPkgs []string, extraPkgs []string) []string {
 	for _, pkg := range extraPkgs {
-		if containsString(systemPkgs, pkg) || o.packageInstalled(pkg) {
+		if slices.Contains(systemPkgs, pkg) || o.packageInstalled(pkg) {
 			continue
 		}
 
