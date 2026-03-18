@@ -21,12 +21,21 @@ Item {
     property var currentTab: NotepadStorageService.tabs.length > NotepadStorageService.currentTabIndex ? NotepadStorageService.tabs[NotepadStorageService.currentTabIndex] : null
     property bool showSettingsMenu: false
     property string pendingSaveContent: ""
+    property var slideout: null
 
     signal hideRequested
     signal previewRequested(string content)
 
     Ref {
         service: NotepadStorageService
+    }
+
+    Connections {
+        target: slideout
+        enabled: slideout !== null
+        function onAboutToHide() {
+            textEditor.autoSaveToSession()
+        }
     }
 
     function hasUnsavedChanges() {
@@ -204,7 +213,8 @@ Item {
             }
 
             onEscapePressed: {
-                root.hideRequested();
+                textEditor.autoSaveToSession()
+                root.hideRequested()
             }
 
             onSettingsRequested: {
