@@ -22,7 +22,6 @@ Singleton {
     property bool nightModeEnabled: false
 
     Component.onCompleted: {
-        Quickshell.execDetached(["mkdir", "-p", greetCfgDir]);
         loadMemory();
         loadSessionConfig();
     }

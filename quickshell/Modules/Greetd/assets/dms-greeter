@@ -87,8 +87,7 @@ exec_compositor() {
         exec "$@" > >(systemd-cat -t "dms-greeter/$log_tag" -p info) 2>&1
     fi
 
-    local log_file="$CACHE_DIR/$log_tag.log"
-    exec "$@" >> "$log_file" 2>&1
+    exec "$@"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -180,19 +179,10 @@ export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export EGL_PLATFORM=gbm
 export DMS_RUN_GREETER=1
 
-ensure_cache_tree() {
-    local base="$1"
-    mkdir -p "$base/.local/state" "$base/.local/state/wireplumber" "$base/.local/share" "$base/.cache"
-}
-
-if ! ensure_cache_tree "$CACHE_DIR" 2>/dev/null; then
-    FALLBACK_CACHE_DIR="/tmp/dms-greeter-${UID:-$(id -u)}"
-    echo "Warning: cache directory '$CACHE_DIR' is not writable; falling back to '$FALLBACK_CACHE_DIR'" >&2
-    CACHE_DIR="$FALLBACK_CACHE_DIR"
-    if ! ensure_cache_tree "$CACHE_DIR"; then
-        echo "Error: failed to initialize fallback cache directory '$CACHE_DIR'" >&2
-        exit 1
-    fi
+if [[ ! -d "$CACHE_DIR" ]]; then
+    echo "Error: cache directory '$CACHE_DIR' does not exist." >&2
+    echo "  Run 'dms greeter sync' to initialize it, or pass --cache-dir to an existing directory." >&2
+    exit 1
 fi
 
 export DMS_GREET_CFG_DIR="$CACHE_DIR"
