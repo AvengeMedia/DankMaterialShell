@@ -1490,6 +1490,19 @@ func checkGreeterStatus() error {
 	}
 	if stat, err := os.Stat(cacheDir); err == nil && stat.IsDir() {
 		fmt.Printf("  ✓ %s exists\n", cacheDir)
+		requiredSubdirs := []string{".local/state", ".local/share", ".cache"}
+		missingSubdirs := false
+		for _, sub := range requiredSubdirs {
+			subPath := filepath.Join(cacheDir, sub)
+			if _, err := os.Stat(subPath); os.IsNotExist(err) {
+				fmt.Printf("  ⚠ Missing required subdir: %s\n", subPath)
+				missingSubdirs = true
+			}
+		}
+		if missingSubdirs {
+			fmt.Println("    Run 'dms greeter sync' to initialize the cache directory structure.")
+			allGood = false
+		}
 	} else {
 		fmt.Printf("  ✗ %s not found\n", cacheDir)
 		fmt.Printf("    %s\n", packageInstallHint())
