@@ -12,7 +12,7 @@ Item {
         "zellij"
     ]
 
-DankFlickable {
+    DankFlickable {
         anchors.fill: parent
         clip: true
         contentHeight: mainColumn.height + Theme.spacingXL
@@ -79,7 +79,6 @@ DankFlickable {
                         onTextEdited: SettingsData.set("muxCustomCommand", text)
                     }
                 }
-
             }
 
             SettingsCard {

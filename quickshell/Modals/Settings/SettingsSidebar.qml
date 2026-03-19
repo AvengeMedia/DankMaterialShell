@@ -270,7 +270,7 @@ Rectangle {
                     "id": "multiplexers",
                     "text": I18n.tr("Multiplexers"),
                     "icon": "terminal",
-                    "tabIndex": 30
+                    "tabIndex": 32
                 },
                 {
                     "id": "window_rules",
