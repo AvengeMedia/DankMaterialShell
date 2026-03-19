@@ -130,6 +130,7 @@ Singleton {
     property string customThemeFile: ""
     property var registryThemeVariants: ({})
     property string matugenScheme: "scheme-tonal-spot"
+    property real matugenContrast: 0
     property bool runUserMatugenTemplates: true
     property string matugenTargetMonitor: ""
     property real popupTransparency: 1.0
@@ -484,9 +485,15 @@ Singleton {
     property bool matugenTemplateZed: true
 
     property var matugenTemplateNeovimSettings: ({
-        "dark": { "baseTheme": "github_dark", "harmony": 0.5 },
-        "light": { "baseTheme": "github_light", "harmony": 0.5 }
-    })
+            "dark": {
+                "baseTheme": "github_dark",
+                "harmony": 0.5
+            },
+            "light": {
+                "baseTheme": "github_light",
+                "harmony": 0.5
+            }
+        })
 
     property bool showDock: false
     property bool dockAutoHide: false
@@ -1320,9 +1327,7 @@ Singleton {
             return true;
 
         const msg = String(error || "").toLowerCase();
-        return msg.indexOf("file does not exist") !== -1
-                || msg.indexOf("no such file") !== -1
-                || msg.indexOf("enoent") !== -1;
+        return msg.indexOf("file does not exist") !== -1 || msg.indexOf("no such file") !== -1 || msg.indexOf("enoent") !== -1;
     }
 
     function loadPluginSettings() {
@@ -1940,6 +1945,12 @@ Singleton {
         if (typeof Theme !== "undefined") {
             Theme.generateSystemThemesFromCurrentTheme();
         }
+    }
+
+    function setMatugenContrast(value) {
+        if (matugenContrast === value)
+            return;
+        set("matugenContrast", value);
     }
 
     function setRunUserMatugenTemplates(enabled) {

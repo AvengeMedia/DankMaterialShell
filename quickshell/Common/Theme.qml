@@ -1249,10 +1249,7 @@ Singleton {
                 const defaults = themeData.variants.defaults || {};
                 const modeDefaults = defaults[colorMode] || defaults.dark || {};
                 const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
-		const stored = isGreeterMode ?
-		      (GreetdSettings.registryThemeVariants[themeId]?.[colorMode] || modeDefaults) :
-		      (typeof SettingsData !== "undefined" ?
-		       SettingsData.getRegistryThemeMultiVariant(themeId, modeDefaults, colorMode) : modeDefaults);
+                const stored = isGreeterMode ? (GreetdSettings.registryThemeVariants[themeId]?.[colorMode] || modeDefaults) : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, modeDefaults, colorMode) : modeDefaults);
                 var flavorId = stored.flavor || modeDefaults.flavor || "";
                 const accentId = stored.accent || modeDefaults.accent || "";
                 var flavor = findVariant(themeData.variants.flavors, flavorId);
@@ -1279,9 +1276,7 @@ Singleton {
 
             if (themeData.variants.options && themeData.variants.options.length > 0) {
                 const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
-                const selectedVariantId = isGreeterMode
-                    ? (typeof GreetdSettings.registryThemeVariants[themeId] === "string" ? GreetdSettings.registryThemeVariants[themeId] : themeData.variants.default)
-                    : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, themeData.variants.default) : themeData.variants.default);
+                const selectedVariantId = isGreeterMode ? (typeof GreetdSettings.registryThemeVariants[themeId] === "string" ? GreetdSettings.registryThemeVariants[themeId] : themeData.variants.default) : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, themeData.variants.default) : themeData.variants.default);
                 const variant = findVariant(themeData.variants.options, selectedVariantId);
                 if (variant) {
                     const variantColors = variant[colorMode] || variant.dark || variant.light || {};
@@ -1554,6 +1549,9 @@ Singleton {
         if (typeof SettingsData !== "undefined" && SettingsData.terminalsAlwaysDark) {
             args.push("--terminals-always-dark");
         }
+        if (typeof SettingsData !== "undefined" && SettingsData.matugenContrast !== 0) {
+            args.push("--contrast", SettingsData.matugenContrast.toString());
+        }
 
         if (typeof SettingsData !== "undefined") {
             const skipTemplates = [];
@@ -1654,12 +1652,8 @@ Singleton {
                         const darkDefaults = defaults.dark || {};
                         const lightDefaults = defaults.light || defaults.dark || {};
                         const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
-                        const storedDark = isGreeterMode
-                            ? (GreetdSettings.registryThemeVariants[themeId]?.dark || darkDefaults)
-                            : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, darkDefaults, "dark") : darkDefaults);
-                        const storedLight = isGreeterMode
-                            ? (GreetdSettings.registryThemeVariants[themeId]?.light || lightDefaults)
-                            : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, lightDefaults, "light") : lightDefaults);
+                        const storedDark = isGreeterMode ? (GreetdSettings.registryThemeVariants[themeId]?.dark || darkDefaults) : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, darkDefaults, "dark") : darkDefaults);
+                        const storedLight = isGreeterMode ? (GreetdSettings.registryThemeVariants[themeId]?.light || lightDefaults) : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, lightDefaults, "light") : lightDefaults);
                         const darkFlavorId = storedDark.flavor || darkDefaults.flavor || "";
                         const lightFlavorId = storedLight.flavor || lightDefaults.flavor || "";
                         const accentId = storedDark.accent || darkDefaults.accent || "";
@@ -1678,9 +1672,7 @@ Singleton {
                         }
                     } else if (customThemeRawData.variants.options) {
                         const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
-                        const selectedVariantId = isGreeterMode
-                            ? (typeof GreetdSettings.registryThemeVariants[themeId] === "string" ? GreetdSettings.registryThemeVariants[themeId] : customThemeRawData.variants.default)
-                            : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, customThemeRawData.variants.default) : customThemeRawData.variants.default);
+                        const selectedVariantId = isGreeterMode ? (typeof GreetdSettings.registryThemeVariants[themeId] === "string" ? GreetdSettings.registryThemeVariants[themeId] : customThemeRawData.variants.default) : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeVariant(themeId, customThemeRawData.variants.default) : customThemeRawData.variants.default);
                         const variant = findVariant(customThemeRawData.variants.options, selectedVariantId);
                         if (variant) {
                             darkTheme = mergeColors(darkTheme, variant.dark || {});

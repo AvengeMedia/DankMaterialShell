@@ -11,6 +11,7 @@ var SPEC = {
     customThemeFile: { def: "" },
     registryThemeVariants: { def: {} },
     matugenScheme: { def: "scheme-tonal-spot", onChange: "regenSystemThemes" },
+    matugenContrast: { def: 0, onChange: "regenSystemThemes" },
     runUserMatugenTemplates: { def: true, onChange: "regenSystemThemes" },
     matugenTargetMonitor: { def: "", onChange: "regenSystemThemes" },
 
@@ -299,10 +300,10 @@ var SPEC = {
     matugenTemplateZed: { def: true },
 
     matugenTemplateNeovimSettings: {
-      def: {
-        dark: { baseTheme: "github_dark", harmony: 0.5 },
-        light: { baseTheme: "github_light", harmony: 0.5 }
-      }
+        def: {
+            dark: { baseTheme: "github_dark", harmony: 0.5 },
+            light: { baseTheme: "github_light", harmony: 0.5 }
+        }
     },
 
     showDock: { def: false },

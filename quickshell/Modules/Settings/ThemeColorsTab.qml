@@ -517,7 +517,24 @@ Item {
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
-                            width: parent.width
+                            width: parent.width - Theme.spacingM * 2
+                            x: Theme.spacingM
+                        }
+
+                        SettingsSliderRow {
+                            tab: "theme"
+                            tags: ["matugen", "contrast", "dynamic"]
+                            settingKey: "matugenContrast"
+                            text: I18n.tr("Matugen Contrast")
+                            description: I18n.tr("Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)")
+                            value: Math.round(SettingsData.matugenContrast * 100)
+                            minimum: -100
+                            maximum: 100
+                            unit: "%"
+                            defaultValue: 0
+                            enabled: Theme.matugenAvailable
+                            opacity: enabled ? 1 : 0.4
+                            onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
                         }
                     }
 

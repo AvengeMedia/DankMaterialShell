@@ -99,6 +99,7 @@ type Options struct {
 	Mode                ColorMode
 	IconTheme           string
 	MatugenType         string
+	Contrast            float64
 	RunUserTemplates    bool
 	ColorsOnly          bool
 	StockColors         string
@@ -228,6 +229,7 @@ func buildOnce(opts *Options) (bool, error) {
 
 		log.Info("Running matugen color hex with stock color overrides")
 		args := []string{"color", "hex", primaryDark, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name()}
+		args = appendContrastArg(args, opts.Contrast)
 		args = append(args, importArgs...)
 		if err := runMatugen(args); err != nil {
 			return false, err
@@ -264,6 +266,7 @@ func buildOnce(opts *Options) (bool, error) {
 			args = []string{opts.Kind, opts.Value}
 		}
 		args = append(args, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name())
+		args = appendContrastArg(args, opts.Contrast)
 		args = append(args, importArgs...)
 		if err := runMatugen(args); err != nil {
 			return false, err
@@ -297,6 +300,13 @@ func buildOnce(opts *Options) (bool, error) {
 	signalTerminals(opts)
 
 	return true, nil
+}
+
+func appendContrastArg(args []string, contrast float64) []string {
+	if contrast == 0 {
+		return args
+	}
+	return append(args, "--contrast", strconv.FormatFloat(contrast, 'f', -1, 64))
 }
 
 func buildMergedConfig(opts *Options, cfgFile *os.File, tmpDir string) error {
@@ -687,6 +697,7 @@ func execDryRun(opts *Options, flags matugenFlags) (string, error) {
 		baseArgs = []string{opts.Kind, opts.Value}
 	}
 	baseArgs = append(baseArgs, "-m", "dark", "-t", opts.MatugenType, "--json", "hex", "--dry-run")
+	baseArgs = appendContrastArg(baseArgs, opts.Contrast)
 	if flags.isV4 {
 		baseArgs = append(baseArgs, "--source-color-index", "0", "--old-json-output")
 	}
