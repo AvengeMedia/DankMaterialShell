@@ -41,6 +41,7 @@ FocusScope {
         editCommentField.text = existing?.comment || "";
         editEnvVarsField.text = existing?.envVars || "";
         editExtraFlagsField.text = existing?.extraFlags || "";
+        editDgpuToggle.checked = existing?.launchOnDgpu || false;
         editMode = true;
         Qt.callLater(() => editNameField.forceActiveFocus());
     }
@@ -64,6 +65,8 @@ FocusScope {
             override.envVars = editEnvVarsField.text.trim();
         if (editExtraFlagsField.text.trim())
             override.extraFlags = editExtraFlagsField.text.trim();
+        if (editDgpuToggle.checked)
+            override.launchOnDgpu = true;
         SessionData.setAppOverride(editAppId, override);
         closeEditMode();
     }
@@ -232,7 +235,7 @@ FocusScope {
             return;
         case Qt.Key_Backtab:
             if (hasCtrl && actionPanel.expanded) {
-                const reverse = true
+                const reverse = true;
                 actionPanel.expanded ? actionPanel.cycleAction(reverse) : actionPanel.show();
                 return;
             }
@@ -578,7 +581,6 @@ FocusScope {
                         }
                     }
                 }
-
             }
 
             Item {
@@ -970,6 +972,15 @@ FocusScope {
                             keyNavigationTab: editNameField
                             keyNavigationBacktab: editEnvVarsField
                         }
+                    }
+
+                    DankToggle {
+                        id: editDgpuToggle
+                        width: parent.width
+                        text: I18n.tr("Launch on dGPU by default")
+                        visible: SessionService.nvidiaCommand.length > 0
+                        checked: false
+                        onToggled: checked => editDgpuToggle.checked = checked
                     }
                 }
             }
