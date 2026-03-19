@@ -775,6 +775,11 @@ Item {
         }
 
         onWheel: wheel => {
+            if (Math.abs(wheel.angleDelta.x) > Math.abs(wheel.angleDelta.y)) {
+                wheel.accepted = false;
+                return;
+            }
+
             if (scrollInProgress)
                 return;
 
