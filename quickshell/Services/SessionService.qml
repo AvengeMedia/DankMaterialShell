@@ -211,11 +211,13 @@ Singleton {
 
     function launchDesktopEntry(desktopEntry, useNvidia) {
         let cmd = desktopEntry.command;
-        if (useNvidia && nvidiaCommand)
-            cmd = [nvidiaCommand].concat(cmd);
 
         const appId = desktopEntry.id || desktopEntry.execString || desktopEntry.exec || "";
         const override = SessionData.getAppOverride(appId);
+
+        const dgpu = useNvidia || (override?.launchOnDgpu && nvidiaCommand);
+        if (dgpu && nvidiaCommand)
+            cmd = [nvidiaCommand].concat(cmd);
 
         if (override?.extraFlags) {
             const extraArgs = override.extraFlags.trim().split(/\s+/).filter(arg => arg.length > 0);
@@ -265,7 +267,11 @@ Singleton {
 
     function launchDesktopAction(desktopEntry, action, useNvidia) {
         let cmd = action.command;
-        if (useNvidia && nvidiaCommand)
+
+        const appId = desktopEntry.id || desktopEntry.execString || desktopEntry.exec || "";
+        const override = SessionData.getAppOverride(appId);
+        const dgpu = useNvidia || (override?.launchOnDgpu && nvidiaCommand);
+        if (dgpu && nvidiaCommand)
             cmd = [nvidiaCommand].concat(cmd);
 
         const userPrefix = SettingsData.launchPrefix?.trim() || "";

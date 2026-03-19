@@ -188,7 +188,7 @@ Variants {
 
             Component.onCompleted: {
                 if (typeof wallpaperWindow.updatesEnabled !== "undefined")
-                    wallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+                    wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
 
                 if (!source) {
                     root._renderSettling = false;
@@ -289,6 +289,9 @@ Variants {
                     break;
                 }
 
+                root._renderSettling = true;
+                renderSettleTimer.restart();
+
                 nextWallpaper.source = newPath;
 
                 if (nextWallpaper.status === Image.Ready)
@@ -339,6 +342,8 @@ Variants {
                     if (status !== Image.Ready)
                         return;
                     if (root.actualTransitionType === "none") {
+                        root._renderSettling = true;
+                        renderSettleTimer.restart();
                         currentWallpaper.source = source;
                         nextWallpaper.source = "";
                         root.transitionProgress = 0.0;

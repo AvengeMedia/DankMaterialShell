@@ -86,7 +86,7 @@ Variants {
 
             Component.onCompleted: {
                 if (typeof blurWallpaperWindow.updatesEnabled !== "undefined")
-                    blurWallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+                    blurWallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
                 isInitialized = true;
             }
 
@@ -167,6 +167,8 @@ Variants {
                     transitionAnimation.stop();
                     root.transitionProgress = 0;
                     root.effectActive = false;
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                     currentWallpaper.source = nextWallpaper.source;
                     nextWallpaper.source = "";
                 }
@@ -174,6 +176,9 @@ Variants {
                     setWallpaperImmediate(newPath);
                     return;
                 }
+
+                root._renderSettling = true;
+                renderSettleTimer.restart();
 
                 nextWallpaper.source = newPath;
 
