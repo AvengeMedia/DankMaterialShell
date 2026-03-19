@@ -244,8 +244,8 @@ FocusScope {
         Loader {
             id: greeterLoader
             anchors.fill: parent
-            active: root.currentIndex === 31
-            visible: active
+            active: false
+            visible: false
             focus: active
 
             sourceComponent: GreeterTab {}

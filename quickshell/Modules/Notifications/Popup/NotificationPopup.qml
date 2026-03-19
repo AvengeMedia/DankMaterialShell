@@ -187,7 +187,7 @@ PanelWindow {
     readonly property real maxPopupShadowBlurPx: Math.max((Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined) ? Theme.elevationLevel3.blurPx : 12, (Theme.elevationLevel4 && Theme.elevationLevel4.blurPx !== undefined) ? Theme.elevationLevel4.blurPx : 16)
     readonly property real maxPopupShadowOffsetXPx: Math.max(Math.abs(Theme.elevationOffsetX(Theme.elevationLevel3)), Math.abs(Theme.elevationOffsetX(Theme.elevationLevel4)))
     readonly property real maxPopupShadowOffsetYPx: Math.max(Math.abs(Theme.elevationOffsetY(Theme.elevationLevel3, 6)), Math.abs(Theme.elevationOffsetY(Theme.elevationLevel4, 8)))
-    readonly property real windowShadowPad: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
+    readonly property real windowShadowPad: SettingsData.notificationPopupShadowEnabled ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
 
     anchors.top: true
     anchors.left: true
@@ -352,7 +352,7 @@ PanelWindow {
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
-        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled
+        readonly property bool shadowsAllowed: SettingsData.notificationPopupShadowEnabled
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
         readonly property real cardInset: Theme.snap(4, win.dpr)
         readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)) + 8), win.dpr) : 0

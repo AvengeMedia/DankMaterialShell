@@ -1640,6 +1640,7 @@ Item {
                     description: I18n.tr("Material inspired shadows and elevation on modals, popouts, and dialogs")
                     checked: SettingsData.m3ElevationEnabled ?? true
                     onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
+                    visible: false
                 }
 
                 SettingsSliderRow {

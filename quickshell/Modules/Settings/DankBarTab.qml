@@ -1049,50 +1049,20 @@ Item {
             SettingsCard {
                 id: shadowCard
                 iconName: "layers"
-                title: I18n.tr("Shadow Override", "bar shadow settings card")
+                title: I18n.tr("Shadow", "bar shadow settings card")
                 settingKey: "barShadow"
                 collapsible: true
-                expanded: true
+                expanded: false
                 visible: selectedBarConfig?.enabled
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
-                readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"
-                readonly property string directionSource: selectedBarConfig?.shadowDirectionMode ?? "inherit"
-
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("Enable a custom override below to set per-bar shadow intensity, opacity, and color.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("Custom Shadow Override")
-                    description: I18n.tr("Override the global shadow with per-bar settings")
-                    checked: shadowCard.shadowActive
-                    onToggled: checked => {
-                        if (checked) {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowIntensity: 12,
-                                shadowOpacity: 60
-                            });
-                        } else {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowIntensity: 0
-                            });
-                        }
-                    }
-                }
+                readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "text") === "custom"
 
                 SettingsSliderRow {
-                    visible: shadowCard.shadowActive
                     text: I18n.tr("Intensity", "shadow intensity slider")
                     minimum: 0
                     maximum: 100
-                    unit: "px"
-                    defaultValue: 12
+                    unit: "%"
                     value: selectedBarConfig?.shadowIntensity ?? 0
                     onSliderValueChanged: newValue => SettingsData.updateBarConfig(selectedBarId, {
                             shadowIntensity: newValue
@@ -1110,78 +1080,6 @@ Item {
                     onSliderValueChanged: newValue => SettingsData.updateBarConfig(selectedBarId, {
                             shadowOpacity: newValue
                         })
-                }
-
-                SettingsDropdownRow {
-                    visible: shadowCard.shadowActive
-                    text: I18n.tr("Direction Source", "bar shadow direction source")
-                    description: I18n.tr("Choose how this bar resolves shadow direction")
-                    settingKey: "barShadowDirectionSource"
-                    options: [I18n.tr("Inherit Global (Default)", "bar shadow direction source option"), I18n.tr("Auto (Bar-aware)", "bar shadow direction source option"), I18n.tr("Manual", "bar shadow direction source option")]
-                    currentValue: {
-                        switch (shadowCard.directionSource) {
-                        case "autoBar":
-                            return I18n.tr("Auto (Bar-aware)", "bar shadow direction source option");
-                        case "manual":
-                            return I18n.tr("Manual", "bar shadow direction source option");
-                        default:
-                            return I18n.tr("Inherit Global (Default)", "bar shadow direction source option");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Auto (Bar-aware)", "bar shadow direction source option")) {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowDirectionMode: "autoBar"
-                            });
-                        } else if (value === I18n.tr("Manual", "bar shadow direction source option")) {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowDirectionMode: "manual"
-                            });
-                        } else {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowDirectionMode: "inherit"
-                            });
-                        }
-                    }
-                }
-
-                SettingsDropdownRow {
-                    visible: shadowCard.shadowActive && shadowCard.directionSource === "manual"
-                    text: I18n.tr("Manual Direction", "bar manual shadow direction")
-                    description: I18n.tr("Use a fixed shadow direction for this bar")
-                    settingKey: "barShadowDirectionManual"
-                    options: [I18n.tr("Top", "shadow direction option"), I18n.tr("Top Left", "shadow direction option"), I18n.tr("Top Right", "shadow direction option"), I18n.tr("Bottom", "shadow direction option")]
-                    currentValue: {
-                        switch (selectedBarConfig?.shadowDirection) {
-                        case "topLeft":
-                            return I18n.tr("Top Left", "shadow direction option");
-                        case "topRight":
-                            return I18n.tr("Top Right", "shadow direction option");
-                        case "bottom":
-                            return I18n.tr("Bottom", "shadow direction option");
-                        default:
-                            return I18n.tr("Top", "shadow direction option");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Top Left", "shadow direction option")) {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowDirection: "topLeft"
-                            });
-                        } else if (value === I18n.tr("Top Right", "shadow direction option")) {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowDirection: "topRight"
-                            });
-                        } else if (value === I18n.tr("Bottom", "shadow direction option")) {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowDirection: "bottom"
-                            });
-                        } else {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                shadowDirection: "top"
-                            });
-                        }
-                    }
                 }
 
                 Column {
@@ -1208,10 +1106,10 @@ Item {
                             buttonPadding: parent.width < 420 ? Theme.spacingXS : Theme.spacingS
                             minButtonWidth: parent.width < 420 ? 36 : 56
                             textSize: parent.width < 420 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                            model: [I18n.tr("Default (Black)"), I18n.tr("Surface", "shadow color option"), I18n.tr("Primary"), I18n.tr("Secondary"), I18n.tr("Custom")]
+                            model: [I18n.tr("Text", "shadow color option"), I18n.tr("Surface", "shadow color option"), I18n.tr("Primary"), I18n.tr("Secondary"), I18n.tr("Custom")]
                             selectionMode: "single"
                             currentIndex: {
-                                switch (selectedBarConfig?.shadowColorMode || "default") {
+                                switch (selectedBarConfig?.shadowColorMode || "text") {
                                 case "surface":
                                     return 1;
                                 case "primary":
@@ -1227,7 +1125,7 @@ Item {
                             onSelectionChanged: (index, selected) => {
                                 if (!selected)
                                     return;
-                                let mode = "default";
+                                let mode = "text";
                                 switch (index) {
                                 case 1:
                                     mode = "surface";

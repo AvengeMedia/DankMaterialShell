@@ -18,7 +18,7 @@ FloatingWindow {
     }
 
     objectName: "changelogModal"
-    title: i18n("What's New")
+    title: I18n.tr("What's New")
     minimumSize: Qt.size(modalWidth, modalHeight)
     maximumSize: Qt.size(modalWidth, modalHeight)
     color: Theme.surfaceContainer
@@ -81,7 +81,7 @@ FloatingWindow {
                     onClicked: root.dismiss()
 
                     DankTooltip {
-                        text: i18n("Close")
+                        text: I18n.tr("Close")
                     }
                 }
             }
@@ -125,7 +125,7 @@ FloatingWindow {
                 spacing: Theme.spacingM
 
                 DankButton {
-                    text: i18n("Read Full Release Notes")
+                    text: I18n.tr("Read Full Release Notes")
                     iconName: "open_in_new"
                     backgroundColor: Theme.surfaceContainerHighest
                     textColor: Theme.surfaceText
@@ -133,7 +133,7 @@ FloatingWindow {
                 }
 
                 DankButton {
-                    text: i18n("Got It")
+                    text: I18n.tr("Got It")
                     iconName: "check"
                     backgroundColor: Theme.primary
                     textColor: Theme.primaryText

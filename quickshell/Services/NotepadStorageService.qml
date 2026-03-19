@@ -260,28 +260,6 @@ Singleton {
         saveMetadata()
     }
 
-    function reorderTab(fromIndex, toIndex) {
-        if (fromIndex < 0 || fromIndex >= tabs.length || toIndex < 0 || toIndex >= tabs.length)
-            return
-        if (fromIndex === toIndex)
-            return
-
-        var newTabs = tabs.slice()
-        var moved = newTabs.splice(fromIndex, 1)[0]
-        newTabs.splice(toIndex, 0, moved)
-        tabs = newTabs
-
-        if (currentTabIndex === fromIndex) {
-            currentTabIndex = toIndex
-        } else if (fromIndex < currentTabIndex && toIndex >= currentTabIndex) {
-            currentTabIndex--
-        } else if (fromIndex > currentTabIndex && toIndex <= currentTabIndex) {
-            currentTabIndex++
-        }
-
-        saveMetadata()
-    }
-
     function saveTabAs(tabIndex, userPath) {
         if (tabIndex < 0 || tabIndex >= tabs.length) return
 
