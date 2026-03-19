@@ -81,7 +81,7 @@ DankModal {
 
                     StyledText {
                         Layout.alignment: Qt.AlignLeft
-                        text: KeybindsService.cheatsheet.title || "Keybinds"
+                        text: KeybindsService.cheatsheet.title || i18n("Keybinds")
                         font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Bold
                         color: Theme.primary
@@ -309,10 +309,12 @@ DankModal {
                                                                         id: keyText
                                                                         anchors.centerIn: parent
                                                                         color: Theme.secondary
-                                                                        text: modelData.key || ""
+                                                                        text: (modelData.key || "").replace(/\+/g, " + ")
                                                                         font.pixelSize: Theme.fontSizeSmall
                                                                         font.weight: Font.Medium
                                                                         isMonospace: true
+                                                                        elide: Text.ElideRight
+                                                                        width: Math.min(implicitWidth, 148)
                                                                     }
                                                                 }
 
@@ -325,6 +327,7 @@ DankModal {
                                                                     font.pixelSize: Theme.fontSizeSmall
                                                                     opacity: 0.9
                                                                     elide: Text.ElideRight
+                                                                    wrapMode: Text.NoWrap
                                                                 }
                                                             }
                                                         }
