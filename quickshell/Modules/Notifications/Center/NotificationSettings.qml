@@ -6,10 +6,11 @@ Rectangle {
     id: root
 
     property bool expanded: false
-    readonly property real contentHeight: contentColumn.height + Theme.spacingL * 2
+    property real maxAllowedHeight: 0
+    readonly property real naturalContentHeight: contentColumn.height + Theme.spacingL * 2
 
     width: parent.width
-    height: expanded ? contentHeight : 0
+    height: expanded ? (maxAllowedHeight > 0 ? Math.min(naturalContentHeight, maxAllowedHeight) : naturalContentHeight) : 0
     visible: expanded
     clip: true
     radius: Theme.cornerRadius
@@ -105,13 +106,22 @@ Rectangle {
         return Math.round(value / 60000) + " minutes";
     }
 
-    Column {
-        id: contentColumn
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: Theme.spacingL
-        spacing: Theme.spacingM
+    Flickable {
+        id: settingsFlickable
+        anchors.fill: parent
+        contentHeight: contentColumn.height + Theme.spacingL * 2
+        clip: true
+        flickableDirection: Flickable.VerticalFlick
+        boundsBehavior: Flickable.DragAndOvershootBounds
+        interactive: root.naturalContentHeight > root.height
+
+        Column {
+            id: contentColumn
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: Theme.spacingL
+            spacing: Theme.spacingM
 
         StyledText {
             text: I18n.tr("Notification Settings")
@@ -420,5 +430,6 @@ Rectangle {
                 onToggled: toggled => SettingsData.set("notificationHistorySaveCritical", toggled)
             }
         }
+    }
     }
 }
