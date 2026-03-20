@@ -64,6 +64,7 @@ Singleton {
     property var suspendMonitor: null
     property var lockComponent: null
     property bool monitorsOff: false
+    property bool isShellLocked: false
 
     function wake() {
         requestMonitorOn();

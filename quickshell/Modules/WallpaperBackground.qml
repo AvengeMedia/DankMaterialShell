@@ -151,6 +151,16 @@ Variants {
                 }
             }
 
+            Connections {
+                target: IdleService
+                function onIsShellLockedChanged() {
+                    if (!IdleService.isShellLocked) {
+                        root._renderSettling = true;
+                        renderSettleTimer.restart();
+                    }
+                }
+            }
+
             Timer {
                 id: renderSettleTimer
                 interval: 1000
