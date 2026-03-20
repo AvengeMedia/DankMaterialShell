@@ -192,6 +192,9 @@ func runShellInteractive(session bool) {
 		}
 	}
 
+	// ! TODO - remove when QS 0.3 is up and we can use the pragma
+	cmd.Env = append(cmd.Env, "QS_APP_ID=com.danklinux.dms")
+
 	if isSessionManaged && hasSystemdRun() {
 		cmd.Env = append(cmd.Env, "DMS_DEFAULT_LAUNCH_PREFIX=systemd-run --user --scope")
 	}
@@ -431,6 +434,9 @@ func runShellDaemon(session bool) {
 			cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)
 		}
 	}
+
+	// ! TODO - remove when QS 0.3 is up and we can use the pragma
+	cmd.Env = append(cmd.Env, "QS_APP_ID=com.danklinux.dms")
 
 	if isSessionManaged && hasSystemdRun() {
 		cmd.Env = append(cmd.Env, "DMS_DEFAULT_LAUNCH_PREFIX=systemd-run --user --scope")
