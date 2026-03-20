@@ -14,6 +14,7 @@ Scope {
     property bool shouldLock: false
 
     onShouldLockChanged: {
+        IdleService.isShellLocked = shouldLock;
         if (shouldLock && lockPowerOffArmed) {
             lockStateCheck.restart();
         }
