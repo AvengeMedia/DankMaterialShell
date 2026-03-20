@@ -194,10 +194,11 @@ Singleton {
                 var timer = monitorTimers[screenName];
                 if (!timer && monitorTimerComponent && monitorTimerComponent.status === Component.Ready) {
                     var newTimers = Object.assign({}, monitorTimers);
-                    newTimers[screenName] = monitorTimerComponent.createObject(root);
-                    newTimers[screenName].targetScreen = screenName;
+                    var newTimer = monitorTimerComponent.createObject(root);
+                    newTimer.targetScreen = screenName;
+                    newTimers[screenName] = newTimer;
                     monitorTimers = newTimers;
-                    timer = monitorTimers[screenName];
+                    timer = newTimer;
                 }
                 if (timer) {
                     timer.interval = settings.interval * 1000;
@@ -258,9 +259,10 @@ Singleton {
             var process = monitorProcesses[screenName];
             if (!process) {
                 var newProcesses = Object.assign({}, monitorProcesses);
-                newProcesses[screenName] = monitorProcessComponent.createObject(root);
+                var newProcess = monitorProcessComponent.createObject(root);
+                newProcesses[screenName] = newProcess;
                 monitorProcesses = newProcesses;
-                process = monitorProcesses[screenName];
+                process = newProcess;
             }
 
             if (process) {
@@ -290,9 +292,10 @@ Singleton {
             var process = monitorProcesses[screenName];
             if (!process) {
                 var newProcesses = Object.assign({}, monitorProcesses);
-                newProcesses[screenName] = monitorProcessComponent.createObject(root);
+                var newProcess = monitorProcessComponent.createObject(root);
+                newProcesses[screenName] = newProcess;
                 monitorProcesses = newProcesses;
-                process = monitorProcesses[screenName];
+                process = newProcess;
             }
 
             if (process) {
