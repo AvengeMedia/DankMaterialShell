@@ -93,10 +93,10 @@ Variants {
             Connections {
                 target: currentWallpaper
                 function onStatusChanged() {
-                    if (currentWallpaper.status === Image.Ready) {
-                        root._renderSettling = true;
-                        renderSettleTimer.restart();
-                    }
+                    if (currentWallpaper.status !== Image.Ready && currentWallpaper.status !== Image.Error)
+                        return;
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                 }
             }
 
@@ -188,7 +188,7 @@ Variants {
 
             Component.onCompleted: {
                 if (typeof wallpaperWindow.updatesEnabled !== "undefined")
-                    wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+                    wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || root.pendingWallpaper !== "" || root._deferredSource !== "" || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
 
                 if (!source) {
                     root._renderSettling = false;
@@ -320,6 +320,7 @@ Variants {
                 opacity: 1
                 layer.enabled: false
                 asynchronous: true
+                retainWhileLoading: true
                 smooth: true
                 cache: true
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
@@ -333,6 +334,7 @@ Variants {
                 opacity: 0
                 layer.enabled: false
                 asynchronous: true
+                retainWhileLoading: true
                 smooth: true
                 cache: true
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
@@ -591,6 +593,8 @@ Variants {
                     root.transitionProgress = 0.0;
                     currentWallpaper.layer.enabled = false;
                     nextWallpaper.layer.enabled = false;
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                     root.effectActive = false;
 
                     if (!root.pendingWallpaper)
