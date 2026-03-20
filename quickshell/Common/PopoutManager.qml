@@ -12,6 +12,27 @@ Singleton {
     signal popoutOpening
     signal popoutChanged
 
+    function _closePopout(popout) {
+        switch (true) {
+        case popout.dashVisible !== undefined:
+            popout.dashVisible = false;
+            return;
+        case popout.notificationHistoryVisible !== undefined:
+            popout.notificationHistoryVisible = false;
+            return;
+        default:
+            popout.close();
+        }
+    }
+
+    function _isStale(popout) {
+        try {
+            return !popout || !("shouldBeVisible" in popout);
+        } catch (e) {
+            return true;
+        }
+    }
+
     function showPopout(popout) {
         if (!popout || !popout.screen)
             return;
@@ -23,13 +44,11 @@ Singleton {
             const otherPopout = currentPopoutsByScreen[otherScreenName];
             if (!otherPopout || otherPopout === popout)
                 continue;
-            if (otherPopout.dashVisible !== undefined) {
-                otherPopout.dashVisible = false;
-            } else if (otherPopout.notificationHistoryVisible !== undefined) {
-                otherPopout.notificationHistoryVisible = false;
-            } else {
-                otherPopout.close();
+            if (_isStale(otherPopout)) {
+                currentPopoutsByScreen[otherScreenName] = null;
+                continue;
             }
+            _closePopout(otherPopout);
         }
 
         currentPopoutsByScreen[screenName] = popout;
@@ -51,15 +70,9 @@ Singleton {
     function closeAllPopouts() {
         for (const screenName in currentPopoutsByScreen) {
             const popout = currentPopoutsByScreen[screenName];
-            if (!popout)
+            if (!popout || _isStale(popout))
                 continue;
-            if (popout.dashVisible !== undefined) {
-                popout.dashVisible = false;
-            } else if (popout.notificationHistoryVisible !== undefined) {
-                popout.notificationHistoryVisible = false;
-            } else {
-                popout.close();
-            }
+            _closePopout(popout);
         }
         currentPopoutsByScreen = {};
     }
@@ -90,6 +103,12 @@ Singleton {
             if (!otherPopout)
                 continue;
 
+            if (_isStale(otherPopout)) {
+                currentPopoutsByScreen[otherScreenName] = null;
+                currentPopoutTriggers[otherScreenName] = null;
+                continue;
+            }
+
             if (otherPopout === popout) {
                 movedFromOtherScreen = true;
                 currentPopoutsByScreen[otherScreenName] = null;
@@ -97,45 +116,26 @@ Singleton {
                 continue;
             }
 
-            if (otherPopout.dashVisible !== undefined) {
-                otherPopout.dashVisible = false;
-            } else if (otherPopout.notificationHistoryVisible !== undefined) {
-                otherPopout.notificationHistoryVisible = false;
-            } else {
-                otherPopout.close();
-            }
+            _closePopout(otherPopout);
         }
 
         if (currentPopout && currentPopout !== popout) {
-            if (currentPopout.dashVisible !== undefined) {
-                currentPopout.dashVisible = false;
-            } else if (currentPopout.notificationHistoryVisible !== undefined) {
-                currentPopout.notificationHistoryVisible = false;
+            if (_isStale(currentPopout)) {
+                currentPopoutsByScreen[screenName] = null;
+                currentPopoutTriggers[screenName] = null;
             } else {
-                currentPopout.close();
+                _closePopout(currentPopout);
             }
         }
 
         if (currentPopout === popout && popout.shouldBeVisible && !movedFromOtherScreen) {
             if (triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId) {
-                if (popout.dashVisible !== undefined) {
-                    popout.dashVisible = false;
-                } else if (popout.notificationHistoryVisible !== undefined) {
-                    popout.notificationHistoryVisible = false;
-                } else {
-                    popout.close();
-                }
+                _closePopout(popout);
                 return;
             }
 
             if (triggerId === undefined) {
-                if (popout.dashVisible !== undefined) {
-                    popout.dashVisible = false;
-                } else if (popout.notificationHistoryVisible !== undefined) {
-                    popout.notificationHistoryVisible = false;
-                } else {
-                    popout.close();
-                }
+                _closePopout(popout);
                 return;
             }
 
