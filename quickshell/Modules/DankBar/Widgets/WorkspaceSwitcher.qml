@@ -286,7 +286,7 @@ Item {
             const key = isActiveWs || !SettingsData.groupWorkspaceApps ? `${moddedId}_${i}` : moddedId;
 
             if (!byApp[key]) {
-                const isQuickshell = keyBase === "org.quickshell";
+                const isQuickshell = keyBase === "org.quickshell" || keyBase === "com.danklinux.dms";
                 const isSteamApp = Paths.isSteamApp(moddedId);
                 const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
                 const icon = Paths.getAppIcon(moddedId, desktopEntry);

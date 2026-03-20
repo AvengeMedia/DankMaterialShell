@@ -990,7 +990,7 @@ BasePill {
                                     break;
                                 }
 
-                                const shouldHidePin = modelData.appId === "org.quickshell";
+                                const shouldHidePin = modelData.appId === "org.quickshell" || modelData.appId === "com.danklinux.dms";
                                 const moddedId = Paths.moddedAppId(modelData.appId);
                                 const desktopEntry = moddedId ? DesktopEntries.heuristicLookup(moddedId) : null;
 
