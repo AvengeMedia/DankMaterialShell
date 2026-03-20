@@ -477,7 +477,7 @@ FocusScope {
         Loader {
             id: muxLoader
             anchors.fill: parent
-            active: root.currentIndex === 30
+            active: root.currentIndex === 32
             visible: active
             focus: active
 

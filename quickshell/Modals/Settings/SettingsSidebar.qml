@@ -156,7 +156,7 @@ Rectangle {
                 {
                     "id": "running_apps",
                     "text": I18n.tr("Running Apps"),
-                    "icon": "apps",
+                    "icon": "app_registration",
                     "tabIndex": 19,
                     "hyprlandNiriOnly": true
                 },
@@ -237,7 +237,7 @@ Rectangle {
         {
             "id": "system",
             "text": I18n.tr("System"),
-            "icon": "computer",
+            "icon": "memory",
             "collapsedByDefault": true,
             "children": [
                 {
@@ -264,7 +264,7 @@ Rectangle {
                     "id": "multiplexers",
                     "text": I18n.tr("Multiplexers"),
                     "icon": "terminal",
-                    "tabIndex": 30
+                    "tabIndex": 32
                 },
                 {
                     "id": "window_rules",
