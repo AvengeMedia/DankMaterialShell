@@ -2485,23 +2485,6 @@
     ]
   },
   {
-    "section": "matugenTemplateZed",
-    "label": "Zed",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "look",
-      "matugen",
-      "scheme",
-      "style",
-      "template",
-      "theme",
-      "zed"
-    ]
-  },
-  {
     "section": "matugenTemplateFirefox",
     "label": "Firefox",
     "tabIndex": 10,
@@ -3536,6 +3519,23 @@
     "description": "Rounded corners for windows (decoration.rounding)"
   },
   {
+    "section": "matugenTemplateZed",
+    "label": "Zed",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme",
+      "zed"
+    ]
+  },
+  {
     "section": "matugenTemplateDgop",
     "label": "dgop",
     "tabIndex": 10,
@@ -3775,18 +3775,14 @@
       "authentication",
       "biometric",
       "enable",
-      "enrolled",
       "fingerprint",
       "fprint",
       "lock",
-      "lockscreen",
       "login",
       "password",
-      "reader",
       "screen",
       "security"
-    ],
-    "description": "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)"
+    ]
   },
   {
     "section": "loginctlLockIntegration",
@@ -3810,6 +3806,26 @@
       "signals"
     ],
     "description": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen"
+  },
+  {
+    "section": "enableU2f",
+    "label": "Enable security key authentication",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authentication",
+      "enable",
+      "fido",
+      "hardware",
+      "key",
+      "lock",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "u2f",
+      "yubikey"
+    ]
   },
   {
     "section": "lockDisplay",
@@ -3981,6 +3997,25 @@
       "turn"
     ],
     "description": "Turn off all displays immediately when the lock screen activates"
+  },
+  {
+    "section": "u2fMode",
+    "label": "Security key mode",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "factor",
+      "key",
+      "lock",
+      "login",
+      "mode",
+      "password",
+      "screen",
+      "second",
+      "security",
+      "u2f",
+      "yubikey"
+    ]
   },
   {
     "section": "lockScreenShowMediaPlayer",

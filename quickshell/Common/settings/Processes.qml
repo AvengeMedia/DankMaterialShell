@@ -57,10 +57,6 @@ Singleton {
         qtToolsDetectionProcess.running = true;
     }
 
-    function detectFprintd() {
-        fprintdDetectionProcess.running = true;
-    }
-
     function detectAuthCapabilities() {
         if (!settingsRoot)
             return;
