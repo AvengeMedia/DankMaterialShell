@@ -173,12 +173,18 @@ DankPopout {
 
             property var externalKeyboardController: null
             property real cachedHeaderHeight: 32
+            readonly property real settingsMaxHeight: {
+                const screenH = root.screen ? root.screen.height : 1080;
+                const maxPopupH = screenH * 0.8;
+                const overhead = cachedHeaderHeight + Theme.spacingL * 2 + Theme.spacingM * 2;
+                return Math.max(200, maxPopupH - overhead - 150);
+            }
             implicitHeight: {
                 let baseHeight = Theme.spacingL * 2;
                 baseHeight += cachedHeaderHeight;
                 baseHeight += Theme.spacingM * 2;
 
-                const settingsHeight = notificationSettings.expanded ? notificationSettings.contentHeight : 0;
+                const settingsHeight = notificationSettings.expanded ? Math.min(notificationSettings.naturalContentHeight, settingsMaxHeight) : 0;
                 const currentListHeight = root.shouldBeVisible ? notificationList.stableContentHeight : notificationList.listContentHeight;
                 let listHeight = notificationHeader.currentTab === 0 ? currentListHeight : Math.max(200, NotificationService.historyList.length * 80);
                 if (notificationHeader.currentTab === 0 && NotificationService.groupedNotifications.length === 0) {
@@ -272,6 +278,7 @@ DankPopout {
                     NotificationSettings {
                         id: notificationSettings
                         expanded: notificationHeader.showSettings
+                        maxAllowedHeight: notificationContent.settingsMaxHeight
                     }
 
                     Item {
