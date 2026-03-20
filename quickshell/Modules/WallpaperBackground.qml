@@ -84,17 +84,19 @@ Variants {
             readonly property bool transitioning: transitionAnimation.running
             property bool effectActive: false
             property bool _renderSettling: true
+            property bool _overviewBlurSettling: false
             property bool useNextForEffect: false
             property string pendingWallpaper: ""
             property string _deferredSource: ""
+            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
 
             Connections {
                 target: currentWallpaper
                 function onStatusChanged() {
-                    if (currentWallpaper.status === Image.Ready) {
-                        root._renderSettling = true;
-                        renderSettleTimer.restart();
-                    }
+                    if (currentWallpaper.status !== Image.Ready && currentWallpaper.status !== Image.Error)
+                        return;
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                 }
             }
 
@@ -121,6 +123,22 @@ Variants {
             }
 
             Connections {
+                target: NiriService
+                function onInOverviewChanged() {
+                    root._overviewBlurSettling = true;
+                    overviewBlurSettleTimer.restart();
+                }
+            }
+
+            Connections {
+                target: SettingsData
+                function onBlurWallpaperOnOverviewChanged() {
+                    root._overviewBlurSettling = true;
+                    overviewBlurSettleTimer.restart();
+                }
+            }
+
+            Connections {
                 target: CompositorService
                 function onRandrDataReady() {
                     if (root._deferredSource) {
@@ -137,6 +155,12 @@ Variants {
                 id: renderSettleTimer
                 interval: 1000
                 onTriggered: root._renderSettling = false
+            }
+
+            Timer {
+                id: overviewBlurSettleTimer
+                interval: 150
+                onTriggered: root._overviewBlurSettling = false
             }
 
             function getFillMode(modeName) {
@@ -164,7 +188,7 @@ Variants {
 
             Component.onCompleted: {
                 if (typeof wallpaperWindow.updatesEnabled !== "undefined")
-                    wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+                    wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || root.pendingWallpaper !== "" || root._deferredSource !== "" || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
 
                 if (!source) {
                     root._renderSettling = false;
@@ -296,6 +320,7 @@ Variants {
                 opacity: 1
                 layer.enabled: false
                 asynchronous: true
+                retainWhileLoading: true
                 smooth: true
                 cache: true
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
@@ -309,6 +334,7 @@ Variants {
                 opacity: 0
                 layer.enabled: false
                 asynchronous: true
+                retainWhileLoading: true
                 smooth: true
                 cache: true
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
@@ -567,6 +593,8 @@ Variants {
                     root.transitionProgress = 0.0;
                     currentWallpaper.layer.enabled = false;
                     nextWallpaper.layer.enabled = false;
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                     root.effectActive = false;
 
                     if (!root.pendingWallpaper)
@@ -578,8 +606,9 @@ Variants {
             }
 
             Loader {
+                id: overviewBlurLoader
                 anchors.fill: parent
-                active: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
+                active: root.overviewBlurActive
 
                 sourceComponent: MultiEffect {
                     anchors.fill: parent

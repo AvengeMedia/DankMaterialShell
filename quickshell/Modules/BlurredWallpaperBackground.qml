@@ -100,10 +100,10 @@ Variants {
             Connections {
                 target: currentWallpaper
                 function onStatusChanged() {
-                    if (currentWallpaper.status === Image.Ready) {
-                        root._renderSettling = true;
-                        renderSettleTimer.restart();
-                    }
+                    if (currentWallpaper.status !== Image.Ready && currentWallpaper.status !== Image.Error)
+                        return;
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                 }
             }
 
@@ -206,6 +206,7 @@ Variants {
                 visible: false
                 opacity: 1
                 asynchronous: true
+                retainWhileLoading: true
                 smooth: true
                 cache: true
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
@@ -218,6 +219,7 @@ Variants {
                 visible: false
                 opacity: 0
                 asynchronous: true
+                retainWhileLoading: true
                 smooth: true
                 cache: true
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
@@ -300,6 +302,8 @@ Variants {
                     root.useNextForEffect = false;
                     nextWallpaper.source = "";
                     root.transitionProgress = 0.0;
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                     root.effectActive = false;
                 }
             }
