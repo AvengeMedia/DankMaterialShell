@@ -1,5 +1,13 @@
 This file is more of a quick reference so I know what to account for before next releases.
 
+# 1.5.0
+- Overhauled shadows
+- App ID changed to com.danklinux.dms - breaking for window rules
+- Greeter stuff
+- Terminal mux
+- Locale overrides
+- new neovim theming
+
 # 1.4.0
 
 - Overhauled system monitor, graphs, styling

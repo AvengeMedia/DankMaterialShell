@@ -72,7 +72,8 @@ Singleton {
     }
 
     function resolveIconPath(iconName: string): string {
-        if (!iconName) return "";
+        if (!iconName)
+            return "";
         const moddedId = moddedAppId(iconName);
         if (moddedId !== iconName) {
             if (moddedId.startsWith("~") || moddedId.startsWith("/"))
@@ -85,7 +86,8 @@ Singleton {
     }
 
     function resolveIconUrl(iconName: string): string {
-        if (!iconName) return "";
+        if (!iconName)
+            return "";
         const moddedId = moddedAppId(iconName);
         if (moddedId !== iconName) {
             if (moddedId.startsWith("~") || moddedId.startsWith("/"))
@@ -98,7 +100,8 @@ Singleton {
     }
 
     function getAppIcon(appId: string, desktopEntry: var): string {
-        if (appId === "org.quickshell") {
+        // ! TODO - after QS 0.3, we can install our icon properly
+        if (appId === "org.quickshell" || appId === "com.danklinux.dms") {
             return Qt.resolvedUrl("../assets/danklogo.svg");
         }
 
@@ -118,7 +121,7 @@ Singleton {
     }
 
     function getAppName(appId: string, desktopEntry: var): string {
-        if (appId === "org.quickshell") {
+        if (appId === "org.quickshell" || appId === "com.danklinux.dms") {
             return "dms";
         }
 

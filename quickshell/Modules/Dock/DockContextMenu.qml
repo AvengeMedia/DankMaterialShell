@@ -17,7 +17,7 @@ PanelWindow {
     property int margin: 10
     property bool hidePin: false
     property var desktopEntry: null
-    property bool isDmsWindow: appData?.appId === "org.quickshell"
+    property bool isDmsWindow: appData?.appId === "org.quickshell" || appData?.appId === "com.danklinux.dms"
     property var dockApps: null
 
     function showForButton(button, data, dockHeight, hidePinOption, entry, dockScreen, parentDockApps) {

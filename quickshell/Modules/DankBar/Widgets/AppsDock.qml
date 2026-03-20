@@ -248,7 +248,7 @@ BasePill {
             let appId = Paths.moddedAppId(rawAppId);
 
             let coreAppData = null;
-            if (rawAppId === "org.quickshell") {
+            if (rawAppId === "org.quickshell" || rawAppId === "com.danklinux.dms") {
                 coreAppData = getCoreAppDataByTitle(toplevel.title);
                 if (coreAppData) {
                     appId = coreAppData.builtInPluginId;
@@ -697,7 +697,7 @@ BasePill {
                         mipmap: true
                         asynchronous: true
                         visible: status === Image.Ready && !coreIcon.visible
-                        layer.enabled: appItem.appId === "org.quickshell"
+                        layer.enabled: appItem.appId === "org.quickshell" || appItem.appId === "com.danklinux.dms"
                         layer.smooth: true
                         layer.mipmap: true
                         layer.effect: MultiEffect {

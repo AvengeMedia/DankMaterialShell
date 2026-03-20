@@ -145,7 +145,7 @@ BasePill {
                 smooth: true
                 mipmap: true
                 asynchronous: true
-                layer.enabled: activeWindow && activeWindow.appId === "org.quickshell"
+                layer.enabled: activeWindow && (activeWindow.appId === "org.quickshell" || activeWindow.appId === "com.danklinux.dms")
                 layer.smooth: true
                 layer.mipmap: true
                 layer.effect: MultiEffect {
