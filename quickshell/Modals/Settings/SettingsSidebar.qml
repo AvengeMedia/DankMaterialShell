@@ -370,6 +370,7 @@ Rectangle {
             if (_collapsedIds.indexOf(marker) < 0)
                 _collapsedIds = _collapsedIds + id + ",";
         }
+        SessionData.setSettingsSidebarState(_expandedIds, _collapsedIds);
     }
 
     function _setAutoExpanded(id, value) {
@@ -537,6 +538,11 @@ Rectangle {
     height: parent.height
     color: Theme.surfaceContainer
     radius: Theme.cornerRadius
+
+    Component.onCompleted: {
+        root._expandedIds = SessionData.settingsSidebarExpandedIds;
+        root._collapsedIds = SessionData.settingsSidebarCollapsedIds;
+    }
 
     StyledTextMetrics {
         id: __m1

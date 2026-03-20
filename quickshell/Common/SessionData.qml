@@ -134,6 +134,8 @@ Singleton {
     property string launcherLastMode: "all"
     property string appDrawerLastMode: "apps"
     property string niriOverviewLastMode: "apps"
+    property string settingsSidebarExpandedIds: ","
+    property string settingsSidebarCollapsedIds: ","
 
     Component.onCompleted: {
         if (!isGreeterMode) {
@@ -1101,6 +1103,12 @@ Singleton {
 
     function setNiriOverviewLastMode(mode) {
         niriOverviewLastMode = mode;
+        saveSettings();
+    }
+
+    function setSettingsSidebarState(expandedIds, collapsedIds) {
+        settingsSidebarExpandedIds = expandedIds;
+        settingsSidebarCollapsedIds = collapsedIds;
         saveSettings();
     }
 

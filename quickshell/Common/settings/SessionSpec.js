@@ -84,7 +84,10 @@ var SPEC = {
 
     launcherLastMode: { def: "all" },
     appDrawerLastMode: { def: "apps" },
-    niriOverviewLastMode: { def: "apps" }
+    niriOverviewLastMode: { def: "apps" },
+
+    settingsSidebarExpandedIds: { def: "," },
+    settingsSidebarCollapsedIds: { def: "," }
 };
 
 function getValidKeys() {
