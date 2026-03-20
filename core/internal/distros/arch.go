@@ -135,6 +135,42 @@ func (a *ArchDistribution) packageInstalled(pkg string) bool {
 	return err == nil
 }
 
+// parseSRCINFODeps reads a .SRCINFO file and returns runtime dep and makedep package
+func parseSRCINFODeps(srcinfoPath string) (deps []string, makedeps []string, err error) {
+	data, err := os.ReadFile(srcinfoPath)
+	if err != nil {
+		return nil, nil, err
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		var pkg string
+		var target *[]string
+		switch {
+		case strings.HasPrefix(line, "makedepends = "):
+			pkg = strings.TrimPrefix(line, "makedepends = ")
+			target = &makedeps
+		case strings.HasPrefix(line, "depends = "):
+			pkg = strings.TrimPrefix(line, "depends = ")
+			target = &deps
+		default:
+			continue
+		}
+		// Strip version constraint (>=, <=, >, <, =) and colon-descriptions
+		if idx := strings.IndexAny(pkg, "><:="); idx >= 0 {
+			pkg = pkg[:idx]
+		}
+		pkg = strings.TrimSpace(pkg)
+		if pkg != "" {
+			*target = append(*target, pkg)
+		}
+	}
+	return deps, makedeps, nil
+}
+
+func (a *ArchDistribution) isInSystemRepo(pkg string) bool {
+	return exec.Command("pacman", "-Si", pkg).Run() == nil
+}
+
 func (a *ArchDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
 	return a.GetPackageMappingWithVariants(wm, make(map[string]deps.PackageVariant))
 }
@@ -524,6 +560,16 @@ func (a *ArchDistribution) reorderAURPackages(packages []string) []string {
 }
 
 func (a *ArchDistribution) installSingleAURPackage(ctx context.Context, pkg, sudoPassword string, progressChan chan<- InstallProgressMsg, startProgress, endProgress float64) error {
+	return a.installSingleAURPackageInternal(ctx, pkg, sudoPassword, progressChan, startProgress, endProgress, make(map[string]bool))
+}
+
+func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, pkg, sudoPassword string, progressChan chan<- InstallProgressMsg, startProgress, endProgress float64, visited map[string]bool) error {
+	if visited[pkg] {
+		a.log(fmt.Sprintf("Skipping %s (already being installed, cycle detected)", pkg))
+		return nil
+	}
+	visited[pkg] = true
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("failed to get user home directory: %w", err)
@@ -610,39 +656,61 @@ func (a *ArchDistribution) installSingleAURPackage(ctx context.Context, pkg, sud
 		progressChan <- InstallProgressMsg{
 			Phase:       PhaseAURPackages,
 			Progress:    startProgress + 0.3*(endProgress-startProgress),
-			Step:        fmt.Sprintf("Installing dependencies for %s...", pkg),
+			Step:        fmt.Sprintf("Resolving dependencies for %s...", pkg),
 			IsComplete:  false,
-			CommandInfo: "Installing package dependencies and makedepends",
+			CommandInfo: "Classifying dependencies as system or AUR",
 		}
 
-		// Install dependencies from .SRCINFO
-		depFilter := ""
-		if pkg == "dms-shell-git" {
-			depFilter = ` | sed -E 's/[[:space:]]*(quickshell|dgop)[[:space:]]*/ /g' | tr -s ' '`
+		runtimeDeps, makeDeps, err := parseSRCINFODeps(srcinfoPath)
+		if err != nil {
+			return fmt.Errorf("failed to parse .SRCINFO for %s: %w", pkg, err)
 		}
 
-		depsCmd := exec.CommandContext(ctx, "bash", "-c",
-			fmt.Sprintf(`
-				deps=$(grep "depends = " "%s" | grep -v "makedepends" | sed 's/.*depends = //' | tr '\n' ' ' %s | sed 's/[[:space:]]*$//')
-				if [ ! -z "$deps" ] && [ "$deps" != " " ]; then
-					echo '%s' | sudo -S pacman -S --needed --noconfirm $deps
-				fi
-				`, srcinfoPath, depFilter, sudoPassword))
+		seen := make(map[string]bool)
+		var systemPkgs []string
+		var aurPkgs []string
 
-		if err := a.runWithProgress(depsCmd, progressChan, PhaseAURPackages, startProgress+0.3*(endProgress-startProgress), startProgress+0.35*(endProgress-startProgress)); err != nil {
-			return fmt.Errorf("FAILED to install runtime dependencies for %s: %w", pkg, err)
+		for _, dep := range append(runtimeDeps, makeDeps...) {
+			if seen[dep] || a.packageInstalled(dep) {
+				continue
+			}
+			seen[dep] = true
+			if a.isInSystemRepo(dep) {
+				systemPkgs = append(systemPkgs, dep)
+			} else {
+				aurPkgs = append(aurPkgs, dep)
+			}
 		}
 
-		makedepsCmd := exec.CommandContext(ctx, "bash", "-c",
-			fmt.Sprintf(`
-				makedeps=$(grep -E "^[[:space:]]*makedepends = " "%s" | sed 's/^[[:space:]]*makedepends = //' | tr '\n' ' ')
-				if [ ! -z "$makedeps" ]; then
-					echo '%s' | sudo -S pacman -S --needed --noconfirm $makedeps
-				fi
-			`, srcinfoPath, sudoPassword))
+		if len(systemPkgs) > 0 {
+			progressChan <- InstallProgressMsg{
+				Phase:       PhaseAURPackages,
+				Progress:    startProgress + 0.32*(endProgress-startProgress),
+				Step:        fmt.Sprintf("Installing %d system dependencies for %s...", len(systemPkgs), pkg),
+				IsComplete:  false,
+				CommandInfo: fmt.Sprintf("sudo pacman -S --needed --noconfirm %s", strings.Join(systemPkgs, " ")),
+			}
+			if err := a.installSystemPackages(ctx, systemPkgs, sudoPassword, progressChan); err != nil {
+				return fmt.Errorf("failed to install system dependencies for %s: %w", pkg, err)
+			}
+		}
 
-		if err := a.runWithProgress(makedepsCmd, progressChan, PhaseAURPackages, startProgress+0.35*(endProgress-startProgress), startProgress+0.4*(endProgress-startProgress)); err != nil {
-			return fmt.Errorf("FAILED to install make dependencies for %s: %w", pkg, err)
+		for _, aurDep := range aurPkgs {
+			a.log(fmt.Sprintf("Dependency %s is AUR-only, building from source...", aurDep))
+			progressChan <- InstallProgressMsg{
+				Phase:       PhaseAURPackages,
+				Progress:    startProgress + 0.35*(endProgress-startProgress),
+				Step:        fmt.Sprintf("Installing AUR dependency %s for %s...", aurDep, pkg),
+				IsComplete:  false,
+				CommandInfo: fmt.Sprintf("Building AUR dependency: %s", aurDep),
+			}
+			if err := a.installSingleAURPackageInternal(ctx, aurDep, sudoPassword, progressChan,
+				startProgress+0.35*(endProgress-startProgress),
+				startProgress+0.39*(endProgress-startProgress),
+				visited,
+			); err != nil {
+				return fmt.Errorf("failed to install AUR dependency %s for %s: %w", aurDep, pkg, err)
+			}
 		}
 	}
 
