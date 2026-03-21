@@ -215,6 +215,11 @@ func runShellInteractive(session bool) {
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
+	// Use elapsed-time animation driver for high refresh rate support (240Hz+)
+	// Without this, Qt's vsync-based animation driver locks FrameAnimation to 60Hz
+	if os.Getenv("QSG_USE_SIMPLE_ANIMATION_DRIVER") == "" {
+		cmd.Env = append(cmd.Env, "QSG_USE_SIMPLE_ANIMATION_DRIVER=1")
+	}
 
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -457,6 +462,11 @@ func runShellDaemon(session bool) {
 	}
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
+	}
+	// Use elapsed-time animation driver for high refresh rate support (240Hz+)
+	// Without this, Qt's vsync-based animation driver locks FrameAnimation to 60Hz
+	if os.Getenv("QSG_USE_SIMPLE_ANIMATION_DRIVER") == "" {
+		cmd.Env = append(cmd.Env, "QSG_USE_SIMPLE_ANIMATION_DRIVER=1")
 	}
 
 	devNull, err := os.OpenFile("/dev/null", os.O_RDWR, 0)
