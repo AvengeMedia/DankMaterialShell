@@ -30,6 +30,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
@@ -63,6 +64,7 @@ var waylandManager *wayland.Manager
 var bluezManager *bluez.Manager
 var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
+var tailscaleManager *tailscale.Manager
 var dwlManager *dwl.Manager
 var extWorkspaceManager *extworkspace.Manager
 var brightnessManager *brightness.Manager
@@ -80,6 +82,8 @@ const dbusClientID = "dms-dbus-client"
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsSubscribers syncmap.Map[string, bool]
 var cupsSubscriberCount atomic.Int32
+var tailscaleSubscribers syncmap.Map[string, bool]
+var tailscaleSubscriberCount atomic.Int32
 var extWorkspaceAvailable atomic.Bool
 var extWorkspaceInitMutex sync.Mutex
 
@@ -247,6 +251,19 @@ func InitializeCupsManager() error {
 	cupsManager = manager
 
 	log.Info("CUPS manager initialized")
+	return nil
+}
+
+func InitializeTailscaleManager() error {
+	manager, err := tailscale.NewManager("")
+	if err != nil {
+		log.Warnf("Failed to initialize tailscale manager: %v", err)
+		return err
+	}
+
+	tailscaleManager = manager
+
+	log.Info("Tailscale manager initialized")
 	return nil
 }
 
@@ -460,6 +477,10 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "cups")
 	}
 
+	if tailscaleManager != nil {
+		caps = append(caps, "tailscale")
+	}
+
 	if dwlManager != nil {
 		caps = append(caps, "dwl")
 	}
@@ -524,6 +545,10 @@ func getServerInfo() ServerInfo {
 
 	if cupsManager != nil {
 		caps = append(caps, "cups")
+	}
+
+	if tailscaleManager != nil {
+		caps = append(caps, "tailscale")
 	}
 
 	if dwlManager != nil {
@@ -1002,6 +1027,51 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}
 	}
 
+	if shouldSubscribe("tailscale") {
+		tailscaleSubscribers.Store(clientID+"-tailscale", true)
+		tailscaleSubscriberCount.Add(1)
+
+		if tailscaleManager != nil {
+			wg.Add(1)
+			tailscaleChan := tailscaleManager.Subscribe(clientID + "-tailscale")
+			go func() {
+				defer wg.Done()
+				defer func() {
+					tailscaleManager.Unsubscribe(clientID + "-tailscale")
+					tailscaleSubscribers.Delete(clientID + "-tailscale")
+					count := tailscaleSubscriberCount.Add(-1)
+
+					if count == 0 {
+						log.Info("Last tailscale subscriber disconnected, manager stays active for reconnection")
+					}
+				}()
+
+				initialState := tailscaleManager.GetState()
+				select {
+				case eventChan <- ServiceEvent{Service: "tailscale", Data: initialState}:
+				case <-stopChan:
+					return
+				}
+
+				for {
+					select {
+					case state, ok := <-tailscaleChan:
+						if !ok {
+							return
+						}
+						select {
+						case eventChan <- ServiceEvent{Service: "tailscale", Data: state}:
+						case <-stopChan:
+							return
+						}
+					case <-stopChan:
+						return
+					}
+				}
+			}()
+		}
+	}
+
 	if shouldSubscribe("dwl") && dwlManager != nil {
 		wg.Add(1)
 		dwlChan := dwlManager.Subscribe(clientID + "-dwl")
@@ -1334,10 +1404,34 @@ func cleanupManagers() {
 	if geoClientInstance != nil {
 		geoClientInstance.Close()
 	}
+	if tailscaleManager != nil {
+		tailscaleManager.Close()
+	}
 }
 
 func Start(printDocs bool) error {
 	cleanupStaleSockets()
+
+	// Eagerly try to initialize Tailscale manager; if it fails (socket not
+	// found), start a background retry loop so the widget recovers when
+	// tailscaled starts later.
+	if err := InitializeTailscaleManager(); err != nil {
+		log.Warnf("Tailscale not available at startup: %v", err)
+		go func() {
+			ticker := time.NewTicker(30 * time.Second)
+			defer ticker.Stop()
+			for range ticker.C {
+				if tailscaleManager != nil {
+					return
+				}
+				if err := InitializeTailscaleManager(); err == nil {
+					log.Info("Tailscale manager initialized after retry")
+					notifyCapabilityChange()
+					return
+				}
+			}
+		}()
+	}
 
 	socketPath := GetSocketPath()
 	os.Remove(socketPath)
