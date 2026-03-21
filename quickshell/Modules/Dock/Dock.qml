@@ -448,7 +448,7 @@ Variants {
                 height: {
                     if (dock.isVertical) {
                         // Keep the taller hit area regardless of the reveal state to prevent shrinking loop
-                        return Math.min(Math.max(dockBackground.height + 64, 200), screenHeight * 0.5);
+                        return Math.min(Math.max(dockBackground.height + 64, 200), maxDockHeight);
                     }
                     return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1;
                 }
