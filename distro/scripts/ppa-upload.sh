@@ -3,13 +3,15 @@
 # Usage: ./ppa-upload.sh [package-name] [ppa-name] [ubuntu-series] [rebuild-number] [--keep-builds] [--rebuild=N]
 #
 # Examples:
-#   ./ppa-upload.sh dms                    # Single package (auto-detects PPA)
-#   ./ppa-upload.sh dms 2                 # Rebuild with ppa2 (simple syntax)
+#   ./ppa-upload.sh dms                    # Upload to questing + resolute (default)
+#   ./ppa-upload.sh dms 2                 # Rebuild with ppa2 on both series
 #   ./ppa-upload.sh dms --rebuild=2       # Rebuild with ppa2 (flag syntax)
-#   ./ppa-upload.sh dms-git               # Single package
-#   ./ppa-upload.sh all                   # All packages
-#   ./ppa-upload.sh dms dms questing      # Explicit PPA and series
-#   ./ppa-upload.sh dms dms questing 2    # Explicit PPA, series, and rebuild number
+#   ./ppa-upload.sh dms-git               # Single package (both series)
+#   ./ppa-upload.sh all                   # All packages (each to both series)
+#   ./ppa-upload.sh dms resolute          # 26.04 LTS only (same as "dms dms resolute")
+#   ./ppa-upload.sh dms questing          # 25.10 only
+#   ./ppa-upload.sh dms dms resolute      # Explicit PPA name + one series (optional form)
+#   ./ppa-upload.sh dms dms resolute 2    # One series + rebuild number
 #   ./ppa-upload.sh distro/ubuntu/dms dms # Path-style (backward compatible)
 
 set -e
@@ -52,7 +54,7 @@ done
 
 PACKAGE_INPUT="${POSITIONAL_ARGS[0]:-}"
 PPA_NAME_INPUT="${POSITIONAL_ARGS[1]:-}"
-UBUNTU_SERIES="${POSITIONAL_ARGS[2]:-questing}"
+UBUNTU_SERIES_RAW="${POSITIONAL_ARGS[2]:-}"
 
 if [[ ${#POSITIONAL_ARGS[@]} -gt 0 ]]; then
     LAST_INDEX=$((${#POSITIONAL_ARGS[@]} - 1))
@@ -64,8 +66,25 @@ if [[ ${#POSITIONAL_ARGS[@]} -gt 0 ]]; then
         POSITIONAL_ARGS=("${POSITIONAL_ARGS[@]:0:$LAST_INDEX}")
         PACKAGE_INPUT="${POSITIONAL_ARGS[0]:-}"
         PPA_NAME_INPUT="${POSITIONAL_ARGS[1]:-}"
-        UBUNTU_SERIES="${POSITIONAL_ARGS[2]:-questing}"
+        UBUNTU_SERIES_RAW="${POSITIONAL_ARGS[2]:-}"
     fi
+fi
+
+# Shorthand: "dms resolute" / "dms questing" (package + series; PPA inferred — no need for "dms dms resolute")
+if [[ ${#POSITIONAL_ARGS[@]} -eq 2 ]] && [[ "${POSITIONAL_ARGS[1]}" == "questing" || "${POSITIONAL_ARGS[1]}" == "resolute" ]]; then
+    PACKAGE_INPUT="${POSITIONAL_ARGS[0]}"
+    PPA_NAME_INPUT=""
+    UBUNTU_SERIES_RAW="${POSITIONAL_ARGS[1]}"
+fi
+
+SERIES_LIST=()
+if [[ -z "$UBUNTU_SERIES_RAW" ]]; then
+    SERIES_LIST=(questing resolute)
+elif [[ "$UBUNTU_SERIES_RAW" == "questing" || "$UBUNTU_SERIES_RAW" == "resolute" ]]; then
+    SERIES_LIST=("$UBUNTU_SERIES_RAW")
+else
+    error "Invalid Ubuntu series: $UBUNTU_SERIES_RAW (use questing, resolute, or omit for both)"
+    exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -119,7 +138,12 @@ elif [[ -n "$PACKAGE_INPUT" ]] && [[ "$PACKAGE_INPUT" == "all" ]]; then
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         info "Processing $pkg..."
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        BUILD_ARGS=("$pkg" "$PPA_NAME_INPUT" "$UBUNTU_SERIES")
+        BUILD_ARGS=("$pkg")
+        [[ -n "$PPA_NAME_INPUT" ]] && BUILD_ARGS+=("$PPA_NAME_INPUT")
+        if [[ ${#SERIES_LIST[@]} -eq 1 ]]; then
+            BUILD_ARGS+=("${SERIES_LIST[0]}")
+        fi
+        [[ -n "$REBUILD_RELEASE" ]] && BUILD_ARGS+=("$REBUILD_RELEASE")
         [[ "$KEEP_BUILDS" == "true" ]] && BUILD_ARGS+=("--keep-builds")
         if ! "$0" "${BUILD_ARGS[@]}"; then
             FAILED_PACKAGES+=("$pkg")
@@ -165,7 +189,9 @@ else
 
     if [[ "$selection" == "a" ]] || [[ "$selection" == "all" ]]; then
         PACKAGE_INPUT="all"
-        BUILD_ARGS=("all" "$PPA_NAME_INPUT" "$UBUNTU_SERIES")
+        BUILD_ARGS=("all")
+        [[ -n "$PPA_NAME_INPUT" ]] && BUILD_ARGS+=("$PPA_NAME_INPUT")
+        [[ -n "$REBUILD_RELEASE" ]] && BUILD_ARGS+=("$REBUILD_RELEASE")
         [[ "$KEEP_BUILDS" == "true" ]] && BUILD_ARGS+=("--keep-builds")
         exec "$0" "${BUILD_ARGS[@]}"
     elif [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#AVAILABLE_PACKAGES[@]} ]]; then
@@ -190,6 +216,26 @@ fi
 
 PACKAGE_DIR=$(cd "$PACKAGE_DIR" && pwd)
 PARENT_DIR=$(dirname "$PACKAGE_DIR")
+
+if [[ ${#SERIES_LIST[@]} -gt 1 ]]; then
+    export REBUILD_RELEASE
+    for SERIES in "${SERIES_LIST[@]}"; do
+        if [[ -n "$PACKAGE_INPUT" ]] && [[ "$PACKAGE_INPUT" == *"/"* ]]; then
+            ARGS=("$PACKAGE_DIR" "$PPA_NAME" "$SERIES")
+        else
+            ARGS=("$PACKAGE_NAME" "$PPA_NAME" "$SERIES")
+        fi
+        [[ -n "$REBUILD_RELEASE" ]] && ARGS+=("$REBUILD_RELEASE")
+        [[ "$KEEP_BUILDS" == "true" ]] && ARGS+=("--keep-builds")
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        info "Upload series: $SERIES (of ${SERIES_LIST[*]})"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        "$0" "${ARGS[@]}" || exit 1
+    done
+    exit 0
+fi
+UBUNTU_SERIES="${SERIES_LIST[0]}"
 
 info "Building and uploading: $PACKAGE_NAME"
 info "Package directory: $PACKAGE_DIR"

@@ -242,7 +242,11 @@ jobs:
               echo "🔄 Using rebuild release number: ppa$REBUILD_RELEASE"
             fi
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            bash distro/scripts/ppa-upload.sh "$PKG" "$PPA_NAME" questing ${REBUILD_RELEASE:+"$REBUILD_RELEASE"}
+            # ppa-upload.sh uploads to questing + resolute when series is omitted
+            if ! bash distro/scripts/ppa-upload.sh "$PKG" "$PPA_NAME" ${REBUILD_RELEASE:+"$REBUILD_RELEASE"}; then
+              echo "::error::Upload failed for $PKG"
+              exit 1
+            fi
           done
 
       - name: Summary

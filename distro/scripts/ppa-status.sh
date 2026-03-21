@@ -10,7 +10,8 @@
 
 PPA_OWNER="avengemedia"
 LAUNCHPAD_API="https://api.launchpad.net/1.0"
-DISTRO_SERIES="questing"
+# Supported Ubuntu series for PPA builds (25.10 questing + 26.04 LTS resolute)
+DISTRO_SERIES_LIST=(questing resolute)
 
 # Define packages (sync with ppa-upload.sh)
 ALL_PACKAGES=(dms dms-git dms-greeter)
@@ -106,10 +107,10 @@ get_status_display() {
 for PPA_NAME in "${PPAS[@]}"; do
     PPA_ARCHIVE="${LAUNCHPAD_API}/~${PPA_OWNER}/+archive/ubuntu/${PPA_NAME}"
 
+    for DISTRO_SERIES in "${DISTRO_SERIES_LIST[@]}"; do
     echo "=========================================="
-    echo "=== PPA: ${PPA_OWNER}/${PPA_NAME} ==="
+    echo "=== PPA: ${PPA_OWNER}/${PPA_NAME} (Ubuntu ${DISTRO_SERIES}) ==="
     echo "=========================================="
-    echo "Distribution: Ubuntu $DISTRO_SERIES"
     echo ""
 
     for pkg in "${PACKAGES[@]}"; do
@@ -210,6 +211,7 @@ for PPA_NAME in "${PPAS[@]}"; do
 
     echo "View full PPA at: https://launchpad.net/~${PPA_OWNER}/+archive/ubuntu/${PPA_NAME}"
     echo ""
+    done
 done
 
 echo "=========================================="

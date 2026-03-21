@@ -3,8 +3,10 @@
 # Usage: ./create-source.sh <package-dir> [ubuntu-series]
 #
 # Example:
-#   ./create-source.sh ../dms questing
+#   ./create-source.sh ../dms questing    # Ubuntu 25.10 (default series in ppa-upload)
+#   ./create-source.sh ../dms resolute     # Ubuntu 26.04 LTS
 #   ./create-source.sh ../dms-git questing
+#   ./create-source.sh ../dms-git resolute
 
 set -e
 
@@ -25,11 +27,13 @@ if [ $# -lt 1 ]; then
     echo "Arguments:"
     echo "  package-dir     : Path to package directory (e.g., ../dms)"
     echo "  ubuntu-series   : Ubuntu series (optional, default: noble)"
-    echo "                    Options: noble, jammy, oracular, mantic"
+    echo "                    Options: noble, jammy, oracular, mantic, questing, resolute"
     echo
     echo "Examples:"
     echo "  $0 ../dms questing"
+    echo "  $0 ../dms resolute"
     echo "  $0 ../dms-git questing"
+    echo "  $0 ../dms-git resolute"
     exit 1
 fi
 
@@ -129,10 +133,14 @@ check_ppa_version_exists() {
     local SOURCE_NAME="$2"
     local VERSION="$3"
     local CHECK_MODE="${4:-commit}"
+    local DISTRO_SERIES="${5:-}"
 
-    # Query Launchpad API
-    PPA_VERSION=$(curl -s \
-        "https://api.launchpad.net/1.0/~avengemedia/+archive/ubuntu/$PPA_NAME?ws.op=getPublishedSources&source_name=$SOURCE_NAME&status=Published" \
+    # Query Launchpad API (optionally scoped to one Ubuntu series so the same version can ship to questing and resolute)
+    local API_URL="https://api.launchpad.net/1.0/~avengemedia/+archive/ubuntu/$PPA_NAME?ws.op=getPublishedSources&source_name=$SOURCE_NAME&status=Published"
+    if [[ -n "$DISTRO_SERIES" ]]; then
+        API_URL+="&distro_series=https://api.launchpad.net/1.0/ubuntu/${DISTRO_SERIES}"
+    fi
+    PPA_VERSION=$(curl -s "$API_URL" \
         | grep -oP '"source_package_version":\s*"\K[^"]+' | head -1 || echo "")
 
     if [[ -n "$PPA_VERSION" ]]; then
@@ -259,14 +267,14 @@ if [ "$IS_GIT_PACKAGE" = false ] && [ -n "$GIT_REPO" ]; then
         if [[ -n "$PPA_NAME" ]]; then
             info "Checking if version $NEW_VERSION already exists in PPA..."
             if [[ -z "${REBUILD_RELEASE:-}" ]]; then
-                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "${BASE_VERSION}ppa1" "exact"; then
+                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "${BASE_VERSION}ppa1" "exact" "$UBUNTU_SERIES"; then
                     error "==> Error: Version ${BASE_VERSION}ppa1 already exists in PPA $PPA_NAME"
                     error "    To rebuild with a different release number, use:"
                     error "      ./distro/scripts/ppa-upload.sh $PACKAGE_NAME 2"
                     exit 1
                 fi
             else
-                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "$NEW_VERSION" "exact"; then
+                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "$NEW_VERSION" "exact" "$UBUNTU_SERIES"; then
                     error "==> Error: Version $NEW_VERSION already exists in PPA $PPA_NAME"
                     NEXT_NUM=$((REBUILD_RELEASE + 1))
                     error "    To rebuild with a different release number, use:"
@@ -410,7 +418,7 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
         if [[ -n "$PPA_NAME" ]]; then
             if [[ -z "${REBUILD_RELEASE:-}" ]]; then
                 info "Checking if commit $GIT_COMMIT_HASH already exists in PPA..."
-                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "${BASE_VERSION}ppa1" "commit"; then
+                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "${BASE_VERSION}ppa1" "commit" "$UBUNTU_SERIES"; then
                     error "==> Error: This commit is already uploaded to PPA"
                     error "    The same git commit ($GIT_COMMIT_HASH) already exists in PPA."
                     error "    To rebuild the same commit, specify a rebuild number:"
@@ -429,7 +437,7 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
                 PPA_NUM=$REBUILD_RELEASE
                 NEW_VERSION="${BASE_VERSION}ppa${PPA_NUM}"
                 info "Checking if version $NEW_VERSION already exists in PPA..."
-                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "$NEW_VERSION" "exact"; then
+                if check_ppa_version_exists "$PPA_NAME" "$SOURCE_NAME" "$NEW_VERSION" "exact" "$UBUNTU_SERIES"; then
                     error "==> Error: Version $NEW_VERSION already exists in PPA"
                     error "    This exact version (including ppa${PPA_NUM}) is already uploaded."
                     NEXT_NUM=$((PPA_NUM + 1))
