@@ -4,7 +4,7 @@
 #
 # Examples:
 #   ./ppa-upload.sh dms                    # Upload to questing + resolute (default)
-#   ./ppa-upload.sh dms 2                 # Rebuild with ppa2 on both series
+#   ./ppa-upload.sh dms 2                 # Native: questing ppa2, resolute ppa3 (auto +1 on second series)
 #   ./ppa-upload.sh dms --rebuild=2       # Rebuild with ppa2 (flag syntax)
 #   ./ppa-upload.sh dms-git               # Single package (both series)
 #   ./ppa-upload.sh all                   # All packages (each to both series)
@@ -218,14 +218,36 @@ PACKAGE_DIR=$(cd "$PACKAGE_DIR" && pwd)
 PARENT_DIR=$(dirname "$PACKAGE_DIR")
 
 if [[ ${#SERIES_LIST[@]} -gt 1 ]]; then
+    SOURCE_FORMAT_LINE=$(head -1 "$PACKAGE_DIR/debian/source/format" 2>/dev/null || echo "")
+    IS_NATIVE_DUAL=false
+    if [[ "$SOURCE_FORMAT_LINE" == *"native"* ]]; then
+        IS_NATIVE_DUAL=true
+        info "Native source format: second series uses PPA suffix +1 (or ppa2 if unset) so both uploads succeed."
+    fi
     export REBUILD_RELEASE
-    for SERIES in "${SERIES_LIST[@]}"; do
+    for idx in "${!SERIES_LIST[@]}"; do
+        SERIES="${SERIES_LIST[$idx]}"
         if [[ -n "$PACKAGE_INPUT" ]] && [[ "$PACKAGE_INPUT" == *"/"* ]]; then
             ARGS=("$PACKAGE_DIR" "$PPA_NAME" "$SERIES")
         else
             ARGS=("$PACKAGE_NAME" "$PPA_NAME" "$SERIES")
         fi
-        [[ -n "$REBUILD_RELEASE" ]] && ARGS+=("$REBUILD_RELEASE")
+        if [[ "$IS_NATIVE_DUAL" == true ]]; then
+            if [[ "$idx" -eq 0 ]]; then
+                [[ -n "${REBUILD_RELEASE:-}" ]] && ARGS+=("$REBUILD_RELEASE")
+            else
+                if [[ -n "${REBUILD_RELEASE:-}" ]]; then
+                    SECOND_PPA=$((REBUILD_RELEASE + 1))
+                    ARGS+=("$SECOND_PPA")
+                    info "Second series ${SERIES}: using ppa${SECOND_PPA} (native dual-series)"
+                else
+                    ARGS+=("2")
+                    info "Second series ${SERIES}: using ppa2 (native dual-series; first uses default ppa1)"
+                fi
+            fi
+        else
+            [[ -n "${REBUILD_RELEASE:-}" ]] && ARGS+=("$REBUILD_RELEASE")
+        fi
         [[ "$KEEP_BUILDS" == "true" ]] && ARGS+=("--keep-builds")
         echo ""
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
