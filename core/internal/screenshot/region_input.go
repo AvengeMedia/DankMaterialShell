@@ -114,6 +114,9 @@ func (r *RegionSelector) setupPointerHandlers() {
 				for _, os := range r.surfaces {
 					r.redrawSurface(os)
 				}
+				if r.screenshoter != nil && r.screenshoter.config.NoConfirm && r.selection.hasSelection {
+					r.finishSelection()
+				}
 			}
 		default:
 			r.cancelled = true

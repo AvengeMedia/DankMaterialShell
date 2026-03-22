@@ -52,6 +52,8 @@ type Config struct {
 	Mode       Mode
 	OutputName string
 	Cursor     CursorMode
+	NoConfirm  bool
+	Reset      bool
 	Format     Format
 	Quality    int
 	OutputDir  string
@@ -66,6 +68,8 @@ func DefaultConfig() Config {
 	return Config{
 		Mode:      ModeRegion,
 		Cursor:    CursorOff,
+		NoConfirm: false,
+		Reset:     false,
 		Format:    FormatPNG,
 		Quality:   90,
 		OutputDir: "",

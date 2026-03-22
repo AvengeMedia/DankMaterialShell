@@ -106,6 +106,12 @@ func (s *Screenshoter) captureLastRegion() (*CaptureResult, error) {
 }
 
 func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
+	if s.config.Reset {
+		if err := SaveLastRegion(Region{}); err != nil {
+			log.Debug("failed to reset last region", "err", err)
+		}
+	}
+
 	selector := NewRegionSelector(s)
 	result, cancelled, err := selector.Run()
 	if err != nil {

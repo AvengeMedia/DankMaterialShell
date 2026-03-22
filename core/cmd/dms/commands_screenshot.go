@@ -22,6 +22,8 @@ var (
 	ssNoClipboard bool
 	ssNoFile      bool
 	ssNoNotify    bool
+	ssNoConfirm   bool
+	ssReset       bool
 	ssStdout      bool
 )
 
@@ -50,8 +52,10 @@ Examples:
   dms screenshot output -o DP-1      # Specific output
   dms screenshot window              # Focused window (Hyprland)
   dms screenshot last                # Last region (pre-selected)
+  dms screenshot --reset             # Reset last region pre-selection
   dms screenshot --no-clipboard      # Save file only
   dms screenshot --no-file           # Clipboard only
+  dms screenshot --no-confirm        # Region capture on mouse release
   dms screenshot --cursor=on         # Include cursor
   dms screenshot -f jpg -q 85        # JPEG with quality 85`,
 }
@@ -119,6 +123,8 @@ func init() {
 	screenshotCmd.PersistentFlags().BoolVar(&ssNoClipboard, "no-clipboard", false, "Don't copy to clipboard")
 	screenshotCmd.PersistentFlags().BoolVar(&ssNoFile, "no-file", false, "Don't save to file")
 	screenshotCmd.PersistentFlags().BoolVar(&ssNoNotify, "no-notify", false, "Don't show notification")
+	screenshotCmd.PersistentFlags().BoolVar(&ssNoConfirm, "no-confirm", false, "Region mode: capture on mouse release without Enter/Space confirmation")
+	screenshotCmd.PersistentFlags().BoolVar(&ssReset, "reset", false, "Reset saved last-region preselection before capturing")
 	screenshotCmd.PersistentFlags().BoolVar(&ssStdout, "stdout", false, "Output image to stdout (for piping to swappy, etc.)")
 
 	screenshotCmd.AddCommand(ssRegionCmd)
@@ -142,6 +148,8 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config.Clipboard = !ssNoClipboard
 	config.SaveFile = !ssNoFile
 	config.Notify = !ssNoNotify
+	config.NoConfirm = ssNoConfirm
+	config.Reset = ssReset
 	config.Stdout = ssStdout
 
 	if ssOutputDir != "" {
