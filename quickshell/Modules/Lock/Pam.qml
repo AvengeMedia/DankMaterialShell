@@ -160,7 +160,7 @@ Scope {
     PamContext {
         id: fprint
 
-        property bool available
+        property bool available: SettingsData.lockFingerprintReady
         property int tries
         property int errorTries
 
@@ -216,7 +216,7 @@ Scope {
     PamContext {
         id: u2f
 
-        property bool available
+        property bool available: SettingsData.lockU2fReady
 
         function checkAvail(): void {
             if (!available || !SettingsData.enableU2f || !root.lockSecured) {
@@ -278,26 +278,6 @@ Scope {
                     u2fErrorRetry.restart();
                 }
             }
-        }
-    }
-
-    Process {
-        id: availProc
-
-        command: ["sh", "-c", "fprintd-list \"${USER:-$(id -un)}\""]
-        onExited: code => {
-            fprint.available = code === 0;
-            fprint.checkAvail();
-        }
-    }
-
-    Process {
-        id: u2fAvailProc
-
-        command: ["sh", "-c", "(test -f /usr/lib/security/pam_u2f.so || test -f /usr/lib64/security/pam_u2f.so) && (test -f /etc/pam.d/dankshell-u2f || test -f \"$HOME/.config/Yubico/u2f_keys\")"]
-        onExited: code => {
-            u2f.available = code === 0;
-            u2f.checkAvail();
         }
     }
 
@@ -364,14 +344,15 @@ Scope {
 
     onLockSecuredChanged: {
         if (lockSecured) {
-            availProc.running = true;
-            u2fAvailProc.running = true;
+            SettingsData.refreshAuthAvailability();
             root.state = "";
             root.fprintState = "";
             root.u2fState = "";
             root.u2fPending = false;
             root.lockMessage = "";
             root.resetAuthFlows();
+            fprint.checkAvail();
+            u2f.checkAvail();
         } else {
             root.resetAuthFlows();
         }
@@ -384,7 +365,15 @@ Scope {
             fprint.checkAvail();
         }
 
+        function onLockFingerprintReadyChanged(): void {
+            fprint.checkAvail();
+        }
+
         function onEnableU2fChanged(): void {
+            u2f.checkAvail();
+        }
+
+        function onLockU2fReadyChanged(): void {
             u2f.checkAvail();
         }
 
