@@ -58,6 +58,13 @@ Item {
         dropdownMenu.close();
     }
 
+    function resetSearch() {
+        searchField.text = "";
+        dropdownMenu.fzfFinder = null;
+        dropdownMenu.searchQuery = "";
+        dropdownMenu.selectedIndex = -1;
+    }
+
     width: compactMode ? dropdownWidth : parent.width
     implicitHeight: compactMode ? 40 : Math.max(60, labelColumn.implicitHeight + Theme.spacingM)
 
@@ -206,7 +213,9 @@ Item {
             fzfFinder = new Fzf.Finder(root.options, {
                 "selector": option => option,
                 "limit": 50,
-                "casing": "case-insensitive"
+                "casing": "case-insensitive",
+                "sort": true,
+                "tiebreakers": [(a, b, selector) => selector(a.item).length - selector(b.item).length]
             });
         }
 
@@ -233,9 +242,14 @@ Item {
         }
 
         onOpened: {
-            fzfFinder = null;
-            searchQuery = "";
             selectedIndex = -1;
+            if (searchField.text.length > 0) {
+                initFinder();
+                searchQuery = searchField.text;
+            } else {
+                fzfFinder = null;
+                searchQuery = "";
+            }
         }
 
         parent: Overlay.overlay

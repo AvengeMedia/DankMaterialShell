@@ -1249,7 +1249,7 @@ const defaultOpts = {
 };
 class Finder {
   constructor(list, ...optionsTuple) {
-    this.opts = Object.assign(defaultOpts, optionsTuple[0]);
+    this.opts = Object.assign({}, defaultOpts, optionsTuple[0]);
     this.items = list;
     this.runesList = list.map((item) => strToRunes(this.opts.selector(item).normalize()));
     this.algoFn = exactMatchNaive;
@@ -1283,12 +1283,13 @@ function postProcessResultItems(result, opts) {
   if (opts.sort) {
     const { selector } = opts;
     result.sort((a, b) => {
-      if (a.score === b.score) {
-        for (const tiebreaker of opts.tiebreakers) {
-          const diff = tiebreaker(a, b, selector);
-          if (diff !== 0) {
-            return diff;
-          }
+      if (a.score !== b.score) {
+        return b.score - a.score;
+      }
+      for (const tiebreaker of opts.tiebreakers) {
+        const diff = tiebreaker(a, b, selector);
+        if (diff !== 0) {
+          return diff;
         }
       }
       return 0;
