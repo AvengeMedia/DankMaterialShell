@@ -107,6 +107,26 @@ Variants {
                 }
             }
 
+            Connections {
+                target: blurWallpaperWindow
+                function onWidthChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
+                function onHeightChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
+            }
+
+            Connections {
+                target: Quickshell
+                function onScreensChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
+            }
+
             Timer {
                 id: renderSettleTimer
                 interval: 1000
