@@ -64,9 +64,8 @@ var killCmd = &cobra.Command{
 }
 
 var ipcCmd = &cobra.Command{
-	Use:     "ipc [target] [function] [args...]",
-	Short:   "Send IPC commands to running DMS shell",
-	PreRunE: findConfig,
+	Use:   "ipc [target] [function] [args...]",
+	Short: "Send IPC commands to running DMS shell",
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		_ = findConfig(cmd, args)
 		return getShellIPCCompletions(args, toComplete), cobra.ShellCompDirectiveNoFileComp
