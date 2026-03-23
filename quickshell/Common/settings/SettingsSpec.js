@@ -549,7 +549,15 @@ var SPEC = {
     clipboardEnterToPaste: { def: false },
 
     launcherPluginVisibility: { def: {} },
-    launcherPluginOrder: { def: [] }
+    launcherPluginOrder: { def: [] },
+
+    frameEnabled: { def: false },
+    frameThickness: { def: 15 },
+    frameRounding: { def: 24 },
+    frameColor: { def: "#2a2a2a" },
+    frameOpacity: { def: 1.0 },
+    frameSyncBarColor: { def: true },
+    frameScreenPreferences: { def: ["all"] }
 };
 
 function getValidKeys() {

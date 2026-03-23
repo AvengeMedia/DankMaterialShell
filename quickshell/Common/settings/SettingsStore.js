@@ -248,6 +248,20 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 6;
     }
 
+    if (currentVersion < 7) {
+        console.info("Migrating settings from version", currentVersion, "to version 7");
+
+        if (settings.frameEnabled === undefined) settings.frameEnabled = false;
+        if (settings.frameThickness === undefined) settings.frameThickness = 15;
+        if (settings.frameRounding === undefined) settings.frameRounding = 24;
+        if (settings.frameColor === undefined) settings.frameColor = "#2a2a2a";
+        if (settings.frameOpacity === undefined) settings.frameOpacity = 1.0;
+        if (settings.frameSyncBarColor === undefined) settings.frameSyncBarColor = true;
+        if (settings.frameScreenPreferences === undefined) settings.frameScreenPreferences = ["all"];
+
+        settings.configVersion = 7;
+    }
+
     return settings;
 }
 
