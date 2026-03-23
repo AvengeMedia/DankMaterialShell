@@ -3,7 +3,7 @@ import Quickshell
 import qs.Common
 import qs.Widgets
 
-Flow {
+Row {
     id: root
 
     property var model: []
