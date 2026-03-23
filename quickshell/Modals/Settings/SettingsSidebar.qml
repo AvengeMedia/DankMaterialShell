@@ -120,6 +120,12 @@ Rectangle {
                     "text": I18n.tr("Widgets"),
                     "icon": "widgets",
                     "tabIndex": 22
+                },
+                {
+                    "id": "frame",
+                    "text": I18n.tr("Frame"),
+                    "icon": "frame_source",
+                    "tabIndex": 33
                 }
             ]
         },
