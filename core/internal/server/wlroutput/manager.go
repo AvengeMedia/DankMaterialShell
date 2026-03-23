@@ -13,7 +13,7 @@ func NewManager(display wlclient.WaylandDisplay) (*Manager, error) {
 	m := &Manager{
 		display:    display,
 		ctx:        display.Context(),
-		cmdq:       make(chan cmd, 128),
+		cmdq:       make(chan cmd, 512),
 		stopChan:   make(chan struct{}),
 		dirty:      make(chan struct{}, 1),
 		fatalError: make(chan error, 1),

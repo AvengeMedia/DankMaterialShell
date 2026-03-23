@@ -1,4 +1,5 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import Quickshell
 import QtQuick
@@ -13,21 +14,31 @@ Singleton {
     signal popoutChanged
 
     function _closePopout(popout) {
-        switch (true) {
-        case popout.dashVisible !== undefined:
-            popout.dashVisible = false;
+        try {
+            switch (true) {
+            case popout.dashVisible !== undefined:
+                popout.dashVisible = false;
+                return;
+            case popout.notificationHistoryVisible !== undefined:
+                popout.notificationHistoryVisible = false;
+                return;
+            default:
+                if (typeof popout.close !== "function")
+                    return;
+                popout.close();
+            }
+        } catch (e) {
             return;
-        case popout.notificationHistoryVisible !== undefined:
-            popout.notificationHistoryVisible = false;
-            return;
-        default:
-            popout.close();
         }
     }
 
     function _isStale(popout) {
         try {
-            return !popout || !("shouldBeVisible" in popout);
+            if (!popout || !("shouldBeVisible" in popout))
+                return true;
+            if (!popout.screen)
+                return true;
+            return false;
         } catch (e) {
             return true;
         }
