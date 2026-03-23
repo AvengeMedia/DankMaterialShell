@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/godbus/dbus/v5"
@@ -59,7 +60,11 @@ func Send(n Notification) error {
 
 	hints := map[string]dbus.Variant{}
 	if n.FilePath != "" {
-		hints["image_path"] = dbus.MakeVariant(n.FilePath)
+		imgPath := n.FilePath
+		if !strings.HasPrefix(imgPath, "file://") {
+			imgPath = "file://" + imgPath
+		}
+		hints["image_path"] = dbus.MakeVariant(imgPath)
 	}
 
 	obj := conn.Object(notifyDest, notifyPath)
