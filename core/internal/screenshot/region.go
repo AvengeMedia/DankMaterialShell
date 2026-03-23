@@ -113,7 +113,11 @@ func NewRegionSelector(s *Screenshoter) *RegionSelector {
 }
 
 func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
-	r.preSelect = GetLastRegion()
+	if r.screenshoter != nil && r.screenshoter.config.Reset {
+		r.preSelect = Region{}
+	} else {
+		r.preSelect = GetLastRegion()
+	}
 
 	if err := r.connect(); err != nil {
 		return nil, false, fmt.Errorf("wayland connect: %w", err)

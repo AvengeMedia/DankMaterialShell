@@ -138,9 +138,13 @@ func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uin
 	if !r.showCapturedCursor {
 		cursorLabel = "show"
 	}
+	captureKey := "Space/Enter"
+	if r.screenshoter != nil && r.screenshoter.config.NoConfirm {
+		captureKey = "Drag+Release"
+	}
 
 	items := []struct{ key, desc string }{
-		{"Space/Enter", "capture"},
+		{captureKey, "capture"},
 		{"P", cursorLabel + " cursor"},
 		{"Esc", "cancel"},
 	}
