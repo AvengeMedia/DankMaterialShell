@@ -2955,6 +2955,35 @@
     "conditionKey": "isDwl"
   },
   {
+    "section": "matugenContrast",
+    "label": "Matugen Contrast",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "adjusts",
+      "appearance",
+      "colors",
+      "colour",
+      "colours",
+      "contrast",
+      "dynamic",
+      "generated",
+      "hue",
+      "look",
+      "material",
+      "matugen",
+      "minimum",
+      "palette",
+      "scheme",
+      "standard",
+      "style",
+      "theme",
+      "tint",
+      "wallpaper colors"
+    ],
+    "description": "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)"
+  },
+  {
     "section": "matugenScheme",
     "label": "Matugen Palette",
     "tabIndex": 10,
@@ -6063,7 +6092,7 @@
       "tasks",
       "windows"
     ],
-    "icon": "apps",
+    "icon": "app_registration",
     "conditionKey": "isHyprlandOrNiri"
   },
   {
@@ -6919,7 +6948,7 @@
       "system",
       "volume"
     ],
-    "icon": "computer"
+    "icon": "memory"
   },
   {
     "section": "_tab_30",
@@ -6948,19 +6977,6 @@
     ],
     "icon": "language",
     "description": "Change the locale used by the DMS interface."
-  },
-  {
-    "section": "_tab_30",
-    "label": "Multiplexers",
-    "tabIndex": 30,
-    "category": "Locale",
-    "keywords": [
-      "country",
-      "language",
-      "locale",
-      "multiplexers"
-    ],
-    "icon": "terminal"
   },
   {
     "section": "timeLocale",
@@ -6992,5 +7008,16 @@
       "settings"
     ],
     "icon": "login"
+  },
+  {
+    "section": "_tab_32",
+    "label": "Multiplexers",
+    "tabIndex": 32,
+    "category": "Settings",
+    "keywords": [
+      "multiplexers",
+      "settings"
+    ],
+    "icon": "terminal"
   }
 ]
