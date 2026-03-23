@@ -518,5 +518,20 @@ FocusScope {
                     Qt.callLater(() => item.forceActiveFocus());
             }
         }
+
+        Loader {
+            id: frameLoader
+            anchors.fill: parent
+            active: root.currentIndex === 33
+            visible: active
+            focus: active
+
+            sourceComponent: FrameTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
     }
 }

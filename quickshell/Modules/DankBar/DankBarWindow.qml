@@ -238,7 +238,9 @@ PanelWindow {
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: (SettingsData.frameEnabled && SettingsData.frameSyncBarColor)
+        ? SettingsData.frameColor
+        : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -384,7 +386,7 @@ PanelWindow {
         shouldHideForWindows = filtered.length > 0;
     }
 
-    property real effectiveSpacing: hasMaximizedToplevel ? 0 : (barConfig?.spacing ?? 4)
+    property real effectiveSpacing: SettingsData.frameEnabled ? 0 : (hasMaximizedToplevel ? 0 : (barConfig?.spacing ?? 4))
 
     Behavior on effectiveSpacing {
         enabled: barWindow.visible
