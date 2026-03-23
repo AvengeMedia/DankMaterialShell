@@ -152,7 +152,7 @@ function scoreItems(items, query, getFrecencyFn) {
         var item = items[i]
         var itemScore
 
-        if (query && item._preScored !== undefined) {
+        if (item._preScored !== undefined && (query || item._preScored > 900)) {
             itemScore = item._preScored
         } else {
             var frecencyData = getFrecencyFn ? getFrecencyFn(item) : null
