@@ -683,12 +683,12 @@ PanelWindow {
         }
 
         property bool reveal: {
-            if (barWindow.hasFullscreenToplevel)
-                return false;
-
             const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false);
             if (inOverviewWithShow)
                 return true;
+
+            if (barWindow.hasFullscreenToplevel)
+                return false;
 
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland)) {
