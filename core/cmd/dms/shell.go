@@ -616,6 +616,43 @@ func getShellIPCCompletions(args []string, _ string) []string {
 	return nil
 }
 
+func getFirstDMSPID() (int, bool) {
+	dir := getRuntimeDir()
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return 0, false
+	}
+
+	for _, entry := range entries {
+		if !strings.HasPrefix(entry.Name(), "danklinux-") || !strings.HasSuffix(entry.Name(), ".pid") {
+			continue
+		}
+
+		data, err := os.ReadFile(filepath.Join(dir, entry.Name()))
+		if err != nil {
+			continue
+		}
+
+		pid, err := strconv.Atoi(strings.TrimSpace(string(data)))
+		if err != nil {
+			continue
+		}
+
+		proc, err := os.FindProcess(pid)
+		if err != nil {
+			continue
+		}
+
+		if proc.Signal(syscall.Signal(0)) != nil {
+			continue
+		}
+
+		return pid, true
+	}
+
+	return 0, false
+}
+
 func runShellIPCCommand(args []string) {
 	if len(args) == 0 {
 		printIPCHelp()
@@ -627,10 +664,21 @@ func runShellIPCCommand(args []string) {
 	}
 
 	cmdArgs := []string{"ipc"}
-	if qsHasAnyDisplay() {
-		cmdArgs = append(cmdArgs, "--any-display")
+
+	switch pid, ok := getFirstDMSPID(); {
+	case ok:
+		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
+	default:
+		if err := findConfig(nil, nil); err != nil {
+			log.Fatalf("Error finding config: %v", err)
+		}
+		// ! TODO - remove check when QS 0.3 is released
+		if qsHasAnyDisplay() {
+			cmdArgs = append(cmdArgs, "--any-display")
+		}
+		cmdArgs = append(cmdArgs, "-p", configPath)
 	}
-	cmdArgs = append(cmdArgs, "-p", configPath)
+
 	cmdArgs = append(cmdArgs, args...)
 	cmd := exec.Command("qs", cmdArgs...)
 	cmd.Stdin = os.Stdin
