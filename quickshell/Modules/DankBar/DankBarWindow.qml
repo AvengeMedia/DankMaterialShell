@@ -157,6 +157,7 @@ PanelWindow {
     property string screenName: modelData.name
 
     property bool hasMaximizedToplevel: false
+    property bool hasFullscreenToplevel: false
     property bool shouldHideForWindows: false
 
     function _updateHasMaximizedToplevel() {
@@ -177,6 +178,22 @@ PanelWindow {
             }
         }
         hasMaximizedToplevel = false;
+    }
+
+    function _updateHasFullscreenToplevel() {
+        if (!CompositorService.isHyprland && !CompositorService.isNiri) {
+            hasFullscreenToplevel = false;
+            return;
+        }
+
+        const filtered = CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
+        for (let i = 0; i < filtered.length; i++) {
+            if (filtered[i]?.fullscreen) {
+                hasFullscreenToplevel = true;
+                return;
+            }
+        }
+        hasFullscreenToplevel = false;
     }
 
     function _updateShouldHideForWindows() {
@@ -485,6 +502,7 @@ PanelWindow {
         target: CompositorService
         function onToplevelsChanged() {
             barWindow._updateHasMaximizedToplevel();
+            barWindow._updateHasFullscreenToplevel();
             barWindow._updateShouldHideForWindows();
         }
     }
@@ -493,6 +511,7 @@ PanelWindow {
         target: NiriService
         function onAllWorkspacesChanged() {
             barWindow._updateHasMaximizedToplevel();
+            barWindow._updateHasFullscreenToplevel();
             barWindow._updateShouldHideForWindows();
         }
     }
@@ -664,6 +683,9 @@ PanelWindow {
         }
 
         property bool reveal: {
+            if (barWindow.hasFullscreenToplevel)
+                return false;
+
             const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false);
             if (inOverviewWithShow)
                 return true;
