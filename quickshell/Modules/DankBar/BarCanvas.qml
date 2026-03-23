@@ -37,6 +37,8 @@ Item {
     }
 
     property real rt: {
+        if (SettingsData.frameEnabled)
+            return Math.max(0, SettingsData.frameRounding - SettingsData.frameThickness);
         if (barConfig?.squareCorners ?? false)
             return 0;
         if (barWindow.hasMaximizedToplevel)
@@ -255,11 +257,12 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
+        const crE = SettingsData.frameEnabled ? 0 : cr;
 
-        let d = `M ${cr} 0`;
-        d += ` L ${w - cr} 0`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${w} ${cr}`;
+        let d = `M ${crE} 0`;
+        d += ` L ${w - crE} 0`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${w} ${crE}`;
         if (r > 0) {
             d += ` L ${w} ${h + r}`;
             d += ` A ${r} ${r} 0 0 0 ${w - r} ${h}`;
@@ -273,9 +276,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 1 0 ${h - cr}`;
         }
-        d += ` L 0 ${cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${cr} 0`;
+        d += ` L 0 ${crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${crE} 0`;
         d += " Z";
         return d;
     }
@@ -285,11 +288,12 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
+        const crE = SettingsData.frameEnabled ? 0 : cr;
 
-        let d = `M ${cr} ${fullH}`;
-        d += ` L ${w - cr} ${fullH}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 ${w} ${fullH - cr}`;
+        let d = `M ${crE} ${fullH}`;
+        d += ` L ${w - crE} ${fullH}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 ${w} ${fullH - crE}`;
         if (r > 0) {
             d += ` L ${w} 0`;
             d += ` A ${r} ${r} 0 0 1 ${w - r} ${r}`;
@@ -303,9 +307,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 0 0 ${cr}`;
         }
-        d += ` L 0 ${fullH - cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 ${cr} ${fullH}`;
+        d += ` L 0 ${fullH - crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 ${crE} ${fullH}`;
         d += " Z";
         return d;
     }
@@ -314,11 +318,12 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
+        const crE = SettingsData.frameEnabled ? 0 : cr;
 
-        let d = `M 0 ${cr}`;
-        d += ` L 0 ${h - cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 ${cr} ${h}`;
+        let d = `M 0 ${crE}`;
+        d += ` L 0 ${h - crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 ${crE} ${h}`;
         if (r > 0) {
             d += ` L ${w + r} ${h}`;
             d += ` A ${r} ${r} 0 0 1 ${w} ${h - r}`;
@@ -332,9 +337,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 0 ${w - cr} 0`;
         }
-        d += ` L ${cr} 0`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 0 ${cr}`;
+        d += ` L ${crE} 0`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 0 ${crE}`;
         d += " Z";
         return d;
     }
@@ -344,11 +349,12 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
+        const crE = SettingsData.frameEnabled ? 0 : cr;
 
-        let d = `M ${fullW} ${cr}`;
-        d += ` L ${fullW} ${h - cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${fullW - cr} ${h}`;
+        let d = `M ${fullW} ${crE}`;
+        d += ` L ${fullW} ${h - crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${fullW - crE} ${h}`;
         if (r > 0) {
             d += ` L 0 ${h}`;
             d += ` A ${r} ${r} 0 0 0 ${r} ${h - r}`;
@@ -362,9 +368,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 1 ${cr} 0`;
         }
-        d += ` L ${fullW - cr} 0`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${fullW} ${cr}`;
+        d += ` L ${fullW - crE} 0`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${fullW} ${crE}`;
         d += " Z";
         return d;
     }

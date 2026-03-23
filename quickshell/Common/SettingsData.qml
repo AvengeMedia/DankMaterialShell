@@ -14,7 +14,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 5
+    readonly property int settingsConfigVersion: 7
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -186,6 +186,7 @@ Singleton {
     onPopoutElevationEnabledChanged: saveSettings()
     property bool barElevationEnabled: true
     onBarElevationEnabledChanged: saveSettings()
+
     property bool blurEnabled: false
     onBlurEnabledChanged: saveSettings()
     property string blurBorderColor: "outline"
@@ -197,6 +198,21 @@ Singleton {
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false
+
+    property bool frameEnabled: false
+    onFrameEnabledChanged: saveSettings()
+    property real frameThickness: 15
+    onFrameThicknessChanged: saveSettings()
+    property real frameRounding: 24
+    onFrameRoundingChanged: saveSettings()
+    property string frameColor: "#2a2a2a"
+    onFrameColorChanged: saveSettings()
+    property real frameOpacity: 1.0
+    onFrameOpacityChanged: saveSettings()
+    property bool frameSyncBarColor: true
+    onFrameSyncBarColorChanged: saveSettings()
+    property var frameScreenPreferences: ["all"]
+    onFrameScreenPreferencesChanged: saveSettings()
 
     property bool showLauncherButton: true
     property bool showWorkspaceSwitcher: true
@@ -1938,6 +1954,47 @@ Singleton {
             return Quickshell.screens;
         }
         return filtered;
+    }
+
+    function getFrameFilteredScreens() {
+        var prefs = frameScreenPreferences || ["all"];
+        if (!prefs || prefs.length === 0 || prefs.includes("all")) {
+            return Quickshell.screens;
+        }
+        return Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
+    }
+
+    function getActiveBarEdgeForScreen(screen) {
+        if (!screen) return "";
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled) continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs)) continue;
+            switch (bc.position ?? 0) {
+            case SettingsData.Position.Top:    return "top";
+            case SettingsData.Position.Bottom: return "bottom";
+            case SettingsData.Position.Left:   return "left";
+            case SettingsData.Position.Right:  return "right";
+            }
+        }
+        return "";
+    }
+
+    function getActiveBarThicknessForScreen(screen) {
+        if (!screen) return frameThickness;
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled) continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs)) continue;
+            const innerPadding = bc.innerPadding ?? 4;
+            const barT = Math.max(26 + innerPadding * 0.6, Theme.barHeight - 4 - (8 - innerPadding));
+            const spacing = bc.spacing ?? 4;
+            const bottomGap = bc.bottomGap ?? 0;
+            return barT + spacing + bottomGap;
+        }
+        return frameThickness;
     }
 
     function sendTestNotifications() {
