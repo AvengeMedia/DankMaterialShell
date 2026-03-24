@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell
 import qs.Common
 import qs.Widgets
 
@@ -74,6 +75,22 @@ StyledRect {
         return determineFileType(fileName) === "image";
     }
 
+    function isVideoFile(fileName) {
+        if (!fileName) {
+            return false;
+        }
+        return determineFileType(fileName) === "video";
+    }
+
+    property string _cacheDir: Quickshell.env("XDG_CACHE_HOME") || (Quickshell.env("HOME") + "/.cache")
+    property string videoThumbnailPath: {
+        if (!listDelegateRoot.fileIsDir && isVideoFile(listDelegateRoot.fileName)) {
+            const hash = Qt.md5("file://" + listDelegateRoot.filePath);
+            return _cacheDir + "/thumbnails/normal/" + hash + ".png";
+        }
+        return "";
+    }
+
     function getIconForFile(fileName) {
         const lowerName = fileName.toLowerCase();
         if (lowerName.startsWith("dockerfile")) {
@@ -127,8 +144,24 @@ StyledRect {
             Image {
                 id: listPreviewImage
                 anchors.fill: parent
-                property string imagePath: (!listDelegateRoot.fileIsDir && isImageFile(listDelegateRoot.fileName)) ? listDelegateRoot.filePath : ""
+                property string imagePath: {
+                    if (!listDelegateRoot.fileIsDir && isImageFile(listDelegateRoot.fileName))
+                        return listDelegateRoot.filePath;
+                    if (videoThumbnailPath)
+                        return videoThumbnailPath;
+                    return "";
+                }
                 source: imagePath ? "file://" + imagePath.split('/').map(s => encodeURIComponent(s)).join('/') : ""
+                onStatusChanged: {
+                    if (status === Image.Error && videoThumbnailPath) {
+                        Proc.runCommand("vidthumb-" + listDelegateRoot.filePath, ["ffmpegthumbnailer", "-i", listDelegateRoot.filePath, "-o", videoThumbnailPath, "-s", "128", "-f"], function(output, exitCode) {
+                            if (exitCode === 0) {
+                                listPreviewImage.imagePath = "";
+                                listPreviewImage.imagePath = videoThumbnailPath;
+                            }
+                        });
+                    }
+                }
                 fillMode: Image.PreserveAspectCrop
                 sourceSize.width: 32
                 sourceSize.height: 32
@@ -141,7 +174,7 @@ StyledRect {
                 source: listPreviewImage
                 maskEnabled: true
                 maskSource: listImageMask
-                visible: listPreviewImage.status === Image.Ready && !listDelegateRoot.fileIsDir && isImageFile(listDelegateRoot.fileName)
+                visible: listPreviewImage.status === Image.Ready && !listDelegateRoot.fileIsDir && (isImageFile(listDelegateRoot.fileName) || isVideoFile(listDelegateRoot.fileName))
                 maskThresholdMin: 0.5
                 maskSpreadAtMin: 1
             }
@@ -166,7 +199,7 @@ StyledRect {
                 name: listDelegateRoot.fileIsDir ? "folder" : getIconForFile(listDelegateRoot.fileName)
                 size: Theme.iconSize - 2
                 color: listDelegateRoot.fileIsDir ? Theme.primary : Theme.surfaceText
-                visible: listDelegateRoot.fileIsDir || !isImageFile(listDelegateRoot.fileName)
+                visible: listDelegateRoot.fileIsDir || (!isImageFile(listDelegateRoot.fileName) && !(isVideoFile(listDelegateRoot.fileName) && listPreviewImage.status === Image.Ready))
             }
         }
 
