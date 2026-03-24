@@ -7,19 +7,19 @@ import qs.Common
 Item {
     id: root
 
-    required property string barEdge      // "top" | "bottom" | "left" | "right" | ""
-    required property real   barThickness
+    required property var barEdges   // array of "top" | "bottom" | "left" | "right"
 
     anchors.fill: parent
 
-    readonly property real _thickness: SettingsData.frameThickness
-    readonly property real _rounding:  SettingsData.frameRounding
+    readonly property real _thickness:    SettingsData.frameThickness
+    readonly property real _barThickness: SettingsData.frameBarThickness
+    readonly property real _rounding:     SettingsData.frameRounding
 
     Rectangle {
         id: borderRect
 
         anchors.fill: parent
-        color:   SettingsData.frameColor
+        color:   SettingsData.effectiveFrameColor
         opacity: SettingsData.frameOpacity
 
         layer.enabled: true
@@ -42,10 +42,10 @@ Item {
         Rectangle {
             anchors {
                 fill:         parent
-                topMargin:    root.barEdge === "top"    ? root.barThickness : root._thickness
-                bottomMargin: root.barEdge === "bottom" ? root.barThickness : root._thickness
-                leftMargin:   root.barEdge === "left"   ? root.barThickness : root._thickness
-                rightMargin:  root.barEdge === "right"  ? root.barThickness : root._thickness
+                topMargin:    root.barEdges.includes("top")    ? root._barThickness : root._thickness
+                bottomMargin: root.barEdges.includes("bottom") ? root._barThickness : root._thickness
+                leftMargin:   root.barEdges.includes("left")   ? root._barThickness : root._thickness
+                rightMargin:  root.barEdges.includes("right")  ? root._barThickness : root._thickness
             }
             radius: root._rounding
         }

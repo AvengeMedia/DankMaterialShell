@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 7
+    readonly property int settingsConfigVersion: 9
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -210,7 +210,7 @@ Singleton {
     onFrameThicknessChanged: saveSettings()
     property real frameRounding: 24
     onFrameRoundingChanged: saveSettings()
-    property string frameColor: "#2a2a2a"
+    property string frameColor: ""
     onFrameColorChanged: saveSettings()
     property real frameOpacity: 1.0
     onFrameOpacityChanged: saveSettings()
@@ -218,6 +218,18 @@ Singleton {
     onFrameSyncBarColorChanged: saveSettings()
     property var frameScreenPreferences: ["all"]
     onFrameScreenPreferencesChanged: saveSettings()
+    property real frameBarThickness: 48
+    onFrameBarThicknessChanged: saveSettings()
+    property bool frameShowOnOverview: false
+    onFrameShowOnOverviewChanged: saveSettings()
+
+    readonly property color effectiveFrameColor: {
+        const fc = frameColor;
+        if (!fc || fc === "default") return Theme.background;
+        if (fc === "primary") return Theme.primary;
+        if (fc === "surface") return Theme.surface;
+        return fc;
+    }
 
     property bool showLauncherButton: true
     property bool showWorkspaceSwitcher: true
@@ -1999,7 +2011,26 @@ Singleton {
         return "";
     }
 
+    function getActiveBarEdgesForScreen(screen) {
+        if (!screen) return [];
+        var edges = [];
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled) continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs)) continue;
+            switch (bc.position ?? 0) {
+            case SettingsData.Position.Top:    edges.push("top"); break;
+            case SettingsData.Position.Bottom: edges.push("bottom"); break;
+            case SettingsData.Position.Left:   edges.push("left"); break;
+            case SettingsData.Position.Right:  edges.push("right"); break;
+            }
+        }
+        return edges;
+    }
+
     function getActiveBarThicknessForScreen(screen) {
+        if (frameEnabled) return frameBarThickness;
         if (!screen) return frameThickness;
         for (var i = 0; i < barConfigs.length; i++) {
             var bc = barConfigs[i];

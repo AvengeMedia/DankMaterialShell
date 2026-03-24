@@ -11,7 +11,7 @@ PanelWindow {
     required property ShellScreen screen
 
     WlrLayershell.namespace: "dms:frame"
-    WlrLayershell.layer: WlrLayer.Bottom
+    WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
     anchors {
@@ -28,7 +28,9 @@ PanelWindow {
 
     FrameBorder {
         anchors.fill: parent
-        barEdge: SettingsData.getActiveBarEdgeForScreen(win.screen)
-        barThickness: SettingsData.getActiveBarThicknessForScreen(win.screen)
+        barEdges: {
+            SettingsData.barConfigs; // force re-eval when bar configs change
+            return SettingsData.getActiveBarEdgesForScreen(win.screen);
+        }
     }
 }

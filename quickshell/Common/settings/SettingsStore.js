@@ -262,6 +262,22 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 7;
     }
 
+    if (currentVersion < 8) {
+        console.info("Migrating settings from version", currentVersion, "to version 8");
+
+        if (settings.frameBarThickness === undefined) settings.frameBarThickness = 48;
+
+        settings.configVersion = 8;
+    }
+
+    if (currentVersion < 9) {
+        console.info("Migrating settings from version", currentVersion, "to version 9");
+
+        if (settings.frameShowOnOverview === undefined) settings.frameShowOnOverview = false;
+
+        settings.configVersion = 9;
+    }
+
     return settings;
 }
 
