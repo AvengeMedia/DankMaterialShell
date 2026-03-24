@@ -239,7 +239,7 @@ PanelWindow {
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
     readonly property color _bgColor: (SettingsData.frameEnabled && SettingsData.frameSyncBarColor)
-        ? SettingsData.frameColor
+        ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
         : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
@@ -397,7 +397,12 @@ PanelWindow {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property real effectiveBarThickness: SettingsData.frameEnabled
+        ? SettingsData.frameBarThickness
+        : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled
+        ? SettingsData.frameShowOnOverview
+        : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
     readonly property bool hasAdjacentTopBar: {
@@ -653,7 +658,7 @@ PanelWindow {
 
         readonly property int barThickness: Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr)
 
-        readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false)
+        readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
         readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
 
@@ -794,7 +799,7 @@ PanelWindow {
         }
 
         property bool reveal: {
-            const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false);
+            const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview;
             if (inOverviewWithShow)
                 return true;
 
@@ -891,7 +896,7 @@ PanelWindow {
                 top: barWindow.isVertical ? parent.top : undefined
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
-            readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false)
+            readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
             hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.hasActivePopout
             acceptedButtons: Qt.NoButton
             enabled: (barConfig?.autoHide ?? false) && !inOverview

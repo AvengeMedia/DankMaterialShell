@@ -554,10 +554,12 @@ var SPEC = {
     frameEnabled: { def: false },
     frameThickness: { def: 15 },
     frameRounding: { def: 24 },
-    frameColor: { def: "#2a2a2a" },
+    frameColor: { def: "" },
     frameOpacity: { def: 1.0 },
     frameSyncBarColor: { def: true },
-    frameScreenPreferences: { def: ["all"] }
+    frameScreenPreferences: { def: ["all"] },
+    frameBarThickness: { def: 42 },
+    frameShowOnOverview: { def: false }
 };
 
 function getValidKeys() {

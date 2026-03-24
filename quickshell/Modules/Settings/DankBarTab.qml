@@ -693,6 +693,8 @@ Item {
 
                 SettingsToggleRow {
                     visible: CompositorService.isNiri
+                    enabled: !SettingsData.frameEnabled
+                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     text: I18n.tr("Show on Overview")
                     checked: selectedBarConfig?.openOnOverview ?? false
                     onToggled: toggled => {
@@ -798,11 +800,42 @@ Item {
                 }
             }
 
+            Item {
+                visible: SettingsData.frameEnabled
+                width: parent.width
+                implicitHeight: frameNote.implicitHeight + Theme.spacingS * 2
+
+                Row {
+                    id: frameNote
+                    x: Theme.spacingM
+                    width: parent.width - Theme.spacingM * 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingS
+
+                    DankIcon {
+                        name: "frame_source"
+                        size: Theme.fontSizeMedium
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Spacing and size are managed by Frame mode")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width - Theme.fontSizeMedium - Theme.spacingS
+                    }
+                }
+            }
+
             SettingsCard {
                 iconName: "space_bar"
                 title: I18n.tr("Spacing")
                 settingKey: "barSpacing"
                 visible: selectedBarConfig?.enabled
+                enabled: !SettingsData.frameEnabled
+                opacity: SettingsData.frameEnabled ? 0.5 : 1.0
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
@@ -1287,6 +1320,8 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Square Corners")
+                    enabled: !SettingsData.frameEnabled
+                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     checked: selectedBarConfig?.squareCorners ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             squareCorners: checked
@@ -1295,6 +1330,8 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("No Background")
+                    enabled: !SettingsData.frameEnabled
+                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     checked: selectedBarConfig?.noBackground ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             noBackground: checked
@@ -1334,6 +1371,8 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Goth Corners")
+                    enabled: !SettingsData.frameEnabled
+                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     checked: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             gothCornersEnabled: checked
