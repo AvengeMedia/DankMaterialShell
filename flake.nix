@@ -150,6 +150,9 @@
                   substituteInPlace $out/share/quickshell/dms/assets/pam/fprint \
                     --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so
 
+                  substituteInPlace $out/share/quickshell/dms/assets/pam/u2f \
+                    --replace-fail pam_u2f.so ${pkgs.pam_u2f}/lib/security/pam_u2f.so
+
                   installShellCompletion --cmd dms \
                     --bash <($out/bin/dms completion bash) \
                     --fish <($out/bin/dms completion fish) \
