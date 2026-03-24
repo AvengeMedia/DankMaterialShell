@@ -92,6 +92,27 @@ Item {
                 }
 
                 SettingsSliderRow {
+                    id: barThicknessSlider
+                    settingKey: "frameBarThickness"
+                    tags: ["frame", "bar", "thickness", "size", "height", "width"]
+                    text: I18n.tr("Bar-edge thickness")
+                    description: I18n.tr("Height of horizontal bars / width of vertical bars in frame mode")
+                    unit: "px"
+                    minimum: 24
+                    maximum: 100
+                    step: 1
+                    defaultValue: 48
+                    value: SettingsData.frameBarThickness
+                    onSliderDragFinished: v => SettingsData.set("frameBarThickness", v)
+
+                    Binding {
+                        target: barThicknessSlider
+                        property: "value"
+                        value: SettingsData.frameBarThickness
+                    }
+                }
+
+                SettingsSliderRow {
                     id: opacitySlider
                     settingKey: "frameOpacity"
                     tags: ["frame", "border", "opacity", "transparency"]
@@ -110,13 +131,45 @@ Item {
                     }
                 }
 
-                // Color row
+                // Color mode buttons
+                SettingsButtonGroupRow {
+                    settingKey: "frameColor"
+                    tags: ["frame", "border", "color", "theme", "primary", "surface", "default"]
+                    text: I18n.tr("Border color")
+                    model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
+                    currentIndex: {
+                        const fc = SettingsData.frameColor;
+                        if (!fc || fc === "default") return 0;
+                        if (fc === "primary") return 1;
+                        if (fc === "surface") return 2;
+                        return 3;
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected) return;
+                        switch (index) {
+                        case 0: SettingsData.set("frameColor", ""); break;
+                        case 1: SettingsData.set("frameColor", "primary"); break;
+                        case 2: SettingsData.set("frameColor", "surface"); break;
+                        case 3:
+                            const cur = SettingsData.frameColor;
+                            const isPreset = !cur || cur === "primary" || cur === "surface";
+                            if (isPreset) SettingsData.set("frameColor", "#2a2a2a");
+                            break;
+                        }
+                    }
+                }
+
+                // Custom color swatch — only visible when a hex color is stored (Custom mode)
                 Item {
+                    visible: {
+                        const fc = SettingsData.frameColor;
+                        return !!(fc && fc !== "primary" && fc !== "surface");
+                    }
                     width: parent.width
-                    height: colorRow.height + Theme.spacingM * 2
+                    height: customColorRow.height + Theme.spacingM * 2
 
                     Row {
-                        id: colorRow
+                        id: customColorRow
                         width: parent.width - Theme.spacingM * 2
                         x: Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
@@ -124,7 +177,7 @@ Item {
 
                         StyledText {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Border color")
+                            text: I18n.tr("Custom color")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -136,7 +189,7 @@ Item {
                             width: 32
                             height: 32
                             radius: 16
-                            color: SettingsData.frameColor
+                            color: SettingsData.effectiveFrameColor
                             border.color: Theme.outline
                             border.width: 1
 
@@ -144,7 +197,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    PopoutService.colorPickerModal.selectedColor = SettingsData.frameColor;
+                                    PopoutService.colorPickerModal.selectedColor = SettingsData.effectiveFrameColor;
                                     PopoutService.colorPickerModal.pickerTitle = I18n.tr("Frame Border Color");
                                     PopoutService.colorPickerModal.onColorSelectedCallback = function (color) {
                                         SettingsData.set("frameColor", color.toString());
@@ -173,6 +226,16 @@ Item {
                     description: I18n.tr("Sets the bar background color to match the frame border color for a seamless look")
                     checked: SettingsData.frameSyncBarColor
                     onToggled: checked => SettingsData.set("frameSyncBarColor", checked)
+                }
+
+                SettingsToggleRow {
+                    visible: CompositorService.isNiri
+                    settingKey: "frameShowOnOverview"
+                    tags: ["frame", "overview", "show", "hide", "niri"]
+                    text: I18n.tr("Show on Overview")
+                    description: I18n.tr("Show the bar and frame during Niri overview mode")
+                    checked: SettingsData.frameShowOnOverview
+                    onToggled: checked => SettingsData.set("frameShowOnOverview", checked)
                 }
             }
 

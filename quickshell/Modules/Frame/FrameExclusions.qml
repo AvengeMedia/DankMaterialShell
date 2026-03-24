@@ -10,48 +10,51 @@ Scope {
 
     required property ShellScreen screen
 
-    readonly property string barEdge: SettingsData.getActiveBarEdgeForScreen(screen)
+    readonly property var barEdges: {
+        SettingsData.barConfigs; // force re-eval when bar configs change
+        return SettingsData.getActiveBarEdgesForScreen(screen);
+    }
 
     // One thin invisible PanelWindow per edge.
-    // Skips the edge where the bar already provides its own exclusiveZone.
+    // Skips any edge where a bar already provides its own exclusiveZone.
 
     Loader {
-        active: root.barEdge !== "top"
-        sourceComponent: EdgeExclusion {
-            screen:        root.screen
-            anchorTop:    true
-            anchorLeft:   true
-            anchorRight:  true
-        }
-    }
-
-    Loader {
-        active: root.barEdge !== "bottom"
-        sourceComponent: EdgeExclusion {
-            screen:        root.screen
-            anchorBottom: true
-            anchorLeft:   true
-            anchorRight:  true
-        }
-    }
-
-    Loader {
-        active: root.barEdge !== "left"
+        active: !root.barEdges.includes("top")
         sourceComponent: EdgeExclusion {
             screen:       root.screen
-            anchorLeft:  true
-            anchorTop:   true
-            anchorBottom: true
+            anchorTop:    true
+            anchorLeft:   true
+            anchorRight:  true
         }
     }
 
     Loader {
-        active: root.barEdge !== "right"
+        active: !root.barEdges.includes("bottom")
         sourceComponent: EdgeExclusion {
             screen:        root.screen
-            anchorRight:  true
-            anchorTop:    true
-            anchorBottom: true
+            anchorBottom:  true
+            anchorLeft:    true
+            anchorRight:   true
+        }
+    }
+
+    Loader {
+        active: !root.barEdges.includes("left")
+        sourceComponent: EdgeExclusion {
+            screen:        root.screen
+            anchorLeft:    true
+            anchorTop:     true
+            anchorBottom:  true
+        }
+    }
+
+    Loader {
+        active: !root.barEdges.includes("right")
+        sourceComponent: EdgeExclusion {
+            screen:        root.screen
+            anchorRight:   true
+            anchorTop:     true
+            anchorBottom:  true
         }
     }
 
