@@ -186,6 +186,8 @@ Item {
         }
     }
 
+    Frame {}
+
     Repeater {
         id: dankBarRepeater
         model: ScriptModel {
@@ -216,8 +218,6 @@ Item {
             }
         }
     }
-
-    Frame {}
 
     property bool dockEnabled: false
 
