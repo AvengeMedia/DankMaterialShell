@@ -154,7 +154,8 @@ StyledRect {
                 source: imagePath ? "file://" + imagePath.split('/').map(s => encodeURIComponent(s)).join('/') : ""
                 onStatusChanged: {
                     if (status === Image.Error && videoThumbnailPath) {
-                        Proc.runCommand("vidthumb-" + listDelegateRoot.filePath, ["ffmpegthumbnailer", "-i", listDelegateRoot.filePath, "-o", videoThumbnailPath, "-s", "128", "-f"], function(output, exitCode) {
+                        const thumbDir = _cacheDir + "/thumbnails/normal";
+                        Proc.runCommand("vidthumb-" + listDelegateRoot.filePath, ["sh", "-c", "mkdir -p '" + thumbDir + "' && ffmpegthumbnailer -i '" + listDelegateRoot.filePath + "' -o '" + videoThumbnailPath + "' -s 128 -f"], function(output, exitCode) {
                             if (exitCode === 0) {
                                 listPreviewImage.imagePath = "";
                                 listPreviewImage.imagePath = videoThumbnailPath;

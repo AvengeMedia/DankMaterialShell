@@ -160,8 +160,9 @@ StyledRect {
                     }
                     if (status === Image.Error && videoThumbnailPath) {
                         const thumbPath = videoThumbnailPath;
+                        const thumbDir = _cacheDir + "/thumbnails/" + _thumbnailSize;
                         const size = _thumbnailPx;
-                        Proc.runCommand("vidthumb-" + delegateRoot.filePath, ["ffmpegthumbnailer", "-i", delegateRoot.filePath, "-o", thumbPath, "-s", String(size), "-f"], function(output, exitCode) {
+                        Proc.runCommand("vidthumb-" + delegateRoot.filePath, ["sh", "-c", "mkdir -p '" + thumbDir + "' && ffmpegthumbnailer -i '" + delegateRoot.filePath + "' -o '" + thumbPath + "' -s " + String(size) + " -f"], function(output, exitCode) {
                             if (exitCode === 0) {
                                 gridPreviewImage.imagePath = "";
                                 gridPreviewImage.imagePath = thumbPath;
