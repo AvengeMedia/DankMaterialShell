@@ -38,7 +38,7 @@ Item {
 
     property real rt: {
         if (SettingsData.frameEnabled)
-            return Math.max(0, SettingsData.frameRounding - SettingsData.frameThickness);
+            return 0;
         if (barConfig?.squareCorners ?? false)
             return 0;
         if (barWindow.hasMaximizedToplevel)
