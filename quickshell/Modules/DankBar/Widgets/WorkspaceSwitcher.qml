@@ -1478,7 +1478,7 @@ Item {
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: (modelData.active || isActive) ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                            readonly property real appOpacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
 
                                             IconImage {
                                                 id: rowAppIcon
@@ -1647,7 +1647,7 @@ Item {
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: (modelData.active || isActive) ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                            readonly property real appOpacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
 
                                             IconImage {
                                                 id: colAppIcon

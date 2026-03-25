@@ -73,6 +73,20 @@ Item {
         id: appLayout
         width: layoutFlow.width
         height: layoutFlow.height
+
+        Behavior on width {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on height {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Easing.OutCubic
+            }
+        }
         anchors.horizontalCenter: root.isVertical ? undefined : parent.horizontalCenter
         anchors.verticalCenter: root.isVertical ? parent.verticalCenter : undefined
         anchors.left: root.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? parent.left : undefined

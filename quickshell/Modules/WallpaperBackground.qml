@@ -109,9 +109,31 @@ Variants {
             }
 
             Connections {
+                target: wallpaperWindow
+                function onWidthChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
+                function onHeightChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
+            }
+
+            Connections {
+                target: Quickshell
+                function onScreensChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
+            }
+
+            Connections {
                 target: NiriService
                 function onDisplayScalesChanged() {
                     root._recheckScreenScale();
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                 }
             }
 
@@ -119,6 +141,8 @@ Variants {
                 target: WlrOutputService
                 function onWlrOutputAvailableChanged() {
                     root._recheckScreenScale();
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
                 }
             }
 

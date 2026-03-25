@@ -91,13 +91,6 @@ Scope {
     }
 
     FileView {
-        id: loginConfigWatcher
-
-        path: "/etc/pam.d/login"
-        printErrors: false
-    }
-
-    FileView {
         id: u2fConfigWatcher
 
         path: "/etc/pam.d/dankshell-u2f"
@@ -108,7 +101,7 @@ Scope {
         id: passwd
 
         config: dankshellConfigWatcher.loaded ? "dankshell" : "login"
-        configDirectory: dankshellConfigWatcher.loaded || loginConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
+        configDirectory: dankshellConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
             if (message.startsWith("The account is locked"))
@@ -252,7 +245,7 @@ Scope {
         configDirectory: u2fConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
-            if (message !== "")
+            if (message.toLowerCase().includes("touch"))
                 root.u2fState = "waiting";
         }
 

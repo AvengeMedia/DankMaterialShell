@@ -329,6 +329,9 @@
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": ""
   },
+  "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+  },
   "Advanced": {
     "Advanced": "Gelişmiş"
   },
@@ -3160,6 +3163,9 @@
   "Launch on dGPU": {
     "Launch on dGPU": "dGPU'da Başlat"
   },
+  "Launch on dGPU by default": {
+    "Launch on dGPU by default": ""
+  },
   "Launcher": {
     "Launcher": "Başlatıcı"
   },
@@ -3366,6 +3372,9 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": ""
+  },
+  "Matugen Contrast": {
+    "Matugen Contrast": ""
   },
   "Matugen Palette": {
     "Matugen Palette": "Matugen Paleti"
