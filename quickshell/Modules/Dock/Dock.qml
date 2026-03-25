@@ -17,6 +17,15 @@ Variants {
     delegate: PanelWindow {
         id: dock
 
+        WindowBlur {
+            targetWindow: dock
+            blurX: dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x
+            blurY: dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y
+            blurWidth: dock.hasApps && dock.reveal ? dockBackground.width : 0
+            blurHeight: dock.hasApps && dock.reveal ? dockBackground.height : 0
+            blurRadius: Theme.cornerRadius
+        }
+
         WlrLayershell.namespace: "dms:dock"
 
         readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
@@ -561,6 +570,15 @@ Variants {
                             anchors.fill: parent
                             color: Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
                             radius: Theme.cornerRadius
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            radius: Theme.cornerRadius
+                            border.color: BlurService.borderColor
+                            border.width: BlurService.borderWidth
+                            z: 100
                         }
                     }
 

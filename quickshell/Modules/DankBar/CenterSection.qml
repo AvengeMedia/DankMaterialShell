@@ -14,6 +14,7 @@ Item {
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
+    property var blurBarWindow: null
     property bool overrideAxisLayout: false
     property bool forceVerticalLayout: false
 
@@ -357,6 +358,7 @@ Item {
                 barThickness: root.barThickness
                 barSpacing: root.barSpacing
                 barConfig: root.barConfig
+                blurBarWindow: root.blurBarWindow
                 isFirst: index === 0
                 isLast: index === centerRepeater.count - 1
                 sectionSpacing: parent.itemSpacing

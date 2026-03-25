@@ -630,7 +630,7 @@ BasePill {
                         if (appItem.isFocused && colorizeEnabled) {
                             return mouseArea.containsMouse ? Theme.withAlpha(Qt.lighter(appItem.activeOverlayColor, 1.3), 0.4) : Theme.withAlpha(appItem.activeOverlayColor, 0.3);
                         }
-                        return mouseArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent";
+                        return mouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
                     }
 
                     border.width: dragHandler.dragging ? 2 : 0

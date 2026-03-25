@@ -17,6 +17,7 @@ Item {
     property real widgetHeight: 30
     property real barThickness: 48
     property var barConfig: null
+    property var blurBarWindow: null
     property var hyprlandOverviewLoader: null
     property var parentScreen: null
     property int _desktopEntriesUpdateTrigger: 0
@@ -1845,5 +1846,27 @@ Item {
         if (useExtWorkspace && !DMSService.activeSubscriptions.includes("extworkspace")) {
             DMSService.addSubscription("extworkspace");
         }
+        _updateBlurRegistration();
+    }
+
+    property bool _blurRegistered: false
+    readonly property bool _shouldBlur: BlurService.enabled && blurBarWindow && blurBarWindow.registerBlurWidget && !(barConfig?.noBackground ?? false) && root.visible && root.width > 0
+
+    on_ShouldBlurChanged: _updateBlurRegistration()
+
+    function _updateBlurRegistration() {
+        if (_shouldBlur && !_blurRegistered) {
+            blurBarWindow.registerBlurWidget(visualBackground);
+            _blurRegistered = true;
+        } else if (!_shouldBlur && _blurRegistered) {
+            if (blurBarWindow && blurBarWindow.unregisterBlurWidget)
+                blurBarWindow.unregisterBlurWidget(visualBackground);
+            _blurRegistered = false;
+        }
+    }
+
+    Component.onDestruction: {
+        if (_blurRegistered && blurBarWindow && blurBarWindow.unregisterBlurWidget)
+            blurBarWindow.unregisterBlurWidget(visualBackground);
     }
 }

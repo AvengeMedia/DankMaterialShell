@@ -354,7 +354,7 @@ BasePill {
                         height: 20
                         radius: 10
                         anchors.verticalCenter: parent.verticalCenter
-                        color: prevArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                        color: prevArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
                         visible: root.playerAvailable
                         opacity: (activePlayer && activePlayer.canGoPrevious) ? 1 : 0.3
 
@@ -411,7 +411,7 @@ BasePill {
                         height: 20
                         radius: 10
                         anchors.verticalCenter: parent.verticalCenter
-                        color: nextArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                        color: nextArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
                         visible: playerAvailable
                         opacity: (activePlayer && activePlayer.canGoNext) ? 1 : 0.3
 
