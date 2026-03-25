@@ -33,6 +33,7 @@ Singleton {
     property int pamSupportProbeExitCode: 0
     property bool pamFprintSupportDetected: false
     property bool pamU2fSupportDetected: false
+    property bool pamFaillockSupportDetected: false
 
     readonly property string homeDir: Quickshell.env("HOME") || ""
     readonly property string u2fKeysPath: homeDir ? homeDir + "/.config/Yubico/u2f_keys" : ""
@@ -70,14 +71,13 @@ Singleton {
             fingerprintProbeState = forcedFprintAvailable ? "ready" : "probe_failed";
         }
 
-        if (forcedFprintAvailable === null || forcedU2fAvailable === null) {
-            pamFprintSupportDetected = false;
-            pamU2fSupportDetected = false;
-            pamSupportProbeOutput = "";
-            pamSupportProbeStreamFinished = false;
-            pamSupportProbeExited = false;
-            pamSupportDetectionProcess.running = true;
-        }
+        pamFprintSupportDetected = false;
+        pamU2fSupportDetected = false;
+        pamFaillockSupportDetected = false;
+        pamSupportProbeOutput = "";
+        pamSupportProbeStreamFinished = false;
+        pamSupportProbeExited = false;
+        pamSupportDetectionProcess.running = true;
 
         recomputeAuthCapabilities();
     }
@@ -321,6 +321,7 @@ Singleton {
             return;
         recomputeFingerprintCapabilities();
         recomputeU2fCapabilities();
+        settingsRoot.lockFaillockSupported = pamFaillockSupportDetected;
         settingsRoot.fprintdAvailable = settingsRoot.lockFingerprintReady || settingsRoot.greeterFingerprintReady;
         settingsRoot.u2fAvailable = settingsRoot.lockU2fReady || settingsRoot.greeterU2fReady;
     }
@@ -338,6 +339,7 @@ Singleton {
 
         pamFprintSupportDetected = false;
         pamU2fSupportDetected = false;
+        pamFaillockSupportDetected = false;
 
         const lines = (pamSupportProbeOutput || "").trim().split(/\r?\n/);
         for (let i = 0; i < lines.length; i++) {
@@ -348,6 +350,8 @@ Singleton {
                 pamFprintSupportDetected = parts[1] === "true";
             else if (parts[0] === "pam_u2f.so")
                 pamU2fSupportDetected = parts[1] === "true";
+            else if (parts[0] === "pam_faillock.so")
+                pamFaillockSupportDetected = parts[1] === "true";
         }
 
         if (forcedFprintAvailable === null && fingerprintProbeState === "missing_pam_support")
@@ -401,7 +405,7 @@ Singleton {
     }
 
     property var pamSupportDetectionProcess: Process {
-        command: ["sh", "-c", "for module in pam_fprintd.so pam_u2f.so; do found=false; for dir in /usr/lib64/security /usr/lib/security /lib/security /lib/x86_64-linux-gnu/security /usr/lib/x86_64-linux-gnu/security /usr/lib/aarch64-linux-gnu/security /run/current-system/sw/lib/security; do if [ -f \"$dir/$module\" ]; then found=true; break; fi; done; printf '%s:%s\\n' \"$module\" \"$found\"; done"]
+        command: ["sh", "-c", "for module in pam_fprintd.so pam_u2f.so pam_faillock.so; do found=false; for dir in /usr/lib64/security /usr/lib/security /lib/security /lib/x86_64-linux-gnu/security /usr/lib/x86_64-linux-gnu/security /usr/lib/aarch64-linux-gnu/security /run/current-system/sw/lib/security; do if [ -f \"$dir/$module\" ]; then found=true; break; fi; done; printf '%s:%s\\n' \"$module\" \"$found\"; done"]
         running: false
 
         stdout: StdioCollector {

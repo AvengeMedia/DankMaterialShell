@@ -1,0 +1,7 @@
+#%PAM-1.0
+auth      required     pam_env.so
+auth      required     pam_faillock.so  preauth
+auth      [success=1 default=bad] pam_unix.so try_first_pass nullok
+auth      [default=die] pam_faillock.so authfail
+auth      required     pam_faillock.so  authsucc
+account   required     pam_unix.so

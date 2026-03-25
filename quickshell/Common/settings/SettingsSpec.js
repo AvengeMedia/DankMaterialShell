@@ -328,6 +328,7 @@ var SPEC = {
     lockAtStartup: { def: false },
     enableFprint: { def: false },
     maxFprintTries: { def: 15 },
+    lockFaillockSupported: { def: false, persist: false },
     fprintdAvailable: { def: false, persist: false },
     lockFingerprintCanEnable: { def: false, persist: false },
     lockFingerprintReady: { def: false, persist: false },
