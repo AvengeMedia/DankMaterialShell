@@ -35,6 +35,15 @@ local function deepGet(t, k)
 	return t
 end
 
+local mode = vim.system({ "dms", "ipc", "call", "theme", "getMode" }, { text = true }):wait().stdout
+if mode ~= nil then
+	if mode:match("light") then
+		vim.o.background = "light"
+	elseif mode:match("dark") then
+		vim.o.background = "dark"
+	end
+end
+
 local current_file_path = debug.getinfo(1, "S").source:sub(2)
 local theme_base = deepGet(settings, { "matugenTemplateNeovimSettings", vim.o.background, "baseTheme" })
 	or ("github_" .. vim.o.background)
