@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Popup {
@@ -186,8 +187,8 @@ Popup {
     contentItem: Rectangle {
         color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
         radius: Theme.cornerRadius
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-        border.width: 1
+        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+        border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
         Item {
             id: keyboardHandler

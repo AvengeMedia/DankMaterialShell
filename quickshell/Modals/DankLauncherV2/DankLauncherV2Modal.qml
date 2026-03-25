@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -128,40 +129,47 @@ Item {
         }
     }
 
-    function show() {
-        closeCleanupTimer.stop();
+    function _finishShow(query, mode) {
+        spotlightOpen = true;
         isClosing = false;
         openedFromOverview = false;
 
-        var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen)
-            launcherWindow.screen = focusedScreen;
-
-        spotlightOpen = true;
         keyboardActive = true;
         ModalManager.openModal(root);
         if (useHyprlandFocusGrab)
             focusGrab.active = true;
 
-        _ensureContentLoadedAndInitialize("", "");
+        _ensureContentLoadedAndInitialize(query || "", mode || "");
+    }
+
+    function show() {
+        closeCleanupTimer.stop();
+
+        var focusedScreen = CompositorService.getFocusedScreen();
+        if (focusedScreen && launcherWindow.screen !== focusedScreen) {
+            spotlightOpen = false;
+            isClosing = false;
+            launcherWindow.screen = focusedScreen;
+            Qt.callLater(() => root._finishShow("", ""));
+            return;
+        }
+
+        _finishShow("", "");
     }
 
     function showWithQuery(query) {
         closeCleanupTimer.stop();
-        isClosing = false;
-        openedFromOverview = false;
 
         var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen)
+        if (focusedScreen && launcherWindow.screen !== focusedScreen) {
+            spotlightOpen = false;
+            isClosing = false;
             launcherWindow.screen = focusedScreen;
+            Qt.callLater(() => root._finishShow(query, ""));
+            return;
+        }
 
-        spotlightOpen = true;
-        keyboardActive = true;
-        ModalManager.openModal(root);
-        if (useHyprlandFocusGrab)
-            focusGrab.active = true;
-
-        _ensureContentLoadedAndInitialize(query, "");
+        _finishShow(query, "");
     }
 
     function hide() {
@@ -185,14 +193,20 @@ Item {
 
     function showWithMode(mode) {
         closeCleanupTimer.stop();
+
+        var focusedScreen = CompositorService.getFocusedScreen();
+        if (focusedScreen && launcherWindow.screen !== focusedScreen) {
+            spotlightOpen = false;
+            isClosing = false;
+            launcherWindow.screen = focusedScreen;
+            Qt.callLater(() => root._finishShow("", mode));
+            return;
+        }
+
+        spotlightOpen = true;
         isClosing = false;
         openedFromOverview = false;
 
-        var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen)
-            launcherWindow.screen = focusedScreen;
-
-        spotlightOpen = true;
         keyboardActive = true;
         ModalManager.openModal(root);
         if (useHyprlandFocusGrab)
@@ -287,6 +301,16 @@ Item {
         visible: spotlightOpen || isClosing
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
+
+        WindowBlur {
+            targetWindow: launcherWindow
+            readonly property real s: Math.min(1, modalContainer.scale)
+            blurX: root.modalX + root.modalWidth * (1 - s) * 0.5
+            blurY: root.modalY + root.modalHeight * (1 - s) * 0.5
+            blurWidth: contentVisible ? root.modalWidth * s : 0
+            blurHeight: contentVisible ? root.modalHeight * s : 0
+            blurRadius: root.cornerRadius
+        }
 
         WlrLayershell.namespace: "dms:spotlight"
         WlrLayershell.layer: {
@@ -420,6 +444,14 @@ Item {
                     root.hide();
                     event.accepted = true;
                 }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: root.cornerRadius
+                color: "transparent"
+                border.color: BlurService.borderColor
+                border.width: BlurService.borderWidth
             }
         }
     }

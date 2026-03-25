@@ -14,6 +14,7 @@ Item {
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
+    property var blurBarWindow: null
     property string pluginId: ""
     property var pluginService: null
 
@@ -182,6 +183,7 @@ Item {
         barThickness: root.barThickness
         barSpacing: root.barSpacing
         barConfig: root.barConfig
+        blurBarWindow: root.blurBarWindow
         content: root.horizontalBarPill
 
         states: State {
@@ -241,6 +243,7 @@ Item {
         barThickness: root.barThickness
         barSpacing: root.barSpacing
         barConfig: root.barConfig
+        blurBarWindow: root.blurBarWindow
         content: root.verticalBarPill
         isVerticalOrientation: true
 

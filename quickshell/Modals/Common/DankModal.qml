@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -59,11 +60,25 @@ Item {
     function open() {
         closeTimer.stop();
         const focusedScreen = CompositorService.getFocusedScreen();
+        const screenChanged = focusedScreen && contentWindow.screen !== focusedScreen;
         if (focusedScreen) {
+            if (screenChanged)
+                contentWindow.visible = false;
             contentWindow.screen = focusedScreen;
-            if (!useSingleWindow)
+            if (!useSingleWindow) {
+                if (screenChanged)
+                    clickCatcher.visible = false;
                 clickCatcher.screen = focusedScreen;
+            }
         }
+        if (screenChanged) {
+            Qt.callLater(() => root._finishOpen());
+        } else {
+            _finishOpen();
+        }
+    }
+
+    function _finishOpen() {
         ModalManager.openModal(root);
         shouldBeVisible = true;
         if (!useSingleWindow)
@@ -214,6 +229,16 @@ Item {
         id: contentWindow
         visible: false
         color: "transparent"
+
+        WindowBlur {
+            targetWindow: contentWindow
+            readonly property real s: Math.min(1, modalContainer.scaleValue)
+            blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
+            blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
+            blurWidth: shouldBeVisible ? modalContainer.width * s : 0
+            blurHeight: shouldBeVisible ? modalContainer.height * s : 0
+            blurRadius: root.cornerRadius
+        }
 
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: {
@@ -391,6 +416,15 @@ Item {
                         borderColor: root.borderColor
                         borderWidth: root.borderWidth
                         shadowEnabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: root.cornerRadius
+                        color: "transparent"
+                        border.color: BlurService.borderColor
+                        border.width: BlurService.borderWidth
+                        z: 100
                     }
 
                     FocusScope {

@@ -125,6 +125,15 @@ Item {
         return Theme.warning;
     }
 
+    function openBlurBorderColorPicker() {
+        PopoutService.colorPickerModal.selectedColor = SettingsData.blurBorderCustomColor ?? "#ffffff";
+        PopoutService.colorPickerModal.pickerTitle = I18n.tr("Blur Border Color");
+        PopoutService.colorPickerModal.onColorSelectedCallback = function (color) {
+            SettingsData.set("blurBorderCustomColor", color.toString());
+        };
+        PopoutService.colorPickerModal.open();
+    }
+
     function openM3ShadowColorPicker() {
         PopoutService.colorPickerModal.selectedColor = SettingsData.m3ElevationCustomColor ?? "#000000";
         PopoutService.colorPickerModal.pickerTitle = I18n.tr("Shadow Color");
@@ -1818,6 +1827,77 @@ Item {
 
             SettingsCard {
                 tab: "theme"
+                tags: ["blur", "background", "transparency", "glass", "frosted"]
+                title: I18n.tr("Background Blur")
+                settingKey: "blurEnabled"
+                iconName: "blur_on"
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["blur", "background", "transparency", "glass", "frosted"]
+                    settingKey: "blurEnabled"
+                    text: I18n.tr("Background Blur")
+                    description: BlurService.available ? I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.") : I18n.tr("Requires a newer version of Quickshell")
+                    checked: SettingsData.blurEnabled ?? false
+                    enabled: BlurService.available
+                    onToggled: checked => SettingsData.set("blurEnabled", checked)
+                }
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["blur", "border", "outline", "edge"]
+                    settingKey: "blurBorderColor"
+                    text: I18n.tr("Blur Border Color")
+                    description: I18n.tr("Border color around blurred surfaces")
+                    visible: SettingsData.blurEnabled
+                    options: [I18n.tr("Outline", "blur border color"), I18n.tr("Primary", "blur border color"), I18n.tr("Secondary", "blur border color"), I18n.tr("Text Color", "blur border color"), I18n.tr("Custom", "blur border color")]
+                    currentValue: {
+                        switch (SettingsData.blurBorderColor) {
+                        case "primary":
+                            return I18n.tr("Primary", "blur border color");
+                        case "secondary":
+                            return I18n.tr("Secondary", "blur border color");
+                        case "surfaceText":
+                            return I18n.tr("Text Color", "blur border color");
+                        case "custom":
+                            return I18n.tr("Custom", "blur border color");
+                        default:
+                            return I18n.tr("Outline", "blur border color");
+                        }
+                    }
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Primary", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "primary");
+                        } else if (value === I18n.tr("Secondary", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "secondary");
+                        } else if (value === I18n.tr("Text Color", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "surfaceText");
+                        } else if (value === I18n.tr("Custom", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "custom");
+                            openBlurBorderColorPicker();
+                        } else {
+                            SettingsData.set("blurBorderColor", "outline");
+                        }
+                    }
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["blur", "border", "opacity"]
+                    settingKey: "blurBorderOpacity"
+                    text: I18n.tr("Blur Border Opacity")
+                    visible: SettingsData.blurEnabled
+                    value: Math.round((SettingsData.blurBorderOpacity ?? 1.0) * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
+                }
+            }
+
+            SettingsCard {
+                tab: "theme"
                 tags: ["niri", "layout", "gaps", "radius", "window", "border"]
                 title: I18n.tr("Niri Layout Overrides").replace("Niri", "niri")
                 settingKey: "niriLayout"
@@ -2601,7 +2681,6 @@ Item {
                     checked: SettingsData.matugenTemplateNeovim
                     onToggled: checked => SettingsData.set("matugenTemplateNeovim", checked)
                 }
-
 
                 SettingsDropdownRow {
                     text: I18n.tr("Dark mode base")

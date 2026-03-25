@@ -285,7 +285,7 @@ BasePill {
                         width: parent.width
                         height: 30
                         radius: Theme.cornerRadius
-                        color: tabArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                        color: tabArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                         Row {
                             anchors.fill: parent
@@ -327,7 +327,7 @@ BasePill {
                     width: parent.width
                     height: 30
                     radius: Theme.cornerRadius
-                    color: newNoteArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                    color: newNoteArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                     Row {
                         anchors.fill: parent

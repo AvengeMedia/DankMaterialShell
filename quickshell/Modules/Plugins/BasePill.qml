@@ -14,6 +14,7 @@ Item {
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
+    property var blurBarWindow: null
     property alias content: contentLoader.sourceComponent
     property bool isVerticalOrientation: axis?.isVertical ?? false
     property bool isFirst: false
@@ -106,7 +107,7 @@ Item {
                 const rawTransparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
                 const isHovered = root.enableBackgroundHover && (mouseArea.containsMouse || (root.isHovered || false));
                 const transparency = isHovered ? Math.max(0.3, rawTransparency) : rawTransparency;
-                const baseColor = isHovered ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
+                const baseColor = isHovered ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.widgetBaseBackgroundColor;
 
                 if (Theme.widgetBackgroundHasAlpha) {
                     return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * transparency);
@@ -168,5 +169,27 @@ Item {
             wheelEvent.accepted = false;
             root.wheel(wheelEvent);
         }
+    }
+
+    property bool _blurRegistered: false
+    readonly property bool _shouldBlur: BlurService.enabled && blurBarWindow && blurBarWindow.registerBlurWidget && !(barConfig?.noBackground ?? false) && root.visible && root.width > 0
+
+    on_ShouldBlurChanged: _updateBlurRegistration()
+
+    function _updateBlurRegistration() {
+        if (_shouldBlur && !_blurRegistered) {
+            blurBarWindow.registerBlurWidget(visualContent);
+            _blurRegistered = true;
+        } else if (!_shouldBlur && _blurRegistered) {
+            if (blurBarWindow && blurBarWindow.unregisterBlurWidget)
+                blurBarWindow.unregisterBlurWidget(visualContent);
+            _blurRegistered = false;
+        }
+    }
+
+    Component.onCompleted: _updateBlurRegistration()
+    Component.onDestruction: {
+        if (_blurRegistered && blurBarWindow && blurBarWindow.unregisterBlurWidget)
+            blurBarWindow.unregisterBlurWidget(visualContent);
     }
 }

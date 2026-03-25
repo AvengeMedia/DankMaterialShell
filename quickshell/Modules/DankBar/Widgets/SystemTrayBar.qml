@@ -287,7 +287,7 @@ BasePill {
                         height: root.trayItemSize
                         anchors.centerIn: parent
                         radius: Theme.cornerRadius
-                        color: trayItemArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                        color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
                         border.width: dragHandler.dragging ? 2 : 0
                         border.color: Theme.primary
                         opacity: dragHandler.dragging ? 0.8 : 1.0
@@ -425,7 +425,7 @@ BasePill {
                     height: root.trayItemSize
                     anchors.centerIn: parent
                     radius: Theme.cornerRadius
-                    color: caretArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                    color: caretArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -547,7 +547,7 @@ BasePill {
                         height: root.trayItemSize
                         anchors.centerIn: parent
                         radius: Theme.cornerRadius
-                        color: trayItemArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                        color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
                         border.width: dragHandler.dragging ? 2 : 0
                         border.color: Theme.primary
                         opacity: dragHandler.dragging ? 0.8 : 1.0
@@ -685,7 +685,7 @@ BasePill {
                     height: root.trayItemSize
                     anchors.centerIn: parent
                     radius: Theme.cornerRadius
-                    color: caretAreaVert.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                    color: caretAreaVert.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -723,6 +723,16 @@ BasePill {
 
     PanelWindow {
         id: overflowMenu
+
+        WindowBlur {
+            targetWindow: overflowMenu
+            blurX: menuContainer.x
+            blurY: menuContainer.y
+            blurWidth: root.menuOpen ? menuContainer.width : 0
+            blurHeight: root.menuOpen ? menuContainer.height : 0
+            blurRadius: Theme.cornerRadius
+        }
+
         visible: root.menuOpen
         screen: root.parentScreen
         WlrLayershell.layer: WlrLayershell.Top
@@ -990,6 +1000,15 @@ BasePill {
                 layer.samples: 4
             }
 
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                radius: Theme.cornerRadius
+                border.color: BlurService.borderColor
+                border.width: BlurService.borderWidth
+                z: 100
+            }
+
             Grid {
                 id: menuGrid
                 anchors.centerIn: parent
@@ -1030,7 +1049,7 @@ BasePill {
                         width: root.trayItemSize + 4
                         height: root.trayItemSize + 4
                         radius: Theme.cornerRadius
-                        color: itemArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.withAlpha(Theme.surfaceContainer, 0)
+                        color: itemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0)
 
                         IconImage {
                             id: menuIconImg
@@ -1191,6 +1210,15 @@ BasePill {
             PanelWindow {
                 id: menuWindow
 
+                WindowBlur {
+                    targetWindow: menuWindow
+                    blurX: trayMenuContainer.x
+                    blurY: trayMenuContainer.y
+                    blurWidth: menuRoot.showMenu ? trayMenuContainer.width : 0
+                    blurHeight: menuRoot.showMenu ? trayMenuContainer.height : 0
+                    blurRadius: Theme.cornerRadius
+                }
+
                 WlrLayershell.namespace: "dms:tray-menu-window"
                 visible: menuRoot.showMenu && (menuRoot.trayItem?.hasMenu ?? false)
                 WlrLayershell.layer: WlrLayershell.Top
@@ -1302,7 +1330,7 @@ BasePill {
                     onClicked: mouse => {
                         const clickX = mouse.x + menuWindow.maskX;
                         const clickY = mouse.y + menuWindow.maskY;
-                        const outsideContent = clickX < menuContainer.x || clickX > menuContainer.x + menuContainer.width || clickY < menuContainer.y || clickY > menuContainer.y + menuContainer.height;
+                        const outsideContent = clickX < trayMenuContainer.x || clickX > trayMenuContainer.x + trayMenuContainer.width || clickY < trayMenuContainer.y || clickY > trayMenuContainer.y + trayMenuContainer.height;
 
                         if (!outsideContent)
                             return;
@@ -1360,7 +1388,7 @@ BasePill {
                 }
 
                 Item {
-                    id: menuContainer
+                    id: trayMenuContainer
 
                     readonly property real rawWidth: Math.min(500, Math.max(250, menuColumn.implicitWidth + Theme.spacingS * 2))
                     readonly property real rawHeight: Math.max(40, menuColumn.implicitHeight + Theme.spacingS * 2)
@@ -1438,6 +1466,15 @@ BasePill {
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically
                     }
 
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "transparent"
+                        radius: Theme.cornerRadius
+                        border.color: BlurService.borderColor
+                        border.width: BlurService.borderWidth
+                        z: 100
+                    }
+
                     QsMenuAnchor {
                         id: submenuHydrator
                         anchor.window: menuWindow
@@ -1470,7 +1507,7 @@ BasePill {
                             width: parent.width
                             height: 28
                             radius: Theme.cornerRadius
-                            color: visibilityToggleArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.withAlpha(Theme.surfaceContainer, 0)
+                            color: visibilityToggleArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0)
 
                             StyledText {
                                 anchors.left: parent.left
@@ -1523,7 +1560,7 @@ BasePill {
                             width: parent.width
                             height: 28
                             radius: Theme.cornerRadius
-                            color: backArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.withAlpha(Theme.surfaceContainer, 0)
+                            color: backArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0)
 
                             Row {
                                 anchors.left: parent.left
@@ -1574,7 +1611,7 @@ BasePill {
                                 color: {
                                     if (menuEntry?.isSeparator)
                                         return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2);
-                                    return itemArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.withAlpha(Theme.surfaceContainer, 0);
+                                    return itemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0);
                                 }
 
                                 MouseArea {
