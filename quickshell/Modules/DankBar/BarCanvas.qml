@@ -10,6 +10,8 @@ Item {
     required property var axis
     required property var barConfig
 
+    visible: !SettingsData.frameEnabled
+
     anchors.fill: parent
 
     anchors.left: parent.left
@@ -38,7 +40,7 @@ Item {
 
     property real rt: {
         if (SettingsData.frameEnabled)
-            return 0;
+            return SettingsData.frameRounding;
         if (barConfig?.squareCorners ?? false)
             return 0;
         if (barWindow.hasMaximizedToplevel)

@@ -7,7 +7,7 @@ import qs.Common
 Variants {
     id: root
 
-    model: SettingsData.frameEnabled ? SettingsData.getFrameFilteredScreens() : []
+    model: SettingsData.getFrameScreensAlways()
 
     FrameInstance {
         required property ShellScreen modelData

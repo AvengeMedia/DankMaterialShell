@@ -19,7 +19,7 @@ Scope {
     // Skips any edge where a bar already provides its own exclusiveZone.
 
     Loader {
-        active: !root.barEdges.includes("top")
+        active: SettingsData.frameEnabled && !root.barEdges.includes("top")
         sourceComponent: EdgeExclusion {
             screen:       root.screen
             anchorTop:    true
@@ -29,7 +29,7 @@ Scope {
     }
 
     Loader {
-        active: !root.barEdges.includes("bottom")
+        active: SettingsData.frameEnabled && !root.barEdges.includes("bottom")
         sourceComponent: EdgeExclusion {
             screen:        root.screen
             anchorBottom:  true
@@ -39,7 +39,7 @@ Scope {
     }
 
     Loader {
-        active: !root.barEdges.includes("left")
+        active: SettingsData.frameEnabled && !root.barEdges.includes("left")
         sourceComponent: EdgeExclusion {
             screen:        root.screen
             anchorLeft:    true
@@ -49,7 +49,7 @@ Scope {
     }
 
     Loader {
-        active: !root.barEdges.includes("right")
+        active: SettingsData.frameEnabled && !root.barEdges.includes("right")
         sourceComponent: EdgeExclusion {
             screen:        root.screen
             anchorRight:   true

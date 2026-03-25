@@ -893,6 +893,8 @@ Item {
 
                 SettingsSliderRow {
                     id: barTransparencySlider
+                    enabled: !SettingsData.frameEnabled
+                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     text: I18n.tr("Bar Transparency")
                     value: (selectedBarConfig?.transparency ?? 1.0) * 100
                     minimum: 0
@@ -932,6 +934,35 @@ Item {
                         property: "value"
                         value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
                         restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                Item {
+                    visible: SettingsData.frameEnabled
+                    width: parent.width
+                    implicitHeight: transparencyFrameNote.implicitHeight + Theme.spacingS * 2
+
+                    Row {
+                        id: transparencyFrameNote
+                        x: Theme.spacingM
+                        width: parent.width - Theme.spacingM * 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "frame_source"
+                            size: Theme.fontSizeMedium
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Opacity is controlled by Frame Border Opacity in Frame settings")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            width: parent.width - Theme.fontSizeMedium - Theme.spacingS
+                        }
                     }
                 }
             }

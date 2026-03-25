@@ -552,8 +552,8 @@ var SPEC = {
     launcherPluginOrder: { def: [] },
 
     frameEnabled: { def: false },
-    frameThickness: { def: 15 },
-    frameRounding: { def: 24 },
+    frameThickness: { def: 16 },
+    frameRounding: { def: 23 },
     frameColor: { def: "" },
     frameOpacity: { def: 1.0 },
     frameSyncBarColor: { def: true },
