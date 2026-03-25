@@ -10,6 +10,7 @@ Singleton {
 
     readonly property url home: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
     readonly property url pictures: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+    readonly property url xdgCache: StandardPaths.standardLocations(StandardPaths.GenericCacheLocation)[0]
 
     readonly property url data: `${StandardPaths.standardLocations(StandardPaths.GenericDataLocation)[0]}/DankMaterialShell`
     readonly property url state: `${StandardPaths.standardLocations(StandardPaths.GenericStateLocation)[0]}/DankMaterialShell`

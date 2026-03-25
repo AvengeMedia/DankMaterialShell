@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Effects
-import Quickshell
 import qs.Common
 import qs.Widgets
 
@@ -86,7 +85,7 @@ StyledRect {
     property bool isImage: isImageFile(delegateRoot.fileName)
     property bool isVideo: isVideoFile(delegateRoot.fileName)
 
-    property string _xdgCacheHome: Quickshell.env("XDG_CACHE_HOME") || (Paths.strip(Paths.home) + "/.cache")
+    property string _xdgCacheHome: Paths.strip(Paths.xdgCache)
     property string _thumbnailSize: iconSizeIndex >= 2 ? "x-large" : "large"
     property int _thumbnailPx: iconSizeIndex >= 2 ? 512 : 256
     property string videoThumbnailPath: {

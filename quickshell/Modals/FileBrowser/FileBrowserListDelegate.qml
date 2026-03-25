@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Effects
-import Quickshell
 import qs.Common
 import qs.Widgets
 
@@ -85,7 +84,7 @@ StyledRect {
     property bool isImage: isImageFile(listDelegateRoot.fileName)
     property bool isVideo: isVideoFile(listDelegateRoot.fileName)
 
-    property string _xdgCacheHome: Quickshell.env("XDG_CACHE_HOME") || (Paths.strip(Paths.home) + "/.cache")
+    property string _xdgCacheHome: Paths.strip(Paths.xdgCache)
     property string videoThumbnailPath: {
         if (!listDelegateRoot.fileIsDir && isVideo) {
             const hash = Qt.md5("file://" + listDelegateRoot.filePath);
