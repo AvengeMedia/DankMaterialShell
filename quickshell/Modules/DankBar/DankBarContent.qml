@@ -23,6 +23,31 @@ Item {
     readonly property real innerPadding: barConfig?.innerPadding ?? 4
     readonly property real outlineThickness: (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0
 
+    readonly property real _frameLeftInset: {
+        if (!SettingsData.frameEnabled || barWindow.isVertical) return 0
+        return barWindow.hasAdjacentLeftBar
+            ? SettingsData.frameBarThickness
+            : 0
+    }
+    readonly property real _frameRightInset: {
+        if (!SettingsData.frameEnabled || barWindow.isVertical) return 0
+        return barWindow.hasAdjacentRightBar
+            ? SettingsData.frameBarThickness
+            : 0
+    }
+    readonly property real _frameTopInset: {
+        if (!SettingsData.frameEnabled || !barWindow.isVertical) return 0
+        return barWindow.hasAdjacentTopBar
+            ? SettingsData.frameThickness
+            : 0
+    }
+    readonly property real _frameBottomInset: {
+        if (!SettingsData.frameEnabled || !barWindow.isVertical) return 0
+        return barWindow.hasAdjacentBottomBar
+            ? SettingsData.frameThickness
+            : 0
+    }
+
     property alias hLeftSection: hLeftSection
     property alias hCenterSection: hCenterSection
     property alias hRightSection: hRightSection
@@ -31,10 +56,14 @@ Item {
     property alias vRightSection: vRightSection
 
     anchors.fill: parent
-    anchors.leftMargin: Math.max(Theme.spacingXS, innerPadding * 0.8)
-    anchors.rightMargin: Math.max(Theme.spacingXS, innerPadding * 0.8)
-    anchors.topMargin: barWindow.isVertical ? (barWindow.hasAdjacentTopBar ? outlineThickness : Theme.spacingXS) : 0
-    anchors.bottomMargin: barWindow.isVertical ? (barWindow.hasAdjacentBottomBar ? outlineThickness : Theme.spacingXS) : 0
+    anchors.leftMargin:   Math.max(Theme.spacingXS, innerPadding * 0.8) + _frameLeftInset
+    anchors.rightMargin:  Math.max(Theme.spacingXS, innerPadding * 0.8) + _frameRightInset
+    anchors.topMargin:    (barWindow.isVertical
+        ? (barWindow.hasAdjacentTopBar ? outlineThickness : Theme.spacingXS)
+        : 0) + _frameTopInset
+    anchors.bottomMargin: (barWindow.isVertical
+        ? (barWindow.hasAdjacentBottomBar ? outlineThickness : Theme.spacingXS)
+        : 0) + _frameBottomInset
     clip: false
 
     property int componentMapRevision: 0

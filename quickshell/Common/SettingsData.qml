@@ -14,7 +14,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 9
+    readonly property int settingsConfigVersion: 10
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -201,9 +201,9 @@ Singleton {
 
     property bool frameEnabled: false
     onFrameEnabledChanged: saveSettings()
-    property real frameThickness: 15
+    property real frameThickness: 16
     onFrameThicknessChanged: saveSettings()
-    property real frameRounding: 24
+    property real frameRounding: 23
     onFrameRoundingChanged: saveSettings()
     property string frameColor: ""
     onFrameColorChanged: saveSettings()
@@ -213,7 +213,7 @@ Singleton {
     onFrameSyncBarColorChanged: saveSettings()
     property var frameScreenPreferences: ["all"]
     onFrameScreenPreferencesChanged: saveSettings()
-    property real frameBarThickness: 48
+    property real frameBarThickness: 42
     onFrameBarThicknessChanged: saveSettings()
     property bool frameShowOnOverview: false
     onFrameShowOnOverviewChanged: saveSettings()
@@ -1974,6 +1974,14 @@ Singleton {
             return Quickshell.screens;
         }
         return Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
+    }
+
+    function getFrameScreensAlways() {
+        const prefs = frameScreenPreferences;
+        if (!prefs || prefs.length === 0 || prefs.includes("all")) {
+            return Quickshell.screens;
+        }
+        return Quickshell.screens.filter(s => prefs.includes(s.name));
     }
 
     function getActiveBarEdgeForScreen(screen) {
