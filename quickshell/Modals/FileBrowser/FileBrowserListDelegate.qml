@@ -82,9 +82,12 @@ StyledRect {
         return determineFileType(fileName) === "video";
     }
 
+    property bool isImage: isImageFile(listDelegateRoot.fileName)
+    property bool isVideo: isVideoFile(listDelegateRoot.fileName)
+
     property string _xdgCacheHome: Quickshell.env("XDG_CACHE_HOME") || (Paths.strip(Paths.home) + "/.cache")
     property string videoThumbnailPath: {
-        if (!listDelegateRoot.fileIsDir && isVideoFile(listDelegateRoot.fileName)) {
+        if (!listDelegateRoot.fileIsDir && isVideo) {
             const hash = Qt.md5("file://" + listDelegateRoot.filePath);
             return _xdgCacheHome + "/thumbnails/normal/" + hash + ".png";
         }
@@ -150,7 +153,7 @@ StyledRect {
                 id: listPreviewImage
                 anchors.fill: parent
                 property string imagePath: {
-                    if (!listDelegateRoot.fileIsDir && isImageFile(listDelegateRoot.fileName))
+                    if (!listDelegateRoot.fileIsDir && isImage)
                         return listDelegateRoot.filePath;
                     if (videoThumbnailPath)
                         return videoThumbnailPath;
@@ -180,7 +183,7 @@ StyledRect {
                 source: listPreviewImage
                 maskEnabled: true
                 maskSource: listImageMask
-                visible: listPreviewImage.status === Image.Ready && !listDelegateRoot.fileIsDir && (isImageFile(listDelegateRoot.fileName) || isVideoFile(listDelegateRoot.fileName))
+                visible: listPreviewImage.status === Image.Ready && !listDelegateRoot.fileIsDir && (isImage || isVideo)
                 maskThresholdMin: 0.5
                 maskSpreadAtMin: 1
             }
@@ -205,7 +208,7 @@ StyledRect {
                 name: listDelegateRoot.fileIsDir ? "folder" : getIconForFile(listDelegateRoot.fileName)
                 size: Theme.iconSize - 2
                 color: listDelegateRoot.fileIsDir ? Theme.primary : Theme.surfaceText
-                visible: listDelegateRoot.fileIsDir || (!isImageFile(listDelegateRoot.fileName) && !(isVideoFile(listDelegateRoot.fileName) && listPreviewImage.status === Image.Ready))
+                visible: listDelegateRoot.fileIsDir || (!isImage && !(isVideo && listPreviewImage.status === Image.Ready))
             }
         }
 

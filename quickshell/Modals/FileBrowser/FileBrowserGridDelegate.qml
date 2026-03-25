@@ -83,11 +83,14 @@ StyledRect {
         return determineFileType(fileName) === "video";
     }
 
+    property bool isImage: isImageFile(delegateRoot.fileName)
+    property bool isVideo: isVideoFile(delegateRoot.fileName)
+
     property string _xdgCacheHome: Quickshell.env("XDG_CACHE_HOME") || (Paths.strip(Paths.home) + "/.cache")
     property string _thumbnailSize: iconSizeIndex >= 2 ? "x-large" : "large"
     property int _thumbnailPx: iconSizeIndex >= 2 ? 512 : 256
     property string videoThumbnailPath: {
-        if (!delegateRoot.fileIsDir && isVideoFile(delegateRoot.fileName)) {
+        if (!delegateRoot.fileIsDir && isVideo) {
             const hash = Qt.md5("file://" + delegateRoot.filePath);
             return _xdgCacheHome + "/thumbnails/" + _thumbnailSize + "/" + hash + ".png";
         }
@@ -148,7 +151,7 @@ StyledRect {
                 property string imagePath: {
                     if (weMode && delegateRoot.fileIsDir)
                         return delegateRoot.filePath + "/preview" + weExtensions[weExtIndex];
-                    if (!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName))
+                    if (!delegateRoot.fileIsDir && isImage)
                         return delegateRoot.filePath;
                     if (videoThumbnailPath)
                         return videoThumbnailPath;
@@ -186,7 +189,7 @@ StyledRect {
                 source: gridPreviewImage
                 maskEnabled: true
                 maskSource: gridImageMask
-                visible: gridPreviewImage.status === Image.Ready && ((!delegateRoot.fileIsDir && (isImageFile(delegateRoot.fileName) || isVideoFile(delegateRoot.fileName))) || (weMode && delegateRoot.fileIsDir))
+                visible: gridPreviewImage.status === Image.Ready && ((!delegateRoot.fileIsDir && (isImage || isVideo)) || (weMode && delegateRoot.fileIsDir))
                 maskThresholdMin: 0.5
                 maskSpreadAtMin: 1
             }
@@ -212,7 +215,7 @@ StyledRect {
                 name: delegateRoot.fileIsDir ? "folder" : getIconForFile(delegateRoot.fileName)
                 size: iconSizes[iconSizeIndex] * 0.45
                 color: delegateRoot.fileIsDir ? Theme.primary : Theme.surfaceText
-                visible: (!delegateRoot.fileIsDir && !isImageFile(delegateRoot.fileName) && !(isVideoFile(delegateRoot.fileName) && gridPreviewImage.status === Image.Ready)) || (delegateRoot.fileIsDir && !weMode)
+                visible: (!delegateRoot.fileIsDir && !isImage && !(isVideo && gridPreviewImage.status === Image.Ready)) || (delegateRoot.fileIsDir && !weMode)
             }
         }
 
