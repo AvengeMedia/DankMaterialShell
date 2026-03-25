@@ -494,6 +494,7 @@ Singleton {
                 "harmony": 0.5
             }
         })
+    property bool matugenTemplateNeovimSetBackground: true
 
     property bool showDock: false
     property bool dockAutoHide: false

@@ -35,6 +35,15 @@ local function deepGet(t, k)
 	return t
 end
 
+local mode = vim.system({ "dms", "ipc", "call", "theme", "getMode" }, { text = true }):wait().stdout
+if mode ~= nil then
+	if mode:match("light") then
+		vim.o.background = "light"
+	elseif mode:match("dark") then
+		vim.o.background = "dark"
+	end
+end
+
 local current_file_path = debug.getinfo(1, "S").source:sub(2)
 local theme_base = deepGet(settings, { "matugenTemplateNeovimSettings", vim.o.background, "baseTheme" })
 	or ("github_" .. vim.o.background)
@@ -74,7 +83,9 @@ end
 if not base46.theme_tables[theme_name] or base46.theme_tables[theme_name].type ~= vim.o.background then
 	local builtin = vim.deepcopy(assert(base46.get_builtin_theme(theme_base)))
 	local harmonized = base46.theme_harmonize(builtin, "{{colors.source_color.default.hex}}", harmony)
-	harmonized = base46.theme_set_bg(harmonized, "{{colors.background.default.hex}}")
+	if settings.matugenTemplateNeovimSetBackground ~= false then
+		harmonized = base46.theme_set_bg(harmonized, "{{colors.background.default.hex}}")
+	end
 
 	base46.theme_tables[theme_name] = harmonized
 end

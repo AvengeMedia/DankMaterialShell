@@ -2671,6 +2671,15 @@ Item {
                     }
                 }
 
+                SettingsToggleRow {
+                    text: I18n.tr("Follow DMS background color")
+                    tags: ["matugen", "neovim", "terminal", "template"]
+                    settingKey: "matugenTemplateNeovimSetBackground"
+                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
+                    checked: SettingsData.matugenTemplateNeovimSetBackground ?? true
+                    onToggled: checked => SettingsData.set("matugenTemplateNeovimSetBackground", checked)
+                }
+
                 SettingsDivider {
                     visible: neovimThemeToggle.visible && neovimThemeToggle.checked
                 }

@@ -1,3 +1,7 @@
-[templates.dmsneovim]
-input_path = 'SHELL_DIR/matugen/templates/neovim.lua'
+[templates.dmsneovim-colors]
+input_path = 'SHELL_DIR/matugen/templates/neovim-colors.lua'
 output_path = 'CONFIG_DIR/nvim/colors/dms.lua'
+
+[templates.dmsneovim-lualine]
+input_path = 'SHELL_DIR/matugen/templates/neovim-lualine.lua'
+output_path = 'CONFIG_DIR/nvim/lua/lualine/themes/dms.lua'
