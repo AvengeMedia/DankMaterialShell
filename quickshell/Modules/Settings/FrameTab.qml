@@ -60,7 +60,7 @@ Item {
                     minimum: 0
                     maximum: 100
                     step: 1
-                    defaultValue: 24
+                    defaultValue: 23
                     value: SettingsData.frameRounding
                     onSliderDragFinished: v => SettingsData.set("frameRounding", v)
 
@@ -80,7 +80,7 @@ Item {
                     minimum: 2
                     maximum: 100
                     step: 1
-                    defaultValue: 15
+                    defaultValue: 16
                     value: SettingsData.frameThickness
                     onSliderDragFinished: v => SettingsData.set("frameThickness", v)
 
@@ -101,7 +101,7 @@ Item {
                     minimum: 24
                     maximum: 100
                     step: 1
-                    defaultValue: 48
+                    defaultValue: 42
                     value: SettingsData.frameBarThickness
                     onSliderDragFinished: v => SettingsData.set("frameBarThickness", v)
 
@@ -116,7 +116,7 @@ Item {
                     id: opacitySlider
                     settingKey: "frameOpacity"
                     tags: ["frame", "border", "opacity", "transparency"]
-                    text: I18n.tr("Border opacity")
+                    text: I18n.tr("Frame Opacity")
                     unit: "%"
                     minimum: 0
                     maximum: 100

@@ -252,8 +252,8 @@ function migrateToVersion(obj, targetVersion) {
         console.info("Migrating settings from version", currentVersion, "to version 7");
 
         if (settings.frameEnabled === undefined) settings.frameEnabled = false;
-        if (settings.frameThickness === undefined) settings.frameThickness = 15;
-        if (settings.frameRounding === undefined) settings.frameRounding = 24;
+        if (settings.frameThickness === undefined) settings.frameThickness = 16;
+        if (settings.frameRounding === undefined) settings.frameRounding = 23;
         if (settings.frameColor === undefined) settings.frameColor = "#2a2a2a";
         if (settings.frameOpacity === undefined) settings.frameOpacity = 1.0;
         if (settings.frameSyncBarColor === undefined) settings.frameSyncBarColor = true;
@@ -265,7 +265,7 @@ function migrateToVersion(obj, targetVersion) {
     if (currentVersion < 8) {
         console.info("Migrating settings from version", currentVersion, "to version 8");
 
-        if (settings.frameBarThickness === undefined) settings.frameBarThickness = 48;
+        if (settings.frameBarThickness === undefined) settings.frameBarThickness = 42;
 
         settings.configVersion = 8;
     }
@@ -276,6 +276,11 @@ function migrateToVersion(obj, targetVersion) {
         if (settings.frameShowOnOverview === undefined) settings.frameShowOnOverview = false;
 
         settings.configVersion = 9;
+    }
+
+    // v10 migration — Session 5
+    if (currentVersion < 10) {
+        settings.configVersion = 10;
     }
 
     return settings;
