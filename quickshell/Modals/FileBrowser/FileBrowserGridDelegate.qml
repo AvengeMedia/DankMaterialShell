@@ -83,15 +83,20 @@ StyledRect {
         return determineFileType(fileName) === "video";
     }
 
-    property string _cacheDir: Quickshell.env("XDG_CACHE_HOME") || (Quickshell.env("HOME") + "/.cache")
+    property string _xdgCacheHome: Quickshell.env("XDG_CACHE_HOME") || (Paths.strip(Paths.home) + "/.cache")
     property string _thumbnailSize: iconSizeIndex >= 2 ? "x-large" : "large"
     property int _thumbnailPx: iconSizeIndex >= 2 ? 512 : 256
     property string videoThumbnailPath: {
         if (!delegateRoot.fileIsDir && isVideoFile(delegateRoot.fileName)) {
             const hash = Qt.md5("file://" + delegateRoot.filePath);
-            return _cacheDir + "/thumbnails/" + _thumbnailSize + "/" + hash + ".png";
+            return _xdgCacheHome + "/thumbnails/" + _thumbnailSize + "/" + hash + ".png";
         }
         return "";
+    }
+
+    onVideoThumbnailPathChanged: {
+        if (videoThumbnailPath)
+            Paths.mkdir(_xdgCacheHome + "/thumbnails/" + _thumbnailSize);
     }
 
     function getIconForFile(fileName) {
@@ -160,9 +165,7 @@ StyledRect {
                     }
                     if (status === Image.Error && videoThumbnailPath) {
                         const thumbPath = videoThumbnailPath;
-                        const thumbDir = _cacheDir + "/thumbnails/" + _thumbnailSize;
-                        const size = _thumbnailPx;
-                        Proc.runCommand("vidthumb-" + delegateRoot.filePath, ["sh", "-c", "mkdir -p '" + thumbDir + "' && ffmpegthumbnailer -i '" + delegateRoot.filePath + "' -o '" + thumbPath + "' -s " + String(size) + " -f"], function(output, exitCode) {
+                        Proc.runCommand("vidthumb-" + delegateRoot.filePath, ["ffmpegthumbnailer", "-i", delegateRoot.filePath, "-o", thumbPath, "-s", String(_thumbnailPx), "-f"], function(output, exitCode) {
                             if (exitCode === 0) {
                                 gridPreviewImage.imagePath = "";
                                 gridPreviewImage.imagePath = thumbPath;

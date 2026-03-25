@@ -82,13 +82,18 @@ StyledRect {
         return determineFileType(fileName) === "video";
     }
 
-    property string _cacheDir: Quickshell.env("XDG_CACHE_HOME") || (Quickshell.env("HOME") + "/.cache")
+    property string _xdgCacheHome: Quickshell.env("XDG_CACHE_HOME") || (Paths.strip(Paths.home) + "/.cache")
     property string videoThumbnailPath: {
         if (!listDelegateRoot.fileIsDir && isVideoFile(listDelegateRoot.fileName)) {
             const hash = Qt.md5("file://" + listDelegateRoot.filePath);
-            return _cacheDir + "/thumbnails/normal/" + hash + ".png";
+            return _xdgCacheHome + "/thumbnails/normal/" + hash + ".png";
         }
         return "";
+    }
+
+    onVideoThumbnailPathChanged: {
+        if (videoThumbnailPath)
+            Paths.mkdir(_xdgCacheHome + "/thumbnails/normal");
     }
 
     function getIconForFile(fileName) {
@@ -154,11 +159,11 @@ StyledRect {
                 source: imagePath ? "file://" + imagePath.split('/').map(s => encodeURIComponent(s)).join('/') : ""
                 onStatusChanged: {
                     if (status === Image.Error && videoThumbnailPath) {
-                        const thumbDir = _cacheDir + "/thumbnails/normal";
-                        Proc.runCommand("vidthumb-" + listDelegateRoot.filePath, ["sh", "-c", "mkdir -p '" + thumbDir + "' && ffmpegthumbnailer -i '" + listDelegateRoot.filePath + "' -o '" + videoThumbnailPath + "' -s 128 -f"], function(output, exitCode) {
+                        const thumbPath = videoThumbnailPath;
+                        Proc.runCommand("vidthumb-" + listDelegateRoot.filePath, ["ffmpegthumbnailer", "-i", listDelegateRoot.filePath, "-o", thumbPath, "-s", "128", "-f"], function(output, exitCode) {
                             if (exitCode === 0) {
                                 listPreviewImage.imagePath = "";
-                                listPreviewImage.imagePath = videoThumbnailPath;
+                                listPreviewImage.imagePath = thumbPath;
                             }
                         });
                     }
