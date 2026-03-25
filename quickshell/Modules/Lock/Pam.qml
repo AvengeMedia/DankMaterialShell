@@ -109,7 +109,7 @@ Scope {
     PamContext {
         id: passwd
 
-        config: dankshellConfigWatcher.loaded ? "dankshell" : root.bundledPasswdConfig
+        config: dankshellConfigWatcher.loaded ? "dankshell" : (loginConfigWatcher.loaded ? "login" : root.bundledPasswdConfig)
         configDirectory: (dankshellConfigWatcher.loaded || loginConfigWatcher.loaded) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
