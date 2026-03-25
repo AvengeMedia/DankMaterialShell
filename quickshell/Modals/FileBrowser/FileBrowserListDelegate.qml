@@ -74,6 +74,46 @@ StyledRect {
         return determineFileType(fileName) === "image";
     }
 
+    function isVideoFile(fileName) {
+        if (!fileName) {
+            return false;
+        }
+        return determineFileType(fileName) === "video";
+    }
+
+    property bool isImage: isImageFile(listDelegateRoot.fileName)
+    property bool isVideo: isVideoFile(listDelegateRoot.fileName)
+
+    property string _xdgCacheHome: Paths.strip(Paths.xdgCache)
+    property string videoThumbnailPath: {
+        if (!listDelegateRoot.fileIsDir && isVideo) {
+            const hash = Qt.md5("file://" + listDelegateRoot.filePath);
+            return _xdgCacheHome + "/thumbnails/normal/" + hash + ".png";
+        }
+        return "";
+    }
+
+    property string _videoThumb: ""
+
+    onVideoThumbnailPathChanged: {
+        _videoThumb = "";
+        if (!videoThumbnailPath)
+            return;
+        const thumbPath = videoThumbnailPath;
+        const fp = listDelegateRoot.filePath;
+        Paths.mkdir(_xdgCacheHome + "/thumbnails/normal");
+        Proc.runCommand(null, ["test", "-f", thumbPath], function(output, exitCode) {
+            if (exitCode === 0) {
+                _videoThumb = thumbPath;
+            } else {
+                Proc.runCommand(null, ["ffmpegthumbnailer", "-i", fp, "-o", thumbPath, "-s", "128", "-f"], function(output, exitCode) {
+                    if (exitCode === 0)
+                        _videoThumb = thumbPath;
+                });
+            }
+        });
+    }
+
     function getIconForFile(fileName) {
         const lowerName = fileName.toLowerCase();
         if (lowerName.startsWith("dockerfile")) {
@@ -127,7 +167,13 @@ StyledRect {
             Image {
                 id: listPreviewImage
                 anchors.fill: parent
-                property string imagePath: (!listDelegateRoot.fileIsDir && isImageFile(listDelegateRoot.fileName)) ? listDelegateRoot.filePath : ""
+                property string imagePath: {
+                    if (!listDelegateRoot.fileIsDir && isImage)
+                        return listDelegateRoot.filePath;
+                    if (_videoThumb)
+                        return _videoThumb;
+                    return "";
+                }
                 source: imagePath ? "file://" + imagePath.split('/').map(s => encodeURIComponent(s)).join('/') : ""
                 fillMode: Image.PreserveAspectCrop
                 sourceSize.width: 32
@@ -141,7 +187,7 @@ StyledRect {
                 source: listPreviewImage
                 maskEnabled: true
                 maskSource: listImageMask
-                visible: listPreviewImage.status === Image.Ready && !listDelegateRoot.fileIsDir && isImageFile(listDelegateRoot.fileName)
+                visible: listPreviewImage.status === Image.Ready && !listDelegateRoot.fileIsDir && (isImage || isVideo)
                 maskThresholdMin: 0.5
                 maskSpreadAtMin: 1
             }
@@ -166,7 +212,7 @@ StyledRect {
                 name: listDelegateRoot.fileIsDir ? "folder" : getIconForFile(listDelegateRoot.fileName)
                 size: Theme.iconSize - 2
                 color: listDelegateRoot.fileIsDir ? Theme.primary : Theme.surfaceText
-                visible: listDelegateRoot.fileIsDir || !isImageFile(listDelegateRoot.fileName)
+                visible: listDelegateRoot.fileIsDir || (!isImage && !(isVideo && listPreviewImage.status === Image.Ready))
             }
         }
 

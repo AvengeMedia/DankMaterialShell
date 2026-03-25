@@ -75,6 +75,50 @@ StyledRect {
         return determineFileType(fileName) === "image";
     }
 
+    function isVideoFile(fileName) {
+        if (!fileName) {
+            return false;
+        }
+        return determineFileType(fileName) === "video";
+    }
+
+    property bool isImage: isImageFile(delegateRoot.fileName)
+    property bool isVideo: isVideoFile(delegateRoot.fileName)
+
+    property string _xdgCacheHome: Paths.strip(Paths.xdgCache)
+    property string _thumbnailSize: iconSizeIndex >= 2 ? "x-large" : "large"
+    property int _thumbnailPx: iconSizeIndex >= 2 ? 512 : 256
+    property string videoThumbnailPath: {
+        if (!delegateRoot.fileIsDir && isVideo) {
+            const hash = Qt.md5("file://" + delegateRoot.filePath);
+            return _xdgCacheHome + "/thumbnails/" + _thumbnailSize + "/" + hash + ".png";
+        }
+        return "";
+    }
+
+    property string _videoThumb: ""
+
+    onVideoThumbnailPathChanged: {
+        _videoThumb = "";
+        if (!videoThumbnailPath)
+            return;
+        const thumbPath = videoThumbnailPath;
+        const thumbDir = _xdgCacheHome + "/thumbnails/" + _thumbnailSize;
+        const size = _thumbnailPx;
+        const fp = delegateRoot.filePath;
+        Paths.mkdir(thumbDir);
+        Proc.runCommand(null, ["test", "-f", thumbPath], function(output, exitCode) {
+            if (exitCode === 0) {
+                _videoThumb = thumbPath;
+            } else {
+                Proc.runCommand(null, ["ffmpegthumbnailer", "-i", fp, "-o", thumbPath, "-s", String(size), "-f"], function(output, exitCode) {
+                    if (exitCode === 0)
+                        _videoThumb = thumbPath;
+                });
+            }
+        });
+    }
+
     function getIconForFile(fileName) {
         const lowerName = fileName.toLowerCase();
         if (lowerName.startsWith("dockerfile")) {
@@ -124,7 +168,11 @@ StyledRect {
                 property string imagePath: {
                     if (weMode && delegateRoot.fileIsDir)
                         return delegateRoot.filePath + "/preview" + weExtensions[weExtIndex];
-                    return (!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)) ? delegateRoot.filePath : "";
+                    if (!delegateRoot.fileIsDir && isImage)
+                        return delegateRoot.filePath;
+                    if (_videoThumb)
+                        return _videoThumb;
+                    return "";
                 }
                 source: imagePath ? "file://" + imagePath.split('/').map(s => encodeURIComponent(s)).join('/') : ""
                 onStatusChanged: {
@@ -149,7 +197,7 @@ StyledRect {
                 source: gridPreviewImage
                 maskEnabled: true
                 maskSource: gridImageMask
-                visible: gridPreviewImage.status === Image.Ready && ((!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)) || (weMode && delegateRoot.fileIsDir))
+                visible: gridPreviewImage.status === Image.Ready && ((!delegateRoot.fileIsDir && (isImage || isVideo)) || (weMode && delegateRoot.fileIsDir))
                 maskThresholdMin: 0.5
                 maskSpreadAtMin: 1
             }
@@ -175,7 +223,7 @@ StyledRect {
                 name: delegateRoot.fileIsDir ? "folder" : getIconForFile(delegateRoot.fileName)
                 size: iconSizes[iconSizeIndex] * 0.45
                 color: delegateRoot.fileIsDir ? Theme.primary : Theme.surfaceText
-                visible: (!delegateRoot.fileIsDir && !isImageFile(delegateRoot.fileName)) || (delegateRoot.fileIsDir && !weMode)
+                visible: (!delegateRoot.fileIsDir && !isImage && !(isVideo && gridPreviewImage.status === Image.Ready)) || (delegateRoot.fileIsDir && !weMode)
             }
         }
 
