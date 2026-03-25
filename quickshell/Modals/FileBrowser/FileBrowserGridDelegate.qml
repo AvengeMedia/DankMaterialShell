@@ -97,9 +97,27 @@ StyledRect {
         return "";
     }
 
+    property string _videoThumb: ""
+
     onVideoThumbnailPathChanged: {
-        if (videoThumbnailPath)
-            Paths.mkdir(_xdgCacheHome + "/thumbnails/" + _thumbnailSize);
+        _videoThumb = "";
+        if (!videoThumbnailPath)
+            return;
+        const thumbPath = videoThumbnailPath;
+        const thumbDir = _xdgCacheHome + "/thumbnails/" + _thumbnailSize;
+        const size = _thumbnailPx;
+        const fp = delegateRoot.filePath;
+        Paths.mkdir(thumbDir);
+        Proc.runCommand(null, ["test", "-f", thumbPath], function(output, exitCode) {
+            if (exitCode === 0) {
+                _videoThumb = thumbPath;
+            } else {
+                Proc.runCommand(null, ["ffmpegthumbnailer", "-i", fp, "-o", thumbPath, "-s", String(size), "-f"], function(output, exitCode) {
+                    if (exitCode === 0)
+                        _videoThumb = thumbPath;
+                });
+            }
+        });
     }
 
     function getIconForFile(fileName) {
@@ -153,8 +171,8 @@ StyledRect {
                         return delegateRoot.filePath + "/preview" + weExtensions[weExtIndex];
                     if (!delegateRoot.fileIsDir && isImage)
                         return delegateRoot.filePath;
-                    if (videoThumbnailPath)
-                        return videoThumbnailPath;
+                    if (_videoThumb)
+                        return _videoThumb;
                     return "";
                 }
                 source: imagePath ? "file://" + imagePath.split('/').map(s => encodeURIComponent(s)).join('/') : ""
@@ -165,15 +183,6 @@ StyledRect {
                         } else {
                             imagePath = "";
                         }
-                    }
-                    if (status === Image.Error && videoThumbnailPath) {
-                        const thumbPath = videoThumbnailPath;
-                        Proc.runCommand("vidthumb-" + delegateRoot.filePath, ["ffmpegthumbnailer", "-i", delegateRoot.filePath, "-o", thumbPath, "-s", String(_thumbnailPx), "-f"], function(output, exitCode) {
-                            if (exitCode === 0) {
-                                gridPreviewImage.imagePath = "";
-                                gridPreviewImage.imagePath = thumbPath;
-                            }
-                        });
                     }
                 }
                 fillMode: Image.PreserveAspectCrop

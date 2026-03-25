@@ -94,9 +94,25 @@ StyledRect {
         return "";
     }
 
+    property string _videoThumb: ""
+
     onVideoThumbnailPathChanged: {
-        if (videoThumbnailPath)
-            Paths.mkdir(_xdgCacheHome + "/thumbnails/normal");
+        _videoThumb = "";
+        if (!videoThumbnailPath)
+            return;
+        const thumbPath = videoThumbnailPath;
+        const fp = listDelegateRoot.filePath;
+        Paths.mkdir(_xdgCacheHome + "/thumbnails/normal");
+        Proc.runCommand(null, ["test", "-f", thumbPath], function(output, exitCode) {
+            if (exitCode === 0) {
+                _videoThumb = thumbPath;
+            } else {
+                Proc.runCommand(null, ["ffmpegthumbnailer", "-i", fp, "-o", thumbPath, "-s", "128", "-f"], function(output, exitCode) {
+                    if (exitCode === 0)
+                        _videoThumb = thumbPath;
+                });
+            }
+        });
     }
 
     function getIconForFile(fileName) {
@@ -155,22 +171,11 @@ StyledRect {
                 property string imagePath: {
                     if (!listDelegateRoot.fileIsDir && isImage)
                         return listDelegateRoot.filePath;
-                    if (videoThumbnailPath)
-                        return videoThumbnailPath;
+                    if (_videoThumb)
+                        return _videoThumb;
                     return "";
                 }
                 source: imagePath ? "file://" + imagePath.split('/').map(s => encodeURIComponent(s)).join('/') : ""
-                onStatusChanged: {
-                    if (status === Image.Error && videoThumbnailPath) {
-                        const thumbPath = videoThumbnailPath;
-                        Proc.runCommand("vidthumb-" + listDelegateRoot.filePath, ["ffmpegthumbnailer", "-i", listDelegateRoot.filePath, "-o", thumbPath, "-s", "128", "-f"], function(output, exitCode) {
-                            if (exitCode === 0) {
-                                listPreviewImage.imagePath = "";
-                                listPreviewImage.imagePath = thumbPath;
-                            }
-                        });
-                    }
-                }
                 fillMode: Image.PreserveAspectCrop
                 sourceSize.width: 32
                 sourceSize.height: 32
