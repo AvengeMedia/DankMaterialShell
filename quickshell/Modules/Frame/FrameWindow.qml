@@ -28,9 +28,7 @@ PanelWindow {
 
     FrameBorder {
         anchors.fill: parent
-        barEdges: {
-            SettingsData.barConfigs; // force re-eval when bar configs change
-            return SettingsData.getActiveBarEdgesForScreen(win.screen);
-        }
+        visible: SettingsData.frameEnabled
+        barEdges: { SettingsData.barConfigs; return SettingsData.getActiveBarEdgesForScreen(win.screen); }
     }
 }
