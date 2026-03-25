@@ -305,6 +305,7 @@ var SPEC = {
             light: { baseTheme: "github_light", harmony: 0.5 }
         }
     },
+    matugenTemplateNeovimSetBackground: true,
 
     showDock: { def: false },
     dockAutoHide: { def: false },

@@ -910,6 +910,13 @@
     "comment": ""
   },
   {
+    "term": "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Advanced",
     "translation": "",
     "context": "",
@@ -5971,6 +5978,13 @@
     "comment": ""
   },
   {
+    "term": "Follow DMS background color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Follow Monitor Focus",
     "translation": "",
     "context": "",
@@ -7623,6 +7637,13 @@
     "comment": ""
   },
   {
+    "term": "Launch on dGPU by default",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Launcher",
     "translation": "",
     "context": "",
@@ -8135,6 +8156,13 @@
   },
   {
     "term": "Material inspired shadows and elevation on modals, popouts, and dialogs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Matugen Contrast",
     "translation": "",
     "context": "",
     "reference": "",

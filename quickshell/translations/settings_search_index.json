@@ -2697,6 +2697,31 @@
     ]
   },
   {
+    "section": "matugenTemplateNeovimSetBackground",
+    "label": "Follow DMS background color",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "color",
+      "colors",
+      "colour",
+      "dms",
+      "follow",
+      "hue",
+      "look",
+      "matugen",
+      "neovim",
+      "scheme",
+      "style",
+      "template",
+      "terminal",
+      "theme",
+      "tint"
+    ]
+  },
+  {
     "section": "matugenTemplateGtk",
     "label": "GTK",
     "tabIndex": 10,
@@ -2953,6 +2978,35 @@
     "icon": "crop_square",
     "description": "Use custom gaps instead of bar spacing",
     "conditionKey": "isDwl"
+  },
+  {
+    "section": "matugenContrast",
+    "label": "Matugen Contrast",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "adjusts",
+      "appearance",
+      "colors",
+      "colour",
+      "colours",
+      "contrast",
+      "dynamic",
+      "generated",
+      "hue",
+      "look",
+      "material",
+      "matugen",
+      "minimum",
+      "palette",
+      "scheme",
+      "standard",
+      "style",
+      "theme",
+      "tint",
+      "wallpaper colors"
+    ],
+    "description": "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)"
   },
   {
     "section": "matugenScheme",
@@ -4329,6 +4383,27 @@
       "startup"
     ],
     "description": "Automatically lock the screen when DMS starts"
+  },
+  {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "automatic",
+      "automatically",
+      "before",
+      "lock",
+      "login",
+      "password",
+      "prepares",
+      "screen",
+      "security",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "lockScreenNotificationMode",
@@ -6063,7 +6138,7 @@
       "tasks",
       "windows"
     ],
-    "icon": "apps",
+    "icon": "app_registration",
     "conditionKey": "isHyprlandOrNiri"
   },
   {
@@ -6331,27 +6406,6 @@
     ],
     "icon": "schedule",
     "description": "Gradually fade the screen before locking with a configurable grace period"
-  },
-  {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "automatically",
-      "before",
-      "energy",
-      "lock",
-      "power",
-      "prepares",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "fadeToLockGracePeriod",
@@ -6919,7 +6973,7 @@
       "system",
       "volume"
     ],
-    "icon": "computer"
+    "icon": "memory"
   },
   {
     "section": "_tab_30",
@@ -6948,19 +7002,6 @@
     ],
     "icon": "language",
     "description": "Change the locale used by the DMS interface."
-  },
-  {
-    "section": "_tab_30",
-    "label": "Multiplexers",
-    "tabIndex": 30,
-    "category": "Locale",
-    "keywords": [
-      "country",
-      "language",
-      "locale",
-      "multiplexers"
-    ],
-    "icon": "terminal"
   },
   {
     "section": "timeLocale",
@@ -6992,5 +7033,16 @@
       "settings"
     ],
     "icon": "login"
+  },
+  {
+    "section": "_tab_32",
+    "label": "Multiplexers",
+    "tabIndex": 32,
+    "category": "Settings",
+    "keywords": [
+      "multiplexers",
+      "settings"
+    ],
+    "icon": "terminal"
   }
 ]
