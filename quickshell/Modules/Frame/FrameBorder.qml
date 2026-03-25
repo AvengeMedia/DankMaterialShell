@@ -7,9 +7,9 @@ import qs.Common
 Item {
     id: root
 
-    required property var barEdges   // array of "top" | "bottom" | "left" | "right"
-
     anchors.fill: parent
+
+    required property var barEdges
 
     readonly property real _thickness:    SettingsData.frameThickness
     readonly property real _barThickness: SettingsData.frameBarThickness
