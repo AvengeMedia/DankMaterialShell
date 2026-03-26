@@ -97,7 +97,13 @@ Item {
         contentVisible = true;
         spotlightContent.searchField.forceActiveFocus();
 
-        var targetQuery = query || SessionData.launcherLastQuery || "";
+        var targetQuery = "";
+
+        if (query) {
+            targetQuery = query;
+        } else if (SettingsData.rememberLastQuery) {
+            targetQuery = SessionData.launcherLastQuery || ""
+        }
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = targetQuery
@@ -238,7 +244,9 @@ Item {
         }
 
         function onQueryChanged(query) {
-            SessionData.setLauncherLastQuery(query);
+            if (SettingsData.rememberLastQuery && root.spotlightOpen && !root.isClosing) {
+                SessionData.setLauncherLastQuery(query);
+            }
         }
     }
 

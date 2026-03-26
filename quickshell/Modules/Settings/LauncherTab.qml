@@ -831,6 +831,20 @@ Item {
                     checked: SessionData.searchAppActions
                     onToggled: checked => SessionData.setSearchAppActions(checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "rememberLastQuery"
+                    tags: ["launcher", "remember", "last", "search", "query"]
+                    text: I18n.tr("Remember Last Query")
+                    checked: SettingsData.rememberLastQuery
+                    onToggled: checked => {
+                        SettingsData.set("rememberLastQuery", checked);
+
+                         if (!checked) {
+                             SessionData.setLauncherLastQuery("");
+                         }
+                    }
+                }
             }
 
             SettingsCard {
