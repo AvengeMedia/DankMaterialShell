@@ -545,7 +545,6 @@ Singleton {
 
     property bool enableFprint: false
     property int maxFprintTries: 15
-    property bool lockFaillockSupported: false
     property bool fprintdAvailable: false
     property bool lockFingerprintCanEnable: false
     property bool lockFingerprintReady: false
