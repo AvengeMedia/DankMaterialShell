@@ -189,6 +189,9 @@ PanelWindow {
         const filtered = CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
         for (let i = 0; i < filtered.length; i++) {
             if (filtered[i]?.fullscreen) {
+                // On niri, fullscreen windows in inactive columns should not hide the bar
+                if (CompositorService.isNiri && !filtered[i]?.activated)
+                    continue;
                 hasFullscreenToplevel = true;
                 return;
             }
