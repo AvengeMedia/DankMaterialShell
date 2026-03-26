@@ -97,8 +97,10 @@ Item {
         contentVisible = true;
         spotlightContent.searchField.forceActiveFocus();
 
+        var targetQuery = query || SessionData.launcherLastQuery || "";
+
         if (spotlightContent.searchField) {
-            spotlightContent.searchField.text = query;
+            spotlightContent.searchField.text = targetQuery
         }
         if (spotlightContent.controller) {
             var targetMode = mode || SessionData.launcherLastMode || "all";
@@ -113,12 +115,9 @@ Item {
             spotlightContent.controller.collapsedSections = {};
             spotlightContent.controller.selectedFlatIndex = 0;
             spotlightContent.controller.selectedItem = null;
-            if (query) {
-                spotlightContent.controller.setSearchQuery(query);
-            } else {
-                spotlightContent.controller.searchQuery = "";
-                spotlightContent.controller.performSearch();
-            }
+
+            spotlightContent.controller.searchQuery = targetQuery
+            spotlightContent.controller.performSearch();
         }
         if (spotlightContent.resetScroll) {
             spotlightContent.resetScroll();
@@ -231,10 +230,15 @@ Item {
 
     Connections {
         target: spotlightContent?.controller ?? null
+
         function onModeChanged(mode) {
             if (spotlightContent.controller.autoSwitchedToFiles)
                 return;
             SessionData.setLauncherLastMode(mode);
+        }
+
+        function onQueryChanged(query) {
+            SessionData.setLauncherLastQuery(query);
         }
     }
 

@@ -132,6 +132,7 @@ Singleton {
     property string timeLocale: ""
 
     property string launcherLastMode: "all"
+    property string launcherLastQuery: ""
     property string appDrawerLastMode: "apps"
     property string niriOverviewLastMode: "apps"
     property string settingsSidebarExpandedIds: ","
@@ -1093,6 +1094,11 @@ Singleton {
 
     function setLauncherLastMode(mode) {
         launcherLastMode = mode;
+        saveSettings();
+    }
+
+    function setLauncherLastQuery(query) {
+        launcherLastQuery = query;
         saveSettings();
     }
 

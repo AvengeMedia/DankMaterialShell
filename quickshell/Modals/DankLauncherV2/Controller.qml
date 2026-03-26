@@ -39,6 +39,7 @@ Item {
     signal itemExecuted
     signal searchCompleted
     signal modeChanged(string mode)
+    signal queryChanged(string query)
     signal viewModeChanged(string sectionId, string mode)
     signal searchQueryRequested(string query)
 
@@ -496,6 +497,8 @@ Item {
     }
 
     function performSearch() {
+        queryChanged(searchQuery)
+
         var currentVersion = _searchVersion;
         isSearching = true;
         var shouldResetSelection = _queryDrivenSearch;
