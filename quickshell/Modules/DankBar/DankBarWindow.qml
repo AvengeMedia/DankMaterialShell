@@ -181,7 +181,7 @@ PanelWindow {
     }
 
     function _updateHasFullscreenToplevel() {
-        if (!CompositorService.isHyprland && !CompositorService.isNiri) {
+        if (!CompositorService.isHyprland) {
             hasFullscreenToplevel = false;
             return;
         }
