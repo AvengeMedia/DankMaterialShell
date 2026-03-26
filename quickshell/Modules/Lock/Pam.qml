@@ -101,12 +101,10 @@ Scope {
         printErrors: false
     }
 
-    readonly property string bundledPasswdConfig: SettingsData.lockFaillockSupported ? "login-faillock" : "login"
-
     PamContext {
         id: passwd
 
-        config: dankshellConfigWatcher.loaded ? "dankshell" : (loginConfigWatcher.loaded ? "login" : root.bundledPasswdConfig)
+        config: dankshellConfigWatcher.loaded ? "dankshell" : "login"
         configDirectory: (dankshellConfigWatcher.loaded || loginConfigWatcher.loaded) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
