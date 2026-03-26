@@ -14,9 +14,12 @@ Scope {
 
     readonly property alias passwd: passwd
     readonly property alias fprint: fprint
+    readonly property alias u2f: u2f
     property string lockMessage
     property string state
     property string fprintState
+    property string u2fState
+    property bool u2fPending: false
     property string buffer
 
     signal flashMsg
@@ -127,9 +130,8 @@ Scope {
         onCompleted: res => {
             if (res === PamResult.Success) {
                 if (!root.unlockInProgress) {
-                    root.unlockInProgress = true;
                     fprint.abort();
-                    root.unlockRequested();
+                    root.proceedAfterPrimaryAuth();
                 }
                 return;
             }
@@ -192,9 +194,8 @@ Scope {
 
             if (res === PamResult.Success) {
                 if (!root.unlockInProgress) {
-                    root.unlockInProgress = true;
                     passwd.abort();
-                    root.unlockRequested();
+                    root.proceedAfterPrimaryAuth();
                 }
                 return;
             }
@@ -356,6 +357,8 @@ Scope {
             SettingsData.refreshAuthAvailability();
             root.state = "";
             root.fprintState = "";
+            root.u2fState = "";
+            root.u2fPending = false;
             root.lockMessage = "";
             root.resetAuthFlows();
             fprint.checkAvail();

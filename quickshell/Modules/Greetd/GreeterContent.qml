@@ -230,19 +230,19 @@ Item {
 
     function currentAuthMessage() {
         if (GreeterState.pamState === "error")
-            return "Authentication error - try again";
+            return I18n.tr("Authentication error - try again");
         if (GreeterState.pamState === "max")
-            return "Too many failed attempts - account may be locked";
+            return I18n.tr("Too many failed attempts - account may be locked");
         if (GreeterState.pamState === "fail") {
             if (passwordAttemptLimitHint > 0) {
                 const attempt = Math.max(1, Math.min(passwordFailureCount, passwordAttemptLimitHint));
                 const remaining = Math.max(passwordAttemptLimitHint - attempt, 0);
                 if (remaining > 0) {
-                    return "Incorrect password - attempt " + attempt + " of " + passwordAttemptLimitHint + " (lockout may follow)";
+                    return I18n.tr("Incorrect password - attempt %1 of %2 (lockout may follow)").arg(attempt).arg(passwordAttemptLimitHint);
                 }
-                return "Incorrect password - next failures may trigger account lockout";
+                return I18n.tr("Incorrect password - next failures may trigger account lockout");
             }
-            return "Incorrect password";
+            return I18n.tr("Incorrect password");
         }
         return "";
     }
@@ -767,7 +767,7 @@ Item {
 
                 property string fullTimeStr: {
                     const format = GreetdSettings.getEffectiveTimeFormat();
-                    return systemClock.date.toLocaleTimeString(Qt.locale(), format);
+                    return systemClock.date.toLocaleTimeString(I18n.locale(), format);
                 }
                 property var timeParts: fullTimeStr.split(':')
                 property string hours: timeParts[0] || ""
@@ -876,7 +876,7 @@ Item {
             anchors.top: clockContainer.bottom
             anchors.topMargin: 4
             text: {
-                return systemClock.date.toLocaleDateString(Qt.locale(), GreetdSettings.getEffectiveLockDateFormat());
+                return systemClock.date.toLocaleDateString(I18n.locale(), GreetdSettings.getEffectiveLockDateFormat());
             }
             font.pixelSize: Theme.fontSizeXLarge
             color: "white"
@@ -1012,15 +1012,15 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
                                 if (GreeterState.unlocking) {
-                                    return "Logging in...";
+                                    return I18n.tr("Logging in...");
                                 }
                                 if (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse) {
-                                    return "Authenticating...";
+                                    return I18n.tr("Authenticating...");
                                 }
                                 if (GreeterState.showPasswordInput) {
-                                    return "Password...";
+                                    return I18n.tr("Password...");
                                 }
-                                return "Username...";
+                                return I18n.tr("Username...");
                             }
                             color: (GreeterState.unlocking || (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse)) ? Theme.primary : Theme.outline
                             font.pixelSize: Theme.fontSizeMedium

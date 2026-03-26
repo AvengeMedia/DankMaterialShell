@@ -6,7 +6,7 @@ A greeter for [greetd](https://github.com/kennylevinsen/greetd) that follows the
 
 - **Multi user**: Login with any system user
 - **dms sync**: Sync settings with dms for consistent styling between shell and greeter
-- **Multiple compositors**: Supports niri, Hyprland, Sway, or mangowc.
+- **Multiple compositors**: The `dms-greeter` wrapper supports niri, Hyprland, sway, scroll, miracle-wm, labwc, and mangowc.
 - **Custom PAM**: Supports custom PAM configuration in `/etc/pam.d/greetd`
 - **Session Memory**: Remembers last selected session and user
   - Can be disabled via `settings.json` keys: `greeterRememberLastSession` and `greeterRememberLastUser`
@@ -152,8 +152,8 @@ sudo chmod +x /usr/local/bin/dms-greeter
 5. Create greeter cache directory with proper permissions:
 ```bash
 sudo mkdir -p /var/cache/dms-greeter
-sudo chown greeter:greeter /var/cache/dms-greeter
-sudo chmod 750 /var/cache/dms-greeter
+sudo chown <greeter-user>:<greeter-group> /var/cache/dms-greeter
+sudo chmod 2770 /var/cache/dms-greeter
 ```
 
 6. Edit or create `/etc/greetd/config.toml`:
@@ -163,7 +163,7 @@ vt = 1
 
 [default_session]
 user = "greeter"
-# Change compositor to sway, hyprland, or mangowc if preferred
+# Change compositor to another wrapper-supported compositor if preferred
 command = "/usr/local/bin/dms-greeter --command niri"
 ```
 
@@ -238,9 +238,12 @@ DMS_RUN_GREETER=1 qs -p /path/to/dms
 
 #### Compositor
 
-You can configure compositor specific settings such as outputs/displays the same as you would in niri or Hyprland.
+For current wrapper-based installs, the `dms-greeter` wrapper supports niri, hyprland, sway, scroll, miracle-wm, labwc, and mangowc.
 
-Simply edit `/etc/greetd/dms-niri.kdl` or `/etc/greetd/dms-hypr.conf` to change compositor settings for the greeter
+Only niri currently has a generated greeter config path managed by `dms greeter sync`.
+
+- niri: `dms greeter sync` writes the generated greeter config to `/etc/greetd/niri/config.kdl`. Add local manual tweaks in `/etc/greetd/niri_overrides.kdl`.
+- Other wrapper-supported compositors use the wrapper-generated config by default. If you need a custom compositor config, add `-C /path/to/config` to the `dms-greeter` command in `/etc/greetd/config.toml`.
 
 #### Personalization
 
@@ -271,4 +274,4 @@ sudo ln -sf ~/.cache/DankMaterialShell/dms-colors.json /var/cache/dms-greeter/co
 
 **Advanced:** You can override the configuration path with the `DMS_GREET_CFG_DIR` environment variable or the `--cache-dir` flag when using `dms-greeter`. The default is `/var/cache/dms-greeter`.
 
-The cache directory should be owned by `greeter:greeter` with `770` permissions.
+The cache directory should be owned by `<greeter-user>:<greeter-group>` with `2770` permissions. If the greeter user is not available yet, DMS falls back to `root:<greeter-group>`.

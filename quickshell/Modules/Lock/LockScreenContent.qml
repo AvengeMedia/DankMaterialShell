@@ -365,9 +365,9 @@ Item {
             visible: SettingsData.lockScreenShowDate
             text: {
                 if (SettingsData.lockDateFormat && SettingsData.lockDateFormat.length > 0) {
-                    return systemClock.date.toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat);
+                    return systemClock.date.toLocaleDateString(I18n.locale(), SettingsData.lockDateFormat);
                 }
-                return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat);
+                return systemClock.date.toLocaleDateString(I18n.locale(), Locale.LongFormat);
             }
             font.pixelSize: Theme.fontSizeXLarge
             color: "white"
@@ -719,14 +719,24 @@ Item {
 
                             anchors.centerIn: parent
                             name: {
+                                if (pam.u2fPending)
+                                    return "passkey";
                                 if (pam.fprint.tries >= SettingsData.maxFprintTries)
                                     return "fingerprint_off";
                                 if (pam.fprint.active)
                                     return "fingerprint";
+                                if (pam.u2f.active)
+                                    return "passkey";
                                 return "lock";
                             }
                             size: 20
-                            color: pam.fprint.tries >= SettingsData.maxFprintTries ? Theme.error : (passwordField.activeFocus ? Theme.primary : Theme.surfaceVariantText)
+                            color: {
+                                if (pam.fprint.tries >= SettingsData.maxFprintTries)
+                                    return Theme.error;
+                                if (pam.u2fState !== "")
+                                    return Theme.tertiary;
+                                return passwordField.activeFocus ? Theme.primary : Theme.surfaceVariantText;
+                            }
                             opacity: pam.passwd.active ? 0 : 1
 
                             Behavior on opacity {
@@ -792,6 +802,11 @@ Item {
                             }
 
                             if (event.key === Qt.Key_Escape) {
+                                if (pam.u2fPending) {
+                                    pam.cancelU2fPending();
+                                    event.accepted = true;
+                                    return;
+                                }
                                 clear();
                             }
 
@@ -855,6 +870,11 @@ Item {
                             }
                             if (root.unlocking) {
                                 return "Unlocking...";
+                            }
+                            if (pam.u2fPending) {
+                                if (pam.u2fState === "insert")
+                                    return "Insert your security key...";
+                                return "Touch your security key...";
                             }
                             if (pam.passwd.active) {
                                 return "Authenticating...";
@@ -930,7 +950,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "keyboard"
                         buttonSize: 32
-                        visible: !demoMode && !pam.passwd.active && !root.unlocking
+                        visible: !demoMode && !pam.passwd.active && !root.unlocking && !pam.u2fPending
                         enabled: visible
                         onClicked: {
                             if (keyboardController.isKeyboardActive) {
@@ -1031,7 +1051,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "keyboard_return"
                         buttonSize: 36
-                        visible: (demoMode || (!pam.passwd.active && !root.unlocking))
+                        visible: (demoMode || (!pam.passwd.active && !root.unlocking && !pam.u2fPending))
                         enabled: !demoMode
                         onClicked: {
                             if (!demoMode && !root.unlocking && !pam.u2fPending) {
@@ -1635,6 +1655,14 @@ Item {
                 placeholderDelay.restart();
                 passwordField.text = "";
                 root.passwordBuffer = "";
+            }
+        }
+        onU2fPendingChanged: {
+            if (u2fPending) {
+                passwordField.text = "";
+                root.passwordBuffer = "";
+                if (keyboardController.isKeyboardActive)
+                    keyboardController.hide();
             }
         }
     }
