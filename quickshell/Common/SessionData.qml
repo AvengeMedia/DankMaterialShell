@@ -338,8 +338,8 @@ Singleton {
 
     function setLightMode(lightMode) {
         isSwitchingMode = true;
+        syncWallpaperForCurrentMode(lightMode);
         isLightMode = lightMode;
-        syncWallpaperForCurrentMode();
         saveSettings();
         Qt.callLater(() => {
             isSwitchingMode = false;
@@ -1091,15 +1091,16 @@ Singleton {
         saveSettings();
     }
 
-    function syncWallpaperForCurrentMode() {
+    function syncWallpaperForCurrentMode(mode) {
         if (!perModeWallpaper)
             return;
+        var light = (mode !== undefined) ? mode : isLightMode;
         if (perMonitorWallpaper) {
-            monitorWallpapers = isLightMode ? Object.assign({}, monitorWallpapersLight) : Object.assign({}, monitorWallpapersDark);
+            monitorWallpapers = light ? Object.assign({}, monitorWallpapersLight) : Object.assign({}, monitorWallpapersDark);
             return;
         }
 
-        wallpaperPath = isLightMode ? wallpaperPathLight : wallpaperPathDark;
+        wallpaperPath = light ? wallpaperPathLight : wallpaperPathDark;
     }
 
     function _findMonitorValue(map, screenName) {
