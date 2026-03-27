@@ -52,33 +52,51 @@ func copyFork(data io.Reader, mimeType string, pasteOnce bool) error {
 	args = append(args, "--type", mimeType)
 
 	cmd := exec.Command(args[0], args[1:]...)
-	cmd.Stdout = nil
 	cmd.Stderr = nil
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	cmd.Env = append(os.Environ(), "DMS_CLIP_FORKED=1")
 
-	if stdinSource, ok := data.(*os.File); ok {
-		cmd.Stdin = stdinSource
-		return cmd.Start()
-	}
-
-	stdin, err := cmd.StdinPipe()
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("stdin pipe: %w", err)
+		return fmt.Errorf("stdout pipe: %w", err)
 	}
 
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("start: %w", err)
+	switch src := data.(type) {
+	case *os.File:
+		cmd.Stdin = src
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("start: %w", err)
+		}
+
+	default:
+		stdin, err := cmd.StdinPipe()
+		if err != nil {
+			return fmt.Errorf("stdin pipe: %w", err)
+		}
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("start: %w", err)
+		}
+		if _, err := io.Copy(stdin, data); err != nil {
+			stdin.Close()
+			return fmt.Errorf("write stdin: %w", err)
+		}
+		if err := stdin.Close(); err != nil {
+			return fmt.Errorf("close stdin: %w", err)
+		}
 	}
 
-	if _, err := io.Copy(stdin, data); err != nil {
-		stdin.Close()
-		return fmt.Errorf("write stdin: %w", err)
+	var buf [1]byte
+	if _, err := stdout.Read(buf[:]); err != nil {
+		return fmt.Errorf("waiting for clipboard ready: %w", err)
 	}
-	if err := stdin.Close(); err != nil {
-		return fmt.Errorf("close stdin: %w", err)
-	}
-
 	return nil
+}
+
+func signalReady() {
+	if os.Getenv("DMS_CLIP_FORKED") == "" {
+		return
+	}
+	os.Stdout.Write([]byte{1})
 }
 
 func copyServeReader(data io.Reader, mimeType string, pasteOnce bool) error {
@@ -242,6 +260,7 @@ func copyServeWithWriter(writeTo func(io.Writer) error, mimeType string, pasteOn
 	}
 
 	display.Roundtrip()
+	signalReady()
 
 	for {
 		select {
