@@ -7,6 +7,10 @@
       url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=41828c4180fb921df7992a5405f5ff05d2ac2fff";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-compat = {
+      url = "github:NixOS/flake-compat";
+      flake = false;
+    };
   };
 
   outputs =
