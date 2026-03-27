@@ -17,9 +17,11 @@ func init() {
 	runCmd.Flags().MarkHidden("daemon-child")
 
 	greeterCmd.AddCommand(greeterInstallCmd, greeterSyncCmd, greeterEnableCmd, greeterStatusCmd, greeterUninstallCmd)
+	authCmd.AddCommand(authSyncCmd)
 	setupCmd.AddCommand(setupBindsCmd, setupLayoutCmd, setupColorsCmd, setupAlttabCmd, setupOutputsCmd, setupCursorCmd, setupWindowrulesCmd)
 	pluginsCmd.AddCommand(pluginsBrowseCmd, pluginsListCmd, pluginsInstallCmd, pluginsUninstallCmd, pluginsUpdateCmd)
 	rootCmd.AddCommand(getCommonCommands()...)
+	rootCmd.AddCommand(authCmd)
 
 	rootCmd.SetHelpTemplate(getHelpTemplate())
 }

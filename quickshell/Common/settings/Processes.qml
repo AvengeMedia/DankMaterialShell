@@ -4,6 +4,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Common
+import qs.Services
 
 Singleton {
     id: root
@@ -52,6 +54,14 @@ Singleton {
 
     readonly property var forcedFprintAvailable: envFlag("DMS_FORCE_FPRINT_AVAILABLE")
     readonly property var forcedU2fAvailable: envFlag("DMS_FORCE_U2F_AVAILABLE")
+    property bool authApplyRunning: false
+    property bool authApplyQueued: false
+    property bool authApplyRerunRequested: false
+    property bool authApplyTerminalFallbackFromPrecheck: false
+    property string authApplyStdout: ""
+    property string authApplyStderr: ""
+    property string authApplySudoProbeStderr: ""
+    property string authApplyTerminalFallbackStderr: ""
 
     function detectQtTools() {
         qtToolsDetectionProcess.running = true;
@@ -90,6 +100,50 @@ Singleton {
 
     function checkPluginSettings() {
         pluginSettingsCheckProcess.running = true;
+    }
+
+    function scheduleAuthApply() {
+        if (!settingsRoot || settingsRoot.isGreeterMode)
+            return;
+
+        authApplyQueued = true;
+        if (authApplyRunning) {
+            authApplyRerunRequested = true;
+            return;
+        }
+
+        authApplyDebounce.restart();
+    }
+
+    function beginAuthApply() {
+        if (!authApplyQueued || authApplyRunning || !settingsRoot || settingsRoot.isGreeterMode)
+            return;
+
+        authApplyQueued = false;
+        authApplyRerunRequested = false;
+        authApplyStdout = "";
+        authApplyStderr = "";
+        authApplySudoProbeStderr = "";
+        authApplyTerminalFallbackStderr = "";
+        authApplyTerminalFallbackFromPrecheck = false;
+        authApplyRunning = true;
+        authApplySudoProbeProcess.running = true;
+    }
+
+    function launchAuthApplyTerminalFallback(fromPrecheck, details) {
+        authApplyTerminalFallbackFromPrecheck = fromPrecheck;
+        if (details && details !== "")
+            ToastService.showInfo(I18n.tr("Authentication changes need sudo. Opening terminal so you can use password or fingerprint."), details, "", "auth-sync");
+        authApplyTerminalFallbackStderr = "";
+        authApplyTerminalFallbackProcess.running = true;
+    }
+
+    function finishAuthApply() {
+        const shouldRerun = authApplyQueued || authApplyRerunRequested;
+        authApplyRunning = false;
+        authApplyRerunRequested = false;
+        if (shouldRerun)
+            authApplyDebounce.restart();
     }
 
     function stripPamComment(line) {
@@ -414,6 +468,91 @@ Singleton {
             root.pamSupportProbeExitCode = exitCode;
             root.pamSupportProbeExited = true;
             root.finalizePamSupportProbe();
+        }
+    }
+
+    Timer {
+        id: authApplyDebounce
+        interval: 300
+        repeat: false
+        onTriggered: root.beginAuthApply()
+    }
+
+    property var authApplyProcess: Process {
+        command: ["dms", "auth", "sync", "--yes"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: root.authApplyStdout = text || ""
+        }
+
+        stderr: StdioCollector {
+            onStreamFinished: root.authApplyStderr = text || ""
+        }
+
+        onExited: exitCode => {
+            const out = (root.authApplyStdout || "").trim();
+            const err = (root.authApplyStderr || "").trim();
+
+            if (exitCode === 0) {
+                let details = out;
+                if (err !== "")
+                    details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
+                ToastService.showInfo(I18n.tr("Authentication changes applied."), details, "", "auth-sync");
+                root.detectAuthCapabilities();
+                root.finishAuthApply();
+                return;
+            }
+
+            let details = "";
+            if (out !== "")
+                details = out;
+            if (err !== "")
+                details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
+            ToastService.showWarning(I18n.tr("Background authentication sync failed. Trying terminal mode."), details, "", "auth-sync");
+            root.launchAuthApplyTerminalFallback(false, "");
+        }
+    }
+
+    property var authApplySudoProbeProcess: Process {
+        command: ["sudo", "-n", "true"]
+        running: false
+
+        stderr: StdioCollector {
+            onStreamFinished: root.authApplySudoProbeStderr = text || ""
+        }
+
+        onExited: exitCode => {
+            const err = (root.authApplySudoProbeStderr || "").trim();
+            if (exitCode === 0) {
+                ToastService.showInfo(I18n.tr("Applying authentication changes…"), "", "", "auth-sync");
+                root.authApplyProcess.running = true;
+                return;
+            }
+
+            root.launchAuthApplyTerminalFallback(true, err);
+        }
+    }
+
+    property var authApplyTerminalFallbackProcess: Process {
+        command: ["dms", "auth", "sync", "--terminal", "--yes"]
+        running: false
+
+        stderr: StdioCollector {
+            onStreamFinished: root.authApplyTerminalFallbackStderr = text || ""
+        }
+
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                const message = root.authApplyTerminalFallbackFromPrecheck
+                    ? I18n.tr("Terminal opened. Complete authentication setup there; it will close automatically when done.")
+                    : I18n.tr("Terminal fallback opened. Complete authentication setup there; it will close automatically when done.");
+                ToastService.showInfo(message, "", "", "auth-sync");
+            } else {
+                let details = (root.authApplyTerminalFallbackStderr || "").trim();
+                ToastService.showError(I18n.tr("Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.") + " (exit " + exitCode + ")", details, "", "auth-sync");
+            }
+            root.finishAuthApply();
         }
     }
 

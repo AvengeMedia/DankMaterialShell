@@ -15,10 +15,10 @@ Item {
     function lockFingerprintDescription() {
         switch (SettingsData.lockFingerprintReason) {
         case "ready":
-            return I18n.tr("Use fingerprint authentication for the lock screen.");
+            return SettingsData.enableFprint ? I18n.tr("Authentication changes apply automatically.") : I18n.tr("Use fingerprint authentication for the lock screen.");
         case "missing_enrollment":
             if (SettingsData.enableFprint)
-                return I18n.tr("Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.");
+                return I18n.tr("Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.");
             return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.");
         case "missing_reader":
             return SettingsData.enableFprint ? I18n.tr("Enabled, but no fingerprint reader was detected.") : I18n.tr("No fingerprint reader detected.");
@@ -32,10 +32,10 @@ Item {
     function lockU2fDescription() {
         switch (SettingsData.lockU2fReason) {
         case "ready":
-            return I18n.tr("Use a security key for lock screen authentication.", "lock screen U2F security key setting");
+            return SettingsData.enableU2f ? I18n.tr("Authentication changes apply automatically.") : I18n.tr("Use a security key for lock screen authentication.", "lock screen U2F security key setting");
         case "missing_key_registration":
             if (SettingsData.enableU2f)
-                return I18n.tr("Enabled, but no registered security key was found yet. Register a key or update your U2F config.");
+                return I18n.tr("Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.");
             return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.");
         case "missing_pam_support":
             return I18n.tr("Not available — install or configure pam_u2f.");
@@ -211,6 +211,15 @@ Item {
                     description: I18n.tr("Automatically lock the screen when DMS starts")
                     checked: SettingsData.lockAtStartup
                     onToggled: checked => SettingsData.set("lockAtStartup", checked)
+                }
+
+                StyledText {
+                    text: I18n.tr("Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    topPadding: Theme.spacingS
                 }
 
                 SettingsToggleRow {

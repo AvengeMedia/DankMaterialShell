@@ -1203,13 +1203,23 @@ Singleton {
         Quickshell.execDetached(["sh", "-lc", script]);
     }
 
+    function scheduleAuthApply() {
+        if (isGreeterMode)
+            return;
+        Qt.callLater(() => {
+            Processes.settingsRoot = root;
+            Processes.scheduleAuthApply();
+        });
+    }
+
     readonly property var _hooks: ({
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
             "updateCompositorLayout": updateCompositorLayout,
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
-            "updateCompositorCursor": updateCompositorCursor
+            "updateCompositorCursor": updateCompositorCursor,
+            "scheduleAuthApply": scheduleAuthApply
         })
 
     function set(key, value) {

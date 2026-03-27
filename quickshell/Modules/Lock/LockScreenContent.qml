@@ -52,6 +52,12 @@ Item {
             return I18n.tr("Touch your security key...");
         if (pam.lockMessage && pam.lockMessage.length > 0)
             return pam.lockMessage;
+        if (root.pamState === "error")
+            return I18n.tr("Authentication error - try again");
+        if (root.pamState === "max")
+            return I18n.tr("Too many attempts - locked out");
+        if (root.pamState === "fail")
+            return I18n.tr("Incorrect password - try again");
         if (pam.fprintState === "error") {
             const detail = (pam.fprint.message || "").trim();
             return detail.length > 0 ? I18n.tr("Fingerprint error: %1").arg(detail) : I18n.tr("Fingerprint error");
@@ -60,12 +66,6 @@ Item {
             return I18n.tr("Maximum fingerprint attempts reached. Please use password.");
         if (pam.fprintState === "fail")
             return I18n.tr("Fingerprint not recognized (%1/%2). Please try again or use password.").arg(pam.fprint.tries).arg(SettingsData.maxFprintTries);
-        if (root.pamState === "error")
-            return I18n.tr("Authentication error - try again");
-        if (root.pamState === "max")
-            return I18n.tr("Too many attempts - locked out");
-        if (root.pamState === "fail")
-            return I18n.tr("Incorrect password - try again");
         return "";
     }
 

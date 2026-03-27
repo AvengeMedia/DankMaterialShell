@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func writeTestJSON(t *testing.T, path string, content string) {
+func writeTestFile(t *testing.T, path string, content string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		t.Fatalf("failed to create parent dir for %s: %v", path, err)
@@ -70,8 +70,8 @@ func TestResolveGreeterThemeSyncState(t *testing.T) {
 			t.Parallel()
 
 			homeDir := t.TempDir()
-			writeTestJSON(t, filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json"), tt.settingsJSON)
-			writeTestJSON(t, filepath.Join(homeDir, ".local", "state", "DankMaterialShell", "session.json"), tt.sessionJSON)
+			writeTestFile(t, filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json"), tt.settingsJSON)
+			writeTestFile(t, filepath.Join(homeDir, ".local", "state", "DankMaterialShell", "session.json"), tt.sessionJSON)
 
 			state, err := resolveGreeterThemeSyncState(homeDir)
 			if err != nil {

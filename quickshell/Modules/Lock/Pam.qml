@@ -91,9 +91,9 @@ Scope {
     }
 
     FileView {
-        id: loginConfigWatcher
+        id: nixosMarker
 
-        path: "/etc/pam.d/login"
+        path: "/etc/NIXOS"
         printErrors: false
     }
 
@@ -108,7 +108,7 @@ Scope {
         id: passwd
 
         config: dankshellConfigWatcher.loaded ? "dankshell" : "login"
-        configDirectory: (dankshellConfigWatcher.loaded || loginConfigWatcher.loaded) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
+        configDirectory: (dankshellConfigWatcher.loaded || nixosMarker.loaded) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
             if (message.startsWith("The account is locked")) {

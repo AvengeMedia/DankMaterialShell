@@ -139,6 +139,13 @@ in
         '';
       }
     ];
+    # DMS currently relies on /etc/pam.d/login for lock screen password auth on NixOS.
+    # Declare security.pam.services.dankshell only if you want to override that runtime fallback.
+    # U2F and fingerprint are handled separately by DMS — do not add pam_u2f or pam_fprintd here.
+    # security.pam.services.dankshell = {
+    #   # Example: add faillock
+    #   faillock.enable = true;
+    # };
     services.greetd = {
       enable = lib.mkDefault true;
       settings.default_session.command = lib.mkDefault (lib.getExe greeterScript);

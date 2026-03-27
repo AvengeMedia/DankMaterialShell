@@ -36,7 +36,7 @@ Item {
 
         switch (reason) {
         case "ready":
-            return SettingsData.greeterEnableFprint ? I18n.tr("Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.") : I18n.tr("Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.");
+            return SettingsData.greeterEnableFprint ? I18n.tr("Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.") : I18n.tr("Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.");
         case "missing_enrollment":
             if (SettingsData.greeterEnableFprint)
                 return I18n.tr("Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.");
@@ -60,7 +60,7 @@ Item {
 
         switch (reason) {
         case "ready":
-            return SettingsData.greeterEnableU2f ? I18n.tr("Run Sync to apply.") : I18n.tr("Available.");
+            return SettingsData.greeterEnableU2f ? I18n.tr("Authentication changes apply automatically.") : I18n.tr("Available.");
         case "missing_key_registration":
             if (SettingsData.greeterEnableU2f)
                 return I18n.tr("Enabled, but no registered security key was found yet. Register a key and run Sync.");
@@ -448,7 +448,7 @@ Item {
                 settingKey: "greeterStatus"
 
                 StyledText {
-                    text: I18n.tr("Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.")
+                    text: I18n.tr("Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -525,7 +525,7 @@ Item {
                 settingKey: "greeterAuth"
 
                 StyledText {
-                    text: I18n.tr("Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.")
+                    text: I18n.tr("Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -754,7 +754,7 @@ Item {
                 settingKey: "greeterDeps"
 
                 StyledText {
-                    text: I18n.tr("DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.")
+                    text: I18n.tr("DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
