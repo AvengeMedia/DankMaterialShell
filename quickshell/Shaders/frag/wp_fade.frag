@@ -13,7 +13,7 @@ layout(std140, binding = 0) uniform buf {
     float progress;
 
     // Fill mode parameters
-    float fillMode;      // 0=stretch, 1=fit, 2=crop, 3=tile, 4=tileV, 5=tileH, 6=pad
+    float fillMode;      // 0=stretch, 1=fit, 2=crop, 3=tile, 4=tileV, 5=tileH, 6=pad, 7=scroll
     float imageWidth1;   // Width of source1 image
     float imageHeight1;  // Height of source1 image
     float imageWidth2;   // Width of source2 image
@@ -21,6 +21,10 @@ layout(std140, binding = 0) uniform buf {
     float screenWidth;   // Screen width
     float screenHeight;  // Screen height
     vec4 fillColor;      // Fill color for empty areas (default: black)
+
+    // Scroll position (0-100 range, only used when fillMode >= 6.5)
+    float scrollX;
+    float scrollY;
 } ubuf;
 
 vec2 calculateUV(vec2 uv, float imgWidth, float imgHeight) {
@@ -54,11 +58,32 @@ vec2 calculateUV(vec2 uv, float imgWidth, float imgHeight) {
         vec2 tileUV = uv * vec2(ubuf.screenWidth, ubuf.screenHeight) / vec2(imgWidth, imgHeight);
         transformedUV = vec2(fract(tileUV.x), uv.y);
     }
-    else {
+    else if (ubuf.fillMode < 6.5) {
+        // fillMode 6 = Pad
         vec2 screenPixel = uv * vec2(ubuf.screenWidth, ubuf.screenHeight);
         vec2 imageOffset = (vec2(ubuf.screenWidth, ubuf.screenHeight) - vec2(imgWidth, imgHeight)) * 0.5;
         vec2 imagePixel = screenPixel - imageOffset;
         transformedUV = imagePixel / vec2(imgWidth, imgHeight);
+    }
+    else {
+        // fillMode 7 = Scroll (Crop with variable offset)
+        float imageAspect = imgWidth / imgHeight;
+        float screenAspect = ubuf.screenWidth / ubuf.screenHeight;
+
+        float scale = max(ubuf.screenWidth / imgWidth, ubuf.screenHeight / imgHeight);
+        vec2 scaledImageSize = vec2(imgWidth, imgHeight) * scale;
+        vec2 offset = (scaledImageSize - vec2(ubuf.screenWidth, ubuf.screenHeight)) / scaledImageSize;
+
+        // Determine scroll axis based on aspect ratio
+        bool scrollHorizontal = imageAspect > screenAspect + 0.01;
+        bool scrollVertical = imageAspect < screenAspect - 0.01;
+
+        vec2 scrollOffset = vec2(
+            scrollHorizontal ? offset.x * (ubuf.scrollX / 100.0) : offset.x * 0.5,
+            scrollVertical ? offset.y * (ubuf.scrollY / 100.0) : offset.y * 0.5
+        );
+
+        transformedUV = uv * (vec2(1.0) - offset) + scrollOffset;
     }
 
     return transformedUV;
