@@ -133,6 +133,7 @@ Singleton {
 
     property string launcherLastMode: "all"
     property string launcherLastQuery: ""
+    property var launcherQueryHistory: []
     property string appDrawerLastMode: "apps"
     property string niriOverviewLastMode: "apps"
     property string settingsSidebarExpandedIds: ","
@@ -1099,6 +1100,31 @@ Singleton {
 
     function setLauncherLastQuery(query) {
         launcherLastQuery = query;
+        saveSettings();
+    }
+
+    function addLauncherHistory(query) {
+        let q = query.trim();
+        if (!q)
+            return;
+
+        let history = [...launcherSearchHistory];
+
+        let idx = history.indexOf(q);
+        if (idx !== -1)
+            history.splice(idx, 1);
+
+        history.unshift(q);
+        if (history.length > 50)
+            history = history.slice(0, 50);
+
+        launcherSearchHistory = history;
+        saveSettings();
+    }
+
+    function clearLauncherHistory() {
+        launcherLastQuery = "";
+        launcherSearchHistory = [];
         saveSettings();
     }
 

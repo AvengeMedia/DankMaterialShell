@@ -176,6 +176,32 @@ Item {
         }
     ]
 
+    property int historyIndex: -1
+    property string typingBackup: ""
+
+    function navigateHistory(isUp) {
+        let history = SessionData.launcherSearchHistory;
+        if (history.length === 0)
+            return;
+
+        if (historyIndex === -1)
+            typingBackup = searchQuery;
+
+        let nextIndex = historyIndex + (isUp ? 1 : -1);
+        if (nextIndex >= history.length)
+            nextIndex = history.length - 1;
+        if (nextIndex < -1)
+            nextIndex = -1;
+
+        if (nextIndex === historyIndex)
+            return;
+        historyIndex = nextIndex;
+
+        let targetText = (historyIndex === -1) ? typingBackup : history[historyIndex];
+
+        setSearchQuery(targetText);
+    }
+
     property string fileSearchType: "all"
     property string fileSearchExt: ""
     property string fileSearchFolder: ""
@@ -497,7 +523,7 @@ Item {
     }
 
     function performSearch() {
-        queryChanged(searchQuery)
+        queryChanged(searchQuery);
 
         var currentVersion = _searchVersion;
         isSearching = true;
@@ -1657,6 +1683,9 @@ Item {
     function executeItem(item) {
         if (!item)
             return;
+
+        SessionData.addLauncherHistory(searchQuery);
+
         if (item.type === "plugin_browse") {
             var browsePluginId = item.data?.pluginId;
             if (!browsePluginId)

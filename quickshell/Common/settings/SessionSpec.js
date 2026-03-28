@@ -84,6 +84,7 @@ var SPEC = {
 
     launcherLastMode: { def: "all" },
     launcherLastQuery: { def: "" },
+    launcherQueryHistory: { def: [] },
     appDrawerLastMode: { def: "apps" },
     niriOverviewLastMode: { def: "apps" },
 

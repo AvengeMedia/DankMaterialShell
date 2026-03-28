@@ -121,6 +121,7 @@ Item {
             spotlightContent.controller.collapsedSections = {};
             spotlightContent.controller.selectedFlatIndex = 0;
             spotlightContent.controller.selectedItem = null;
+            spotlightContent.controller.historyIndex = -1;
 
             spotlightContent.controller.searchQuery = targetQuery;
             spotlightContent.controller.performSearch();

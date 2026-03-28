@@ -838,9 +838,7 @@ Item {
                     text: I18n.tr("Remember Last Query")
                     description: I18n.tr("Autofill last remembered query on launcher open")
                     checked: SettingsData.rememberLastQuery
-                    onToggled: checked => {
-                        SettingsData.set("rememberLastQuery", checked);
-                    }
+                    onToggled: checked => SettingsData.set("rememberLastQuery", checked)
                 }
             }
 

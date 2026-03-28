@@ -149,10 +149,18 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Down:
-            controller.selectNext();
+            if (hasCtrl) {
+                controller.navigateHistory(true);
+            } else {
+                controller.selectNext();
+            }
             return;
         case Qt.Key_Up:
-            controller.selectPrevious();
+            if (hasCtrl) {
+                controller.navigateHistory(false);
+            } else {
+                controller.selectPrevious();
+            }
             return;
         case Qt.Key_PageDown:
             controller.selectPageDown(8);
