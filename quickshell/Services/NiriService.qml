@@ -1427,6 +1427,15 @@ Singleton {
     }
 
     function renameWorkspace(name) {
+        if (!name || name.trim() === "") {
+            return send({
+                "Action": {
+                    "UnsetWorkspaceName": {
+                        "workspace": null
+                    }
+                }
+            });
+        }
         return send({
             "Action": {
                 "SetWorkspaceName": {
