@@ -45,6 +45,10 @@ Item {
 
     onActiveChanged: {
         if (!active) {
+            if (searchQuery && searchQuery.trim().length > 0) {
+                SessionData.addLauncherHistory(searchQuery);
+            }
+
             sections = [];
             flatModel = [];
             selectedItem = null;
@@ -179,15 +183,15 @@ Item {
     property int historyIndex: -1
     property string typingBackup: ""
 
-    function navigateHistory(isUp) {
-        let history = SessionData.launcherSearchHistory;
+    function navigateHistory(direction) {
+        let history = SessionData.launcherQueryHistory;
         if (history.length === 0)
             return;
 
         if (historyIndex === -1)
             typingBackup = searchQuery;
 
-        let nextIndex = historyIndex + (isUp ? 1 : -1);
+        let nextIndex = historyIndex + (direction === "up" ? 1 : -1);
         if (nextIndex >= history.length)
             nextIndex = history.length - 1;
         if (nextIndex < -1)
@@ -200,6 +204,7 @@ Item {
         let targetText = (historyIndex === -1) ? typingBackup : history[historyIndex];
 
         setSearchQuery(targetText);
+        searchQueryRequested(targetText);
     }
 
     property string fileSearchType: "all"

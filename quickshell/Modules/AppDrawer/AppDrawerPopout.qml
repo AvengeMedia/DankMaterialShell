@@ -90,7 +90,7 @@ DankPopout {
         if (!lc)
             return;
 
-        const query = _pendingQuery || SessionData.launcherLastQuery || "";
+        const query = _pendingQuery || (SettingsData.rememberLastQuery ? SessionData.launcherLastQuery : "") || "";
         const mode = _pendingMode || SessionData.appDrawerLastMode || "apps";
         _pendingMode = "";
         _pendingQuery = "";
@@ -119,7 +119,9 @@ DankPopout {
         }
 
         function onQueryChanged(query) {
-            SessionData.setLauncherLastQuery(query);
+            if (root.isOpen) {
+                SessionData.setLauncherLastQuery(query);
+            }
         }
     }
 

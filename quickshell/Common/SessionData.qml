@@ -1108,7 +1108,11 @@ Singleton {
         if (!q)
             return;
 
-        let history = [...launcherSearchHistory];
+        if (launcherQueryHistory.length > 0 && launcherQueryHistory[0] === q) {
+            return;
+        }
+
+        let history = [...launcherQueryHistory];
 
         let idx = history.indexOf(q);
         if (idx !== -1)
@@ -1118,7 +1122,7 @@ Singleton {
         if (history.length > 50)
             history = history.slice(0, 50);
 
-        launcherSearchHistory = history;
+        launcherQueryHistory = history;
         saveSettings();
     }
 

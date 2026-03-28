@@ -245,7 +245,9 @@ Item {
         }
 
         function onQueryChanged(query) {
-            SessionData.setLauncherLastQuery(query);
+            if (root.spotlightOpen && !root.isClosing) {
+                SessionData.setLauncherLastQuery(query);
+            }
         }
     }
 

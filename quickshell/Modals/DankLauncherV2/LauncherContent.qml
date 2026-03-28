@@ -150,14 +150,14 @@ FocusScope {
             return;
         case Qt.Key_Down:
             if (hasCtrl) {
-                controller.navigateHistory(true);
+                controller.navigateHistory("down");
             } else {
                 controller.selectNext();
             }
             return;
         case Qt.Key_Up:
             if (hasCtrl) {
-                controller.navigateHistory(false);
+                controller.navigateHistory("up");
             } else {
                 controller.selectPrevious();
             }
@@ -771,6 +771,7 @@ FocusScope {
         }
         function onSearchQueryRequested(query) {
             searchField.text = query;
+            searchField.cursorPosition = query.length;
         }
         function onModeChanged() {
             extFilterField.text = "";
