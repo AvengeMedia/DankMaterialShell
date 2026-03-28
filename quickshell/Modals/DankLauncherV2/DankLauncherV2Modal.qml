@@ -122,10 +122,13 @@ Item {
             spotlightContent.controller.selectedFlatIndex = 0;
             spotlightContent.controller.selectedItem = null;
             spotlightContent.controller.historyIndex = -1;
-
             spotlightContent.controller.searchQuery = targetQuery;
-            spotlightContent.controller.performSearch();
         }
+        Qt.callLater(function () {
+            if (spotlightContent.controller) {
+                spotlightContent.controller.performSearch();
+            }
+        });
         if (spotlightContent.resetScroll) {
             spotlightContent.resetScroll();
         }
@@ -242,12 +245,6 @@ Item {
             if (spotlightContent.controller.autoSwitchedToFiles)
                 return;
             SessionData.setLauncherLastMode(mode);
-        }
-
-        function onQueryChanged(query) {
-            if (root.spotlightOpen && !root.isClosing) {
-                SessionData.setLauncherLastQuery(query);
-            }
         }
     }
 

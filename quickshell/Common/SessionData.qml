@@ -1112,6 +1112,8 @@ Singleton {
             return;
         }
 
+        setLauncherLastQuery(q);
+
         let history = [...launcherQueryHistory];
 
         let idx = history.indexOf(q);

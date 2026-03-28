@@ -103,9 +103,12 @@ DankPopout {
             lc.controller.searchMode = mode;
             lc.controller.pluginFilter = "";
             lc.controller.searchQuery = query;
-
-            lc.controller.performSearch();
         }
+        Qt.callLater(function () {
+            if (lc.controller) {
+                lc.controller.performSearch();
+            }
+        });
         lc.resetScroll?.();
         lc.actionPanel?.hide();
     }
@@ -116,12 +119,6 @@ DankPopout {
             if (contentLoader.item.launcherContent.controller.autoSwitchedToFiles)
                 return;
             SessionData.setAppDrawerLastMode(mode);
-        }
-
-        function onQueryChanged(query) {
-            if (root.isOpen) {
-                SessionData.setLauncherLastQuery(query);
-            }
         }
     }
 
