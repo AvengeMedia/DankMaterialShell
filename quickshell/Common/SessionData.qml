@@ -1105,14 +1105,15 @@ Singleton {
 
     function addLauncherHistory(query) {
         let q = query.trim();
+
+        setLauncherLastQuery(q);
+
         if (!q)
             return;
 
         if (launcherQueryHistory.length > 0 && launcherQueryHistory[0] === q) {
             return;
         }
-
-        setLauncherLastQuery(q);
 
         let history = [...launcherQueryHistory];
 
