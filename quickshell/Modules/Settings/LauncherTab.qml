@@ -831,6 +831,20 @@ Item {
                     checked: SessionData.searchAppActions
                     onToggled: checked => SessionData.setSearchAppActions(checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "rememberLastQuery"
+                    tags: ["launcher", "remember", "last", "search", "query"]
+                    text: I18n.tr("Remember Last Query")
+                    checked: SettingsData.rememberLastQuery
+                    onToggled: checked => {
+                        SettingsData.set("rememberLastQuery", checked);
+
+                        if (!checked) {
+                            SessionData.setLauncherLastQuery("");
+                        }
+                    }
+                }
             }
 
             SettingsCard {
@@ -1189,17 +1203,11 @@ Item {
                                             if (diffMins < 1)
                                                 return I18n.tr("Last launched just now");
                                             if (diffMins < 60)
-                                                return diffMins === 1
-                                                    ? I18n.tr("Last launched %1 minute ago").arg(diffMins)
-                                                    : I18n.tr("Last launched %1 minutes ago").arg(diffMins);
+                                                return diffMins === 1 ? I18n.tr("Last launched %1 minute ago").arg(diffMins) : I18n.tr("Last launched %1 minutes ago").arg(diffMins);
                                             if (diffHours < 24)
-                                                return diffHours === 1
-                                                    ? I18n.tr("Last launched %1 hour ago").arg(diffHours)
-                                                    : I18n.tr("Last launched %1 hours ago").arg(diffHours);
+                                                return diffHours === 1 ? I18n.tr("Last launched %1 hour ago").arg(diffHours) : I18n.tr("Last launched %1 hours ago").arg(diffHours);
                                             if (diffDays < 7)
-                                                return diffDays === 1
-                                                    ? I18n.tr("Last launched %1 day ago").arg(diffDays)
-                                                    : I18n.tr("Last launched %1 days ago").arg(diffDays);
+                                                return diffDays === 1 ? I18n.tr("Last launched %1 day ago").arg(diffDays) : I18n.tr("Last launched %1 days ago").arg(diffDays);
                                             return I18n.tr("Last launched %1").arg(date.toLocaleDateString());
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
