@@ -102,11 +102,11 @@ Item {
         if (query) {
             targetQuery = query;
         } else if (SettingsData.rememberLastQuery) {
-            targetQuery = SessionData.launcherLastQuery || ""
+            targetQuery = SessionData.launcherLastQuery || "";
         }
 
         if (spotlightContent.searchField) {
-            spotlightContent.searchField.text = targetQuery
+            spotlightContent.searchField.text = targetQuery;
         }
         if (spotlightContent.controller) {
             var targetMode = mode || SessionData.launcherLastMode || "all";
@@ -122,7 +122,7 @@ Item {
             spotlightContent.controller.selectedFlatIndex = 0;
             spotlightContent.controller.selectedItem = null;
 
-            spotlightContent.controller.searchQuery = targetQuery
+            spotlightContent.controller.searchQuery = targetQuery;
             spotlightContent.controller.performSearch();
         }
         if (spotlightContent.resetScroll) {
@@ -244,9 +244,7 @@ Item {
         }
 
         function onQueryChanged(query) {
-            if (SettingsData.rememberLastQuery && root.spotlightOpen && !root.isClosing) {
-                SessionData.setLauncherLastQuery(query);
-            }
+            SessionData.setLauncherLastQuery(query);
         }
     }
 

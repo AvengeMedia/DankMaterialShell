@@ -90,7 +90,7 @@ DankPopout {
         if (!lc)
             return;
 
-        const query = _pendingQuery;
+        const query = _pendingQuery || SessionData.launcherLastQuery || "";
         const mode = _pendingMode || SessionData.appDrawerLastMode || "apps";
         _pendingMode = "";
         _pendingQuery = "";
@@ -102,12 +102,9 @@ DankPopout {
         if (lc.controller) {
             lc.controller.searchMode = mode;
             lc.controller.pluginFilter = "";
-            lc.controller.searchQuery = "";
-            if (query) {
-                lc.controller.setSearchQuery(query);
-            } else {
-                lc.controller.performSearch();
-            }
+            lc.controller.searchQuery = query;
+
+            lc.controller.performSearch();
         }
         lc.resetScroll?.();
         lc.actionPanel?.hide();
@@ -119,6 +116,10 @@ DankPopout {
             if (contentLoader.item.launcherContent.controller.autoSwitchedToFiles)
                 return;
             SessionData.setAppDrawerLastMode(mode);
+        }
+
+        function onQueryChanged(query) {
+            SessionData.setLauncherLastQuery(query);
         }
     }
 
