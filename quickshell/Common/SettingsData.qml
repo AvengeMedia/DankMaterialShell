@@ -338,6 +338,7 @@ Singleton {
     property bool sortAppsAlphabetically: false
     property int appLauncherGridColumns: 4
     property bool spotlightCloseNiriOverview: true
+    property bool rememberLastQuery: false
     property var spotlightSectionViewModes: ({})
     onSpotlightSectionViewModesChanged: saveSettings()
     property var appDrawerSectionViewModes: ({})
