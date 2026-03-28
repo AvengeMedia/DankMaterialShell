@@ -123,12 +123,9 @@ Item {
             spotlightContent.controller.selectedItem = null;
             spotlightContent.controller.historyIndex = -1;
             spotlightContent.controller.searchQuery = targetQuery;
+
+            spotlightContent.controller.performSearch();
         }
-        Qt.callLater(function () {
-            if (spotlightContent.controller) {
-                spotlightContent.controller.performSearch();
-            }
-        });
         if (spotlightContent.resetScroll) {
             spotlightContent.resetScroll();
         }

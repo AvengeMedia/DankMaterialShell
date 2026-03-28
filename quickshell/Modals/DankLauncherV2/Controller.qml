@@ -45,9 +45,7 @@ Item {
 
     onActiveChanged: {
         if (!active) {
-            if (searchQuery && searchQuery.trim().length > 0) {
-                SessionData.addLauncherHistory(searchQuery);
-            }
+            SessionData.addLauncherHistory(searchQuery);
 
             sections = [];
             flatModel = [];

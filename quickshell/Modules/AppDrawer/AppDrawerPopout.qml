@@ -103,12 +103,9 @@ DankPopout {
             lc.controller.searchMode = mode;
             lc.controller.pluginFilter = "";
             lc.controller.searchQuery = query;
+
+            lc.controller.performSearch();
         }
-        Qt.callLater(function () {
-            if (lc.controller) {
-                lc.controller.performSearch();
-            }
-        });
         lc.resetScroll?.();
         lc.actionPanel?.hide();
     }
