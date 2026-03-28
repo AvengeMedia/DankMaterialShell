@@ -836,14 +836,9 @@ Item {
                     settingKey: "rememberLastQuery"
                     tags: ["launcher", "remember", "last", "search", "query"]
                     text: I18n.tr("Remember Last Query")
+                    description: I18n.tr("Autofill last remembered query when opened")
                     checked: SettingsData.rememberLastQuery
-                    onToggled: checked => {
-                        SettingsData.set("rememberLastQuery", checked);
-
-                        if (!checked) {
-                            SessionData.setLauncherLastQuery("");
-                        }
-                    }
+                    onToggled: checked => SettingsData.set("rememberLastQuery", checked)
                 }
             }
 
