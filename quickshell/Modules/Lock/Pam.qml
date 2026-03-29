@@ -104,11 +104,14 @@ Scope {
         printErrors: false
     }
 
+    // Detects Nix-installed DMS on non-NixOS systems
+    readonly property bool runningFromNixStore: Quickshell.shellDir.startsWith("/nix/store/")
+
     PamContext {
         id: passwd
 
         config: dankshellConfigWatcher.loaded ? "dankshell" : "login"
-        configDirectory: (dankshellConfigWatcher.loaded || nixosMarker.loaded) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
+        configDirectory: (dankshellConfigWatcher.loaded || nixosMarker.loaded || root.runningFromNixStore) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
             if (message.startsWith("The account is locked")) {
