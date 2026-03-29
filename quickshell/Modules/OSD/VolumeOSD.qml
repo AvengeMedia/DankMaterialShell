@@ -95,7 +95,7 @@ DankOSD {
                 anchors.verticalCenter: parent.verticalCenter
                 minimum: 0
                 maximum: AudioService.sinkMaxVolume
-                enabled: AudioService.sink?.audio
+                enabled: AudioService.sink?.audio ?? false
                 showValue: true
                 unit: "%"
                 thumbOutlineColor: Theme.surfaceContainer
@@ -207,7 +207,7 @@ DankOSD {
                     id: vertSliderArea
                     anchors.fill: parent
                     anchors.margins: -12
-                    enabled: AudioService.sink?.audio
+                    enabled: AudioService.sink?.audio ?? false
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
 
