@@ -38,7 +38,7 @@ Output format flags (mutually exclusive, default: --hex):
   --json - JSON with all formats
 
 Optional:
-  --raw (Giải thích sau)
+  --raw - Removes ANSI escape codes and background colors. Use this when piping to other commands
 
 Examples:
   dms color pick                # Pick color, output as hex
@@ -56,7 +56,7 @@ func init() {
 	colorPickCmd.Flags().Bool("hsv", false, "Output as HSV (H S% V%)")
 	colorPickCmd.Flags().Bool("cmyk", false, "Output as CMYK (C% M% Y% K%)")
 	colorPickCmd.Flags().Bool("json", false, "Output all formats as JSON")
-	colorPickCmd.Flags().Bool("raw", false, "Output chosen format without formatting")
+	colorPickCmd.Flags().Bool("raw", false, "Removes ANSI escape codes and background colors. Use this when piping to other commands")
 	colorPickCmd.Flags().StringVarP(&colorOutputFmt, "output-format", "o", "", "Custom output format template")
 	colorPickCmd.Flags().BoolVarP(&colorAutocopy, "autocopy", "a", false, "Copy result to clipboard")
 	colorPickCmd.Flags().BoolVarP(&colorLowercase, "lowercase", "l", false, "Output hex in lowercase")
