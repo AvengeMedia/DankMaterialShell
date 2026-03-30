@@ -150,7 +150,10 @@ PanelWindow {
                 const region = Qt.createQmlObject(qml, barWindow, "BarBlurRegion");
 
                 if (hasBar) {
-                    region.item = Qt.binding(() => barUnitInset);
+                    region.x = Qt.binding(() => topBarMouseArea.x + barUnitInset.x + topBarSlide.x);
+                    region.y = Qt.binding(() => topBarMouseArea.y + barUnitInset.y + topBarSlide.y);
+                    region.width = Qt.binding(() => barUnitInset.width);
+                    region.height = Qt.binding(() => barUnitInset.height);
                     region.radius = Qt.binding(() => barBackground.rt);
                 }
 
@@ -181,6 +184,18 @@ PanelWindow {
             target: BlurService
             function onEnabledChanged() {
                 barBlur.rebuild();
+            }
+        }
+
+        Connections {
+            target: topBarSlide
+            function onXChanged() {
+                if (barWindow.blurRegion)
+                    barWindow.blurRegion.changed();
+            }
+            function onYChanged() {
+                if (barWindow.blurRegion)
+                    barWindow.blurRegion.changed();
             }
         }
 

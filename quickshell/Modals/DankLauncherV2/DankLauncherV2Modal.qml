@@ -314,8 +314,8 @@ Item {
             readonly property real s: Math.min(1, modalContainer.scale)
             blurX: root.modalX + root.modalWidth * (1 - s) * 0.5
             blurY: root.modalY + root.modalHeight * (1 - s) * 0.5
-            blurWidth: contentVisible ? root.modalWidth * s : 0
-            blurHeight: contentVisible ? root.modalHeight * s : 0
+            blurWidth: (contentVisible && modalContainer.opacity > 0) ? root.modalWidth * s : 0
+            blurHeight: (contentVisible && modalContainer.opacity > 0) ? root.modalHeight * s : 0
             blurRadius: root.cornerRadius
         }
 

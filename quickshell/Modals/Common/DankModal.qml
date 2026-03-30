@@ -235,8 +235,8 @@ Item {
             readonly property real s: Math.min(1, modalContainer.scaleValue)
             blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
             blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
-            blurWidth: shouldBeVisible ? modalContainer.width * s : 0
-            blurHeight: shouldBeVisible ? modalContainer.height * s : 0
+            blurWidth: (shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.width * s : 0
+            blurHeight: (shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.height * s : 0
             blurRadius: root.cornerRadius
         }
 

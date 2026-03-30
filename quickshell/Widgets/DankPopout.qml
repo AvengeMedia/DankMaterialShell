@@ -404,8 +404,8 @@ Item {
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             blurX: contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
             blurY: contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: shouldBeVisible ? contentContainer.width * s : 0
-            blurHeight: shouldBeVisible ? contentContainer.height * s : 0
+            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.width * s : 0
+            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.height * s : 0
             blurRadius: Theme.cornerRadius
         }
 
