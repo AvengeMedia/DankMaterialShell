@@ -352,6 +352,17 @@ Item {
         visible: false
         color: "transparent"
 
+        WindowBlur {
+            id: popoutBlur
+            targetWindow: contentWindow
+            readonly property real s: Math.min(1, contentContainer.scaleValue)
+            blurX: contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
+            blurY: contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.width * s : 0
+            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.height * s : 0
+            blurRadius: Theme.cornerRadius
+        }
+
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_POPOUT_LAYER")) {
@@ -545,8 +556,8 @@ Item {
                     anchors.fill: parent
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                    border.color: Theme.outlineMedium
-                    border.width: 1
+                    border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+                    border.width: BlurService.borderWidth
                 }
 
                 Loader {

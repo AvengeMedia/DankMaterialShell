@@ -16,6 +16,7 @@ Loader {
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
+    property var blurBarWindow: null
     property bool isFirst: false
     property bool isLast: false
     property real sectionSpacing: 0
@@ -80,6 +81,14 @@ Loader {
         when: root.item && "barConfig" in root.item
         property: "barConfig"
         value: root.barConfig
+        restoreMode: Binding.RestoreNone
+    }
+
+    Binding {
+        target: root.item
+        when: root.item && "blurBarWindow" in root.item
+        property: "blurBarWindow"
+        value: root.blurBarWindow
         restoreMode: Binding.RestoreNone
     }
 

@@ -14,6 +14,8 @@ Item {
     required property var rootWindow
     required property var barConfig
 
+    readonly property var blurBarWindow: barWindow
+
     property var leftWidgetsModel
     property var centerWidgetsModel
     property var rightWidgetsModel
@@ -408,6 +410,12 @@ Item {
                 value: topBarContent.barConfig
                 restoreMode: Binding.RestoreNone
             }
+            Binding {
+                target: hLeftSection
+                property: "blurBarWindow"
+                value: topBarContent.blurBarWindow
+                restoreMode: Binding.RestoreNone
+            }
 
             RightSection {
                 id: hRightSection
@@ -434,6 +442,12 @@ Item {
                 value: topBarContent.barConfig
                 restoreMode: Binding.RestoreNone
             }
+            Binding {
+                target: hRightSection
+                property: "blurBarWindow"
+                value: topBarContent.blurBarWindow
+                restoreMode: Binding.RestoreNone
+            }
 
             CenterSection {
                 id: hCenterSection
@@ -458,6 +472,12 @@ Item {
                 target: hCenterSection
                 property: "barConfig"
                 value: topBarContent.barConfig
+                restoreMode: Binding.RestoreNone
+            }
+            Binding {
+                target: hCenterSection
+                property: "blurBarWindow"
+                value: topBarContent.blurBarWindow
                 restoreMode: Binding.RestoreNone
             }
         }
@@ -493,6 +513,12 @@ Item {
                 value: topBarContent.barConfig
                 restoreMode: Binding.RestoreNone
             }
+            Binding {
+                target: vLeftSection
+                property: "blurBarWindow"
+                value: topBarContent.blurBarWindow
+                restoreMode: Binding.RestoreNone
+            }
 
             CenterSection {
                 id: vCenterSection
@@ -518,6 +544,12 @@ Item {
                 target: vCenterSection
                 property: "barConfig"
                 value: topBarContent.barConfig
+                restoreMode: Binding.RestoreNone
+            }
+            Binding {
+                target: vCenterSection
+                property: "blurBarWindow"
+                value: topBarContent.blurBarWindow
                 restoreMode: Binding.RestoreNone
             }
 
@@ -546,6 +578,12 @@ Item {
                 target: vRightSection
                 property: "barConfig"
                 value: topBarContent.barConfig
+                restoreMode: Binding.RestoreNone
+            }
+            Binding {
+                target: vRightSection
+                property: "blurBarWindow"
+                value: topBarContent.blurBarWindow
                 restoreMode: Binding.RestoreNone
             }
         }

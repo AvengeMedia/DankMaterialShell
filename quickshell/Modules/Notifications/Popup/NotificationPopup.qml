@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
@@ -10,6 +9,15 @@ import qs.Widgets
 
 PanelWindow {
     id: win
+
+    WindowBlur {
+        targetWindow: win
+        blurX: content.x + content.cardInset + swipeTx.x + tx.x
+        blurY: content.y + content.cardInset + swipeTx.y + tx.y
+        blurWidth: !win._finalized ? Math.max(0, content.width - content.cardInset * 2) : 0
+        blurHeight: !win._finalized ? Math.max(0, content.height - content.cardInset * 2) : 0
+        blurRadius: Theme.cornerRadius
+    }
 
     WlrLayershell.namespace: "dms:notification-popup"
 
@@ -394,6 +402,16 @@ PanelWindow {
                     }
                 }
             }
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: content.cardInset
+            radius: Theme.cornerRadius
+            color: "transparent"
+            border.color: BlurService.borderColor
+            border.width: BlurService.borderWidth
+            z: 100
         }
 
         Item {

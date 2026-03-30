@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Modules.Plugins
+import qs.Services
 import qs.Widgets
 
 BasePill {
@@ -92,6 +93,15 @@ BasePill {
 
     PanelWindow {
         id: contextMenuWindow
+
+        WindowBlur {
+            targetWindow: contextMenuWindow
+            blurX: menuContainer.x
+            blurY: menuContainer.y
+            blurWidth: contextMenuWindow.visible ? menuContainer.width : 0
+            blurHeight: contextMenuWindow.visible ? menuContainer.height : 0
+            blurRadius: Theme.cornerRadius
+        }
 
         WlrLayershell.namespace: "dms:clipboard-context-menu"
 
@@ -187,8 +197,8 @@ BasePill {
             height: Math.max(64, menuColumn.implicitHeight + Theme.spacingS * 2)
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 1
+            border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
             opacity: contextMenuWindow.visible ? 1 : 0
             visible: opacity > 0
@@ -224,7 +234,7 @@ BasePill {
                     width: parent.width
                     height: 30
                     radius: Theme.cornerRadius
-                    color: clearAllArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                    color: clearAllArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                     Row {
                         anchors.fill: parent
@@ -264,7 +274,7 @@ BasePill {
                     width: parent.width
                     height: 30
                     radius: Theme.cornerRadius
-                    color: savedItemsArea.containsMouse ? Theme.widgetBaseHoverColor : "transparent"
+                    color: savedItemsArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                     Row {
                         anchors.fill: parent

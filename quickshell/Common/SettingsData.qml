@@ -165,6 +165,14 @@ Singleton {
     property int modalCustomAnimationDuration: 150
     property bool enableRippleEffects: true
     onEnableRippleEffectsChanged: saveSettings()
+    property bool blurEnabled: false
+    onBlurEnabledChanged: saveSettings()
+    property string blurBorderColor: "outline"
+    onBlurBorderColorChanged: saveSettings()
+    property string blurBorderCustomColor: "#ffffff"
+    onBlurBorderCustomColorChanged: saveSettings()
+    property real blurBorderOpacity: 1.0
+    onBlurBorderOpacityChanged: saveSettings()
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false
