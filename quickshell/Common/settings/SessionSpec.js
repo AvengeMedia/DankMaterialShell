@@ -83,6 +83,8 @@ var SPEC = {
     timeLocale: { def: "" },
 
     launcherLastMode: { def: "all" },
+    launcherLastQuery: { def: "" },
+    launcherQueryHistory: { def: [] },
     appDrawerLastMode: { def: "apps" },
     niriOverviewLastMode: { def: "apps" },
 

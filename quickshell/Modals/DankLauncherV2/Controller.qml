@@ -39,11 +39,14 @@ Item {
     signal itemExecuted
     signal searchCompleted
     signal modeChanged(string mode)
+    signal queryChanged(string query)
     signal viewModeChanged(string sectionId, string mode)
     signal searchQueryRequested(string query)
 
     onActiveChanged: {
         if (!active) {
+            SessionData.addLauncherHistory(searchQuery);
+
             sections = [];
             flatModel = [];
             selectedItem = null;
@@ -174,6 +177,33 @@ Item {
             defaultViewMode: "list"
         }
     ]
+
+    property int historyIndex: -1
+    property string typingBackup: ""
+
+    function navigateHistory(direction) {
+        let history = SessionData.launcherQueryHistory;
+        if (history.length === 0)
+            return;
+
+        if (historyIndex === -1)
+            typingBackup = searchQuery;
+
+        let nextIndex = historyIndex + (direction === "up" ? 1 : -1);
+        if (nextIndex >= history.length)
+            nextIndex = history.length - 1;
+        if (nextIndex < -1)
+            nextIndex = -1;
+
+        if (nextIndex === historyIndex)
+            return;
+        historyIndex = nextIndex;
+
+        let targetText = (historyIndex === -1) ? typingBackup : history[historyIndex];
+
+        setSearchQuery(targetText);
+        searchQueryRequested(targetText);
+    }
 
     property string fileSearchType: "all"
     property string fileSearchExt: ""
@@ -496,6 +526,8 @@ Item {
     }
 
     function performSearch() {
+        queryChanged(searchQuery);
+
         var currentVersion = _searchVersion;
         isSearching = true;
         var shouldResetSelection = _queryDrivenSearch;
@@ -1654,6 +1686,9 @@ Item {
     function executeItem(item) {
         if (!item)
             return;
+
+        SessionData.addLauncherHistory(searchQuery);
+
         if (item.type === "plugin_browse") {
             var browsePluginId = item.data?.pluginId;
             if (!browsePluginId)

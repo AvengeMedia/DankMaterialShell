@@ -149,10 +149,18 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Down:
-            controller.selectNext();
+            if (hasCtrl) {
+                controller.navigateHistory("down");
+            } else {
+                controller.selectNext();
+            }
             return;
         case Qt.Key_Up:
-            controller.selectPrevious();
+            if (hasCtrl) {
+                controller.navigateHistory("up");
+            } else {
+                controller.selectPrevious();
+            }
             return;
         case Qt.Key_PageDown:
             controller.selectPageDown(8);
@@ -763,6 +771,7 @@ FocusScope {
         }
         function onSearchQueryRequested(query) {
             searchField.text = query;
+            searchField.cursorPosition = query.length;
         }
         function onModeChanged() {
             extFilterField.text = "";
