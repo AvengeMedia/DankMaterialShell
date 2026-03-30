@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 import qs.Common
 import qs.Widgets
 import qs.Services
@@ -52,15 +51,14 @@ Column {
     height: implicitHeight
     spacing: Theme.spacingM
 
-    RowLayout {
-        width: parent.width
+    Row {
         spacing: Theme.spacingM
 
         DankIcon {
             name: root.titleIcon
             size: Theme.iconSize
             color: Theme.primary
-            Layout.alignment: Qt.AlignVCenter
+            anchors.verticalCenter: parent.verticalCenter
         }
 
         StyledText {
@@ -68,7 +66,7 @@ Column {
             font.pixelSize: Theme.fontSizeLarge
             font.weight: Font.Medium
             color: Theme.surfaceText
-            Layout.alignment: Qt.AlignVCenter
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 
@@ -981,10 +979,26 @@ Column {
 
                 Repeater {
                     model: [
-                        { label: I18n.tr("Percentage"), mode: 0, icon: "percent" },
-                        { label: I18n.tr("Total"), mode: 1, icon: "storage" },
-                        { label: I18n.tr("Remaining"), mode: 2, icon: "hourglass_empty" },
-                        { label: I18n.tr("Remaining / Total"), mode: 3, icon: "pie_chart" }
+                        {
+                            label: I18n.tr("Percentage"),
+                            mode: 0,
+                            icon: "percent"
+                        },
+                        {
+                            label: I18n.tr("Total"),
+                            mode: 1,
+                            icon: "storage"
+                        },
+                        {
+                            label: I18n.tr("Remaining"),
+                            mode: 2,
+                            icon: "hourglass_empty"
+                        },
+                        {
+                            label: I18n.tr("Remaining / Total"),
+                            mode: 3,
+                            icon: "pie_chart"
+                        }
                     ]
 
                     delegate: Rectangle {
@@ -1316,20 +1330,7 @@ Column {
                     id: longestControlCenterLabelMetrics
                     font.pixelSize: Theme.fontSizeSmall
                     text: {
-                        const labels = [
-                            I18n.tr("Network"),
-                            I18n.tr("VPN"),
-                            I18n.tr("Bluetooth"),
-                            I18n.tr("Audio"),
-                            I18n.tr("Volume"),
-                            I18n.tr("Microphone"),
-                            I18n.tr("Microphone Volume"),
-                            I18n.tr("Brightness"),
-                            I18n.tr("Brightness Value"),
-                            I18n.tr("Battery"),
-                            I18n.tr("Printer"),
-                            I18n.tr("Screen Sharing")
-                        ];
+                        const labels = [I18n.tr("Network"), I18n.tr("VPN"), I18n.tr("Bluetooth"), I18n.tr("Audio"), I18n.tr("Volume"), I18n.tr("Microphone"), I18n.tr("Microphone Volume"), I18n.tr("Brightness"), I18n.tr("Brightness Value"), I18n.tr("Battery"), I18n.tr("Printer"), I18n.tr("Screen Sharing")];
                         let longest = "";
                         for (let i = 0; i < labels.length; i++) {
                             if (labels[i].length > longest.length)
@@ -1340,6 +1341,7 @@ Column {
                 }
 
                 Repeater {
+                    id: groupRepeater
                     model: controlCenterContextMenu.controlCenterGroups
 
                     delegate: Item {
@@ -1569,8 +1571,6 @@ Column {
                             }
                         }
                     }
-
-                    id: groupRepeater
                 }
             }
         }
