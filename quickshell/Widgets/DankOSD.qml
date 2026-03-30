@@ -107,6 +107,16 @@ PanelWindow {
     }
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+    WindowBlur {
+        targetWindow: root
+        blurX: shadowBuffer
+        blurY: shadowBuffer
+        blurWidth: shouldBeVisible ? alignedWidth : 0
+        blurHeight: shouldBeVisible ? alignedHeight : 0
+        blurRadius: Theme.cornerRadius
+    }
+
     color: "transparent"
 
     readonly property real dpr: CompositorService.getScreenScale(screen)
@@ -263,8 +273,8 @@ PanelWindow {
             anchors.fill: parent
             radius: Theme.cornerRadius
             color: Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
-            border.color: Theme.outlineMedium
-            border.width: 1
+            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+            border.width: BlurService.enabled ? BlurService.borderWidth : 1
             z: -1
         }
 
