@@ -121,11 +121,7 @@ func runColorPick(cmd *cobra.Command, args []string) {
 	}
 
 	if raw, _ := cmd.Flags().GetBool("raw"); raw {
-		if color.IsDark() {
-			fmt.Printf("%s\n", output)
-		} else {
-			fmt.Printf("%s\n", output)
-		}
+		fmt.Printf("%s\n", output)
 		return
 	}
 
