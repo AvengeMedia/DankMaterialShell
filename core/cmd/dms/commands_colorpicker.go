@@ -37,6 +37,9 @@ Output format flags (mutually exclusive, default: --hex):
   --cmyk - CMYK values (C% M% Y% K%)
   --json - JSON with all formats
 
+Optional:
+  --raw - Removes ANSI escape codes and background colors. Use this when piping to other commands
+
 Examples:
   dms color pick                # Pick color, output as hex
   dms color pick --rgb          # Output as RGB
@@ -53,6 +56,7 @@ func init() {
 	colorPickCmd.Flags().Bool("hsv", false, "Output as HSV (H S% V%)")
 	colorPickCmd.Flags().Bool("cmyk", false, "Output as CMYK (C% M% Y% K%)")
 	colorPickCmd.Flags().Bool("json", false, "Output all formats as JSON")
+	colorPickCmd.Flags().Bool("raw", false, "Removes ANSI escape codes and background colors. Use this when piping to other commands")
 	colorPickCmd.Flags().StringVarP(&colorOutputFmt, "output-format", "o", "", "Custom output format template")
 	colorPickCmd.Flags().BoolVarP(&colorAutocopy, "autocopy", "a", false, "Copy result to clipboard")
 	colorPickCmd.Flags().BoolVarP(&colorLowercase, "lowercase", "l", false, "Output hex in lowercase")
@@ -113,7 +117,15 @@ func runColorPick(cmd *cobra.Command, args []string) {
 
 	if jsonOutput {
 		fmt.Println(output)
-	} else if color.IsDark() {
+		return
+	}
+
+	if raw, _ := cmd.Flags().GetBool("raw"); raw {
+		fmt.Printf("%s\n", output)
+		return
+	}
+
+	if color.IsDark() {
 		fmt.Printf("\033[48;2;%d;%d;%dm\033[97m %s \033[0m\n", color.R, color.G, color.B, output)
 	} else {
 		fmt.Printf("\033[48;2;%d;%d;%dm\033[30m %s \033[0m\n", color.R, color.G, color.B, output)
