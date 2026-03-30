@@ -99,15 +99,14 @@ Singleton {
                 const lines = text.split('\n');
                 const trimmedLines = lines.map(line => line.replace(/\s+$/, '')).filter(line => line.length > 0);
                 configValidationOutput = trimmedLines.join('\n').trim();
-                if (hasInitialConnection) {
-                    ToastService.showError("niri: failed to load config", configValidationOutput, "", "niri-config");
-                }
             }
         }
 
         onExited: exitCode => {
             if (exitCode === 0) {
                 configValidationOutput = "";
+            } else if (hasInitialConnection && configValidationOutput.length > 0) {
+                ToastService.showError("niri: failed to load config", configValidationOutput, "", "niri-config");
             }
         }
     }
