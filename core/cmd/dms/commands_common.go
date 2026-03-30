@@ -525,5 +525,6 @@ func getCommonCommands() []*cobra.Command {
 		configCmd,
 		dlCmd,
 		randrCmd,
+		blurCmd,
 	}
 }
