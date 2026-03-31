@@ -444,20 +444,21 @@ func GetFocusedMonitor() string {
 
 type outputInfo struct {
 	x, y      int32
+	scale     float64
 	transform int32
 }
 
-func getOutputInfo(outputName string) (*outputInfo, bool) {
+func getAllOutputInfos() map[string]*outputInfo {
 	display, err := client.Connect("")
 	if err != nil {
-		return nil, false
+		return nil
 	}
 	ctx := display.Context()
 	defer ctx.Close()
 
 	registry, err := display.GetRegistry()
 	if err != nil {
-		return nil, false
+		return nil
 	}
 
 	var outputManager *wlr_output_management.ZwlrOutputManagerV1
@@ -476,16 +477,17 @@ func getOutputInfo(outputName string) (*outputInfo, bool) {
 	})
 
 	if err := wlhelpers.Roundtrip(display, ctx); err != nil {
-		return nil, false
+		return nil
 	}
 
 	if outputManager == nil {
-		return nil, false
+		return nil
 	}
 
 	type headState struct {
 		name      string
 		x, y      int32
+		scale     float64
 		transform int32
 	}
 	heads := make(map[*wlr_output_management.ZwlrOutputHeadV1]*headState)
@@ -501,6 +503,9 @@ func getOutputInfo(outputName string) (*outputInfo, bool) {
 			state.x = pe.X
 			state.y = pe.Y
 		})
+		e.Head.SetScaleHandler(func(se wlr_output_management.ZwlrOutputHeadV1ScaleEvent) {
+			state.scale = se.Scale
+		})
 		e.Head.SetTransformHandler(func(te wlr_output_management.ZwlrOutputHeadV1TransformEvent) {
 			state.transform = te.Transform
 		})
@@ -511,21 +516,32 @@ func getOutputInfo(outputName string) (*outputInfo, bool) {
 
 	for !done {
 		if err := ctx.Dispatch(); err != nil {
-			return nil, false
+			return nil
 		}
 	}
 
+	result := make(map[string]*outputInfo, len(heads))
 	for _, state := range heads {
-		if state.name == outputName {
-			return &outputInfo{
-				x:         state.x,
-				y:         state.y,
-				transform: state.transform,
-			}, true
+		if state.name == "" {
+			continue
+		}
+		result[state.name] = &outputInfo{
+			x:         state.x,
+			y:         state.y,
+			scale:     state.scale,
+			transform: state.transform,
 		}
 	}
+	return result
+}
 
-	return nil, false
+func getOutputInfo(outputName string) (*outputInfo, bool) {
+	infos := getAllOutputInfos()
+	if infos == nil {
+		return nil, false
+	}
+	info, ok := infos[outputName]
+	return info, ok
 }
 
 func getDWLActiveWindow() (*WindowGeometry, error) {
