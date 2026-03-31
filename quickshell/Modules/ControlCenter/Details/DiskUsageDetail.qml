@@ -79,9 +79,9 @@ Rectangle {
                     width: parent.width
                     height: 80
                     radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                    border.color: modelData.mount === currentMountPath ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                    border.width: modelData.mount === currentMountPath ? 2 : 0
+                    color: Theme.surfaceLight
+                    border.color: modelData.mount === currentMountPath ? Theme.primary : Theme.outlineLight
+                    border.width: modelData.mount === currentMountPath ? 2 : 1
 
                     Row {
                         anchors.left: parent.left

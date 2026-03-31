@@ -129,8 +129,9 @@ Rectangle {
                 width: (parent.width - Theme.spacingM) / 2
                 height: 64
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                border.width: 0
+                color: Theme.surfaceLight
+                border.color: Theme.outlineLight
+                border.width: 1
 
                 Column {
                     anchors.centerIn: parent
@@ -164,8 +165,9 @@ Rectangle {
                 width: (parent.width - Theme.spacingM) / 2
                 height: 64
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                border.width: 0
+                color: Theme.surfaceLight
+                border.color: Theme.outlineLight
+                border.width: 1
 
                 Column {
                     anchors.centerIn: parent

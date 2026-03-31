@@ -34,7 +34,7 @@ PluginComponent {
             id: detailRoot
             implicitHeight: detailColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
             DankActionButton {
                 anchors.top: parent.top
@@ -252,7 +252,7 @@ PluginComponent {
                                 width: parent ? parent.width : 300
                                 height: 50
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHighest
+                                color: Theme.surfaceLight
                                 border.width: 1
                                 border.color: Theme.outlineLight
                                 opacity: 1.0

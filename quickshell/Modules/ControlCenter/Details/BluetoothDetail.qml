@@ -229,7 +229,6 @@ Rectangle {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    border.width: 0
 
                     Component.onCompleted: {
                         if (!isConnected)
@@ -243,8 +242,8 @@ Rectangle {
                         if (isConnecting)
                             return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12);
                         if (deviceMouseArea.containsMouse)
-                            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
-                        return Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency);
+                            return Theme.primaryHoverLight;
+                        return Theme.surfaceLight;
                     }
 
                     border.color: {
@@ -252,8 +251,9 @@ Rectangle {
                             return Theme.warning;
                         if (isConnected)
                             return Theme.primary;
-                        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12);
+                        return Theme.outlineLight;
                     }
+                    border.width: (isConnecting || isConnected) ? 2 : 1
 
                     Row {
                         anchors.left: parent.left
@@ -490,9 +490,9 @@ Rectangle {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    color: availableMouseArea.containsMouse && isInteractive ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                    border.width: 0
+                    color: availableMouseArea.containsMouse && isInteractive ? Theme.primaryHoverLight : Theme.surfaceLight
+                    border.color: Theme.outlineLight
+                    border.width: 1
                     opacity: isInteractive ? 1 : 0.6
 
                     Row {

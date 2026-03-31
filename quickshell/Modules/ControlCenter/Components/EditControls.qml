@@ -33,7 +33,7 @@ Row {
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         background: Rectangle {
-            color: Theme.surfaceContainer
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             border.color: Theme.primarySelected
             border.width: 0
             radius: Theme.cornerRadius

@@ -576,20 +576,27 @@ Item {
                     }
                 }
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.cornerRadius
-                    color: "transparent"
-                    border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-                    border.width: BlurService.borderWidth
-                }
-
                 Loader {
                     id: contentLoader
                     anchors.fill: parent
                     active: root._primeContent || shouldBeVisible || contentWindow.visible
                     asynchronous: false
                 }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: parent.height
+                x: contentWrapper.x
+                y: contentWrapper.y
+                opacity: contentWrapper.opacity
+                scale: contentWrapper.scale
+                visible: contentWrapper.visible
+                radius: Theme.cornerRadius
+                color: "transparent"
+                border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+                border.width: BlurService.borderWidth
+                z: 100
             }
         }
 

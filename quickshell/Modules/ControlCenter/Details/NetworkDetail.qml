@@ -308,9 +308,9 @@ Rectangle {
                     width: parent.width
                     height: wiredContentRow.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: wiredNetworkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                    border.color: Theme.primary
-                    border.width: 0
+                    color: wiredNetworkMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                    border.color: isActive ? Theme.primary : Theme.outlineLight
+                    border.width: isActive ? 2 : 1
 
                     Row {
                         id: wiredContentRow
@@ -565,9 +565,9 @@ Rectangle {
             width: wifiContent.width
             height: wifiContentRow.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
-            color: networkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-            border.color: wifiDelegate.isConnected ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-            border.width: 0
+            color: networkMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+            border.color: wifiDelegate.isConnected ? Theme.primary : Theme.outlineLight
+            border.width: wifiDelegate.isConnected ? 2 : 1
 
             Row {
                 id: wifiContentRow

@@ -238,7 +238,7 @@ Rectangle {
                         width: fieldContent.width + Theme.spacingM * 2
                         height: 32
                         radius: Theme.cornerRadius - 2
-                        color: Theme.surfaceContainerHigh
+                        color: Theme.surfaceLight
                         border.width: 1
                         border.color: Theme.outlineLight
 
@@ -272,7 +272,9 @@ Rectangle {
                 checked: configData ? (configData.autoconnect || false) : false
                 visible: !VPNService.configLoading && configData !== null
                 onToggled: checked => {
-                    VPNService.updateConfig(profile.uuid, {autoconnect: checked});
+                    VPNService.updateConfig(profile.uuid, {
+                        autoconnect: checked
+                    });
                 }
             }
 
