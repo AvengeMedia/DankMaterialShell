@@ -2,6 +2,7 @@ package screenshot
 
 import (
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -298,22 +299,20 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 	if len(outputs) == 0 {
 		return nil, fmt.Errorf("no outputs available")
 	}
-
 	if len(outputs) == 1 {
 		return s.captureWholeOutput(outputs[0])
 	}
 
-	// Capture all outputs first to get actual buffer sizes
-	type capturedOutput struct {
-		output *WaylandOutput
-		result *CaptureResult
-		physX  int
-		physY  int
-	}
-	captured := make([]capturedOutput, 0, len(outputs))
+	wlrInfos := getAllOutputInfos()
 
-	var minX, minY, maxX, maxY int
-	first := true
+	type pendingOutput struct {
+		result *CaptureResult
+		logX   float64
+		logY   float64
+		scale  float64
+	}
+	var pending []pendingOutput
+	maxScale := 1.0
 
 	for _, output := range outputs {
 		result, err := s.captureWholeOutput(output)
@@ -322,50 +321,74 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 			continue
 		}
 
-		outX, outY := output.x, output.y
+		logX, logY := float64(output.x), float64(output.y)
 		scale := float64(output.scale)
+
 		switch DetectCompositor() {
 		case CompositorHyprland:
 			if hx, hy, _, _, ok := GetHyprlandMonitorGeometry(output.name); ok {
-				outX, outY = hx, hy
+				logX, logY = float64(hx), float64(hy)
 			}
-			if s := GetHyprlandMonitorScale(output.name); s > 0 {
-				scale = s
+			if hs := GetHyprlandMonitorScale(output.name); hs > 0 {
+				scale = hs
 			}
-		case CompositorDWL:
-			if info, ok := getOutputInfo(output.name); ok {
-				outX, outY = info.x, info.y
+		default:
+			if wlrInfos != nil {
+				if info, ok := wlrInfos[output.name]; ok {
+					logX, logY = float64(info.x), float64(info.y)
+					if info.scale > 0 {
+						scale = info.scale
+					}
+				}
 			}
 		}
+
 		if scale <= 0 {
 			scale = 1.0
 		}
 
-		physX := int(float64(outX) * scale)
-		physY := int(float64(outY) * scale)
+		pending = append(pending, pendingOutput{result: result, logX: logX, logY: logY, scale: scale})
+		if scale > maxScale {
+			maxScale = scale
+		}
+	}
 
-		captured = append(captured, capturedOutput{
-			output: output,
-			result: result,
-			physX:  physX,
-			physY:  physY,
-		})
+	if len(pending) == 0 {
+		return nil, fmt.Errorf("failed to capture any outputs")
+	}
+	if len(pending) == 1 {
+		return pending[0].result, nil
+	}
 
-		right := physX + result.Buffer.Width
-		bottom := physY + result.Buffer.Height
+	type layoutEntry struct {
+		result  *CaptureResult
+		canvasX int
+		canvasY int
+		canvasW int
+		canvasH int
+	}
+	entries := make([]layoutEntry, len(pending))
+	var minX, minY, maxX, maxY int
 
-		if first {
-			minX, minY = physX, physY
-			maxX, maxY = right, bottom
-			first = false
+	for i, p := range pending {
+		cx := int(math.Round(p.logX * maxScale))
+		cy := int(math.Round(p.logY * maxScale))
+		cw := int(math.Round(float64(p.result.Buffer.Width) * maxScale / p.scale))
+		ch := int(math.Round(float64(p.result.Buffer.Height) * maxScale / p.scale))
+
+		entries[i] = layoutEntry{result: p.result, canvasX: cx, canvasY: cy, canvasW: cw, canvasH: ch}
+
+		right := cx + cw
+		bottom := cy + ch
+		if i == 0 {
+			minX, minY, maxX, maxY = cx, cy, right, bottom
 			continue
 		}
-
-		if physX < minX {
-			minX = physX
+		if cx < minX {
+			minX = cx
 		}
-		if physY < minY {
-			minY = physY
+		if cy < minY {
+			minY = cy
 		}
 		if right > maxX {
 			maxX = right
@@ -375,35 +398,26 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 		}
 	}
 
-	if len(captured) == 0 {
-		return nil, fmt.Errorf("failed to capture any outputs")
-	}
-
-	if len(captured) == 1 {
-		return captured[0].result, nil
-	}
-
 	totalW := maxX - minX
 	totalH := maxY - minY
-
-	compositeStride := totalW * 4
-	composite, err := CreateShmBuffer(totalW, totalH, compositeStride)
+	composite, err := CreateShmBuffer(totalW, totalH, totalW*4)
 	if err != nil {
-		for _, c := range captured {
-			c.result.Buffer.Close()
+		for _, e := range entries {
+			e.result.Buffer.Close()
 		}
 		return nil, fmt.Errorf("create composite buffer: %w", err)
 	}
-
 	composite.Clear()
 
 	var format uint32
-	for _, c := range captured {
+	for _, e := range entries {
 		if format == 0 {
-			format = c.result.Format
+			format = e.result.Format
 		}
-		s.blitBuffer(composite, c.result.Buffer, c.physX-minX, c.physY-minY, c.result.YInverted)
-		c.result.Buffer.Close()
+		s.blitBufferScaled(composite, e.result.Buffer,
+			e.canvasX-minX, e.canvasY-minY, e.canvasW, e.canvasH,
+			e.result.YInverted)
+		e.result.Buffer.Close()
 	}
 
 	return &CaptureResult{
@@ -413,32 +427,44 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 	}, nil
 }
 
-func (s *Screenshoter) blitBuffer(dst, src *ShmBuffer, dstX, dstY int, yInverted bool) {
+func (s *Screenshoter) blitBufferScaled(dst, src *ShmBuffer, dstX, dstY, dstW, dstH int, yInverted bool) {
+	if dstW <= 0 || dstH <= 0 {
+		return
+	}
+
 	srcData := src.Data()
 	dstData := dst.Data()
 
-	for srcY := 0; srcY < src.Height; srcY++ {
-		actualSrcY := srcY
-		if yInverted {
-			actualSrcY = src.Height - 1 - srcY
-		}
-
-		dy := dstY + srcY
-		if dy < 0 || dy >= dst.Height {
+	for dy := 0; dy < dstH; dy++ {
+		canvasY := dstY + dy
+		if canvasY < 0 || canvasY >= dst.Height {
 			continue
 		}
 
-		srcRowOff := actualSrcY * src.Stride
-		dstRowOff := dy * dst.Stride
+		srcY := dy * src.Height / dstH
+		if yInverted {
+			srcY = src.Height - 1 - srcY
+		}
+		if srcY < 0 || srcY >= src.Height {
+			continue
+		}
 
-		for srcX := 0; srcX < src.Width; srcX++ {
-			dx := dstX + srcX
-			if dx < 0 || dx >= dst.Width {
+		srcRowOff := srcY * src.Stride
+		dstRowOff := canvasY * dst.Stride
+
+		for dx := 0; dx < dstW; dx++ {
+			canvasX := dstX + dx
+			if canvasX < 0 || canvasX >= dst.Width {
+				continue
+			}
+
+			srcX := dx * src.Width / dstW
+			if srcX >= src.Width {
 				continue
 			}
 
 			si := srcRowOff + srcX*4
-			di := dstRowOff + dx*4
+			di := dstRowOff + canvasX*4
 
 			if si+3 >= len(srcData) || di+3 >= len(dstData) {
 				continue
