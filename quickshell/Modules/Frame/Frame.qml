@@ -7,10 +7,10 @@ import qs.Common
 Variants {
     id: root
 
-    model: SettingsData.getFrameScreensAlways()
+    model: Quickshell.screens
 
     FrameInstance {
-        required property ShellScreen modelData
+        required property var modelData
 
         screen: modelData
     }

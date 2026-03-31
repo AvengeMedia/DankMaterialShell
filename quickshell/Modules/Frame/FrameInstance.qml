@@ -6,10 +6,10 @@ import Quickshell
 Item {
     id: root
 
-    required property ShellScreen screen
+    required property var screen
 
     FrameWindow {
-        screen: root.screen
+        targetScreen: root.screen
     }
 
     FrameExclusions {

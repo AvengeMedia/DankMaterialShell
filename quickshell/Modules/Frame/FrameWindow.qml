@@ -8,7 +8,10 @@ import qs.Common
 PanelWindow {
     id: win
 
-    required property ShellScreen screen
+    required property var targetScreen
+
+    screen: targetScreen
+    visible: true
 
     WlrLayershell.namespace: "dms:frame"
     WlrLayershell.layer: WlrLayer.Top
@@ -28,7 +31,7 @@ PanelWindow {
 
     FrameBorder {
         anchors.fill: parent
-        visible: SettingsData.frameEnabled
+        visible: SettingsData.frameEnabled && SettingsData.isScreenInPreferences(win.screen, SettingsData.frameScreenPreferences)
         barEdges: { SettingsData.barConfigs; return SettingsData.getActiveBarEdgesForScreen(win.screen); }
     }
 }
