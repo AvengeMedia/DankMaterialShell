@@ -31,7 +31,7 @@ Item {
     property real animationOffset: Theme.spacingL
     property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
-    property color backgroundColor: Theme.surfaceContainer
+    property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 0
     property real cornerRadius: Theme.cornerRadius

@@ -266,7 +266,7 @@ PanelWindow {
         scale: shouldBeVisible ? 1 : 0.9
 
         property bool childHovered: false
-        readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
+        readonly property real popupSurfaceAlpha: Theme.popupTransparency
 
         Rectangle {
             id: background
@@ -286,7 +286,7 @@ PanelWindow {
             level: Theme.elevationLevel3
             fallbackOffset: 6
             targetRadius: Theme.cornerRadius
-            targetColor: Theme.surfaceContainer
+            targetColor: Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
             borderColor: Theme.outlineMedium
             borderWidth: 1
             shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"

@@ -132,7 +132,7 @@ DankModal {
 
     modalWidth: 680
     modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 680
-    backgroundColor: Theme.surfaceContainer
+    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     cornerRadius: Theme.cornerRadius
     borderColor: Theme.outlineMedium
     borderWidth: 1

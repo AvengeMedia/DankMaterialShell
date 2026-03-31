@@ -579,7 +579,7 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                    color: "transparent"
                     border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
                     border.width: BlurService.borderWidth
                 }
