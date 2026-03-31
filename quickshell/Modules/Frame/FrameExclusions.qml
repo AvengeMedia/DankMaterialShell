@@ -8,7 +8,7 @@ import qs.Common
 Scope {
     id: root
 
-    required property ShellScreen screen
+    required property var screen
 
     readonly property var barEdges: {
         SettingsData.barConfigs; // force re-eval when bar configs change
@@ -18,10 +18,12 @@ Scope {
     // One thin invisible PanelWindow per edge.
     // Skips any edge where a bar already provides its own exclusiveZone.
 
+    readonly property bool screenEnabled: SettingsData.frameEnabled && SettingsData.isScreenInPreferences(root.screen, SettingsData.frameScreenPreferences)
+
     Loader {
-        active: SettingsData.frameEnabled && !root.barEdges.includes("top")
+        active: root.screenEnabled && !root.barEdges.includes("top")
         sourceComponent: EdgeExclusion {
-            screen:       root.screen
+            targetScreen:  root.screen
             anchorTop:    true
             anchorLeft:   true
             anchorRight:  true
@@ -29,9 +31,9 @@ Scope {
     }
 
     Loader {
-        active: SettingsData.frameEnabled && !root.barEdges.includes("bottom")
+        active: root.screenEnabled && !root.barEdges.includes("bottom")
         sourceComponent: EdgeExclusion {
-            screen:        root.screen
+            targetScreen:  root.screen
             anchorBottom:  true
             anchorLeft:    true
             anchorRight:   true
@@ -39,9 +41,9 @@ Scope {
     }
 
     Loader {
-        active: SettingsData.frameEnabled && !root.barEdges.includes("left")
+        active: root.screenEnabled && !root.barEdges.includes("left")
         sourceComponent: EdgeExclusion {
-            screen:        root.screen
+            targetScreen:  root.screen
             anchorLeft:    true
             anchorTop:     true
             anchorBottom:  true
@@ -49,9 +51,9 @@ Scope {
     }
 
     Loader {
-        active: SettingsData.frameEnabled && !root.barEdges.includes("right")
+        active: root.screenEnabled && !root.barEdges.includes("right")
         sourceComponent: EdgeExclusion {
-            screen:        root.screen
+            targetScreen:  root.screen
             anchorRight:   true
             anchorTop:     true
             anchorBottom:  true
@@ -59,7 +61,9 @@ Scope {
     }
 
     component EdgeExclusion: PanelWindow {
-        required property ShellScreen screen
+        required property var targetScreen
+
+        screen: targetScreen
         property bool anchorTop:    false
         property bool anchorBottom: false
         property bool anchorLeft:   false

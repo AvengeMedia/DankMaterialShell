@@ -1976,14 +1976,6 @@ Singleton {
         return Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
     }
 
-    function getFrameScreensAlways() {
-        const prefs = frameScreenPreferences;
-        if (!prefs || prefs.length === 0 || prefs.includes("all")) {
-            return Quickshell.screens;
-        }
-        return Quickshell.screens.filter(s => prefs.includes(s.name));
-    }
-
     function getActiveBarEdgeForScreen(screen) {
         if (!screen) return "";
         for (var i = 0; i < barConfigs.length; i++) {
