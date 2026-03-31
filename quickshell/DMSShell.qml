@@ -27,6 +27,8 @@ import qs.Services
 Item {
     id: root
 
+    readonly property var _trayRecovery: TrayRecoveryService
+
     Instantiator {
         id: daemonPluginInstantiator
         asynchronous: true
