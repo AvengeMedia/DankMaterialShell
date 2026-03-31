@@ -13,6 +13,7 @@ Row {
     property string instanceId: ""
     property string screenName: ""
     property var parentScreen: null
+    property bool applyToAll: SettingsData.brightnessApplyToAll === true
 
     signal iconClicked
 
@@ -26,6 +27,10 @@ Row {
     property string targetDeviceName: {
         if (!DisplayService.brightnessAvailable || !DisplayService.devices || DisplayService.devices.length === 0) {
             return "";
+        }
+
+        if (applyToAll) {
+            return "all";
         }
 
         if (screenName && screenName.length > 0) {
@@ -72,6 +77,10 @@ Row {
             return null;
         }
 
+        if (targetDeviceName === "all") {
+            return DisplayService.devices.find(d => d.class === "ddc" || d.class === "backlight") || DisplayService.devices[0] || null;
+        }
+
         return DisplayService.devices.find(dev => dev.name === targetDeviceName) || null;
     }
 
@@ -79,6 +88,10 @@ Row {
         DisplayService.brightnessVersion;
         if (!targetDeviceName) {
             return 0;
+        }
+
+        if (targetDeviceName === "all" && targetDevice) {
+            return DisplayService.getDeviceBrightness(targetDevice.id);
         }
 
         return DisplayService.getDeviceBrightness(targetDeviceName);

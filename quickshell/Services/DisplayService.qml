@@ -244,6 +244,11 @@ Singleton {
     }
 
     function setBrightness(percentage, device, suppressOsd) {
+        if (device === "all") {
+            root.setBrightnessAll(percentage, suppressOsd);
+            return;
+        }
+
         const actualDevice = device === "" ? getDefaultDevice() : (device || currentDevice || getDefaultDevice());
         if (!actualDevice) {
             console.warn("DisplayService: No device selected for brightness change");
@@ -324,6 +329,22 @@ Singleton {
                 ToastService.dismissCategory("brightness");
             }
         });
+    }
+
+    function getControllableDevices() {
+        return root.devices.filter(d => d.class === "ddc" || d.class === "backlight");
+    }
+
+    function setBrightnessAll(percentage, suppressOsd) {
+        const controllableDevices = getControllableDevices();
+        if (controllableDevices.length === 0) {
+            console.warn("DisplayService: No controllable brightness devices found");
+            return;
+        }
+
+        for (const device of controllableDevices) {
+            root.setBrightness(percentage, device.id, suppressOsd);
+        }
     }
 
     function setCurrentDevice(deviceName, saveToSession = false) {
@@ -881,6 +902,12 @@ Singleton {
             if (isNaN(value))
                 return "Invalid brightness value: " + percentage;
 
+            if (device === "all") {
+                const clampedValue = Math.max(1, Math.min(100, value));
+                root.setBrightness(clampedValue, "all");
+                return "Brightness set to " + clampedValue + "% on all devices";
+            }
+
             const actualDevice = device || root.getPreferredDevice();
 
             if (actualDevice && !root.devices.some(d => d.id === actualDevice))
@@ -903,12 +930,23 @@ Singleton {
             if (!root.brightnessAvailable)
                 return "Brightness control not available";
 
+            const stepValue = parseInt(step || "5");
+
+            if (device === "all") {
+                const controllableDevices = root.getControllableDevices();
+                for (const dev of controllableDevices) {
+                    const isExp = SessionData.getBrightnessExponential(dev.id);
+                    const current = root.getDeviceBrightness(dev.id);
+                    const maxVal = isExp ? 100 : (dev.displayMax || 100);
+                    root.setBrightness(Math.min(maxVal, current + stepValue), dev.id);
+                }
+                return "Brightness increased by " + stepValue + "% on all devices";
+            }
+
             const actualDevice = device || root.getPreferredDevice();
 
             if (actualDevice && !root.devices.some(d => d.id === actualDevice))
                 return "Device not found: " + actualDevice;
-
-            const stepValue = parseInt(step || "5");
 
             root.lastIpcDevice = actualDevice;
             if (actualDevice && actualDevice !== root.currentDevice)
@@ -930,12 +968,26 @@ Singleton {
             if (!root.brightnessAvailable)
                 return "Brightness control not available";
 
+            const stepValue = parseInt(step || "5");
+
+            if (device === "all") {
+                const controllableDevices = root.getControllableDevices();
+                for (const dev of controllableDevices) {
+                    const isExp = SessionData.getBrightnessExponential(dev.id);
+                    const current = root.getDeviceBrightness(dev.id);
+                    let minVal = 0;
+                    if (isExp || dev.class === "backlight" || dev.class === "ddc") {
+                        minVal = 1;
+                    }
+                    root.setBrightness(Math.max(minVal, current - stepValue), dev.id);
+                }
+                return "Brightness decreased by " + stepValue + "% on all devices";
+            }
+
             const actualDevice = device || root.getPreferredDevice();
 
             if (actualDevice && !root.devices.some(d => d.id === actualDevice))
                 return "Device not found: " + actualDevice;
-
-            const stepValue = parseInt(step || "5");
 
             root.lastIpcDevice = actualDevice;
             if (actualDevice && actualDevice !== root.currentDevice)

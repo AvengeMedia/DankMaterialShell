@@ -247,6 +247,7 @@ var SPEC = {
     fadeToDpmsGracePeriod: { def: 5 },
     launchPrefix: { def: "" },
     brightnessDevicePins: { def: {} },
+    brightnessApplyToAll: { def: false },
     wifiNetworkPins: { def: {} },
     bluetoothDevicePins: { def: {} },
     audioInputDevicePins: { def: {} },

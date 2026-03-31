@@ -423,6 +423,7 @@ Singleton {
     property int fadeToDpmsGracePeriod: 5
     property string launchPrefix: ""
     property var brightnessDevicePins: ({})
+    property bool brightnessApplyToAll: false
     property var wifiNetworkPins: ({})
     property var bluetoothDevicePins: ({})
     property var audioInputDevicePins: ({})
