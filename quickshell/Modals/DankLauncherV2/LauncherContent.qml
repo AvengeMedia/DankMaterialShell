@@ -270,7 +270,7 @@ FocusScope {
 
     Item {
         anchors.fill: parent
-        visible: !editMode
+        visible: !editMode && !(root.parentModal?.isClosing ?? false)
 
         Item {
             id: footerBar
@@ -551,7 +551,6 @@ FocusScope {
             Item {
                 width: parent.width
                 height: parent.height - searchField.height - categoryRow.height - actionPanel.height - Theme.spacingXS * (categoryRow.visible ? 3 : 2)
-                opacity: root.parentModal?.isClosing ? 0 : 1
 
                 ResultsList {
                     id: resultsList

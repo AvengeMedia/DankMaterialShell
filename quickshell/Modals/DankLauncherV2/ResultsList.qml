@@ -324,6 +324,8 @@ Item {
         height: 24
         z: 100
         visible: {
+            if (BlurService.enabled)
+                return false;
             if (mainListView.contentHeight <= mainListView.height)
                 return false;
             var atBottom = mainListView.contentY >= mainListView.contentHeight - mainListView.height + mainListView.originY - 5;
@@ -441,7 +443,7 @@ Item {
                     case "apps":
                         return "apps";
                     default:
-                        return root.controller?.searchQuery?.length > 0 ? "search_off" : "search";
+                        return "search_off";
                     }
                 }
             }
@@ -469,9 +471,9 @@ Item {
                     case "plugins":
                         return hasQuery ? I18n.tr("No plugin results") : I18n.tr("Browse or search plugins");
                     case "apps":
-                        return hasQuery ? I18n.tr("No apps found") : I18n.tr("Type to search apps");
+                        return I18n.tr("No apps found");
                     default:
-                        return hasQuery ? I18n.tr("No results found") : I18n.tr("Type to search");
+                        return I18n.tr("No results found");
                     }
                 }
             }
