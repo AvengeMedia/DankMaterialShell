@@ -218,9 +218,9 @@ Rectangle {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                    border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                    border.width: 0
+                    color: deviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                    border.color: modelData === AudioService.sink ? Theme.primary : Theme.outlineLight
+                    border.width: modelData === AudioService.sink ? 2 : 1
 
                     DankRipple {
                         id: deviceRipple
@@ -397,9 +397,9 @@ Rectangle {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                    border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                    border.width: 0
+                    color: Theme.surfaceLight
+                    border.color: modelData === AudioService.sink ? Theme.primary : Theme.outlineLight
+                    border.width: modelData === AudioService.sink ? 2 : 1
 
                     Row {
                         anchors.left: parent.left

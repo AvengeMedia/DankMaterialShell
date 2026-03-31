@@ -89,7 +89,7 @@ Row {
             width: Math.max(contentItem.implicitWidth + root.buttonPadding * 2, root.minButtonWidth) + (selected ? 4 : 0)
             height: root.buttonHeight
 
-            color: selected ? Theme.buttonBg : Theme.surfaceVariant
+            color: selected ? Theme.buttonBg : Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency)
             border.color: "transparent"
             border.width: 0
 

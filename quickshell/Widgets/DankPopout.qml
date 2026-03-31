@@ -552,20 +552,27 @@ Item {
                     }
                 }
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                    border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-                    border.width: BlurService.borderWidth
-                }
-
                 Loader {
                     id: contentLoader
                     anchors.fill: parent
                     active: shouldBeVisible || contentWindow.visible
                     asynchronous: false
                 }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: parent.height
+                x: contentWrapper.x
+                y: contentWrapper.y
+                opacity: contentWrapper.opacity
+                scale: contentWrapper.scale
+                visible: contentWrapper.visible
+                radius: Theme.cornerRadius
+                color: "transparent"
+                border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+                border.width: BlurService.borderWidth
+                z: 100
             }
         }
 
