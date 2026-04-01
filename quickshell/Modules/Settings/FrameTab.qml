@@ -55,7 +55,7 @@ Item {
                     id: roundingSlider
                     settingKey: "frameRounding"
                     tags: ["frame", "border", "rounding", "radius", "corner"]
-                    text: I18n.tr("Border rounding")
+                    text: I18n.tr("Border Radius")
                     unit: "px"
                     minimum: 0
                     maximum: 100
@@ -75,7 +75,7 @@ Item {
                     id: thicknessSlider
                     settingKey: "frameThickness"
                     tags: ["frame", "border", "thickness", "size", "width"]
-                    text: I18n.tr("Border thickness")
+                    text: I18n.tr("Border Width")
                     unit: "px"
                     minimum: 2
                     maximum: 100
@@ -93,22 +93,22 @@ Item {
 
                 SettingsSliderRow {
                     id: barThicknessSlider
-                    settingKey: "frameBarThickness"
+                    settingKey: "frameBarSize"
                     tags: ["frame", "bar", "thickness", "size", "height", "width"]
-                    text: I18n.tr("Bar-edge thickness")
+                    text: I18n.tr("Size")
                     description: I18n.tr("Height of horizontal bars / width of vertical bars in frame mode")
                     unit: "px"
                     minimum: 24
                     maximum: 100
                     step: 1
-                    defaultValue: 42
-                    value: SettingsData.frameBarThickness
-                    onSliderDragFinished: v => SettingsData.set("frameBarThickness", v)
+                    defaultValue: 40
+                    value: SettingsData.frameBarSize
+                    onSliderDragFinished: v => SettingsData.set("frameBarSize", v)
 
                     Binding {
                         target: barThicknessSlider
                         property: "value"
-                        value: SettingsData.frameBarThickness
+                        value: SettingsData.frameBarSize
                     }
                 }
 
@@ -128,6 +128,50 @@ Item {
                         target: opacitySlider
                         property: "value"
                         value: SettingsData.frameOpacity * 100
+                    }
+                }
+
+                SettingsToggleRow {
+                    id: frameBlurToggle
+                    settingKey: "frameBlurEnabled"
+                    tags: ["frame", "blur", "background", "glass", "transparency", "frosted"]
+                    text: I18n.tr("Frame Blur")
+                    description: !BlurService.available
+                        ? I18n.tr("Requires a newer version of Quickshell")
+                        : I18n.tr("Apply compositor blur behind the frame border")
+                    checked: SettingsData.frameBlurEnabled
+                    onToggled: checked => SettingsData.set("frameBlurEnabled", checked)
+                    enabled: BlurService.available && SettingsData.blurEnabled
+                    opacity: enabled ? 1.0 : 0.5
+                    visible: BlurService.available
+                }
+
+                Item {
+                    visible: BlurService.available && !SettingsData.blurEnabled
+                    width: parent.width
+                    height: blurToggleNote.height + Theme.spacingM * 2
+
+                    Row {
+                        id: blurToggleNote
+                        x: Theme.spacingM
+                        width: parent.width - Theme.spacingM * 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "blur_on"
+                            size: Theme.fontSizeMedium
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Frame Blur is controlled by Background Blur in Theme & Colors")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            width: parent.width - Theme.fontSizeMedium - Theme.spacingS
+                        }
                     }
                 }
 
@@ -217,16 +261,8 @@ Item {
                 title: I18n.tr("Bar Integration")
                 settingKey: "frameBarIntegration"
                 collapsible: true
+                expanded: false
                 visible: SettingsData.frameEnabled
-
-                SettingsToggleRow {
-                    settingKey: "frameSyncBarColor"
-                    tags: ["frame", "bar", "sync", "color", "background"]
-                    text: I18n.tr("Sync bar background to frame")
-                    description: I18n.tr("Sets the bar background color to match the frame border color for a seamless look")
-                    checked: SettingsData.frameSyncBarColor
-                    onToggled: checked => SettingsData.set("frameSyncBarColor", checked)
-                }
 
                 SettingsToggleRow {
                     visible: CompositorService.isNiri
@@ -246,6 +282,7 @@ Item {
                 title: I18n.tr("Display Assignment")
                 settingKey: "frameDisplays"
                 collapsible: true
+                expanded: false
                 visible: SettingsData.frameEnabled
 
                 SettingsDisplayPicker {

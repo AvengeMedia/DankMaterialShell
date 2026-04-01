@@ -26,13 +26,13 @@ Item {
     readonly property real _frameLeftInset: {
         if (!SettingsData.frameEnabled || barWindow.isVertical) return 0
         return barWindow.hasAdjacentLeftBar
-            ? SettingsData.frameBarThickness
+            ? SettingsData.frameBarSize
             : 0
     }
     readonly property real _frameRightInset: {
         if (!SettingsData.frameEnabled || barWindow.isVertical) return 0
         return barWindow.hasAdjacentRightBar
-            ? SettingsData.frameBarThickness
+            ? SettingsData.frameBarSize
             : 0
     }
     readonly property real _frameTopInset: {
