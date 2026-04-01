@@ -133,6 +133,11 @@ PanelWindow {
             teardown();
             if (!BlurService.enabled || !BlurService.available)
                 return;
+            // In frame mode, FrameWindow owns the blur region for the entire screen edge
+            // (including the bar area). The bar must not set its own competing blur region
+            // so that frameBlurEnabled acts as the single control for all blur in frame mode.
+            if (SettingsData.frameEnabled)
+                return;
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
             const hasBar = barHasTransparency;
@@ -188,6 +193,11 @@ PanelWindow {
         }
 
         Connections {
+            target: SettingsData
+            function onFrameEnabledChanged() { barBlur.rebuild(); }
+        }
+
+        Connections {
             target: topBarSlide
             function onXChanged() {
                 if (barWindow.blurRegion)
@@ -238,7 +248,7 @@ PanelWindow {
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: (SettingsData.frameEnabled && SettingsData.frameSyncBarColor)
+    readonly property color _bgColor: SettingsData.frameEnabled
         ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
         : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
@@ -398,7 +408,7 @@ PanelWindow {
 
     readonly property int notificationCount: NotificationService.notifications.length
     readonly property real effectiveBarThickness: SettingsData.frameEnabled
-        ? SettingsData.frameBarThickness
+        ? SettingsData.frameBarSize
         : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
     readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled
         ? SettingsData.frameShowOnOverview

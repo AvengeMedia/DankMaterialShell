@@ -9,18 +9,24 @@ Item {
 
     anchors.fill: parent
 
-    required property var barEdges
-
-    readonly property real _thickness:    SettingsData.frameThickness
-    readonly property real _barThickness: SettingsData.frameBarThickness
-    readonly property real _rounding:     SettingsData.frameRounding
+    required property real cutoutTopInset
+    required property real cutoutBottomInset
+    required property real cutoutLeftInset
+    required property real cutoutRightInset
+    required property real cutoutRadius
 
     Rectangle {
         id: borderRect
 
         anchors.fill: parent
-        color:   SettingsData.effectiveFrameColor
-        opacity: SettingsData.frameOpacity
+        // Bake frameOpacity into the color alpha rather than using the `opacity` property.
+        // Qt Quick can skip layer.effect processing on items with opacity < 1 as an
+        // optimization, causing the MultiEffect inverted mask to stop working and the
+        // Rectangle to render as a plain square at low opacity values.
+        color: Qt.rgba(SettingsData.effectiveFrameColor.r,
+                       SettingsData.effectiveFrameColor.g,
+                       SettingsData.effectiveFrameColor.b,
+                       SettingsData.frameOpacity)
 
         layer.enabled: true
         layer.effect: MultiEffect {
@@ -42,12 +48,12 @@ Item {
         Rectangle {
             anchors {
                 fill:         parent
-                topMargin:    root.barEdges.includes("top")    ? root._barThickness : root._thickness
-                bottomMargin: root.barEdges.includes("bottom") ? root._barThickness : root._thickness
-                leftMargin:   root.barEdges.includes("left")   ? root._barThickness : root._thickness
-                rightMargin:  root.barEdges.includes("right")  ? root._barThickness : root._thickness
+                topMargin:    root.cutoutTopInset
+                bottomMargin: root.cutoutBottomInset
+                leftMargin:   root.cutoutLeftInset
+                rightMargin:  root.cutoutRightInset
             }
-            radius: root._rounding
+            radius: root.cutoutRadius
         }
     }
 }
