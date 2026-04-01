@@ -14,7 +14,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 10
+    readonly property int settingsConfigVersion: 11
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -209,18 +209,18 @@ Singleton {
     onFrameColorChanged: saveSettings()
     property real frameOpacity: 1.0
     onFrameOpacityChanged: saveSettings()
-    property bool frameSyncBarColor: true
-    onFrameSyncBarColorChanged: saveSettings()
     property var frameScreenPreferences: ["all"]
     onFrameScreenPreferencesChanged: saveSettings()
-    property real frameBarThickness: 42
-    onFrameBarThicknessChanged: saveSettings()
+    property real frameBarSize: 40
+    onFrameBarSizeChanged: saveSettings()
     property bool frameShowOnOverview: false
     onFrameShowOnOverviewChanged: saveSettings()
+    property bool frameBlurEnabled: true
+    onFrameBlurEnabledChanged: saveSettings()
 
     readonly property color effectiveFrameColor: {
         const fc = frameColor;
-        if (!fc || fc === "default") return Theme.background;
+        if (!fc || fc === "default") return Theme.surfaceContainer;
         if (fc === "primary") return Theme.primary;
         if (fc === "surface") return Theme.surface;
         return fc;
@@ -2012,7 +2012,7 @@ Singleton {
     }
 
     function getActiveBarThicknessForScreen(screen) {
-        if (frameEnabled) return frameBarThickness;
+        if (frameEnabled) return frameBarSize;
         if (!screen) return frameThickness;
         for (var i = 0; i < barConfigs.length; i++) {
             var bc = barConfigs[i];
