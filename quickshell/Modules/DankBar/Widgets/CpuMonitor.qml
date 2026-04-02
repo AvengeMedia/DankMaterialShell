@@ -102,7 +102,7 @@ BasePill {
                     StyledTextMetrics {
                         id: cpuBaseline
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        text: "88%"
+                        text: "100%"
                     }
 
                     StyledTextMetrics {
