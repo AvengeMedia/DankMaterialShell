@@ -369,9 +369,7 @@ Item {
         }
 
         function previous(): void {
-            if (MprisController.activePlayer && MprisController.activePlayer.canGoPrevious) {
-                MprisController.activePlayer.previous();
-            }
+            MprisController.previousOrRewind();
         }
 
         function next(): void {

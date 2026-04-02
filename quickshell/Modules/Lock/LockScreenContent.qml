@@ -1338,7 +1338,7 @@ Item {
                             enabled: MprisController.activePlayer?.canGoPrevious ?? false
                             hoverEnabled: enabled
                             cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.previous()
+                            onClicked: MprisController.previousOrRewind()
                         }
                     }
 

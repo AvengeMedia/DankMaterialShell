@@ -10,4 +10,13 @@ Singleton {
 
     readonly property list<MprisPlayer> availablePlayers: Mpris.players.values
     property MprisPlayer activePlayer: availablePlayers.find(p => p.isPlaying) ?? availablePlayers.find(p => p.canControl && p.canPlay) ?? null
+
+    function previousOrRewind(): void {
+        if (!activePlayer)
+            return;
+        if (activePlayer.position > 8 && activePlayer.canSeek)
+            activePlayer.position = 0;
+        else if (activePlayer.canGoPrevious)
+            activePlayer.previous();
+    }
 }
