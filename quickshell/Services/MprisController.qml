@@ -11,6 +11,13 @@ Singleton {
     readonly property list<MprisPlayer> availablePlayers: Mpris.players.values
     property MprisPlayer activePlayer: availablePlayers.find(p => p.isPlaying) ?? availablePlayers.find(p => p.canControl && p.canPlay) ?? null
 
+    Timer {
+        interval: 1000
+        running: root.activePlayer?.playbackState === MprisPlaybackState.Playing
+        repeat: true
+        onTriggered: root.activePlayer?.positionChanged()
+    }
+
     function previousOrRewind(): void {
         if (!activePlayer)
             return;
