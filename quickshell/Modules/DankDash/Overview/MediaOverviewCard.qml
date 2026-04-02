@@ -145,14 +145,7 @@ Card {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (!activePlayer) return
-                        if (activePlayer.position > 8 && activePlayer.canSeek) {
-                            activePlayer.position = 0
-                        } else {
-                            activePlayer.previous()
-                        }
-                    }
+                    onClicked: MprisController.previousOrRewind()
                 }
             }
 
