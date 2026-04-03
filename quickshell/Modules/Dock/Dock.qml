@@ -19,11 +19,12 @@ Variants {
 
         WindowBlur {
             targetWindow: dock
-            blurX: dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x
-            blurY: dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y
-            blurWidth: dock.hasApps && dock.reveal ? dockBackground.width : 0
-            blurHeight: dock.hasApps && dock.reveal ? dockBackground.height : 0
-            blurRadius: Theme.cornerRadius
+            blurEnabled: dock.effectiveBlurEnabled
+            blurX: dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x - dock.horizontalConnectorExtent
+            blurY: dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y - dock.verticalConnectorExtent
+            blurWidth: dock.hasApps && dock.reveal ? dockBackground.width + dock.horizontalConnectorExtent * 2 : 0
+            blurHeight: dock.hasApps && dock.reveal ? dockBackground.height + dock.verticalConnectorExtent * 2 : 0
+            blurRadius: dock.surfaceRadius
         }
 
         WlrLayershell.namespace: "dms:dock"
@@ -42,6 +43,29 @@ Variants {
         property real backgroundTransparency: SettingsData.dockTransparency
         property bool groupByApp: SettingsData.dockGroupByApp
         readonly property int borderThickness: SettingsData.dockBorderEnabled ? SettingsData.dockBorderThickness : 0
+        readonly property string connectedBarSide: SettingsData.dockPosition === SettingsData.Position.Top ? "top"
+            : SettingsData.dockPosition === SettingsData.Position.Bottom ? "bottom"
+            : SettingsData.dockPosition === SettingsData.Position.Left ? "left" : "right"
+        readonly property bool connectedBarActiveOnEdge: Theme.isConnectedEffect
+            && !!(dock.screen || modelData)
+            && SettingsData.getActiveBarEdgesForScreen(dock.screen || modelData).includes(connectedBarSide)
+        readonly property real connectedJoinInset: {
+            if (!Theme.isConnectedEffect)
+                return 0;
+            return connectedBarActiveOnEdge ? SettingsData.frameBarSize : SettingsData.frameThickness;
+        }
+        readonly property real surfaceRadius: Theme.connectedSurfaceRadius
+        readonly property color surfaceColor: Theme.isConnectedEffect
+            ? Theme.connectedSurfaceColor
+            : Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
+        readonly property color surfaceBorderColor: Theme.isConnectedEffect ? "transparent" : BlurService.borderColor
+        readonly property real surfaceBorderWidth: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
+        readonly property real surfaceTopLeftRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Left) ? 0 : surfaceRadius
+        readonly property real surfaceTopRightRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Right) ? 0 : surfaceRadius
+        readonly property real surfaceBottomLeftRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Bottom || SettingsData.dockPosition === SettingsData.Position.Left) ? 0 : surfaceRadius
+        readonly property real surfaceBottomRightRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Bottom || SettingsData.dockPosition === SettingsData.Position.Right) ? 0 : surfaceRadius
+        readonly property real horizontalConnectorExtent: Theme.isConnectedEffect && !isVertical ? Theme.connectedCornerRadius : 0
+        readonly property real verticalConnectorExtent: Theme.isConnectedEffect && isVertical ? Theme.connectedCornerRadius : 0
 
         readonly property int hasApps: dockApps.implicitWidth > 0 || dockApps.implicitHeight > 0
 
@@ -113,11 +137,55 @@ Variants {
             return getBarHeight(leftBar);
         }
 
-        readonly property real dockMargin: SettingsData.dockSpacing
-        readonly property real positionSpacing: barSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin
+        readonly property real dockMargin: SettingsData.dockMargin
+        readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
+        readonly property real effectiveDockBottomGap: Theme.isConnectedEffect ? 0 : SettingsData.dockBottomGap
+        readonly property real effectiveDockMargin: Theme.isConnectedEffect ? 0 : SettingsData.dockMargin
+        readonly property real positionSpacing: barSpacing + effectiveDockBottomGap + effectiveDockMargin
+        readonly property real joinedEdgeMargin: Theme.isConnectedEffect ? 0 : (barSpacing + effectiveDockMargin + 1 + dock.borderThickness)
         readonly property real _dpr: (dock.screen && dock.screen.devicePixelRatio) ? dock.screen.devicePixelRatio : 1
         function px(v) {
             return Math.round(v * _dpr) / _dpr;
+        }
+
+        function connectorWidth(spacing) {
+            return dock.isVertical ? (spacing + Theme.connectedCornerRadius) : Theme.connectedCornerRadius;
+        }
+
+        function connectorHeight(spacing) {
+            return dock.isVertical ? Theme.connectedCornerRadius : (spacing + Theme.connectedCornerRadius);
+        }
+
+        function connectorSeamX(baseX, bodyWidth, placement) {
+            if (!dock.isVertical)
+                return placement === "left" ? baseX : baseX + bodyWidth;
+            return SettingsData.dockPosition === SettingsData.Position.Left ? baseX : baseX + bodyWidth;
+        }
+
+        function connectorSeamY(baseY, bodyHeight, placement) {
+            if (SettingsData.dockPosition === SettingsData.Position.Top)
+                return baseY;
+            if (SettingsData.dockPosition === SettingsData.Position.Bottom)
+                return baseY + bodyHeight;
+            return placement === "left" ? baseY : baseY + bodyHeight;
+        }
+
+        function connectorX(baseX, bodyWidth, placement, spacing) {
+            const seamX = connectorSeamX(baseX, bodyWidth, placement);
+            const width = connectorWidth(spacing);
+            if (!dock.isVertical)
+                return placement === "left" ? seamX - width : seamX;
+            return SettingsData.dockPosition === SettingsData.Position.Left ? seamX : seamX - width;
+        }
+
+        function connectorY(baseY, bodyHeight, placement, spacing) {
+            const seamY = connectorSeamY(baseY, bodyHeight, placement);
+            const height = connectorHeight(spacing);
+            if (SettingsData.dockPosition === SettingsData.Position.Top)
+                return seamY;
+            if (SettingsData.dockPosition === SettingsData.Position.Bottom)
+                return seamY - height;
+            return placement === "left" ? seamY - height : seamY;
         }
 
         property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData)
@@ -130,7 +198,7 @@ Variants {
                 return false;
 
             const screenName = dock.modelData?.name ?? "";
-            const dockThickness = effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin;
+            const dockThickness = dock.connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin;
             const screenWidth = dock.screen?.width ?? 0;
             const screenHeight = dock.screen?.height ?? 0;
 
@@ -302,13 +370,13 @@ Variants {
                 return -1;
             if (barSpacing > 0)
                 return -1;
-            return px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin);
+            return px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockBottomGap + effectiveDockMargin);
         }
 
         property real animationHeadroom: Math.ceil(SettingsData.dockIconSize * 0.35)
 
-        implicitWidth: isVertical ? (px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
-        implicitHeight: !isVertical ? (px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+        implicitWidth: isVertical ? (px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+        implicitHeight: !isVertical ? (px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
 
         Item {
             id: maskItem
@@ -318,17 +386,17 @@ Variants {
             x: {
                 const baseX = dockCore.x + dockMouseArea.x;
                 if (isVertical && SettingsData.dockPosition === SettingsData.Position.Right)
-                    return baseX - (expanded ? animationHeadroom + borderThickness : 0);
-                return baseX - (expanded ? borderThickness : 0);
+                    return baseX - (expanded ? animationHeadroom + borderThickness + dock.horizontalConnectorExtent : 0);
+                return baseX - (expanded ? borderThickness + dock.horizontalConnectorExtent : 0);
             }
             y: {
                 const baseY = dockCore.y + dockMouseArea.y;
                 if (!isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom)
-                    return baseY - (expanded ? animationHeadroom + borderThickness : 0);
-                return baseY - (expanded ? borderThickness : 0);
+                    return baseY - (expanded ? animationHeadroom + borderThickness + dock.verticalConnectorExtent : 0);
+                return baseY - (expanded ? borderThickness + dock.verticalConnectorExtent : 0);
             }
-            width: dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 : 0)
-            height: dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 : 0)
+            width: dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.horizontalConnectorExtent * 2 : 0)
+            height: dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.verticalConnectorExtent * 2 : 0)
         }
 
         mask: Region {
@@ -388,7 +456,7 @@ Variants {
             const screenHeight = dock.screen ? dock.screen.height : 0;
 
             const gap = Theme.spacingS;
-            const bgMargin = barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness;
+            const bgMargin = dock.joinedEdgeMargin + dock.connectedJoinInset;
             const btnW = dock.hoveredButton.width;
             const btnH = dock.hoveredButton.height;
 
@@ -459,11 +527,11 @@ Variants {
                         // Keep the taller hit area regardless of the reveal state to prevent shrinking loop
                         return Math.min(Math.max(dockBackground.height + 64, 200), maxDockHeight);
                     }
-                    return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1;
+                    return dock.reveal ? px(dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin) : 1;
                 }
                 width: {
                     if (dock.isVertical) {
-                        return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1;
+                        return dock.reveal ? px(dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin) : 1;
                     }
                     // Keep the wider hit area regardless of the reveal state to prevent shrinking loop
                     return Math.min(dockBackground.width + 8 + dock.borderThickness, maxDockWidth);
@@ -505,7 +573,7 @@ Variants {
                                 return 0;
                             if (dock.reveal)
                                 return 0;
-                            const hideDistance = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin + 10;
+                            const hideDistance = dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin + 10;
                             if (SettingsData.dockPosition === SettingsData.Position.Right) {
                                 return hideDistance;
                             } else {
@@ -517,7 +585,7 @@ Variants {
                                 return 0;
                             if (dock.reveal)
                                 return 0;
-                            const hideDistance = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin + 10;
+                            const hideDistance = dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin + 10;
                             if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
                                 return hideDistance;
                             } else {
@@ -528,16 +596,26 @@ Variants {
                         Behavior on x {
                             NumberAnimation {
                                 id: slideXAnimation
-                                duration: Theme.shortDuration
-                                easing.type: Easing.OutCubic
+                                duration: Theme.isConnectedEffect
+                                    ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal)
+                                    : Theme.shortDuration
+                                easing.type: Theme.isConnectedEffect ? Easing.BezierSpline : Easing.OutCubic
+                                easing.bezierCurve: Theme.isConnectedEffect
+                                    ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve)
+                                    : []
                             }
                         }
 
                         Behavior on y {
                             NumberAnimation {
                                 id: slideYAnimation
-                                duration: Theme.shortDuration
-                                easing.type: Easing.OutCubic
+                                duration: Theme.isConnectedEffect
+                                    ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal)
+                                    : Theme.shortDuration
+                                easing.type: Theme.isConnectedEffect ? Easing.BezierSpline : Easing.OutCubic
+                                easing.bezierCurve: Theme.isConnectedEffect
+                                    ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve)
+                                    : []
                             }
                         }
                     }
@@ -553,33 +631,62 @@ Variants {
                             right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined) : undefined
                             verticalCenter: dock.isVertical ? parent.verticalCenter : undefined
                         }
-                        anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
-                        anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
-                        anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
-                        anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
+                        anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
+                        anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
+                        anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
+                        anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
 
                         implicitWidth: dock.isVertical ? (dockApps.implicitHeight + SettingsData.dockSpacing * 2) : (dockApps.implicitWidth + SettingsData.dockSpacing * 2)
                         implicitHeight: dock.isVertical ? (dockApps.implicitWidth + SettingsData.dockSpacing * 2) : (dockApps.implicitHeight + SettingsData.dockSpacing * 2)
                         width: implicitWidth
                         height: implicitHeight
 
-                        layer.enabled: true
+                        // Avoid an offscreen texture seam where the connected dock meets the frame.
+                        layer.enabled: !Theme.isConnectedEffect
                         clip: false
 
                         Rectangle {
                             anchors.fill: parent
-                            color: Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
-                            radius: Theme.cornerRadius
+                            color: dock.surfaceColor
+                            topLeftRadius: dock.surfaceTopLeftRadius
+                            topRightRadius: dock.surfaceTopRightRadius
+                            bottomLeftRadius: dock.surfaceBottomLeftRadius
+                            bottomRightRadius: dock.surfaceBottomRightRadius
                         }
 
                         Rectangle {
                             anchors.fill: parent
                             color: "transparent"
-                            radius: Theme.cornerRadius
-                            border.color: BlurService.borderColor
-                            border.width: BlurService.borderWidth
+                            topLeftRadius: dock.surfaceTopLeftRadius
+                            topRightRadius: dock.surfaceTopRightRadius
+                            bottomLeftRadius: dock.surfaceBottomLeftRadius
+                            bottomRightRadius: dock.surfaceBottomRightRadius
+                            border.color: dock.surfaceBorderColor
+                            border.width: dock.surfaceBorderWidth
                             z: 100
                         }
+                    }
+
+                    ConnectedCorner {
+                        visible: Theme.isConnectedEffect && dock.reveal
+                        barSide: dock.connectedBarSide
+                        placement: "left"
+                        spacing: 0
+                        connectorRadius: Theme.connectedCornerRadius
+                        color: dock.surfaceColor
+                        x: Theme.snap(dock.connectorX(dockBackground.x, dockBackground.width, placement, spacing), dock._dpr)
+                        y: Theme.snap(dock.connectorY(dockBackground.y, dockBackground.height, placement, spacing), dock._dpr)
+                    }
+
+                    ConnectedCorner {
+                        visible: Theme.isConnectedEffect && dock.reveal
+                        barSide: dock.connectedBarSide
+                        placement: "right"
+                        spacing: 0
+                        connectorRadius: Theme.connectedCornerRadius
+                        color: dock.surfaceColor
+                        x: Theme.snap(dock.connectorX(dockBackground.x, dockBackground.width, placement, spacing), dock._dpr)
+                        y: Theme.snap(dock.connectorY(dockBackground.y, dockBackground.height, placement, spacing), dock._dpr)
                     }
 
                     Shape {
@@ -588,12 +695,12 @@ Variants {
                         y: dockBackground.y - borderThickness
                         width: dockBackground.width + borderThickness * 2
                         height: dockBackground.height + borderThickness * 2
-                        visible: SettingsData.dockBorderEnabled && dock.hasApps
+                        visible: SettingsData.dockBorderEnabled && dock.hasApps && !Theme.isConnectedEffect
                         preferredRendererType: Shape.CurveRenderer
 
                         readonly property real borderThickness: Math.max(1, dock.borderThickness)
                         readonly property real i: borderThickness / 2
-                        readonly property real cr: Theme.cornerRadius
+                        readonly property real cr: dock.surfaceRadius
                         readonly property real w: dockBackground.width
                         readonly property real h: dockBackground.height
 

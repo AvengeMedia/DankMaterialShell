@@ -203,17 +203,25 @@ Item {
                 SettingsDropdownRow {
                     visible: SettingsData.motionEffect === 1
                     tab: "typography"
-                    tags: ["animation", "directional", "behavior", "overlap", "sticky", "roll"]
+                    tags: ["animation", "directional", "behavior", "overlap", "sticky", "roll", "connected"]
                     settingKey: "directionalAnimationMode"
                     text: I18n.tr("Directional Behavior")
-                    description: I18n.tr("How the popout emerges from the DankBar")
-                    options: [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll")]
+                    description: {
+                        if (SettingsData.directionalAnimationMode === 3 && SettingsData.frameEnabled)
+                            return I18n.tr("Popouts emerge flush from the bar edge as a single continuous piece, with corner connectors bridging the junction");
+                        return I18n.tr("How the popout emerges from the DankBar");
+                    }
+                    options: SettingsData.frameEnabled
+                        ? [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll"), I18n.tr("Connected")]
+                        : [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll")]
                     currentValue: {
                         switch (SettingsData.directionalAnimationMode) {
                         case 1:
                             return I18n.tr("Slide");
                         case 2:
                             return I18n.tr("Roll");
+                        case 3:
+                            return SettingsData.frameEnabled ? I18n.tr("Connected") : I18n.tr("Slide");
                         default:
                             return I18n.tr("Overlap");
                         }
@@ -223,7 +231,11 @@ Item {
                             SettingsData.set("directionalAnimationMode", 1);
                         else if (value === I18n.tr("Roll"))
                             SettingsData.set("directionalAnimationMode", 2);
-                        else
+                        else if (value === I18n.tr("Connected") && SettingsData.frameEnabled) {
+                            if (SettingsData.directionalAnimationMode !== 3)
+                                SettingsData.set("previousDirectionalMode", SettingsData.directionalAnimationMode);
+                            SettingsData.set("directionalAnimationMode", 3);
+                        } else
                             SettingsData.set("directionalAnimationMode", 0);
                     }
                 }

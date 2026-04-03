@@ -13,8 +13,13 @@ Item {
 
     property color targetColor: "white"
     property real targetRadius: Theme.cornerRadius
+    property real topLeftRadius: targetRadius
+    property real topRightRadius: targetRadius
+    property real bottomLeftRadius: targetRadius
+    property real bottomRightRadius: targetRadius
     property color borderColor: "transparent"
     property real borderWidth: 0
+    property bool useCustomSource: false
 
     property bool shadowEnabled: Theme.elevationEnabled
     property real shadowBlurPx: level && level.blurPx !== undefined ? level.blurPx : 0
@@ -46,7 +51,11 @@ Item {
     Rectangle {
         id: sourceRect
         anchors.fill: parent
-        radius: root.targetRadius
+        visible: !root.useCustomSource
+        topLeftRadius: root.topLeftRadius
+        topRightRadius: root.topRightRadius
+        bottomLeftRadius: root.bottomLeftRadius
+        bottomRightRadius: root.bottomRightRadius
         color: root.targetColor
         border.color: root.borderColor
         border.width: root.borderWidth

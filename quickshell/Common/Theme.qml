@@ -972,6 +972,22 @@ Singleton {
     readonly property real variantOpacityDurationScale: AnimVariants.variantOpacityDurationScale
     readonly property bool isDirectionalEffect: AnimVariants.isDirectionalEffect
     readonly property bool isDepthEffect: AnimVariants.isDepthEffect
+    readonly property bool isConnectedEffect: AnimVariants.isConnectedEffect
+    readonly property real connectedCornerRadius: {
+        if (typeof SettingsData === "undefined") return 12;
+        return SettingsData.frameEnabled ? SettingsData.frameRounding : cornerRadius;
+    }
+    readonly property color connectedSurfaceColor: {
+        if (typeof SettingsData === "undefined")
+            return withAlpha(surfaceContainer, popupTransparency);
+        return isConnectedEffect
+            ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
+            : withAlpha(surfaceContainer, popupTransparency);
+    }
+    readonly property real connectedSurfaceRadius: isConnectedEffect ? connectedCornerRadius : cornerRadius
+    readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined")
+        ? true
+        : (!isConnectedEffect || SettingsData.frameBlurEnabled)
     readonly property real effectScaleCollapsed: AnimVariants.effectScaleCollapsed
     readonly property real effectAnimOffset: AnimVariants.effectAnimOffset
     function variantDuration(baseDuration, entering) { return AnimVariants.variantDuration(baseDuration, entering); }
@@ -1143,7 +1159,11 @@ Singleton {
     property real iconSizeLarge: 32
 
     property real panelTransparency: 0.85
-    property real popupTransparency: typeof SettingsData !== "undefined" && SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0
+    property real popupTransparency: {
+        if (typeof SettingsData === "undefined")
+            return 1.0;
+        return SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0;
+    }
 
     function screenTransition() {
         if (CompositorService.isNiri) {
@@ -1840,6 +1860,12 @@ Singleton {
 
     function withAlpha(c, a) {
         return Qt.rgba(c.r, c.g, c.b, a);
+    }
+
+    function popupLayerColor(baseColor) {
+        if (isConnectedEffect)
+            return connectedSurfaceColor;
+        return withAlpha(baseColor, popupTransparency);
     }
 
     function blendAlpha(c, a) {
