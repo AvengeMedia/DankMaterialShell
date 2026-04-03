@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Services.UPower
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -9,6 +10,8 @@ BasePill {
 
     property bool batteryPopupVisible: false
     property var popoutTarget: null
+
+    property real touchpadAccumulator: 0
 
     readonly property int barPosition: {
         switch (axis?.edge) {
@@ -118,6 +121,45 @@ BasePill {
         onPressed: mouse => {
             battery.triggerRipple(this, mouse.x, mouse.y);
             toggleBatteryPopup();
+        }
+        onWheel: wheel => {
+            var delta = wheel.angleDelta.y;
+            if (delta === 0)
+                return;
+
+            // Check if this is a touchpad
+            if (delta !== 120 && delta !== -120) {
+                touchpadAccumulator += delta;
+                console.info("Acc: "+touchpadAccumulator);
+                if (Math.abs(touchpadAccumulator) < 500)
+                    return;
+                delta = touchpadAccumulator;
+                touchpadAccumulator = 0;
+            }
+            console.info("Trigger! Delta: "+delta)
+
+            // This is after the other delta checks so it only shows on valid Y scroll
+            if (typeof PowerProfiles === "undefined") {
+                ToastService.showError("power-profiles-daemon not available");
+                return;
+            }
+
+            // Get list of profiles, and current index
+            const profiles = [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []);
+            var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
+
+            // Step once based on mouse wheel direction
+            if (delta > 0) index += 1;
+            else index -= 1;
+
+            // Already at end of list, can't go further
+            if (index < 0 || index >= profiles.length) return;
+
+            // Set new profile
+            PowerProfiles.profile = profiles[index];
+            if (PowerProfiles.profile !== profiles[index]) {
+                ToastService.showError("Failed to set power profile");
+            }
         }
     }
 }
