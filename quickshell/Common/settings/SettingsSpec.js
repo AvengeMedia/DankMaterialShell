@@ -52,6 +52,7 @@ var SPEC = {
     animationVariant: { def: 0 },
     motionEffect: { def: 0 },
     directionalAnimationMode: { def: 0 },
+    previousDirectionalMode: { def: 1 },
     m3ElevationEnabled: { def: true },
     m3ElevationIntensity: { def: 12 },
     m3ElevationOpacity: { def: 30 },

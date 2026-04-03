@@ -47,6 +47,8 @@ Item {
     property var screen: null
 
     readonly property real effectiveBarThickness: {
+        if (Theme.isConnectedEffect)
+            return Math.max(0, storedBarThickness);
         const padding = storedBarConfig ? (storedBarConfig.innerPadding !== undefined ? storedBarConfig.innerPadding : 4) : 4;
         return Math.max(26 + padding * 0.6, Theme.barHeight - 4 - (8 - padding)) + storedBarSpacing;
     }
@@ -68,6 +70,7 @@ Item {
     readonly property real barWidth: barBounds.width
     readonly property real barHeight: barBounds.height
     readonly property real barWingSize: barBounds.wingSize
+    readonly property bool effectiveSurfaceBlurEnabled: Theme.connectedSurfaceBlurEnabled
 
     signal opened
     signal popoutClosed
@@ -254,11 +257,25 @@ Item {
     readonly property real screenWidth: screen ? screen.width : 0
     readonly property real screenHeight: screen ? screen.height : 0
     readonly property real dpr: screen ? screen.devicePixelRatio : 1
+    readonly property real frameInset: {
+        if (!SettingsData.frameEnabled) return 0;
+        const ft = SettingsData.frameThickness;
+        const fr = SettingsData.frameRounding;
+        const ccr = Theme.connectedCornerRadius;
+        if (Theme.isConnectedEffect)
+            return Math.max(ft * 4, ft + ccr * 2);
+        const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
+        const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 6;
+        const gap = useAutoGaps ? Math.max(6, storedBarSpacing) : manualGapValue;
+        return Math.max(ft + gap, fr);
+    }
 
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.popoutElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, effectiveShadowDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
+        if (Theme.isConnectedEffect)
+            return Math.max(storedBarSpacing + Theme.connectedCornerRadius + 4, 40);
         if (Theme.isDirectionalEffect) {
             if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode !== 0)
                 return 16; // Slide Behind and Roll Out do not add animationOffset, enabling strict Wayland clipping.
@@ -271,6 +288,40 @@ Item {
     readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
+    readonly property real connectedAnchorX: {
+        if (!Theme.isConnectedEffect)
+            return triggerX;
+        switch (effectiveBarPosition) {
+        case SettingsData.Position.Left:
+            return barX + barWidth;
+        case SettingsData.Position.Right:
+            return barX;
+        default:
+            return triggerX;
+        }
+    }
+    readonly property real connectedAnchorY: {
+        if (!Theme.isConnectedEffect)
+            return triggerY;
+        switch (effectiveBarPosition) {
+        case SettingsData.Position.Top:
+            return barY + barHeight;
+        case SettingsData.Position.Bottom:
+            return barY;
+        default:
+            return triggerY;
+        }
+    }
+
+    function adjacentBarClearance(exclusion) {
+        if (exclusion <= 0)
+            return 0;
+        if (!Theme.isConnectedEffect)
+            return exclusion;
+        // In a shared frame corner, the adjacent connected bar already occupies
+        // one rounded-corner radius before the popout's own connector begins.
+        return exclusion + Theme.connectedCornerRadius * 2;
+    }
 
     onAlignedHeightChanged: {
         if (!suspendShadowWhileResizing || !shouldBeVisible)
@@ -295,17 +346,22 @@ Item {
     readonly property real alignedX: Theme.snap((() => {
             const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
             const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
-            const popupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
+            const rawPopupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
+            const popupGap = Theme.isConnectedEffect ? 0 : rawPopupGap;
+            const edgeGap = Math.max(popupGap, frameInset);
+            const anchorX = Theme.isConnectedEffect ? connectedAnchorX : triggerX;
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Left:
-                return Math.max(popupGap, Math.min(screenWidth - popupWidth - popupGap, triggerX));
+                // bar on left: left side is bar-adjacent (popupGap), right side is frame-perpendicular (edgeGap)
+                return Math.max(popupGap, Math.min(screenWidth - popupWidth - edgeGap, anchorX));
             case SettingsData.Position.Right:
-                return Math.max(popupGap, Math.min(screenWidth - popupWidth - popupGap, triggerX - popupWidth));
+                // bar on right: right side is bar-adjacent (popupGap), left side is frame-perpendicular (edgeGap)
+                return Math.max(edgeGap, Math.min(screenWidth - popupWidth - popupGap, anchorX - popupWidth));
             default:
                 const rawX = triggerX + (triggerWidth / 2) - (popupWidth / 2);
-                const minX = adjacentBarInfo.leftBar > 0 ? adjacentBarInfo.leftBar : popupGap;
-                const maxX = screenWidth - popupWidth - (adjacentBarInfo.rightBar > 0 ? adjacentBarInfo.rightBar : popupGap);
+                const minX = Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.leftBar));
+                const maxX = screenWidth - popupWidth - Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.rightBar));
                 return Math.max(minX, Math.min(maxX, rawX));
             }
         })(), dpr)
@@ -313,17 +369,22 @@ Item {
     readonly property real alignedY: Theme.snap((() => {
             const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
             const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
-            const popupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
+            const rawPopupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
+            const popupGap = Theme.isConnectedEffect ? 0 : rawPopupGap;
+            const edgeGap = Math.max(popupGap, frameInset);
+            const anchorY = Theme.isConnectedEffect ? connectedAnchorY : triggerY;
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Bottom:
-                return Math.max(popupGap, Math.min(screenHeight - popupHeight - popupGap, triggerY - popupHeight));
+                // bar on bottom: bottom side is bar-adjacent (popupGap), top side is frame-perpendicular (edgeGap)
+                return Math.max(edgeGap, Math.min(screenHeight - popupHeight - popupGap, anchorY - popupHeight));
             case SettingsData.Position.Top:
-                return Math.max(popupGap, Math.min(screenHeight - popupHeight - popupGap, triggerY));
+                // bar on top: top side is bar-adjacent (popupGap), bottom side is frame-perpendicular (edgeGap)
+                return Math.max(popupGap, Math.min(screenHeight - popupHeight - edgeGap, anchorY));
             default:
                 const rawY = triggerY - (popupHeight / 2);
-                const minY = adjacentBarInfo.topBar > 0 ? adjacentBarInfo.topBar : popupGap;
-                const maxY = screenHeight - popupHeight - (adjacentBarInfo.bottomBar > 0 ? adjacentBarInfo.bottomBar : popupGap);
+                const minY = Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.topBar));
+                const maxY = screenHeight - popupHeight - Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.bottomBar));
                 return Math.max(minY, Math.min(maxY, rawY));
             }
         })(), dpr)
@@ -472,6 +533,18 @@ Item {
         visible: false
         color: "transparent"
 
+        WindowBlur {
+            id: popoutBlur
+            targetWindow: contentWindow
+            blurEnabled: root.effectiveSurfaceBlurEnabled
+            readonly property real s: Math.min(1, contentContainer.scaleValue)
+            blurX: contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr) - contentContainer.horizontalConnectorExtent * s
+            blurY: contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s
+            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s : 0
+            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s : 0
+            blurRadius: Theme.connectedSurfaceRadius
+        }
+
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_POPOUT_LAYER")) {
@@ -524,10 +597,10 @@ Item {
         Item {
             id: contentMaskRect
             visible: false
-            x: contentContainer.x
-            y: contentContainer.y
-            width: root.alignedWidth
-            height: root.alignedHeight
+            x: contentContainer.x - contentContainer.horizontalConnectorExtent
+            y: contentContainer.y - contentContainer.verticalConnectorExtent
+            width: root.alignedWidth + contentContainer.horizontalConnectorExtent * 2
+            height: root.alignedHeight + contentContainer.verticalConnectorExtent * 2
         }
 
         MouseArea {
@@ -556,12 +629,66 @@ Item {
             readonly property bool barBottom: effectiveBarPosition === SettingsData.Position.Bottom
             readonly property bool barLeft: effectiveBarPosition === SettingsData.Position.Left
             readonly property bool barRight: effectiveBarPosition === SettingsData.Position.Right
+            readonly property string connectedBarSide: barTop ? "top" : (barBottom ? "bottom" : (barLeft ? "left" : "right"))
+            readonly property real surfaceRadius: Theme.connectedSurfaceRadius
+            readonly property color surfaceColor: Theme.popupLayerColor(Theme.surfaceContainer)
+            readonly property color surfaceBorderColor: Theme.isConnectedEffect
+                ? "transparent"
+                : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
+            readonly property real surfaceBorderWidth: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
+            readonly property real surfaceTopLeftRadius: Theme.isConnectedEffect && (barTop || barLeft) ? 0 : surfaceRadius
+            readonly property real surfaceTopRightRadius: Theme.isConnectedEffect && (barTop || barRight) ? 0 : surfaceRadius
+            readonly property real surfaceBottomLeftRadius: Theme.isConnectedEffect && (barBottom || barLeft) ? 0 : surfaceRadius
+            readonly property real surfaceBottomRightRadius: Theme.isConnectedEffect && (barBottom || barRight) ? 0 : surfaceRadius
             readonly property bool directionalEffect: Theme.isDirectionalEffect
             readonly property bool depthEffect: Theme.isDepthEffect
             readonly property real directionalTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
             readonly property real directionalTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
             readonly property real depthTravel: Math.max(root.animationOffset * 0.7, 28)
             readonly property real sectionTilt: (triggerSection === "left" ? -1 : (triggerSection === "right" ? 1 : 0))
+            readonly property real horizontalConnectorExtent: Theme.isConnectedEffect && (barTop || barBottom) ? Theme.connectedCornerRadius : 0
+            readonly property real verticalConnectorExtent: Theme.isConnectedEffect && (barLeft || barRight) ? Theme.connectedCornerRadius : 0
+
+            function connectorWidth(spacing) {
+                return (barTop || barBottom) ? Theme.connectedCornerRadius : (spacing + Theme.connectedCornerRadius);
+            }
+
+            function connectorHeight(spacing) {
+                return (barTop || barBottom) ? (spacing + Theme.connectedCornerRadius) : Theme.connectedCornerRadius;
+            }
+
+            function connectorSeamX(baseX, bodyWidth, placement) {
+                if (barTop || barBottom)
+                    return placement === "left" ? baseX : baseX + bodyWidth;
+                return barLeft ? baseX : baseX + bodyWidth;
+            }
+
+            function connectorSeamY(baseY, bodyHeight, placement) {
+                if (barTop)
+                    return baseY;
+                if (barBottom)
+                    return baseY + bodyHeight;
+                return placement === "left" ? baseY : baseY + bodyHeight;
+            }
+
+            function connectorX(baseX, bodyWidth, placement, spacing) {
+                const seamX = connectorSeamX(baseX, bodyWidth, placement);
+                const width = connectorWidth(spacing);
+                if (barTop || barBottom)
+                    return placement === "left" ? seamX - width : seamX;
+                return barLeft ? seamX : seamX - width;
+            }
+
+            function connectorY(baseY, bodyHeight, placement, spacing) {
+                const seamY = connectorSeamY(baseY, bodyHeight, placement);
+                const height = connectorHeight(spacing);
+                if (barTop)
+                    return seamY;
+                if (barBottom)
+                    return seamY - height;
+                return placement === "left" ? seamY - height : seamY;
+            }
+
             readonly property real offsetX: {
                 if (directionalEffect) {
                     if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2)
@@ -663,17 +790,38 @@ Item {
             Item {
                 id: directionalClipMask
 
-                readonly property bool shouldClip: typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0 && Theme.isDirectionalEffect
+                readonly property bool shouldClip: Theme.isDirectionalEffect
+                    && typeof SettingsData !== "undefined"
+                    && SettingsData.directionalAnimationMode > 0
                 readonly property real clipOversize: 1000
+                readonly property real connectedClipAllowance: Theme.isConnectedEffect
+                    ? Math.ceil(root.shadowRenderPadding + BlurService.borderWidth + 2)
+                    : 0
 
                 clip: shouldClip
 
                 // Bound the clipping strictly to the bar side, allowing massive overflow on the other 3 sides for shadows
-                x: shouldClip ? (contentContainer.barRight ? -clipOversize : (contentContainer.barLeft ? 0 : -clipOversize)) : 0
-                y: shouldClip ? (contentContainer.barBottom ? -clipOversize : (contentContainer.barTop ? 0 : -clipOversize)) : 0
+                x: shouldClip ? (contentContainer.barLeft ? -connectedClipAllowance : -clipOversize) : 0
+                y: shouldClip ? (contentContainer.barTop ? -connectedClipAllowance : -clipOversize) : 0
 
-                width: shouldClip ? parent.width + clipOversize + (contentContainer.barLeft || contentContainer.barRight ? 0 : clipOversize) : parent.width
-                height: shouldClip ? parent.height + clipOversize + (contentContainer.barTop || contentContainer.barBottom ? 0 : clipOversize) : parent.height
+                width: {
+                    if (!shouldClip)
+                        return parent.width;
+                    if (contentContainer.barLeft)
+                        return parent.width + connectedClipAllowance + clipOversize;
+                    if (contentContainer.barRight)
+                        return parent.width + clipOversize + connectedClipAllowance;
+                    return parent.width + clipOversize * 2;
+                }
+                height: {
+                    if (!shouldClip)
+                        return parent.height;
+                    if (contentContainer.barTop)
+                        return parent.height + connectedClipAllowance + clipOversize;
+                    if (contentContainer.barBottom)
+                        return parent.height + clipOversize + connectedClipAllowance;
+                    return parent.height + clipOversize * 2;
+                }
 
                 Item {
                     id: aligner
@@ -697,18 +845,75 @@ Item {
 
                         ElevationShadow {
                             id: shadowSource
-                            width: parent.width
-                            height: parent.height
+                            readonly property real connectorExtent: Theme.isConnectedEffect ? Theme.connectedCornerRadius : 0
+                            readonly property real extraLeft: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
+                            readonly property real extraRight: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
+                            readonly property real extraTop: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
+                            readonly property real extraBottom: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
+                            readonly property real bodyX: extraLeft
+                            readonly property real bodyY: extraTop
+                            readonly property real bodyWidth: parent.width
+                            readonly property real bodyHeight: parent.height
+
+                            width: parent.width + extraLeft + extraRight
+                            height: parent.height + extraTop + extraBottom
                             opacity: contentWrapper.opacity
                             scale: contentWrapper.scale
-                            x: contentWrapper.x
-                            y: contentWrapper.y
+                            x: contentWrapper.x - extraLeft
+                            y: contentWrapper.y - extraTop
                             level: root.shadowLevel
                             direction: root.effectiveShadowDirection
                             fallbackOffset: root.shadowFallbackOffset
-                            targetRadius: Theme.cornerRadius
-                            targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                            targetRadius: contentContainer.surfaceRadius
+                            topLeftRadius: contentContainer.surfaceTopLeftRadius
+                            topRightRadius: contentContainer.surfaceTopRightRadius
+                            bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
+                            bottomRightRadius: contentContainer.surfaceBottomRightRadius
+                            targetColor: contentContainer.surfaceColor
+                            borderColor: contentContainer.surfaceBorderColor
+                            borderWidth: contentContainer.surfaceBorderWidth
+                            useCustomSource: Theme.isConnectedEffect
                             shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+
+                            Item {
+                                anchors.fill: parent
+                                visible: Theme.isConnectedEffect
+                                clip: false
+
+                                Rectangle {
+                                    x: shadowSource.bodyX
+                                    y: shadowSource.bodyY
+                                    width: shadowSource.bodyWidth
+                                    height: shadowSource.bodyHeight
+                                    topLeftRadius: contentContainer.surfaceTopLeftRadius
+                                    topRightRadius: contentContainer.surfaceTopRightRadius
+                                    bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
+                                    bottomRightRadius: contentContainer.surfaceBottomRightRadius
+                                    color: contentContainer.surfaceColor
+                                }
+
+                                ConnectedCorner {
+                                    visible: Theme.isConnectedEffect
+                                    barSide: contentContainer.connectedBarSide
+                                    placement: "left"
+                                    spacing: 0
+                                    connectorRadius: Theme.connectedCornerRadius
+                                    color: contentContainer.surfaceColor
+                                    x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
+                                    y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
+                                }
+
+                                ConnectedCorner {
+                                    visible: Theme.isConnectedEffect
+                                    barSide: contentContainer.connectedBarSide
+                                    placement: "right"
+                                    spacing: 0
+                                    connectorRadius: Theme.connectedCornerRadius
+                                    color: contentContainer.surfaceColor
+                                    x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
+                                    y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
+                                }
+                            }
                         }
 
                         Item {
@@ -735,12 +940,43 @@ Item {
                                 }
                             }
 
-                            Rectangle {
+                            Item {
                                 anchors.fill: parent
-                                radius: Theme.cornerRadius
-                                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                                border.color: Theme.outlineMedium
-                                border.width: 0
+                                clip: false
+                                visible: !Theme.isConnectedEffect
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    topLeftRadius: contentContainer.surfaceTopLeftRadius
+                                    topRightRadius: contentContainer.surfaceTopRightRadius
+                                    bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
+                                    bottomRightRadius: contentContainer.surfaceBottomRightRadius
+                                    color: contentContainer.surfaceColor
+                                    border.color: contentContainer.surfaceBorderColor
+                                    border.width: contentContainer.surfaceBorderWidth
+                                }
+
+                                ConnectedCorner {
+                                    visible: Theme.isConnectedEffect
+                                    barSide: contentContainer.connectedBarSide
+                                    placement: "left"
+                                    spacing: 0
+                                    connectorRadius: Theme.connectedCornerRadius
+                                    color: contentContainer.surfaceColor
+                                    x: Theme.snap(contentContainer.connectorX(0, contentWrapper.width, placement, spacing), root.dpr)
+                                    y: Theme.snap(contentContainer.connectorY(0, contentWrapper.height, placement, spacing), root.dpr)
+                                }
+
+                                ConnectedCorner {
+                                    visible: Theme.isConnectedEffect
+                                    barSide: contentContainer.connectedBarSide
+                                    placement: "right"
+                                    spacing: 0
+                                    connectorRadius: Theme.connectedCornerRadius
+                                    color: contentContainer.surfaceColor
+                                    x: Theme.snap(contentContainer.connectorX(0, contentWrapper.width, placement, spacing), root.dpr)
+                                    y: Theme.snap(contentContainer.connectorY(0, contentWrapper.height, placement, spacing), root.dpr)
+                                }
                             }
 
                             Loader {

@@ -235,6 +235,8 @@ Singleton {
     onFrameShowOnOverviewChanged: saveSettings()
     property bool frameBlurEnabled: true
     onFrameBlurEnabledChanged: saveSettings()
+    property int previousDirectionalMode: 1
+    onPreviousDirectionalModeChanged: saveSettings()
 
     readonly property color effectiveFrameColor: {
         const fc = frameColor;
@@ -1592,34 +1594,36 @@ Singleton {
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
         const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
         const bottomGap = Math.max(0, rawBottomGap);
+        const isConnected = frameEnabled && motionEffect === 1 && directionalAnimationMode === 3;
 
         const useAutoGaps = (barConfig && barConfig.popupGapsAuto !== undefined) ? barConfig.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
         const manualGapValue = (barConfig && barConfig.popupGapsManual !== undefined) ? barConfig.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
-        const popupGap = useAutoGaps ? Math.max(4, spacing) : manualGapValue;
+        const popupGap = isConnected ? 0 : (useAutoGaps ? Math.max(4, spacing) : manualGapValue);
+        const edgeSpacing = isConnected ? 0 : spacing;
 
         switch (position) {
         case SettingsData.Position.Left:
             return {
-                "x": barThickness + spacing + popupGap,
+                "x": barThickness + edgeSpacing + popupGap,
                 "y": relativeY,
                 "width": widgetWidth
             };
         case SettingsData.Position.Right:
             return {
-                "x": (screen?.width || 0) - (barThickness + spacing + popupGap),
+                "x": (screen?.width || 0) - (barThickness + edgeSpacing + popupGap),
                 "y": relativeY,
                 "width": widgetWidth
             };
         case SettingsData.Position.Bottom:
             return {
                 "x": relativeX,
-                "y": (screen?.height || 0) - (barThickness + spacing + bottomGap + popupGap),
+                "y": (screen?.height || 0) - (barThickness + edgeSpacing + bottomGap + popupGap),
                 "width": widgetWidth
             };
         default:
             return {
                 "x": relativeX,
-                "y": barThickness + spacing + bottomGap + popupGap,
+                "y": barThickness + edgeSpacing + bottomGap + popupGap,
                 "width": widgetWidth
             };
         }
