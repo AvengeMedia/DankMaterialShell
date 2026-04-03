@@ -143,8 +143,13 @@ Singleton {
         return variantDuration(baseDuration, false) + variantExitCleanupPadding();
     }
 
-    readonly property bool isDirectionalEffect: typeof SettingsData !== "undefined" && SettingsData.motionEffect === 1
+    readonly property bool isDirectionalEffect: isConnectedEffect
+        || (typeof SettingsData !== "undefined" && SettingsData.motionEffect === 1)
     readonly property bool isDepthEffect: typeof SettingsData !== "undefined" && SettingsData.motionEffect === 2
+    readonly property bool isConnectedEffect: typeof SettingsData !== "undefined"
+        && SettingsData.frameEnabled
+        && SettingsData.motionEffect === 1
+        && SettingsData.directionalAnimationMode === 3
 
     readonly property real effectScaleCollapsed: {
         if (typeof SettingsData === "undefined")

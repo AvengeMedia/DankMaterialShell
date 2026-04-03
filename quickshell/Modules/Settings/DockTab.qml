@@ -7,6 +7,9 @@ import qs.Modules.Settings.Widgets
 
 Item {
     id: root
+    readonly property bool connectedFrameModeActive: SettingsData.frameEnabled
+        && SettingsData.motionEffect === 1
+        && SettingsData.directionalAnimationMode === 3
 
     FileBrowserModal {
         id: dockLogoFileBrowser
@@ -604,6 +607,8 @@ Item {
 
                 SettingsSliderRow {
                     text: I18n.tr("Exclusive Zone Offset")
+                    enabled: !root.connectedFrameModeActive
+                    opacity: root.connectedFrameModeActive ? 0.5 : 1.0
                     value: SettingsData.dockBottomGap
                     minimum: -100
                     maximum: 100
@@ -613,6 +618,8 @@ Item {
 
                 SettingsSliderRow {
                     text: I18n.tr("Margin")
+                    enabled: !root.connectedFrameModeActive
+                    opacity: root.connectedFrameModeActive ? 0.5 : 1.0
                     value: SettingsData.dockMargin
                     minimum: 0
                     maximum: 100
@@ -621,11 +628,42 @@ Item {
                 }
             }
 
+            Item {
+                visible: root.connectedFrameModeActive
+                width: parent.width
+                implicitHeight: dockConnectedNote.implicitHeight + Theme.spacingS * 2
+
+                Row {
+                    id: dockConnectedNote
+                    x: Theme.spacingM
+                    width: parent.width - Theme.spacingM * 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingS
+
+                    DankIcon {
+                        name: "frame_source"
+                        size: Theme.fontSizeMedium
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Connected Frame mode manages dock edge offset, transparency, blur, and border styling")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width - Theme.fontSizeMedium - Theme.spacingS
+                    }
+                }
+            }
+
             SettingsCard {
                 width: parent.width
                 iconName: "opacity"
                 title: I18n.tr("Transparency")
                 settingKey: "dockTransparency"
+                enabled: !root.connectedFrameModeActive
+                opacity: root.connectedFrameModeActive ? 0.5 : 1.0
 
                 SettingsSliderRow {
                     text: I18n.tr("Dock Transparency")
@@ -645,6 +683,8 @@ Item {
                 settingKey: "dockBorder"
                 collapsible: true
                 expanded: false
+                enabled: !root.connectedFrameModeActive
+                opacity: root.connectedFrameModeActive ? 0.5 : 1.0
 
                 SettingsToggleRow {
                     text: I18n.tr("Border")
