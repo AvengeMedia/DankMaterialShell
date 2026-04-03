@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -65,8 +66,9 @@ Item {
     readonly property real modalX: (screenWidth - modalWidth) / 2
     readonly property real modalY: (screenHeight - modalHeight) / 2
 
-    readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-    readonly property real cornerRadius: Theme.cornerRadius
+    readonly property bool connectedSurfaceOverride: Theme.isConnectedEffect
+    readonly property color backgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    readonly property real cornerRadius: connectedSurfaceOverride ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     readonly property color borderColor: {
         if (!SettingsData.dankLauncherV2BorderEnabled)
             return Theme.outlineMedium;
@@ -84,6 +86,9 @@ Item {
         }
     }
     readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
+    readonly property color effectiveBorderColor: connectedSurfaceOverride ? "transparent" : borderColor
+    readonly property int effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
+    readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
 
     // Shadow padding for the content window (render padding only, no motion padding)
     readonly property var shadowLevel: Theme.elevationLevel3
@@ -97,13 +102,13 @@ Item {
 
     // For directional/depth: window extends from screen top (content slides within)
     // For standard: small window tightly around the modal + shadow padding
-    readonly property bool _needsExtendedWindow: Theme.isDirectionalEffect || Theme.isDepthEffect
+    readonly property bool _needsExtendedWindow: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) || Theme.isDepthEffect
     // Content window geometry
     readonly property real _cwMarginLeft: Theme.snap(alignedX - shadowPad, dpr)
     readonly property real _cwMarginTop: _needsExtendedWindow ? 0 : Theme.snap(alignedY - shadowPad, dpr)
     readonly property real _cwWidth: alignedWidth + shadowPad * 2
     readonly property real _cwHeight: {
-        if (Theme.isDirectionalEffect)
+        if (Theme.isDirectionalEffect && !Theme.isConnectedEffect)
             return screenHeight + shadowPad;
         if (Theme.isDepthEffect)
             return alignedY + alignedHeight + shadowPad;
@@ -387,7 +392,7 @@ Item {
             visible: launcherMotionVisible || opacity > 0
 
             Behavior on opacity {
-                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                 DankAnim {
                     duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
                     easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
@@ -407,6 +412,17 @@ Item {
         id: contentWindow
         visible: false
         color: "transparent"
+
+        WindowBlur {
+            targetWindow: contentWindow
+            blurEnabled: root.effectiveBlurEnabled
+            readonly property real s: Math.min(1, contentContainer.scaleValue)
+            blurX: root._ccX + root.alignedWidth * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
+            blurY: root._ccY + root.alignedHeight * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+            blurWidth: (root.spotlightOpen || root.isClosing) && contentWrapper.opacity > 0 ? root.alignedWidth * s : 0
+            blurHeight: (root.spotlightOpen || root.isClosing) && contentWrapper.opacity > 0 ? root.alignedHeight * s : 0
+            blurRadius: root.cornerRadius
+        }
 
         WlrLayershell.namespace: "dms:spotlight"
         WlrLayershell.layer: {
@@ -572,8 +588,8 @@ Item {
                         level: root.shadowLevel
                         fallbackOffset: root.shadowFallbackOffset
                         targetColor: root.backgroundColor
-                        borderColor: root.borderColor
-                        borderWidth: root.borderWidth
+                        borderColor: root.effectiveBorderColor
+                        borderWidth: root.effectiveBorderWidth
                         targetRadius: root.cornerRadius
                         shadowEnabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                     }
@@ -583,14 +599,14 @@ Item {
                         id: contentWrapper
                         width: parent.width
                         height: parent.height
-                        opacity: Theme.isDirectionalEffect ? 1 : (launcherMotionVisible ? 1 : 0)
+                        opacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (launcherMotionVisible ? 1 : 0)
                         visible: opacity > 0
                         scale: contentContainer.scaleValue
                         x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
                         y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
 
                         Behavior on opacity {
-                            enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                            enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                             DankAnim {
                                 duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
                                 easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve

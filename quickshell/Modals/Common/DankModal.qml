@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -34,6 +35,12 @@ Item {
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 0
     property real cornerRadius: Theme.cornerRadius
+    readonly property bool connectedSurfaceOverride: Theme.isConnectedEffect
+    readonly property color effectiveBackgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : backgroundColor
+    readonly property color effectiveBorderColor: connectedSurfaceOverride ? "transparent" : borderColor
+    readonly property real effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
+    readonly property real effectiveCornerRadius: connectedSurfaceOverride ? Theme.connectedSurfaceRadius : cornerRadius
+    readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
     property bool enableShadow: true
     property alias modalFocusScope: focusScope
     property bool shouldBeVisible: false
@@ -163,6 +170,8 @@ Item {
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
+        if (Theme.isConnectedEffect)
+            return 0;
         if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0 && Theme.isDirectionalEffect)
             return 0; // Wayland native overlap mask
         if (animationType === "slide")
@@ -244,7 +253,7 @@ Item {
             visible: opacity > 0
 
             Behavior on opacity {
-                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                 NumberAnimation {
                     duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                     easing.type: Easing.BezierSpline
@@ -258,6 +267,17 @@ Item {
         id: contentWindow
         visible: false
         color: "transparent"
+
+        WindowBlur {
+            targetWindow: contentWindow
+            blurEnabled: root.effectiveBlurEnabled
+            readonly property real s: Math.min(1, modalContainer.scaleValue)
+            blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
+            blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
+            blurWidth: (root.shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.width * s : 0
+            blurHeight: (root.shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.height * s : 0
+            blurRadius: root.effectiveCornerRadius
+        }
 
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: {
@@ -333,7 +353,7 @@ Item {
             visible: opacity > 0
 
             Behavior on opacity {
-                enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                 NumberAnimation {
                     duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                     easing.type: Easing.BezierSpline
@@ -487,12 +507,12 @@ Item {
                     id: animatedContent
                     anchors.fill: parent
                     clip: false
-                    opacity: Theme.isDirectionalEffect ? 1 : (root.shouldBeVisible ? 1 : 0)
+                    opacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (root.shouldBeVisible ? 1 : 0)
                     scale: modalContainer.scaleValue
                     transformOrigin: Item.Center
 
                     Behavior on opacity {
-                        enabled: root.animationsEnabled && !Theme.isDirectionalEffect
+                        enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                         NumberAnimation {
                             duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                             easing.type: Easing.BezierSpline
@@ -505,11 +525,20 @@ Item {
                         anchors.fill: parent
                         level: root.shadowLevel
                         fallbackOffset: root.shadowFallbackOffset
-                        targetRadius: root.cornerRadius
-                        targetColor: root.backgroundColor
-                        borderColor: root.borderColor
-                        borderWidth: root.borderWidth
+                        targetRadius: root.effectiveCornerRadius
+                        targetColor: root.effectiveBackgroundColor
+                        borderColor: root.effectiveBorderColor
+                        borderWidth: root.effectiveBorderWidth
                         shadowEnabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: root.effectiveCornerRadius
+                        color: "transparent"
+                        border.color: root.connectedSurfaceOverride ? "transparent" : BlurService.borderColor
+                        border.width: root.connectedSurfaceOverride ? 0 : BlurService.borderWidth
+                        z: 100
                     }
 
                     FocusScope {
