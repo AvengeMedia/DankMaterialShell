@@ -62,7 +62,7 @@ func (m *Manager) getRegisteredItems() []string {
 	switch v := variant.Value().(type) {
 	case []string:
 		return v
-	case []interface{}:
+	case []any:
 		items := make([]string, 0, len(v))
 		for _, elem := range v {
 			if s, ok := elem.(string); ok {
