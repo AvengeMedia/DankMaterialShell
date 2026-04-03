@@ -1183,6 +1183,13 @@
     "comment": ""
   },
   {
+    "term": "Applying authentication changes…",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Apps",
     "translation": "",
     "context": "",
@@ -1379,6 +1386,34 @@
     "comment": ""
   },
   {
+    "term": "Authentication changes applied.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Authentication changes apply automatically.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Authentication error - try again",
     "translation": "",
     "context": "",
@@ -1513,6 +1548,13 @@
   },
   {
     "term": "Autoconnect enabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Autofill last remembered query when opened",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1673,7 +1715,21 @@
     "comment": ""
   },
   {
+    "term": "Background Blur",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Background Opacity",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Background authentication sync failed. Trying terminal mode.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1876,6 +1932,20 @@
     "comment": ""
   },
   {
+    "term": "Blur Border Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Blur Border Opacity",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Blur Wallpaper Layer",
     "translation": "",
     "context": "",
@@ -1884,6 +1954,13 @@
   },
   {
     "term": "Blur on Overview",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1933,6 +2010,13 @@
   },
   {
     "term": "Border Thickness",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Border color around blurred surfaces",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2289,7 +2373,7 @@
     "comment": ""
   },
   {
-    "term": "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.",
+    "term": "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3544,7 +3628,7 @@
   {
     "term": "Custom",
     "translation": "",
-    "context": "shadow color option | theme category option",
+    "context": "blur border color | shadow color option | theme category option",
     "reference": "",
     "comment": ""
   },
@@ -3717,7 +3801,7 @@
     "comment": ""
   },
   {
-    "term": "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.",
+    "term": "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4788,7 +4872,7 @@
     "comment": ""
   },
   {
-    "term": "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.",
+    "term": "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4837,6 +4921,13 @@
     "comment": ""
   },
   {
+    "term": "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.",
     "translation": "",
     "context": "",
@@ -4844,7 +4935,7 @@
     "comment": ""
   },
   {
-    "term": "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.",
+    "term": "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4852,13 +4943,6 @@
   },
   {
     "term": "Enabled, but no registered security key was found yet. Register a key and run Sync.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no registered security key was found yet. Register a key or update your U2F config.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5804,6 +5888,27 @@
   },
   {
     "term": "Fingerprint availability could not be confirmed.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Fingerprint error",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Fingerprint error: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Fingerprint not recognized (%1/%2). Please try again or use password.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7140,6 +7245,13 @@
     "comment": ""
   },
   {
+    "term": "Incorrect password - try again",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Indicator Style",
     "translation": "",
     "context": "",
@@ -7197,6 +7309,13 @@
   },
   {
     "term": "Input Volume Slider",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Insert your security key...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7931,6 +8050,13 @@
     "comment": ""
   },
   {
+    "term": "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Locked",
     "translation": "",
     "context": "",
@@ -8310,6 +8436,13 @@
   },
   {
     "term": "Maximum Pinned Entries",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Maximum fingerprint attempts reached. Please use password.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10131,7 +10264,7 @@
   {
     "term": "Outline",
     "translation": "",
-    "context": "outline color",
+    "context": "blur border color | outline color",
     "reference": "",
     "comment": ""
   },
@@ -11062,7 +11195,7 @@
   {
     "term": "Primary",
     "translation": "",
-    "context": "button color option | color option | primary color | shadow color option | tile color option",
+    "context": "blur border color | button color option | color option | primary color | shadow color option | tile color option",
     "reference": "",
     "comment": ""
   },
@@ -11480,6 +11613,13 @@
     "comment": ""
   },
   {
+    "term": "Remember Last Query",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Remember last session",
     "translation": "",
     "context": "",
@@ -11600,6 +11740,13 @@
   },
   {
     "term": "Requires DWL compositor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Requires a newer version of Quickshell",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11845,20 +11992,6 @@
   },
   {
     "term": "Run DMS Templates",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Run Sync to apply.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12259,7 +12392,7 @@
   {
     "term": "Secondary",
     "translation": "",
-    "context": "button color option | color option | secondary color | tile color option",
+    "context": "blur border color | button color option | color option | secondary color | tile color option",
     "reference": "",
     "comment": ""
   },
@@ -14056,7 +14189,21 @@
     "comment": ""
   },
   {
+    "term": "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14071,6 +14218,13 @@
   },
   {
     "term": "Terminal multiplexer backend to use",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Terminal opened. Complete authentication setup there; it will close automatically when done.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14128,7 +14282,7 @@
   {
     "term": "Text Color",
     "translation": "",
-    "context": "shadow color option",
+    "context": "blur border color | shadow color option",
     "reference": "",
     "comment": ""
   },
@@ -14490,6 +14644,13 @@
     "comment": ""
   },
   {
+    "term": "Too many attempts - locked out",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Too many failed attempts - account may be locked",
     "translation": "",
     "context": "",
@@ -14568,6 +14729,13 @@
   },
   {
     "term": "Total Jobs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Touch your security key...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14673,20 +14841,6 @@
   },
   {
     "term": "Type this prefix to search keybinds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Type to search",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Type to search apps",
     "translation": "",
     "context": "",
     "reference": "",

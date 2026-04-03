@@ -267,7 +267,7 @@
     "Activate": "Activer"
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
-    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": ""
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Activer le greeter DMS ? Un terminal va s'ouvrir pour l'authentification sudo. Exécutez la Synchro après l'activation pour appliquer vos paramètres."
   },
   "Activation": {
     "Activation": "Activation"
@@ -330,7 +330,7 @@
     "Adjust volume per scroll indent": "Ajuster le volume à la molette"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Ajuste le contraste des couleurs générées (-100 = minimum, 0 = standard, 100 = maximum)"
   },
   "Advanced": {
     "Advanced": "Avancé"
@@ -424,6 +424,9 @@
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Appliquer une température de couleur chaude pour réduire la fatigue visuelle. Utilisez les paramètres d’automatisation ci-dessous pour définir son activation."
+  },
+  "Applying authentication changes…": {
+    "Applying authentication changes…": ""
   },
   "Apps": {
     "Apps": "Applis"
@@ -532,6 +535,18 @@
   "Authentication Required": {
     "Authentication Required": "Authentification requise"
   },
+  "Authentication changes applied.": {
+    "Authentication changes applied.": ""
+  },
+  "Authentication changes apply automatically.": {
+    "Authentication changes apply automatically.": ""
+  },
+  "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+  },
+  "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
+  },
   "Authentication error - try again": {
     "Authentication error - try again": "Erreur d'authentification - essayez à nouveau"
   },
@@ -585,6 +600,9 @@
   },
   "Autoconnect enabled": {
     "Autoconnect enabled": "Connexion automatique activée"
+  },
+  "Autofill last remembered query when opened": {
+    "Autofill last remembered query when opened": ""
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "Mode sombre automatique"
@@ -652,8 +670,14 @@
   "Background": {
     "Background": "Arrière-plan"
   },
+  "Background Blur": {
+    "Background Blur": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Opacité de l’arrière-plan"
+  },
+  "Background authentication sync failed. Trying terminal mode.": {
+    "Background authentication sync failed. Trying terminal mode.": ""
   },
   "Backlight device": {
     "Backlight device": "Périphérique de rétroéclairage"
@@ -671,7 +695,7 @@
     "Bar Transparency": "Transparence de la barre"
   },
   "Base color for shadows (opacity is applied automatically)": {
-    "Base color for shadows (opacity is applied automatically)": ""
+    "Base color for shadows (opacity is applied automatically)": "Couleur de base pour les ombres (l'opacité est appliquée automatiquement)"
   },
   "Base duration for animations (drag to use Custom)": {
     "Base duration for animations (drag to use Custom)": "Durée de base des animations (faites glisser pour utiliser une valeur personnalisée)"
@@ -730,11 +754,20 @@
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth non disponible"
   },
+  "Blur Border Color": {
+    "Blur Border Color": ""
+  },
+  "Blur Border Opacity": {
+    "Blur Border Opacity": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Flouter la couche du fond d’écran"
   },
   "Blur on Overview": {
     "Blur on Overview": "Flou dans la vue d’ensemble"
+  },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Flouter le fond d’écran lorsque la vue d’ensemble de Niri est ouverte"
@@ -753,6 +786,9 @@
   },
   "Border Thickness": {
     "Border Thickness": "Épaisseur de la bordure"
+  },
+  "Border color around blurred surfaces": {
+    "Border color around blurred surfaces": ""
   },
   "Border with BG": {
     "Border with BG": "Bordures avec fond"
@@ -887,7 +923,7 @@
     "Change the locale used by the DMS interface.": ""
   },
   "Change the locale used for date and time formatting, independent of the interface language.": {
-    "Change the locale used for date and time formatting, independent of the interface language.": ""
+    "Change the locale used for date and time formatting, independent of the interface language.": "Changer les paramètres régionaux utilisés pour le format de la date et de l'heure, indépendant de la langue de l'interface."
   },
   "Channel": {
     "Channel": "Canal"
@@ -900,6 +936,9 @@
   },
   "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
     "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": ""
+  },
+  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": "Vérification des mises à jour..."
@@ -929,7 +968,7 @@
     "Choose how the weather widget is displayed": "Choisir le mode d’affichage du widget météo"
   },
   "Choose how this bar resolves shadow direction": {
-    "Choose how this bar resolves shadow direction": ""
+    "Choose how this bar resolves shadow direction": "Choisissez comment cette barre gère la direction de l'ombre"
   },
   "Choose icon": {
     "Choose icon": "Choisir une icône"
@@ -1352,7 +1391,7 @@
     "Current Items": "Éléments actuels"
   },
   "Current Locale": {
-    "Current Locale": ""
+    "Current Locale": "Paramètres régionaux actuels"
   },
   "Current Period": {
     "Current Period": "Période actuelle"
@@ -1421,7 +1460,7 @@
     "Custom Shadow Color": "Couleur d'ombre personnalisée"
   },
   "Custom Shadow Override": {
-    "Custom Shadow Override": ""
+    "Custom Shadow Override": "Surcharge d'ombre personnalisée"
   },
   "Custom Suspend Command": {
     "Custom Suspend Command": "Commande de mise en veille personnalisée"
@@ -1449,6 +1488,9 @@
   },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "Gestionnaire de plugins DMS indisponible"
+  },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": ""
@@ -1667,7 +1709,7 @@
     "Disk Usage": "Utilisation du disque"
   },
   "Disk Usage Display": {
-    "Disk Usage Display": ""
+    "Disk Usage Display": "Affichage de l'utilisation du disque"
   },
   "Disks": {
     "Disks": "Disques"
@@ -1885,6 +1927,9 @@
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "Activer l’authentification par empreinte digitale"
   },
+  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
+  },
   "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
     "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": ""
   },
@@ -1924,29 +1969,35 @@
   "Enabled, but no fingerprint reader was detected.": {
     "Enabled, but no fingerprint reader was detected.": "Activé, mais aucun lecteur d'empreintes n'a été détecté."
   },
+  "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+  },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
-    "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": ""
+    "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": "Activé, mais aucune empreinte n'a encore été enregistrée. Enregistrez une empreinte et exécutez la Synchro."
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": "Activé, mais aucune empreinte n'a été enregistrée pour le moment. Enregistrez des empreintes pour l'utiliser."
+  },
+  "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key or update your U2F config.": {
-    "Enabled, but no registered security key was found yet. Register a key or update your U2F config.": ""
+    "Enabled, but no registered security key was found yet. Register a key or update your U2F config.": "Activé, mais aucune clé de sécurité n'a encore été trouvée. Enregistrez une clé ou mettez à jour votre config U2F."
   },
   "Enabled, but security-key availability could not be confirmed.": {
-    "Enabled, but security-key availability could not be confirmed.": ""
+    "Enabled, but security-key availability could not be confirmed.": "Activé, mais la disponibilité de la clé de sécurité n'a pas pu être confirmée."
   },
   "Enabled. PAM already provides fingerprint auth.": {
-    "Enabled. PAM already provides fingerprint auth.": ""
+    "Enabled. PAM already provides fingerprint auth.": "Activé. PAM fourni déjà une authentification par empreinte."
   },
   "Enabled. PAM already provides security-key auth.": {
-    "Enabled. PAM already provides security-key auth.": ""
+    "Enabled. PAM already provides security-key auth.": "Activé. PAM fourni déjà une authentification par clé de sécurité."
   },
   "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.": {
-    "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.": ""
+    "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.": "Activé. PAM fourni l'authentification par empreinte, mais aucune empreinte n'a encore été enregistrée."
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Activation du Wi-Fi..."
@@ -1970,7 +2021,7 @@
     "Enter PIN for ": "Saisir le code PIN pour "
   },
   "Enter a new name for session \"%1": {
-    "Enter a new name for session \"%1\"": ""
+    "Enter a new name for session \"%1\"": "Entrer un nouveau nom pour la session \"%1\""
   },
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "Entrer un nom pour cet espace de travail"
@@ -2278,8 +2329,17 @@
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": "La disponibilité de l'empreinte n'a pas pu être confirmée."
   },
+  "Fingerprint error": {
+    "Fingerprint error": ""
+  },
+  "Fingerprint error: %1": {
+    "Fingerprint error: %1": ""
+  },
+  "Fingerprint not recognized (%1/%2). Please try again or use password.": {
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+  },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
-    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": ""
+    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "Lecteur d'empreintes détecté, mais aucune empreinte n'a encore été enregistrée. Vous pouvez l'activer maintenant et enregistrer une empreinte plus tard."
   },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": ""
@@ -2327,13 +2387,13 @@
     "Focused Color": "Couleur active"
   },
   "Focused Monitor Only": {
-    "Focused Monitor Only": ""
+    "Focused Monitor Only": "Uniquement l'écran sélectionné"
   },
   "Focused Window": {
     "Focused Window": "Fenêtre active"
   },
   "Focused monitor only": {
-    "Focused monitor only": ""
+    "Focused monitor only": "Uniquement l'écran sélectionné"
   },
   "Fog": {
     "Fog": "Brouillard"
@@ -2343,6 +2403,9 @@
   },
   "Folders": {
     "Folders": "Dossiers"
+  },
+  "Follow DMS background color": {
+    "Follow DMS background color": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Suivre le focus de l’écran"
@@ -2645,10 +2708,10 @@
     "High-fidelity palette that preserves source hues.": "Palette fidèle qui préserve les teintes d'origine."
   },
   "Highlight Active Workspace App": {
-    "Highlight Active Workspace App": ""
+    "Highlight Active Workspace App": "Mettre en évidence l'appli de l'espace de travail actif"
   },
   "Highlight the currently focused app inside workspace indicators": {
-    "Highlight the currently focused app inside workspace indicators": ""
+    "Highlight the currently focused app inside workspace indicators": "Mettre en évidence l'appli sélectionnée dans les indicateurs d'espace de travail"
   },
   "History Settings": {
     "History Settings": "Paramètres de l'historique"
@@ -2696,7 +2759,7 @@
     "How often to change wallpaper": "Fréquence de changement de fond d'écran"
   },
   "How the background image is scaled": {
-    "How the background image is scaled": ""
+    "How the background image is scaled": "Comment l'image d'arrière-plan est échelonnée"
   },
   "Humidity": {
     "Humidity": "Humidité"
@@ -2785,6 +2848,9 @@
   "Incorrect password - next failures may trigger account lockout": {
     "Incorrect password - next failures may trigger account lockout": "Mot de passe incorrect - les prochains échecs pourraient activer le verrouillage du compte"
   },
+  "Incorrect password - try again": {
+    "Incorrect password - try again": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Style d'indicateur"
   },
@@ -2805,6 +2871,9 @@
   },
   "Input Volume Slider": {
     "Input Volume Slider": "Curseur du volume d'entrée"
+  },
+  "Insert your security key...": {
+    "Insert your security key...": ""
   },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": "Installation terminée. Greeter a été installé."
@@ -3101,7 +3170,7 @@
     "LabWC IRC Channel": ""
   },
   "LabWC Website": {
-    "LabWC Website": ""
+    "LabWC Website": "Site LabWC"
   },
   "Label for printer IP address or hostname input field": {
     "Host": "Hôte"
@@ -3164,7 +3233,7 @@
     "Launch on dGPU": "Lancer sur le GPU intégrée"
   },
   "Launch on dGPU by default": {
-    "Launch on dGPU by default": ""
+    "Launch on dGPU by default": "Lancer sur dGPU par défaut"
   },
   "Launcher": {
     "Launcher": "Lanceur"
@@ -3251,10 +3320,10 @@
     "Local": "Local"
   },
   "Locale": {
-    "Locale": ""
+    "Locale": "Régional"
   },
   "Locale Settings": {
-    "Locale Settings": ""
+    "Locale Settings": "Paramètres régionaux"
   },
   "Location": {
     "Location": "Emplacement"
@@ -3288,6 +3357,9 @@
   },
   "Lock fade grace period": {
     "Lock fade grace period": "Délai de grâce avant le fondu du verrouillage"
+  },
+  "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
   "Locked": {
     "Locked": "Verrouillé"
@@ -3374,7 +3446,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": ""
   },
   "Matugen Contrast": {
-    "Matugen Contrast": ""
+    "Matugen Contrast": "Contraste Matugen"
   },
   "Matugen Palette": {
     "Matugen Palette": "Palette Matugen"
@@ -3432,6 +3504,9 @@
   },
   "Maximum Pinned Entries": {
     "Maximum Pinned Entries": "Maximum d'entrées épinglées"
+  },
+  "Maximum fingerprint attempts reached. Please use password.": {
+    "Maximum fingerprint attempts reached. Please use password.": ""
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "Nombre maximal d’éléments conservés dans le presse-papiers"
@@ -3590,13 +3665,13 @@
     "Moving to Paused": "Mise en pause en cours"
   },
   "Multiplexer": {
-    "Multiplexer": ""
+    "Multiplexer": "Multiplexeur"
   },
   "Multiplexer Type": {
-    "Multiplexer Type": ""
+    "Multiplexer Type": "Type de multiplexeur"
   },
   "Multiplexers": {
-    "Multiplexers": ""
+    "Multiplexers": "Multiplexeurs"
   },
   "Music": {
     "Music": "Musique"
@@ -3926,7 +4001,7 @@
     "Not available — install or configure pam_u2f, or configure greetd PAM.": ""
   },
   "Not available — install or configure pam_u2f.": {
-    "Not available — install or configure pam_u2f.": ""
+    "Not available — install or configure pam_u2f.": "Non disponible — installez ou configurez pam_u2f."
   },
   "Not available — install pam_u2f and enroll keys.": {
     "Not available — install pam_u2f and enroll keys.": "Non disponible — installez pam_2u2f et enregistrez des clés."
@@ -4115,10 +4190,10 @@
     "Override global layout settings for this output": "Remplacer les paramètres de mise en page globale pour cette sortie"
   },
   "Override terminal with a custom command or script": {
-    "Override terminal with a custom command or script": ""
+    "Override terminal with a custom command or script": "Surcharger le terminal avec une commande personnalisée ou un script"
   },
   "Override the global shadow with per-bar settings": {
-    "Override the global shadow with per-bar settings": ""
+    "Override the global shadow with per-bar settings": "Surcharger l'ombre globale avec des paramètres par barre"
   },
   "Overrides": {
     "Overrides": "Remplacements"
@@ -4133,19 +4208,19 @@
     "Overwrite": "Écraser"
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
-    "PAM already provides fingerprint auth. Enable this to show it at login.": ""
+    "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM fourni déjà une authentification par empreinte. Activez ceci pour l'afficher lors de la connexion."
   },
   "PAM already provides security-key auth. Enable this to show it at login.": {
-    "PAM already provides security-key auth. Enable this to show it at login.": ""
+    "PAM already provides security-key auth. Enable this to show it at login.": "PAM fourni déjà une authentification par clé de sécurité. Activez ceci pour l'afficher lors de la connexion."
   },
   "PAM provides fingerprint auth, but availability could not be confirmed.": {
     "PAM provides fingerprint auth, but availability could not be confirmed.": ""
   },
   "PAM provides fingerprint auth, but no prints are enrolled yet.": {
-    "PAM provides fingerprint auth, but no prints are enrolled yet.": ""
+    "PAM provides fingerprint auth, but no prints are enrolled yet.": "PAM fourni l'authentification par empreinte, mais aucune empreinte n'a été encore enregistrée."
   },
   "PAM provides fingerprint auth, but no reader was detected.": {
-    "PAM provides fingerprint auth, but no reader was detected.": ""
+    "PAM provides fingerprint auth, but no reader was detected.": "PAM fourni l'authentification par empreinte, mais aucun lecteur n'a été détecté."
   },
   "PIN": {
     "PIN": "PIN"
@@ -4336,7 +4411,7 @@
     "Playback": "Lecture"
   },
   "Playback error: ": {
-    "Playback error: ": ""
+    "Playback error: ": "Erreur de lecture : "
   },
   "Please write a name for your new %1 session": {
     "Please write a name for your new %1 session": "Entrer un nom pour votre nouvelle session %1"
@@ -4617,6 +4692,9 @@
   "Remaining / Total": {
     "Remaining / Total": "Restant / Total"
   },
+  "Remember Last Query": {
+    "Remember Last Query": ""
+  },
   "Remember last session": {
     "Remember last session": "Se souvenir de la dernière session"
   },
@@ -4664,6 +4742,9 @@
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "Nécessite un compositeur DWL"
+  },
+  "Requires a newer version of Quickshell": {
+    "Requires a newer version of Quickshell": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Nécessite le support du mode nuit"
@@ -4753,10 +4834,10 @@
     "Run DMS Templates": "Exécuter les modèles DMS"
   },
   "Run Sync to apply.": {
-    "Run Sync to apply.": "Lancer la synchro pour appliquer."
+    "Run Sync to apply.": "Exécutez la Synchro pour appliquer."
   },
   "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": {
-    "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": ""
+    "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": "Exécutez la Synchro pour appliquer. La connexion par empreinte seulement peut ne pas déverrouiller le gestionnaire de mots de passe Gnome."
   },
   "Run User Templates": {
     "Run User Templates": "Exécuter les modèles utilisateur"
@@ -4783,7 +4864,7 @@
     "Current Monitor": "Ecran actuel"
   },
   "Running greeter sync…": {
-    "Running greeter sync…": ""
+    "Running greeter sync…": "Synchro du greeter en cours…"
   },
   "SDR Brightness": {
     "SDR Brightness": "Luminosité SDR"
@@ -5050,10 +5131,10 @@
     "Shadow Opacity": "Opacité de l'ombre"
   },
   "Shadow elevation on bars and panels": {
-    "Shadow elevation on bars and panels": ""
+    "Shadow elevation on bars and panels": "Élévation de l'ombre sur les barres et les panneaux"
   },
   "Shadow elevation on modals and dialogs": {
-    "Shadow elevation on modals and dialogs": ""
+    "Shadow elevation on modals and dialogs": "Élévation de l'ombre sur les modales et les dialogues"
   },
   "Shadow elevation on popouts, OSDs, and dropdowns": {
     "Shadow elevation on popouts, OSDs, and dropdowns": ""
@@ -5521,7 +5602,7 @@
     "Sync Position Across Screens": "Synchroniser la position entre les écrans"
   },
   "Sync completed successfully.": {
-    "Sync completed successfully.": "Synchro complété avec succès."
+    "Sync completed successfully.": "Synchro complétée avec succès."
   },
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "Synchroniser le mode sombre avec les préférences système pour l’ensemble du thème"
@@ -5530,7 +5611,7 @@
     "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": "Synchro échouée en arrière-plan. Essayez avec le terminal pour vous authentifier de façon interactive."
   },
   "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
-    "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": "La synchro nécessite une authentification sudo. Ouverture du terminal pour utiliser le mot de passe ou l'empreinte."
+    "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": "La Synchro nécessite une authentification sudo. Ouverture du terminal pour utiliser le mot de passe ou l'empreinte."
   },
   "System": {
     "System": "Système"
@@ -5592,14 +5673,23 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Paramètres supplémentaires pour le terminal"
   },
+  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": ""
+  },
+  "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": ""
   },
   "Terminal multiplexer backend to use": {
     "Terminal multiplexer backend to use": ""
+  },
+  "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": ""
@@ -5683,7 +5773,7 @@
     "Tiling": "Mosaïque"
   },
   "Time & Date Locale": {
-    "Time & Date Locale": ""
+    "Time & Date Locale": "Format régional de la date et de l'heure"
   },
   "Time & Weather": {
     "Time & Weather": "Heure et météo"
@@ -5754,6 +5844,9 @@
   "Toner Low": {
     "Toner Low": "Toner faible"
   },
+  "Too many attempts - locked out": {
+    "Too many attempts - locked out": ""
+  },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": "Trop de tentatives échouées - le compte peut être verrouillé"
   },
@@ -5783,6 +5876,9 @@
   },
   "Total Jobs": {
     "Total Jobs": "Total des tâches"
+  },
+  "Touch your security key...": {
+    "Touch your security key...": ""
   },
   "Transform": {
     "Transform": "Transformer"
@@ -5845,10 +5941,10 @@
     "Typography & Motion": "Typographie et animation"
   },
   "U2F mode option: key required after password or fingerprint": {
-    "Second Factor (AND)": ""
+    "Second Factor (AND)": "Deux facteurs (AND)"
   },
   "U2F mode option: key works as standalone unlock method": {
-    "Alternative (OR)": ""
+    "Alternative (OR)": "Alternatif (OR)"
   },
   "Unavailable": {
     "Unavailable": "Indisponible"
@@ -5974,10 +6070,10 @@
     "Use System Theme": "Utiliser le thème système"
   },
   "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": ""
+    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Utilisez une image personnalisée pour l'écran de connexion, ou laissez vide pour utiliser pour fond d'écran de bureau."
   },
   "Use a fixed shadow direction for this bar": {
-    "Use a fixed shadow direction for this bar": ""
+    "Use a fixed shadow direction for this bar": "Utiliser une direction d'ombre fixe pour cette barre"
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Utiliser des barres de progression animées en forme de vague pour la lecture multimédia"
@@ -6390,10 +6486,10 @@
     "Manual Direction": "Direction manuelle"
   },
   "bar shadow direction source": {
-    "Direction Source": ""
+    "Direction Source": "Direction de la source"
   },
   "bar shadow direction source option": {
-    "Inherit Global (Default)": "",
+    "Inherit Global (Default)": "Hérite des paramètres globaux (par défaut)",
     "Manual": "Manuel"
   },
   "bar shadow direction source option | shadow direction option": {
@@ -6401,7 +6497,7 @@
   },
   "bar shadow settings card": {
     "Shadow": "Ombre",
-    "Shadow Override": ""
+    "Shadow Override": "Surcharge de l'ombre"
   },
   "battery status": {
     "Charging": "Chargement",
@@ -6423,6 +6519,21 @@
   },
   "bluetooth status | lock screen notification mode option": {
     "Disabled": "Désactivé"
+  },
+  "blur border color | button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
+  "blur border color | button color option | color option | secondary color | tile color option": {
+    "Secondary": ""
+  },
+  "blur border color | outline color": {
+    "Outline": ""
+  },
+  "blur border color | shadow color option": {
+    "Text Color": ""
+  },
+  "blur border color | shadow color option | theme category option": {
+    "Custom": ""
   },
   "border color": {
     "Color": "Couleur"
@@ -6743,7 +6854,7 @@
     "Skip setup": "Ignorer la configuration"
   },
   "greeter status error": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
+    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Échec de l'exécution de 'dms greeter status'. Vérifiez que DMS est installé et dans le PATH."
   },
   "greeter status loading": {
     "Checking…": "Vérification..."
@@ -6809,7 +6920,7 @@
     "Loading...": "Chargement…"
   },
   "lock screen U2F security key mode setting": {
-    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "",
+    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "'Alternatif' laisse la clé se déverrouiller d'elle-même. 'Deux facteurs' nécessite un mot de passe ou une empreinte d'abord, puis la clé.",
     "Security key mode": "Mode clé de sécurité"
   },
   "lock screen U2F security key setting": {

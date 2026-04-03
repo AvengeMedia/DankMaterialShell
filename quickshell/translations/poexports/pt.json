@@ -111,7 +111,7 @@
     "+ %1 more": "+ %1 mais"
   },
   "/path/to/videos": {
-    "/path/to/videos": ""
+    "/path/to/videos": "/caminho/dos/videos"
   },
   "0 = square corners": {
     "0 = square corners": "0 = cantos quadrados"
@@ -258,7 +258,7 @@
     "Action": "Ação"
   },
   "Action failed or terminal was closed.": {
-    "Action failed or terminal was closed.": ""
+    "Action failed or terminal was closed.": "A ação falhou ou o termianl foi fechado."
   },
   "Actions": {
     "Actions": "Ações"
@@ -425,6 +425,9 @@
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Aplicar temperatura de cor quente para reduzir a fadiga ocular. Use as configurações de automação abaixo para controlar quando ela será ativada."
   },
+  "Applying authentication changes…": {
+    "Applying authentication changes…": ""
+  },
   "Apps": {
     "Apps": "Aplicativos"
   },
@@ -532,6 +535,18 @@
   "Authentication Required": {
     "Authentication Required": "Autenticação Necessária"
   },
+  "Authentication changes applied.": {
+    "Authentication changes applied.": ""
+  },
+  "Authentication changes apply automatically.": {
+    "Authentication changes apply automatically.": ""
+  },
+  "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+  },
+  "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
+  },
   "Authentication error - try again": {
     "Authentication error - try again": ""
   },
@@ -585,6 +600,9 @@
   },
   "Autoconnect enabled": {
     "Autoconnect enabled": "Conexão automática ativada"
+  },
+  "Autofill last remembered query when opened": {
+    "Autofill last remembered query when opened": ""
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "Modo de Cor Automático"
@@ -652,8 +670,14 @@
   "Background": {
     "Background": ""
   },
+  "Background Blur": {
+    "Background Blur": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Opacidade do Fundo"
+  },
+  "Background authentication sync failed. Trying terminal mode.": {
+    "Background authentication sync failed. Trying terminal mode.": ""
   },
   "Backlight device": {
     "Backlight device": "Dispositivo de iluminação de fundo"
@@ -665,13 +689,13 @@
     "Bar Configurations": "Configurações da Barra"
   },
   "Bar Shadows": {
-    "Bar Shadows": ""
+    "Bar Shadows": "Sombras da Barra"
   },
   "Bar Transparency": {
     "Bar Transparency": "Trasparência da Barra"
   },
   "Base color for shadows (opacity is applied automatically)": {
-    "Base color for shadows (opacity is applied automatically)": ""
+    "Base color for shadows (opacity is applied automatically)": "Cor base para sombras (a opacidade é aplicada automaticamente)"
   },
   "Base duration for animations (drag to use Custom)": {
     "Base duration for animations (drag to use Custom)": "Duração base para animações (arraste para usar Personalizado)"
@@ -730,11 +754,20 @@
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth indisponível"
   },
+  "Blur Border Color": {
+    "Blur Border Color": ""
+  },
+  "Blur Border Opacity": {
+    "Blur Border Opacity": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Camada de Papel de Parede com Desfoque"
   },
   "Blur on Overview": {
     "Blur on Overview": "Desfoque na Visão Geral"
+  },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Desfoque de papel de parede quando a visão geral do niri estiver aberta"
@@ -753,6 +786,9 @@
   },
   "Border Thickness": {
     "Border Thickness": "Espessura da Borda"
+  },
+  "Border color around blurred surfaces": {
+    "Border color around blurred surfaces": ""
   },
   "Border with BG": {
     "Border with BG": "Borda com Fundo"
@@ -884,10 +920,10 @@
     "Change bar appearance": "Alterar aparência da barra"
   },
   "Change the locale used by the DMS interface.": {
-    "Change the locale used by the DMS interface.": ""
+    "Change the locale used by the DMS interface.": "Mudar a localidade usada pela interface do DMS."
   },
   "Change the locale used for date and time formatting, independent of the interface language.": {
-    "Change the locale used for date and time formatting, independent of the interface language.": ""
+    "Change the locale used for date and time formatting, independent of the interface language.": "Mudar a localidade usada para formatação de data e hora, independente da língua da interface."
   },
   "Channel": {
     "Channel": "Canal"
@@ -900,6 +936,9 @@
   },
   "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
     "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": ""
+  },
+  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": ""
@@ -1253,10 +1292,10 @@
     "Controls the base blur radius and offset of shadows": ""
   },
   "Controls the transparency of the shadow": {
-    "Controls the transparency of the shadow": ""
+    "Controls the transparency of the shadow": "Controla a transparência da sombra"
   },
   "Convenience options for the login screen. Sync to apply.": {
-    "Convenience options for the login screen. Sync to apply.": ""
+    "Convenience options for the login screen. Sync to apply.": "Opções de conveniência para a tela de login. Sincronize para aplicar."
   },
   "Cooldown": {
     "Cooldown": "Tempo de espera"
@@ -1449,6 +1488,9 @@
   },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "Gerenciador de Plugins DMS indispónivel"
+  },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": ""
@@ -1880,10 +1922,13 @@
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Habilitar camada de desfoque direcionável ao compositor (namespace: dms:blurwallpaper). Requer configuração manual do niri."
   },
   "Enable fingerprint at login": {
-    "Enable fingerprint at login": ""
+    "Enable fingerprint at login": "Habilitar impressão digital no login"
   },
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "Habilitar autenticação por impressão digital"
+  },
+  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
   },
   "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
     "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": ""
@@ -1924,11 +1969,17 @@
   "Enabled, but no fingerprint reader was detected.": {
     "Enabled, but no fingerprint reader was detected.": ""
   },
+  "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+  },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": ""
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": ""
+  },
+  "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": ""
@@ -2278,6 +2329,15 @@
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": ""
   },
+  "Fingerprint error": {
+    "Fingerprint error": ""
+  },
+  "Fingerprint error: %1": {
+    "Fingerprint error: %1": ""
+  },
+  "Fingerprint not recognized (%1/%2). Please try again or use password.": {
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+  },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": ""
   },
@@ -2285,7 +2345,7 @@
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": ""
   },
   "First Day of Week": {
-    "First Day of Week": ""
+    "First Day of Week": "Primeiro Dia da Semana"
   },
   "First Time Setup": {
     "First Time Setup": "Configuração Inicial"
@@ -2344,6 +2404,9 @@
   "Folders": {
     "Folders": "Pastas"
   },
+  "Follow DMS background color": {
+    "Follow DMS background color": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Seguir Foco do Monitor"
   },
@@ -2351,7 +2414,7 @@
     "Follow focus": "Seguir foco"
   },
   "Font": {
-    "Font": ""
+    "Font": "Fonte"
   },
   "Font Family": {
     "Font Family": "Família da Fonte"
@@ -2366,7 +2429,7 @@
     "Font Weight": "Peso da Fonte"
   },
   "Font used on the login screen": {
-    "Font used on the login screen": ""
+    "Font used on the login screen": "Fonte usada na tela de login"
   },
   "Force HDR": {
     "Force HDR": "Forçar HDR"
@@ -2696,7 +2759,7 @@
     "How often to change wallpaper": "Tempo entre papéis de parede"
   },
   "How the background image is scaled": {
-    "How the background image is scaled": ""
+    "How the background image is scaled": "Como a imagem de fundo é dimensionada"
   },
   "Humidity": {
     "Humidity": "Umidade"
@@ -2785,6 +2848,9 @@
   "Incorrect password - next failures may trigger account lockout": {
     "Incorrect password - next failures may trigger account lockout": ""
   },
+  "Incorrect password - try again": {
+    "Incorrect password - try again": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Estilo de Indicador"
   },
@@ -2805,6 +2871,9 @@
   },
   "Input Volume Slider": {
     "Input Volume Slider": "Controle deslizante de volume de entrada"
+  },
+  "Insert your security key...": {
+    "Insert your security key...": ""
   },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": ""
@@ -3122,7 +3191,7 @@
     "Last launched %1": "Lançado pela última vez em %1"
   },
   "Last launched %1 day ago": {
-    "Last launched %1 day ago": ""
+    "Last launched %1 day ago": "Lançado pela última vez %1 dia atrás"
   },
   "Last launched %1 day%2 ago": {
     "Last launched %1 day%2 ago": "Lançado pela última vez %1 dia%2 atrás"
@@ -3191,7 +3260,7 @@
     "Left Section": "Seção da Esquerda"
   },
   "Light Direction": {
-    "Light Direction": ""
+    "Light Direction": "Direção da Luz"
   },
   "Light Mode": {
     "Light Mode": "Modo Claro"
@@ -3288,6 +3357,9 @@
   },
   "Lock fade grace period": {
     "Lock fade grace period": "Período de carência de fade de bloqueio"
+  },
+  "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
   "Locked": {
     "Locked": "Bloqueado"
@@ -3432,6 +3504,9 @@
   },
   "Maximum Pinned Entries": {
     "Maximum Pinned Entries": "Máximo de Entradas Fixadas"
+  },
+  "Maximum fingerprint attempts reached. Please use password.": {
+    "Maximum fingerprint attempts reached. Please use password.": ""
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "Número máximo de entradas da área de transferência para guardar"
@@ -3878,7 +3953,7 @@
     "No variants created. Click Add to create a new monitor widget.": "Nenhuma variante criada. Clique Adicionar para criar um novo widget de monitor."
   },
   "No video found in folder": {
-    "No video found in folder": ""
+    "No video found in folder": "Nenhum vídeo encontrado na pasta"
   },
   "No wallpapers": {
     "No wallpapers": ""
@@ -3914,7 +3989,7 @@
     "Not available": "Indisponível"
   },
   "Not available — install fprintd and enroll fingerprints.": {
-    "Not available — install fprintd and enroll fingerprints.": ""
+    "Not available — install fprintd and enroll fingerprints.": "Não disponível — instale fprintd e cadastre as impressões digitais."
   },
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": ""
@@ -3929,7 +4004,7 @@
     "Not available — install or configure pam_u2f.": ""
   },
   "Not available — install pam_u2f and enroll keys.": {
-    "Not available — install pam_u2f and enroll keys.": ""
+    "Not available — install pam_u2f and enroll keys.": "Não disponível — instale pam_u2f e cadastre as chaves."
   },
   "Not connected": {
     "Not connected": "Não conectado"
@@ -4190,7 +4265,7 @@
     "Paste": "Colar"
   },
   "Path to a video file or folder containing videos": {
-    "Path to a video file or folder containing videos": ""
+    "Path to a video file or folder containing videos": "Caminho para um arquivo de vídeo ou pasta de vídeos"
   },
   "Pattern": {
     "Pattern": "Padrão"
@@ -4315,7 +4390,7 @@
     "Place plugins in %1": "Coloque plugins em %1"
   },
   "Placeholder text for manual printer address input": {
-    "IP address or hostname": ""
+    "IP address or hostname": "Endereço de IP ou nome do host"
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
@@ -4546,7 +4621,7 @@
     "Protocol": "Protocolo"
   },
   "QtMultimedia is not available": {
-    "QtMultimedia is not available": ""
+    "QtMultimedia is not available": "QtMultimedia não está disponível"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": ""
@@ -4612,16 +4687,19 @@
     "Reload Plugin": "Reiniciar Plugin"
   },
   "Remaining": {
-    "Remaining": ""
+    "Remaining": "Restante"
   },
   "Remaining / Total": {
-    "Remaining / Total": ""
+    "Remaining / Total": "Restante / Total"
+  },
+  "Remember Last Query": {
+    "Remember Last Query": ""
   },
   "Remember last session": {
-    "Remember last session": ""
+    "Remember last session": "Lembrar última sessão"
   },
   "Remember last user": {
-    "Remember last user": ""
+    "Remember last user": "Lembrar último usuário"
   },
   "Remove": {
     "Remove": "Remover"
@@ -4664,6 +4742,9 @@
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "Requer o compositor DWL"
+  },
+  "Requires a newer version of Quickshell": {
+    "Requires a newer version of Quickshell": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Requer suporte a modo noturno"
@@ -5592,14 +5673,23 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Parâmetros adicionais para o terminal"
   },
+  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": ""
+  },
+  "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": ""
   },
   "Terminal multiplexer backend to use": {
     "Terminal multiplexer backend to use": ""
+  },
+  "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": ""
@@ -5734,7 +5824,7 @@
     "Today": "Hoje"
   },
   "Toggle button to manually add a printer by IP or hostname": {
-    "Add by Address": ""
+    "Add by Address": "Adicionar por Endereço"
   },
   "Toggle button to scan for printers via mDNS/Avahi": {
     "Discover Devices": ""
@@ -5753,6 +5843,9 @@
   },
   "Toner Low": {
     "Toner Low": "Toner Baixo"
+  },
+  "Too many attempts - locked out": {
+    "Too many attempts - locked out": ""
   },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": ""
@@ -5783,6 +5876,9 @@
   },
   "Total Jobs": {
     "Total Jobs": "Total de Trabalhos"
+  },
+  "Touch your security key...": {
+    "Touch your security key...": ""
   },
   "Transform": {
     "Transform": "Transformar"
@@ -6387,14 +6483,14 @@
     "by %1": "por %1"
   },
   "bar manual shadow direction": {
-    "Manual Direction": ""
+    "Manual Direction": "Direção Manual"
   },
   "bar shadow direction source": {
     "Direction Source": ""
   },
   "bar shadow direction source option": {
     "Inherit Global (Default)": "",
-    "Manual": ""
+    "Manual": "Manual"
   },
   "bar shadow direction source option | shadow direction option": {
     "Auto (Bar-aware)": ""
@@ -6423,6 +6519,21 @@
   },
   "bluetooth status | lock screen notification mode option": {
     "Disabled": "Desativado"
+  },
+  "blur border color | button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
+  "blur border color | button color option | color option | secondary color | tile color option": {
+    "Secondary": ""
+  },
+  "blur border color | outline color": {
+    "Outline": ""
+  },
+  "blur border color | shadow color option": {
+    "Text Color": ""
+  },
+  "blur border color | shadow color option | theme category option": {
+    "Custom": ""
   },
   "border color": {
     "Color": "Cor"
@@ -6602,7 +6713,7 @@
     "files": "arquivos"
   },
   "fingerprint not detected status | security key not detected status": {
-    "Not enrolled": ""
+    "Not enrolled": "Não cadastrado"
   },
   "generic theme description": {
     "Material Design inspired color themes": "Temas de cor inspirados no Material Design"
@@ -6646,9 +6757,9 @@
     "No warnings": "Sem avisos"
   },
   "greeter doctor page error count": {
-    "%1 issue found": "",
+    "%1 issue found": "%1 problema encontrado",
     "%1 issue(s) found": "%1 problema(s) encontrado(s)",
-    "%1 issues found": ""
+    "%1 issues found": "%1 problemas encontrados"
   },
   "greeter doctor page loading text": {
     "Analyzing configuration...": "Analisando configuração..."

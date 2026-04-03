@@ -105,7 +105,7 @@
     "%1m ago": "%1 min fa"
   },
   "(Unnamed)": {
-    "(Unnamed)": "(Senza Nome)"
+    "(Unnamed)": "(Senza nome)"
   },
   "+ %1 more": {
     "+ %1 more": "+ %1 altre"
@@ -330,7 +330,7 @@
     "Adjust volume per scroll indent": "Regola volume per scatto rotellina"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Regola il contrasto dei colori generati (-100 = minimo, 0 = standard, 100 = massimo)"
   },
   "Advanced": {
     "Advanced": "Avanzate"
@@ -424,6 +424,9 @@
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Applica una temperatura colore più calda per ridurre l'affaticamento visivo. Usa le impostazioni di automazione qui sotto per controllare quando attivarla."
+  },
+  "Applying authentication changes…": {
+    "Applying authentication changes…": ""
   },
   "Apps": {
     "Apps": "App"
@@ -524,13 +527,25 @@
     "Authenticate": "Autenticati"
   },
   "Authenticating...": {
-    "Authenticating...": "Autenticazione in Corso..."
+    "Authenticating...": "Autenticazione in corso..."
   },
   "Authentication": {
     "Authentication": "Autenticazione"
   },
   "Authentication Required": {
     "Authentication Required": "Autenticazione Richiesta"
+  },
+  "Authentication changes applied.": {
+    "Authentication changes applied.": ""
+  },
+  "Authentication changes apply automatically.": {
+    "Authentication changes apply automatically.": ""
+  },
+  "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+  },
+  "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
   },
   "Authentication error - try again": {
     "Authentication error - try again": "Errore di autenticazione - riprova"
@@ -569,7 +584,7 @@
     "Auto-close Niri overview when launching apps.": "Chiudi automaticamente la panoramica di Niri all'avvio delle app."
   },
   "Auto-hide": {
-    "Auto-hide": "Nascondi automaticamente"
+    "Auto-hide": "Nascondi Automaticamente"
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "Nascondi Automaticamente la Dock"
@@ -585,6 +600,9 @@
   },
   "Autoconnect enabled": {
     "Autoconnect enabled": "Connessione automatica abilitata"
+  },
+  "Autofill last remembered query when opened": {
+    "Autofill last remembered query when opened": ""
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "Modalità Colore Automatica"
@@ -652,8 +670,14 @@
   "Background": {
     "Background": "Sfondo"
   },
+  "Background Blur": {
+    "Background Blur": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Opacità dello Sfondo"
+  },
+  "Background authentication sync failed. Trying terminal mode.": {
+    "Background authentication sync failed. Trying terminal mode.": ""
   },
   "Backlight device": {
     "Backlight device": "Dispositivo di retroilluminazione"
@@ -730,11 +754,20 @@
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth non disponibile"
   },
+  "Blur Border Color": {
+    "Blur Border Color": ""
+  },
+  "Blur Border Opacity": {
+    "Blur Border Opacity": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Sfoca il Livello dello Sfondo"
   },
   "Blur on Overview": {
     "Blur on Overview": "Sfocatura su Panoramica"
+  },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Sfoca lo sfondo quando la panoramica di niri è aperta"
@@ -753,6 +786,9 @@
   },
   "Border Thickness": {
     "Border Thickness": "Spessore Bordo"
+  },
+  "Border color around blurred surfaces": {
+    "Border color around blurred surfaces": ""
   },
   "Border with BG": {
     "Border with BG": "Bordo con Sfondo"
@@ -900,6 +936,9 @@
   },
   "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
     "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": "Controlla lo stato di sincronizzazione su richiesta. Sincronizza copia il tema, le impostazioni, la configurazione PAM e lo sfondo nella schermata di blocco in un solo passaggio. È necessario eseguire Sincronizza per applicare le modifiche."
+  },
+  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": "Controllo aggiornamenti..."
@@ -1448,7 +1487,10 @@
     "DEMO MODE - Click anywhere to exit": "MODALITÀ DEMO - Fai clic ovunque per uscire"
   },
   "DMS Plugin Manager Unavailable": {
-    "DMS Plugin Manager Unavailable": "Gestore Plugin DMS non disponibile"
+    "DMS Plugin Manager Unavailable": "Gestore Plugin DMS non Disponibile"
+  },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": "Il greeter DMS richiede: greetd, dms-greeter. Impronte digitali: fprintd, pam_fprintd. Chiavi di sicurezza: pam_u2f. Aggiungi il tuo utente al gruppo greeter. La sincronizzazione controlla prima sudo e apre un terminale se è richiesta l'autenticazione interattiva."
@@ -1625,7 +1667,7 @@
     "Digital": "Digitale"
   },
   "Disable Autoconnect": {
-    "Disable Autoconnect": "Disattiva autoconn."
+    "Disable Autoconnect": "Disattiva Autoconn."
   },
   "Disable Clipboard Manager": {
     "Disable Clipboard Manager": "Disabilita Gestore Appunti"
@@ -1835,7 +1877,7 @@
     "Enable 10-bit color depth for wider color gamut and HDR support": "Abilita profondità colore a 10 bit per una gamma cromatica più ampia e supporto HDR"
   },
   "Enable Autoconnect": {
-    "Enable Autoconnect": "Abilita connessione automatica"
+    "Enable Autoconnect": "Attiva Autoconn."
   },
   "Enable Bar": {
     "Enable Bar": "Abilita Barra"
@@ -1885,6 +1927,9 @@
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "Abilita autenticazione tramite impronta digitale"
   },
+  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
+  },
   "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
     "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": "Abilita impronta digitale o chiave di sicurezza per il Greeter DMS. Esegui Sincronizza per applicare e configurare PAM."
   },
@@ -1924,11 +1969,17 @@
   "Enabled, but no fingerprint reader was detected.": {
     "Enabled, but no fingerprint reader was detected.": "Attivato, ma non è stato rilevato nessun lettore di impronte digitali."
   },
+  "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+  },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": "Attivato, ma nessuna impronta è ancora registrata. Registra le impronte ed esegui Sincronizza."
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": "Attivato, ma nessuna impronta è ancora registrata. Registra le impronte per utilizzarlo."
+  },
+  "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": "Attivato, ma nessuna chiave di sicurezza registrata trovata. Registra una chiave ed esegui Sincronizza."
@@ -2278,6 +2329,15 @@
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": "La disponibilità dell'impronta digitale non ha potuto essere confermata."
   },
+  "Fingerprint error": {
+    "Fingerprint error": ""
+  },
+  "Fingerprint error: %1": {
+    "Fingerprint error: %1": ""
+  },
+  "Fingerprint not recognized (%1/%2). Please try again or use password.": {
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+  },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "Lettore di impronte rilevato, ma nessuna impronta è ancora registrata. Puoi abilitarlo ora e registrare le impronte in seguito."
   },
@@ -2294,7 +2354,7 @@
     "Fix Now": "Correggi Ora"
   },
   "Fixing...": {
-    "Fixing...": "Correzione in Corso..."
+    "Fixing...": "Correzione in corso..."
   },
   "Flags": {
     "Flags": "Flag"
@@ -2343,6 +2403,9 @@
   },
   "Folders": {
     "Folders": "Cartelle"
+  },
+  "Follow DMS background color": {
+    "Follow DMS background color": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Segui lo Schermo Attivo"
@@ -2441,7 +2504,7 @@
     "GPU Temperature": "Temperatura GPU"
   },
   "GPU temperature display": {
-    "GPU temperature display": "Visualizzazione temperatura GPU"
+    "GPU temperature display": "Mostra Temperatura GPU"
   },
   "Games": {
     "Games": "Giochi"
@@ -2785,6 +2848,9 @@
   "Incorrect password - next failures may trigger account lockout": {
     "Incorrect password - next failures may trigger account lockout": "Password errata - ulteriori errori potrebbero bloccare l'account"
   },
+  "Incorrect password - try again": {
+    "Incorrect password - try again": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Stile Indicatore"
   },
@@ -2805,6 +2871,9 @@
   },
   "Input Volume Slider": {
     "Input Volume Slider": "Slider Volume di Input"
+  },
+  "Insert your security key...": {
+    "Insert your security key...": ""
   },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": "Installazione completata. Il Greeter è stato installato."
@@ -3164,7 +3233,7 @@
     "Launch on dGPU": "Avvia su dGPU"
   },
   "Launch on dGPU by default": {
-    "Launch on dGPU by default": ""
+    "Launch on dGPU by default": "Avvia sulla GPU dedicata per impostazione predefinita"
   },
   "Launcher": {
     "Launcher": "Launcher"
@@ -3230,7 +3299,7 @@
     "Loading codecs...": "Caricamento codec in corso..."
   },
   "Loading keybinds...": {
-    "Loading keybinds...": "Caricamento Scorciatoie..."
+    "Loading keybinds...": "Caricamento scorciatoie..."
   },
   "Loading overlay subtitle": {
     "This may take a few seconds": "L'operazione potrebbe richiedere alcuni secondi"
@@ -3288,6 +3357,9 @@
   },
   "Lock fade grace period": {
     "Lock fade grace period": "Periodo di attesa per la dissolvenza al blocco"
+  },
+  "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
   "Locked": {
     "Locked": "Bloccato"
@@ -3374,7 +3446,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Ombre e rilievi ispirati al Material Design su modali, popup e finestre di dialogo"
   },
   "Matugen Contrast": {
-    "Matugen Contrast": ""
+    "Matugen Contrast": "Contrasto Matugen"
   },
   "Matugen Palette": {
     "Matugen Palette": "Tavolozza Matugen"
@@ -3432,6 +3504,9 @@
   },
   "Maximum Pinned Entries": {
     "Maximum Pinned Entries": "Numero Massimo di Voci Fissate"
+  },
+  "Maximum fingerprint attempts reached. Please use password.": {
+    "Maximum fingerprint attempts reached. Please use password.": ""
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "Numero massimo di voci degli appunti da conservare"
@@ -4172,7 +4247,7 @@
     "Pairing failed": "Impossibile associare"
   },
   "Pairing...": {
-    "Pairing...": "Associazione in Corso..."
+    "Pairing...": "Associazione in corso..."
   },
   "Partly Cloudy": {
     "Partly Cloudy": "Parzialmente Nuvoloso"
@@ -4617,6 +4692,9 @@
   "Remaining / Total": {
     "Remaining / Total": "Rimanente/Totale"
   },
+  "Remember Last Query": {
+    "Remember Last Query": ""
+  },
   "Remember last session": {
     "Remember last session": "Ricorda l'ultima sessione"
   },
@@ -4664,6 +4742,9 @@
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "Richiede compositor DWL"
+  },
+  "Requires a newer version of Quickshell": {
+    "Requires a newer version of Quickshell": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Richiede il supporto alla modalità notturna"
@@ -5592,14 +5673,23 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Parametri aggiuntivi personalizzati terminale"
   },
+  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Terminale di ripiego fallito. Installa uno degli emulatori di terminale supportati o esegui \"dms greeter sync\" manualmente."
+  },
+  "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": "Terminale di ripiego aperto. Completa la sincronizzazione lì; si chiuderà automaticamente al termine."
   },
   "Terminal multiplexer backend to use": {
     "Terminal multiplexer backend to use": "Backend multiplexer del terminale da usare"
+  },
+  "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": "Terminale aperto. Completa l'autenticazione per la sincronizzazione lì; si chiuderà automaticamente al termine."
@@ -5754,6 +5844,9 @@
   "Toner Low": {
     "Toner Low": "Toner in Esaurimento"
   },
+  "Too many attempts - locked out": {
+    "Too many attempts - locked out": ""
+  },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": "Troppi tentativi falliti - l'account potrebbe essere bloccato"
   },
@@ -5783,6 +5876,9 @@
   },
   "Total Jobs": {
     "Total Jobs": "Stampe Totali"
+  },
+  "Touch your security key...": {
+    "Touch your security key...": ""
   },
   "Transform": {
     "Transform": "Trasforma"
@@ -6423,6 +6519,21 @@
   },
   "bluetooth status | lock screen notification mode option": {
     "Disabled": "Disattivato"
+  },
+  "blur border color | button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
+  "blur border color | button color option | color option | secondary color | tile color option": {
+    "Secondary": ""
+  },
+  "blur border color | outline color": {
+    "Outline": ""
+  },
+  "blur border color | shadow color option": {
+    "Text Color": ""
+  },
+  "blur border color | shadow color option | theme category option": {
+    "Custom": ""
   },
   "border color": {
     "Color": "Colore"

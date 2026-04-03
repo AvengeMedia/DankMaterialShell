@@ -1,6 +1,6 @@
 {
   "%1 Animation Speed": {
-    "%1 Animation Speed": "מהירות אנימציה %1"
+    "%1 Animation Speed": "מהירות האנימציה ב%1"
   },
   "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
     "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 קיצורי DMS עשויים להידרס על ידי קיצורי config שמגיעים אחרי ה-include."
@@ -267,7 +267,7 @@
     "Activate": "הפעל/י"
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
-    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "האם להפעיל את הGreeter של DMS? מסוף ייפתח לאימות עם sudo. הרץ/י את הסנכרון לאחר ההפעלה כדי להחיל את ההגדרות שלך."
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "האם להפעיל את מסך ההתחברות של DMS? מסוף ייפתח לאימות עם sudo. הרץ/י את הסנכרון לאחר ההפעלה כדי להחיל את ההגדרות שלך."
   },
   "Activation": {
     "Activation": "הפעלה"
@@ -330,7 +330,7 @@
     "Adjust volume per scroll indent": "התאמת עוצמה לכל הזחת גלילה"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "כוונן/י את הניגודיות של הצבעים שנוצרו (100- = מינימום, 0 = סטנדרטי, 100 = מקסימום)"
   },
   "Advanced": {
     "Advanced": "מתקדם"
@@ -387,7 +387,7 @@
     "Animation Duration": "משך זמן לאנימציה"
   },
   "Animation Speed": {
-    "Animation Speed": "מהירות אנימציה"
+    "Animation Speed": "מהירות האנימציה"
   },
   "Anonymous Identity": {
     "Anonymous Identity": "זהות אנונימית"
@@ -425,6 +425,9 @@
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "הגדרת טמפרטורת צבע חמה כדי להפחית מאמץ בעיניים. השתמש/י בהגדרות האוטומציה למטה כדי לשלוט מתי ההגדרה מופעלת."
   },
+  "Applying authentication changes…": {
+    "Applying authentication changes…": ""
+  },
   "Apps": {
     "Apps": "אפליקציות"
   },
@@ -435,7 +438,7 @@
     "Apps Dock Settings": "הגדרות לאפליקציות Dock"
   },
   "Apps Icon": {
-    "Apps Icon": "סמל אפליקציות"
+    "Apps Icon": "סמל האפליקציות"
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "האפליקציות ממוינות לפי תדירות השימוש, אחר כך לפי שימוש אחרון ולבסוף לפי סדר אלפביתי."
@@ -532,6 +535,18 @@
   "Authentication Required": {
     "Authentication Required": "נדרש אימות"
   },
+  "Authentication changes applied.": {
+    "Authentication changes applied.": ""
+  },
+  "Authentication changes apply automatically.": {
+    "Authentication changes apply automatically.": ""
+  },
+  "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+  },
+  "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
+  },
   "Authentication error - try again": {
     "Authentication error - try again": "שגיאת אימות - נסה/י שנית"
   },
@@ -585,6 +600,9 @@
   },
   "Autoconnect enabled": {
     "Autoconnect enabled": "התחברות אוטומטית מופעלת"
+  },
+  "Autofill last remembered query when opened": {
+    "Autofill last remembered query when opened": ""
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "מצב צבע אוטומטי"
@@ -652,8 +670,14 @@
   "Background": {
     "Background": "רקע"
   },
+  "Background Blur": {
+    "Background Blur": ""
+  },
   "Background Opacity": {
     "Background Opacity": "שקיפות רקע"
+  },
+  "Background authentication sync failed. Trying terminal mode.": {
+    "Background authentication sync failed. Trying terminal mode.": ""
   },
   "Backlight device": {
     "Backlight device": "התקן תאורה אחורית"
@@ -730,11 +754,20 @@
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth אינו זמין"
   },
+  "Blur Border Color": {
+    "Blur Border Color": ""
+  },
+  "Blur Border Opacity": {
+    "Blur Border Opacity": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "שכבת טשטוש לתמונת הרקע"
   },
   "Blur on Overview": {
     "Blur on Overview": "טשטוש בסקירה"
+  },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "טשטש/י את הרקע כאשר הסקירה של Niri פתוחה"
@@ -753,6 +786,9 @@
   },
   "Border Thickness": {
     "Border Thickness": "עובי המסגרת"
+  },
+  "Border color around blurred surfaces": {
+    "Border color around blurred surfaces": ""
   },
   "Border with BG": {
     "Border with BG": "מסגרת עם רקע"
@@ -900,6 +936,9 @@
   },
   "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
     "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": "בדוק/בדקי את סטטוס הסנכרון לפי דרישה. הסנכרון מעתיק את ערכת הנושא, ההגדרות, תצורת PAM ותמונת הרקע שלך למסך ההתחברות בפעולה אחת. חובה להריץ סנכרון כדי להחיל שינויים."
+  },
+  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": "בודק עדכונים..."
@@ -1450,8 +1489,11 @@
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "מנהל התוספים של DMS אינו זמין"
   },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+  },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
-    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": "הGreeter של DMS דורש את החבילות הבאות: greetd ו dms-greeter (חובה), fprintd ו pam_fprintd (בשביל הזדהות עם טביעת אצבע) ולסיום, pam_u2f (בשביל הזדהות עם מפתחות אבטחה). לאחר התקנת החבילות, הוסף/הוסיפי את המשתמש שלך לקבוצת המערכת greeter ולחץ/י על סנכרון למעלה. במהלך סנכרון, נבדקות ההרשאות לsudo ונפתח חלון מסוף כשנדרש אימות אינטראקטיבי."
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": "מסך ההתחברות של DMS דורש את החבילות הבאות: greetd ו dms-greeter (חובה), fprintd ו pam_fprintd (בשביל הזדהות עם טביעת אצבע) ולסיום, pam-u2f (בשביל הזדהות עם מפתחות אבטחה). לאחר התקנת החבילות, הוסף/הוסיפי את המשתמש שלך לקבוצת המערכת greeter ולחץ/י על סנכרון למעלה. במהלך סנכרון, נבדקות ההרשאות לsudo ונפתח חלון מסוף כשנדרש אימות אינטראקטיבי."
   },
   "DMS out of date": {
     "DMS out of date": "הDMS לא מעודכן"
@@ -1885,8 +1927,11 @@
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "הפעלת אימות באמצעות טביעת אצבע"
   },
+  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
+  },
   "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
-    "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": "הפעל/י הזדהות באמצעות טביעת אצבע או מפתח אבטחה עבור DMS Greeter. הרץ/י סנכרון כדי להחיל ולהגדיר את PAM."
+    "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": "הפעל/י הזדהות באמצעות טביעת אצבע או מפתח אבטחה במסך ההתחברות של DMS. הרץ/י סנכרון כדי להחיל ולהגדיר את PAM."
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "הפעלת האינטגרציה עם loginctl"
@@ -1924,11 +1969,17 @@
   "Enabled, but no fingerprint reader was detected.": {
     "Enabled, but no fingerprint reader was detected.": "מופעל, אך לא זוהה קורא טביעות אצבע."
   },
+  "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+  },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": "מופעל, אך אין טביעות אצבע רשומות עדיין. רשום/י טביעות אצבע והרץ/י את הסנכרון."
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": "מופעל, אך אין טביעות אצבע רשומות עדיין.  רשום/י טביעות אצבע כדי להשתמש בהם להזדהות."
+  },
+  "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": "מופעל, אך לא נמצא מפתח אבטחה רשום עדיין. רשום/י מפתח והרץ/י את הסנכרון."
@@ -2278,6 +2329,15 @@
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": "לא ניתן היה לאשר את זמינות טביעת האצבע."
   },
+  "Fingerprint error": {
+    "Fingerprint error": ""
+  },
+  "Fingerprint error: %1": {
+    "Fingerprint error: %1": ""
+  },
+  "Fingerprint not recognized (%1/%2). Please try again or use password.": {
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+  },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "זוהה קורא טביעות אצבע, אך אין טביעות אצבע רשומות עדיין. ניתן להפעיל את ההזדהות כעת ולרשום את הטביעות מאוחר יותר."
   },
@@ -2343,6 +2403,9 @@
   },
   "Folders": {
     "Folders": "תיקיות"
+  },
+  "Follow DMS background color": {
+    "Follow DMS background color": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "מעקב אחרי המסך הממוקד"
@@ -2489,28 +2552,28 @@
     "Graphics": "גרפיקה"
   },
   "Greeter": {
-    "Greeter": "Greeter"
+    "Greeter": "מסך ההתחברות"
   },
   "Greeter Appearance": {
-    "Greeter Appearance": "מראה הGreeter"
+    "Greeter Appearance": "המראה של מסך ההתחברות"
   },
   "Greeter Behavior": {
-    "Greeter Behavior": "התנהגות הGreeter"
+    "Greeter Behavior": "התנהגות מסך ההתחברות"
   },
   "Greeter Status": {
-    "Greeter Status": "מצב הGreeter"
+    "Greeter Status": "מצב מסך ההתחברות"
   },
   "Greeter activated. greetd is now enabled.": {
-    "Greeter activated. greetd is now enabled.": "Greeter הופעל. greetd מופעל כעת."
+    "Greeter activated. greetd is now enabled.": "מסך ההתחברות הופעל. greetd פועל כעת כמנהל התצוגה."
   },
   "Greeter font": {
-    "Greeter font": "גופן הGreeter"
+    "Greeter font": "גופן מסך ההתחברות"
   },
   "Greeter only — does not affect main clock": {
-    "Greeter only — does not affect main clock": "בGreeter בלבד — ללא השפעה על השעון הראשי"
+    "Greeter only — does not affect main clock": "במסך ההתחברות בלבד - ללא השפעה על השעון הראשי"
   },
   "Greeter only — format for the date on the login screen": {
-    "Greeter only — format for the date on the login screen": "בGreeter בלבד — תבנית לתאריך במסך הכניסה"
+    "Greeter only — format for the date on the login screen": "במסך ההתחברות בלבד - תבנית לתאריך שמופיע בכניסה"
   },
   "Grid": {
     "Grid": "רשת"
@@ -2651,7 +2714,7 @@
     "Highlight the currently focused app inside workspace indicators": "הדגש/י את האפליקציה הממוקדת כעת בתוך מחווני סביבת העבודה"
   },
   "History Settings": {
-    "History Settings": "הגדרות של היסטוריית ההתראות"
+    "History Settings": "ההגדרות של היסטוריית ההתראות"
   },
   "History cleared. %1 pinned entries kept.": {
     "History cleared. %1 pinned entries kept.": "ההיסטוריה נוקתה. %1 רשומות מוצמדות נשמרו."
@@ -2785,6 +2848,9 @@
   "Incorrect password - next failures may trigger account lockout": {
     "Incorrect password - next failures may trigger account lockout": "סיסמה שגויה - כשלונות נוספים עלולים לגרום לנעילת החשבון"
   },
+  "Incorrect password - try again": {
+    "Incorrect password - try again": ""
+  },
   "Indicator Style": {
     "Indicator Style": "סגנון מחוון"
   },
@@ -2806,17 +2872,20 @@
   "Input Volume Slider": {
     "Input Volume Slider": "מחוון עוצמת קלט"
   },
+  "Insert your security key...": {
+    "Insert your security key...": ""
+  },
   "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "ההתקנה הושלמה. Greeter הותקן."
+    "Install complete. Greeter has been installed.": "ההתקנה הושלמה. מסך ההתחברות הותקן."
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "התקן/י תוספים ממאגר התוספים של DMS"
   },
   "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "להתקין את הGreeter של DMS? ייפתח מסוף לאימות עם sudo."
+    "Install the DMS greeter? A terminal will open for sudo authentication.": "להתקין את מסך ההתחברות של DMS? ייפתח מסוף לאימות עם sudo."
   },
   "Installation and PAM setup: see the ": {
-    "Installation and PAM setup: see the ": "להתקנה והגדרת PAM: ראה/י את "
+    "Installation and PAM setup: see the ": "להתקנה והגדרה של PAM: ראה/י את "
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "הסתרה אוטומטית חכמה"
@@ -3049,7 +3118,7 @@
     "Unpair": "בטל/י צימוד"
   },
   "Keep Awake": {
-    "Keep Awake": "השאר/י ער"
+    "Keep Awake": "מניעת שינה"
   },
   "Keep Changes": {
     "Keep Changes": "שמור/י שינויים"
@@ -3164,7 +3233,7 @@
     "Launch on dGPU": "הפעל/י על dGPU"
   },
   "Launch on dGPU by default": {
-    "Launch on dGPU by default": ""
+    "Launch on dGPU by default": "הפעל/י על הdGPU כברירת מחדל"
   },
   "Launcher": {
     "Launcher": "משגר"
@@ -3182,7 +3251,7 @@
     "Layout Overrides": "דריסות פריסה"
   },
   "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": {
-    "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": "פריסה ומיקומי מודולים בGreeter מסונכרנים מהמעטפת שלך (לדוגמה, הגדרות הסרגל). הרץ/י סנכרון כדי להחיל."
+    "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": "פריסה ומיקומי מודולים במסך ההתחברות מסונכרנים מהמעטפת שלך (לדוגמה, הגדרות הסרגל). הרץ/י סנכרון כדי להחיל."
   },
   "Left": {
     "Left": "שמאל"
@@ -3266,10 +3335,10 @@
     "Lock": "נעילה"
   },
   "Lock Screen": {
-    "Lock Screen": "מסך נעילה"
+    "Lock Screen": "מסך הנעילה"
   },
   "Lock Screen Display": {
-    "Lock Screen Display": "תצוגת מסך נעילה"
+    "Lock Screen Display": "תצוגת מסך הנעילה"
   },
   "Lock Screen Format": {
     "Lock Screen Format": "תבנית מסך הנעילה"
@@ -3278,7 +3347,7 @@
     "Lock Screen behaviour": "התנהגות מסך הנעילה"
   },
   "Lock Screen layout": {
-    "Lock Screen layout": "פריסת מסך נעילה"
+    "Lock Screen layout": "פריסת מסך הנעילה"
   },
   "Lock at startup": {
     "Lock at startup": "נעילה בעת ההפעלה"
@@ -3288,6 +3357,9 @@
   },
   "Lock fade grace period": {
     "Lock fade grace period": "תקופת חסד לדהייה של מסך הנעילה"
+  },
+  "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
   "Locked": {
     "Locked": "נעול"
@@ -3299,7 +3371,7 @@
     "Logging in...": "מתחבר..."
   },
   "Login Authentication": {
-    "Login Authentication": "אימות התחברות"
+    "Login Authentication": "הזדהות בכניסה"
   },
   "Long": {
     "Long": "ארוך"
@@ -3374,7 +3446,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "הצללות והגבהה בהשראת Material Design על חלוניות, חלונות קופצים ותיבות דו-שיח"
   },
   "Matugen Contrast": {
-    "Matugen Contrast": ""
+    "Matugen Contrast": "ניגודיות Matugen"
   },
   "Matugen Palette": {
     "Matugen Palette": "פלטת צבעים של Matugen"
@@ -3432,6 +3504,9 @@
   },
   "Maximum Pinned Entries": {
     "Maximum Pinned Entries": "מקסימום רשומות מוצמדות"
+  },
+  "Maximum fingerprint attempts reached. Please use password.": {
+    "Maximum fingerprint attempts reached. Please use password.": ""
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "מספר מקסימלי של רשומות לוח ההעתקה לשמירה"
@@ -3968,7 +4043,7 @@
     "Notification Settings": "הגדרות התראות"
   },
   "Notification Timeouts": {
-    "Notification Timeouts": "זמני תפוגת התראות"
+    "Notification Timeouts": "הקצבת זמן להתראות"
   },
   "Notification toast popups": {
     "Notification toast popups": "התראות קופצות"
@@ -4375,7 +4450,7 @@
     "Popouts": "חלונות קופצים"
   },
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
-    "Popouts and Modals follow global Animation Speed (disable to customize independently)": "חלונות קופצים ומודליים עוקבים אחר מהירות אנימציה גלובלית (השבת/י כדי להתאים אישית באופן עצמאי)"
+    "Popouts and Modals follow global Animation Speed (disable to customize independently)": "חלונות קופצים ומודליים עוקבים אחר מהירות האנימציה הגלובלית (השבת/י כדי להתאים אישית באופן עצמאי)"
   },
   "Popup Position": {
     "Popup Position": "מיקום חלונית קופצת"
@@ -4429,10 +4504,10 @@
     "Power source": "מקור חשמל"
   },
   "Pre-fill the last successful username on the greeter": {
-    "Pre-fill the last successful username on the greeter": "מלא/י מראש את שם המשתמש האחרון שהתחבר בהצלחה בGreeter"
+    "Pre-fill the last successful username on the greeter": "מלא/י מראש את שם המשתמש האחרון שהתחבר בהצלחה במסך ההתחברות"
   },
   "Pre-select the last used session on the greeter": {
-    "Pre-select the last used session on the greeter": "בחר/י מראש את ההפעלה האחרונה שהייתה בשימוש בGreeter"
+    "Pre-select the last used session on the greeter": "בחר/י מראש את ההפעלה האחרונה שהייתה בשימוש במסך ההתחברות"
   },
   "Precip": {
     "Precip": "משקעים"
@@ -4617,6 +4692,9 @@
   "Remaining / Total": {
     "Remaining / Total": "נותר / סה״כ"
   },
+  "Remember Last Query": {
+    "Remember Last Query": ""
+  },
   "Remember last session": {
     "Remember last session": "זכירת ההפעלה האחרונה"
   },
@@ -4664,6 +4742,9 @@
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "קומפוזיטור DWL נדרש"
+  },
+  "Requires a newer version of Quickshell": {
+    "Requires a newer version of Quickshell": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "תמיכה במצב לילה נדרשת"
@@ -4783,7 +4864,7 @@
     "Current Monitor": "המסך הנוכחי"
   },
   "Running greeter sync…": {
-    "Running greeter sync…": "מפעיל סנכרון לGreeter…"
+    "Running greeter sync…": "מריץ סנכרון במסך ההתחברות…"
   },
   "SDR Brightness": {
     "SDR Brightness": "בהירות של SDR"
@@ -4984,7 +5065,7 @@
     "Select font weight for UI text": "בחר/י משקל לגופן שבחרת לטקסט ממשק המשתמש"
   },
   "Select greeter background image": {
-    "Select greeter background image": "בחר/י תמונת רקע לGreeter"
+    "Select greeter background image": "בחר/י תמונת רקע במסך ההתחברות"
   },
   "Select monitor to configure wallpaper": {
     "Select monitor to configure wallpaper": "בחר/י מסך להגדרת הרקע"
@@ -5131,7 +5212,7 @@
     "Show Header": "הצג/י כותרת"
   },
   "Show Hibernate": {
-    "Show Hibernate": "הצג/י את \"שינה עמוקה\""
+    "Show Hibernate": "הצגה של \"שינה עמוקה\""
   },
   "Show Hour Numbers": {
     "Show Hour Numbers": "הצג/י מספרי שעות"
@@ -5152,10 +5233,10 @@
     "Show Location": "הצגת מיקום"
   },
   "Show Lock": {
-    "Show Lock": "הצג/י את \"נעילה\""
+    "Show Lock": "הצגה של \"נעילה\""
   },
   "Show Log Out": {
-    "Show Log Out": "הצג/י את \"התנתקות\""
+    "Show Log Out": "הצגה של \"התנתקות\""
   },
   "Show Material Design ripple animations on interactive elements": {
     "Show Material Design ripple animations on interactive elements": "הצג/י אנימציות של אדוות בעיצוב Material על גבי רכיבים אינטראקטיביים"
@@ -5182,7 +5263,7 @@
     "Show Overflow Badge Count": "הצגת תג עם ספירה לגלישה"
   },
   "Show Power Off": {
-    "Show Power Off": "הצג/י את \"כיבוי\""
+    "Show Power Off": "הצגה של \"כיבוי\""
   },
   "Show Precipitation Probability": {
     "Show Precipitation Probability": "הצג/י סיכוי למשקעים"
@@ -5191,10 +5272,10 @@
     "Show Pressure": "הצג/י לחץ"
   },
   "Show Reboot": {
-    "Show Reboot": "הצג/י את \"הפעלה מחדש\""
+    "Show Reboot": "הצגה של \"הפעלה מחדש\""
   },
   "Show Restart DMS": {
-    "Show Restart DMS": "הצג/י את \"הפעלה מחדש של DMS\""
+    "Show Restart DMS": "הצגה של \"הפעלה מחדש של DMS\""
   },
   "Show Saved Items": {
     "Show Saved Items": "הצג/י פריטים שמורים"
@@ -5206,7 +5287,7 @@
     "Show Sunrise/Sunset": "הצג/י זריחה/שקיעה"
   },
   "Show Suspend": {
-    "Show Suspend": "הצג/י את \"השהיה\""
+    "Show Suspend": "הצגה של \"השהיה\""
   },
   "Show Swap": {
     "Show Swap": "הצג/י Swap"
@@ -5592,14 +5673,23 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "פרמטרים נוספים מותאמים אישית למסוף"
   },
+  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "המעבר למסוף כגיבוי נכשל. התקן/י את אחד מיישומי המסוף הנתמכים או הרץ/י את הפקודה 'dms greeter sync' באופן ידני."
+  },
+  "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": "נפתח מסוף כגיבוי. השלם/השלימי את הסנכרון שם. הוא ייסגר אוטומטית בסיום."
   },
   "Terminal multiplexer backend to use": {
-    "Terminal multiplexer backend to use": "backend של מרבב המסוף שברצונך להשתמש בו"
+    "Terminal multiplexer backend to use": "הbackend של מרבב המסוף שברצונך להשתמש בו"
+  },
+  "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": "המסוף נפתח. השלם/השלימי את אימות הסנכרון שם. הוא ייסגר אוטומטית בסיום."
@@ -5754,6 +5844,9 @@
   "Toner Low": {
     "Toner Low": "הטונר עומד להסתיים"
   },
+  "Too many attempts - locked out": {
+    "Too many attempts - locked out": ""
+  },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": "יותר מדי ניסיונות כושלים - החשבון עלול להינעל"
   },
@@ -5783,6 +5876,9 @@
   },
   "Total Jobs": {
     "Total Jobs": "סה״כ עבודות"
+  },
+  "Touch your security key...": {
+    "Touch your security key...": ""
   },
   "Transform": {
     "Transform": "שינוי"
@@ -5863,10 +5959,10 @@
     "Uninstall Plugin": "הסר/י תוסף"
   },
   "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "ההסרה הושלמה. Greeter הוסר."
+    "Uninstall complete. Greeter has been removed.": "ההסרה הושלמה. מסך ההתחברות הוסר."
   },
   "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "להסיר את הGreeter של DMS? זה יסיר את ההגדרות וישחזר את מנהל התצוגה הקודם שלך. ייפתח חלון מסוף לאימות עם sudo."
+    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "להסיר את מסך ההתחברות של DMS? זה יסיר את ההגדרות וישחזר את מנהל התצוגה הקודם שלך. ייפתח חלון מסוף לאימות עם sudo."
   },
   "Unknown": {
     "Unknown": "לא ידוע"
@@ -6330,7 +6426,7 @@
     "Workspace Padding": "ריווח סביבת העבודה"
   },
   "Workspace Settings": {
-    "Workspace Settings": "הגדרות סביבת העבודה"
+    "Workspace Settings": "הגדרות סביבות העבודה"
   },
   "Workspace Switcher": {
     "Workspace Switcher": "מחליף סביבות העבודה"
@@ -6423,6 +6519,21 @@
   },
   "bluetooth status | lock screen notification mode option": {
     "Disabled": "מושבת"
+  },
+  "blur border color | button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
+  "blur border color | button color option | color option | secondary color | tile color option": {
+    "Secondary": ""
+  },
+  "blur border color | outline color": {
+    "Outline": ""
+  },
+  "blur border color | shadow color option": {
+    "Text Color": ""
+  },
+  "blur border color | shadow color option | theme category option": {
+    "Custom": ""
   },
   "border color": {
     "Color": "צבע"
@@ -6526,7 +6637,7 @@
     "Write:": "כתיבה:"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms היא מעטפת שולחן עבודה מודרנית וניתנת להתאמה אישית גבוהה עם עיצוב <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">בהשראת Material Design 3</a>.<br /><br/>היא בנויה עם <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, מסגרת QT6 לבניית מעטפות לשולחן העבודה, ו<a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, כשפת התכנות."
+    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "הפרויקט DMS הוא מעטפת שולחן עבודה מודרנית וניתנת להתאמה אישית עם עיצוב בהשראת <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material Design 3</a> של גוגל.<br /><br/>היא נבנתה עם שפת התכנות <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a> ו<a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, ספריית QT6 לבניית מעטפות לשולחן העבודה."
   },
   "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
     "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": "dms/binds.kdl קיים אך אינו כלול בconfig.kdl. קיצורי מקלדת מותאמים אישית לא יעבדו עד שהבעיה תתוקן."
@@ -6611,9 +6722,9 @@
     "GPU Monitoring": "ניטור GPU"
   },
   "greeter action confirmation": {
-    "Activate Greeter": "הפעל/י את הGreeter",
-    "Install Greeter": "התקן/י את הGreeter",
-    "Uninstall Greeter": "הסר/י את הGreeter"
+    "Activate Greeter": "הפעל/י את מסך ההתחברות",
+    "Install Greeter": "התקן/י את מסך ההתחברות",
+    "Uninstall Greeter": "הסר/י את מסך ההתחברות"
   },
   "greeter back button": {
     "Back": "חזרה"
@@ -6676,7 +6787,7 @@
     "Colors from wallpaper": "צבעים מתמונת רקע",
     "Community themes": "ערכות נושא קהילתיות",
     "Extensible architecture": "ארכיטקטורה ניתנת להרחבה",
-    "GTK, Qt, IDEs, more": "GTK, Qt, סביבות פיתוח, ועוד",
+    "GTK, Qt, IDEs, more": "Qt, GTK, סביבות פיתוח, ועוד",
     "Modular widget bar": "פס ווידג׳טים מודולרי",
     "Night mode & gamma": "מצב לילה וגאמה",
     "Per-screen config": "הגדרה לכל מסך",
@@ -6743,7 +6854,7 @@
     "Skip setup": "דלג/י על ההתקנה"
   },
   "greeter status error": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "הפעלת 'dms greeter status' נכשלה. ודא/י שDMS מותקן ו-dms נמצא בPATH."
+    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "הרצת הפקודה 'dms greeter status' נכשלה. ודא/י שDMS מותקן ו-dms נמצא בPATH."
   },
   "greeter status loading": {
     "Checking…": "בודק…"
@@ -7257,7 +7368,7 @@
     "Wallpaper processing failed": "עיבוד תמונת הרקע נכשל"
   },
   "wallpaper settings disable description": {
-    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "השתמש/י במנהל רקעים חיצוני כמו hyprpaper, swww או swaybg."
+    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "השתמש/י במנהל רקעים חיצוני כמו hyprpaper, awww או swaybg."
   },
   "wallpaper settings disable toggle": {
     "Disable Built-in Wallpapers": "השבתת רקעים מובנים"

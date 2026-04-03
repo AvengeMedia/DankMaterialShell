@@ -330,7 +330,7 @@
     "Adjust volume per scroll indent": "Hangerőállítás görgetési lépésenként"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Beállítja a generált színek kontrasztját (-100 = minimum, 0 = normál, 100 = maximum)"
   },
   "Advanced": {
     "Advanced": "Speciális"
@@ -424,6 +424,9 @@
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Meleg színhőmérséklet alkalmazása a szem megerőltetésének csökkentése érdekében. Az alábbi automatizálási beállítások segítségével szabályozhatod, hogy mikor aktiválódjon."
+  },
+  "Applying authentication changes…": {
+    "Applying authentication changes…": ""
   },
   "Apps": {
     "Apps": "Alkalmazások"
@@ -532,6 +535,18 @@
   "Authentication Required": {
     "Authentication Required": "Hitelesítés szükséges"
   },
+  "Authentication changes applied.": {
+    "Authentication changes applied.": ""
+  },
+  "Authentication changes apply automatically.": {
+    "Authentication changes apply automatically.": ""
+  },
+  "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+  },
+  "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
+  },
   "Authentication error - try again": {
     "Authentication error - try again": "Hitelesítési hiba – próbáld újra"
   },
@@ -585,6 +600,9 @@
   },
   "Autoconnect enabled": {
     "Autoconnect enabled": "Automatikus csatlakozás engedélyezve"
+  },
+  "Autofill last remembered query when opened": {
+    "Autofill last remembered query when opened": ""
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "Automatikus színmód"
@@ -652,8 +670,14 @@
   "Background": {
     "Background": "Háttér"
   },
+  "Background Blur": {
+    "Background Blur": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Háttér átlátszósága"
+  },
+  "Background authentication sync failed. Trying terminal mode.": {
+    "Background authentication sync failed. Trying terminal mode.": ""
   },
   "Backlight device": {
     "Backlight device": "Háttérvilágítás eszköz"
@@ -730,11 +754,20 @@
   "Bluetooth not available": {
     "Bluetooth not available": "A Bluetooth nem elérhető"
   },
+  "Blur Border Color": {
+    "Blur Border Color": ""
+  },
+  "Blur Border Opacity": {
+    "Blur Border Opacity": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Háttérkép elmosási réteg"
   },
   "Blur on Overview": {
     "Blur on Overview": "Elmosás az áttekintésben"
+  },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Háttérkép elmosása, ha a niri-áttekintés nyitva van"
@@ -753,6 +786,9 @@
   },
   "Border Thickness": {
     "Border Thickness": "Szegély vastagsága"
+  },
+  "Border color around blurred surfaces": {
+    "Border color around blurred surfaces": ""
   },
   "Border with BG": {
     "Border with BG": "Szegély háttérrel"
@@ -901,11 +937,14 @@
   "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
     "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": "Szinkronizálási állapot ellenőrzése igény szerint. A szinkronizálás (Sync) egy lépésben másolja a témát, a beállításokat, a PAM konfigurációt és a háttérképet a bejelentkezési képernyőre. A módosítások alkalmazásához futtatni kell a szinkronizálást."
   },
+  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
+  },
   "Checking for updates...": {
     "Checking for updates...": "Frissítések keresése…"
   },
   "Checking whether sudo authentication is needed…": {
-    "Checking whether sudo authentication is needed…": "Annak ellenőrzése, hogy szükség van-e sudo hitelesítésre…"
+    "Checking whether sudo authentication is needed…": "Sudo hitelesítés szükségességének ellenőrzése…"
   },
   "Checking...": {
     "Checking...": "Ellenőrzés…"
@@ -1178,7 +1217,7 @@
     "Configure which displays show \"%1\"": "Mely kijelzők mutassák ezt: „%1”"
   },
   "Configure which displays show shell components": {
-    "Configure which displays show shell components": "Mely kijelzőkön jelenjenek meg a shell összetevői"
+    "Configure which displays show shell components": "Mely kijelzőkön jelenjenek meg a héj összetevői"
   },
   "Confirm": {
     "Confirm": "Megerősítés"
@@ -1190,7 +1229,7 @@
     "Confirm Display Changes": "Kijelzőváltoztatások megerősítése"
   },
   "Confirm passkey for ": {
-    "Confirm passkey for ": "Jelszó megerősítése ehhez: "
+    "Confirm passkey for ": "Párosítási kód megerősítése ehhez: "
   },
   "Conflicts with: %1": {
     "Conflicts with: %1": "Ütközik ezzel: %1"
@@ -1450,6 +1489,9 @@
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "A DMS-bővítménykezelő nem elérhető"
   },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+  },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": "DMS üdvözlőképernyő követelményei: greetd, dms-greeter. Ujjlenyomat: fprintd, pam_fprintd. Biztonsági kulcsok: pam_u2f. Add hozzá a felhasználódat a greeter csoporthoz. A szinkronizálás először ellenőrzi a sudo-t, és terminált nyit, ha interaktív hitelesítés szükséges."
   },
@@ -1460,7 +1502,7 @@
     "DMS service is not connected. Clipboard settings are unavailable.": "A DMS-szolgáltatás nincs csatlakoztatva. A vágólapbeállítások nem elérhetők."
   },
   "DMS shell actions (launcher, clipboard, etc.)": {
-    "DMS shell actions (launcher, clipboard, etc.)": "DMS shell műveletek (indító, vágólap, stb.)"
+    "DMS shell actions (launcher, clipboard, etc.)": "DMS héj-műveletek (indító, vágólap, stb.)"
   },
   "DMS_SOCKET not available": {
     "DMS_SOCKET not available": "A DMS_SOCKET nem elérhető"
@@ -1526,7 +1568,7 @@
     "Daytime": "Nappal"
   },
   "Deck": {
-    "Deck": "Pakli"
+    "Deck": "Köteg"
   },
   "Default": {
     "Default": "Alapértelmezett"
@@ -1885,6 +1927,9 @@
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "Ujjlenyomatos azonosítás engedélyezése"
   },
+  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
+  },
   "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
     "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": "Ujjlenyomat vagy biztonsági kulcs engedélyezése a DMS üdvözlőképernyőhöz. Futtasd a szinkronizálást az alkalmazáshoz és a PAM konfigurálásához."
   },
@@ -1924,11 +1969,17 @@
   "Enabled, but no fingerprint reader was detected.": {
     "Enabled, but no fingerprint reader was detected.": "Engedélyezve, de nem található ujjlenyomat-olvasó."
   },
+  "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+  },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": "Engedélyezve, de még nincs regisztrált ujjlenyomat. Regisztrálj ujjlenyomatokat, majd futtasd a szinkronizálást."
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": "Engedélyezve, de még nincs regisztrált ujjlenyomat. A használathoz regisztrálj ujjlenyomatokat."
+  },
+  "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": "Engedélyezve, de nem található regisztrált biztonsági kulcs. Regisztrálj egy kulcsot, majd futtasd a szinkronizálást."
@@ -1961,7 +2012,7 @@
     "Enlargement %": "Nagyítás %"
   },
   "Enter 6-digit passkey": {
-    "Enter 6-digit passkey": "Add meg a 6 számjegyű jelszót"
+    "Enter 6-digit passkey": "Add meg a 6 számjegyű párosítási kódot"
   },
   "Enter PIN": {
     "Enter PIN": "Írd be a PIN-kódot"
@@ -2000,13 +2051,13 @@
     "Enter network name and password": "Add meg a hálózat nevét és jelszavát"
   },
   "Enter passkey for ": {
-    "Enter passkey for ": "Jelszó megadása ehhez: "
+    "Enter passkey for ": "Párosítási kód megadása ehhez: "
   },
   "Enter password for ": {
     "Enter password for ": "Add meg a jelszót: "
   },
   "Enter this passkey on ": {
-    "Enter this passkey on ": "Írd be ezt a jelszót ehhez: "
+    "Enter this passkey on ": "Írd be ezt a párosítási kódot ehhez: "
   },
   "Enter to Paste": {
     "Enter to Paste": "Enter a beillesztéshez"
@@ -2278,6 +2329,15 @@
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": "Az ujjlenyomat-olvasó elérhetősége nem erősíthető meg."
   },
+  "Fingerprint error": {
+    "Fingerprint error": ""
+  },
+  "Fingerprint error: %1": {
+    "Fingerprint error: %1": ""
+  },
+  "Fingerprint not recognized (%1/%2). Please try again or use password.": {
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+  },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "Ujjlenyomat-olvasó észlelve, de még nincs regisztrált ujjlenyomat. Most engedélyezheted, és később regisztrálhatsz."
   },
@@ -2343,6 +2403,9 @@
   },
   "Folders": {
     "Folders": "Mappa"
+  },
+  "Follow DMS background color": {
+    "Follow DMS background color": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Monitor fókuszának követése"
@@ -2785,6 +2848,9 @@
   "Incorrect password - next failures may trigger account lockout": {
     "Incorrect password - next failures may trigger account lockout": "Helytelen jelszó – a következő sikertelen próbálkozások a fiók zárolását vonhatják maguk után"
   },
+  "Incorrect password - try again": {
+    "Incorrect password - try again": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Jelző stílusa"
   },
@@ -2805,6 +2871,9 @@
   },
   "Input Volume Slider": {
     "Input Volume Slider": "Bemeneti hangerő csúszka"
+  },
+  "Insert your security key...": {
+    "Insert your security key...": ""
   },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": "Telepítés befejezve. Az üdvözlőképernyő telepítve lett."
@@ -2868,7 +2937,7 @@
     "SMS": "SMS"
   },
   "KDE Connect accept pairing button": {
-    "Accept": "Elfogad"
+    "Accept": "Elfogadás"
   },
   "KDE Connect browse action": {
     "Opening file browser": "Fájlkezelő megnyitása",
@@ -2918,7 +2987,7 @@
     "File received from": "Fájl érkezett innen:"
   },
   "KDE Connect hint message": {
-    "Make sure KDE Connect is running on your other devices": "Győződjön meg róla, hogy a KDE Connect fut a többi eszközén"
+    "Make sure KDE Connect is running on your other devices": "Győződj meg róla, hogy a KDE Connect fut a többi eszközön"
   },
   "KDE Connect no devices message": {
     "No devices found": "Nem találhatók eszközök"
@@ -3164,7 +3233,7 @@
     "Launch on dGPU": "Indítás dGPU-n"
   },
   "Launch on dGPU by default": {
-    "Launch on dGPU by default": ""
+    "Launch on dGPU by default": "Indítás alapértelmezés szerint a dGPU-n"
   },
   "Launcher": {
     "Launcher": "Indító"
@@ -3182,7 +3251,7 @@
     "Layout Overrides": "Elrendezés felülbírálása"
   },
   "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": {
-    "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": "Az üdvözlőképernyő elrendezése és a modulok pozíciói a shellből (pl. sávkonfiguráció) vannak szinkronizálva. Futtasd a szinkronizálást az alkalmazáshoz."
+    "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": "Az üdvözlőképernyő elrendezése és a modulok pozíciói a héjból (pl. sávkonfiguráció) vannak szinkronizálva. Futtasd a szinkronizálást az alkalmazáshoz."
   },
   "Left": {
     "Left": "Bal"
@@ -3289,6 +3358,9 @@
   "Lock fade grace period": {
     "Lock fade grace period": "Zárolási elhalványítás türelmi ideje"
   },
+  "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+  },
   "Locked": {
     "Locked": "Zárolva"
   },
@@ -3350,16 +3422,16 @@
     "Margin": "Margó"
   },
   "Marker Supply Empty": {
-    "Marker Supply Empty": "Jelölőanyag-ellátás üres"
+    "Marker Supply Empty": "A festék kifogyott"
   },
   "Marker Supply Low": {
-    "Marker Supply Low": "Jelölőanyag-ellátás alacsony"
+    "Marker Supply Low": "A festék szintje alacsony"
   },
   "Marker Waste Almost Full": {
-    "Marker Waste Almost Full": "Jelölőanyag-hulladék majdnem tele"
+    "Marker Waste Almost Full": "A hulladéktartály majdnem tele"
   },
   "Marker Waste Full": {
-    "Marker Waste Full": "Jelölőanyag-hulladék tele"
+    "Marker Waste Full": "A hulladéktartály megtelt"
   },
   "Match Criteria": {
     "Match Criteria": "Illesztési feltételek"
@@ -3374,7 +3446,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Material stílusú árnyékok és emelések a modális ablakokon, felugrókon és párbeszédpaneleken"
   },
   "Matugen Contrast": {
-    "Matugen Contrast": ""
+    "Matugen Contrast": "Matugen kontraszt"
   },
   "Matugen Palette": {
     "Matugen Palette": "Matugen paletta"
@@ -3432,6 +3504,9 @@
   },
   "Maximum Pinned Entries": {
     "Maximum Pinned Entries": "Rögzített bejegyzések maximális száma"
+  },
+  "Maximum fingerprint attempts reached. Please use password.": {
+    "Maximum fingerprint attempts reached. Please use password.": ""
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "Megtartandó vágólap-bejegyzések maximális száma"
@@ -3563,7 +3638,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "Az a monitor, amelynek háttérképe meghatározza a dinamikus témaszíneket"
   },
   "Monocle": {
-    "Monocle": "Monokli"
+    "Monocle": "Egyablakos"
   },
   "Monospace Font": {
     "Monospace Font": "Rögzített szélességű betűtípus"
@@ -4151,7 +4226,7 @@
     "PIN": "PIN"
   },
   "Pad Hours": {
-    "Pad Hours": "Órák kiegészítése"
+    "Pad Hours": "Kezdő nulla az órákhoz"
   },
   "Pad hours (02:00 vs 2:00)": {
     "Pad hours (02:00 vs 2:00)": "Órák kiegészítése nullával (02:00 vs 2:00)"
@@ -4178,7 +4253,7 @@
     "Partly Cloudy": "Részben felhős"
   },
   "Passkey:": {
-    "Passkey:": "Jelszó:"
+    "Passkey:": "Párosítási kód:"
   },
   "Password": {
     "Password": "Jelszó"
@@ -4254,7 +4329,7 @@
     "File received from": "Fájl érkezett tőle:"
   },
   "Phone Connect hint message": {
-    "Make sure KDE Connect or Valent is running on your other devices": "Győződj meg róla, hogy a KDE Connect vagy a Valent fut a többi eszközödön"
+    "Make sure KDE Connect or Valent is running on your other devices": "Győződj meg róla, hogy a KDE Connect vagy a Valent fut a többi eszközön"
   },
   "Phone Connect no devices status | bluetooth status": {
     "No devices": "Nincsenek eszközök"
@@ -4519,7 +4594,7 @@
     "Processing": "Feldolgozás"
   },
   "Profile Image Error": {
-    "Profile Image Error": "Profilkép-hiba"
+    "Profile Image Error": "Profilképhiba"
   },
   "Profile activated: %1": {
     "Profile activated: %1": "Profil aktiválva: %1"
@@ -4617,6 +4692,9 @@
   "Remaining / Total": {
     "Remaining / Total": "Hátralévő / Összesen"
   },
+  "Remember Last Query": {
+    "Remember Last Query": ""
+  },
   "Remember last session": {
     "Remember last session": "Utolsó munkamenet megjegyzése"
   },
@@ -4664,6 +4742,9 @@
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "Szükséges a DWL kompozitor"
+  },
+  "Requires a newer version of Quickshell": {
+    "Requires a newer version of Quickshell": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Éjszakai mód támogatás szükséges"
@@ -4765,7 +4846,7 @@
     "Run a program (e.g., firefox, kitty)": "Program futtatása (pl. firefox, kitty)"
   },
   "Run a shell command (e.g., notify-send)": {
-    "Run a shell command (e.g., notify-send)": "Shell parancs futtatása (pl. notify-send)"
+    "Run a shell command (e.g., notify-send)": "Héjparancs futtatása (pl. notify-send)"
   },
   "Running Apps": {
     "Running Apps": "Futó alkalmazások"
@@ -4861,7 +4942,7 @@
     "Scroll Factor": "Görgetési tényező"
   },
   "Scroll GitHub": {
-    "Scroll GitHub": "Scroll GitHubja"
+    "Scroll GitHub": "Scroll GitHub"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Egérgörgő"
@@ -5065,7 +5146,7 @@
     "Share Gamma Control Settings": "Gammavezérlési beállítások megosztása"
   },
   "Shell": {
-    "Shell": "Shell"
+    "Shell": "Héj"
   },
   "Shift+Del: Clear All • Esc: Close": {
     "Shift+Del: Clear All • Esc: Close": "Shift+Del: Összes törlése • Esc: Bezárás"
@@ -5431,7 +5512,7 @@
     "Speed": "Sebesség"
   },
   "Spool Area Full": {
-    "Spool Area Full": "Spool terület tele"
+    "Spool Area Full": "A nyomtatási sor megtelt"
   },
   "Square Corners": {
     "Square Corners": "Szögletes sarkok"
@@ -5500,7 +5581,7 @@
     "Swap": "Cserehely"
   },
   "Sway Website": {
-    "Sway Website": "Sway weboldala"
+    "Sway Website": "Sway weboldal"
   },
   "Switch User": {
     "Switch User": "Felhasználóváltás"
@@ -5592,14 +5673,23 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Terminál egyéni további paraméterei"
   },
+  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "A terminál tartalék megnyitása sikertelen. Telepíts egyet a támogatott terminálemulátorok közül, vagy futtasd a 'dms greeter sync' parancsot."
+  },
+  "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": "Terminál tartalék megnyitva, ott befejezheted a szinkronizálást; automatikusan be fog záródni, ha kész lesz."
   },
   "Terminal multiplexer backend to use": {
     "Terminal multiplexer backend to use": "Használandó terminálmultiplexer-háttérprogram"
+  },
+  "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": "Terminál megnyitva, ott befejezheted a szinkronizálás hitelesítését; automatikusan be fog záródni, ha kész lesz."
@@ -5754,6 +5844,9 @@
   "Toner Low": {
     "Toner Low": "Toner alacsony"
   },
+  "Too many attempts - locked out": {
+    "Too many attempts - locked out": ""
+  },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": "Túl sok sikertelen próbálkozás - a fiók zárolva lehet"
   },
@@ -5783,6 +5876,9 @@
   },
   "Total Jobs": {
     "Total Jobs": "Összes feladat"
+  },
+  "Touch your security key...": {
+    "Touch your security key...": ""
   },
   "Transform": {
     "Transform": "Átalakítás"
@@ -6109,7 +6205,7 @@
     "Version": "Verzió"
   },
   "Vertical Deck": {
-    "Vertical Deck": "Függőleges pakli"
+    "Vertical Deck": "Függőleges köteg"
   },
   "Vertical Grid": {
     "Vertical Grid": "Függőleges rács"
@@ -6423,6 +6519,21 @@
   },
   "bluetooth status | lock screen notification mode option": {
     "Disabled": "Letiltva"
+  },
+  "blur border color | button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
+  "blur border color | button color option | color option | secondary color | tile color option": {
+    "Secondary": ""
+  },
+  "blur border color | outline color": {
+    "Outline": ""
+  },
+  "blur border color | shadow color option": {
+    "Text Color": ""
+  },
+  "blur border color | shadow color option | theme category option": {
+    "Custom": ""
   },
   "border color": {
     "Color": "Szín"
@@ -6764,7 +6875,7 @@
     "Features": "Funkciók"
   },
   "greeter welcome page tagline": {
-    "A modern desktop shell for Wayland compositors": "Egy modern asztali shell Wayland kompozitorokhoz"
+    "A modern desktop shell for Wayland compositors": "Egy modern asztali héj Wayland kompozitorokhoz"
   },
   "greeter welcome page title": {
     "Welcome to DankMaterialShell": "Üdvözlünk a DankMaterialShell-ben"
@@ -7058,7 +7169,7 @@
     "Select Profile Image": "Profilkép kiválasztása"
   },
   "qt theme env error body": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Be kell állítanod a\nQT_QPA_PLATFORMTHEME=gtk3\nvagy a\nQT_QPA_PLATFORMTHEME=qt6ct\nkörnyezeti változót, majd indítsd újra a shellt.\n\nA qt6ct-hez telepíteni kell a qt6ct-kde csomagot."
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Be kell állítanod a\nQT_QPA_PLATFORMTHEME=gtk3\nvagy a\nQT_QPA_PLATFORMTHEME=qt6ct\nkörnyezeti változót, majd indítsd újra a héjat.\n\nA qt6ct-hez telepíteni kell a qt6ct-kde csomagot."
   },
   "qt theme env error title": {
     "Missing Environment Variables": "Hiányzó környezeti változók"
@@ -7214,7 +7325,7 @@
     "Wallpaper processing failed - check wallpaper path": "A háttérkép feldolgozása sikertelen - ellenőrizd a háttérkép útvonalát"
   },
   "wallpaper error status": {
-    "Wallpaper Error": "Háttérkép hiba"
+    "Wallpaper Error": "Háttérképhiba"
   },
   "wallpaper fill mode": {
     "Fill": "Kitöltés",

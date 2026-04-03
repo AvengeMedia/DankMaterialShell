@@ -330,7 +330,7 @@
     "Adjust volume per scroll indent": "Volume per scrollstap aanpassen"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Past het contrast van gegenereerde kleuren aan (-100 = minimum, 0 = standaard, 100 = maximum)"
   },
   "Advanced": {
     "Advanced": "Geavanceerd"
@@ -424,6 +424,9 @@
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Warme kleurtemperatuur toepassen om oogvermoeidheid te verminderen. Gebruik de automatiseringsinstellingen hieronder om te bepalen wanneer dit activeert."
+  },
+  "Applying authentication changes…": {
+    "Applying authentication changes…": ""
   },
   "Apps": {
     "Apps": "Apps"
@@ -532,6 +535,18 @@
   "Authentication Required": {
     "Authentication Required": "Authenticatie vereist"
   },
+  "Authentication changes applied.": {
+    "Authentication changes applied.": ""
+  },
+  "Authentication changes apply automatically.": {
+    "Authentication changes apply automatically.": ""
+  },
+  "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+  },
+  "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
+  },
   "Authentication error - try again": {
     "Authentication error - try again": "Authenticatiefout - probeer het opnieuw"
   },
@@ -585,6 +600,9 @@
   },
   "Autoconnect enabled": {
     "Autoconnect enabled": "Automatisch verbinden ingeschakeld"
+  },
+  "Autofill last remembered query when opened": {
+    "Autofill last remembered query when opened": ""
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "Automatische kleurmodus"
@@ -652,8 +670,14 @@
   "Background": {
     "Background": "Achtergrond"
   },
+  "Background Blur": {
+    "Background Blur": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Achtergronddekking"
+  },
+  "Background authentication sync failed. Trying terminal mode.": {
+    "Background authentication sync failed. Trying terminal mode.": ""
   },
   "Backlight device": {
     "Backlight device": "Achtergrondverlichtingsapparaat"
@@ -730,11 +754,20 @@
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth niet beschikbaar"
   },
+  "Blur Border Color": {
+    "Blur Border Color": ""
+  },
+  "Blur Border Opacity": {
+    "Blur Border Opacity": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Achtergrondlaag vervagen"
   },
   "Blur on Overview": {
     "Blur on Overview": "Vervagen bij overzicht"
+  },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Achtergrond vervagen wanneer niri-overzicht open is"
@@ -753,6 +786,9 @@
   },
   "Border Thickness": {
     "Border Thickness": "Randdikte"
+  },
+  "Border color around blurred surfaces": {
+    "Border color around blurred surfaces": ""
   },
   "Border with BG": {
     "Border with BG": "Rand met achtergrond"
@@ -900,6 +936,9 @@
   },
   "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
     "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": "Controleer de synchronisatiestatus op aanvraag. Sync kopieert je thema, instellingen, PAM-configuratie en achtergrond in één stap naar het aanmeldscherm. Je moet Sync uitvoeren om wijzigingen toe te passen."
+  },
+  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": "Zoeken naar updates..."
@@ -1450,6 +1489,9 @@
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "DMS Plug-inbeheer niet beschikbaar"
   },
+  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+  },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": "DMS Greeter vereist: greetd, dms-greeter. Vingerafdruk: fprintd, pam_fprintd. Beveiligingssleutels: pam_u2f. Voeg je gebruiker toe aan de greeter-groep. Sync controleert eerst sudo en opent een terminal als interactieve authenticatie vereist is."
   },
@@ -1885,6 +1927,9 @@
   "Enable fingerprint authentication": {
     "Enable fingerprint authentication": "Vingerafdrukverificatie inschakelen"
   },
+  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
+  },
   "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
     "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": "Schakel vingerafdruk of beveiligingssleutel in voor DMS Greeter. Voer Sync uit om toe te passen en PAM te configureren."
   },
@@ -1924,11 +1969,17 @@
   "Enabled, but no fingerprint reader was detected.": {
     "Enabled, but no fingerprint reader was detected.": "Ingeschakeld, maar er is geen vingerafdrukscanner gedetecteerd."
   },
+  "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+  },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": "Ingeschakeld, maar er zijn nog geen afdrukken geregistreerd. Registreer vingerafdrukken en voer Sync uit."
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": "Ingeschakeld, maar er zijn nog geen afdrukken geregistreerd. Registreer vingerafdrukken om dit te gebruiken."
+  },
+  "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": "Ingeschakeld, maar er is nog geen geregistreerde beveiligingssleutel gevonden. Registreer een sleutel en voer Sync uit."
@@ -2278,6 +2329,15 @@
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": "Beschikbaarheid van vingerafdrukscanner kon niet worden bevestigd."
   },
+  "Fingerprint error": {
+    "Fingerprint error": ""
+  },
+  "Fingerprint error: %1": {
+    "Fingerprint error: %1": ""
+  },
+  "Fingerprint not recognized (%1/%2). Please try again or use password.": {
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+  },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "Vingerafdrukscanner gedetecteerd, maar er zijn nog geen afdrukken geregistreerd. U kunt dit nu inschakelen en later registreren."
   },
@@ -2343,6 +2403,9 @@
   },
   "Folders": {
     "Folders": "Mappen"
+  },
+  "Follow DMS background color": {
+    "Follow DMS background color": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Monitorfocus volgen"
@@ -2785,6 +2848,9 @@
   "Incorrect password - next failures may trigger account lockout": {
     "Incorrect password - next failures may trigger account lockout": "Onjuist wachtwoord - volgende fouten kunnen leiden tot blokkering van account"
   },
+  "Incorrect password - try again": {
+    "Incorrect password - try again": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Indicatorstijl"
   },
@@ -2805,6 +2871,9 @@
   },
   "Input Volume Slider": {
     "Input Volume Slider": "Invoervolumeschuif"
+  },
+  "Insert your security key...": {
+    "Insert your security key...": ""
   },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": "Installatie voltooid. Greeter is geïnstalleerd."
@@ -3164,7 +3233,7 @@
     "Launch on dGPU": "Starten op dGPU"
   },
   "Launch on dGPU by default": {
-    "Launch on dGPU by default": ""
+    "Launch on dGPU by default": "Start standaard op dGPU"
   },
   "Launcher": {
     "Launcher": "Starter"
@@ -3289,6 +3358,9 @@
   "Lock fade grace period": {
     "Lock fade grace period": "Vervalperiode vergrendelvervaging"
   },
+  "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+  },
   "Locked": {
     "Locked": "Vergrendeld"
   },
@@ -3374,7 +3446,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Op Material Design geïnspireerde schaduwen en diepte (elevation) op modale vensters, pop-outs en dialoogvensters"
   },
   "Matugen Contrast": {
-    "Matugen Contrast": ""
+    "Matugen Contrast": "Matugen Contrast"
   },
   "Matugen Palette": {
     "Matugen Palette": "Matugen-palet"
@@ -3432,6 +3504,9 @@
   },
   "Maximum Pinned Entries": {
     "Maximum Pinned Entries": "Maximaal aantal vastgemaakte items"
+  },
+  "Maximum fingerprint attempts reached. Please use password.": {
+    "Maximum fingerprint attempts reached. Please use password.": ""
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "Maximaal aantal te bewaren klemborditems"
@@ -4617,6 +4692,9 @@
   "Remaining / Total": {
     "Remaining / Total": "Resterend / Totaal"
   },
+  "Remember Last Query": {
+    "Remember Last Query": ""
+  },
   "Remember last session": {
     "Remember last session": "Onthoud laatste sessie"
   },
@@ -4664,6 +4742,9 @@
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "Vereist DWL-compositor"
+  },
+  "Requires a newer version of Quickshell": {
+    "Requires a newer version of Quickshell": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Vereist ondersteuning voor nachtmodus"
@@ -5592,14 +5673,23 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Aangepaste extra parameters terminal"
   },
+  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Terminal fallback mislukt. Installeer een van de ondersteunde terminal-emulators of voer handmatig 'dms greeter sync' uit."
+  },
+  "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": "Terminal fallback geopend. Voltooi de synchronisatie daar; de terminal sluit automatisch wanneer dit is voltooid."
   },
   "Terminal multiplexer backend to use": {
     "Terminal multiplexer backend to use": "Te gebruiken terminal-multiplexer-backend"
+  },
+  "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": "Terminal geopend. Voltooi de sync-authenticatie daar; de terminal sluit automatisch wanneer dit is voltooid."
@@ -5754,6 +5844,9 @@
   "Toner Low": {
     "Toner Low": "Toner laag"
   },
+  "Too many attempts - locked out": {
+    "Too many attempts - locked out": ""
+  },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": "Te veel mislukte pogingen - account is mogelijk geblokkeerd"
   },
@@ -5783,6 +5876,9 @@
   },
   "Total Jobs": {
     "Total Jobs": "Totaal aantal taken"
+  },
+  "Touch your security key...": {
+    "Touch your security key...": ""
   },
   "Transform": {
     "Transform": "Transformatie"
@@ -6423,6 +6519,21 @@
   },
   "bluetooth status | lock screen notification mode option": {
     "Disabled": "Uitgeschakeld"
+  },
+  "blur border color | button color option | color option | primary color | shadow color option | tile color option": {
+    "Primary": ""
+  },
+  "blur border color | button color option | color option | secondary color | tile color option": {
+    "Secondary": ""
+  },
+  "blur border color | outline color": {
+    "Outline": ""
+  },
+  "blur border color | shadow color option": {
+    "Text Color": ""
+  },
+  "blur border color | shadow color option | theme category option": {
+    "Custom": ""
   },
   "border color": {
     "Color": "Kleur"
