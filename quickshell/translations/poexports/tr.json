@@ -1,60 +1,60 @@
 {
   "%1 Animation Speed": {
-    "%1 Animation Speed": ""
+    "%1 Animation Speed": "%1 Animasyon hızı"
   },
   "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
     "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 DMS bağlamaları, dahil etmeden sonra gelen yapılandırma bağlamaları tarafından geçersiz kılınabilir."
   },
   "%1 Sessions": {
-    "%1 Sessions": ""
+    "%1 Sessions": "%1 oturumlar"
   },
   "%1 active session": {
-    "%1 active session": ""
+    "%1 active session": "%1 aktiv oturum"
   },
   "%1 active sessions": {
-    "%1 active sessions": ""
+    "%1 active sessions": "%1 aktiv oturumlar"
   },
   "%1 adapter(s), none connected": {
     "%1 adapter(s), none connected": "%1 bağdaştırıcı, hiçbiri bağlı değil"
   },
   "%1 adapter, none connected": {
-    "%1 adapter, none connected": ""
+    "%1 adapter, none connected": "%1 adaptör, hiçbiri bağlantılı değil"
   },
   "%1 adapters, none connected": {
-    "%1 adapters, none connected": ""
+    "%1 adapters, none connected": "%1 adaptörler, hiçbiri bağlantılı değil"
   },
   "%1 character": {
-    "%1 character": ""
+    "%1 character": "%1 karakter"
   },
   "%1 characters": {
-    "%1 characters": "%1 karakter"
+    "%1 characters": "%1 karakterler"
   },
   "%1 class(es)": {
-    "%1 class(es)": "%1 sınıf"
+    "%1 class(es)": "%1 sınıflar"
   },
   "%1 connected": {
     "%1 connected": "%1 bağlı"
   },
   "%1 custom animation duration": {
-    "%1 custom animation duration": ""
+    "%1 custom animation duration": "%1 özel animasyon süresi"
   },
   "%1 days ago": {
     "%1 days ago": "%1 gün önce"
   },
   "%1 disconnected": {
-    "%1 disconnected": ""
+    "%1 disconnected": "%1 bağlantı kesildi"
   },
   "%1 disconnected (hidden)": {
-    "%1 disconnected (hidden)": ""
+    "%1 disconnected (hidden)": "%1 bağlantı kesildi (gizlenmiş)"
   },
   "%1 display": {
-    "%1 display": ""
+    "%1 display": "%1 ekran"
   },
   "%1 display(s)": {
     "%1 display(s)": "%1 ekran"
   },
   "%1 displays": {
-    "%1 displays": ""
+    "%1 displays": "%1 ekranlar"
   },
   "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": {
     "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": ""
@@ -63,25 +63,25 @@
     "%1 exists but is not included. Window rules won't apply.": ""
   },
   "%1 filtered": {
-    "%1 filtered": ""
+    "%1 filtered": "%1 filtrelenmiş"
   },
   "%1 is now included in config": {
-    "%1 is now included in config": ""
+    "%1 is now included in config": "%1 artık yapılandırmaya dahil edildi."
   },
   "%1 job(s)": {
     "%1 job(s)": "%1 iş"
   },
   "%1 notifications": {
-    "%1 notifications": ""
+    "%1 notifications": "%1 bildirimler"
   },
   "%1 printer(s)": {
     "%1 printer(s)": "%1 yazıcı"
   },
   "%1 update": {
-    "%1 update": ""
+    "%1 update": "%1 güncelleme"
   },
   "%1 updates": {
-    "%1 updates": ""
+    "%1 updates": "%1 güncellemeler"
   },
   "%1 variants": {
     "%1 variants": "%1 varyant"
@@ -96,10 +96,10 @@
     "%1 widgets": "%1 widget"
   },
   "%1 window": {
-    "%1 window": ""
+    "%1 window": "%1 pencere"
   },
   "%1 windows": {
-    "%1 windows": ""
+    "%1 windows": "%1 pencereler"
   },
   "%1m ago": {
     "%1m ago": "%1dk önce"
@@ -108,10 +108,10 @@
     "(Unnamed)": "(İsimsiz)"
   },
   "+ %1 more": {
-    "+ %1 more": ""
+    "+ %1 more": "%1 daha fazlası"
   },
   "/path/to/videos": {
-    "/path/to/videos": ""
+    "/path/to/videos": "/path/to/Videolar"
   },
   "0 = square corners": {
     "0 = square corners": "0 = kare köşeler"
@@ -126,7 +126,7 @@
     "1 minute": "1 dakika"
   },
   "1 notification": {
-    "1 notification": ""
+    "1 notification": "1 bildirim"
   },
   "1 second": {
     "1 second": "1 saniye"
@@ -153,22 +153,22 @@
     "2 minutes": "2 dakika"
   },
   "2 seconds": {
-    "2 seconds": ""
+    "2 seconds": "2 saniye"
   },
   "20 minutes": {
-    "20 minutes": ""
+    "20 minutes": "20 dakika"
   },
   "24-Hour Format": {
     "24-Hour Format": "24-Saat Biçimi"
   },
   "24-hour clock": {
-    "24-hour clock": ""
+    "24-hour clock": "24 saatlik saat sistemi"
   },
   "24-hour format": {
     "24-hour format": "24-saat biçimi"
   },
   "250 ms": {
-    "250 ms": ""
+    "250 ms": "250 ms"
   },
   "270°": {
     "270°": "270°"
@@ -177,7 +177,7 @@
     "3 days": "3 gün"
   },
   "3 minutes": {
-    "3 minutes": ""
+    "3 minutes": "3 dakika"
   },
   "3 seconds": {
     "3 seconds": "3 saniye"
@@ -192,7 +192,7 @@
     "3rd party": "Üçüncü taraf"
   },
   "4 seconds": {
-    "4 seconds": ""
+    "4 seconds": "4 saniye"
   },
   "5 minutes": {
     "5 minutes": "5 dakika"
@@ -201,13 +201,13 @@
     "5 seconds": "5 saniye"
   },
   "500 ms": {
-    "500 ms": ""
+    "500 ms": "500 ms"
   },
   "7 days": {
     "7 days": "7 gün"
   },
   "750 ms": {
-    "750 ms": ""
+    "750 ms": "750 ms"
   },
   "8 seconds": {
     "8 seconds": "8 saniye"
@@ -237,7 +237,7 @@
     "About": "Hakkında"
   },
   "Accent Color": {
-    "Accent Color": ""
+    "Accent Color": "Vurgulanmış reng"
   },
   "Accept Jobs": {
     "Accept Jobs": "İşleri Kabul Et"
@@ -258,7 +258,7 @@
     "Action": "Eylem"
   },
   "Action failed or terminal was closed.": {
-    "Action failed or terminal was closed.": ""
+  "Action failed or terminal was closed.": "İşlem başarısız oldu veya terminal kapatıldı."
   },
   "Actions": {
     "Actions": "Eylemler"
@@ -270,13 +270,13 @@
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": ""
   },
   "Activation": {
-    "Activation": ""
+    "Activation": "Aktivasyon"
   },
   "Active": {
     "Active": "Etkin"
   },
   "Active Color": {
-    "Active Color": ""
+    "Active Color": "Aktiv renk"
   },
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "Aktif Kilit Ekranı Monitörü"
