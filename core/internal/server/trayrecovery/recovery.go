@@ -145,7 +145,7 @@ func (m *Manager) scanWellKnownNames(allNames []string, registeredItems []string
 
 		for _, objPath := range objectPaths {
 			if m.probeSNI(name, objPath, probeTimeout) {
-				m.registerSNI(name, objPath)
+				m.registerSNI(name)
 				// Update set so the connection-ID section won't double-register this app
 				if connForName != "" {
 					registeredConnIDs[connForName] = true
@@ -190,7 +190,7 @@ func (m *Manager) scanConnectionIDs(allNames []string, registeredItems []string,
 				return
 			}
 
-			m.registerSNI(conn, "/StatusNotifierItem")
+			m.registerSNI(conn)
 			log.Infof("TrayRecovery: re-registered %s (Id: %s)", conn, sniID)
 		}(name)
 	}
@@ -227,14 +227,14 @@ func (m *Manager) getSNIId(dest string, timeout time.Duration) string {
 	return id
 }
 
-func (m *Manager) registerSNI(name, objPath string) {
+func (m *Manager) registerSNI(name string) {
 	obj := m.conn.Object(sniWatcherDest, sniWatcherPath)
 	call := obj.Call(sniWatcherIface+".RegisterStatusNotifierItem", 0, name)
 	if call.Err != nil {
 		log.Warnf("TrayRecovery: failed to register %s: %v", name, call.Err)
 		return
 	}
-	log.Infof("TrayRecovery: re-registered %s at %s", name, objPath)
+	log.Infof("TrayRecovery: re-registered %s", name)
 }
 
 func extractName(item string) string {
