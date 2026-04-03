@@ -11,6 +11,9 @@ import qs.Modules.Settings.Widgets
 Item {
     id: themeColorsTab
 
+    readonly property bool connectedFrameModeActive: SettingsData.frameEnabled
+        && SettingsData.motionEffect === 1
+        && SettingsData.directionalAnimationMode === 3
     property var cachedIconThemes: SettingsData.availableIconThemes
     property var cachedCursorThemes: SettingsData.availableCursorThemes
     property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
@@ -1618,7 +1621,11 @@ Item {
                     tags: ["popup", "transparency", "opacity", "modal"]
                     settingKey: "popupTransparency"
                     text: I18n.tr("Popup Transparency")
-                    description: I18n.tr("Controls opacity of all popouts, modals, and their content layers")
+                    description: themeColorsTab.connectedFrameModeActive
+                        ? I18n.tr("Connected Frame mode follows Frame Opacity for connected popouts, docks, and modal surfaces")
+                        : I18n.tr("Controls opacity of all popouts, modals, and their content layers")
+                    enabled: !themeColorsTab.connectedFrameModeActive
+                    opacity: themeColorsTab.connectedFrameModeActive ? 0.5 : 1.0
                     value: Math.round(SettingsData.popupTransparency * 100)
                     minimum: 0
                     maximum: 100
@@ -1837,7 +1844,11 @@ Item {
                     tags: ["blur", "background", "transparency", "glass", "frosted"]
                     settingKey: "blurEnabled"
                     text: I18n.tr("Background Blur")
-                    description: BlurService.available ? I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.") : I18n.tr("Requires a newer version of Quickshell")
+                    description: !BlurService.available
+                        ? I18n.tr("Requires a newer version of Quickshell")
+                        : (themeColorsTab.connectedFrameModeActive
+                            ? I18n.tr("Connected Frame mode follows Frame Blur for connected surfaces while this remains the master blur availability toggle")
+                            : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration."))
                     checked: SettingsData.blurEnabled ?? false
                     enabled: BlurService.available
                     onToggled: checked => SettingsData.set("blurEnabled", checked)

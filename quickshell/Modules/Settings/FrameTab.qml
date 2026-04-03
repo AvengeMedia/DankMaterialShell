@@ -261,7 +261,7 @@ Item {
                 title: I18n.tr("Bar Integration")
                 settingKey: "frameBarIntegration"
                 collapsible: true
-                expanded: false
+                expanded: true
                 visible: SettingsData.frameEnabled
 
                 SettingsToggleRow {
@@ -272,6 +272,31 @@ Item {
                     description: I18n.tr("Show the bar and frame during Niri overview mode")
                     checked: SettingsData.frameShowOnOverview
                     onToggled: checked => SettingsData.set("frameShowOnOverview", checked)
+                }
+
+                SettingsToggleRow {
+                    visible: SettingsData.frameEnabled
+                    settingKey: "directionalAnimationMode"
+                    tags: ["frame", "connected", "popout", "corner", "animation"]
+                    text: I18n.tr("Connected Mode")
+                    description: I18n.tr("Popouts emerge flush from the bar edge as one continuous piece (based on Slide)")
+                    checked: SettingsData.motionEffect === 1 && SettingsData.directionalAnimationMode === 3
+                    onToggled: checked => {
+                        if (checked) {
+                            if (SettingsData.directionalAnimationMode !== 3)
+                                SettingsData.set("previousDirectionalMode", SettingsData.directionalAnimationMode);
+                            SettingsData.set("motionEffect", 1);
+                            SettingsData.set("directionalAnimationMode", 3);
+                        } else {
+                            SettingsData.set("directionalAnimationMode", SettingsData.previousDirectionalMode);
+                        }
+                    }
+
+                    Connections {
+                        target: SettingsData
+                        function onDirectionalAnimationModeChanged() {}
+                        function onMotionEffectChanged() {}
+                    }
                 }
             }
 
