@@ -17,7 +17,7 @@ BasePill {
     property int availableWidth: 400
     readonly property int maxNormalWidth: 456
     readonly property int maxCompactWidth: 288
-    readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
+    property Toplevel activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
@@ -38,8 +38,42 @@ BasePill {
         return 0;
     }
 
+    function updateActiveWindow() {
+        const active = ToplevelManager.activeToplevel;
+
+        if (!active) {
+            // Only clear if our tracked window is no longer alive
+            if (activeWindow) {
+                const alive = ToplevelManager.toplevels?.values;
+                if (alive && !Array.from(alive).some(t => t === activeWindow))
+                    activeWindow = null;
+            }
+            return;
+        }
+
+        if (!parentScreen || CompositorService.filterCurrentDisplay([active], parentScreen?.name)?.length > 0) {
+            activeWindow = active;
+        }
+        // else: active window is on a different screen so keep the previous value
+    }
+
     Component.onCompleted: {
+        updateActiveWindow();
         updateDesktopEntry();
+    }
+
+    Connections {
+        target: ToplevelManager
+        function onActiveToplevelChanged() {
+            root.updateActiveWindow();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onToplevelsChanged() {
+            root.updateActiveWindow();
+        }
     }
 
     Connections {
