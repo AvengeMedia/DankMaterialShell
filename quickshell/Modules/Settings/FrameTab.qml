@@ -115,8 +115,9 @@ Item {
                 SettingsSliderRow {
                     id: opacitySlider
                     settingKey: "frameOpacity"
-                    tags: ["frame", "border", "opacity", "transparency"]
-                    text: I18n.tr("Frame Opacity")
+                    tags: ["frame", "border", "surface", "popup", "opacity", "transparency"]
+                    text: I18n.tr("Surface Opacity")
+                    description: I18n.tr("Frame border opacity. Controls all surface opacity globally when Connected Mode is active")
                     unit: "%"
                     minimum: 0
                     maximum: 100

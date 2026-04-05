@@ -1618,11 +1618,11 @@ Item {
 
                 SettingsSliderRow {
                     tab: "theme"
-                    tags: ["popup", "transparency", "opacity", "modal"]
+                    tags: ["surface", "popup", "transparency", "opacity", "modal"]
                     settingKey: "popupTransparency"
-                    text: I18n.tr("Popup Transparency")
+                    text: I18n.tr("Surface Opacity")
                     description: themeColorsTab.connectedFrameModeActive
-                        ? I18n.tr("Connected Frame mode follows Frame Opacity for connected popouts, docks, and modal surfaces")
+                        ? I18n.tr("Connected Frame mode follows Surface Opacity from the Frame tab for connected popouts, docks, and modal surfaces")
                         : I18n.tr("Controls opacity of all popouts, modals, and their content layers")
                     enabled: !themeColorsTab.connectedFrameModeActive
                     opacity: themeColorsTab.connectedFrameModeActive ? 0.5 : 1.0
