@@ -453,9 +453,6 @@ EOFCONFIG
     }
 
     function getSoundPath(soundEvent) {
-        if (soundEvent === "desktop-login") {
-            console.warn("AudioService: getSoundPath called for desktop-login. useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme, "soundFilePaths:", JSON.stringify(soundFilePaths));
-        }
         const soundMap = {
             "audio-volume-change": "../assets/sounds/freedesktop/audio-volume-change.wav",
             "power-plug": "../assets/sounds/plasma/power-plug.wav",
