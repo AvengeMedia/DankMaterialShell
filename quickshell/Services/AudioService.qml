@@ -26,6 +26,7 @@ Singleton {
     property var powerUnplugSound: null
     property var normalNotificationSound: null
     property var criticalNotificationSound: null
+    property var loginSound: null
     property real notificationsVolume: 1.0
     property bool notificationsAudioMuted: false
 
@@ -395,7 +396,7 @@ EOFCONFIG
         const themesToSearch = themeName !== "freedesktop" ? `${themeName} freedesktop` : themeName;
 
         const script = `
-            for event_key in audio-volume-change power-plug power-unplug message message-new-instant; do
+            for event_key in audio-volume-change power-plug power-unplug message message-new-instant desktop-login; do
                 found=0
 
                 case "$event_key" in
@@ -452,12 +453,16 @@ EOFCONFIG
     }
 
     function getSoundPath(soundEvent) {
+        if (soundEvent === "desktop-login") {
+            console.warn("AudioService: getSoundPath called for desktop-login. useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme, "soundFilePaths:", JSON.stringify(soundFilePaths));
+        }
         const soundMap = {
             "audio-volume-change": "../assets/sounds/freedesktop/audio-volume-change.wav",
             "power-plug": "../assets/sounds/plasma/power-plug.wav",
             "power-unplug": "../assets/sounds/plasma/power-unplug.wav",
             "message": "../assets/sounds/freedesktop/message.wav",
-            "message-new-instant": "../assets/sounds/freedesktop/message-new-instant.wav"
+            "message-new-instant": "../assets/sounds/freedesktop/message-new-instant.wav",
+            "desktop-login": "../assets/sounds/freedesktop/desktop-login.wav"
         };
 
         const specialConditions = {
@@ -551,6 +556,10 @@ EOFCONFIG
             criticalNotificationSound.destroy();
             criticalNotificationSound = null;
         }
+        if (loginSound) {
+            loginSound.destroy();
+            loginSound = null;
+        }
     }
 
     function createSoundPlayers() {
@@ -622,6 +631,19 @@ EOFCONFIG
                     }
                 }
             `, root, "AudioService.CriticalNotificationSound");
+
+            const loginPath = getSoundPath("desktop-login");
+            loginSound = Qt.createQmlObject(`
+                import QtQuick
+                import QtMultimedia
+                MediaPlayer {
+                    source: "${loginPath}"
+                    audioOutput: AudioOutput {
+                        ${deviceProperty}volume: notificationsVolume
+                    }
+                }
+            `, root, "AudioService.LoginSound");
+
         } catch (e) {
             console.warn("AudioService: Error creating sound players:", e);
         }
@@ -661,9 +683,22 @@ EOFCONFIG
         criticalNotificationSound.play();
     }
 
+    function playLoginSound() {
+        if (!soundsAvailable || !loginSound || notificationsAudioMuted || isMediaPlaying()) {
+            return;
+        }
+        loginSound.play();
+    }
+
     function playVolumeChangeSoundIfEnabled() {
         if (SettingsData.soundsEnabled && SettingsData.soundVolumeChanged && !notificationsAudioMuted) {
             playVolumeChangeSound();
+        }
+    }
+
+    function playLoginSoundIfEnabled() {
+        if (SettingsData.soundsEnabled && SettingsData.soundLogin && !notificationsAudioMuted) {
+            playLoginSound();
         }
     }
 
