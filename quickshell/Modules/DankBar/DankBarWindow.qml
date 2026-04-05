@@ -661,7 +661,7 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    exclusiveZone: (!(barConfig?.visible ?? true) || topBarCore.autoHide) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (barConfig?.bottomGap ?? 0))
+    exclusiveZone: (!(barConfig?.visible ?? true) || topBarCore.autoHide) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (Theme.isConnectedEffect ? 0 : (barConfig?.bottomGap ?? 0)))
 
     Item {
         id: inputMask

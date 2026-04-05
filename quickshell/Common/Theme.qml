@@ -1170,6 +1170,8 @@ Singleton {
     property real popupTransparency: {
         if (typeof SettingsData === "undefined")
             return 1.0;
+        if (isConnectedEffect)
+            return SettingsData.frameOpacity !== undefined ? SettingsData.frameOpacity : 1.0;
         return SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0;
     }
 
