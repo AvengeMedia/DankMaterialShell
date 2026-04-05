@@ -1593,8 +1593,8 @@ Singleton {
         const spacing = barSpacing !== undefined ? barSpacing : (defaultBar?.spacing ?? 4);
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
         const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
-        const bottomGap = Math.max(0, rawBottomGap);
         const isConnected = frameEnabled && motionEffect === 1 && directionalAnimationMode === 3;
+        const bottomGap = isConnected ? 0 : Math.max(0, rawBottomGap);
 
         const useAutoGaps = (barConfig && barConfig.popupGapsAuto !== undefined) ? barConfig.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
         const manualGapValue = (barConfig && barConfig.popupGapsManual !== undefined) ? barConfig.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
@@ -1717,7 +1717,9 @@ Singleton {
         const screenWidth = screen.width;
         const screenHeight = screen.height;
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
-        const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
+        const isConnected = frameEnabled && motionEffect === 1 && directionalAnimationMode === 3;
+        const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
+        const bottomGap = isConnected ? 0 : rawBottomGap;
 
         let topOffset = 0;
         let bottomOffset = 0;
@@ -1739,7 +1741,7 @@ Singleton {
                 const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
                 const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
                 const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing + wingSize;
-                const otherBottomGap = other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0);
+                const otherBottomGap = isConnected ? 0 : (other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0));
 
                 switch (other.position) {
                 case SettingsData.Position.Top:

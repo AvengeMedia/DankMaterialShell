@@ -3504,7 +3504,7 @@
   },
   {
     "section": "popupTransparency",
-    "label": "Popup Transparency",
+    "label": "Surface Opacity",
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
@@ -3522,6 +3522,7 @@
       "popup",
       "scheme",
       "style",
+      "surface",
       "their",
       "theme",
       "translucent",
