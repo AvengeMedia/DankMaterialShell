@@ -2,9 +2,6 @@
   "%1 Animation Speed": {
     "%1 Animation Speed": "Скорость анимации %1"
   },
-  "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
-    "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 комбинаций клавиш DMS могут быть переопределены комбинациями из конфигурации, которые идут после include."
-  },
   "%1 Sessions": {
     "%1 Sessions": ""
   },
@@ -13,9 +10,6 @@
   },
   "%1 active sessions": {
     "%1 active sessions": ""
-  },
-  "%1 adapter(s), none connected": {
-    "%1 adapter(s), none connected": "%1 адаптер(ов), ни один не подключен"
   },
   "%1 adapter, none connected": {
     "%1 adapter, none connected": ""
@@ -29,17 +23,11 @@
   "%1 characters": {
     "%1 characters": "%1 символов"
   },
-  "%1 class(es)": {
-    "%1 class(es)": "%1 класс(ов)"
-  },
   "%1 connected": {
     "%1 connected": "%1 подключен(о)"
   },
   "%1 custom animation duration": {
     "%1 custom animation duration": "Пользовательская длительность анимации %1"
-  },
-  "%1 days ago": {
-    "%1 days ago": "%1 дней назад"
   },
   "%1 disconnected": {
     "%1 disconnected": "%1 отключен(о)"
@@ -49,9 +37,6 @@
   },
   "%1 display": {
     "%1 display": ""
-  },
-  "%1 display(s)": {
-    "%1 display(s)": "%1 дисплей(ев)"
   },
   "%1 displays": {
     "%1 displays": ""
@@ -68,14 +53,14 @@
   "%1 is now included in config": {
     "%1 is now included in config": "%1 теперь включен в конфигурацию"
   },
-  "%1 job(s)": {
-    "%1 job(s)": "%1 задани(й/я)"
+  "%1 issue found": {
+    "%1 issue found": ""
+  },
+  "%1 issues found": {
+    "%1 issues found": ""
   },
   "%1 notifications": {
     "%1 notifications": "%1 уведомлений"
-  },
-  "%1 printer(s)": {
-    "%1 printer(s)": "%1 принтер(ов)"
   },
   "%1 update": {
     "%1 update": ""
@@ -104,6 +89,12 @@
   "%1m ago": {
     "%1m ago": "%1 мин. назад"
   },
+  "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": {
+    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": ""
+  },
+  "(Default)": {
+    "(Default)": "(По умолчанию)"
+  },
   "(Unnamed)": {
     "(Unnamed)": "(Без названия)"
   },
@@ -119,8 +110,17 @@
   "1 day": {
     "1 day": "1 день"
   },
+  "1 device connected": {
+    "1 device connected": "1 устройство подключено"
+  },
   "1 event": {
     "1 event": "1 событие"
+  },
+  "1 hour": {
+    "1 hour": "1 час"
+  },
+  "1 hour 30 minutes": {
+    "1 hour 30 minutes": "1 час 30 минут"
   },
   "1 minute": {
     "1 minute": "1 минута"
@@ -140,14 +140,23 @@
   "10-bit Color": {
     "10-bit Color": "10-битный цвет"
   },
+  "12 hours": {
+    "12 hours": "12 часов"
+  },
   "14 days": {
     "14 days": "14 дней"
+  },
+  "15 minutes": {
+    "15 minutes": "15 минут"
   },
   "15 seconds": {
     "15 seconds": "15 секунд"
   },
   "180°": {
     "180°": "180°"
+  },
+  "2 hours": {
+    "2 hours": "2 часа"
   },
   "2 minutes": {
     "2 minutes": "2 минуты"
@@ -158,6 +167,9 @@
   "20 minutes": {
     "20 minutes": "20 минут"
   },
+  "20 seconds": {
+    "20 seconds": "20 секунд"
+  },
   "24-Hour Format": {
     "24-Hour Format": "24-Часовой формат"
   },
@@ -166,6 +178,9 @@
   },
   "24-hour format": {
     "24-hour format": "24-часовой формат"
+  },
+  "25 seconds": {
+    "25 seconds": "25 секунд"
   },
   "250 ms": {
     "250 ms": "250 мс"
@@ -176,6 +191,9 @@
   "3 days": {
     "3 days": "3 дня"
   },
+  "3 hours": {
+    "3 hours": "3 часа"
+  },
   "3 minutes": {
     "3 minutes": "3 минуты"
   },
@@ -185,14 +203,29 @@
   "30 days": {
     "30 days": "30 дней"
   },
+  "30 minutes": {
+    "30 minutes": "30 минут"
+  },
   "30 seconds": {
     "30 seconds": "30 секунд"
+  },
+  "35 seconds": {
+    "35 seconds": "35 секунд"
   },
   "3rd party": {
     "3rd party": "Сторонние"
   },
+  "4 hours": {
+    "4 hours": "4 часа"
+  },
   "4 seconds": {
     "4 seconds": "4 секунды"
+  },
+  "40 seconds": {
+    "40 seconds": "40 секунд"
+  },
+  "45 seconds": {
+    "45 seconds": "45 секунд"
   },
   "5 minutes": {
     "5 minutes": "5 минут"
@@ -200,14 +233,26 @@
   "5 seconds": {
     "5 seconds": "5 секунд"
   },
+  "50 seconds": {
+    "50 seconds": "50 секунд"
+  },
   "500 ms": {
     "500 ms": "500 мс"
+  },
+  "55 seconds": {
+    "55 seconds": "55 секунд"
+  },
+  "6 hours": {
+    "6 hours": "6 часов"
   },
   "7 days": {
     "7 days": "7 дней"
   },
   "750 ms": {
     "750 ms": "750 мс"
+  },
+  "8 hours": {
+    "8 hours": "8 часов"
   },
   "8 seconds": {
     "8 seconds": "8 секунд"
@@ -224,6 +269,9 @@
   "A file with this name already exists. Do you want to overwrite it?": {
     "A file with this name already exists. Do you want to overwrite it?": "Файл с таким именем уже существует. Хотите его перезаписать?"
   },
+  "A modern desktop shell for Wayland compositors": {
+    "A modern desktop shell for Wayland compositors": "Современная оболочка рабочего стола для композиторов Wayland"
+  },
   "AC Power": {
     "AC Power": "Сеть"
   },
@@ -238,6 +286,9 @@
   },
   "Accent Color": {
     "Accent Color": "Акцентный цвет"
+  },
+  "Accept": {
+    "Accept": "Принять"
   },
   "Accept Jobs": {
     "Accept Jobs": "Принять задания"
@@ -266,6 +317,9 @@
   "Activate": {
     "Activate": "Активировать"
   },
+  "Activate Greeter": {
+    "Activate Greeter": ""
+  },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": ""
   },
@@ -280,6 +334,9 @@
   },
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "Монитор экрана блокировки"
+  },
+  "Active tile background and icon color": {
+    "Active tile background and icon color": "Фон активной плитки и цвет значка"
   },
   "Active: %1": {
     "Active: %1": "Активно: %1"
@@ -323,6 +380,9 @@
   "Add and configure widgets that appear on your desktop": {
     "Add and configure widgets that appear on your desktop": "Добавить и настроить виджеты, отображаемые на рабочем столе"
   },
+  "Add by Address": {
+    "Add by Address": ""
+  },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Настроить количество столбцов в режиме сетки."
   },
@@ -344,6 +404,9 @@
   "All Monitors": {
     "All Monitors": "Все мониторы"
   },
+  "All checks passed": {
+    "All checks passed": "Все проверки пройдены"
+  },
   "All day": {
     "All day": "Весь день"
   },
@@ -355,6 +418,9 @@
   },
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Назад • F1/I: Информация о Файле • F10: Справка • Esc: Закрыть"
+  },
+  "Alternative (OR)": {
+    "Alternative (OR)": ""
   },
   "Always Active": {
     "Always Active": "Всегда активно"
@@ -383,6 +449,12 @@
   "Analog": {
     "Analog": "Аналоговый"
   },
+  "Analog, digital, or stacked clock display": {
+    "Analog, digital, or stacked clock display": "Аналоговые, цифровые или многоярусные часы"
+  },
+  "Analyzing configuration...": {
+    "Analyzing configuration...": "Анализ конфигурации..."
+  },
   "Animation Duration": {
     "Animation Duration": "Длительность анимации"
   },
@@ -406,6 +478,15 @@
   },
   "App Launcher": {
     "App Launcher": "Программа Запуска Приложений"
+  },
+  "App Names": {
+    "App Names": "Имена приложений"
+  },
+  "App Theming": {
+    "App Theming": "Реестр тем"
+  },
+  "Appearance": {
+    "Appearance": "Внешний вид"
   },
   "Application Dock": {
     "Application Dock": "Приложение Док"
@@ -449,6 +530,9 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Приложения с отключёнными всплывающими уведомлениями. Включите звук или удалите для удаления."
   },
+  "Architecture": {
+    "Architecture": "Архитектура"
+  },
   "Are you sure you want to kill session \"%1\"?": {
     "Are you sure you want to kill session \"%1\"?": ""
   },
@@ -484,32 +568,6 @@
   },
   "Audio Visualizer": {
     "Audio Visualizer": "Аудио Визуализатор"
-  },
-  "Audio device rename dialog field label": {
-    "Custom Name": "Пользовательское имя"
-  },
-  "Audio device rename dialog hint": {
-    "Press Enter and the audio system will restart to apply the change": "Нажмите Enter, и аудиосистема перезапустится для применения изменений"
-  },
-  "Audio device rename dialog placeholder": {
-    "Enter device name...": "Введите имя устройства..."
-  },
-  "Audio device rename dialog title": {
-    "Set Custom Device Name": "Установить пользовательское имя устройства"
-  },
-  "Audio settings description": {
-    "Set custom names for your audio input devices": "Установить пользовательские имена для устройств вывода аудио",
-    "Set custom names for your audio output devices": "Установить пользовательские имена для устройств вывода аудио"
-  },
-  "Audio settings empty state": {
-    "No input devices found": "Устройства вывода не найдены",
-    "No output devices found": "Устройства вывода не найдены"
-  },
-  "Audio settings: maximum volume limit per device": {
-    "Max Volume": "Максимальная громкость"
-  },
-  "Audio settings: speaker/headphone devices": {
-    "Output Devices": "Устройства вывода"
   },
   "Audio system restarted": {
     "Audio system restarted": "Аудио система перезапущена"
@@ -565,6 +623,9 @@
   "Auto": {
     "Auto": "Авто"
   },
+  "Auto (Bar-aware)": {
+    "Auto (Bar-aware)": ""
+  },
   "Auto (Wide)": {
     "Auto (Wide)": "Авто (широкий)"
   },
@@ -582,6 +643,9 @@
   },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "Автозакрытие обзора Niri при запуске приложений."
+  },
+  "Auto-delete notifications older than this": {
+    "Auto-delete notifications older than this": "Сохранять уведомления обычного приоритета в историю"
   },
   "Auto-hide": {
     "Auto-hide": "Автоскрытие"
@@ -679,8 +743,17 @@
   "Background authentication sync failed. Trying terminal mode.": {
     "Background authentication sync failed. Trying terminal mode.": ""
   },
+  "Background image": {
+    "Background image": "Фоновое изображение"
+  },
   "Backlight device": {
     "Backlight device": "Подсветки устройство"
+  },
+  "Balance power and performance": {
+    "Balance power and performance": "Приоритет производительности"
+  },
+  "Balanced": {
+    "Balanced": "Экономия энергии"
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Сбалансированная палитра с фокусными акцентами (по умолчанию)."
@@ -772,6 +845,9 @@
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Размытие обоев при открытом обзоре Niri"
   },
+  "Body": {
+    "Body": "Заголовок"
+  },
   "Border": {
     "Border": "Рамка"
   },
@@ -795,6 +871,9 @@
   },
   "Bottom": {
     "Bottom": "Снизу"
+  },
+  "Bottom Center": {
+    "Bottom Center": "Вверху справа"
   },
   "Bottom Left": {
     "Bottom Left": "Внизу слева"
@@ -823,20 +902,20 @@
   "Browse": {
     "Browse": "Просмотр"
   },
+  "Browse Files": {
+    "Browse Files": "Обзор файлов"
+  },
   "Browse Plugins": {
     "Browse Plugins": "Просмотр Дополнений"
+  },
+  "Browse Themes": {
+    "Browse Themes": "Просмотр тем"
   },
   "Browse or search plugins": {
     "Browse or search plugins": "Обзор или поиск Плагины"
   },
   "Button Color": {
     "Button Color": "Цвет кнопки"
-  },
-  "Button state while testing printer connection": {
-    "Testing...": ""
-  },
-  "Button to test connection to a printer by IP address": {
-    "Test Connection": ""
   },
   "CPU": {
     "CPU": "ЦП"
@@ -856,6 +935,9 @@
   "CPU usage indicator": {
     "CPU usage indicator": "Индикатор загрузки ЦП"
   },
+  "CPU, memory, network, and disk monitoring": {
+    "CPU, memory, network, and disk monitoring": "Мониторинг ЦП, памяти, сети и диска"
+  },
   "CUPS Insecure Filter Warning": {
     "CUPS Insecure Filter Warning": "CUPS: предупреждение о небезопасном фильтре"
   },
@@ -867,12 +949,6 @@
   },
   "CUPS not available": {
     "CUPS not available": "CUPS недоступен"
-  },
-  "Calc": {
-    "Calc": "Калькулятор"
-  },
-  "Calculator": {
-    "Calculator": "Калькулятор"
   },
   "Camera": {
     "Camera": "Камера"
@@ -916,6 +992,12 @@
   "Certificate Password": {
     "Certificate Password": "Сертификата Пароль"
   },
+  "Change Song": {
+    "Change Song": "Ничего"
+  },
+  "Change Volume": {
+    "Change Volume": "Ничего"
+  },
   "Change bar appearance": {
     "Change bar appearance": "Изменить панели внешний вид"
   },
@@ -934,9 +1016,6 @@
   "Check for system updates": {
     "Check for system updates": "Проверить наличие обновлений системы"
   },
-  "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": {
-    "Check sync status on demand. Sync copies your theme, settings, PAM config, and wallpaper to the login screen in one step. Must run Sync to apply changes.": ""
-  },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
   },
@@ -949,14 +1028,26 @@
   "Checking...": {
     "Checking...": ""
   },
+  "Checking…": {
+    "Checking…": ""
+  },
   "Choose Color": {
     "Choose Color": "Выбрать Цвет"
+  },
+  "Choose Dark Mode Color": {
+    "Choose Dark Mode Color": "Выбрать цвет тёмного режима"
   },
   "Choose Dock Launcher Logo Color": {
     "Choose Dock Launcher Logo Color": "Выбрать Док Лаунчер Логотипа Цвет"
   },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "Выбрать Цвет Логотипа Лаунчера"
+  },
+  "Choose Light Mode Color": {
+    "Choose Light Mode Color": "Выбрать цвет светлого режима"
+  },
+  "Choose Wallpaper Color": {
+    "Choose Wallpaper Color": "Выбрать цвет обоев"
   },
   "Choose a color": {
     "Choose a color": "Выбрать a цвет"
@@ -1000,6 +1091,9 @@
   "Cipher": {
     "Cipher": "Шифр"
   },
+  "Circle": {
+    "Circle": "Линия"
+  },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "Regex класса (например, ^firefox$)"
   },
@@ -1008,9 +1102,6 @@
   },
   "Clear All": {
     "Clear All": "Очистить Всё"
-  },
-  "Clear All History?": {
-    "Clear All History?": "Очистить Всю Историю?"
   },
   "Clear All Jobs": {
     "Clear All Jobs": "Очистить все задания"
@@ -1036,17 +1127,14 @@
   "Click 'Setup' to create cursor config and add include to your compositor config.": {
     "Click 'Setup' to create cursor config and add include to your compositor config.": "Нажмите «Setup» для создания конфига курсора и добавления include в конфиг композитора."
   },
-  "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": {
-    "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": "Нажмите «Setup» для создания dms/binds.kdl и добавления include в config.kdl."
-  },
   "Click 'Setup' to create the outputs config and add include to your compositor config.": {
     "Click 'Setup' to create the outputs config and add include to your compositor config.": "Нажмите «Setup» для создания конфига outputs и добавления include в конфиг композитора."
   },
-  "Click + to add a rule for the focused window": {
-    "Click + to add a rule for the focused window": "Нажмите +, чтобы добавить правило для активного окна"
-  },
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "Нажмите Import для добавления .ovpn или .conf"
+  },
+  "Click Refresh to check status.": {
+    "Click Refresh to check status.": ""
   },
   "Click Through": {
     "Click Through": "Нажмите насквозь"
@@ -1054,11 +1142,11 @@
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Нажмите любую горячую клавишу для редактирования. Изменения сохраняются в %1"
   },
-  "Click any shortcut to edit. Changes save to dms/binds.kdl": {
-    "Click any shortcut to edit. Changes save to dms/binds.kdl": "Нажмите на любое сочетание клавиш, чтобы изменить его. Изменения сохраняются в dms/binds.kdl"
-  },
   "Click to capture": {
     "Click to capture": "Нажмите для захвата"
+  },
+  "Click to select a custom theme JSON file": {
+    "Click to select a custom theme JSON file": "Нажмите для выбора пользовательского JSON-файла темы"
   },
   "Clip": {
     "Clip": "Обрезать"
@@ -1075,8 +1163,8 @@
   "Clipboard Manager": {
     "Clipboard Manager": "Менеджер Буфера Обмена"
   },
-  "Clipboard behavior setting description": {
-    "Press Enter to paste, Shift+Enter to copy": "Нажмите Enter для вставки, Shift+Enter для копирования"
+  "Clipboard sent": {
+    "Clipboard sent": "Буфер обмена отправлен"
   },
   "Clipboard service not available": {
     "Clipboard service not available": "Служба буфера обмена недоступна"
@@ -1141,11 +1229,20 @@
   "Color theme for syntax highlighting. %1 themes available.": {
     "Color theme for syntax highlighting. %1 themes available.": "Цветовая тема для подсветки синтаксиса. Доступно тем: %1."
   },
+  "Color theme from DMS registry": {
+    "Color theme from DMS registry": "Цветовая тема из реестра DMS"
+  },
+  "Colorful": {
+    "Colorful": "По умолчанию"
+  },
   "Colorful mix of bright contrasting accents.": {
     "Colorful mix of bright contrasting accents.": "Красочная смесь ярких контрастных акцентов."
   },
   "Colorize Active": {
     "Colorize Active": "Colorize активен"
+  },
+  "Colors from wallpaper": {
+    "Colors from wallpaper": "Безопасность и конфиденциальность"
   },
   "Column": {
     "Column": "Колонка"
@@ -1167,6 +1264,9 @@
   },
   "Communication": {
     "Communication": "Взаимодействие"
+  },
+  "Community themes": {
+    "Community themes": "Безопасность и конфиденциальность"
   },
   "Compact": {
     "Compact": "Компактно"
@@ -1203,6 +1303,12 @@
   },
   "Configuration will be preserved when this display reconnects": {
     "Configuration will be preserved when this display reconnects": "Конфигурация будет сохранена при переподключении этого дисплея"
+  },
+  "Configure": {
+    "Configure": "Настроить"
+  },
+  "Configure Keybinds": {
+    "Configure Keybinds": "Настроить комбинации клавиш"
   },
   "Configure a new printer": {
     "Configure a new printer": "Настроить новый принтер"
@@ -1249,6 +1355,9 @@
   "Connected": {
     "Connected": "Подключено"
   },
+  "Connected Device": {
+    "Connected Device": "Выкл"
+  },
   "Connected Displays": {
     "Connected Displays": "Подключённые Мониторы"
   },
@@ -1257,6 +1366,15 @@
   },
   "Connecting...": {
     "Connecting...": "Подключение..."
+  },
+  "Connection failed": {
+    "Connection failed": ""
+  },
+  "Contains": {
+    "Contains": "Регулярное выражение"
+  },
+  "Content": {
+    "Content": "Яркий"
   },
   "Content copied": {
     "Content copied": "Содержимое скопировано"
@@ -1275,6 +1393,9 @@
   },
   "Control currently playing media": {
     "Control currently playing media": "Управление воспроизводимым медиа"
+  },
+  "Control what notification information is shown on the lock screen": {
+    "Control what notification information is shown on the lock screen": "Отображение уведомлений"
   },
   "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.": {
     "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.": "Контроль того, какие плагины появляются в режиме «All» без требования префикса триггера. Перетащите для изменения порядка."
@@ -1333,14 +1454,8 @@
   "Copy PID": {
     "Copy PID": "Скопировать PID"
   },
-  "Copy Process Name": {
-    "Copy Process Name": "Скопировать Имя Процесса"
-  },
   "Copy Text": {
     "Copy Text": "Копировать текст"
-  },
-  "Copy URL": {
-    "Copy URL": "Копировать URL"
   },
   "Copy path": {
     "Copy path": "Копировать путь"
@@ -1353,6 +1468,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "Углы и фон"
+  },
+  "Count Only": {
+    "Count Only": "Полное содержимое"
   },
   "Cover Open": {
     "Cover Open": "Крышка открыта"
@@ -1375,9 +1493,6 @@
   "Create rule for:": {
     "Create rule for:": "Создать правило для:"
   },
-  "Create rules to mute, ignore, hide from history, or override notification priority.": {
-    "Create rules to mute, ignore, hide from history, or override notification priority.": "Создавать правила для отключения звука, игнорирования, скрытия из истории или переопределения приоритета уведомлений."
-  },
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
     "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Создать правила для отключения звука, игнорирования, скрытия из истории или переопределения приоритета уведомлений. По умолчанию переопределяется только приоритет; уведомления всё равно показываются нормально."
   },
@@ -1387,11 +1502,17 @@
   "Critical Priority": {
     "Critical Priority": "Критический Приоритет"
   },
+  "Current": {
+    "Current": "История"
+  },
   "Current Items": {
     "Current Items": "Текущие Элементы"
   },
   "Current Locale": {
     "Current Locale": ""
+  },
+  "Current Monitor": {
+    "Current Monitor": "Текущий монитор"
   },
   "Current Period": {
     "Current Period": "Текущий период"
@@ -1402,8 +1523,14 @@
   "Current Temp": {
     "Current Temp": "Текущая температура"
   },
+  "Current Theme: %1": {
+    "Current Theme: %1": "Текущая тема: %1"
+  },
   "Current Weather": {
     "Current Weather": "Погода сейчас"
+  },
+  "Current Workspace": {
+    "Current Workspace": "Текущее рабочее пространство"
   },
   "Current time and date display": {
     "Current time and date display": "Отображение текущих даты и времени"
@@ -1447,6 +1574,9 @@
   "Custom Logout Command": {
     "Custom Logout Command": "Пользовательская команда выхода"
   },
+  "Custom Name": {
+    "Custom Name": "Пользовательское имя"
+  },
   "Custom Power Actions": {
     "Custom Power Actions": "Пользовательские действия питания"
   },
@@ -1467,6 +1597,12 @@
   },
   "Custom Transparency": {
     "Custom Transparency": "Своя Прозрачность"
+  },
+  "Custom power profile": {
+    "Custom power profile": "Приоритет производительности"
+  },
+  "Custom theme loaded from JSON file": {
+    "Custom theme loaded from JSON file": "Пользовательская тема загружена из JSON-файла"
   },
   "Custom...": {
     "Custom...": "Пользовательский..."
@@ -1489,11 +1625,11 @@
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "Менеджер Дополнений DMS Недоступен"
   },
+  "DMS Shortcuts": {
+    "DMS Shortcuts": "Комбинации клавиш DMS"
+  },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
-  },
-  "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": {
-    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Sync checks sudo first and opens a terminal when interactive authentication is required.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS устарел"
@@ -1513,9 +1649,6 @@
   "Daily": {
     "Daily": "Ежедневно"
   },
-  "Daily Forecast": {
-    "Daily Forecast": "Ежедневный Прогноз"
-  },
   "Daily at:": {
     "Daily at:": "Ежедневно в:"
   },
@@ -1525,8 +1658,11 @@
   "Dank Bar": {
     "Dank Bar": "Панель Dank"
   },
-  "DankSearch not available": {
-    "DankSearch not available": "DankSearch недоступен"
+  "DankBar": {
+    "DankBar": "DankBar"
+  },
+  "DankMaterialShell is ready to use": {
+    "DankMaterialShell is ready to use": "DankMaterialShell готов к использованию"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell и системные значки (требуется перезапуск)"
@@ -1561,6 +1697,12 @@
   "Dawn (Nautical Twilight)": {
     "Dawn (Nautical Twilight)": "Рассвет (навигационные сумерки)"
   },
+  "Day Date": {
+    "Day Date": "Системный по умолчанию"
+  },
+  "Day Month Date": {
+    "Day Month Date": "Системный по умолчанию"
+  },
   "Day Temperature": {
     "Day Temperature": "Дневная температура"
   },
@@ -1572,6 +1714,9 @@
   },
   "Default": {
     "Default": "По умолчанию"
+  },
+  "Default (Black)": {
+    "Default (Black)": ""
   },
   "Default Width (%)": {
     "Default Width (%)": "Ширина по умолчанию (%)"
@@ -1627,6 +1772,9 @@
   "Desktop Clock": {
     "Desktop Clock": "Настольные часы"
   },
+  "Desktop Entry": {
+    "Desktop Entry": "Заголовок"
+  },
   "Desktop Widget": {
     "Desktop Widget": "Виджет рабочего стола"
   },
@@ -1635,12 +1783,6 @@
   },
   "Desktop background images": {
     "Desktop background images": "Фоновые изображения рабочего стола"
-  },
-  "Desktop clock widget description": {
-    "Analog, digital, or stacked clock display": "Аналоговые, цифровые или многоярусные часы"
-  },
-  "Desktop clock widget name": {
-    "Desktop Clock": "Настольные часы"
   },
   "Detailed": {
     "Detailed": "Подробно"
@@ -1663,14 +1805,20 @@
   "Device paired": {
     "Device paired": "Устройство сопряжено"
   },
+  "Device unpaired": {
+    "Device unpaired": "Сопряжение устройства отменено"
+  },
   "Digital": {
     "Digital": "Цифровой"
+  },
+  "Direction Source": {
+    "Direction Source": ""
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Отключите Автоподключение"
   },
-  "Disable Clipboard Manager": {
-    "Disable Clipboard Manager": "Отключить менеджер буфера обмена"
+  "Disable Built-in Wallpapers": {
+    "Disable Built-in Wallpapers": "Отключить встроенные обои"
   },
   "Disable History Persistence": {
     "Disable History Persistence": "Отключить сохранение истории"
@@ -1678,20 +1826,20 @@
   "Disable Output": {
     "Disable Output": "Отключите Выход"
   },
-  "Disable clipboard manager entirely (requires restart)": {
-    "Disable clipboard manager entirely (requires restart)": "Полностью отключите менеджер буфера обмена (требуется перезапуск)"
-  },
   "Disabled": {
     "Disabled": "Отключено"
-  },
-  "Disabled.": {
-    "Disabled.": ""
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "Отключение Wi-Fi…"
   },
+  "Disc": {
+    "Disc": "Стирание"
+  },
   "Discard": {
     "Discard": "Отменить"
+  },
+  "Discharging": {
+    "Discharging": "Подключено"
   },
   "Disconnect": {
     "Disconnect": "Отключить"
@@ -1702,8 +1850,14 @@
   "Disconnected from WiFi": {
     "Disconnected from WiFi": "Отключен от WiFi"
   },
+  "Discover Devices": {
+    "Discover Devices": ""
+  },
   "Disk": {
     "Disk": "Диск"
+  },
+  "Disk I/O": {
+    "Disk I/O": "Дисковый ввод/вывод"
   },
   "Disk Usage": {
     "Disk Usage": "Использование Диска"
@@ -1722,6 +1876,9 @@
   },
   "Display Assignment": {
     "Display Assignment": "Назначение дисплеев"
+  },
+  "Display Control": {
+    "Display Control": "Реестр тем"
   },
   "Display Name Format": {
     "Display Name Format": "Формат имени дисплея"
@@ -1780,6 +1937,9 @@
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "Отображает активную раскладку клавиатуры и позволяет переключаться"
   },
+  "Distribution": {
+    "Distribution": "Имя хоста"
+  },
   "Diverse palette spanning the full spectrum.": {
     "Diverse palette spanning the full spectrum.": "Разнообразная палитра, охватывающая весь спектр."
   },
@@ -1791,9 +1951,6 @@
   },
   "Dock & Launcher": {
     "Dock & Launcher": "Док & Лаунчер"
-  },
-  "Dock Position": {
-    "Dock Position": "Расположение Дока"
   },
   "Dock Transparency": {
     "Dock Transparency": "Прозрачность Дока"
@@ -1855,8 +2012,20 @@
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "Сумерки (навигационные сумерки)"
   },
+  "Dynamic": {
+    "Dynamic": "Динамическая"
+  },
   "Dynamic Properties": {
     "Dynamic Properties": "Динамические свойства"
+  },
+  "Dynamic Theming": {
+    "Dynamic Theming": "Динамичные темы"
+  },
+  "Dynamic colors from wallpaper": {
+    "Dynamic colors from wallpaper": "Динамические цвета из обоев"
+  },
+  "Dynamic colors, presets": {
+    "Dynamic colors, presets": "Динамические цвета, предустановки"
   },
   "Edge Spacing": {
     "Edge Spacing": "Отступ краёв"
@@ -1882,26 +2051,17 @@
   "Enable Bar": {
     "Enable Bar": "Включить бар"
   },
-  "Enable Desktop Clock": {
-    "Enable Desktop Clock": "Включить часы рабочего стола"
-  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Включить режим 'Не беспокоить'"
   },
-  "Enable FIDO2/U2F hardware security key for lock screen": {
-    "Enable security key authentication": ""
-  },
-  "Enable GPU Temperature": {
-    "Enable GPU Temperature": "Включить Температуру ГП"
+  "Enable History": {
+    "Enable History": "Включить историю"
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Включить наложение обзора"
   },
   "Enable Ripple Effects": {
     "Enable Ripple Effects": "Включить эффекты ряби"
-  },
-  "Enable System Monitor": {
-    "Enable System Monitor": "Включить системный монитор"
   },
   "Enable System Sounds": {
     "Enable System Sounds": "Включить системные звуки"
@@ -1930,35 +2090,14 @@
   "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
     "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
   },
-  "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": {
-    "Enable fingerprint or security key for DMS Greeter. Run Sync to apply and configure PAM.": ""
-  },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Включить интеграцию блокировки loginctl"
-  },
-  "Enable media player controls on the lock screen window": {
-    "Show Media Player": "Показать медиаплеер"
-  },
-  "Enable password field display on the lock screen window": {
-    "Show Password Field": "Показать поле для ввода пароля"
-  },
-  "Enable power action icon on the lock screen window": {
-    "Show Power Actions": "Показать действия питания"
-  },
-  "Enable profile image display on the lock screen window": {
-    "Show Profile Image": "Показать изображение профиля"
   },
   "Enable security key at login": {
     "Enable security key at login": ""
   },
-  "Enable system date display on the lock screen window": {
-    "Show System Date": "Показать системную дату"
-  },
-  "Enable system status icons on the lock screen window": {
-    "Show System Icons": "Показать системные иконки"
-  },
-  "Enable system time display on the lock screen window": {
-    "Show System Time": "Показать системное время"
+  "Enable security key authentication": {
+    "Enable security key authentication": ""
   },
   "Enabled": {
     "Enabled": "Включено"
@@ -1975,17 +2114,11 @@
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": ""
   },
-  "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": {
-    "Enabled, but no prints are enrolled yet. Enroll fingerprints to use it.": ""
-  },
   "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
     "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": ""
-  },
-  "Enabled, but no registered security key was found yet. Register a key or update your U2F config.": {
-    "Enabled, but no registered security key was found yet. Register a key or update your U2F config.": ""
   },
   "Enabled, but security-key availability could not be confirmed.": {
     "Enabled, but security-key availability could not be confirmed.": ""
@@ -2020,14 +2153,14 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Введите PIN для "
   },
+  "Enter URL or text to share": {
+    "Enter URL or text to share": "Введите URL или текст для отправки"
+  },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": ""
   },
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "Введите новое имя для этого рабочего пространства"
-  },
-  "Enter a search query": {
-    "Enter a search query": "Введите поисковый запрос"
   },
   "Enter command or script path": {
     "Enter command or script path": ""
@@ -2040,6 +2173,9 @@
   },
   "Enter custom top bar format (e.g., ddd MMM d)": {
     "Enter custom top bar format (e.g., ddd MMM d)": "Введите пользовательский формат верхней панели (например, ddd MMM d)"
+  },
+  "Enter device name...": {
+    "Enter device name...": "Введите имя устройства..."
   },
   "Enter filename...": {
     "Enter filename...": "Введите имя файла..."
@@ -2077,8 +2213,14 @@
   "Error": {
     "Error": "Ошибка"
   },
+  "Errors": {
+    "Errors": "Ошибки"
+  },
   "Ethernet": {
     "Ethernet": "Ethernet"
+  },
+  "Exact": {
+    "Exact": "Регулярное выражение"
   },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "Смещение Исключительной Зоны"
@@ -2086,8 +2228,23 @@
   "Experimental Feature": {
     "Experimental Feature": "Экспериментальная функция"
   },
+  "Explore": {
+    "Explore": "Обзор"
+  },
   "Exponential": {
     "Exponential": "Экспоненциальный"
+  },
+  "Expressive": {
+    "Expressive": "Яркий"
+  },
+  "Extend battery life": {
+    "Extend battery life": "Приоритет производительности"
+  },
+  "Extensible architecture": {
+    "Extensible architecture": "Безопасность и конфиденциальность"
+  },
+  "External Wallpaper Management": {
+    "External Wallpaper Management": "Внешнее управление обоями"
   },
   "Extra Arguments": {
     "Extra Arguments": "Дополнительные аргументы"
@@ -2095,14 +2252,17 @@
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: Переключить • F10: Справка"
   },
-  "Fade grace period": {
-    "Fade grace period": "Период плавного затухания"
+  "Fade": {
+    "Fade": "Стирание"
   },
   "Fade to lock screen": {
     "Fade to lock screen": "Плавный переход к экрану блокировки"
   },
   "Fade to monitor off": {
     "Fade to monitor off": "Плавное выключение монитора"
+  },
+  "Failed to accept pairing": {
+    "Failed to accept pairing": "Не удалось принять сопряжение"
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Не удалось активировать конфигурацию"
@@ -2115,6 +2275,9 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "Не удалось добавить принтер в класс"
+  },
+  "Failed to browse device": {
+    "Failed to browse device": "Не удалось просмотреть устройство"
   },
   "Failed to cancel all jobs": {
     "Failed to cancel all jobs": "Не удалось отменить все задания"
@@ -2185,6 +2348,9 @@
   "Failed to import VPN": {
     "Failed to import VPN": "Не удалось импортировать VPN"
   },
+  "Failed to launch SMS app": {
+    "Failed to launch SMS app": "Не удалось запустить SMS-приложение"
+  },
   "Failed to load VPN config": {
     "Failed to load VPN config": "Не удалось загрузить VPN config"
   },
@@ -2212,6 +2378,9 @@
   "Failed to print test page": {
     "Failed to print test page": "Не удалось напечатать тестовую страницу"
   },
+  "Failed to reject pairing": {
+    "Failed to reject pairing": "Не удалось отклонить сопряжение"
+  },
   "Failed to remove device": {
     "Failed to remove device": "Не удалось удалить устройство"
   },
@@ -2230,6 +2399,12 @@
   "Failed to resume printer": {
     "Failed to resume printer": "Не удалось возобновить принтер"
   },
+  "Failed to ring device": {
+    "Failed to ring device": "Не удалось вызвать устройство"
+  },
+  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
+    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "Не удалось сохранить аудиоконфиг"
   },
@@ -2241,6 +2416,15 @@
   },
   "Failed to save profile file": {
     "Failed to save profile file": "Не удалось сохранить файл профиля"
+  },
+  "Failed to send clipboard": {
+    "Failed to send clipboard": "Не удалось отправить буфер обмена"
+  },
+  "Failed to send file": {
+    "Failed to send file": "Не удалось отправить файл"
+  },
+  "Failed to send ping": {
+    "Failed to send ping": "Не удалось отправить ping"
   },
   "Failed to set brightness": {
     "Failed to set brightness": "Не удалось установить яркость"
@@ -2262,6 +2446,9 @@
   },
   "Failed to set profile image: %1": {
     "Failed to set profile image: %1": "Не удалось установить изображение профиля: %1"
+  },
+  "Failed to share": {
+    "Failed to share": "Не удалось поделиться"
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "Не удалось начать подключение к %1"
@@ -2287,11 +2474,20 @@
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "Не удалось записать временный файл для проверки"
   },
+  "Features": {
+    "Features": "Возможности"
+  },
   "Feels": {
     "Feels": "Ощущается"
   },
   "Feels Like": {
     "Feels Like": "Ощущается как"
+  },
+  "Feels Like %1°": {
+    "Feels Like %1°": "Ощущается как %1°"
+  },
+  "Fidelity": {
+    "Fidelity": "Яркий"
   },
   "Field": {
     "Field": "Поле"
@@ -2305,11 +2501,11 @@
   "File Information": {
     "File Information": "Информация о Файле"
   },
+  "File received from": {
+    "File received from": "Файл получен от"
+  },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "Поиск файлов требует dsearch. Установите с github.com/morelazers/dsearch"
-  },
-  "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": {
-    "File search requires dsearch\\nInstall from github.com/AvengeMedia/danksearch": "Поиск файлов требует dsearch\\nУстановите с github.com/morelazers/dsearch"
   },
   "Files": {
     "Files": "Файлы"
@@ -2317,14 +2513,14 @@
   "Filesystem usage monitoring": {
     "Filesystem usage monitoring": "Мониторинг использования файловой системы"
   },
+  "Fill": {
+    "Fill": "Плитка вертикально"
+  },
   "Find in Text": {
     "Find in Text": "Найти в Тексте"
   },
   "Find in note...": {
     "Find in note...": "Поиск по заметке..."
-  },
-  "Fine-tune animation timing in milliseconds": {
-    "Fine-tune animation timing in milliseconds": "Точная настройка времени анимации в миллисекундах"
   },
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": ""
@@ -2344,11 +2540,17 @@
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": ""
   },
+  "Finish": {
+    "Finish": "Завершить"
+  },
   "First Day of Week": {
     "First Day of Week": ""
   },
   "First Time Setup": {
     "First Time Setup": "Первоначальная настройка"
+  },
+  "Fit": {
+    "Fit": "Плитка вертикально"
   },
   "Fix Now": {
     "Fix Now": "Исправить сейчас"
@@ -2437,9 +2639,6 @@
   "Force Kill (SIGKILL)": {
     "Force Kill (SIGKILL)": "Принудительно остановить (SIGKILL)"
   },
-  "Force Kill Process": {
-    "Force Kill Process": "Принудительно Завершить Процесс"
-  },
   "Force Wide Color": {
     "Force Wide Color": "Force Wide цвет"
   },
@@ -2454,6 +2653,9 @@
   },
   "Forecast Not Available": {
     "Forecast Not Available": "Прогноз недоступен"
+  },
+  "Forever": {
+    "Forever": "Навсегда"
   },
   "Forget": {
     "Forget": "Забыть"
@@ -2488,23 +2690,50 @@
   "Frequency": {
     "Frequency": "Частота"
   },
+  "Fruit Salad": {
+    "Fruit Salad": "Яркий"
+  },
+  "Full Command:": {
+    "Full Command:": "Полная комманда:"
+  },
+  "Full Content": {
+    "Full Content": "Полное содержимое"
+  },
+  "Full Day & Month": {
+    "Full Day & Month": "Системный по умолчанию"
+  },
+  "Full with Year": {
+    "Full with Year": "Системный по умолчанию"
+  },
   "Fullscreen": {
     "Fullscreen": "Полноэкранный"
   },
   "Fullscreen Only": {
     "Fullscreen Only": "Только полноэкранный"
   },
+  "Fully Charged": {
+    "Fully Charged": "Подключено"
+  },
   "Fun": {
     "Fun": "Развлечение"
   },
+  "G: grid • Z/X: size": {
+    "G: grid • Z/X: size": "G: сетка • Z/X: размер"
+  },
   "GPU": {
     "GPU": "ГП"
+  },
+  "GPU Monitoring": {
+    "GPU Monitoring": "Мониторинг ГП"
   },
   "GPU Temperature": {
     "GPU Temperature": "Температура ГП"
   },
   "GPU temperature display": {
     "GPU temperature display": ""
+  },
+  "GTK, Qt, IDEs, more": {
+    "GTK, Qt, IDEs, more": "GTK, Qt, IDEs, и далее"
   },
   "Games": {
     "Games": "Игры"
@@ -2518,8 +2747,11 @@
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": ""
   },
-  "Generic device name | Generic device name fallback": {
-    "device": "устройство"
+  "Generic": {
+    "Generic": "Общий"
+  },
+  "Get Started": {
+    "Get Started": "Начать"
   },
   "GitHub": {
     "GitHub": "GitHub"
@@ -2580,6 +2812,12 @@
   },
   "Grid Columns": {
     "Grid Columns": "Столбцы сетки"
+  },
+  "Grid: OFF": {
+    "Grid: OFF": "Сетка: ВКЛ"
+  },
+  "Grid: ON": {
+    "Grid: ON": "Сетка: ВКЛ"
   },
   "Group": {
     "Group": "Группа"
@@ -2674,6 +2912,9 @@
   "Hide Indicators": {
     "Hide Indicators": "Скрыть индикаторы"
   },
+  "Hide Updater Widget": {
+    "Hide Updater Widget": "Скрыть виджет обновления"
+  },
   "Hide When Typing": {
     "Hide When Typing": "Скрывать когда печатаешь"
   },
@@ -2701,9 +2942,6 @@
   "Hide on Touch": {
     "Hide on Touch": "Скрывать при касании"
   },
-  "Hide the dock when not in use and reveal it when hovering near the dock area": {
-    "Hide the dock when not in use and reveal it when hovering near the dock area": "Скрывать док, когда он не используется, и показывать его при наведении курсора мыши на его область"
-  },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Высокоточная палитра, сохраняющая исходные оттенки."
   },
@@ -2712,6 +2950,12 @@
   },
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": ""
+  },
+  "History": {
+    "History": "История"
+  },
+  "History Retention": {
+    "History Retention": "Хранение истории"
   },
   "History Settings": {
     "History Settings": "Историю Настройки"
@@ -2737,6 +2981,12 @@
   "Home": {
     "Home": "Домой"
   },
+  "Host": {
+    "Host": ""
+  },
+  "Hostname": {
+    "Hostname": "Имя хоста"
+  },
   "Hot Corners": {
     "Hot Corners": "Горячие углы"
   },
@@ -2748,9 +2998,6 @@
   },
   "Hourly": {
     "Hourly": "Почасовой"
-  },
-  "Hourly Forecast": {
-    "Hourly Forecast": "Почасовой Прогноз"
   },
   "Hourly Forecast Count": {
     "Hourly Forecast Count": "Количество почасовых прогнозов"
@@ -2785,6 +3032,12 @@
   "IP Address:": {
     "IP Address:": "IP-адрес:"
   },
+  "IP address or hostname": {
+    "IP address or hostname": ""
+  },
+  "ISO Date": {
+    "ISO Date": "Системный по умолчанию"
+  },
   "Icon": {
     "Icon": "Значок"
   },
@@ -2814,6 +3067,9 @@
   },
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "Если поле скрыто, оно появится сразу после нажатия клавиши."
+  },
+  "Ignore Completely": {
+    "Ignore Completely": "Только всплывающее"
   },
   "Image": {
     "Image": "Изображение"
@@ -2860,8 +3116,14 @@
   "Individual bar configuration": {
     "Individual bar configuration": "Индивидуальная конфигурация бара"
   },
+  "Info": {
+    "Info": "Информация"
+  },
   "Inherit": {
     "Inherit": "Наследовать"
+  },
+  "Inherit Global (Default)": {
+    "Inherit Global (Default)": ""
   },
   "Inhibitable": {
     "Inhibitable": "Блокируемый"
@@ -2875,8 +3137,32 @@
   "Insert your security key...": {
     "Insert your security key...": ""
   },
+  "Install": {
+    "Install": "Установить"
+  },
+  "Install Greeter": {
+    "Install Greeter": ""
+  },
+  "Install Plugin": {
+    "Install Plugin": "Установить дополнение"
+  },
+  "Install Theme": {
+    "Install Theme": "Установить тему"
+  },
+  "Install color themes from the DMS theme registry": {
+    "Install color themes from the DMS theme registry": "Установить цветовые темы из реестра тем DMS"
+  },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": ""
+  },
+  "Install failed: %1": {
+    "Install failed: %1": "Ошибка установки: %1"
+  },
+  "Install matugen package for dynamic theming": {
+    "Install matugen package for dynamic theming": "Установите пакет matugen для динамического оформления"
+  },
+  "Install plugin '%1' from the DMS registry?": {
+    "Install plugin '%1' from the DMS registry?": "Установить дополнение '%1' из реестра DMS?"
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Установить дополнения из репозитория DMS"
@@ -2884,11 +3170,26 @@
   "Install the DMS greeter? A terminal will open for sudo authentication.": {
     "Install the DMS greeter? A terminal will open for sudo authentication.": ""
   },
+  "Install theme '%1' from the DMS registry?": {
+    "Install theme '%1' from the DMS registry?": "Установить тему '%1' из реестра DMS?"
+  },
   "Installation and PAM setup: see the ": {
     "Installation and PAM setup: see the ": ""
   },
+  "Installed": {
+    "Installed": "Установлено"
+  },
+  "Installed: %1": {
+    "Installed: %1": "Установлено: %1"
+  },
+  "Installing: %1": {
+    "Installing: %1": "Установка: %1"
+  },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "Умное автоскрытие"
+  },
+  "Intensity": {
+    "Intensity": "Интенсивность"
   },
   "Interface:": {
     "Interface:": "Интерфейс:"
@@ -2908,6 +3209,9 @@
   "Invert on mode change": {
     "Invert on mode change": "Инвертировать при смене режима"
   },
+  "Iris Bloom": {
+    "Iris Bloom": "Стирание"
+  },
   "Isolate Displays": {
     "Isolate Displays": "Изолировать дисплеи"
   },
@@ -2916,206 +3220,6 @@
   },
   "Jobs: ": {
     "Jobs: ": "Задания: "
-  },
-  "KDE Connect SMS action": {
-    "Opening SMS": "Открытие SMS-приложения",
-    "Opening SMS app": "Открытие SMS-приложения"
-  },
-  "KDE Connect SMS dialog title": {
-    "Send SMS": "Отправить SMS"
-  },
-  "KDE Connect SMS message input placeholder": {
-    "Message": "Сообщение"
-  },
-  "KDE Connect SMS phone input placeholder": {
-    "Phone number": "Номер телефона"
-  },
-  "KDE Connect SMS send button": {
-    "Send": "Отправить"
-  },
-  "KDE Connect SMS tooltip": {
-    "SMS": "SMS"
-  },
-  "KDE Connect accept pairing button": {
-    "Accept": "Принять"
-  },
-  "KDE Connect browse action": {
-    "Opening file browser": "Открытие файлового менеджера",
-    "Opening files": "Открытие файлов"
-  },
-  "KDE Connect browse tooltip": {
-    "Browse Files": "Обзор файлов"
-  },
-  "KDE Connect clipboard action": {
-    "Clipboard sent": "Буфер обмена отправлен"
-  },
-  "KDE Connect clipboard action | Phone Connect clipboard action": {
-    "Clipboard sent": "Буфер обмена отправлен"
-  },
-  "KDE Connect clipboard tooltip": {
-    "Send Clipboard": "Отправить буфер обмена"
-  },
-  "KDE Connect connected status": {
-    "Connected": "Подключено"
-  },
-  "KDE Connect connected status | network status": {
-    "Connected": "Подключено"
-  },
-  "KDE Connect daemon hint": {
-    "Start kdeconnectd to use this plugin": "Запустите kdeconnectd для использования этого плагина"
-  },
-  "KDE Connect error": {
-    "Failed to accept pairing": "Не удалось принять сопряжение",
-    "Failed to browse device": "Не удалось просмотреть устройство",
-    "Failed to launch SMS app": "Не удалось запустить SMS-приложение",
-    "Failed to reject pairing": "Не удалось отклонить сопряжение",
-    "Failed to ring device": "Не удалось вызвать устройство",
-    "Failed to send clipboard": "Не удалось отправить буфер обмена",
-    "Failed to send file": "Не удалось отправить файл",
-    "Failed to send ping": "Не удалось отправить ping",
-    "Failed to share": "Не удалось поделиться",
-    "Pairing failed": "Сопряжение не удалось",
-    "Unpair failed": "Отмена сопряжения не удалась"
-  },
-  "KDE Connect file browser title": {
-    "Select File to Send": "Выбрать файл для отправки"
-  },
-  "KDE Connect file send": {
-    "Sending": "Отправка"
-  },
-  "KDE Connect file share notification": {
-    "File received from": "Файл получен от"
-  },
-  "KDE Connect hint message": {
-    "Make sure KDE Connect is running on your other devices": "Убедитесь, что KDE Connect запущен на других устройствах"
-  },
-  "KDE Connect no devices message": {
-    "No devices found": "Устройства не найдены"
-  },
-  "KDE Connect no devices status": {
-    "No devices": "Нет устройств"
-  },
-  "KDE Connect no devices status | bluetooth status": {
-    "No devices": "Нет устройств"
-  },
-  "KDE Connect not paired status": {
-    "Not paired": "Не сопряжено"
-  },
-  "KDE Connect offline status": {
-    "Offline": "Оффлайн"
-  },
-  "KDE Connect offline status | Phone Connect offline status": {
-    "Offline": "Оффлайн"
-  },
-  "KDE Connect open SMS app button": {
-    "Open App": "Открыть приложение"
-  },
-  "KDE Connect open app hint": {
-    "Open KDE Connect on your phone": "Откройте KDE Connect на телефоне"
-  },
-  "KDE Connect pair button": {
-    "Pair": "Сопряжение"
-  },
-  "KDE Connect pairing action": {
-    "Device paired": "Устройство сопряжено",
-    "Pairing request sent": "Запрос сопряжения отправлен"
-  },
-  "KDE Connect pairing in progress status": {
-    "Pairing": "Сопряжение"
-  },
-  "KDE Connect pairing request notification": {
-    "Pairing request from": "Запрос сопряжения от"
-  },
-  "KDE Connect pairing requested status": {
-    "Pairing requested": "Запрос сопряжения отправлен"
-  },
-  "KDE Connect pairing verification key label": {
-    "Verification": "Проверка"
-  },
-  "KDE Connect ping action": {
-    "Ping sent": "Ping отправлен на",
-    "Ping sent to": "Ping отправлен на"
-  },
-  "KDE Connect ping tooltip": {
-    "Ping": "Ping"
-  },
-  "KDE Connect refresh button | KDE Connect refresh tooltip": {
-    "Refresh": "Обновить"
-  },
-  "KDE Connect refresh button | Phone Connect refresh tooltip": {
-    "Refresh": "Обновить"
-  },
-  "KDE Connect reject pairing button": {
-    "Reject": "Отклонить"
-  },
-  "KDE Connect request pairing button": {
-    "Request Pairing": "Запрос сопряжения"
-  },
-  "KDE Connect ring action": {
-    "Ringing": "Вызов"
-  },
-  "KDE Connect ring action | Phone Connect ring action": {
-    "Ringing": "Вызов"
-  },
-  "KDE Connect ring tooltip": {
-    "Ring": "Вызов"
-  },
-  "KDE Connect send file button": {
-    "Send File": "Отправить файл"
-  },
-  "KDE Connect service unavailable message": {
-    "KDE Connect unavailable": "KDE Connect недоступен"
-  },
-  "KDE Connect share URL button": {
-    "Share URL": "Поделиться URL"
-  },
-  "KDE Connect share button": {
-    "Share Text": "Поделиться текстом"
-  },
-  "KDE Connect share button | KDE Connect share dialog title | KDE Connect share tooltip": {
-    "Share": "Поделиться"
-  },
-  "KDE Connect share dialog title | KDE Connect share tooltip": {
-    "Share": "Поделиться"
-  },
-  "KDE Connect share input placeholder": {
-    "Enter URL or text to share": "Введите URL или текст для отправки"
-  },
-  "KDE Connect share success": {
-    "Shared": "Отправлено"
-  },
-  "KDE Connect start daemon hint": {
-    "Start kdeconnectd to connect devices": "Запустите kdeconnectd для подключения устройств"
-  },
-  "KDE Connect status": {
-    "No devices connected": "Нет подключённых устройств"
-  },
-  "KDE Connect status multiple devices": {
-    "devices connected": "устройств подключено"
-  },
-  "KDE Connect status single device": {
-    "1 device connected": "1 устройство подключено"
-  },
-  "KDE Connect unavailable error title": {
-    "KDE Connect Not Available": "KDE Connect не доступен"
-  },
-  "KDE Connect unavailable status": {
-    "Unavailable": "Недоступно"
-  },
-  "KDE Connect unknown device status | battery status | power profile option | unknown author | widget status": {
-    "Unknown": "Неизвестный"
-  },
-  "KDE Connect unknown device status | unknown author": {
-    "Unknown": "Неизвестный"
-  },
-  "KDE Connect unpair action": {
-    "Device unpaired": "Сопряжение устройства отменено"
-  },
-  "KDE Connect unpair action | Phone Connect unpair action": {
-    "Device unpaired": "Сопряжение устройства отменено"
-  },
-  "KDE Connect unpair tooltip": {
-    "Unpair": "Отменить сопряжение"
   },
   "Keep Awake": {
     "Keep Awake": "Не спать"
@@ -3126,11 +3230,17 @@
   "Keeping Awake": {
     "Keeping Awake": "Не спит"
   },
+  "Kernel": {
+    "Kernel": "Ядро"
+  },
   "Key": {
     "Key": "Ключ"
   },
   "Keybind Sources": {
     "Keybind Sources": "Источники комбинаций клавиш"
+  },
+  "Keybinds": {
+    "Keybinds": "Темы и цвета"
   },
   "Keybinds Search Settings": {
     "Keybinds Search Settings": "Настройки поиска комбинаций клавиш"
@@ -3143,10 +3253,6 @@
   },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Горячие клавиши"
-  },
-  "Keyboard hints when enter-to-paste is enabled": {
-    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "↑/↓: Навигация • Enter: Вставить • Del: Удалить • F10: Справка",
-    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: Навигация • Enter: Вставить • Del: Удалить • F10: Справка"
   },
   "Keys": {
     "Keys": "Ключи"
@@ -3172,20 +3278,14 @@
   "LabWC Website": {
     "LabWC Website": ""
   },
-  "Label for printer IP address or hostname input field": {
-    "Host": ""
-  },
-  "Label for printer port number input field": {
-    "Port": ""
-  },
-  "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket": {
-    "Protocol": ""
-  },
   "Large": {
     "Large": "Большой"
   },
   "Largest": {
     "Largest": "Крупнейший"
+  },
+  "Last hour": {
+    "Last hour": "Вчера"
   },
   "Last launched %1": {
     "Last launched %1": "Последние запущененные %1"
@@ -3193,26 +3293,17 @@
   "Last launched %1 day ago": {
     "Last launched %1 day ago": ""
   },
-  "Last launched %1 day%2 ago": {
-    "Last launched %1 day%2 ago": "Последний запуск %1 день%2 назад"
-  },
   "Last launched %1 days ago": {
     "Last launched %1 days ago": ""
   },
   "Last launched %1 hour ago": {
     "Last launched %1 hour ago": ""
   },
-  "Last launched %1 hour%2 ago": {
-    "Last launched %1 hour%2 ago": "Последний запуск %1 час%2 назад"
-  },
   "Last launched %1 hours ago": {
     "Last launched %1 hours ago": ""
   },
   "Last launched %1 minute ago": {
     "Last launched %1 minute ago": ""
-  },
-  "Last launched %1 minute%2 ago": {
-    "Last launched %1 minute%2 ago": "Последний запуск %1 минуту%2 назад"
   },
   "Last launched %1 minutes ago": {
     "Last launched %1 minutes ago": ""
@@ -3256,6 +3347,9 @@
   "Left": {
     "Left": "Слева"
   },
+  "Left Center": {
+    "Left Center": "Вверху справа"
+  },
   "Left Section": {
     "Left Section": "Левая секция"
   },
@@ -3280,6 +3374,9 @@
   "Light mode harmony": {
     "Light mode harmony": ""
   },
+  "Line": {
+    "Line": "Линия"
+  },
   "Line: %1": {
     "Line: %1": ""
   },
@@ -3295,20 +3392,14 @@
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Живая палитра с насыщенными акцентами."
   },
+  "Load Average": {
+    "Load Average": "Средняя загрузка"
+  },
   "Loading codecs...": {
     "Loading codecs...": "Загрузка кодеков..."
   },
   "Loading keybinds...": {
     "Loading keybinds...": "Загрузка комбинаций клавиш..."
-  },
-  "Loading overlay subtitle": {
-    "This may take a few seconds": "Это может занять несколько секунд"
-  },
-  "Loading overlay while WirePlumber restarts": {
-    "Restarting audio system...": "Перезапуск аудиосистемы..."
-  },
-  "Loading plugins...": {
-    "Loading plugins...": "Загрузка дополнений..."
   },
   "Loading trending...": {
     "Loading trending...": "Загрузка трендов..."
@@ -3394,6 +3485,9 @@
   "MTU": {
     "MTU": "MTU"
   },
+  "Make sure KDE Connect or Valent is running on your other devices": {
+    "Make sure KDE Connect or Valent is running on your other devices": "Убедитесь, что KDE Connect или Valent запущены на других устройствах"
+  },
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "Управление и настройка дополнений для расширения функционала DMS"
   },
@@ -3406,8 +3500,14 @@
   "MangoWC Layout Overrides": {
     "MangoWC Layout Overrides": "Переопределения макета MangoWC"
   },
+  "Manual": {
+    "Manual": ""
+  },
   "Manual Coordinates": {
     "Manual Coordinates": "Свои Координаты"
+  },
+  "Manual Direction": {
+    "Manual Direction": ""
   },
   "Manual Gap Size": {
     "Manual Gap Size": "Ручной размер отступа"
@@ -3442,11 +3542,20 @@
   "Material Colors": {
     "Material Colors": "Акцентные Цвета"
   },
+  "Material Design inspired color themes": {
+    "Material Design inspired color themes": "Цветовые темы в стиле Material Design"
+  },
+  "Material colors generated from wallpaper": {
+    "Material colors generated from wallpaper": "Цветовая палитра Material, созданная из обоев"
+  },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": ""
   },
   "Matugen Contrast": {
     "Matugen Contrast": ""
+  },
+  "Matugen Missing": {
+    "Matugen Missing": "Matugen отсутствует"
   },
   "Matugen Palette": {
     "Matugen Palette": "Палитра Matugen"
@@ -3474,6 +3583,9 @@
   },
   "Max Running Apps (0 = Unlimited)": {
     "Max Running Apps (0 = Unlimited)": "Макс запущенных приложений (0 = безлимитно)"
+  },
+  "Max Volume": {
+    "Max Volume": "Максимальная громкость"
   },
   "Max W": {
     "Max W": "Макс Ш"
@@ -3513,6 +3625,9 @@
   },
   "Maximum number of entries that can be saved": {
     "Maximum number of entries that can be saved": "Максимальное количество записей, которые можно сохранить"
+  },
+  "Maximum number of notifications to keep": {
+    "Maximum number of notifications to keep": "Максимальное количество уведомлений для хранения"
   },
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Достигнуто максимальное количество закреплённых записей"
@@ -3571,6 +3686,12 @@
   "Memory usage indicator": {
     "Memory usage indicator": "Индикатор Использования Памяти"
   },
+  "Message": {
+    "Message": "Сообщение"
+  },
+  "Message Content": {
+    "Message Content": "Содержимое сообщения"
+  },
   "Microphone": {
     "Microphone": "Микрофон"
   },
@@ -3604,6 +3725,9 @@
   "Mirror Display": {
     "Mirror Display": "Зеркальный дисплей"
   },
+  "Missing Environment Variables": {
+    "Missing Environment Variables": "Отсутствующие переменные окружения"
+  },
   "Modal Background": {
     "Modal Background": "Фон модального окна"
   },
@@ -3625,6 +3749,9 @@
   "Modified": {
     "Modified": "Изменено"
   },
+  "Modular widget bar": {
+    "Modular widget bar": "Безопасность и конфиденциальность"
+  },
   "Monitor": {
     "Monitor": "Монитор"
   },
@@ -3637,17 +3764,23 @@
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "Монитор, чьи обои определяют цвета динамической темы"
   },
+  "Monochrome": {
+    "Monochrome": "Яркий"
+  },
   "Monocle": {
     "Monocle": "Монокль"
   },
   "Monospace Font": {
     "Monospace Font": "Моноширинный Шрифт"
   },
+  "Month Date": {
+    "Month Date": "Системный по умолчанию"
+  },
   "Morning": {
     "Morning": "Утро"
   },
-  "Mount": {
-    "Mount": "Монтирование"
+  "Mount Points": {
+    "Mount Points": "Точки монтирования"
   },
   "Mouse pointer appearance": {
     "Mouse pointer appearance": "Внешний вид указателя мыши"
@@ -3664,6 +3797,9 @@
   "Moving to Paused": {
     "Moving to Paused": "Перемещение в Paused"
   },
+  "Multi-Monitor": {
+    "Multi-Monitor": "Мульти-мониторы"
+  },
   "Multiplexer": {
     "Multiplexer": ""
   },
@@ -3676,8 +3812,14 @@
   "Music": {
     "Music": "Музыка"
   },
+  "Mute Popups": {
+    "Mute Popups": "Только всплывающее"
+  },
   "Mute popups for %1": {
     "Mute popups for %1": "Отключить всплывающие окна для %1"
+  },
+  "Muted": {
+    "Muted": "Выбрать устройство"
   },
   "Muted Apps": {
     "Muted Apps": "Отключённые приложения"
@@ -3724,6 +3866,9 @@
   "Network download and upload speed display": {
     "Network download and upload speed display": "Отображение скорости скачивания и загрузки данных по сети"
   },
+  "Neutral": {
+    "Neutral": "Яркий"
+  },
   "Never": {
     "Never": "Никогда"
   },
@@ -3754,6 +3899,9 @@
   "New group name...": {
     "New group name...": "Новое название группы..."
   },
+  "Next": {
+    "Next": "Далее"
+  },
   "Next Transition": {
     "Next Transition": "Следующий переход"
   },
@@ -3765,6 +3913,9 @@
   },
   "Night Temperature": {
     "Night Temperature": "Ночная температура"
+  },
+  "Night mode & gamma": {
+    "Night mode & gamma": "Безопасность и конфиденциальность"
   },
   "Niri Integration": {
     "Niri Integration": "Интеграция Niri"
@@ -3787,6 +3938,9 @@
   "No Background": {
     "No Background": "Без Заднего Фона"
   },
+  "No Battery": {
+    "No Battery": "Подключено"
+  },
   "No Bluetooth adapter found": {
     "No Bluetooth adapter found": "Адаптер Bluetooth не найден"
   },
@@ -3796,6 +3950,9 @@
   "No Border": {
     "No Border": "Без границы"
   },
+  "No DMS shortcuts configured": {
+    "No DMS shortcuts configured": "Комбинации клавиш DMS не настроены"
+  },
   "No Dim": {
     "No Dim": "Без затемнения"
   },
@@ -3804,6 +3961,12 @@
   },
   "No GPU detected": {
     "No GPU detected": "GPU не обнаружен"
+  },
+  "No GPUs detected": {
+    "No GPUs detected": "ГП не обнаружены"
+  },
+  "No History": {
+    "No History": "Только всплывающее"
   },
   "No Media": {
     "No Media": "Нет Медиа"
@@ -3835,6 +3998,9 @@
   "No active %1 sessions": {
     "No active %1 sessions": ""
   },
+  "No adapter": {
+    "No adapter": "Выкл"
+  },
   "No adapters": {
     "No adapters": "Нет адаптеров"
   },
@@ -3859,8 +4025,17 @@
   "No changes": {
     "No changes": "Нет изменений"
   },
-  "No clipboard entries found": {
-    "No clipboard entries found": "Нет записей в буфере обмена"
+  "No checks passed": {
+    "No checks passed": "Нет предупреждений"
+  },
+  "No custom theme file": {
+    "No custom theme file": "Нет пользовательского файла темы"
+  },
+  "No devices": {
+    "No devices": "Нет устройств"
+  },
+  "No devices connected": {
+    "No devices connected": "Нет подключённых устройств"
   },
   "No devices found": {
     "No devices found": "Устройства не найдены"
@@ -3873,6 +4048,9 @@
   },
   "No drivers found": {
     "No drivers found": "Драйверы не найдены"
+  },
+  "No errors": {
+    "No errors": "Нет ошибок"
   },
   "No features enabled": {
     "No features enabled": "Функции не включены"
@@ -3889,8 +4067,17 @@
   "No hidden apps.": {
     "No hidden apps.": "Нет скрытых приложений."
   },
+  "No info items": {
+    "No info items": "Нет предупреждений"
+  },
   "No information available": {
     "No information available": ""
+  },
+  "No input device": {
+    "No input device": "Выбрать устройство"
+  },
+  "No input devices found": {
+    "No input devices found": "Устройства вывода не найдены"
   },
   "No items added yet": {
     "No items added yet": "Ни один элемент ещё не добавлен"
@@ -3906,6 +4093,21 @@
   },
   "No matches": {
     "No matches": "Нет совпадений"
+  },
+  "No matching processes": {
+    "No matching processes": "Нет соответствующих процессов"
+  },
+  "No monitors": {
+    "No monitors": "Нет мониторов"
+  },
+  "No mount points found": {
+    "No mount points found": "Точки монтирования не найдены"
+  },
+  "No output device": {
+    "No output device": "Выбрать устройство"
+  },
+  "No output devices found": {
+    "No output devices found": "Устройства вывода не найдены"
   },
   "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": ""
@@ -3946,20 +4148,29 @@
   "No status output.": {
     "No status output.": ""
   },
+  "No themes found": {
+    "No themes found": "Темы не найдены"
+  },
+  "No themes installed. Browse themes to install from the registry.": {
+    "No themes installed. Browse themes to install from the registry.": "Темы не установлены. Просмотрите темы для установки из реестра."
+  },
   "No trigger": {
     "No trigger": "Нет триггера"
   },
-  "No variants created. Click Add to create a new monitor widget.": {
-    "No variants created. Click Add to create a new monitor widget.": "Варианты не созданы. Нажмите «Добавить», чтобы создать новый виджет монитора."
-  },
   "No video found in folder": {
     "No video found in folder": ""
+  },
+  "No wallpaper selected": {
+    "No wallpaper selected": "Обои не выбраны"
   },
   "No wallpapers": {
     "No wallpapers": ""
   },
   "No wallpapers found\n\nClick the folder icon below to browse": {
     "No wallpapers found\n\nClick the folder icon below to browse": "Обои не найдены\n\nНажмите на значок папки ниже для просмотра"
+  },
+  "No warnings": {
+    "No warnings": "Нет предупреждений"
   },
   "No widgets added. Click \"Add Widget\" to get started.": {
     "No widgets added. Click \"Add Widget\" to get started.": "Виджеты не добавлены. Нажмите «Добавить виджет» для начала."
@@ -3988,9 +4199,6 @@
   "Not available": {
     "Not available": "Недоступно"
   },
-  "Not available — install fprintd and enroll fingerprints.": {
-    "Not available — install fprintd and enroll fingerprints.": ""
-  },
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": ""
   },
@@ -4003,14 +4211,17 @@
   "Not available — install or configure pam_u2f.": {
     "Not available — install or configure pam_u2f.": ""
   },
-  "Not available — install pam_u2f and enroll keys.": {
-    "Not available — install pam_u2f and enroll keys.": ""
-  },
   "Not connected": {
     "Not connected": "Не подключено"
   },
   "Not detected": {
     "Not detected": "Не обнаружено"
+  },
+  "Not paired": {
+    "Not paired": "Не сопряжено"
+  },
+  "Not set": {
+    "Not set": "Не установлено"
   },
   "Note: this only changes the percentage, it does not actually limit charging.": {
     "Note: this only changes the percentage, it does not actually limit charging.": "Примечание: это изменяет только процент, это фактически не ограничивает зарядку."
@@ -4024,11 +4235,17 @@
   "Notepad Slideout": {
     "Notepad Slideout": "Выезжающий блокнот"
   },
+  "Nothing": {
+    "Nothing": "Ничего"
+  },
   "Nothing to see here": {
     "Nothing to see here": "Здесь не на что смотреть"
   },
   "Notification Center": {
     "Notification Center": "Центр Уведомлений"
+  },
+  "Notification Display": {
+    "Notification Display": "Отображение уведомлений"
   },
   "Notification Overlay": {
     "Notification Overlay": "Наложение уведомлений"
@@ -4054,6 +4271,15 @@
   "Numbers": {
     "Numbers": "Числа"
   },
+  "Numeric (D/M)": {
+    "Numeric (D/M)": "Системный по умолчанию"
+  },
+  "Numeric (M/D)": {
+    "Numeric (M/D)": "Системный по умолчанию"
+  },
+  "OK": {
+    "OK": "ОК"
+  },
   "OS Logo": {
     "OS Logo": "Логотип ОС"
   },
@@ -4069,8 +4295,14 @@
   "Office": {
     "Office": "Офис"
   },
+  "Offline": {
+    "Offline": "Оффлайн"
+  },
   "Offline Report": {
     "Offline Report": "Офлайн отчёт"
+  },
+  "Older": {
+    "Older": "Старее"
   },
   "On": {
     "On": "Вкл"
@@ -4090,9 +4322,6 @@
   "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": {
     "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": ""
   },
-  "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": {
-    "Only off for DMS-managed PAM lines. If greetd includes system-auth/common-auth/password-auth with pam_fprintd, fingerprint still stays enabled.": ""
-  },
   "Only show windows from the current monitor on each dock": {
     "Only show windows from the current monitor on each dock": "Показывать только окна с текущего монитора на каждом доке"
   },
@@ -4107,6 +4336,12 @@
   },
   "Open": {
     "Open": "Открыть"
+  },
+  "Open App": {
+    "Open App": "Открыть приложение"
+  },
+  "Open KDE Connect on your phone": {
+    "Open KDE Connect on your phone": "Откройте KDE Connect на телефоне"
   },
   "Open Notepad File": {
     "Open Notepad File": "Открыть Файл Блокнота"
@@ -4129,6 +4364,18 @@
   "Open with...": {
     "Open with...": "Открыть с помощью..."
   },
+  "Opening SMS": {
+    "Opening SMS": "Открытие SMS-приложения"
+  },
+  "Opening SMS app": {
+    "Opening SMS app": "Открытие SMS-приложения"
+  },
+  "Opening file browser": {
+    "Opening file browser": "Открытие файлового менеджера"
+  },
+  "Opening files": {
+    "Opening files": "Открытие файлов"
+  },
   "Opening terminal: ": {
     "Opening terminal: ": ""
   },
@@ -4144,8 +4391,14 @@
   "Organize widgets into collapsible groups": {
     "Organize widgets into collapsible groups": "Организовать виджеты в сворачиваемые группы"
   },
+  "Original: %1": {
+    "Original: %1": "Оригинал: %1"
+  },
   "Other": {
     "Other": "Другое"
+  },
+  "Outline": {
+    "Outline": "Контур"
   },
   "Output": {
     "Output": "Вывод"
@@ -4158,6 +4411,9 @@
   },
   "Output Device": {
     "Output Device": ""
+  },
+  "Output Devices": {
+    "Output Devices": "Устройства вывода"
   },
   "Output Tray Missing": {
     "Output Tray Missing": "Выходной лоток отсутствует"
@@ -4225,6 +4481,9 @@
   "PIN": {
     "PIN": "PIN"
   },
+  "Pad": {
+    "Pad": "Плитка вертикально"
+  },
   "Pad Hours": {
     "Pad Hours": "Пад часы"
   },
@@ -4243,8 +4502,20 @@
   "Paired": {
     "Paired": "Сопряжено"
   },
+  "Pairing": {
+    "Pairing": "Сопряжение"
+  },
   "Pairing failed": {
     "Pairing failed": "Сопряжение не удалось"
+  },
+  "Pairing request from": {
+    "Pairing request from": "Запрос сопряжения от"
+  },
+  "Pairing request sent": {
+    "Pairing request sent": "Запрос сопряжения отправлен"
+  },
+  "Pairing requested": {
+    "Pairing requested": "Запрос сопряжения отправлен"
   },
   "Pairing...": {
     "Pairing...": "Сопряжение..."
@@ -4279,14 +4550,20 @@
   "Pending": {
     "Pending": "Ожидание"
   },
+  "Pending Charge": {
+    "Pending Charge": "Подключено"
+  },
+  "Pending Discharge": {
+    "Pending Discharge": "Подключено"
+  },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Обои для режима"
   },
   "Per-Monitor Wallpapers": {
     "Per-Monitor Wallpapers": "Обои для монитора"
   },
-  "Per-Monitor Workspaces": {
-    "Per-Monitor Workspaces": "Рабочие области для каждого монитора"
+  "Per-screen config": {
+    "Per-screen config": "Безопасность и конфиденциальность"
   },
   "Percentage": {
     "Percentage": "Процент"
@@ -4300,70 +4577,14 @@
   "Personalization": {
     "Personalization": "Персонализация"
   },
-  "Phone Connect SMS action": {
-    "Opening SMS app": "Открытие SMS-приложения"
-  },
-  "Phone Connect browse action": {
-    "Opening file browser": "Открытие файлового менеджера"
-  },
-  "Phone Connect daemon hint": {
-    "Start KDE Connect or Valent to use this plugin": "Запустите KDE Connect или Valent для использования этого плагина"
-  },
-  "Phone Connect error": {
-    "Failed to accept pairing": "Не удалось принять сопряжение",
-    "Failed to browse device": "Не удалось просмотреть устройство",
-    "Failed to launch SMS app": "Не удалось запустить SMS-приложение",
-    "Failed to reject pairing": "Не удалось отклонить сопряжение",
-    "Failed to ring device": "Не удалось вызвать устройство",
-    "Failed to send clipboard": "Не удалось отправить буфер обмена",
-    "Failed to send file": "Не удалось отправить файл",
-    "Failed to send ping": "Не удалось отправить ping",
-    "Failed to share": "Не удалось поделиться",
-    "Pairing failed": "Сопряжение не удалось",
-    "Unpair failed": "Отмена сопряжения не удалась"
-  },
-  "Phone Connect file send": {
-    "Sending": "Отправка"
-  },
-  "Phone Connect file share notification": {
-    "File received from": "Файл получен от"
-  },
-  "Phone Connect hint message": {
-    "Make sure KDE Connect or Valent is running on your other devices": "Убедитесь, что KDE Connect или Valent запущены на других устройствах"
-  },
-  "Phone Connect no devices status | bluetooth status": {
-    "No devices": "Нет устройств"
-  },
-  "Phone Connect pairing action": {
-    "Device paired": "Устройство сопряжено",
-    "Pairing request sent": "Запрос сопряжения отправлен"
-  },
-  "Phone Connect pairing request notification": {
-    "Pairing request from": "Запрос сопряжения от"
-  },
-  "Phone Connect pairing verification key label": {
-    "Verification": "Проверка"
-  },
-  "Phone Connect ping action": {
-    "Ping sent to": "Ping отправлен на"
-  },
-  "Phone Connect refresh tooltip": {
-    "Refresh": "Обновить"
-  },
-  "Phone Connect service unavailable message": {
-    "Phone Connect unavailable": "Phone Connect недоступен"
-  },
-  "Phone Connect share success": {
-    "Shared": "Отправлено"
-  },
-  "Phone Connect start daemon hint": {
-    "Start KDE Connect or Valent": "Запустите KDE Connect или Valent"
-  },
-  "Phone Connect unavailable error title": {
+  "Phone Connect Not Available": {
     "Phone Connect Not Available": "Phone Connect недоступен"
   },
-  "Phone Connect unavailable status": {
-    "Unavailable": "Недоступно"
+  "Phone Connect unavailable": {
+    "Phone Connect unavailable": "Phone Connect недоступен"
+  },
+  "Phone number": {
+    "Phone number": "Номер телефона"
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": ""
@@ -4377,20 +4598,29 @@
   "Pin to Dock": {
     "Pin to Dock": "Закрепить в Доке"
   },
+  "Ping": {
+    "Ping": "Ping"
+  },
+  "Ping sent": {
+    "Ping sent": "Ping отправлен на"
+  },
+  "Ping sent to": {
+    "Ping sent to": "Ping отправлен на"
+  },
   "Pinned": {
     "Pinned": "Закреплено"
   },
   "Pinned and running apps with drag-and-drop": {
     "Pinned and running apps with drag-and-drop": "Закреплённые и запущенные приложения с перетаскиванием"
   },
+  "Pixelate": {
+    "Pixelate": "Стирание"
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Поместите каталоги дополнений здесь. Каждое дополнение должно иметь файл plugin.json в качестве манифеста."
   },
   "Place plugins in %1": {
     "Place plugins in %1": "Поместите плагины в %1"
-  },
-  "Placeholder text for manual printer address input": {
-    "IP address or hostname": ""
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
@@ -4412,6 +4642,9 @@
   },
   "Playback error: ": {
     "Playback error: ": ""
+  },
+  "Please wait...": {
+    "Please wait...": "Пожалуйста, подождите…"
   },
   "Please write a name for your new %1 session": {
     "Please write a name for your new %1 session": ""
@@ -4452,6 +4685,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Всплывающие окна и модальные следуют глобальной скорости анимации (отключите для независимой настройки)"
   },
+  "Popup Only": {
+    "Popup Only": "Только всплывающее"
+  },
   "Popup Position": {
     "Popup Position": "Позиция Всплывающего Окна"
   },
@@ -4461,8 +4697,20 @@
   "Popup Transparency": {
     "Popup Transparency": "Прозрачность Всплывающего Окна"
   },
+  "Popup behavior, position": {
+    "Popup behavior, position": "Поведение всплывающих окон, позиция"
+  },
+  "Port": {
+    "Port": ""
+  },
+  "Portal": {
+    "Portal": "Стирание"
+  },
   "Position": {
     "Position": "Позиция"
+  },
+  "Position, pinned apps": {
+    "Position, pinned apps": "Позиция, закреплённые приложения"
   },
   "Possible Override Conflicts": {
     "Possible Override Conflicts": "Возможные конфликты переопределения"
@@ -4493,6 +4741,9 @@
   },
   "Power Profile Degradation": {
     "Power Profile Degradation": "Ухудшение Профиля Питания"
+  },
+  "Power Saver": {
+    "Power Saver": "Экономия энергии"
   },
   "Power off monitors on lock": {
     "Power off monitors on lock": "Выключить мониторы при блокировке"
@@ -4527,6 +4778,12 @@
   "Press 'n' or click 'New Session' to create one": {
     "Press 'n' or click 'New Session' to create one": ""
   },
+  "Press Enter and the audio system will restart to apply the change": {
+    "Press Enter and the audio system will restart to apply the change": "Нажмите Enter, и аудиосистема перезапустится для применения изменений"
+  },
+  "Press Enter to paste, Shift+Enter to copy": {
+    "Press Enter to paste, Shift+Enter to copy": "Нажмите Enter для вставки, Shift+Enter для копирования"
+  },
   "Press key...": {
     "Press key...": "Нажмите клавишу..."
   },
@@ -4541,6 +4798,9 @@
   },
   "Primary": {
     "Primary": "Основной"
+  },
+  "Primary Container": {
+    "Primary Container": "Вариант поверхности"
   },
   "Print Server Management": {
     "Print Server Management": "Управление Print Server"
@@ -4563,11 +4823,17 @@
   "Printer name (no spaces)": {
     "Printer name (no spaces)": "Имя принтера (без пробелов)"
   },
+  "Printer reachable": {
+    "Printer reachable": ""
+  },
   "Printers": {
     "Printers": "Принтеры"
   },
   "Printers: ": {
     "Printers: ": "Принтеры: "
+  },
+  "Prioritize performance": {
+    "Prioritize performance": "Приоритет производительности"
   },
   "Priority": {
     "Priority": "Приоритет"
@@ -4581,14 +4847,14 @@
   "Private Key Password": {
     "Private Key Password": "Пароль приватного ключа"
   },
-  "Process": {
-    "Process": "Процесс"
-  },
   "Process Count": {
     "Process Count": "Количество процессов"
   },
   "Processes": {
     "Processes": "Процессы"
+  },
+  "Processes:": {
+    "Processes:": "Процессы:"
   },
   "Processing": {
     "Processing": "Обработка"
@@ -4641,6 +4907,9 @@
   "Quick note-taking slideout panel": {
     "Quick note-taking slideout panel": "Выезжающая панель для быстрых заметок"
   },
+  "Quick system toggles": {
+    "Quick system toggles": "Безопасность и конфиденциальность"
+  },
   "RGB": {
     "RGB": "RGB"
   },
@@ -4653,8 +4922,17 @@
   "Rain Chance": {
     "Rain Chance": "Вероятность Осадков"
   },
+  "Rainbow": {
+    "Rainbow": "Яркий"
+  },
+  "Random": {
+    "Random": "Стирание"
+  },
   "Rate": {
     "Rate": "Частота"
+  },
+  "Read:": {
+    "Read:": "Прочитано:"
   },
   "Reason": {
     "Reason": "Причина"
@@ -4676,6 +4954,12 @@
   },
   "Refresh Weather": {
     "Refresh Weather": "Обновить погоду"
+  },
+  "Regex": {
+    "Regex": "Регулярное выражение"
+  },
+  "Reject": {
+    "Reject": "Отклонить"
   },
   "Reject Jobs": {
     "Reject Jobs": "Отклонить задания"
@@ -4728,11 +5012,17 @@
   "Report": {
     "Report": "Отчёт"
   },
+  "Request Pairing": {
+    "Request Pairing": "Запрос сопряжения"
+  },
   "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": {
     "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "Требовать удержания кнопки/клавиши для подтверждения выключения, перезапуска, приостановки, гибернации и выхода"
   },
   "Required plugin: ": {
     "Required plugin: ": ""
+  },
+  "Requires %1": {
+    "Requires %1": "Требуется %1"
   },
   "Requires 'dgop' tool": {
     "Requires 'dgop' tool": "Требуется инструмент 'dgop'"
@@ -4767,11 +5057,17 @@
   "Resolution & Refresh": {
     "Resolution & Refresh": "Разрешение и обновление"
   },
+  "Resolution, position, scale": {
+    "Resolution, position, scale": "Разрешение, позиция, масштаб"
+  },
   "Restart DMS": {
     "Restart DMS": "Перезагрузить DMS"
   },
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "Перезагрузить DankMaterialShell"
+  },
+  "Restarting audio system...": {
+    "Restarting audio system...": "Перезапуск аудиосистемы..."
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": ""
@@ -4791,6 +5087,9 @@
   "Right": {
     "Right": "Справа"
   },
+  "Right Center": {
+    "Right Center": "Вверху справа"
+  },
   "Right Section": {
     "Right Section": "Правая секция"
   },
@@ -4805,6 +5104,12 @@
   },
   "Right-click bar widget to cycle": {
     "Right-click bar widget to cycle": "Щёлкните ПКМ по виджету панели для переключения"
+  },
+  "Ring": {
+    "Ring": "Вызов"
+  },
+  "Ringing": {
+    "Ringing": "Вызов"
   },
   "Ripple Effects": {
     "Ripple Effects": "Эффекты ряби"
@@ -4830,14 +5135,11 @@
   "Rules (%1)": {
     "Rules (%1)": "Правила (%1)"
   },
+  "Run Again": {
+    "Run Again": "Запустить ещё раз"
+  },
   "Run DMS Templates": {
     "Run DMS Templates": "Запустить шаблоны DMS"
-  },
-  "Run Sync to apply.": {
-    "Run Sync to apply.": ""
-  },
-  "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": {
-    "Run Sync to apply. Fingerprint-only login may not unlock GNOME Keyring.": ""
   },
   "Run User Templates": {
     "Run User Templates": "Запустить пользовательский пример"
@@ -4851,17 +5153,8 @@
   "Running Apps": {
     "Running Apps": "Запущенные Приложения"
   },
-  "Running Apps Only In Current Workspace": {
-    "Running Apps Only In Current Workspace": "Запущенные Приложение Только в Текущей Рабочей Области"
-  },
   "Running Apps Settings": {
     "Running Apps Settings": "Настройка Запущенных Приложений"
-  },
-  "Running apps filter: only show apps from the active workspace": {
-    "Current Workspace": "Текущее рабочее пространство"
-  },
-  "Running apps filter: only show apps from the same monitor": {
-    "Current Monitor": "Текущий монитор"
   },
   "Running greeter sync…": {
     "Running greeter sync…": ""
@@ -4871,6 +5164,9 @@
   },
   "SDR Saturation": {
     "SDR Saturation": "Насыщенность SDR"
+  },
+  "SMS": {
+    "SMS": "SMS"
   },
   "Save": {
     "Save": "Сохранить"
@@ -4883,6 +5179,18 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Сохранить и переключаться между конфигурациями дисплеев"
+  },
+  "Save critical priority notifications to history": {
+    "Save critical priority notifications to history": "Сохранять уведомления обычного приоритета в историю"
+  },
+  "Save dismissed notifications to history": {
+    "Save dismissed notifications to history": "Сохранять отклонённые уведомления в историю"
+  },
+  "Save low priority notifications to history": {
+    "Save low priority notifications to history": "Сохранять уведомления обычного приоритета в историю"
+  },
+  "Save normal priority notifications to history": {
+    "Save normal priority notifications to history": "Сохранять уведомления обычного приоритета в историю"
   },
   "Save password": {
     "Save password": "Сохранить пароль"
@@ -4947,9 +5255,6 @@
   "Scroll Wheel": {
     "Scroll Wheel": "Колесо прокрутки"
   },
-  "Scroll on widget changes media volume": {
-    "Scroll on widget changes media volume": "Прокрутка виджета изменяет громкость мультимедиа"
-  },
   "Scroll song title": {
     "Scroll song title": "Прокручивать название песни"
   },
@@ -4971,15 +5276,6 @@
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Поиск по комбинации клавиш, описанию или имени действия.\n\nДействие по умолчанию копирует комбинацию клавиш в буфер обмена.\nЩёлкните ПКМ или нажмите стрелку вправо для закрепления часто используемых комбинаций клавиш — они будут отображаться вверху при отсутствии поиска."
   },
-  "Search by key combo, description, or action name.\\n\\nDefault action copies the keybind to clipboard.\\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\\n\\nDefault action copies the keybind to clipboard.\\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Поиск по комбинации клавиш, описанию или имени действия.\\n\\nДействие по умолчанию копирует комбинацию клавиш в буфер обмена.\\nЩёлкните ПКМ или нажмите стрелку вправо, чтобы закрепить часто используемые комбинации — они будут отображаться вверху при отсутствии поиска."
-  },
-  "Search file contents": {
-    "Search file contents": "Поиск содержимого файла"
-  },
-  "Search filenames": {
-    "Search filenames": "Поиск имен файлов"
-  },
   "Search for a location...": {
     "Search for a location...": "Поиск местоположения..."
   },
@@ -4992,8 +5288,14 @@
   "Search plugins...": {
     "Search plugins...": "Поиск дополнений..."
   },
+  "Search processes...": {
+    "Search processes...": "Поиск процессов..."
+  },
   "Search sessions...": {
     "Search sessions...": ""
+  },
+  "Search themes...": {
+    "Search themes...": "Поиск тем..."
   },
   "Search widgets...": {
     "Search widgets...": "Поиск виджетов..."
@@ -5004,6 +5306,9 @@
   "Searching...": {
     "Searching...": "Поиск..."
   },
+  "Second Factor (AND)": {
+    "Second Factor (AND)": ""
+  },
   "Secondary": {
     "Secondary": "Вторичный"
   },
@@ -5012,6 +5317,12 @@
   },
   "Security": {
     "Security": "Безопасность"
+  },
+  "Security & privacy": {
+    "Security & privacy": "Безопасность и конфиденциальность"
+  },
+  "Security key mode": {
+    "Security key mode": ""
   },
   "Security-key availability could not be confirmed.": {
     "Security-key availability could not be confirmed.": ""
@@ -5028,14 +5339,29 @@
   "Select Bar": {
     "Select Bar": "Select Панели"
   },
+  "Select Custom Theme": {
+    "Select Custom Theme": "Выберите пользовательскую тему"
+  },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": "Выбрать логотип лаунчера дока"
+  },
+  "Select File to Send": {
+    "Select File to Send": "Выбрать файл для отправки"
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Выбрать лого лаунчера"
   },
+  "Select Profile Image": {
+    "Select Profile Image": "Выберите изображение профиля"
+  },
   "Select Video or Folder": {
     "Select Video or Folder": ""
+  },
+  "Select Wallpaper": {
+    "Select Wallpaper": "Выберите обои для рабочего стола"
+  },
+  "Select Wallpaper Directory": {
+    "Select Wallpaper Directory": "Выберите каталог обоев"
   },
   "Select a color from the palette or use custom sliders": {
     "Select a color from the palette or use custom sliders": "Выбрать цвет из палитры или использовать пользовательские ползунки"
@@ -5055,6 +5381,9 @@
   "Select at least one provider": {
     "Select at least one provider": "Выбрать хотя бы одного провайдера"
   },
+  "Select device": {
+    "Select device": "Выбрать устройство"
+  },
   "Select device...": {
     "Select device...": "Выбрать устройство..."
   },
@@ -5072,6 +5401,9 @@
   },
   "Select monospace font for process list and technical displays": {
     "Select monospace font for process list and technical displays": "Выбрать моноширинный шрифт для списка процессов и технических дисплеев"
+  },
+  "Select network": {
+    "Select network": "Подключено"
   },
   "Select system sound theme": {
     "Select system sound theme": "Выбрать системную тему звуков"
@@ -5094,6 +5426,21 @@
   "Selected image file not found.": {
     "Selected image file not found.": "Выбранный файл изображения не найден."
   },
+  "Send": {
+    "Send": "Отправить"
+  },
+  "Send Clipboard": {
+    "Send Clipboard": "Отправить буфер обмена"
+  },
+  "Send File": {
+    "Send File": "Отправить файл"
+  },
+  "Send SMS": {
+    "Send SMS": "Отправить SMS"
+  },
+  "Sending": {
+    "Sending": "Отправка"
+  },
   "Separator": {
     "Separator": "Разделитель"
   },
@@ -5103,8 +5450,17 @@
   "Session Filter": {
     "Session Filter": ""
   },
+  "Set Custom Device Name": {
+    "Set Custom Device Name": "Установить пользовательское имя устройства"
+  },
   "Set custom name": {
     "Set custom name": "Установить пользовательское имя"
+  },
+  "Set custom names for your audio input devices": {
+    "Set custom names for your audio input devices": "Установить пользовательские имена для устройств вывода аудио"
+  },
+  "Set custom names for your audio output devices": {
+    "Set custom names for your audio output devices": "Установить пользовательские имена для устройств вывода аудио"
   },
   "Set different wallpapers for each connected monitor": {
     "Set different wallpapers for each connected monitor": "Установить разные обои для каждого подключённого монитора"
@@ -5118,6 +5474,12 @@
   "Set notification rules": {
     "Set notification rules": "Установить правила уведомлений"
   },
+  "Settings": {
+    "Settings": "Настройки"
+  },
+  "Settings are read-only. Changes will not persist.": {
+    "Settings are read-only. Changes will not persist.": "Настройки доступны только для чтения. Изменения не будут сохранены."
+  },
   "Setup": {
     "Setup": "Настройка"
   },
@@ -5129,6 +5491,9 @@
   },
   "Shadow Opacity": {
     "Shadow Opacity": ""
+  },
+  "Shadow Override": {
+    "Shadow Override": ""
   },
   "Shadow elevation on bars and panels": {
     "Shadow elevation on bars and panels": ""
@@ -5142,8 +5507,20 @@
   "Shadows": {
     "Shadows": ""
   },
+  "Share": {
+    "Share": "Поделиться"
+  },
   "Share Gamma Control Settings": {
     "Share Gamma Control Settings": "Поделиться настройками управления Gamma"
+  },
+  "Share Text": {
+    "Share Text": "Поделиться текстом"
+  },
+  "Share URL": {
+    "Share URL": "Поделиться URL"
+  },
+  "Shared": {
+    "Shared": "Отправлено"
   },
   "Shell": {
     "Shell": "Оболочка"
@@ -5153,6 +5530,9 @@
   },
   "Shift+Enter to paste": {
     "Shift+Enter to paste": "Shift+Enter для вставки"
+  },
+  "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
+    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "↑/↓: Навигация • Enter: Вставить • Del: Удалить • F10: Справка"
   },
   "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
     "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": "Shift+Enter: Вставить • Shift+Del: Очистить всё • Esc: Закрыть"
@@ -5202,6 +5582,9 @@
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Показать ощущаемую температуру"
   },
+  "Show Footer": {
+    "Show Footer": "Показать нижний колонтитул"
+  },
   "Show Forecast": {
     "Show Forecast": "Показать прогноз"
   },
@@ -5241,6 +5624,9 @@
   "Show Material Design ripple animations on interactive elements": {
     "Show Material Design ripple animations on interactive elements": "Показать анимацию ряби Material Design на интерактивных элементах"
   },
+  "Show Media Player": {
+    "Show Media Player": "Показать медиаплеер"
+  },
   "Show Memory": {
     "Show Memory": "Показать память"
   },
@@ -5262,6 +5648,12 @@
   "Show Overflow Badge Count": {
     "Show Overflow Badge Count": "Показать счётчик переполнения"
   },
+  "Show Password Field": {
+    "Show Password Field": "Показать поле для ввода пароля"
+  },
+  "Show Power Actions": {
+    "Show Power Actions": "Показать действия питания"
+  },
   "Show Power Off": {
     "Show Power Off": "Показать выключение"
   },
@@ -5270,6 +5662,9 @@
   },
   "Show Pressure": {
     "Show Pressure": "Показывать нажатия"
+  },
+  "Show Profile Image": {
+    "Show Profile Image": "Показать изображение профиля"
   },
   "Show Reboot": {
     "Show Reboot": "Показать перезагрузку"
@@ -5291,6 +5686,15 @@
   },
   "Show Swap": {
     "Show Swap": ""
+  },
+  "Show System Date": {
+    "Show System Date": "Показать системную дату"
+  },
+  "Show System Icons": {
+    "Show System Icons": "Показать системные иконки"
+  },
+  "Show System Time": {
+    "Show System Time": "Показать системное время"
   },
   "Show Top Processes": {
     "Show Top Processes": "Показать топ процессов"
@@ -5328,9 +5732,6 @@
   "Show dock when floating windows don't overlap its area": {
     "Show dock when floating windows don't overlap its area": "Показывать док, когда плавающие окна не перекрывают его область"
   },
-  "Show drop shadow on notification popups": {
-    "Show drop shadow on notification popups": "Показать тень на всплывающих уведомлениях"
-  },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": ""
   },
@@ -5339,6 +5740,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показывать наложение лаунчера при вводе в обзоре Niri. Отключите для использования другого лаунчера."
+  },
+  "Show mode tabs and keyboard hints at the bottom.": {
+    "Show mode tabs and keyboard hints at the bottom.": "Показывать вкладки режимов и подсказки клавиатуры внизу."
   },
   "Show notification popups only on the currently focused monitor": {
     "Show notification popups only on the currently focused monitor": ""
@@ -5391,15 +5795,6 @@
   "Show on-screen display when volume changes": {
     "Show on-screen display when volume changes": "Показывать on-screen отображение при изменении громкости"
   },
-  "Show only apps running in current workspace": {
-    "Show only apps running in current workspace": "Показывать только приложения, запущенные в текущей рабочей области"
-  },
-  "Show only workspaces belonging to each specific monitor.": {
-    "Show only workspaces belonging to each specific monitor.": "Отображать только рабочие области, принадлежащие каждому конкретному монитору."
-  },
-  "Show password": {
-    "Show password": "Показать пароль"
-  },
   "Show seconds": {
     "Show seconds": ""
   },
@@ -5423,9 +5818,6 @@
   },
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "Показывает текущую рабочую область и позволяет переключаться"
-  },
-  "Shows the original device name before renaming": {
-    "Original: %1": "Оригинал: %1"
   },
   "Shows when caps lock is active": {
     "Shows when caps lock is active": "Показывает, когда Caps Lock активен"
@@ -5454,8 +5846,14 @@
   "Sizing": {
     "Sizing": "Размер"
   },
+  "Skip": {
+    "Skip": "Пропустить"
+  },
   "Skip confirmation": {
     "Skip confirmation": "Пропустить подтверждение"
+  },
+  "Skip setup": {
+    "Skip setup": "Пропустить настройку"
   },
   "Small": {
     "Small": "Маленький"
@@ -5526,6 +5924,12 @@
   "Start": {
     "Start": "Старт"
   },
+  "Start KDE Connect or Valent": {
+    "Start KDE Connect or Valent": "Запустите KDE Connect или Valent"
+  },
+  "Start KDE Connect or Valent to use this plugin": {
+    "Start KDE Connect or Valent to use this plugin": "Запустите KDE Connect или Valent для использования этого плагина"
+  },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Начните вводить заметки здесь..."
   },
@@ -5534,12 +5938,6 @@
   },
   "Status": {
     "Status": "Статус"
-  },
-  "Status message when test connection to printer fails": {
-    "Connection failed": ""
-  },
-  "Status message when test connection to printer succeeds": {
-    "Printer reachable": ""
   },
   "Stopped": {
     "Stopped": "Остановить"
@@ -5550,8 +5948,14 @@
   "Stopping": {
     "Stopping": "Останавливается"
   },
-  "Storage & Disks": {
-    "Storage & Disks": "Хранилища и диски"
+  "Stretch": {
+    "Stretch": "Плитка вертикально"
+  },
+  "Stripes": {
+    "Stripes": "Стирание"
+  },
+  "Summary": {
+    "Summary": "Заголовок"
   },
   "Sunrise": {
     "Sunrise": "Восход"
@@ -5565,6 +5969,9 @@
   "Surface": {
     "Surface": "Поверхность"
   },
+  "Surface Variant": {
+    "Surface Variant": "Вариант поверхности"
+  },
   "Suspend": {
     "Suspend": "Приостановить"
   },
@@ -5576,9 +5983,6 @@
   },
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "Приостановить затем гибернация"
-  },
-  "Swap": {
-    "Swap": "Подкачка"
   },
   "Sway Website": {
     "Sway Website": ""
@@ -5619,6 +6023,18 @@
   "System App Theming": {
     "System App Theming": "Темы системных приложений"
   },
+  "System Check": {
+    "System Check": "Проверка системы"
+  },
+  "System Default": {
+    "System Default": "Системный по умолчанию"
+  },
+  "System Information": {
+    "System Information": "Системная информация"
+  },
+  "System Monitor": {
+    "System Monitor": "Системный монитор"
+  },
   "System Monitor Unavailable": {
     "System Monitor Unavailable": "Системный монитор недоступен"
   },
@@ -5637,20 +6053,11 @@
   "System Updates": {
     "System Updates": "Обновления системы"
   },
-  "System monitor widget description": {
-    "CPU, memory, network, and disk monitoring": "Мониторинг ЦП, памяти, сети и диска"
-  },
-  "System monitor widget name | sysmon window title": {
-    "System Monitor": "Системный монитор"
-  },
   "System notification area icons": {
     "System notification area icons": "Значки области системных уведомлений"
   },
   "System sounds are not available. Install %1 for sound support.": {
     "System sounds are not available. Install %1 for sound support.": "Системные звуки недоступны. Установите %1 для поддержки звуков."
-  },
-  "System sounds are not available. Install canberra-gtk-play for sound support.": {
-    "System sounds are not available. Install canberra-gtk-play for sound support.": "Системные звуки недоступны. Для поддержки звука установите canberra-gtk-play."
   },
   "System theme toggle": {
     "System theme toggle": "Переключатель системной темы"
@@ -5697,17 +6104,26 @@
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "Терминалы — всегда использовать тёмную тему"
   },
+  "Test Connection": {
+    "Test Connection": ""
+  },
   "Test Page": {
     "Test Page": "Тестовая страница"
   },
   "Test page sent to printer": {
     "Test page sent to printer": "Тестовая страница отправлена на принтер"
   },
+  "Testing...": {
+    "Testing...": ""
+  },
   "Text": {
     "Text": "Текст"
   },
-  "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": "Инструмент 'dgop' требуется для системного мониторинга.\\nУстановите dgop для использования этой функции."
+  "Text Color": {
+    "Text Color": ""
+  },
+  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
+    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Инструмент 'dgop' требуется для системного мониторинга.\nУстановите dgop для использования этой функции."
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Переменная окружения DMS_SOCKET не установлена или сокет недоступен. Автоматизированное управление плагинами требует DMS_SOCKET."
@@ -5727,6 +6143,12 @@
   "Theme Color": {
     "Theme Color": "Theme Цвет"
   },
+  "Theme Registry": {
+    "Theme Registry": "Реестр тем"
+  },
+  "Themes": {
+    "Themes": "Темы"
+  },
   "Thickness": {
     "Thickness": "Толщина"
   },
@@ -5736,11 +6158,11 @@
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "Сторонние плагины созданы сообществом и официально не поддерживаются DankMaterialShell.\n\nЭти плагины могут представлять риски для безопасности и конфиденциальности — устанавливайте на свой страх и риск."
   },
-  "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": "Сторонние плагины создаются сообществом и официально не поддерживаются DankMaterialShell.\\n\\n Эти плагины могут представлять угрозу безопасности и конфиденциальности - устанавливайте на свой страх и риск."
-  },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "Эта комбинация клавиш переопределена в config.kdl"
+  },
+  "This may take a few seconds": {
+    "This may take a few seconds": "Это может занять несколько секунд"
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Этот плагин не имеет разрешения 'settings_write'.\n\nДобавьте \"permissions\": [\"settings_read\", \"settings_write\"] в plugin.json"
@@ -5763,6 +6185,15 @@
   "Thunderstorm with Hail": {
     "Thunderstorm with Hail": "Гроза с градом"
   },
+  "Tile": {
+    "Tile": "Плитка вертикально"
+  },
+  "Tile H": {
+    "Tile H": "Плитка вертикально"
+  },
+  "Tile V": {
+    "Tile V": "Плитка вертикально"
+  },
   "Tiled": {
     "Tiled": "Плиточный"
   },
@@ -5771,6 +6202,9 @@
   },
   "Tiling": {
     "Tiling": "Тайлинг"
+  },
+  "Time": {
+    "Time": "Время"
   },
   "Time & Date Locale": {
     "Time & Date Locale": ""
@@ -5823,12 +6257,6 @@
   "Today": {
     "Today": "Сегодня"
   },
-  "Toggle button to manually add a printer by IP or hostname": {
-    "Add by Address": ""
-  },
-  "Toggle button to scan for printers via mDNS/Avahi": {
-    "Discover Devices": ""
-  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Переключить видимость этой конфигурации панели"
   },
@@ -5837,6 +6265,9 @@
   },
   "Tomorrow": {
     "Tomorrow": "Завтра"
+  },
+  "Tonal Spot": {
+    "Tonal Spot": "Яркий"
   },
   "Toner Empty": {
     "Toner Empty": "Тонер пуст"
@@ -5856,8 +6287,14 @@
   "Top": {
     "Top": "Сверху"
   },
+  "Top (Default)": {
+    "Top (Default)": ""
+  },
   "Top Bar Format": {
     "Top Bar Format": "Формат верхней панели"
+  },
+  "Top Center": {
+    "Top Center": "Вверху справа"
   },
   "Top Left": {
     "Top Left": "Вверху слева"
@@ -5925,12 +6362,6 @@
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": "Введите этот префикс для поиска комбинацию клавишs"
   },
-  "Type to search": {
-    "Type to search": "Введите для поиска"
-  },
-  "Type to search apps": {
-    "Type to search apps": "Введите для поиска приложений"
-  },
   "Type to search files": {
     "Type to search files": "Введите для поиска файлов"
   },
@@ -5939,12 +6370,6 @@
   },
   "Typography & Motion": {
     "Typography & Motion": "Типография и движение"
-  },
-  "U2F mode option: key required after password or fingerprint": {
-    "Second Factor (AND)": ""
-  },
-  "U2F mode option: key works as standalone unlock method": {
-    "Alternative (OR)": ""
   },
   "Unavailable": {
     "Unavailable": "Недоступно"
@@ -5955,14 +6380,29 @@
   "Ungrouped": {
     "Ungrouped": "Негруппированный"
   },
+  "Uninstall": {
+    "Uninstall": "Удалить"
+  },
+  "Uninstall Greeter": {
+    "Uninstall Greeter": ""
+  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Удалить плагин"
   },
   "Uninstall complete. Greeter has been removed.": {
     "Uninstall complete. Greeter has been removed.": ""
   },
+  "Uninstall failed: %1": {
+    "Uninstall failed: %1": "Ошибка удаления: %1"
+  },
   "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
     "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": ""
+  },
+  "Uninstalled: %1": {
+    "Uninstalled: %1": "Удалено: %1"
+  },
+  "Uninstalling: %1": {
+    "Uninstalling: %1": "Удаление: %1"
   },
   "Unknown": {
     "Unknown": "Неизвестный"
@@ -5978,6 +6418,9 @@
   },
   "Unknown Device": {
     "Unknown Device": "Неизвестное устройство"
+  },
+  "Unknown GPU": {
+    "Unknown GPU": "Неизвестный GPU"
   },
   "Unknown Monitor": {
     "Unknown Monitor": "Неизвестный монитор"
@@ -6002,6 +6445,12 @@
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Правило без имени"
+  },
+  "Unpair": {
+    "Unpair": "Отменить сопряжение"
+  },
+  "Unpair failed": {
+    "Unpair failed": "Отмена сопряжения не удалась"
   },
   "Unpin": {
     "Unpin": "Открепить"
@@ -6039,6 +6488,9 @@
   "Uptime": {
     "Uptime": "Время работы"
   },
+  "Uptime:": {
+    "Uptime:": "Время работы:"
+  },
   "Urgent Color": {
     "Urgent Color": "Цвет срочного"
   },
@@ -6075,6 +6527,12 @@
   "Use a fixed shadow direction for this bar": {
     "Use a fixed shadow direction for this bar": ""
   },
+  "Use a security key for lock screen authentication.": {
+    "Use a security key for lock screen authentication.": ""
+  },
+  "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
+    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Используйте внешний менеджер обоев, такой как swww, hyprpaper или swaybg."
+  },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Использовать анимированные волновые прогресс-бары для воспроизведения медиа"
   },
@@ -6102,9 +6560,6 @@
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": ""
   },
-  "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
-    "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "Использовать сканер отпечатков пальцев для аутентификации на Lock Screen (требуется регистрация отпечатков)"
-  },
   "Use light theme instead of dark theme": {
     "Use light theme instead of dark theme": "Использовать светлую тему вместо тёмной"
   },
@@ -6122,12 +6577,6 @@
   },
   "Use trigger prefix to activate": {
     "Use trigger prefix to activate": "Использовать префикс триггера для активации"
-  },
-  "Use%": {
-    "Use%": "Использованое%"
-  },
-  "Used": {
-    "Used": "Использовано"
   },
   "Used when accent color is set to Custom": {
     "Used when accent color is set to Custom": "Используется, когда акцентный цвет установлен в Custom"
@@ -6189,17 +6638,11 @@
   "VRR On-Demand": {
     "VRR On-Demand": "VRR по требованию"
   },
-  "VRR activates only when applications request it": {
-    "VRR activates only when applications request it": "VRR активируется только тогда, когда этого запрашивают приложения"
-  },
   "Variable Refresh Rate": {
     "Variable Refresh Rate": "Переменная частота обновления"
   },
-  "Variant created - expand to configure": {
-    "Variant created - expand to configure": "Вариант создан — разверните для настройки"
-  },
-  "Variant removed": {
-    "Variant removed": "Вариант удален"
+  "Verification": {
+    "Verification": "Проверка"
   },
   "Version": {
     "Version": "Версия"
@@ -6215,6 +6658,9 @@
   },
   "Vertical Tiling": {
     "Vertical Tiling": "Вертикальный тайлинг"
+  },
+  "Vibrant": {
+    "Vibrant": "Яркий"
   },
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Яркая палитра с игривой насыщенностью."
@@ -6261,11 +6707,20 @@
   "Wallpaper": {
     "Wallpaper": "Обои"
   },
+  "Wallpaper Error": {
+    "Wallpaper Error": "Ошибка в выборе обоев"
+  },
   "Wallpaper Monitor": {
     "Wallpaper Monitor": "Монитор обоев"
   },
   "Wallpaper fill mode": {
     "Wallpaper fill mode": ""
+  },
+  "Wallpaper processing failed": {
+    "Wallpaper processing failed": "Не удалось обработать обои"
+  },
+  "Wallpaper processing failed - check wallpaper path": {
+    "Wallpaper processing failed - check wallpaper path": "Ошибка обработки обоев - проверьте путь к обоям"
   },
   "Wallpapers": {
     "Wallpapers": "Обои"
@@ -6276,6 +6731,9 @@
   "Warning": {
     "Warning": "Предупреждение"
   },
+  "Warnings": {
+    "Warnings": "Предупреждения"
+  },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Волновые прогресс-бары"
   },
@@ -6284,6 +6742,12 @@
   },
   "Weather Widget": {
     "Weather Widget": "Виджет погоды"
+  },
+  "Welcome": {
+    "Welcome": "Добро пожаловать"
+  },
+  "Welcome to DankMaterialShell": {
+    "Welcome to DankMaterialShell": "Добро пожаловать в DankMaterialShell"
   },
   "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": {
     "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": ""
@@ -6295,7 +6759,6 @@
     "When locked": "Когда заблокировано"
   },
   "When updater widget is used, then hide it if no update found": {
-    "Hide Updater Widget": "Скрыть виджет обновления",
     "When updater widget is used, then hide it if no update found": "Когда виджет обновления используется, скрывать его если обновление не найдено"
   },
   "Wi-Fi Password": {
@@ -6325,6 +6788,9 @@
   "WiFi is off": {
     "WiFi is off": "WiFi отключен"
   },
+  "WiFi off": {
+    "WiFi off": "Подключено"
+  },
   "Wide (BT2020)": {
     "Wide (BT2020)": "Широкий (BT2020)"
   },
@@ -6346,21 +6812,17 @@
   "Widget Transparency": {
     "Widget Transparency": "Виджет Прозрачность"
   },
-  "Widget Variants": {
-    "Widget Variants": "Варианты виджетов"
-  },
   "Widget added": {
     "Widget added": "Виджет добавленные"
   },
-  "Widget grid keyboard hints": {
-    "G: grid • Z/X: size": "G: сетка • Z/X: размер"
-  },
-  "Widget grid snap status": {
-    "Grid: OFF": "Сетка: ВКЛ",
-    "Grid: ON": "Сетка: ВКЛ"
-  },
   "Widget removed": {
     "Widget removed": "Виджет удалён"
+  },
+  "Widgets": {
+    "Widgets": "Виджеты"
+  },
+  "Widgets, layout, style": {
+    "Widgets, layout, style": "Виджеты, макет, стиль"
   },
   "Width": {
     "Width": "Ширина"
@@ -6410,6 +6872,9 @@
   "Window Rules Not Configured": {
     "Window Rules Not Configured": "Правила окон не настроены"
   },
+  "Wipe": {
+    "Wipe": "Стирание"
+  },
   "Workspace": {
     "Workspace": "Рабочее пространство"
   },
@@ -6440,6 +6905,9 @@
   "Workspaces & Widgets": {
     "Workspaces & Widgets": "Рабочие области и виджеты"
   },
+  "Write:": {
+    "Write:": "Запись:"
+  },
   "X Axis": {
     "X Axis": "Ось X"
   },
@@ -6448,6 +6916,9 @@
   },
   "Yes": {
     "Yes": "Да"
+  },
+  "Yesterday": {
+    "Yesterday": "Вчера"
   },
   "You have unsaved changes. Save before closing this tab?": {
     "You have unsaved changes. Save before closing this tab?": "У вас есть несохранённые изменения. Сохранить перед закрытием этой вкладки?"
@@ -6461,214 +6932,50 @@
   "You have unsaved changes. Save before opening a file?": {
     "You have unsaved changes. Save before opening a file?": "У вас есть несохранённые изменения. Сохранить изменения перед открытием файла?"
   },
+  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Необходимо установить одну из переменных окружения:\nQT_QPA_PLATFORMTHEME=gtk3 ИЛИ\nQT_QPA_PLATFORMTHEME=qt6ct\nа затем перезапустить оболочку.\n\nДля qt6ct требуется qt6ct-kde."
+  },
+  "You're All Set!": {
+    "You're All Set!": "Всё готово!"
+  },
   "Your system is up to date!": {
     "Your system is up to date!": ""
   },
   "actions": {
     "actions": "действия"
   },
-  "apps": {
-    "apps": "приложения"
-  },
   "attached": {
     "attached": ""
-  },
-  "audio status": {
-    "Muted": "Выбрать устройство",
-    "No input device": "Выбрать устройство",
-    "No output device": "Выбрать устройство",
-    "Select device": "Выбрать устройство"
-  },
-  "author attribution": {
-    "by %1": "на %1"
-  },
-  "bar manual shadow direction": {
-    "Manual Direction": ""
-  },
-  "bar shadow direction source": {
-    "Direction Source": ""
-  },
-  "bar shadow direction source option": {
-    "Inherit Global (Default)": "",
-    "Manual": ""
-  },
-  "bar shadow direction source option | shadow direction option": {
-    "Auto (Bar-aware)": ""
-  },
-  "bar shadow settings card": {
-    "Shadow": "Тень",
-    "Shadow Override": ""
-  },
-  "battery status": {
-    "Charging": "Заряжается",
-    "Discharging": "Подключено",
-    "Empty": "Пусто",
-    "Fully Charged": "Подключено",
-    "No Battery": "Подключено",
-    "Pending Charge": "Подключено",
-    "Pending Discharge": "Подключено",
-    "Plugged In": "Подключено"
-  },
-  "bluetooth status": {
-    "Bluetooth": "Bluetooth",
-    "Connected Device": "Выкл",
-    "Enabled": "Включено",
-    "No adapter": "Выкл",
-    "No adapters": "Нет адаптеров",
-    "Off": "Выкл"
-  },
-  "bluetooth status | lock screen notification mode option": {
-    "Disabled": "Отключено"
-  },
-  "blur border color | button color option | color option | primary color | shadow color option | tile color option": {
-    "Primary": ""
-  },
-  "blur border color | button color option | color option | secondary color | tile color option": {
-    "Secondary": ""
-  },
-  "blur border color | outline color": {
-    "Outline": ""
-  },
-  "blur border color | shadow color option": {
-    "Text Color": ""
-  },
-  "blur border color | shadow color option | theme category option": {
-    "Custom": ""
-  },
-  "border color": {
-    "Color": "Цвет"
-  },
-  "border thickness": {
-    "Thickness": "Толщина"
   },
   "brandon": {
     "brandon": "brandon"
   },
-  "browse themes button | theme browser header | theme browser window title": {
-    "Browse Themes": "Просмотр тем"
-  },
-  "button color option | color option | primary color | shadow color option | tile color option": {
-    "Primary": ""
-  },
-  "button color option | color option | primary color | tile color option": {
-    "Primary": "Основной"
-  },
-  "button color option | color option | secondary color | tile color option": {
-    "Secondary": "Вторичный"
-  },
-  "button color option | shadow color option | tile color option": {
-    "Surface Variant": ""
-  },
-  "button color option | tile color option": {
-    "Primary Container": "Вариант поверхности",
-    "Surface Variant": "Вариант поверхности"
-  },
-  "catppuccin theme description": {
-    "Soothing pastel theme based on Catppuccin": "Успокаивающая пастельная тема на основе Catppuccin"
-  },
-  "color option | primary color | tile color option": {
-    "Primary": "Основной"
-  },
-  "color option | secondary color | tile color option": {
-    "Secondary": "Вторичный"
-  },
-  "color option | shadow color option": {
-    "Surface": "Поверхность"
-  },
-  "control center tile color setting description": {
-    "Active tile background and icon color": "Фон активной плитки и цвет значка"
-  },
-  "count of hidden audio devices": {
-    "Hidden (%1)": "Скрыто (%1)"
-  },
-  "current theme label": {
-    "Current Theme: %1": "Текущая тема: %1"
-  },
-  "custom theme description": {
-    "Custom theme loaded from JSON file": "Пользовательская тема загружена из JSON-файла"
-  },
-  "custom theme file browser title": {
-    "Select Custom Theme": "Выберите пользовательскую тему"
-  },
-  "custom theme file hint": {
-    "Click to select a custom theme JSON file": "Нажмите для выбора пользовательского JSON-файла темы"
-  },
-  "dark mode wallpaper color picker title": {
-    "Choose Dark Mode Color": "Выбрать цвет тёмного режима"
-  },
-  "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
-    "Select Wallpaper": "Выберите обои для рабочего стола"
-  },
-  "date format option": {
-    "Custom...": "Пользовательский...",
-    "Day Date": "Системный по умолчанию",
-    "Day Month Date": "Системный по умолчанию",
-    "Full Day & Month": "Системный по умолчанию",
-    "Full with Year": "Системный по умолчанию",
-    "ISO Date": "Системный по умолчанию",
-    "Month Date": "Системный по умолчанию",
-    "Numeric (D/M)": "Системный по умолчанию",
-    "Numeric (M/D)": "Системный по умолчанию",
-    "System Default": "Системный по умолчанию"
+  "by %1": {
+    "by %1": "на %1"
   },
   "days": {
     "days": "дней"
   },
-  "default monitor label suffix": {
-    "(Default)": "(По умолчанию)"
-  },
   "detached": {
     "detached": ""
+  },
+  "device": {
+    "device": "устройство"
+  },
+  "devices connected": {
+    "devices connected": "устройств подключено"
   },
   "dgop not available": {
     "dgop not available": "dgop недоступен"
   },
-  "dgop unavailable error message": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Инструмент 'dgop' требуется для системного мониторинга.\nУстановите dgop для использования этой функции.",
-    "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": "Инструмент 'dgop' требуется для системного мониторинга.\\nУстановите dgop для использования этой функции."
-  },
-  "disk io header in system monitor": {
-    "Disk I/O": "Дисковый ввод/вывод"
-  },
-  "disk read label": {
-    "Read:": "Прочитано:"
-  },
-  "disk write label": {
-    "Write:": "Запись:"
-  },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
-  },
-  "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
-    "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": "Файл dms/binds.kdl существует, но не включен в config.kdl. Пользовательские сочетания клавиш не будут работать, пока это не будет исправлено."
-  },
-  "dms/binds.kdl is now included in config.kdl": {
-    "dms/binds.kdl is now included in config.kdl": "Файл dms/binds.kdl теперь включён в config.kdl"
   },
   "dms/cursor config exists but is not included. Cursor settings won't apply.": {
     "dms/cursor config exists but is not included. Cursor settings won't apply.": "конфигурация dms/cursor существует но не включена. Настройки курсора не будут применены."
   },
   "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": {
     "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": "dms/outputs config существует, но не включён в ваш конфиг композитора. Изменения дисплеев не сохранятся."
-  },
-  "dock indicator style option": {
-    "Circle": "Линия",
-    "Line": "Линия"
-  },
-  "dock position option": {
-    "Bottom": "Снизу",
-    "Left": "Слева",
-    "Right": "Справа",
-    "Top": "Сверху"
-  },
-  "dynamic colors description": {
-    "Dynamic colors from wallpaper": "Динамические цвета из обоев"
-  },
-  "dynamic theme description": {
-    "Material colors generated from wallpaper": "Цветовая палитра Material, созданная из обоев"
-  },
-  "dynamic theme name": {
-    "Dynamic": "Динамическая"
   },
   "e.g., firefox, kitty --title foo": {
     "e.g., firefox, kitty --title foo": "например, firefox, kitty --title foo"
@@ -6682,266 +6989,17 @@
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": ""
   },
-  "empty plugin list": {
-    "No plugins found": "Дополнения не найдены"
-  },
-  "empty state in disk mounts list": {
-    "No mount points found": "Точки монтирования не найдены"
-  },
-  "empty state in gpu list": {
-    "No GPUs detected": "ГП не обнаружены"
-  },
-  "empty state in process list": {
-    "No matching processes": "Нет соответствующих процессов"
-  },
-  "empty theme list": {
-    "No themes found": "Темы не найдены"
-  },
   "events": {
     "events": "события"
   },
   "ext": {
     "ext": "расш"
   },
-  "fallback gpu name": {
-    "Unknown GPU": "Неизвестный GPU"
-  },
   "featured": {
     "featured": "избранное"
   },
-  "files": {
-    "files": "файлы"
-  },
-  "fingerprint not detected status | security key not detected status": {
-    "Not enrolled": ""
-  },
-  "generic theme description": {
-    "Material Design inspired color themes": "Цветовые темы в стиле Material Design"
-  },
-  "gpu section header in system monitor": {
-    "GPU Monitoring": "Мониторинг ГП"
-  },
-  "greeter action confirmation": {
-    "Activate Greeter": "",
-    "Install Greeter": "",
-    "Uninstall Greeter": ""
-  },
-  "greeter back button": {
-    "Back": "Назад"
-  },
-  "greeter completion page subtitle": {
-    "DankMaterialShell is ready to use": "DankMaterialShell готов к использованию"
-  },
-  "greeter completion page title": {
-    "You're All Set!": "Всё готово!"
-  },
-  "greeter configure keybinds link": {
-    "Configure Keybinds": "Настроить комбинации клавиш"
-  },
-  "greeter dankbar description": {
-    "Widgets, layout, style": "Виджеты, макет, стиль"
-  },
-  "greeter displays description": {
-    "Resolution, position, scale": "Разрешение, позиция, масштаб"
-  },
-  "greeter dock description": {
-    "Position, pinned apps": "Позиция, закреплённые приложения"
-  },
-  "greeter doctor page button": {
-    "Run Again": "Запустить ещё раз"
-  },
-  "greeter doctor page empty state": {
-    "No checks passed": "Нет предупреждений",
-    "No errors": "Нет ошибок",
-    "No info items": "Нет предупреждений",
-    "No warnings": "Нет предупреждений"
-  },
-  "greeter doctor page error count": {
-    "%1 issue found": "",
-    "%1 issue(s) found": "Найдено проблем: %1",
-    "%1 issues found": ""
-  },
-  "greeter doctor page loading text": {
-    "Analyzing configuration...": "Анализ конфигурации..."
-  },
-  "greeter doctor page status card": {
-    "Errors": "Ошибки",
-    "Info": "Информация",
-    "OK": "ОК",
-    "Warnings": "Предупреждения"
-  },
-  "greeter doctor page success": {
-    "All checks passed": "Все проверки пройдены"
-  },
-  "greeter doctor page title": {
-    "System Check": "Проверка системы"
-  },
-  "greeter documentation link": {
-    "Docs": "Документация"
-  },
-  "greeter explore section header": {
-    "Explore": "Обзор"
-  },
-  "greeter feature card description": {
-    "Background app icons": "Безопасность и конфиденциальность",
-    "Colors from wallpaper": "Безопасность и конфиденциальность",
-    "Community themes": "Безопасность и конфиденциальность",
-    "Extensible architecture": "Безопасность и конфиденциальность",
-    "GTK, Qt, IDEs, more": "GTK, Qt, IDEs, и далее",
-    "Modular widget bar": "Безопасность и конфиденциальность",
-    "Night mode & gamma": "Безопасность и конфиденциальность",
-    "Per-screen config": "Безопасность и конфиденциальность",
-    "Quick system toggles": "Безопасность и конфиденциальность",
-    "Security & privacy": "Безопасность и конфиденциальность"
-  },
-  "greeter feature card title": {
-    "App Theming": "Реестр тем",
-    "Control Center": "Центр Управления",
-    "Display Control": "Реестр тем",
-    "Dynamic Theming": "Динамичные темы",
-    "Multi-Monitor": "Мульти-мониторы",
-    "System Tray": "Системный трей",
-    "Theme Registry": "Реестр тем"
-  },
-  "greeter feature card title | greeter plugins link": {
-    "Plugins": "Дополнения"
-  },
-  "greeter feature card title | greeter settings link": {
-    "DankBar": "DankBar"
-  },
-  "greeter feature card title | lock screen notifications settings card": {
-    "Lock Screen": "Экран Блокировки"
-  },
-  "greeter finish button": {
-    "Finish": "Завершить"
-  },
-  "greeter first page button": {
-    "Get Started": "Начать"
-  },
-  "greeter keybinds niri description": {
-    "niri shortcuts config": "конфигурация комбинаций клавиш niri"
-  },
-  "greeter keybinds section header": {
-    "DMS Shortcuts": "Комбинации клавиш DMS"
-  },
-  "greeter modal window title": {
-    "Welcome": "Добро пожаловать"
-  },
-  "greeter next button": {
-    "Next": "Далее"
-  },
-  "greeter no keybinds message": {
-    "No DMS shortcuts configured": "Комбинации клавиш DMS не настроены"
-  },
-  "greeter notifications description": {
-    "Popup behavior, position": "Поведение всплывающих окон, позиция"
-  },
-  "greeter settings link": {
-    "Displays": "Мониторы",
-    "Dock": "Док",
-    "Keybinds": "Темы и цвета",
-    "Notifications": "Уведомления",
-    "Theme & Colors": "Темы и цвета",
-    "Wallpaper": "Обои"
-  },
-  "greeter settings section header": {
-    "Configure": "Настроить"
-  },
-  "greeter skip button": {
-    "Skip": "Пропустить"
-  },
-  "greeter skip button tooltip": {
-    "Skip setup": "Пропустить настройку"
-  },
-  "greeter status error": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
-  },
-  "greeter status loading": {
-    "Checking…": ""
-  },
-  "greeter status placeholder": {
-    "Click Refresh to check status.": ""
-  },
-  "greeter theme description": {
-    "Dynamic colors, presets": "Динамические цвета, предустановки"
-  },
-  "greeter themes link": {
-    "Themes": "Темы"
-  },
-  "greeter wallpaper description": {
-    "Background image": "Фоновое изображение"
-  },
-  "greeter welcome page section header": {
-    "Features": "Возможности"
-  },
-  "greeter welcome page tagline": {
-    "A modern desktop shell for Wayland compositors": "Современная оболочка рабочего стола для композиторов Wayland"
-  },
-  "greeter welcome page title": {
-    "Welcome to DankMaterialShell": "Добро пожаловать в DankMaterialShell"
-  },
-  "install action button": {
-    "Install": "Установить"
-  },
-  "installation error": {
-    "Install failed: %1": "Ошибка установки: %1"
-  },
-  "installation progress": {
-    "Installing: %1": "Установка: %1"
-  },
-  "installation success": {
-    "Installed: %1": "Установлено: %1"
-  },
-  "installed status": {
-    "Installed": "Установлено"
-  },
-  "launcher appearance settings": {
-    "Appearance": "Внешний вид"
-  },
-  "launcher border option": {
-    "Border": "Рамка"
-  },
-  "launcher footer description": {
-    "Show mode tabs and keyboard hints at the bottom.": "Показывать вкладки режимов и подсказки клавиатуры внизу."
-  },
-  "launcher footer visibility": {
-    "Show Footer": "Показать нижний колонтитул"
-  },
-  "launcher size option": {
-    "Size": "Размер"
-  },
   "leave empty for default": {
     "leave empty for default": "оставьте пустым для значения по умолчанию"
-  },
-  "light mode wallpaper color picker title": {
-    "Choose Light Mode Color": "Выбрать цвет светлого режима"
-  },
-  "loading indicator": {
-    "Loading...": "Загрузка..."
-  },
-  "lock screen U2F security key mode setting": {
-    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "",
-    "Security key mode": ""
-  },
-  "lock screen U2F security key setting": {
-    "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)": "",
-    "Use a security key for lock screen authentication.": ""
-  },
-  "lock screen notification mode option": {
-    "App Names": "Имена приложений",
-    "Count Only": "Полное содержимое",
-    "Disabled": "Отключено",
-    "Full Content": "Полное содержимое"
-  },
-  "lock screen notification mode option | notification rule match field option": {
-    "App Names": "Имена приложений"
-  },
-  "lock screen notification privacy setting": {
-    "Control what notification information is shown on the lock screen": "Отображение уведомлений",
-    "Notification Display": "Отображение уведомлений"
-  },
-  "lock screen notifications settings card": {
-    "Lock Screen": "Экран Блокировки"
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl недоступен — интеграция блокировки требует подключения к сокету DMS"
@@ -6952,36 +7010,11 @@
   "mangowc GitHub": {
     "mangowc GitHub": ""
   },
-  "matugen color scheme option": {
-    "Content": "Яркий",
-    "Expressive": "Яркий",
-    "Fidelity": "Яркий",
-    "Fruit Salad": "Яркий",
-    "Monochrome": "Яркий",
-    "Neutral": "Яркий",
-    "Rainbow": "Яркий",
-    "Tonal Spot": "Яркий",
-    "Vibrant": "Яркий"
-  },
-  "matugen error": {
+  "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen не найден - установите пакет matugen для динамической тематизации"
-  },
-  "matugen installation hint": {
-    "Install matugen package for dynamic theming": "Установите пакет matugen для динамического оформления"
-  },
-  "matugen not found status": {
-    "Matugen Missing": "Matugen отсутствует"
-  },
-  "media scroll wheel option": {
-    "Change Song": "Ничего",
-    "Change Volume": "Ничего",
-    "Nothing": "Ничего"
   },
   "minutes": {
     "minutes": "минут"
-  },
-  "mount points header in system monitor": {
-    "Mount Points": "Точки монтирования"
   },
   "ms": {
     "ms": "мс"
@@ -6989,107 +7022,17 @@
   "nav": {
     "nav": "навигация"
   },
-  "neovim template description": {
-    "Requires lazy plugin manager": "Требуется менеджер плагинов lazy"
-  },
-  "network status": {
-    "Connected": "Подключено",
-    "Disabling WiFi...": "Отключение Wi-Fi…",
-    "Enabling WiFi...": "Включение Wi-Fi…",
-    "Ethernet": "Ethernet",
-    "Not connected": "Не подключено",
-    "Please wait...": "Пожалуйста, подождите…",
-    "Select network": "Подключено",
-    "WiFi off": "Подключено"
-  },
   "niri GitHub": {
     "niri GitHub": ""
   },
   "niri Matrix Chat": {
     "niri Matrix Chat": ""
   },
+  "niri shortcuts config": {
+    "niri shortcuts config": "конфигурация комбинаций клавиш niri"
+  },
   "niri/dms Discord": {
     "niri/dms Discord": ""
-  },
-  "no custom theme file status": {
-    "No custom theme file": "Нет пользовательского файла темы"
-  },
-  "no monitors available label": {
-    "No monitors": "Нет мониторов"
-  },
-  "no registry themes installed hint": {
-    "No themes installed. Browse themes to install from the registry.": "Темы не установлены. Просмотрите темы для установки из реестра."
-  },
-  "no wallpaper status": {
-    "No wallpaper selected": "Обои не выбраны"
-  },
-  "notification center tab": {
-    "Current": "История",
-    "History": "История"
-  },
-  "notification history filter": {
-    "All": "Все",
-    "Last hour": "Вчера",
-    "Today": "Сегодня",
-    "Yesterday": "Вчера"
-  },
-  "notification history filter for content older than other filters": {
-    "Older": "Старее"
-  },
-  "notification history filter | notification history retention option": {
-    "30 days": "30 дней",
-    "7 days": "7 дней"
-  },
-  "notification history limit": {
-    "Maximum number of notifications to keep": "Максимальное количество уведомлений для хранения"
-  },
-  "notification history retention option": {
-    "1 day": "1 день",
-    "14 days": "14 дней",
-    "3 days": "3 дня",
-    "Forever": "Навсегда"
-  },
-  "notification history retention settings label": {
-    "History Retention": "Хранение истории"
-  },
-  "notification history setting": {
-    "Auto-delete notifications older than this": "Сохранять уведомления обычного приоритета в историю",
-    "Save critical priority notifications to history": "Сохранять уведомления обычного приоритета в историю",
-    "Save low priority notifications to history": "Сохранять уведомления обычного приоритета в историю",
-    "Save normal priority notifications to history": "Сохранять уведомления обычного приоритета в историю"
-  },
-  "notification history toggle description": {
-    "Save dismissed notifications to history": "Сохранять отклонённые уведомления в историю"
-  },
-  "notification history toggle label": {
-    "Enable History": "Включить историю"
-  },
-  "notification privacy mode placeholder": {
-    "Message Content": "Содержимое сообщения"
-  },
-  "notification rule action option": {
-    "Ignore Completely": "Только всплывающее",
-    "Mute Popups": "Только всплывающее",
-    "No History": "Только всплывающее",
-    "Popup Only": "Только всплывающее"
-  },
-  "notification rule action option | notification rule urgency option | widget style option": {
-    "Default": "По умолчанию"
-  },
-  "notification rule match field option": {
-    "Body": "Заголовок",
-    "Desktop Entry": "Заголовок",
-    "Summary": "Заголовок"
-  },
-  "notification rule match type option": {
-    "Contains": "Регулярное выражение",
-    "Exact": "Регулярное выражение",
-    "Regex": "Регулярное выражение"
-  },
-  "notification rule urgency option": {
-    "Critical Priority": "Критический Приоритет",
-    "Low Priority": "Низкий Приоритет",
-    "Normal Priority": "Обычный Приоритет"
   },
   "now": {
     "now": "сейчас"
@@ -7121,181 +7064,23 @@
   "or run ": {
     "or run ": ""
   },
-  "outline color": {
-    "Outline": "Контур"
-  },
-  "plugin browser description": {
-    "Install plugins from the DMS plugin registry": "Установить дополнения из репозитория DMS"
-  },
-  "plugin browser header | plugin browser window title": {
-    "Browse Plugins": "Просмотр Дополнений"
-  },
-  "plugin installation confirmation": {
-    "Install plugin '%1' from the DMS registry?": "Установить дополнение '%1' из реестра DMS?"
-  },
-  "plugin installation dialog title": {
-    "Install Plugin": "Установить дополнение"
-  },
-  "plugin search placeholder": {
-    "Search plugins...": "Поиск дополнений..."
-  },
-  "power profile description": {
-    "Balance power and performance": "Приоритет производительности",
-    "Custom power profile": "Приоритет производительности",
-    "Extend battery life": "Приоритет производительности",
-    "Prioritize performance": "Приоритет производительности"
-  },
-  "power profile option": {
-    "Balanced": "Экономия энергии",
-    "Performance": "Производительность",
-    "Power Saver": "Экономия энергии"
-  },
   "power-profiles-daemon not available": {
     "power-profiles-daemon not available": ""
   },
-  "primary color": {
-    "Primary": "Основной"
-  },
-  "process count label in footer": {
-    "Processes:": "Процессы:"
-  },
-  "process detail label": {
-    "Full Command:": "Полная комманда:"
-  },
-  "process search placeholder": {
-    "Search processes...": "Поиск процессов..."
-  },
-  "profile image file browser title": {
-    "Select Profile Image": "Выберите изображение профиля"
-  },
-  "qt theme env error body": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Необходимо установить одну из переменных окружения:\nQT_QPA_PLATFORMTHEME=gtk3 ИЛИ\nQT_QPA_PLATFORMTHEME=qt6ct\nа затем перезапустить оболочку.\n\nДля qt6ct требуется qt6ct-kde."
-  },
-  "qt theme env error title": {
-    "Missing Environment Variables": "Отсутствующие переменные окружения"
+  "procs": {
+    "procs": "проц."
   },
   "r/niri Subreddit": {
     "r/niri Subreddit": ""
   },
-  "read-only settings warning for NixOS home-manager users": {
-    "Settings are read-only. Changes will not persist.": "Настройки доступны только для чтения. Изменения не будут сохранены."
-  },
-  "registry theme description": {
-    "Color theme from DMS registry": "Цветовая тема из реестра DMS"
-  },
-  "screen position option": {
-    "Bottom Center": "Вверху справа",
-    "Bottom Left": "Внизу слева",
-    "Bottom Right": "Внизу справа",
-    "Left Center": "Вверху справа",
-    "Right Center": "Вверху справа",
-    "Top Center": "Вверху справа",
-    "Top Left": "Вверху слева",
-    "Top Right": "Вверху справа"
-  },
-  "screen position option | shadow direction option": {
-    "Top Left": "",
-    "Top Right": ""
-  },
-  "secondary color": {
-    "Secondary": "Вторичный"
-  },
   "seconds": {
     "seconds": "секунд"
   },
-  "settings window title": {
-    "Settings": "Настройки"
-  },
-  "settings_displays": {
-    "Widgets": "Виджеты"
-  },
-  "shadow color option": {
-    "Default (Black)": "",
-    "Surface": "Поверхность",
-    "Text": "Текст",
-    "Text Color": ""
-  },
-  "shadow color option | text color": {
-    "Text": "Текст"
-  },
-  "shadow color option | theme category option": {
-    "Custom": ""
-  },
-  "shadow direction option": {
-    "Bottom": "",
-    "Top": "",
-    "Top (Default)": ""
-  },
-  "shadow intensity slider": {
-    "Intensity": "Интенсивность"
-  },
-  "short for processes": {
-    "procs": "проц."
-  },
-  "source code link": {
+  "source": {
     "source": "исходный"
-  },
-  "sysmon window title": {
-    "System Monitor": "Системный монитор"
-  },
-  "system info header in system monitor": {
-    "System Information": "Системная информация"
-  },
-  "system info label": {
-    "Architecture": "Архитектура",
-    "Distribution": "Имя хоста",
-    "Hostname": "Имя хоста",
-    "Kernel": "Ядро",
-    "Load Average": "Средняя загрузка"
-  },
-  "text color": {
-    "Text": ""
-  },
-  "theme auto mode tab": {
-    "Location": "Местоположение"
-  },
-  "theme auto mode tab | wallpaper cycling mode tab": {
-    "Time": "Время"
-  },
-  "theme browser description": {
-    "Install color themes from the DMS theme registry": "Установить цветовые темы из реестра тем DMS"
-  },
-  "theme category option": {
-    "Auto": "Авто",
-    "Browse": "Просмотр",
-    "Custom": "Свой",
-    "Generic": "Общий"
-  },
-  "theme installation confirmation": {
-    "Install theme '%1' from the DMS registry?": "Установить тему '%1' из реестра DMS?"
-  },
-  "theme installation dialog title": {
-    "Install Theme": "Установить тему"
-  },
-  "theme search placeholder": {
-    "Search themes...": "Поиск тем..."
   },
   "this app": {
     "this app": "это приложение"
-  },
-  "tile color option": {
-    "Primary Container": "Вариант поверхности",
-    "Surface Variant": "Вариант поверхности"
-  },
-  "uninstall action button": {
-    "Uninstall": "Удалить"
-  },
-  "uninstallation error": {
-    "Uninstall failed: %1": "Ошибка удаления: %1"
-  },
-  "uninstallation progress": {
-    "Uninstalling: %1": "Удаление: %1"
-  },
-  "uninstallation success": {
-    "Uninstalled: %1": "Удалено: %1"
-  },
-  "unknown author": {
-    "Unknown": "Неизвестный"
   },
   "up": {
     "up": "вверх"
@@ -7303,102 +7088,11 @@
   "update dms for NM integration.": {
     "update dms for NM integration.": "обновите dms для NM интеграции."
   },
-  "uptime label in footer": {
-    "Uptime:": "Время работы:"
-  },
   "v%1 by %2": {
     "v%1 by %2": "v%1 от %2"
   },
-  "version requirement": {
-    "Requires %1": "Требуется %1"
-  },
-  "wallpaper color picker title": {
-    "Choose Wallpaper Color": "Выбрать цвет обоев"
-  },
-  "wallpaper cycling mode tab": {
-    "Interval": "Интервал"
-  },
-  "wallpaper directory file browser title": {
-    "Select Wallpaper Directory": "Выберите каталог обоев"
-  },
-  "wallpaper error": {
-    "Wallpaper processing failed - check wallpaper path": "Ошибка обработки обоев - проверьте путь к обоям"
-  },
-  "wallpaper error status": {
-    "Wallpaper Error": "Ошибка в выборе обоев"
-  },
-  "wallpaper fill mode": {
-    "Fill": "Плитка вертикально",
-    "Fit": "Плитка вертикально",
-    "Pad": "Плитка вертикально",
-    "Stretch": "Плитка вертикально",
-    "Tile": "Плитка вертикально",
-    "Tile H": "Плитка вертикально",
-    "Tile V": "Плитка вертикально"
-  },
-  "wallpaper interval": {
-    "1 hour": "1 час",
-    "1 hour 30 minutes": "1 час 30 минут",
-    "1 minute": "1 минута",
-    "10 seconds": "10 секунд",
-    "12 hours": "12 часов",
-    "15 minutes": "15 минут",
-    "15 seconds": "15 секунд",
-    "2 hours": "2 часа",
-    "20 seconds": "20 секунд",
-    "25 seconds": "25 секунд",
-    "3 hours": "3 часа",
-    "30 minutes": "30 минут",
-    "30 seconds": "30 секунд",
-    "35 seconds": "35 секунд",
-    "4 hours": "4 часа",
-    "40 seconds": "40 секунд",
-    "45 seconds": "45 секунд",
-    "5 minutes": "5 минут",
-    "5 seconds": "5 секунд",
-    "50 seconds": "50 секунд",
-    "55 seconds": "55 секунд",
-    "6 hours": "6 часов",
-    "8 hours": "8 часов"
-  },
-  "wallpaper not set label": {
-    "Not set": "Не установлено"
-  },
-  "wallpaper processing error": {
-    "Wallpaper processing failed": "Не удалось обработать обои"
-  },
-  "wallpaper settings disable description": {
-    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Используйте внешний менеджер обоев, такой как swww, hyprpaper или swaybg."
-  },
-  "wallpaper settings disable toggle": {
-    "Disable Built-in Wallpapers": "Отключить встроенные обои"
-  },
-  "wallpaper settings external management": {
-    "External Wallpaper Management": "Внешнее управление обоями"
-  },
-  "wallpaper transition option": {
-    "Disc": "Стирание",
-    "Fade": "Стирание",
-    "Iris Bloom": "Стирание",
-    "None": "Нет",
-    "Pixelate": "Стирание",
-    "Portal": "Стирание",
-    "Random": "Стирание",
-    "Stripes": "Стирание",
-    "Wipe": "Стирание"
-  },
-  "weather feels like temperature": {
-    "Feels Like %1°": "Ощущается как %1°"
-  },
-  "widget style option": {
-    "Colorful": "По умолчанию",
-    "Default": "По умолчанию"
-  },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype недоступен - установите wtype для поддержки вставки"
-  },
-  "yesterday": {
-    "yesterday": "вчера"
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• Устанавливайте только из доверенных источников"
@@ -7444,5 +7138,8 @@
   },
   "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": {
     "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": ""
+  },
+  "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": {
+    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: Навигация • Enter: Вставить • Del: Удалить • F10: Справка"
   }
 }

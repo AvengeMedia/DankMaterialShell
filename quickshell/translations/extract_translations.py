@@ -86,13 +86,13 @@ def create_poeditor_json(translations):
             references.append(ref)
 
         contexts = sorted(data['contexts']) if data['contexts'] else []
-        context_str = " | ".join(contexts) if contexts else term
+        comment = " | ".join(contexts) if contexts else ""
 
         entry = {
             "term": term,
-            "context": context_str,
+            "context": term,
             "reference": ", ".join(references),
-            "comment": ""
+            "comment": comment
         }
         poeditor_data.append(entry)
 

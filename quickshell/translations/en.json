@@ -109,15 +109,15 @@
   },
   {
     "term": "%1 issue found",
-    "context": "greeter doctor page error count",
+    "context": "%1 issue found",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:232",
-    "comment": ""
+    "comment": "greeter doctor page error count"
   },
   {
     "term": "%1 issues found",
-    "context": "greeter doctor page error count",
+    "context": "%1 issues found",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:233",
-    "comment": ""
+    "comment": "greeter doctor page error count"
   },
   {
     "term": "%1 notifications",
@@ -181,15 +181,15 @@
   },
   {
     "term": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
-    "context": "lock screen U2F security key mode setting",
+    "context": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
     "reference": "Modules/Settings/LockScreenTab.qml:251",
-    "comment": ""
+    "comment": "lock screen U2F security key mode setting"
   },
   {
     "term": "(Default)",
-    "context": "default monitor label suffix",
+    "context": "(Default)",
     "reference": "Modules/Settings/WallpaperTab.qml:859, Modules/Settings/WallpaperTab.qml:874, Modules/Settings/WallpaperTab.qml:881",
-    "comment": ""
+    "comment": "default monitor label suffix"
   },
   {
     "term": "(Unnamed)",
@@ -217,15 +217,15 @@
   },
   {
     "term": "1 day",
-    "context": "notification history retention option",
+    "context": "1 day",
     "reference": "Modules/Settings/NotificationsTab.qml:839, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NotificationsTab.qml:857, Modules/Settings/ClipboardTab.qml:103",
-    "comment": ""
+    "comment": "notification history retention option"
   },
   {
     "term": "1 device connected",
-    "context": "KDE Connect status single device",
+    "context": "1 device connected",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:37",
-    "comment": ""
+    "comment": "KDE Connect status single device"
   },
   {
     "term": "1 event",
@@ -235,21 +235,21 @@
   },
   {
     "term": "1 hour",
-    "context": "wallpaper interval",
+    "context": "1 hour",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:10",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "1 hour 30 minutes",
-    "context": "wallpaper interval",
+    "context": "1 hour 30 minutes",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:10",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "1 minute",
-    "context": "wallpaper interval",
+    "context": "1 minute",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:65, Modules/Notifications/Center/NotificationSettings.qml:70",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "1 notification",
@@ -271,9 +271,9 @@
   },
   {
     "term": "10 seconds",
-    "context": "wallpaper interval",
+    "context": "10 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:482, Modules/Settings/NotificationsTab.qml:53, Modules/Notifications/Center/NotificationSettings.qml:58",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "10-bit Color",
@@ -283,27 +283,27 @@
   },
   {
     "term": "12 hours",
-    "context": "wallpaper interval",
+    "context": "12 hours",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "14 days",
-    "context": "notification history retention option",
+    "context": "14 days",
     "reference": "Modules/Settings/NotificationsTab.qml:845, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NotificationsTab.qml:863, Modules/Settings/ClipboardTab.qml:115",
-    "comment": ""
+    "comment": "notification history retention option"
   },
   {
     "term": "15 minutes",
-    "context": "wallpaper interval",
+    "context": "15 minutes",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:10",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "15 seconds",
-    "context": "wallpaper interval",
+    "context": "15 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/NotificationsTab.qml:57, Modules/Notifications/Center/NotificationSettings.qml:62",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "180°",
@@ -313,9 +313,9 @@
   },
   {
     "term": "2 hours",
-    "context": "wallpaper interval",
+    "context": "2 hours",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:10",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "2 minutes",
@@ -337,9 +337,9 @@
   },
   {
     "term": "20 seconds",
-    "context": "wallpaper interval",
+    "context": "20 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "24-Hour Format",
@@ -361,9 +361,9 @@
   },
   {
     "term": "25 seconds",
-    "context": "wallpaper interval",
+    "context": "25 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "250 ms",
@@ -379,15 +379,15 @@
   },
   {
     "term": "3 days",
-    "context": "notification history retention option",
+    "context": "3 days",
     "reference": "Modules/Settings/NotificationsTab.qml:841, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NotificationsTab.qml:859, Modules/Settings/ClipboardTab.qml:107",
-    "comment": ""
+    "comment": "notification history retention option"
   },
   {
     "term": "3 hours",
-    "context": "wallpaper interval",
+    "context": "3 hours",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:10",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "3 minutes",
@@ -403,27 +403,27 @@
   },
   {
     "term": "30 days",
-    "context": "notification history filter | notification history retention option",
+    "context": "30 days",
     "reference": "Modules/Settings/NotificationsTab.qml:847, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NotificationsTab.qml:865, Modules/Settings/ClipboardTab.qml:119, Modules/Notifications/Center/HistoryNotificationList.qml:112",
-    "comment": ""
+    "comment": "notification history filter | notification history retention option"
   },
   {
     "term": "30 minutes",
-    "context": "wallpaper interval",
+    "context": "30 minutes",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:10",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "30 seconds",
-    "context": "wallpaper interval",
+    "context": "30 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/NotificationsTab.qml:61, Modules/Notifications/Center/NotificationSettings.qml:66",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "35 seconds",
-    "context": "wallpaper interval",
+    "context": "35 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "3rd party",
@@ -433,9 +433,9 @@
   },
   {
     "term": "4 hours",
-    "context": "wallpaper interval",
+    "context": "4 hours",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "4 seconds",
@@ -445,33 +445,33 @@
   },
   {
     "term": "40 seconds",
-    "context": "wallpaper interval",
+    "context": "40 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "45 seconds",
-    "context": "wallpaper interval",
+    "context": "45 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "5 minutes",
-    "context": "wallpaper interval",
+    "context": "5 minutes",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/WallpaperTab.qml:1020, Modules/Settings/WallpaperTab.qml:1044, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:73, Modules/Notifications/Center/NotificationSettings.qml:78",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "5 seconds",
-    "context": "wallpaper interval",
+    "context": "5 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:114, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:140, Modules/Settings/PowerSleepTab.qml:482, Modules/Settings/NotificationsTab.qml:45, Modules/Settings/NotificationsTab.qml:160, Modules/Notifications/Center/NotificationSettings.qml:50, Modules/Notifications/Center/NotificationSettings.qml:89",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "50 seconds",
-    "context": "wallpaper interval",
+    "context": "50 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "500 ms",
@@ -481,21 +481,21 @@
   },
   {
     "term": "55 seconds",
-    "context": "wallpaper interval",
+    "context": "55 seconds",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "6 hours",
-    "context": "wallpaper interval",
+    "context": "6 hours",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "7 days",
-    "context": "notification history filter | notification history retention option",
+    "context": "7 days",
     "reference": "Modules/Settings/NotificationsTab.qml:843, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NotificationsTab.qml:861, Modules/Settings/ClipboardTab.qml:111, Modules/Notifications/Center/HistoryNotificationList.qml:107",
-    "comment": ""
+    "comment": "notification history filter | notification history retention option"
   },
   {
     "term": "750 ms",
@@ -505,9 +505,9 @@
   },
   {
     "term": "8 hours",
-    "context": "wallpaper interval",
+    "context": "8 hours",
     "reference": "Modules/Settings/WallpaperTab.qml:996",
-    "comment": ""
+    "comment": "wallpaper interval"
   },
   {
     "term": "8 seconds",
@@ -541,9 +541,9 @@
   },
   {
     "term": "A modern desktop shell for Wayland compositors",
-    "context": "greeter welcome page tagline",
+    "context": "A modern desktop shell for Wayland compositors",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:55",
-    "comment": ""
+    "comment": "greeter welcome page tagline"
   },
   {
     "term": "AC Power",
@@ -577,9 +577,9 @@
   },
   {
     "term": "Accept",
-    "context": "KDE Connect accept pairing button",
+    "context": "Accept",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:182, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:370",
-    "comment": ""
+    "comment": "KDE Connect accept pairing button"
   },
   {
     "term": "Accept Jobs",
@@ -637,9 +637,9 @@
   },
   {
     "term": "Activate Greeter",
-    "context": "greeter action confirmation",
+    "context": "Activate Greeter",
     "reference": "Modules/Settings/GreeterTab.qml:168",
-    "comment": ""
+    "comment": "greeter action confirmation"
   },
   {
     "term": "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.",
@@ -673,9 +673,9 @@
   },
   {
     "term": "Active tile background and icon color",
-    "context": "control center tile color setting description",
+    "context": "Active tile background and icon color",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1557",
-    "comment": ""
+    "comment": "control center tile color setting description"
   },
   {
     "term": "Active: %1",
@@ -763,9 +763,9 @@
   },
   {
     "term": "Add by Address",
-    "context": "Toggle button to manually add a printer by IP or hostname",
+    "context": "Add by Address",
     "reference": "Modules/Settings/PrinterTab.qml:390",
-    "comment": ""
+    "comment": "Toggle button to manually add a printer by IP or hostname"
   },
   {
     "term": "Adjust the number of columns in grid view mode.",
@@ -799,9 +799,9 @@
   },
   {
     "term": "All",
-    "context": "notification history filter",
+    "context": "All",
     "reference": "Modals/ProcessListModal.qml:377, Services/AppSearchService.qml:698, Services/AppSearchService.qml:719, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:660, Modals/DankLauncherV2/LauncherContent.qml:348, Modals/DankLauncherV2/LauncherContent.qml:624, Modules/ProcessList/ProcessListPopout.qml:155, Modules/Settings/WidgetsTabSection.qml:2361, Modules/Settings/WidgetsTabSection.qml:2415, Modules/Settings/KeybindsTab.qml:410, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:94, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:97, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:109, Modules/Notifications/Center/HistoryNotificationList.qml:87",
-    "comment": ""
+    "comment": "notification history filter"
   },
   {
     "term": "All Monitors",
@@ -811,9 +811,9 @@
   },
   {
     "term": "All checks passed",
-    "context": "greeter doctor page success",
+    "context": "All checks passed",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:230",
-    "comment": ""
+    "comment": "greeter doctor page success"
   },
   {
     "term": "All day",
@@ -841,9 +841,9 @@
   },
   {
     "term": "Alternative (OR)",
-    "context": "U2F mode option: key works as standalone unlock method",
+    "context": "Alternative (OR)",
     "reference": "Modules/Settings/LockScreenTab.qml:253, Modules/Settings/LockScreenTab.qml:254",
-    "comment": ""
+    "comment": "U2F mode option: key works as standalone unlock method"
   },
   {
     "term": "Always Active",
@@ -901,15 +901,15 @@
   },
   {
     "term": "Analog, digital, or stacked clock display",
-    "context": "Desktop clock widget description",
+    "context": "Analog, digital, or stacked clock display",
     "reference": "Services/DesktopWidgetRegistry.qml:41",
-    "comment": ""
+    "comment": "Desktop clock widget description"
   },
   {
     "term": "Analyzing configuration...",
-    "context": "greeter doctor page loading text",
+    "context": "Analyzing configuration...",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:165",
-    "comment": ""
+    "comment": "greeter doctor page loading text"
   },
   {
     "term": "Animation Duration",
@@ -961,21 +961,21 @@
   },
   {
     "term": "App Names",
-    "context": "lock screen notification mode option | notification rule match field option",
+    "context": "App Names",
     "reference": "Modules/Settings/LockScreenTab.qml:148, Modules/Settings/NotificationsTab.qml:85, Modules/Settings/NotificationsTab.qml:729",
-    "comment": ""
+    "comment": "lock screen notification mode option | notification rule match field option"
   },
   {
     "term": "App Theming",
-    "context": "greeter feature card title",
+    "context": "App Theming",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:98",
-    "comment": ""
+    "comment": "greeter feature card title"
   },
   {
     "term": "Appearance",
-    "context": "launcher appearance settings",
+    "context": "Appearance",
     "reference": "Modules/Settings/LauncherTab.qml:361",
-    "comment": ""
+    "comment": "launcher appearance settings"
   },
   {
     "term": "Application Dock",
@@ -1063,9 +1063,9 @@
   },
   {
     "term": "Architecture",
-    "context": "system info label",
+    "context": "Architecture",
     "reference": "Modules/ProcessList/SystemView.qml:72",
-    "comment": ""
+    "comment": "system info label"
   },
   {
     "term": "Are you sure you want to kill session \"%1\"?",
@@ -1243,15 +1243,15 @@
   },
   {
     "term": "Auto",
-    "context": "theme category option",
+    "context": "Auto",
     "reference": "Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/NetworkTab.qml:260, Modules/Settings/NetworkTab.qml:883, Modules/Settings/NetworkTab.qml:887, Modules/Settings/NetworkTab.qml:888, Modules/Settings/NetworkTab.qml:891, Modules/Settings/DisplayConfigTab.qml:150, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:351, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:359, Modules/ControlCenter/Details/NetworkDetail.qml:117, Modules/ControlCenter/Details/NetworkDetail.qml:118, Modules/ControlCenter/Details/NetworkDetail.qml:121, Modules/ControlCenter/Details/NetworkDetail.qml:124",
-    "comment": ""
+    "comment": "theme category option"
   },
   {
     "term": "Auto (Bar-aware)",
-    "context": "bar shadow direction source option | shadow direction option",
+    "context": "Auto (Bar-aware)",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1728, Modules/Settings/ThemeColorsTab.qml:1732, Modules/Settings/ThemeColorsTab.qml:1745, Modules/Settings/DankBarTab.qml:1120, Modules/Settings/DankBarTab.qml:1124, Modules/Settings/DankBarTab.qml:1132",
-    "comment": ""
+    "comment": "bar shadow direction source option | shadow direction option"
   },
   {
     "term": "Auto (Wide)",
@@ -1291,9 +1291,9 @@
   },
   {
     "term": "Auto-delete notifications older than this",
-    "context": "notification history setting",
+    "context": "Auto-delete notifications older than this",
     "reference": "Modules/Settings/NotificationsTab.qml:833",
-    "comment": ""
+    "comment": "notification history setting"
   },
   {
     "term": "Auto-hide",
@@ -1453,9 +1453,9 @@
   },
   {
     "term": "Back",
-    "context": "greeter back button",
+    "context": "Back",
     "reference": "Modals/Greeter/GreeterModal.qml:285, Modules/DankBar/Widgets/SystemTrayBar.qml:1579",
-    "comment": ""
+    "comment": "greeter back button"
   },
   {
     "term": "Backend",
@@ -1489,9 +1489,9 @@
   },
   {
     "term": "Background image",
-    "context": "greeter wallpaper description",
+    "context": "Background image",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:382",
-    "comment": ""
+    "comment": "greeter wallpaper description"
   },
   {
     "term": "Backlight device",
@@ -1501,15 +1501,15 @@
   },
   {
     "term": "Balance power and performance",
-    "context": "power profile description",
+    "context": "Balance power and performance",
     "reference": "Common/Theme.qml:1487",
-    "comment": ""
+    "comment": "power profile description"
   },
   {
     "term": "Balanced",
-    "context": "power profile option",
+    "context": "Balanced",
     "reference": "Common/Theme.qml:1474",
-    "comment": ""
+    "comment": "power profile option"
   },
   {
     "term": "Balanced palette with focused accents (default).",
@@ -1639,9 +1639,9 @@
   },
   {
     "term": "Bluetooth",
-    "context": "bluetooth status",
+    "context": "Bluetooth",
     "reference": "Modules/Settings/WidgetsTabSection.qml:1114, Modules/Settings/WidgetsTabSection.qml:1333, Modules/ControlCenter/Models/WidgetModel.qml:110, Modules/ControlCenter/Components/DragDropGrid.qml:313",
-    "comment": ""
+    "comment": "bluetooth status"
   },
   {
     "term": "Bluetooth Settings",
@@ -1693,15 +1693,15 @@
   },
   {
     "term": "Body",
-    "context": "notification rule match field option",
+    "context": "Body",
     "reference": "Modules/Settings/NotificationsTab.qml:97",
-    "comment": ""
+    "comment": "notification rule match field option"
   },
   {
     "term": "Border",
-    "context": "launcher border option",
+    "context": "Border",
     "reference": "Modules/Settings/DockTab.qml:584, Modules/Settings/DockTab.qml:590, Modules/Settings/LauncherTab.qml:432, Modules/Settings/DankBarTab.qml:1384",
-    "comment": ""
+    "comment": "launcher border option"
   },
   {
     "term": "Border Color",
@@ -1741,27 +1741,27 @@
   },
   {
     "term": "Bottom",
-    "context": "shadow direction option",
+    "context": "Bottom",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1728, Modules/Settings/ThemeColorsTab.qml:1738, Modules/Settings/ThemeColorsTab.qml:1751, Modules/Settings/DockTab.qml:102, Modules/Settings/DankBarTab.qml:286, Modules/Settings/DankBarTab.qml:542, Modules/Settings/DankBarTab.qml:1153, Modules/Settings/DankBarTab.qml:1161, Modules/Settings/DankBarTab.qml:1175",
-    "comment": ""
+    "comment": "shadow direction option"
   },
   {
     "term": "Bottom Center",
-    "context": "screen position option",
+    "context": "Bottom Center",
     "reference": "Modules/Settings/OSDTab.qml:45, Modules/Settings/OSDTab.qml:51, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:66, Modules/Settings/NotificationsTab.qml:227, Modules/Settings/NotificationsTab.qml:232, Modules/Settings/NotificationsTab.qml:244",
-    "comment": ""
+    "comment": "screen position option"
   },
   {
     "term": "Bottom Left",
-    "context": "screen position option",
+    "context": "Bottom Left",
     "reference": "Modules/Settings/OSDTab.qml:43, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:64, Modules/Settings/NotificationsTab.qml:221, Modules/Settings/NotificationsTab.qml:232, Modules/Settings/NotificationsTab.qml:250, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:144",
-    "comment": ""
+    "comment": "screen position option"
   },
   {
     "term": "Bottom Right",
-    "context": "screen position option",
+    "context": "Bottom Right",
     "reference": "Modules/Settings/OSDTab.qml:41, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:62, Modules/Settings/NotificationsTab.qml:225, Modules/Settings/NotificationsTab.qml:232, Modules/Settings/NotificationsTab.qml:247, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:144",
-    "comment": ""
+    "comment": "screen position option"
   },
   {
     "term": "Bottom Section",
@@ -1801,27 +1801,27 @@
   },
   {
     "term": "Browse",
-    "context": "theme category option",
+    "context": "Browse",
     "reference": "Modals/DankLauncherV2/Controller.qml:160, Modals/DankLauncherV2/Controller.qml:1201, Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/GreeterTab.qml:683, Modules/Settings/PluginsTab.qml:209, Modules/Settings/LockScreenTab.qml:327",
-    "comment": ""
+    "comment": "theme category option"
   },
   {
     "term": "Browse Files",
-    "context": "KDE Connect browse tooltip",
+    "context": "Browse Files",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:151, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:322",
-    "comment": ""
+    "comment": "KDE Connect browse tooltip"
   },
   {
     "term": "Browse Plugins",
-    "context": "plugin browser header | plugin browser window title",
+    "context": "Browse Plugins",
     "reference": "Modules/Settings/PluginBrowser.qml:147, Modules/Settings/PluginBrowser.qml:257, Modules/Settings/DesktopWidgetsTab.qml:101",
-    "comment": ""
+    "comment": "plugin browser header | plugin browser window title"
   },
   {
     "term": "Browse Themes",
-    "context": "browse themes button | theme browser header | theme browser window title",
+    "context": "Browse Themes",
     "reference": "Modules/Settings/ThemeColorsTab.qml:790, Modules/Settings/ThemeBrowser.qml:146, Modules/Settings/ThemeBrowser.qml:243",
-    "comment": ""
+    "comment": "browse themes button | theme browser header | theme browser window title"
   },
   {
     "term": "Browse or search plugins",
@@ -1873,9 +1873,9 @@
   },
   {
     "term": "CPU, memory, network, and disk monitoring",
-    "context": "System monitor widget description",
+    "context": "CPU, memory, network, and disk monitoring",
     "reference": "Services/DesktopWidgetRegistry.qml:56",
-    "comment": ""
+    "comment": "System monitor widget description"
   },
   {
     "term": "CUPS Insecure Filter Warning",
@@ -1987,15 +1987,15 @@
   },
   {
     "term": "Change Song",
-    "context": "media scroll wheel option",
+    "context": "Change Song",
     "reference": "Modules/Settings/MediaPlayerTab.qml:51",
-    "comment": ""
+    "comment": "media scroll wheel option"
   },
   {
     "term": "Change Volume",
-    "context": "media scroll wheel option",
+    "context": "Change Volume",
     "reference": "Modules/Settings/MediaPlayerTab.qml:51",
-    "comment": ""
+    "comment": "media scroll wheel option"
   },
   {
     "term": "Change bar appearance",
@@ -2023,9 +2023,9 @@
   },
   {
     "term": "Charging",
-    "context": "battery status",
+    "context": "Charging",
     "reference": "Services/BatteryService.qml:136, Services/BatteryService.qml:165, Modules/ControlCenter/Widgets/BatteryPill.qml:25",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "Check for system updates",
@@ -2059,9 +2059,9 @@
   },
   {
     "term": "Checking…",
-    "context": "greeter status loading",
+    "context": "Checking…",
     "reference": "Modules/Settings/GreeterTab.qml:473",
-    "comment": ""
+    "comment": "greeter status loading"
   },
   {
     "term": "Choose Color",
@@ -2071,9 +2071,9 @@
   },
   {
     "term": "Choose Dark Mode Color",
-    "context": "dark mode wallpaper color picker title",
+    "context": "Choose Dark Mode Color",
     "reference": "Modules/Settings/WallpaperTab.qml:706",
-    "comment": ""
+    "comment": "dark mode wallpaper color picker title"
   },
   {
     "term": "Choose Dock Launcher Logo Color",
@@ -2089,15 +2089,15 @@
   },
   {
     "term": "Choose Light Mode Color",
-    "context": "light mode wallpaper color picker title",
+    "context": "Choose Light Mode Color",
     "reference": "Modules/Settings/WallpaperTab.qml:516",
-    "comment": ""
+    "comment": "light mode wallpaper color picker title"
   },
   {
     "term": "Choose Wallpaper Color",
-    "context": "wallpaper color picker title",
+    "context": "Choose Wallpaper Color",
     "reference": "Modules/Settings/WallpaperTab.qml:180",
-    "comment": ""
+    "comment": "wallpaper color picker title"
   },
   {
     "term": "Choose a color",
@@ -2185,9 +2185,9 @@
   },
   {
     "term": "Circle",
-    "context": "dock indicator style option",
+    "context": "Circle",
     "reference": "Modules/Settings/DockTab.qml:177",
-    "comment": ""
+    "comment": "dock indicator style option"
   },
   {
     "term": "Class regex (e.g. ^firefox$)",
@@ -2269,9 +2269,9 @@
   },
   {
     "term": "Click Refresh to check status.",
-    "context": "greeter status placeholder",
+    "context": "Click Refresh to check status.",
     "reference": "Modules/Settings/GreeterTab.qml:473",
-    "comment": ""
+    "comment": "greeter status placeholder"
   },
   {
     "term": "Click Through",
@@ -2293,9 +2293,9 @@
   },
   {
     "term": "Click to select a custom theme JSON file",
-    "context": "custom theme file hint",
+    "context": "Click to select a custom theme JSON file",
     "reference": "Modules/Settings/ThemeColorsTab.qml:583",
-    "comment": ""
+    "comment": "custom theme file hint"
   },
   {
     "term": "Clip",
@@ -2329,9 +2329,9 @@
   },
   {
     "term": "Clipboard sent",
-    "context": "KDE Connect clipboard action | Phone Connect clipboard action",
+    "context": "Clipboard sent",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:117, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:300",
-    "comment": ""
+    "comment": "KDE Connect clipboard action | Phone Connect clipboard action"
   },
   {
     "term": "Clipboard service not available",
@@ -2383,9 +2383,9 @@
   },
   {
     "term": "Color",
-    "context": "border color",
+    "context": "Color",
     "reference": "Modules/Settings/LauncherTab.qml:459, Modules/Settings/DankBarTab.qml:1193, Modules/Settings/DankBarTab.qml:1267, Modules/Settings/DankBarTab.qml:1392, Modules/Settings/DankBarTab.qml:1482, Modules/Settings/Widgets/SettingsColorPicker.qml:29",
-    "comment": ""
+    "comment": "border color"
   },
   {
     "term": "Color Gamut",
@@ -2461,15 +2461,15 @@
   },
   {
     "term": "Color theme from DMS registry",
-    "context": "registry theme description",
+    "context": "Color theme from DMS registry",
     "reference": "Modules/Settings/ThemeColorsTab.qml:246",
-    "comment": ""
+    "comment": "registry theme description"
   },
   {
     "term": "Colorful",
-    "context": "widget style option",
+    "context": "Colorful",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1508",
-    "comment": ""
+    "comment": "widget style option"
   },
   {
     "term": "Colorful mix of bright contrasting accents.",
@@ -2485,9 +2485,9 @@
   },
   {
     "term": "Colors from wallpaper",
-    "context": "greeter feature card description",
+    "context": "Colors from wallpaper",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:91",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "Column",
@@ -2533,9 +2533,9 @@
   },
   {
     "term": "Community themes",
-    "context": "greeter feature card description",
+    "context": "Community themes",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:107",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "Compact",
@@ -2611,15 +2611,15 @@
   },
   {
     "term": "Configure",
-    "context": "greeter settings section header",
+    "context": "Configure",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:356",
-    "comment": ""
+    "comment": "greeter settings section header"
   },
   {
     "term": "Configure Keybinds",
-    "context": "greeter configure keybinds link",
+    "context": "Configure Keybinds",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:297",
-    "comment": ""
+    "comment": "greeter configure keybinds link"
   },
   {
     "term": "Configure a new printer",
@@ -2707,15 +2707,15 @@
   },
   {
     "term": "Connected",
-    "context": "network status",
+    "context": "Connected",
     "reference": "Modules/Settings/AboutTab.qml:716, Modules/Settings/NetworkTab.qml:448, Modules/Settings/NetworkTab.qml:1201, Modules/Settings/NetworkTab.qml:1558, Modules/ControlCenter/Details/BluetoothDetail.qml:301, Modules/ControlCenter/Details/BluetoothDetail.qml:302, Modules/ControlCenter/Details/NetworkDetail.qml:609, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:21, Modules/ControlCenter/Components/DragDropGrid.qml:337, Modules/ControlCenter/Components/DragDropGrid.qml:340, Modules/ControlCenter/Components/DragDropGrid.qml:342, Modules/ControlCenter/Components/DragDropGrid.qml:345",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "Connected Device",
-    "context": "bluetooth status",
+    "context": "Connected Device",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:367",
-    "comment": ""
+    "comment": "bluetooth status"
   },
   {
     "term": "Connected Displays",
@@ -2737,21 +2737,21 @@
   },
   {
     "term": "Connection failed",
-    "context": "Status message when test connection to printer fails",
+    "context": "Connection failed",
     "reference": "Modules/Settings/PrinterTab.qml:639",
-    "comment": ""
+    "comment": "Status message when test connection to printer fails"
   },
   {
     "term": "Contains",
-    "context": "notification rule match type option",
+    "context": "Contains",
     "reference": "Modules/Settings/NotificationsTab.qml:104",
-    "comment": ""
+    "comment": "notification rule match type option"
   },
   {
     "term": "Content",
-    "context": "matugen color scheme option",
+    "context": "Content",
     "reference": "Common/Theme.qml:475",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Content copied",
@@ -2767,9 +2767,9 @@
   },
   {
     "term": "Control Center",
-    "context": "greeter feature card title",
+    "context": "Control Center",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:149, Modules/Settings/WidgetsTab.qml:162",
-    "comment": ""
+    "comment": "greeter feature card title"
   },
   {
     "term": "Control Center Tile Color",
@@ -2791,9 +2791,9 @@
   },
   {
     "term": "Control what notification information is shown on the lock screen",
-    "context": "lock screen notification privacy setting",
+    "context": "Control what notification information is shown on the lock screen",
     "reference": "Modules/Settings/LockScreenTab.qml:147, Modules/Settings/NotificationsTab.qml:728",
-    "comment": ""
+    "comment": "lock screen notification privacy setting"
   },
   {
     "term": "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.",
@@ -2941,9 +2941,9 @@
   },
   {
     "term": "Count Only",
-    "context": "lock screen notification mode option",
+    "context": "Count Only",
     "reference": "Modules/Settings/LockScreenTab.qml:148, Modules/Settings/NotificationsTab.qml:729",
-    "comment": ""
+    "comment": "lock screen notification mode option"
   },
   {
     "term": "Cover Open",
@@ -3001,15 +3001,15 @@
   },
   {
     "term": "Critical Priority",
-    "context": "notification rule urgency option",
+    "context": "Critical Priority",
     "reference": "Modules/Settings/NotificationsTab.qml:154, Modules/Settings/NotificationsTab.qml:785, Modules/Settings/NotificationsTab.qml:892, Modules/Notifications/Center/NotificationSettings.qml:211, Modules/Notifications/Center/NotificationSettings.qml:432",
-    "comment": ""
+    "comment": "notification rule urgency option"
   },
   {
     "term": "Current",
-    "context": "notification center tab",
+    "context": "Current",
     "reference": "Modules/Notifications/Center/NotificationHeader.qml:151",
-    "comment": ""
+    "comment": "notification center tab"
   },
   {
     "term": "Current Items",
@@ -3025,9 +3025,9 @@
   },
   {
     "term": "Current Monitor",
-    "context": "Running apps filter: only show apps from the same monitor",
+    "context": "Current Monitor",
     "reference": "Modules/Settings/WidgetsTabSection.qml:2244",
-    "comment": ""
+    "comment": "Running apps filter: only show apps from the same monitor"
   },
   {
     "term": "Current Period",
@@ -3049,9 +3049,9 @@
   },
   {
     "term": "Current Theme: %1",
-    "context": "current theme label",
+    "context": "Current Theme: %1",
     "reference": "Modules/Settings/ThemeColorsTab.qml:230, Modules/Settings/ThemeColorsTab.qml:232, Modules/Settings/ThemeColorsTab.qml:233",
-    "comment": ""
+    "comment": "current theme label"
   },
   {
     "term": "Current Weather",
@@ -3061,9 +3061,9 @@
   },
   {
     "term": "Current Workspace",
-    "context": "Running apps filter: only show apps from the active workspace",
+    "context": "Current Workspace",
     "reference": "Modules/Settings/WidgetsTabSection.qml:2192",
-    "comment": ""
+    "comment": "Running apps filter: only show apps from the active workspace"
   },
   {
     "term": "Current time and date display",
@@ -3109,9 +3109,9 @@
   },
   {
     "term": "Custom",
-    "context": "blur border color | shadow color option | theme category option",
+    "context": "Custom",
     "reference": "Widgets/KeybindItem.qml:1403, dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/ThemeColorsTab.qml:1690, Modules/Settings/ThemeColorsTab.qml:1700, Modules/Settings/ThemeColorsTab.qml:1711, Modules/Settings/ThemeColorsTab.qml:1853, Modules/Settings/ThemeColorsTab.qml:1863, Modules/Settings/ThemeColorsTab.qml:1875, Modules/Settings/TypographyMotionTab.qml:212, Modules/Settings/TypographyMotionTab.qml:315, Modules/Settings/TypographyMotionTab.qml:399, Modules/Settings/DockTab.qml:282, Modules/Settings/DockTab.qml:389, Modules/Settings/LauncherTab.qml:75, Modules/Settings/LauncherTab.qml:181, Modules/Settings/DankBarTab.qml:1211, Modules/Settings/NotificationsTab.qml:337, Modules/Settings/Widgets/SettingsColorPicker.qml:52, Modules/Settings/Widgets/DeviceAliasRow.qml:92",
-    "comment": ""
+    "comment": "blur border color | shadow color option | theme category option"
   },
   {
     "term": "Custom Color",
@@ -3151,9 +3151,9 @@
   },
   {
     "term": "Custom Name",
-    "context": "Audio device rename dialog field label",
+    "context": "Custom Name",
     "reference": "Modules/Settings/AudioTab.qml:616",
-    "comment": ""
+    "comment": "Audio device rename dialog field label"
   },
   {
     "term": "Custom Power Actions",
@@ -3199,21 +3199,21 @@
   },
   {
     "term": "Custom power profile",
-    "context": "power profile description",
+    "context": "Custom power profile",
     "reference": "Common/Theme.qml:1491",
-    "comment": ""
+    "comment": "power profile description"
   },
   {
     "term": "Custom theme loaded from JSON file",
-    "context": "custom theme description",
+    "context": "Custom theme loaded from JSON file",
     "reference": "Modules/Settings/ThemeColorsTab.qml:248",
-    "comment": ""
+    "comment": "custom theme description"
   },
   {
     "term": "Custom...",
-    "context": "date format option",
+    "context": "Custom...",
     "reference": "Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:183, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:270, Modules/Settings/DisplayConfig/OutputCard.qml:182, Modules/Settings/DisplayConfig/OutputCard.qml:188, Modules/Settings/DisplayConfig/OutputCard.qml:190, Modules/Settings/DisplayConfig/OutputCard.qml:196",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Custom: ",
@@ -3253,9 +3253,9 @@
   },
   {
     "term": "DMS Shortcuts",
-    "context": "greeter keybinds section header",
+    "context": "DMS Shortcuts",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:136",
-    "comment": ""
+    "comment": "greeter keybinds section header"
   },
   {
     "term": "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.",
@@ -3319,15 +3319,15 @@
   },
   {
     "term": "DankBar",
-    "context": "greeter feature card title | greeter settings link",
+    "context": "DankBar",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:114, Modals/Greeter/GreeterCompletePage.qml:405",
-    "comment": ""
+    "comment": "greeter feature card title | greeter settings link"
   },
   {
     "term": "DankMaterialShell is ready to use",
-    "context": "greeter completion page subtitle",
+    "context": "DankMaterialShell is ready to use",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:112",
-    "comment": ""
+    "comment": "greeter completion page subtitle"
   },
   {
     "term": "DankShell & System Icons (requires restart)",
@@ -3397,15 +3397,15 @@
   },
   {
     "term": "Day Date",
-    "context": "date format option",
+    "context": "Day Date",
     "reference": "Modules/Settings/GreeterTab.qml:398, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:138, Modules/Settings/TimeWeatherTab.qml:175, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:225, Modules/Settings/TimeWeatherTab.qml:262",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Day Month Date",
-    "context": "date format option",
+    "context": "Day Month Date",
     "reference": "Modules/Settings/GreeterTab.qml:402, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:142, Modules/Settings/TimeWeatherTab.qml:176, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:229, Modules/Settings/TimeWeatherTab.qml:263",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Day Temperature",
@@ -3427,15 +3427,15 @@
   },
   {
     "term": "Default",
-    "context": "notification rule action option | notification rule urgency option | widget style option",
+    "context": "Default",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1508, Modules/Settings/DockTab.qml:389, Modules/Settings/LauncherTab.qml:181, Modules/Settings/NotificationsTab.qml:119, Modules/Settings/NotificationsTab.qml:142",
-    "comment": ""
+    "comment": "notification rule action option | notification rule urgency option | widget style option"
   },
   {
     "term": "Default (Black)",
-    "context": "shadow color option",
+    "context": "Default (Black)",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1690, Modules/Settings/ThemeColorsTab.qml:1702, Modules/Settings/DankBarTab.qml:1211",
-    "comment": ""
+    "comment": "shadow color option"
   },
   {
     "term": "Default Width (%)",
@@ -3541,15 +3541,15 @@
   },
   {
     "term": "Desktop Clock",
-    "context": "Desktop clock widget name",
+    "context": "Desktop Clock",
     "reference": "Services/DesktopWidgetRegistry.qml:39",
-    "comment": ""
+    "comment": "Desktop clock widget name"
   },
   {
     "term": "Desktop Entry",
-    "context": "notification rule match field option",
+    "context": "Desktop Entry",
     "reference": "Modules/Settings/NotificationsTab.qml:89",
-    "comment": ""
+    "comment": "notification rule match field option"
   },
   {
     "term": "Desktop Widget",
@@ -3607,15 +3607,15 @@
   },
   {
     "term": "Device paired",
-    "context": "Phone Connect pairing action",
+    "context": "Device paired",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:164, Modules/ControlCenter/Details/BluetoothDetail.qml:54",
-    "comment": ""
+    "comment": "Phone Connect pairing action"
   },
   {
     "term": "Device unpaired",
-    "context": "KDE Connect unpair action | Phone Connect unpair action",
+    "context": "Device unpaired",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:179, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:359",
-    "comment": ""
+    "comment": "KDE Connect unpair action | Phone Connect unpair action"
   },
   {
     "term": "Digital",
@@ -3625,9 +3625,9 @@
   },
   {
     "term": "Direction Source",
-    "context": "bar shadow direction source",
+    "context": "Direction Source",
     "reference": "Modules/Settings/DankBarTab.qml:1117",
-    "comment": ""
+    "comment": "bar shadow direction source"
   },
   {
     "term": "Disable Autoconnect",
@@ -3637,9 +3637,9 @@
   },
   {
     "term": "Disable Built-in Wallpapers",
-    "context": "wallpaper settings disable toggle",
+    "context": "Disable Built-in Wallpapers",
     "reference": "Modules/Settings/WallpaperTab.qml:1250",
-    "comment": ""
+    "comment": "wallpaper settings disable toggle"
   },
   {
     "term": "Disable History Persistence",
@@ -3655,21 +3655,21 @@
   },
   {
     "term": "Disabled",
-    "context": "bluetooth status | lock screen notification mode option",
+    "context": "Disabled",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1389, Modules/Settings/LockScreenTab.qml:148, Modules/Settings/NetworkTab.qml:823, Modules/Settings/DankBarTab.qml:357, Modules/Settings/NotificationsTab.qml:729, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1226, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1232, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1234, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1246, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1260, Modules/ControlCenter/Components/DragDropGrid.qml:317",
-    "comment": ""
+    "comment": "bluetooth status | lock screen notification mode option"
   },
   {
     "term": "Disabling WiFi...",
-    "context": "network status",
+    "context": "Disabling WiFi...",
     "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:192, Modules/ControlCenter/Components/DragDropGrid.qml:293",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "Disc",
-    "context": "wallpaper transition option",
+    "context": "Disc",
     "reference": "Modules/Settings/WallpaperTab.qml:1167",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Discard",
@@ -3679,9 +3679,9 @@
   },
   {
     "term": "Discharging",
-    "context": "battery status",
+    "context": "Discharging",
     "reference": "Services/BatteryService.qml:138, Services/BatteryService.qml:165",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "Disconnect",
@@ -3703,9 +3703,9 @@
   },
   {
     "term": "Discover Devices",
-    "context": "Toggle button to scan for printers via mDNS/Avahi",
+    "context": "Discover Devices",
     "reference": "Modules/Settings/PrinterTab.qml:352",
-    "comment": ""
+    "comment": "Toggle button to scan for printers via mDNS/Avahi"
   },
   {
     "term": "Disk",
@@ -3715,9 +3715,9 @@
   },
   {
     "term": "Disk I/O",
-    "context": "disk io header in system monitor",
+    "context": "Disk I/O",
     "reference": "Modules/ProcessList/DisksView.qml:58",
-    "comment": ""
+    "comment": "disk io header in system monitor"
   },
   {
     "term": "Disk Usage",
@@ -3757,9 +3757,9 @@
   },
   {
     "term": "Display Control",
-    "context": "greeter feature card title",
+    "context": "Display Control",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:141",
-    "comment": ""
+    "comment": "greeter feature card title"
   },
   {
     "term": "Display Name Format",
@@ -3859,9 +3859,9 @@
   },
   {
     "term": "Displays",
-    "context": "greeter settings link",
+    "context": "Displays",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:373, Modals/Settings/SettingsSidebar.qml:206, Modules/Settings/Widgets/SettingsDisplayPicker.qml:36",
-    "comment": ""
+    "comment": "greeter settings link"
   },
   {
     "term": "Displays count when overflow is active",
@@ -3877,9 +3877,9 @@
   },
   {
     "term": "Distribution",
-    "context": "system info label",
+    "context": "Distribution",
     "reference": "Modules/ProcessList/SystemView.qml:64",
-    "comment": ""
+    "comment": "system info label"
   },
   {
     "term": "Diverse palette spanning the full spectrum.",
@@ -3895,9 +3895,9 @@
   },
   {
     "term": "Dock",
-    "context": "greeter settings link",
+    "context": "Dock",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:422, Modals/Settings/SettingsSidebar.qml:185",
-    "comment": ""
+    "comment": "greeter settings link"
   },
   {
     "term": "Dock & Launcher",
@@ -3919,9 +3919,9 @@
   },
   {
     "term": "Docs",
-    "context": "greeter documentation link",
+    "context": "Docs",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:468, Modules/Settings/AboutTab.qml:274, Modules/Settings/AboutTab.qml:282",
-    "comment": ""
+    "comment": "greeter documentation link"
   },
   {
     "term": "Documents",
@@ -4027,9 +4027,9 @@
   },
   {
     "term": "Dynamic",
-    "context": "dynamic theme name",
+    "context": "Dynamic",
     "reference": "Modules/Settings/ThemeColorsTab.qml:230",
-    "comment": ""
+    "comment": "dynamic theme name"
   },
   {
     "term": "Dynamic Properties",
@@ -4039,21 +4039,21 @@
   },
   {
     "term": "Dynamic Theming",
-    "context": "greeter feature card title",
+    "context": "Dynamic Theming",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:90",
-    "comment": ""
+    "comment": "greeter feature card title"
   },
   {
     "term": "Dynamic colors from wallpaper",
-    "context": "dynamic colors description",
+    "context": "Dynamic colors from wallpaper",
     "reference": "Modules/Settings/ThemeColorsTab.qml:488",
-    "comment": ""
+    "comment": "dynamic colors description"
   },
   {
     "term": "Dynamic colors, presets",
-    "context": "greeter theme description",
+    "context": "Dynamic colors, presets",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:390",
-    "comment": ""
+    "comment": "greeter theme description"
   },
   {
     "term": "Edge Spacing",
@@ -4081,9 +4081,9 @@
   },
   {
     "term": "Empty",
-    "context": "battery status",
+    "context": "Empty",
     "reference": "Services/BatteryService.qml:140, Modules/Notepad/NotepadTextEditor.qml:848",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "Enable 10-bit color depth for wider color gamut and HDR support",
@@ -4111,9 +4111,9 @@
   },
   {
     "term": "Enable History",
-    "context": "notification history toggle label",
+    "context": "Enable History",
     "reference": "Modules/Settings/NotificationsTab.qml:809",
-    "comment": ""
+    "comment": "notification history toggle label"
   },
   {
     "term": "Enable Overview Overlay",
@@ -4195,15 +4195,15 @@
   },
   {
     "term": "Enable security key authentication",
-    "context": "Enable FIDO2/U2F hardware security key for lock screen",
+    "context": "Enable security key authentication",
     "reference": "Modules/Settings/LockScreenTab.qml:239",
-    "comment": ""
+    "comment": "Enable FIDO2/U2F hardware security key for lock screen"
   },
   {
     "term": "Enabled",
-    "context": "bluetooth status",
+    "context": "Enabled",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1389, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1226, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1234, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1260, Modules/ControlCenter/Components/DragDropGrid.qml:318",
-    "comment": ""
+    "comment": "bluetooth status"
   },
   {
     "term": "Enabled, but fingerprint availability could not be confirmed.",
@@ -4267,9 +4267,9 @@
   },
   {
     "term": "Enabling WiFi...",
-    "context": "network status",
+    "context": "Enabling WiFi...",
     "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:192, Modules/ControlCenter/Components/DragDropGrid.qml:293",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "End",
@@ -4309,9 +4309,9 @@
   },
   {
     "term": "Enter URL or text to share",
-    "context": "KDE Connect share input placeholder",
+    "context": "Enter URL or text to share",
     "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:73",
-    "comment": ""
+    "comment": "KDE Connect share input placeholder"
   },
   {
     "term": "Enter a new name for session \"%1\"",
@@ -4351,9 +4351,9 @@
   },
   {
     "term": "Enter device name...",
-    "context": "Audio device rename dialog placeholder",
+    "context": "Enter device name...",
     "reference": "Modules/Settings/AudioTab.qml:627",
-    "comment": ""
+    "comment": "Audio device rename dialog placeholder"
   },
   {
     "term": "Enter filename...",
@@ -4429,21 +4429,21 @@
   },
   {
     "term": "Errors",
-    "context": "greeter doctor page status card",
+    "context": "Errors",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:248",
-    "comment": ""
+    "comment": "greeter doctor page status card"
   },
   {
     "term": "Ethernet",
-    "context": "network status",
+    "context": "Ethernet",
     "reference": "Modules/Settings/NetworkTab.qml:211, Modules/Settings/NetworkTab.qml:260, Modules/Settings/NetworkTab.qml:328, Modules/ControlCenter/Details/NetworkDetail.qml:136, Modules/ControlCenter/Components/DragDropGrid.qml:297, Modules/ControlCenter/Components/DragDropGrid.qml:300",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "Exact",
-    "context": "notification rule match type option",
+    "context": "Exact",
     "reference": "Modules/Settings/NotificationsTab.qml:108",
-    "comment": ""
+    "comment": "notification rule match type option"
   },
   {
     "term": "Exclusive Zone Offset",
@@ -4459,9 +4459,9 @@
   },
   {
     "term": "Explore",
-    "context": "greeter explore section header",
+    "context": "Explore",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:453",
-    "comment": ""
+    "comment": "greeter explore section header"
   },
   {
     "term": "Exponential",
@@ -4471,27 +4471,27 @@
   },
   {
     "term": "Expressive",
-    "context": "matugen color scheme option",
+    "context": "Expressive",
     "reference": "Common/Theme.qml:479",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Extend battery life",
-    "context": "power profile description",
+    "context": "Extend battery life",
     "reference": "Common/Theme.qml:1485",
-    "comment": ""
+    "comment": "power profile description"
   },
   {
     "term": "Extensible architecture",
-    "context": "greeter feature card description",
+    "context": "Extensible architecture",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:123",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "External Wallpaper Management",
-    "context": "wallpaper settings external management",
+    "context": "External Wallpaper Management",
     "reference": "Modules/Settings/WallpaperTab.qml:1242",
-    "comment": ""
+    "comment": "wallpaper settings external management"
   },
   {
     "term": "Extra Arguments",
@@ -4507,9 +4507,9 @@
   },
   {
     "term": "Fade",
-    "context": "wallpaper transition option",
+    "context": "Fade",
     "reference": "Modules/Settings/WallpaperTab.qml:1163",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Fade to lock screen",
@@ -4525,9 +4525,9 @@
   },
   {
     "term": "Failed to accept pairing",
-    "context": "Phone Connect error",
+    "context": "Failed to accept pairing",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:161",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to activate configuration",
@@ -4555,9 +4555,9 @@
   },
   {
     "term": "Failed to browse device",
-    "context": "Phone Connect error",
+    "context": "Failed to browse device",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:143",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to cancel all jobs",
@@ -4699,9 +4699,9 @@
   },
   {
     "term": "Failed to launch SMS app",
-    "context": "Phone Connect error",
+    "context": "Failed to launch SMS app",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:133",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to load VPN config",
@@ -4759,9 +4759,9 @@
   },
   {
     "term": "Failed to reject pairing",
-    "context": "Phone Connect error",
+    "context": "Failed to reject pairing",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:170",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to remove device",
@@ -4801,15 +4801,15 @@
   },
   {
     "term": "Failed to ring device",
-    "context": "Phone Connect error",
+    "context": "Failed to ring device",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:96",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
-    "context": "greeter status error",
+    "context": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
     "reference": "Modules/Settings/GreeterTab.qml:274",
-    "comment": ""
+    "comment": "greeter status error"
   },
   {
     "term": "Failed to save audio config",
@@ -4837,21 +4837,21 @@
   },
   {
     "term": "Failed to send clipboard",
-    "context": "Phone Connect error",
+    "context": "Failed to send clipboard",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:114",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to send file",
-    "context": "Phone Connect error",
+    "context": "Failed to send file",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:361, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:421",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to send ping",
-    "context": "Phone Connect error",
+    "context": "Failed to send ping",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:105",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to set brightness",
@@ -4897,9 +4897,9 @@
   },
   {
     "term": "Failed to share",
-    "context": "Phone Connect error",
+    "context": "Failed to share",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:341, dms-plugins/DankKDEConnect/DankKDEConnect.qml:349, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:407",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Failed to start connection to %1",
@@ -4951,9 +4951,9 @@
   },
   {
     "term": "Features",
-    "context": "greeter welcome page section header",
+    "context": "Features",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:75",
-    "comment": ""
+    "comment": "greeter welcome page section header"
   },
   {
     "term": "Feels",
@@ -4969,15 +4969,15 @@
   },
   {
     "term": "Feels Like %1°",
-    "context": "weather feels like temperature",
+    "context": "Feels Like %1°",
     "reference": "Modules/DankDash/WeatherTab.qml:309, Modules/Settings/TimeWeatherTab.qml:776",
-    "comment": ""
+    "comment": "weather feels like temperature"
   },
   {
     "term": "Fidelity",
-    "context": "matugen color scheme option",
+    "context": "Fidelity",
     "reference": "Common/Theme.qml:483",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Field",
@@ -5005,9 +5005,9 @@
   },
   {
     "term": "File received from",
-    "context": "Phone Connect file share notification",
+    "context": "File received from",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:79",
-    "comment": ""
+    "comment": "Phone Connect file share notification"
   },
   {
     "term": "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch",
@@ -5029,9 +5029,9 @@
   },
   {
     "term": "Fill",
-    "context": "wallpaper fill mode",
+    "context": "Fill",
     "reference": "Modules/Settings/GreeterTab.qml:698, Modules/Settings/WallpaperTab.qml:312",
-    "comment": ""
+    "comment": "wallpaper fill mode"
   },
   {
     "term": "Find in Text",
@@ -5083,9 +5083,9 @@
   },
   {
     "term": "Finish",
-    "context": "greeter finish button",
+    "context": "Finish",
     "reference": "Modals/Greeter/GreeterModal.qml:304",
-    "comment": ""
+    "comment": "greeter finish button"
   },
   {
     "term": "First Day of Week",
@@ -5101,9 +5101,9 @@
   },
   {
     "term": "Fit",
-    "context": "wallpaper fill mode",
+    "context": "Fit",
     "reference": "Modules/Settings/WallpaperTab.qml:312",
-    "comment": ""
+    "comment": "wallpaper fill mode"
   },
   {
     "term": "Fix Now",
@@ -5311,9 +5311,9 @@
   },
   {
     "term": "Forever",
-    "context": "notification history retention option",
+    "context": "Forever",
     "reference": "Modules/Settings/NotificationsTab.qml:837, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NotificationsTab.qml:855",
-    "comment": ""
+    "comment": "notification history retention option"
   },
   {
     "term": "Forget",
@@ -5383,33 +5383,33 @@
   },
   {
     "term": "Fruit Salad",
-    "context": "matugen color scheme option",
+    "context": "Fruit Salad",
     "reference": "Common/Theme.qml:487",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Full Command:",
-    "context": "process detail label",
+    "context": "Full Command:",
     "reference": "Modules/ProcessList/ProcessesView.qml:681",
-    "comment": ""
+    "comment": "process detail label"
   },
   {
     "term": "Full Content",
-    "context": "lock screen notification mode option",
+    "context": "Full Content",
     "reference": "Modules/Settings/LockScreenTab.qml:148, Modules/Settings/NotificationsTab.qml:729",
-    "comment": ""
+    "comment": "lock screen notification mode option"
   },
   {
     "term": "Full Day & Month",
-    "context": "date format option",
+    "context": "Full Day & Month",
     "reference": "Modules/Settings/GreeterTab.qml:426, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:166, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:253, Modules/Settings/TimeWeatherTab.qml:269",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Full with Year",
-    "context": "date format option",
+    "context": "Full with Year",
     "reference": "Modules/Settings/GreeterTab.qml:418, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:158, Modules/Settings/TimeWeatherTab.qml:180, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:245, Modules/Settings/TimeWeatherTab.qml:267",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Fullscreen",
@@ -5425,9 +5425,9 @@
   },
   {
     "term": "Fully Charged",
-    "context": "battery status",
+    "context": "Fully Charged",
     "reference": "Services/BatteryService.qml:142",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "Fun",
@@ -5437,9 +5437,9 @@
   },
   {
     "term": "G: grid • Z/X: size",
-    "context": "Widget grid keyboard hints",
+    "context": "G: grid • Z/X: size",
     "reference": "Modules/Plugins/DesktopPluginWrapper.qml:746",
-    "comment": ""
+    "comment": "Widget grid keyboard hints"
   },
   {
     "term": "GPU",
@@ -5449,9 +5449,9 @@
   },
   {
     "term": "GPU Monitoring",
-    "context": "gpu section header in system monitor",
+    "context": "GPU Monitoring",
     "reference": "Modules/ProcessList/SystemView.qml:117",
-    "comment": ""
+    "comment": "gpu section header in system monitor"
   },
   {
     "term": "GPU Temperature",
@@ -5467,9 +5467,9 @@
   },
   {
     "term": "GTK, Qt, IDEs, more",
-    "context": "greeter feature card description",
+    "context": "GTK, Qt, IDEs, more",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:99",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "Games",
@@ -5497,15 +5497,15 @@
   },
   {
     "term": "Generic",
-    "context": "theme category option",
+    "context": "Generic",
     "reference": "Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/ThemeColorsTab.qml:289",
-    "comment": ""
+    "comment": "theme category option"
   },
   {
     "term": "Get Started",
-    "context": "greeter first page button",
+    "context": "Get Started",
     "reference": "Modals/Greeter/GreeterModal.qml:295",
-    "comment": ""
+    "comment": "greeter first page button"
   },
   {
     "term": "GitHub",
@@ -5629,15 +5629,15 @@
   },
   {
     "term": "Grid: OFF",
-    "context": "Widget grid snap status",
+    "context": "Grid: OFF",
     "reference": "Modules/Plugins/DesktopPluginWrapper.qml:716",
-    "comment": ""
+    "comment": "Widget grid snap status"
   },
   {
     "term": "Grid: ON",
-    "context": "Widget grid snap status",
+    "context": "Grid: ON",
     "reference": "Modules/Plugins/DesktopPluginWrapper.qml:716",
-    "comment": ""
+    "comment": "Widget grid snap status"
   },
   {
     "term": "Group",
@@ -5773,9 +5773,9 @@
   },
   {
     "term": "Hidden (%1)",
-    "context": "count of hidden audio devices",
+    "context": "Hidden (%1)",
     "reference": "Modules/Settings/AudioTab.qml:265, Modules/Settings/AudioTab.qml:409",
-    "comment": ""
+    "comment": "count of hidden audio devices"
   },
   {
     "term": "Hidden Apps",
@@ -5827,9 +5827,9 @@
   },
   {
     "term": "Hide Updater Widget",
-    "context": "When updater widget is used, then hide it if no update found",
+    "context": "Hide Updater Widget",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:29",
-    "comment": ""
+    "comment": "When updater widget is used, then hide it if no update found"
   },
   {
     "term": "Hide When Typing",
@@ -5905,15 +5905,15 @@
   },
   {
     "term": "History",
-    "context": "notification center tab",
+    "context": "History",
     "reference": "Modals/Clipboard/ClipboardHeader.qml:60, Modules/Notifications/Center/NotificationHeader.qml:151",
-    "comment": ""
+    "comment": "notification center tab"
   },
   {
     "term": "History Retention",
-    "context": "notification history retention settings label",
+    "context": "History Retention",
     "reference": "Modules/Settings/NotificationsTab.qml:832",
-    "comment": ""
+    "comment": "notification history retention settings label"
   },
   {
     "term": "History Settings",
@@ -5965,15 +5965,15 @@
   },
   {
     "term": "Host",
-    "context": "Label for printer IP address or hostname input field",
+    "context": "Host",
     "reference": "Modules/Settings/PrinterTab.qml:501",
-    "comment": ""
+    "comment": "Label for printer IP address or hostname input field"
   },
   {
     "term": "Hostname",
-    "context": "system info label",
+    "context": "Hostname",
     "reference": "Modules/ProcessList/SystemView.qml:60",
-    "comment": ""
+    "comment": "system info label"
   },
   {
     "term": "Hot Corners",
@@ -6067,15 +6067,15 @@
   },
   {
     "term": "IP address or hostname",
-    "context": "Placeholder text for manual printer address input",
+    "context": "IP address or hostname",
     "reference": "Modules/Settings/PrinterTab.qml:511",
-    "comment": ""
+    "comment": "Placeholder text for manual printer address input"
   },
   {
     "term": "ISO Date",
-    "context": "date format option",
+    "context": "ISO Date",
     "reference": "Modules/Settings/GreeterTab.qml:422, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:162, Modules/Settings/TimeWeatherTab.qml:181, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:249, Modules/Settings/TimeWeatherTab.qml:268",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Icon",
@@ -6139,9 +6139,9 @@
   },
   {
     "term": "Ignore Completely",
-    "context": "notification rule action option",
+    "context": "Ignore Completely",
     "reference": "Modules/Settings/NotificationsTab.qml:127",
-    "comment": ""
+    "comment": "notification rule action option"
   },
   {
     "term": "Image",
@@ -6235,9 +6235,9 @@
   },
   {
     "term": "Info",
-    "context": "greeter doctor page status card",
+    "context": "Info",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:270",
-    "comment": ""
+    "comment": "greeter doctor page status card"
   },
   {
     "term": "Inherit",
@@ -6247,9 +6247,9 @@
   },
   {
     "term": "Inherit Global (Default)",
-    "context": "bar shadow direction source option",
+    "context": "Inherit Global (Default)",
     "reference": "Modules/Settings/DankBarTab.qml:1120, Modules/Settings/DankBarTab.qml:1128",
-    "comment": ""
+    "comment": "bar shadow direction source option"
   },
   {
     "term": "Inhibitable",
@@ -6277,33 +6277,33 @@
   },
   {
     "term": "Install",
-    "context": "install action button",
+    "context": "Install",
     "reference": "Modules/Settings/PluginBrowser.qml:121, Modules/Settings/PluginBrowser.qml:634, Modules/Settings/GreeterTab.qml:120, Modules/Settings/GreeterTab.qml:166, Modules/Settings/ThemeBrowser.qml:120, Modules/Settings/ThemeBrowser.qml:648",
-    "comment": ""
+    "comment": "install action button"
   },
   {
     "term": "Install Greeter",
-    "context": "greeter action confirmation",
+    "context": "Install Greeter",
     "reference": "Modules/Settings/GreeterTab.qml:164",
-    "comment": ""
+    "comment": "greeter action confirmation"
   },
   {
     "term": "Install Plugin",
-    "context": "plugin installation dialog title",
+    "context": "Install Plugin",
     "reference": "Modules/Settings/PluginBrowser.qml:119",
-    "comment": ""
+    "comment": "plugin installation dialog title"
   },
   {
     "term": "Install Theme",
-    "context": "theme installation dialog title",
+    "context": "Install Theme",
     "reference": "Modules/Settings/ThemeBrowser.qml:118",
-    "comment": ""
+    "comment": "theme installation dialog title"
   },
   {
     "term": "Install color themes from the DMS theme registry",
-    "context": "theme browser description",
+    "context": "Install color themes from the DMS theme registry",
     "reference": "Modules/Settings/ThemeBrowser.qml:290",
-    "comment": ""
+    "comment": "theme browser description"
   },
   {
     "term": "Install complete. Greeter has been installed.",
@@ -6313,27 +6313,27 @@
   },
   {
     "term": "Install failed: %1",
-    "context": "installation error",
+    "context": "Install failed: %1",
     "reference": "Modules/Settings/PluginBrowser.qml:85, Modules/Settings/ThemeBrowser.qml:68",
-    "comment": ""
+    "comment": "installation error"
   },
   {
     "term": "Install matugen package for dynamic theming",
-    "context": "matugen installation hint",
+    "context": "Install matugen package for dynamic theming",
     "reference": "Modules/Settings/ThemeColorsTab.qml:485",
-    "comment": ""
+    "comment": "matugen installation hint"
   },
   {
     "term": "Install plugin '%1' from the DMS registry?",
-    "context": "plugin installation confirmation",
+    "context": "Install plugin '%1' from the DMS registry?",
     "reference": "Modules/Settings/PluginBrowser.qml:120",
-    "comment": ""
+    "comment": "plugin installation confirmation"
   },
   {
     "term": "Install plugins from the DMS plugin registry",
-    "context": "plugin browser description",
+    "context": "Install plugins from the DMS plugin registry",
     "reference": "Modules/Settings/PluginBrowser.qml:321",
-    "comment": ""
+    "comment": "plugin browser description"
   },
   {
     "term": "Install the DMS greeter? A terminal will open for sudo authentication.",
@@ -6343,9 +6343,9 @@
   },
   {
     "term": "Install theme '%1' from the DMS registry?",
-    "context": "theme installation confirmation",
+    "context": "Install theme '%1' from the DMS registry?",
     "reference": "Modules/Settings/ThemeBrowser.qml:119",
-    "comment": ""
+    "comment": "theme installation confirmation"
   },
   {
     "term": "Installation and PAM setup: see the ",
@@ -6355,21 +6355,21 @@
   },
   {
     "term": "Installed",
-    "context": "installed status",
+    "context": "Installed",
     "reference": "Modules/Settings/PluginBrowser.qml:630, Modules/Settings/ThemeBrowser.qml:651",
-    "comment": ""
+    "comment": "installed status"
   },
   {
     "term": "Installed: %1",
-    "context": "installation success",
+    "context": "Installed: %1",
     "reference": "Modules/Settings/PluginBrowser.qml:88, Modules/Settings/ThemeBrowser.qml:71",
-    "comment": ""
+    "comment": "installation success"
   },
   {
     "term": "Installing: %1",
-    "context": "installation progress",
+    "context": "Installing: %1",
     "reference": "Modules/Settings/PluginBrowser.qml:82, Modules/Settings/ThemeBrowser.qml:65",
-    "comment": ""
+    "comment": "installation progress"
   },
   {
     "term": "Intelligent Auto-hide",
@@ -6379,9 +6379,9 @@
   },
   {
     "term": "Intensity",
-    "context": "shadow intensity slider",
+    "context": "Intensity",
     "reference": "Modules/Settings/DankBarTab.qml:1091",
-    "comment": ""
+    "comment": "shadow intensity slider"
   },
   {
     "term": "Interface:",
@@ -6403,9 +6403,9 @@
   },
   {
     "term": "Interval",
-    "context": "wallpaper cycling mode tab",
+    "context": "Interval",
     "reference": "Modules/Settings/WallpaperTab.qml:956, Modules/Settings/WallpaperTab.qml:1009",
-    "comment": ""
+    "comment": "wallpaper cycling mode tab"
   },
   {
     "term": "Invalid configuration",
@@ -6421,9 +6421,9 @@
   },
   {
     "term": "Iris Bloom",
-    "context": "wallpaper transition option",
+    "context": "Iris Bloom",
     "reference": "Modules/Settings/WallpaperTab.qml:1171",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Isolate Displays",
@@ -6463,9 +6463,9 @@
   },
   {
     "term": "Kernel",
-    "context": "system info label",
+    "context": "Kernel",
     "reference": "Modules/ProcessList/SystemView.qml:68",
-    "comment": ""
+    "comment": "system info label"
   },
   {
     "term": "Key",
@@ -6481,9 +6481,9 @@
   },
   {
     "term": "Keybinds",
-    "context": "greeter settings link",
+    "context": "Keybinds",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:413",
-    "comment": ""
+    "comment": "greeter settings link"
   },
   {
     "term": "Keybinds Search Settings",
@@ -6571,9 +6571,9 @@
   },
   {
     "term": "Last hour",
-    "context": "notification history filter",
+    "context": "Last hour",
     "reference": "Modules/Notifications/Center/HistoryNotificationList.qml:92",
-    "comment": ""
+    "comment": "notification history filter"
   },
   {
     "term": "Last launched %1",
@@ -6697,9 +6697,9 @@
   },
   {
     "term": "Left Center",
-    "context": "screen position option",
+    "context": "Left Center",
     "reference": "Modules/Settings/OSDTab.qml:47, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:68",
-    "comment": ""
+    "comment": "screen position option"
   },
   {
     "term": "Left Section",
@@ -6751,9 +6751,9 @@
   },
   {
     "term": "Line",
-    "context": "dock indicator style option",
+    "context": "Line",
     "reference": "Modules/Settings/DockTab.qml:177",
-    "comment": ""
+    "comment": "dock indicator style option"
   },
   {
     "term": "Line: %1",
@@ -6787,9 +6787,9 @@
   },
   {
     "term": "Load Average",
-    "context": "system info label",
+    "context": "Load Average",
     "reference": "Modules/ProcessList/SystemView.qml:84",
-    "comment": ""
+    "comment": "system info label"
   },
   {
     "term": "Loading codecs...",
@@ -6811,9 +6811,9 @@
   },
   {
     "term": "Loading...",
-    "context": "loading indicator",
+    "context": "Loading...",
     "reference": "Widgets/VpnProfileDelegate.qml:220, Modules/Settings/PluginBrowser.qml:389, Modules/Settings/PrinterTab.qml:707, Modules/Settings/ThemeBrowser.qml:357, Modules/Settings/NetworkTab.qml:681, Modules/Settings/NetworkTab.qml:1398, Modules/Settings/NetworkTab.qml:1884, Modules/DankDash/Overview/WeatherOverviewCard.qml:31",
-    "comment": ""
+    "comment": "loading indicator"
   },
   {
     "term": "Local",
@@ -6835,9 +6835,9 @@
   },
   {
     "term": "Location",
-    "context": "theme auto mode tab",
+    "context": "Location",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1098, Modules/Settings/GammaControlTab.qml:188, Modules/Settings/PrinterTab.qml:775, Modules/Settings/PrinterTab.qml:1164",
-    "comment": ""
+    "comment": "theme auto mode tab"
   },
   {
     "term": "Location Search",
@@ -6853,9 +6853,9 @@
   },
   {
     "term": "Lock Screen",
-    "context": "greeter feature card title | lock screen notifications settings card",
+    "context": "Lock Screen",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:158, Modals/Settings/SettingsSidebar.qml:292, Modules/Settings/NotificationsTab.qml:721",
-    "comment": ""
+    "comment": "greeter feature card title | lock screen notifications settings card"
   },
   {
     "term": "Lock Screen Display",
@@ -6955,9 +6955,9 @@
   },
   {
     "term": "Low Priority",
-    "context": "notification rule urgency option",
+    "context": "Low Priority",
     "reference": "Modules/Settings/NotificationsTab.qml:146, Modules/Settings/NotificationsTab.qml:751, Modules/Settings/NotificationsTab.qml:874, Modules/Notifications/Center/NotificationSettings.qml:181, Modules/Notifications/Center/NotificationSettings.qml:364",
-    "comment": ""
+    "comment": "notification rule urgency option"
   },
   {
     "term": "MAC",
@@ -6973,9 +6973,9 @@
   },
   {
     "term": "Make sure KDE Connect or Valent is running on your other devices",
-    "context": "Phone Connect hint message",
+    "context": "Make sure KDE Connect or Valent is running on your other devices",
     "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:18",
-    "comment": ""
+    "comment": "Phone Connect hint message"
   },
   {
     "term": "Manage and configure plugins for extending DMS functionality",
@@ -7003,9 +7003,9 @@
   },
   {
     "term": "Manual",
-    "context": "bar shadow direction source option",
+    "context": "Manual",
     "reference": "Modules/Settings/DankBarTab.qml:1120, Modules/Settings/DankBarTab.qml:1126, Modules/Settings/DankBarTab.qml:1136",
-    "comment": ""
+    "comment": "bar shadow direction source option"
   },
   {
     "term": "Manual Coordinates",
@@ -7015,9 +7015,9 @@
   },
   {
     "term": "Manual Direction",
-    "context": "bar manual shadow direction",
+    "context": "Manual Direction",
     "reference": "Modules/Settings/DankBarTab.qml:1150",
-    "comment": ""
+    "comment": "bar manual shadow direction"
   },
   {
     "term": "Manual Gap Size",
@@ -7087,15 +7087,15 @@
   },
   {
     "term": "Material Design inspired color themes",
-    "context": "generic theme description",
+    "context": "Material Design inspired color themes",
     "reference": "Modules/Settings/ThemeColorsTab.qml:249",
-    "comment": ""
+    "comment": "generic theme description"
   },
   {
     "term": "Material colors generated from wallpaper",
-    "context": "dynamic theme description",
+    "context": "Material colors generated from wallpaper",
     "reference": "Modules/Settings/ThemeColorsTab.qml:244",
-    "comment": ""
+    "comment": "dynamic theme description"
   },
   {
     "term": "Material inspired shadows and elevation on modals, popouts, and dialogs",
@@ -7111,9 +7111,9 @@
   },
   {
     "term": "Matugen Missing",
-    "context": "matugen not found status",
+    "context": "Matugen Missing",
     "reference": "Modules/Settings/ThemeColorsTab.qml:468",
-    "comment": ""
+    "comment": "matugen not found status"
   },
   {
     "term": "Matugen Palette",
@@ -7171,9 +7171,9 @@
   },
   {
     "term": "Max Volume",
-    "context": "Audio settings: maximum volume limit per device",
+    "context": "Max Volume",
     "reference": "Modules/Settings/AudioTab.qml:187",
-    "comment": ""
+    "comment": "Audio settings: maximum volume limit per device"
   },
   {
     "term": "Max W",
@@ -7255,9 +7255,9 @@
   },
   {
     "term": "Maximum number of notifications to keep",
-    "context": "notification history limit",
+    "context": "Maximum number of notifications to keep",
     "reference": "Modules/Settings/NotificationsTab.qml:819",
-    "comment": ""
+    "comment": "notification history limit"
   },
   {
     "term": "Maximum pinned entries reached",
@@ -7375,15 +7375,15 @@
   },
   {
     "term": "Message",
-    "context": "KDE Connect SMS message input placeholder",
+    "context": "Message",
     "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:73",
-    "comment": ""
+    "comment": "KDE Connect SMS message input placeholder"
   },
   {
     "term": "Message Content",
-    "context": "notification privacy mode placeholder",
+    "context": "Message Content",
     "reference": "Modules/Notifications/Popup/NotificationPopup.qml:670",
-    "comment": ""
+    "comment": "notification privacy mode placeholder"
   },
   {
     "term": "Microphone",
@@ -7453,9 +7453,9 @@
   },
   {
     "term": "Missing Environment Variables",
-    "context": "qt theme env error title",
+    "context": "Missing Environment Variables",
     "reference": "Modules/Settings/ThemeColorsTab.qml:2464",
-    "comment": ""
+    "comment": "qt theme env error title"
   },
   {
     "term": "Modal Background",
@@ -7501,9 +7501,9 @@
   },
   {
     "term": "Modular widget bar",
-    "context": "greeter feature card description",
+    "context": "Modular widget bar",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:115",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "Monitor",
@@ -7531,9 +7531,9 @@
   },
   {
     "term": "Monochrome",
-    "context": "matugen color scheme option",
+    "context": "Monochrome",
     "reference": "Common/Theme.qml:491",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Monocle",
@@ -7549,9 +7549,9 @@
   },
   {
     "term": "Month Date",
-    "context": "date format option",
+    "context": "Month Date",
     "reference": "Modules/Settings/GreeterTab.qml:406, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:146, Modules/Settings/TimeWeatherTab.qml:177, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:233, Modules/Settings/TimeWeatherTab.qml:264",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Morning",
@@ -7561,9 +7561,9 @@
   },
   {
     "term": "Mount Points",
-    "context": "mount points header in system monitor",
+    "context": "Mount Points",
     "reference": "Modules/ProcessList/DisksView.qml:131",
-    "comment": ""
+    "comment": "mount points header in system monitor"
   },
   {
     "term": "Mouse pointer appearance",
@@ -7597,9 +7597,9 @@
   },
   {
     "term": "Multi-Monitor",
-    "context": "greeter feature card title",
+    "context": "Multi-Monitor",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:130",
-    "comment": ""
+    "comment": "greeter feature card title"
   },
   {
     "term": "Multiplexer",
@@ -7627,9 +7627,9 @@
   },
   {
     "term": "Mute Popups",
-    "context": "notification rule action option",
+    "context": "Mute Popups",
     "reference": "Modules/Settings/NotificationsTab.qml:123",
-    "comment": ""
+    "comment": "notification rule action option"
   },
   {
     "term": "Mute popups for %1",
@@ -7639,9 +7639,9 @@
   },
   {
     "term": "Muted",
-    "context": "audio status",
+    "context": "Muted",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:375, Modules/ControlCenter/Components/DragDropGrid.qml:386",
-    "comment": ""
+    "comment": "audio status"
   },
   {
     "term": "Muted Apps",
@@ -7735,9 +7735,9 @@
   },
   {
     "term": "Neutral",
-    "context": "matugen color scheme option",
+    "context": "Neutral",
     "reference": "Common/Theme.qml:495",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Never",
@@ -7801,9 +7801,9 @@
   },
   {
     "term": "Next",
-    "context": "greeter next button",
+    "context": "Next",
     "reference": "Modals/Greeter/GreeterModal.qml:295",
-    "comment": ""
+    "comment": "greeter next button"
   },
   {
     "term": "Next Transition",
@@ -7831,9 +7831,9 @@
   },
   {
     "term": "Night mode & gamma",
-    "context": "greeter feature card description",
+    "context": "Night mode & gamma",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:142",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "Niri Integration",
@@ -7879,9 +7879,9 @@
   },
   {
     "term": "No Battery",
-    "context": "battery status",
+    "context": "No Battery",
     "reference": "Services/BatteryService.qml:155",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "No Bluetooth adapter found",
@@ -7903,9 +7903,9 @@
   },
   {
     "term": "No DMS shortcuts configured",
-    "context": "greeter no keybinds message",
+    "context": "No DMS shortcuts configured",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:265",
-    "comment": ""
+    "comment": "greeter no keybinds message"
   },
   {
     "term": "No Dim",
@@ -7927,15 +7927,15 @@
   },
   {
     "term": "No GPUs detected",
-    "context": "empty state in gpu list",
+    "context": "No GPUs detected",
     "reference": "Modules/ProcessList/SystemView.qml:350",
-    "comment": ""
+    "comment": "empty state in gpu list"
   },
   {
     "term": "No History",
-    "context": "notification rule action option",
+    "context": "No History",
     "reference": "Modules/Settings/NotificationsTab.qml:135",
-    "comment": ""
+    "comment": "notification rule action option"
   },
   {
     "term": "No Media",
@@ -7999,15 +7999,15 @@
   },
   {
     "term": "No adapter",
-    "context": "bluetooth status",
+    "context": "No adapter",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:315",
-    "comment": ""
+    "comment": "bluetooth status"
   },
   {
     "term": "No adapters",
-    "context": "bluetooth status",
+    "context": "No adapters",
     "reference": "Modules/Settings/NetworkTab.qml:341, Modules/ControlCenter/Components/DragDropGrid.qml:353",
-    "comment": ""
+    "comment": "bluetooth status"
   },
   {
     "term": "No app customizations.",
@@ -8053,33 +8053,33 @@
   },
   {
     "term": "No checks passed",
-    "context": "greeter doctor page empty state",
+    "context": "No checks passed",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:338",
-    "comment": ""
+    "comment": "greeter doctor page empty state"
   },
   {
     "term": "No custom theme file",
-    "context": "no custom theme file status",
+    "context": "No custom theme file",
     "reference": "Modules/Settings/ThemeColorsTab.qml:574",
-    "comment": ""
+    "comment": "no custom theme file status"
   },
   {
     "term": "No devices",
-    "context": "Phone Connect no devices status | bluetooth status",
+    "context": "No devices",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:33, Modules/ControlCenter/Components/DragDropGrid.qml:368",
-    "comment": ""
+    "comment": "Phone Connect no devices status | bluetooth status"
   },
   {
     "term": "No devices connected",
-    "context": "KDE Connect status",
+    "context": "No devices connected",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:35",
-    "comment": ""
+    "comment": "KDE Connect status"
   },
   {
     "term": "No devices found",
-    "context": "KDE Connect no devices message",
+    "context": "No devices found",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:124, dms-plugins/DankKDEConnect/components/EmptyState.qml:11, Modules/Settings/PrinterTab.qml:436",
-    "comment": ""
+    "comment": "KDE Connect no devices message"
   },
   {
     "term": "No disk data",
@@ -8101,9 +8101,9 @@
   },
   {
     "term": "No errors",
-    "context": "greeter doctor page empty state",
+    "context": "No errors",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:332",
-    "comment": ""
+    "comment": "greeter doctor page empty state"
   },
   {
     "term": "No features enabled",
@@ -8137,9 +8137,9 @@
   },
   {
     "term": "No info items",
-    "context": "greeter doctor page empty state",
+    "context": "No info items",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:336",
-    "comment": ""
+    "comment": "greeter doctor page empty state"
   },
   {
     "term": "No information available",
@@ -8149,15 +8149,15 @@
   },
   {
     "term": "No input device",
-    "context": "audio status",
+    "context": "No input device",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:323",
-    "comment": ""
+    "comment": "audio status"
   },
   {
     "term": "No input devices found",
-    "context": "Audio settings empty state",
+    "context": "No input devices found",
     "reference": "Modules/Settings/AudioTab.qml:372",
-    "comment": ""
+    "comment": "Audio settings empty state"
   },
   {
     "term": "No items added yet",
@@ -8191,33 +8191,33 @@
   },
   {
     "term": "No matching processes",
-    "context": "empty state in process list",
+    "context": "No matching processes",
     "reference": "Modules/ProcessList/ProcessesView.qml:361",
-    "comment": ""
+    "comment": "empty state in process list"
   },
   {
     "term": "No monitors",
-    "context": "no monitors available label",
+    "context": "No monitors",
     "reference": "Modules/Settings/WallpaperTab.qml:828, Modules/Settings/WallpaperTab.qml:859",
-    "comment": ""
+    "comment": "no monitors available label"
   },
   {
     "term": "No mount points found",
-    "context": "empty state in disk mounts list",
+    "context": "No mount points found",
     "reference": "Modules/ProcessList/DisksView.qml:335",
-    "comment": ""
+    "comment": "empty state in disk mounts list"
   },
   {
     "term": "No output device",
-    "context": "audio status",
+    "context": "No output device",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:321",
-    "comment": ""
+    "comment": "audio status"
   },
   {
     "term": "No output devices found",
-    "context": "Audio settings empty state",
+    "context": "No output devices found",
     "reference": "Modules/Settings/AudioTab.qml:228",
-    "comment": ""
+    "comment": "Audio settings empty state"
   },
   {
     "term": "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.",
@@ -8233,9 +8233,9 @@
   },
   {
     "term": "No plugins found",
-    "context": "empty plugin list",
+    "context": "No plugins found",
     "reference": "Modules/Settings/PluginBrowser.qml:708",
-    "comment": ""
+    "comment": "empty plugin list"
   },
   {
     "term": "No plugins found.",
@@ -8299,15 +8299,15 @@
   },
   {
     "term": "No themes found",
-    "context": "empty theme list",
+    "context": "No themes found",
     "reference": "Modules/Settings/ThemeBrowser.qml:684",
-    "comment": ""
+    "comment": "empty theme list"
   },
   {
     "term": "No themes installed. Browse themes to install from the registry.",
-    "context": "no registry themes installed hint",
+    "context": "No themes installed. Browse themes to install from the registry.",
     "reference": "Modules/Settings/ThemeColorsTab.qml:780",
-    "comment": ""
+    "comment": "no registry themes installed hint"
   },
   {
     "term": "No trigger",
@@ -8323,9 +8323,9 @@
   },
   {
     "term": "No wallpaper selected",
-    "context": "no wallpaper status",
+    "context": "No wallpaper selected",
     "reference": "Modules/Settings/ThemeColorsTab.qml:471, Modules/Settings/WallpaperTab.qml:240",
-    "comment": ""
+    "comment": "no wallpaper status"
   },
   {
     "term": "No wallpapers",
@@ -8341,9 +8341,9 @@
   },
   {
     "term": "No warnings",
-    "context": "greeter doctor page empty state",
+    "context": "No warnings",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:334",
-    "comment": ""
+    "comment": "greeter doctor page empty state"
   },
   {
     "term": "No widgets added. Click \"Add Widget\" to get started.",
@@ -8371,9 +8371,9 @@
   },
   {
     "term": "None",
-    "context": "wallpaper transition option",
+    "context": "None",
     "reference": "Modals/WindowRuleModal.qml:740, Services/CupsService.qml:784, Modules/Settings/TypographyMotionTab.qml:212, Modules/Settings/TypographyMotionTab.qml:315, Modules/Settings/TypographyMotionTab.qml:399, Modules/Settings/WallpaperTab.qml:1161, Modules/Settings/DesktopWidgetInstanceCard.qml:258, Modules/Settings/DesktopWidgetInstanceCard.qml:274, Modules/Settings/DankBarTab.qml:729, Modules/Settings/DankBarTab.qml:729, Modules/Settings/DankBarTab.qml:766, Modules/Settings/NotificationsTab.qml:337, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:87, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:100, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:104",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Normal",
@@ -8389,9 +8389,9 @@
   },
   {
     "term": "Normal Priority",
-    "context": "notification rule urgency option",
+    "context": "Normal Priority",
     "reference": "Modules/Settings/NotificationsTab.qml:150, Modules/Settings/NotificationsTab.qml:768, Modules/Settings/NotificationsTab.qml:883, Modules/Notifications/Center/NotificationSettings.qml:196, Modules/Notifications/Center/NotificationSettings.qml:398",
-    "comment": ""
+    "comment": "notification rule urgency option"
   },
   {
     "term": "Not available",
@@ -8425,9 +8425,9 @@
   },
   {
     "term": "Not connected",
-    "context": "network status",
+    "context": "Not connected",
     "reference": "Modules/Settings/NetworkTab.qml:826, Modules/ControlCenter/Components/DragDropGrid.qml:307",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "Not detected",
@@ -8437,15 +8437,15 @@
   },
   {
     "term": "Not paired",
-    "context": "KDE Connect not paired status",
+    "context": "Not paired",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:214, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:207",
-    "comment": ""
+    "comment": "KDE Connect not paired status"
   },
   {
     "term": "Not set",
-    "context": "wallpaper not set label",
+    "context": "Not set",
     "reference": "Modules/Settings/WallpaperTab.qml:567, Modules/Settings/WallpaperTab.qml:757",
-    "comment": ""
+    "comment": "wallpaper not set label"
   },
   {
     "term": "Note: this only changes the percentage, it does not actually limit charging.",
@@ -8457,7 +8457,7 @@
     "term": "Notepad",
     "context": "Notepad",
     "reference": "DMSShell.qml:814, Services/AppSearchService.qml:179, Modules/Settings/WidgetsTab.qml:232",
-    "comment": ""
+    "comment": "Notepad"
   },
   {
     "term": "Notepad Font Settings",
@@ -8473,9 +8473,9 @@
   },
   {
     "term": "Nothing",
-    "context": "media scroll wheel option",
+    "context": "Nothing",
     "reference": "Modules/Settings/MediaPlayerTab.qml:51",
-    "comment": ""
+    "comment": "media scroll wheel option"
   },
   {
     "term": "Nothing to see here",
@@ -8491,9 +8491,9 @@
   },
   {
     "term": "Notification Display",
-    "context": "lock screen notification privacy setting",
+    "context": "Notification Display",
     "reference": "Modules/Settings/LockScreenTab.qml:146, Modules/Settings/NotificationsTab.qml:727",
-    "comment": ""
+    "comment": "lock screen notification privacy setting"
   },
   {
     "term": "Notification Overlay",
@@ -8533,9 +8533,9 @@
   },
   {
     "term": "Notifications",
-    "context": "greeter settings link",
+    "context": "Notifications",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:397, Modals/Settings/SettingsSidebar.qml:146, Modules/Notifications/Center/NotificationHeader.qml:49",
-    "comment": ""
+    "comment": "greeter settings link"
   },
   {
     "term": "Numbers",
@@ -8545,21 +8545,21 @@
   },
   {
     "term": "Numeric (D/M)",
-    "context": "date format option",
+    "context": "Numeric (D/M)",
     "reference": "Modules/Settings/GreeterTab.qml:414, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:154, Modules/Settings/TimeWeatherTab.qml:179, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:241, Modules/Settings/TimeWeatherTab.qml:266",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "Numeric (M/D)",
-    "context": "date format option",
+    "context": "Numeric (M/D)",
     "reference": "Modules/Settings/GreeterTab.qml:410, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:150, Modules/Settings/TimeWeatherTab.qml:178, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:237, Modules/Settings/TimeWeatherTab.qml:265",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "OK",
-    "context": "greeter doctor page status card",
+    "context": "OK",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:281",
-    "comment": ""
+    "comment": "greeter doctor page status card"
   },
   {
     "term": "OS Logo",
@@ -8581,9 +8581,9 @@
   },
   {
     "term": "Off",
-    "context": "bluetooth status",
+    "context": "Off",
     "reference": "Modules/ProcessList/SystemView.qml:274, Modules/Settings/DisplayConfig/OutputCard.qml:280, Modules/Settings/DisplayConfig/OutputCard.qml:289, Modules/Settings/DisplayConfig/OutputCard.qml:292, Modules/Settings/DisplayConfig/OutputCard.qml:303, Modules/Settings/DisplayConfig/OutputCard.qml:311, Modules/Settings/DisplayConfig/OutputCard.qml:315, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:89, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:97, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:104, Modules/ControlCenter/Components/DragDropGrid.qml:355",
-    "comment": ""
+    "comment": "bluetooth status"
   },
   {
     "term": "Office",
@@ -8593,9 +8593,9 @@
   },
   {
     "term": "Offline",
-    "context": "KDE Connect offline status | Phone Connect offline status",
+    "context": "Offline",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:40, dms-plugins/DankKDEConnect/components/DeviceCard.qml:216, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:209",
-    "comment": ""
+    "comment": "KDE Connect offline status | Phone Connect offline status"
   },
   {
     "term": "Offline Report",
@@ -8605,9 +8605,9 @@
   },
   {
     "term": "Older",
-    "context": "notification history filter for content older than other filters",
+    "context": "Older",
     "reference": "Modules/Notifications/Center/HistoryNotificationList.qml:117",
-    "comment": ""
+    "comment": "notification history filter for content older than other filters"
   },
   {
     "term": "On",
@@ -8677,15 +8677,15 @@
   },
   {
     "term": "Open App",
-    "context": "KDE Connect open SMS app button",
+    "context": "Open App",
     "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:91",
-    "comment": ""
+    "comment": "KDE Connect open SMS app button"
   },
   {
     "term": "Open KDE Connect on your phone",
-    "context": "KDE Connect open app hint",
+    "context": "Open KDE Connect on your phone",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:131",
-    "comment": ""
+    "comment": "KDE Connect open app hint"
   },
   {
     "term": "Open Notepad File",
@@ -8731,27 +8731,27 @@
   },
   {
     "term": "Opening SMS",
-    "context": "KDE Connect SMS action",
+    "context": "Opening SMS",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:344",
-    "comment": ""
+    "comment": "KDE Connect SMS action"
   },
   {
     "term": "Opening SMS app",
-    "context": "Phone Connect SMS action",
+    "context": "Opening SMS app",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:136",
-    "comment": ""
+    "comment": "Phone Connect SMS action"
   },
   {
     "term": "Opening file browser",
-    "context": "Phone Connect browse action",
+    "context": "Opening file browser",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:146",
-    "comment": ""
+    "comment": "Phone Connect browse action"
   },
   {
     "term": "Opening files",
-    "context": "KDE Connect browse action",
+    "context": "Opening files",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:328",
-    "comment": ""
+    "comment": "KDE Connect browse action"
   },
   {
     "term": "Opening terminal: ",
@@ -8785,9 +8785,9 @@
   },
   {
     "term": "Original: %1",
-    "context": "Shows the original device name before renaming",
+    "context": "Original: %1",
     "reference": "Modules/Settings/AudioTab.qml:600, Modules/Settings/Widgets/DeviceAliasRow.qml:103",
-    "comment": ""
+    "comment": "Shows the original device name before renaming"
   },
   {
     "term": "Other",
@@ -8797,9 +8797,9 @@
   },
   {
     "term": "Outline",
-    "context": "blur border color | outline color",
+    "context": "Outline",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1853, Modules/Settings/ThemeColorsTab.qml:1865, Modules/Settings/LauncherTab.qml:477",
-    "comment": ""
+    "comment": "blur border color | outline color"
   },
   {
     "term": "Output",
@@ -8827,9 +8827,9 @@
   },
   {
     "term": "Output Devices",
-    "context": "Audio settings: speaker/headphone devices",
+    "context": "Output Devices",
     "reference": "Modules/Settings/AudioTab.qml:128",
-    "comment": ""
+    "comment": "Audio settings: speaker/headphone devices"
   },
   {
     "term": "Output Tray Missing",
@@ -8965,9 +8965,9 @@
   },
   {
     "term": "Pad",
-    "context": "wallpaper fill mode",
+    "context": "Pad",
     "reference": "Modules/Settings/WallpaperTab.qml:312",
-    "comment": ""
+    "comment": "wallpaper fill mode"
   },
   {
     "term": "Pad Hours",
@@ -8989,9 +8989,9 @@
   },
   {
     "term": "Pair",
-    "context": "KDE Connect pair button",
+    "context": "Pair",
     "reference": "Modals/BluetoothPairingModal.qml:324, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:391, Modules/ControlCenter/Details/BluetoothDetail.qml:558",
-    "comment": ""
+    "comment": "KDE Connect pair button"
   },
   {
     "term": "Pair Bluetooth Device",
@@ -9007,33 +9007,33 @@
   },
   {
     "term": "Pairing",
-    "context": "KDE Connect pairing in progress status",
+    "context": "Pairing",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:212, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:205",
-    "comment": ""
+    "comment": "KDE Connect pairing in progress status"
   },
   {
     "term": "Pairing failed",
-    "context": "Phone Connect error",
+    "context": "Pairing failed",
     "reference": "Modals/BluetoothPairingModal.qml:400, dms-plugins/DankKDEConnect/DankKDEConnect.qml:152, Modules/ControlCenter/Details/BluetoothDetail.qml:50",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Pairing request from",
-    "context": "Phone Connect pairing request notification",
+    "context": "Pairing request from",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:71",
-    "comment": ""
+    "comment": "Phone Connect pairing request notification"
   },
   {
     "term": "Pairing request sent",
-    "context": "Phone Connect pairing action",
+    "context": "Pairing request sent",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:155",
-    "comment": ""
+    "comment": "Phone Connect pairing action"
   },
   {
     "term": "Pairing requested",
-    "context": "KDE Connect pairing requested status",
+    "context": "Pairing requested",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:210, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:203",
-    "comment": ""
+    "comment": "KDE Connect pairing requested status"
   },
   {
     "term": "Pairing...",
@@ -9103,15 +9103,15 @@
   },
   {
     "term": "Pending Charge",
-    "context": "battery status",
+    "context": "Pending Charge",
     "reference": "Services/BatteryService.qml:144",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "Pending Discharge",
-    "context": "battery status",
+    "context": "Pending Discharge",
     "reference": "Services/BatteryService.qml:146",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "Per-Mode Wallpapers",
@@ -9127,9 +9127,9 @@
   },
   {
     "term": "Per-screen config",
-    "context": "greeter feature card description",
+    "context": "Per-screen config",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:131",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "Percentage",
@@ -9139,9 +9139,9 @@
   },
   {
     "term": "Performance",
-    "context": "power profile option",
+    "context": "Performance",
     "reference": "Modals/ProcessListModal.qml:311, Common/Theme.qml:1476",
-    "comment": ""
+    "comment": "power profile option"
   },
   {
     "term": "Permission denied to set profile image.",
@@ -9157,21 +9157,21 @@
   },
   {
     "term": "Phone Connect Not Available",
-    "context": "Phone Connect unavailable error title",
+    "context": "Phone Connect Not Available",
     "reference": "dms-plugins/DankKDEConnect/components/UnavailableMessage.qml:30",
-    "comment": ""
+    "comment": "Phone Connect unavailable error title"
   },
   {
     "term": "Phone Connect unavailable",
-    "context": "Phone Connect service unavailable message",
+    "context": "Phone Connect unavailable",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:97",
-    "comment": ""
+    "comment": "Phone Connect service unavailable message"
   },
   {
     "term": "Phone number",
-    "context": "KDE Connect SMS phone input placeholder",
+    "context": "Phone number",
     "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:67",
-    "comment": ""
+    "comment": "KDE Connect SMS phone input placeholder"
   },
   {
     "term": "Pick a different random video each time from the same folder",
@@ -9199,21 +9199,21 @@
   },
   {
     "term": "Ping",
-    "context": "KDE Connect ping tooltip",
+    "context": "Ping",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:124, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:281",
-    "comment": ""
+    "comment": "KDE Connect ping tooltip"
   },
   {
     "term": "Ping sent",
-    "context": "KDE Connect ping action",
+    "context": "Ping sent",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:286",
-    "comment": ""
+    "comment": "KDE Connect ping action"
   },
   {
     "term": "Ping sent to",
-    "context": "Phone Connect ping action",
+    "context": "Ping sent to",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:108",
-    "comment": ""
+    "comment": "Phone Connect ping action"
   },
   {
     "term": "Pinned",
@@ -9229,9 +9229,9 @@
   },
   {
     "term": "Pixelate",
-    "context": "wallpaper transition option",
+    "context": "Pixelate",
     "reference": "Modules/Settings/WallpaperTab.qml:1173",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
@@ -9289,9 +9289,9 @@
   },
   {
     "term": "Please wait...",
-    "context": "network status",
+    "context": "Please wait...",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:333",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "Please write a name for your new %1 session",
@@ -9301,9 +9301,9 @@
   },
   {
     "term": "Plugged In",
-    "context": "battery status",
+    "context": "Plugged In",
     "reference": "Services/BatteryService.qml:159, Services/BatteryService.qml:165, Modules/Settings/SoundsTab.qml:119",
-    "comment": ""
+    "comment": "battery status"
   },
   {
     "term": "Plugged in",
@@ -9343,9 +9343,9 @@
   },
   {
     "term": "Plugins",
-    "context": "greeter feature card title | greeter plugins link",
+    "context": "Plugins",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:122, Modals/Greeter/GreeterCompletePage.qml:476, Modals/DankLauncherV2/LauncherContent.qml:363, Modals/Settings/SettingsSidebar.qml:312, Modules/Settings/AboutTab.qml:290, Modules/Settings/AboutTab.qml:298",
-    "comment": ""
+    "comment": "greeter feature card title | greeter plugins link"
   },
   {
     "term": "Pointer",
@@ -9373,9 +9373,9 @@
   },
   {
     "term": "Popup Only",
-    "context": "notification rule action option",
+    "context": "Popup Only",
     "reference": "Modules/Settings/NotificationsTab.qml:131",
-    "comment": ""
+    "comment": "notification rule action option"
   },
   {
     "term": "Popup Position",
@@ -9397,21 +9397,21 @@
   },
   {
     "term": "Popup behavior, position",
-    "context": "greeter notifications description",
+    "context": "Popup behavior, position",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:398",
-    "comment": ""
+    "comment": "greeter notifications description"
   },
   {
     "term": "Port",
-    "context": "Label for printer port number input field",
+    "context": "Port",
     "reference": "Modules/Settings/PrinterTab.qml:525",
-    "comment": ""
+    "comment": "Label for printer port number input field"
   },
   {
     "term": "Portal",
-    "context": "wallpaper transition option",
+    "context": "Portal",
     "reference": "Modules/Settings/WallpaperTab.qml:1175",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Position",
@@ -9421,9 +9421,9 @@
   },
   {
     "term": "Position, pinned apps",
-    "context": "greeter dock description",
+    "context": "Position, pinned apps",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:423",
-    "comment": ""
+    "comment": "greeter dock description"
   },
   {
     "term": "Possible Override Conflicts",
@@ -9487,9 +9487,9 @@
   },
   {
     "term": "Power Saver",
-    "context": "power profile option",
+    "context": "Power Saver",
     "reference": "Common/Theme.qml:1472",
-    "comment": ""
+    "comment": "power profile option"
   },
   {
     "term": "Power off monitors on lock",
@@ -9559,15 +9559,15 @@
   },
   {
     "term": "Press Enter and the audio system will restart to apply the change",
-    "context": "Audio device rename dialog hint",
+    "context": "Press Enter and the audio system will restart to apply the change",
     "reference": "Modules/Settings/AudioTab.qml:657",
-    "comment": ""
+    "comment": "Audio device rename dialog hint"
   },
   {
     "term": "Press Enter to paste, Shift+Enter to copy",
-    "context": "Clipboard behavior setting description",
+    "context": "Press Enter to paste, Shift+Enter to copy",
     "reference": "Modules/Settings/ClipboardTab.qml:436",
-    "comment": ""
+    "comment": "Clipboard behavior setting description"
   },
   {
     "term": "Press key...",
@@ -9595,15 +9595,15 @@
   },
   {
     "term": "Primary",
-    "context": "blur border color | button color option | color option | primary color | shadow color option | tile color option",
+    "context": "Primary",
     "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:39, Modules/Settings/ThemeColorsTab.qml:1558, Modules/Settings/ThemeColorsTab.qml:1568, Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/ThemeColorsTab.qml:1600, Modules/Settings/ThemeColorsTab.qml:1690, Modules/Settings/ThemeColorsTab.qml:1696, Modules/Settings/ThemeColorsTab.qml:1707, Modules/Settings/ThemeColorsTab.qml:1853, Modules/Settings/ThemeColorsTab.qml:1857, Modules/Settings/ThemeColorsTab.qml:1869, Modules/Settings/DockTab.qml:389, Modules/Settings/DockTab.qml:600, Modules/Settings/LauncherTab.qml:181, Modules/Settings/LauncherTab.qml:477, Modules/Settings/WorkspacesTab.qml:369, Modules/Settings/NetworkTab.qml:227, Modules/Settings/DankBarTab.qml:1211, Modules/Settings/Widgets/SettingsColorPicker.qml:42",
-    "comment": ""
+    "comment": "blur border color | button color option | color option | primary color | shadow color option | tile color option"
   },
   {
     "term": "Primary Container",
-    "context": "button color option | tile color option",
+    "context": "Primary Container",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1558, Modules/Settings/ThemeColorsTab.qml:1562, Modules/Settings/ThemeColorsTab.qml:1572, Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/ThemeColorsTab.qml:1594, Modules/Settings/ThemeColorsTab.qml:1604",
-    "comment": ""
+    "comment": "button color option | tile color option"
   },
   {
     "term": "Print Server Management",
@@ -9649,9 +9649,9 @@
   },
   {
     "term": "Printer reachable",
-    "context": "Status message when test connection to printer succeeds",
+    "context": "Printer reachable",
     "reference": "Modules/Settings/PrinterTab.qml:639",
-    "comment": ""
+    "comment": "Status message when test connection to printer succeeds"
   },
   {
     "term": "Printers",
@@ -9667,9 +9667,9 @@
   },
   {
     "term": "Prioritize performance",
-    "context": "power profile description",
+    "context": "Prioritize performance",
     "reference": "Common/Theme.qml:1489",
-    "comment": ""
+    "comment": "power profile description"
   },
   {
     "term": "Priority",
@@ -9709,9 +9709,9 @@
   },
   {
     "term": "Processes:",
-    "context": "process count label in footer",
+    "context": "Processes:",
     "reference": "Modals/ProcessListModal.qml:491",
-    "comment": ""
+    "comment": "process count label in footer"
   },
   {
     "term": "Processing",
@@ -9769,9 +9769,9 @@
   },
   {
     "term": "Protocol",
-    "context": "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket",
+    "context": "Protocol",
     "reference": "Widgets/VpnProfileDelegate.qml:63, Modules/Settings/PrinterTab.qml:549, Modules/Settings/NetworkTab.qml:1925",
-    "comment": ""
+    "comment": "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket"
   },
   {
     "term": "QtMultimedia is not available",
@@ -9817,9 +9817,9 @@
   },
   {
     "term": "Quick system toggles",
-    "context": "greeter feature card description",
+    "context": "Quick system toggles",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:150",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "RGB",
@@ -9847,15 +9847,15 @@
   },
   {
     "term": "Rainbow",
-    "context": "matugen color scheme option",
+    "context": "Rainbow",
     "reference": "Common/Theme.qml:499",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Random",
-    "context": "wallpaper transition option",
+    "context": "Random",
     "reference": "Modules/Settings/WallpaperTab.qml:1159, Modules/Settings/WallpaperTab.qml:1182, Modules/Settings/WallpaperTab.qml:1185",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Rate",
@@ -9865,9 +9865,9 @@
   },
   {
     "term": "Read:",
-    "context": "disk read label",
+    "context": "Read:",
     "reference": "Modules/ProcessList/DisksView.qml:73",
-    "comment": ""
+    "comment": "disk read label"
   },
   {
     "term": "Reason",
@@ -9901,9 +9901,9 @@
   },
   {
     "term": "Refresh",
-    "context": "Phone Connect refresh tooltip",
+    "context": "Refresh",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:296, Modules/Settings/GreeterTab.qml:504, Modules/DankDash/Overview/WeatherOverviewCard.qml:38",
-    "comment": ""
+    "comment": "Phone Connect refresh tooltip"
   },
   {
     "term": "Refresh Weather",
@@ -9913,15 +9913,15 @@
   },
   {
     "term": "Regex",
-    "context": "notification rule match type option",
+    "context": "Regex",
     "reference": "Modules/Settings/NotificationsTab.qml:112",
-    "comment": ""
+    "comment": "notification rule match type option"
   },
   {
     "term": "Reject",
-    "context": "KDE Connect reject pairing button",
+    "context": "Reject",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:188, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:377",
-    "comment": ""
+    "comment": "KDE Connect reject pairing button"
   },
   {
     "term": "Reject Jobs",
@@ -10027,9 +10027,9 @@
   },
   {
     "term": "Request Pairing",
-    "context": "KDE Connect request pairing button",
+    "context": "Request Pairing",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:199",
-    "comment": ""
+    "comment": "KDE Connect request pairing button"
   },
   {
     "term": "Require holding button/key to confirm power off, restart, suspend, hibernate and logout",
@@ -10045,9 +10045,9 @@
   },
   {
     "term": "Requires %1",
-    "context": "version requirement",
+    "context": "Requires %1",
     "reference": "Modules/Settings/PluginBrowser.qml:632",
-    "comment": ""
+    "comment": "version requirement"
   },
   {
     "term": "Requires 'dgop' tool",
@@ -10117,9 +10117,9 @@
   },
   {
     "term": "Resolution, position, scale",
-    "context": "greeter displays description",
+    "context": "Resolution, position, scale",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:374",
-    "comment": ""
+    "comment": "greeter displays description"
   },
   {
     "term": "Restart DMS",
@@ -10135,9 +10135,9 @@
   },
   {
     "term": "Restarting audio system...",
-    "context": "Loading overlay while WirePlumber restarts",
+    "context": "Restarting audio system...",
     "reference": "Modules/Settings/AudioTab.qml:503",
-    "comment": ""
+    "comment": "Loading overlay while WirePlumber restarts"
   },
   {
     "term": "Restore Special Workspace Windows",
@@ -10177,9 +10177,9 @@
   },
   {
     "term": "Right Center",
-    "context": "screen position option",
+    "context": "Right Center",
     "reference": "Modules/Settings/OSDTab.qml:49, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:70",
-    "comment": ""
+    "comment": "screen position option"
   },
   {
     "term": "Right Section",
@@ -10213,15 +10213,15 @@
   },
   {
     "term": "Ring",
-    "context": "KDE Connect ring tooltip",
+    "context": "Ring",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:115, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:267",
-    "comment": ""
+    "comment": "KDE Connect ring tooltip"
   },
   {
     "term": "Ringing",
-    "context": "KDE Connect ring action | Phone Connect ring action",
+    "context": "Ringing",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:99, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:272",
-    "comment": ""
+    "comment": "KDE Connect ring action | Phone Connect ring action"
   },
   {
     "term": "Ripple Effects",
@@ -10273,9 +10273,9 @@
   },
   {
     "term": "Run Again",
-    "context": "greeter doctor page button",
+    "context": "Run Again",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:380",
-    "comment": ""
+    "comment": "greeter doctor page button"
   },
   {
     "term": "Run DMS Templates",
@@ -10333,9 +10333,9 @@
   },
   {
     "term": "SMS",
-    "context": "KDE Connect SMS tooltip",
+    "context": "SMS",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:161, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:338",
-    "comment": ""
+    "comment": "KDE Connect SMS tooltip"
   },
   {
     "term": "Save",
@@ -10363,27 +10363,27 @@
   },
   {
     "term": "Save critical priority notifications to history",
-    "context": "notification history setting",
+    "context": "Save critical priority notifications to history",
     "reference": "Modules/Settings/NotificationsTab.qml:893",
-    "comment": ""
+    "comment": "notification history setting"
   },
   {
     "term": "Save dismissed notifications to history",
-    "context": "notification history toggle description",
+    "context": "Save dismissed notifications to history",
     "reference": "Modules/Settings/NotificationsTab.qml:810",
-    "comment": ""
+    "comment": "notification history toggle description"
   },
   {
     "term": "Save low priority notifications to history",
-    "context": "notification history setting",
+    "context": "Save low priority notifications to history",
     "reference": "Modules/Settings/NotificationsTab.qml:875",
-    "comment": ""
+    "comment": "notification history setting"
   },
   {
     "term": "Save normal priority notifications to history",
-    "context": "notification history setting",
+    "context": "Save normal priority notifications to history",
     "reference": "Modules/Settings/NotificationsTab.qml:884",
-    "comment": ""
+    "comment": "notification history setting"
   },
   {
     "term": "Save password",
@@ -10573,15 +10573,15 @@
   },
   {
     "term": "Search plugins...",
-    "context": "plugin search placeholder",
+    "context": "Search plugins...",
     "reference": "Modules/Settings/PluginBrowser.qml:345",
-    "comment": ""
+    "comment": "plugin search placeholder"
   },
   {
     "term": "Search processes...",
-    "context": "process search placeholder",
+    "context": "Search processes...",
     "reference": "Modals/ProcessListModal.qml:409",
-    "comment": ""
+    "comment": "process search placeholder"
   },
   {
     "term": "Search sessions...",
@@ -10591,9 +10591,9 @@
   },
   {
     "term": "Search themes...",
-    "context": "theme search placeholder",
+    "context": "Search themes...",
     "reference": "Modules/Settings/ThemeBrowser.qml:314",
-    "comment": ""
+    "comment": "theme search placeholder"
   },
   {
     "term": "Search widgets...",
@@ -10615,15 +10615,15 @@
   },
   {
     "term": "Second Factor (AND)",
-    "context": "U2F mode option: key required after password or fingerprint",
+    "context": "Second Factor (AND)",
     "reference": "Modules/Settings/LockScreenTab.qml:253, Modules/Settings/LockScreenTab.qml:254, Modules/Settings/LockScreenTab.qml:256",
-    "comment": ""
+    "comment": "U2F mode option: key required after password or fingerprint"
   },
   {
     "term": "Secondary",
-    "context": "blur border color | button color option | color option | secondary color | tile color option",
+    "context": "Secondary",
     "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:43, Modules/Settings/ThemeColorsTab.qml:1558, Modules/Settings/ThemeColorsTab.qml:1564, Modules/Settings/ThemeColorsTab.qml:1574, Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/ThemeColorsTab.qml:1596, Modules/Settings/ThemeColorsTab.qml:1606, Modules/Settings/ThemeColorsTab.qml:1853, Modules/Settings/ThemeColorsTab.qml:1859, Modules/Settings/ThemeColorsTab.qml:1871, Modules/Settings/DockTab.qml:600, Modules/Settings/LauncherTab.qml:477, Modules/Settings/WorkspacesTab.qml:369, Modules/Settings/DankBarTab.qml:1211, Modules/Settings/Widgets/SettingsColorPicker.qml:47",
-    "comment": ""
+    "comment": "blur border color | button color option | color option | secondary color | tile color option"
   },
   {
     "term": "Secured",
@@ -10639,15 +10639,15 @@
   },
   {
     "term": "Security & privacy",
-    "context": "greeter feature card description",
+    "context": "Security & privacy",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:159",
-    "comment": ""
+    "comment": "greeter feature card description"
   },
   {
     "term": "Security key mode",
-    "context": "lock screen U2F security key mode setting",
+    "context": "Security key mode",
     "reference": "Modules/Settings/LockScreenTab.qml:250",
-    "comment": ""
+    "comment": "lock screen U2F security key mode setting"
   },
   {
     "term": "Security-key availability could not be confirmed.",
@@ -10681,9 +10681,9 @@
   },
   {
     "term": "Select Custom Theme",
-    "context": "custom theme file browser title",
+    "context": "Select Custom Theme",
     "reference": "Modules/Settings/ThemeColorsTab.qml:2985",
-    "comment": ""
+    "comment": "custom theme file browser title"
   },
   {
     "term": "Select Dock Launcher Logo",
@@ -10693,9 +10693,9 @@
   },
   {
     "term": "Select File to Send",
-    "context": "KDE Connect file browser title",
+    "context": "Select File to Send",
     "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:101",
-    "comment": ""
+    "comment": "KDE Connect file browser title"
   },
   {
     "term": "Select Launcher Logo",
@@ -10705,9 +10705,9 @@
   },
   {
     "term": "Select Profile Image",
-    "context": "profile image file browser title",
+    "context": "Select Profile Image",
     "reference": "Modals/Settings/SettingsModal.qml:127",
-    "comment": ""
+    "comment": "profile image file browser title"
   },
   {
     "term": "Select Video or Folder",
@@ -10717,15 +10717,15 @@
   },
   {
     "term": "Select Wallpaper",
-    "context": "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title",
+    "context": "Select Wallpaper",
     "reference": "Modals/Settings/SettingsModal.qml:151, Modules/Settings/WallpaperTab.qml:1313, Modules/Settings/WallpaperTab.qml:1335, Modules/Settings/WallpaperTab.qml:1355",
-    "comment": ""
+    "comment": "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title"
   },
   {
     "term": "Select Wallpaper Directory",
-    "context": "wallpaper directory file browser title",
+    "context": "Select Wallpaper Directory",
     "reference": "Modules/DankDash/WallpaperTab.qml:320",
-    "comment": ""
+    "comment": "wallpaper directory file browser title"
   },
   {
     "term": "Select a color from the palette or use custom sliders",
@@ -10765,9 +10765,9 @@
   },
   {
     "term": "Select device",
-    "context": "audio status",
+    "context": "Select device",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:373, Modules/ControlCenter/Components/DragDropGrid.qml:384",
-    "comment": ""
+    "comment": "audio status"
   },
   {
     "term": "Select device...",
@@ -10807,9 +10807,9 @@
   },
   {
     "term": "Select network",
-    "context": "network status",
+    "context": "Select network",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:347",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "Select system sound theme",
@@ -10855,33 +10855,33 @@
   },
   {
     "term": "Send",
-    "context": "KDE Connect SMS send button",
+    "context": "Send",
     "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:80",
-    "comment": ""
+    "comment": "KDE Connect SMS send button"
   },
   {
     "term": "Send Clipboard",
-    "context": "KDE Connect clipboard tooltip",
+    "context": "Send Clipboard",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:133, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:295",
-    "comment": ""
+    "comment": "KDE Connect clipboard tooltip"
   },
   {
     "term": "Send File",
-    "context": "KDE Connect send file button",
+    "context": "Send File",
     "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:91",
-    "comment": ""
+    "comment": "KDE Connect send file button"
   },
   {
     "term": "Send SMS",
-    "context": "KDE Connect SMS dialog title",
+    "context": "Send SMS",
     "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:28",
-    "comment": ""
+    "comment": "KDE Connect SMS dialog title"
   },
   {
     "term": "Sending",
-    "context": "Phone Connect file send",
+    "context": "Sending",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:365, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:424",
-    "comment": ""
+    "comment": "Phone Connect file send"
   },
   {
     "term": "Separator",
@@ -10903,9 +10903,9 @@
   },
   {
     "term": "Set Custom Device Name",
-    "context": "Audio device rename dialog title",
+    "context": "Set Custom Device Name",
     "reference": "Modules/Settings/AudioTab.qml:580",
-    "comment": ""
+    "comment": "Audio device rename dialog title"
   },
   {
     "term": "Set custom name",
@@ -10915,15 +10915,15 @@
   },
   {
     "term": "Set custom names for your audio input devices",
-    "context": "Audio settings description",
+    "context": "Set custom names for your audio input devices",
     "reference": "Modules/Settings/AudioTab.qml:329",
-    "comment": ""
+    "comment": "Audio settings description"
   },
   {
     "term": "Set custom names for your audio output devices",
-    "context": "Audio settings description",
+    "context": "Set custom names for your audio output devices",
     "reference": "Modules/Settings/AudioTab.qml:138",
-    "comment": ""
+    "comment": "Audio settings description"
   },
   {
     "term": "Set different wallpapers for each connected monitor",
@@ -10951,15 +10951,15 @@
   },
   {
     "term": "Settings",
-    "context": "settings window title",
+    "context": "Settings",
     "reference": "Services/AppSearchService.qml:168, Services/AppSearchService.qml:212, Services/AppSearchService.qml:654, Services/PopoutService.qml:405, Services/PopoutService.qml:422, Modals/Settings/SettingsSidebar.qml:114, Modals/Settings/SettingsModal.qml:82, Modals/Settings/SettingsModal.qml:222, Modules/DankDash/DankDashPopout.qml:292",
-    "comment": ""
+    "comment": "settings window title"
   },
   {
     "term": "Settings are read-only. Changes will not persist.",
-    "context": "read-only settings warning for NixOS home-manager users",
+    "context": "Settings are read-only. Changes will not persist.",
     "reference": "Modals/Settings/SettingsModal.qml:294",
-    "comment": ""
+    "comment": "read-only settings warning for NixOS home-manager users"
   },
   {
     "term": "Setup",
@@ -10987,9 +10987,9 @@
   },
   {
     "term": "Shadow Override",
-    "context": "bar shadow settings card",
+    "context": "Shadow Override",
     "reference": "Modules/Settings/DankBarTab.qml:1052",
-    "comment": ""
+    "comment": "bar shadow settings card"
   },
   {
     "term": "Shadow elevation on bars and panels",
@@ -11017,9 +11017,9 @@
   },
   {
     "term": "Share",
-    "context": "KDE Connect share dialog title | KDE Connect share tooltip",
+    "context": "Share",
     "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:34, dms-plugins/DankKDEConnect/components/DeviceCard.qml:142, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:309",
-    "comment": ""
+    "comment": "KDE Connect share dialog title | KDE Connect share tooltip"
   },
   {
     "term": "Share Gamma Control Settings",
@@ -11029,21 +11029,21 @@
   },
   {
     "term": "Share Text",
-    "context": "KDE Connect share button",
+    "context": "Share Text",
     "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:81",
-    "comment": ""
+    "comment": "KDE Connect share button"
   },
   {
     "term": "Share URL",
-    "context": "KDE Connect share URL button",
+    "context": "Share URL",
     "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:81",
-    "comment": ""
+    "comment": "KDE Connect share URL button"
   },
   {
     "term": "Shared",
-    "context": "Phone Connect share success",
+    "context": "Shared",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:344, dms-plugins/DankKDEConnect/DankKDEConnect.qml:352, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:410",
-    "comment": ""
+    "comment": "Phone Connect share success"
   },
   {
     "term": "Shell",
@@ -11065,9 +11065,9 @@
   },
   {
     "term": "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close",
-    "context": "Keyboard hints when enter-to-paste is enabled",
+    "context": "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:13",
-    "comment": ""
+    "comment": "Keyboard hints when enter-to-paste is enabled"
   },
   {
     "term": "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close",
@@ -11167,9 +11167,9 @@
   },
   {
     "term": "Show Footer",
-    "context": "launcher footer visibility",
+    "context": "Show Footer",
     "reference": "Modules/Settings/LauncherTab.qml:413",
-    "comment": ""
+    "comment": "launcher footer visibility"
   },
   {
     "term": "Show Forecast",
@@ -11251,9 +11251,9 @@
   },
   {
     "term": "Show Media Player",
-    "context": "Enable media player controls on the lock screen window",
+    "context": "Show Media Player",
     "reference": "Modules/Settings/LockScreenTab.qml:138",
-    "comment": ""
+    "comment": "Enable media player controls on the lock screen window"
   },
   {
     "term": "Show Memory",
@@ -11299,15 +11299,15 @@
   },
   {
     "term": "Show Password Field",
-    "context": "Enable password field display on the lock screen window",
+    "context": "Show Password Field",
     "reference": "Modules/Settings/LockScreenTab.qml:129",
-    "comment": ""
+    "comment": "Enable password field display on the lock screen window"
   },
   {
     "term": "Show Power Actions",
-    "context": "Enable power action icon on the lock screen window",
+    "context": "Show Power Actions",
     "reference": "Modules/Settings/LockScreenTab.qml:89",
-    "comment": ""
+    "comment": "Enable power action icon on the lock screen window"
   },
   {
     "term": "Show Power Off",
@@ -11329,9 +11329,9 @@
   },
   {
     "term": "Show Profile Image",
-    "context": "Enable profile image display on the lock screen window",
+    "context": "Show Profile Image",
     "reference": "Modules/Settings/LockScreenTab.qml:121",
-    "comment": ""
+    "comment": "Enable profile image display on the lock screen window"
   },
   {
     "term": "Show Reboot",
@@ -11377,21 +11377,21 @@
   },
   {
     "term": "Show System Date",
-    "context": "Enable system date display on the lock screen window",
+    "context": "Show System Date",
     "reference": "Modules/Settings/LockScreenTab.qml:113",
-    "comment": ""
+    "comment": "Enable system date display on the lock screen window"
   },
   {
     "term": "Show System Icons",
-    "context": "Enable system status icons on the lock screen window",
+    "context": "Show System Icons",
     "reference": "Modules/Settings/LockScreenTab.qml:97",
-    "comment": ""
+    "comment": "Enable system status icons on the lock screen window"
   },
   {
     "term": "Show System Time",
-    "context": "Enable system time display on the lock screen window",
+    "context": "Show System Time",
     "reference": "Modules/Settings/LockScreenTab.qml:105",
-    "comment": ""
+    "comment": "Enable system time display on the lock screen window"
   },
   {
     "term": "Show Top Processes",
@@ -11485,9 +11485,9 @@
   },
   {
     "term": "Show mode tabs and keyboard hints at the bottom.",
-    "context": "launcher footer description",
+    "context": "Show mode tabs and keyboard hints at the bottom.",
     "reference": "Modules/Settings/LauncherTab.qml:414",
-    "comment": ""
+    "comment": "launcher footer description"
   },
   {
     "term": "Show notification popups only on the currently focused monitor",
@@ -11671,9 +11671,9 @@
   },
   {
     "term": "Size",
-    "context": "launcher size option",
+    "context": "Size",
     "reference": "Modals/WindowRuleModal.qml:989, Modals/DankLauncherV2/LauncherContent.qml:704, Modals/DankLauncherV2/LauncherContent.qml:709, Modals/DankLauncherV2/LauncherContent.qml:716, Modules/Settings/LauncherTab.qml:369, Modules/Settings/DankBarTab.qml:851, Modules/Settings/WindowRulesTab.qml:565",
-    "comment": ""
+    "comment": "launcher size option"
   },
   {
     "term": "Size Constraints",
@@ -11695,9 +11695,9 @@
   },
   {
     "term": "Skip",
-    "context": "greeter skip button",
+    "context": "Skip",
     "reference": "Modals/Greeter/GreeterModal.qml:277",
-    "comment": ""
+    "comment": "greeter skip button"
   },
   {
     "term": "Skip confirmation",
@@ -11707,9 +11707,9 @@
   },
   {
     "term": "Skip setup",
-    "context": "greeter skip button tooltip",
+    "context": "Skip setup",
     "reference": "Modals/Greeter/GreeterModal.qml:231",
-    "comment": ""
+    "comment": "greeter skip button tooltip"
   },
   {
     "term": "Small",
@@ -11851,15 +11851,15 @@
   },
   {
     "term": "Start KDE Connect or Valent",
-    "context": "Phone Connect start daemon hint",
+    "context": "Start KDE Connect or Valent",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:104",
-    "comment": ""
+    "comment": "Phone Connect start daemon hint"
   },
   {
     "term": "Start KDE Connect or Valent to use this plugin",
-    "context": "Phone Connect daemon hint",
+    "context": "Start KDE Connect or Valent to use this plugin",
     "reference": "dms-plugins/DankKDEConnect/components/UnavailableMessage.qml:39",
-    "comment": ""
+    "comment": "Phone Connect daemon hint"
   },
   {
     "term": "Start typing your notes here...",
@@ -11899,21 +11899,21 @@
   },
   {
     "term": "Stretch",
-    "context": "wallpaper fill mode",
+    "context": "Stretch",
     "reference": "Modules/Settings/WallpaperTab.qml:312",
-    "comment": ""
+    "comment": "wallpaper fill mode"
   },
   {
     "term": "Stripes",
-    "context": "wallpaper transition option",
+    "context": "Stripes",
     "reference": "Modules/Settings/WallpaperTab.qml:1169",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Summary",
-    "context": "notification rule match field option",
+    "context": "Summary",
     "reference": "Modules/Settings/NotificationsTab.qml:93",
-    "comment": ""
+    "comment": "notification rule match field option"
   },
   {
     "term": "Sunrise",
@@ -11935,15 +11935,15 @@
   },
   {
     "term": "Surface",
-    "context": "color option | shadow color option",
+    "context": "Surface",
     "reference": "Modules/Settings/DockTab.qml:389, Modules/Settings/DockTab.qml:600, Modules/Settings/LauncherTab.qml:181, Modules/Settings/WorkspacesTab.qml:369, Modules/Settings/DankBarTab.qml:1211",
-    "comment": ""
+    "comment": "color option | shadow color option"
   },
   {
     "term": "Surface Variant",
-    "context": "button color option | shadow color option | tile color option",
+    "context": "Surface Variant",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1558, Modules/Settings/ThemeColorsTab.qml:1566, Modules/Settings/ThemeColorsTab.qml:1576, Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/ThemeColorsTab.qml:1598, Modules/Settings/ThemeColorsTab.qml:1608, Modules/Settings/ThemeColorsTab.qml:1690, Modules/Settings/ThemeColorsTab.qml:1698, Modules/Settings/ThemeColorsTab.qml:1709",
-    "comment": ""
+    "comment": "button color option | shadow color option | tile color option"
   },
   {
     "term": "Suspend",
@@ -12049,27 +12049,27 @@
   },
   {
     "term": "System Check",
-    "context": "greeter doctor page title",
+    "context": "System Check",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:157, Modals/Greeter/GreeterDoctorPage.qml:221, Modules/Settings/AboutTab.qml:814",
-    "comment": ""
+    "comment": "greeter doctor page title"
   },
   {
     "term": "System Default",
-    "context": "date format option",
+    "context": "System Default",
     "reference": "Modules/Settings/GreeterTab.qml:394, Modules/Settings/TimeWeatherTab.qml:12, Modules/Settings/TimeWeatherTab.qml:131, Modules/Settings/TimeWeatherTab.qml:134, Modules/Settings/TimeWeatherTab.qml:174, Modules/Settings/TimeWeatherTab.qml:218, Modules/Settings/TimeWeatherTab.qml:221, Modules/Settings/TimeWeatherTab.qml:261, Modules/Settings/LocaleTab.qml:9",
-    "comment": ""
+    "comment": "date format option"
   },
   {
     "term": "System Information",
-    "context": "system info header in system monitor",
+    "context": "System Information",
     "reference": "Modules/ProcessList/SystemView.qml:45",
-    "comment": ""
+    "comment": "system info header in system monitor"
   },
   {
     "term": "System Monitor",
-    "context": "System monitor widget name | sysmon window title",
+    "context": "System Monitor",
     "reference": "Modals/ProcessListModal.qml:51, Modals/ProcessListModal.qml:85, Modals/ProcessListModal.qml:261, Services/AppSearchService.qml:190, Services/DesktopWidgetRegistry.qml:54",
-    "comment": ""
+    "comment": "System monitor widget name | sysmon window title"
   },
   {
     "term": "System Monitor Unavailable",
@@ -12211,9 +12211,9 @@
   },
   {
     "term": "Test Connection",
-    "context": "Button to test connection to a printer by IP address",
+    "context": "Test Connection",
     "reference": "Modules/Settings/PrinterTab.qml:580",
-    "comment": ""
+    "comment": "Button to test connection to a printer by IP address"
   },
   {
     "term": "Test Page",
@@ -12229,27 +12229,27 @@
   },
   {
     "term": "Testing...",
-    "context": "Button state while testing printer connection",
+    "context": "Testing...",
     "reference": "Modules/Settings/PrinterTab.qml:580",
-    "comment": ""
+    "comment": "Button state while testing printer connection"
   },
   {
     "term": "Text",
-    "context": "text color",
+    "context": "Text",
     "reference": "Modals/Clipboard/ClipboardEntry.qml:120, Modules/Settings/LauncherTab.qml:477",
-    "comment": ""
+    "comment": "text color"
   },
   {
     "term": "Text Color",
-    "context": "blur border color | shadow color option",
+    "context": "Text Color",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1690, Modules/Settings/ThemeColorsTab.qml:1694, Modules/Settings/ThemeColorsTab.qml:1714, Modules/Settings/ThemeColorsTab.qml:1853, Modules/Settings/ThemeColorsTab.qml:1861, Modules/Settings/ThemeColorsTab.qml:1873",
-    "comment": ""
+    "comment": "blur border color | shadow color option"
   },
   {
     "term": "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.",
-    "context": "dgop unavailable error message",
+    "context": "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.",
     "reference": "Modals/ProcessListModal.qml:222",
-    "comment": ""
+    "comment": "dgop unavailable error message"
   },
   {
     "term": "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.",
@@ -12277,9 +12277,9 @@
   },
   {
     "term": "Theme & Colors",
-    "context": "greeter settings link",
+    "context": "Theme & Colors",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:389, Modals/Settings/SettingsSidebar.qml:82",
-    "comment": ""
+    "comment": "greeter settings link"
   },
   {
     "term": "Theme Color",
@@ -12289,21 +12289,21 @@
   },
   {
     "term": "Theme Registry",
-    "context": "greeter feature card title",
+    "context": "Theme Registry",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:106",
-    "comment": ""
+    "comment": "greeter feature card title"
   },
   {
     "term": "Themes",
-    "context": "greeter themes link",
+    "context": "Themes",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:484",
-    "comment": ""
+    "comment": "greeter themes link"
   },
   {
     "term": "Thickness",
-    "context": "border thickness",
+    "context": "Thickness",
     "reference": "Modules/Settings/LauncherTab.qml:445, Modules/Settings/WorkspacesTab.qml:403, Modules/Settings/DankBarTab.qml:1451, Modules/Settings/DankBarTab.qml:1541",
-    "comment": ""
+    "comment": "border thickness"
   },
   {
     "term": "Third-Party Plugin Warning",
@@ -12325,9 +12325,9 @@
   },
   {
     "term": "This may take a few seconds",
-    "context": "Loading overlay subtitle",
+    "context": "This may take a few seconds",
     "reference": "Modules/Settings/AudioTab.qml:512",
-    "comment": ""
+    "comment": "Loading overlay subtitle"
   },
   {
     "term": "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json",
@@ -12373,21 +12373,21 @@
   },
   {
     "term": "Tile",
-    "context": "wallpaper fill mode",
+    "context": "Tile",
     "reference": "Modals/WindowRuleModal.qml:939, Modules/Settings/WallpaperTab.qml:312, Modules/Settings/WindowRulesTab.qml:555",
-    "comment": ""
+    "comment": "wallpaper fill mode"
   },
   {
     "term": "Tile H",
-    "context": "wallpaper fill mode",
+    "context": "Tile H",
     "reference": "Modules/Settings/WallpaperTab.qml:312",
-    "comment": ""
+    "comment": "wallpaper fill mode"
   },
   {
     "term": "Tile V",
-    "context": "wallpaper fill mode",
+    "context": "Tile V",
     "reference": "Modules/Settings/WallpaperTab.qml:312",
-    "comment": ""
+    "comment": "wallpaper fill mode"
   },
   {
     "term": "Tiled",
@@ -12409,9 +12409,9 @@
   },
   {
     "term": "Time",
-    "context": "theme auto mode tab | wallpaper cycling mode tab",
+    "context": "Time",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1094, Modules/Settings/GammaControlTab.qml:184, Modules/Settings/WallpaperTab.qml:960",
-    "comment": ""
+    "comment": "theme auto mode tab | wallpaper cycling mode tab"
   },
   {
     "term": "Time & Date Locale",
@@ -12511,9 +12511,9 @@
   },
   {
     "term": "Today",
-    "context": "notification history filter",
+    "context": "Today",
     "reference": "Services/WeatherService.qml:441, Modules/Notifications/Center/HistoryNotificationList.qml:97",
-    "comment": ""
+    "comment": "notification history filter"
   },
   {
     "term": "Toggle visibility of this bar configuration",
@@ -12535,9 +12535,9 @@
   },
   {
     "term": "Tonal Spot",
-    "context": "matugen color scheme option",
+    "context": "Tonal Spot",
     "reference": "Common/Theme.qml:467",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Toner Empty",
@@ -12571,15 +12571,15 @@
   },
   {
     "term": "Top",
-    "context": "shadow direction option",
+    "context": "Top",
     "reference": "Modules/Settings/DockTab.qml:102, Modules/Settings/DankBarTab.qml:284, Modules/Settings/DankBarTab.qml:292, Modules/Settings/DankBarTab.qml:542, Modules/Settings/DankBarTab.qml:1153, Modules/Settings/DankBarTab.qml:1163",
-    "comment": ""
+    "comment": "shadow direction option"
   },
   {
     "term": "Top (Default)",
-    "context": "shadow direction option",
+    "context": "Top (Default)",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1728, Modules/Settings/ThemeColorsTab.qml:1740",
-    "comment": ""
+    "comment": "shadow direction option"
   },
   {
     "term": "Top Bar Format",
@@ -12589,15 +12589,15 @@
   },
   {
     "term": "Top Center",
-    "context": "screen position option",
+    "context": "Top Center",
     "reference": "Modules/Settings/OSDTab.qml:39, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:60, Modules/Settings/NotificationsTab.qml:216, Modules/Settings/NotificationsTab.qml:232, Modules/Settings/NotificationsTab.qml:241",
-    "comment": ""
+    "comment": "screen position option"
   },
   {
     "term": "Top Left",
-    "context": "screen position option | shadow direction option",
+    "context": "Top Left",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1728, Modules/Settings/ThemeColorsTab.qml:1734, Modules/Settings/ThemeColorsTab.qml:1747, Modules/Settings/DankBarTab.qml:1153, Modules/Settings/DankBarTab.qml:1157, Modules/Settings/DankBarTab.qml:1167, Modules/Settings/OSDTab.qml:37, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:58, Modules/Settings/NotificationsTab.qml:223, Modules/Settings/NotificationsTab.qml:232, Modules/Settings/NotificationsTab.qml:238, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:144",
-    "comment": ""
+    "comment": "screen position option | shadow direction option"
   },
   {
     "term": "Top Processes",
@@ -12607,9 +12607,9 @@
   },
   {
     "term": "Top Right",
-    "context": "screen position option | shadow direction option",
+    "context": "Top Right",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1728, Modules/Settings/ThemeColorsTab.qml:1736, Modules/Settings/ThemeColorsTab.qml:1749, Modules/Settings/DankBarTab.qml:1153, Modules/Settings/DankBarTab.qml:1159, Modules/Settings/DankBarTab.qml:1171, Modules/Settings/OSDTab.qml:35, Modules/Settings/OSDTab.qml:54, Modules/Settings/OSDTab.qml:56, Modules/Settings/NotificationsTab.qml:219, Modules/Settings/NotificationsTab.qml:229, Modules/Settings/NotificationsTab.qml:232, Modules/Settings/NotificationsTab.qml:235, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:144",
-    "comment": ""
+    "comment": "screen position option | shadow direction option"
   },
   {
     "term": "Top Section",
@@ -12745,9 +12745,9 @@
   },
   {
     "term": "Unavailable",
-    "context": "Phone Connect unavailable status",
+    "context": "Unavailable",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:31, Modules/Settings/PrinterTab.qml:202, Modules/Settings/NetworkTab.qml:452",
-    "comment": ""
+    "comment": "Phone Connect unavailable status"
   },
   {
     "term": "Unfocused Color",
@@ -12763,15 +12763,15 @@
   },
   {
     "term": "Uninstall",
-    "context": "uninstall action button",
+    "context": "Uninstall",
     "reference": "Modules/Settings/GreeterTab.qml:123, Modules/Settings/GreeterTab.qml:174, Modules/Settings/ThemeBrowser.qml:650",
-    "comment": ""
+    "comment": "uninstall action button"
   },
   {
     "term": "Uninstall Greeter",
-    "context": "greeter action confirmation",
+    "context": "Uninstall Greeter",
     "reference": "Modules/Settings/GreeterTab.qml:172",
-    "comment": ""
+    "comment": "greeter action confirmation"
   },
   {
     "term": "Uninstall Plugin",
@@ -12787,9 +12787,9 @@
   },
   {
     "term": "Uninstall failed: %1",
-    "context": "uninstallation error",
+    "context": "Uninstall failed: %1",
     "reference": "Modules/Settings/ThemeColorsTab.qml:766, Modules/Settings/ThemeBrowser.qml:97",
-    "comment": ""
+    "comment": "uninstallation error"
   },
   {
     "term": "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.",
@@ -12799,21 +12799,21 @@
   },
   {
     "term": "Uninstalled: %1",
-    "context": "uninstallation success",
+    "context": "Uninstalled: %1",
     "reference": "Modules/Settings/ThemeColorsTab.qml:769, Modules/Settings/ThemeBrowser.qml:100",
-    "comment": ""
+    "comment": "uninstallation success"
   },
   {
     "term": "Uninstalling: %1",
-    "context": "uninstallation progress",
+    "context": "Uninstalling: %1",
     "reference": "Modules/Settings/ThemeColorsTab.qml:763, Modules/Settings/ThemeBrowser.qml:94",
-    "comment": ""
+    "comment": "uninstallation progress"
   },
   {
     "term": "Unknown",
-    "context": "KDE Connect unknown device status | battery status | power profile option | unknown author | widget status",
+    "context": "Unknown",
     "reference": "Common/Theme.qml:1478, Services/WeatherService.qml:151, Services/WeatherService.qml:605, Services/WeatherService.qml:606, Services/WeatherService.qml:765, Services/WeatherService.qml:766, Services/BatteryService.qml:148, dms-plugins/DankKDEConnect/components/DeviceCard.qml:208, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:201, Modules/Lock/LockScreenContent.qml:396, Modules/Lock/LockScreenContent.qml:516, Modules/Lock/LockScreenContent.qml:612, Modules/Settings/PluginBrowser.qml:539, Modules/Settings/PrinterTab.qml:1638, Modules/Settings/ThemeBrowser.qml:527, Modules/Settings/NetworkTab.qml:175, Modules/Settings/NetworkTab.qml:217, Modules/Settings/NetworkTab.qml:431, Modules/Settings/NetworkTab.qml:454, Modules/Settings/NetworkTab.qml:602, Modules/Settings/NetworkTab.qml:747, Modules/Settings/NetworkTab.qml:1172, Modules/Settings/NotificationsTab.qml:666, Modules/ControlCenter/Details/BatteryDetail.qml:185, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Components/DragDropGrid.qml:325, Modules/ControlCenter/Components/DragDropGrid.qml:626, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/DankBar/Popouts/BatteryPopout.qml:341",
-    "comment": ""
+    "comment": "KDE Connect unknown device status | battery status | power profile option | unknown author | widget status"
   },
   {
     "term": "Unknown App",
@@ -12841,9 +12841,9 @@
   },
   {
     "term": "Unknown GPU",
-    "context": "fallback gpu name",
+    "context": "Unknown GPU",
     "reference": "Modules/ProcessList/SystemView.qml:202",
-    "comment": ""
+    "comment": "fallback gpu name"
   },
   {
     "term": "Unknown Monitor",
@@ -12895,15 +12895,15 @@
   },
   {
     "term": "Unpair",
-    "context": "KDE Connect unpair tooltip",
+    "context": "Unpair",
     "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:171, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:354",
-    "comment": ""
+    "comment": "KDE Connect unpair tooltip"
   },
   {
     "term": "Unpair failed",
-    "context": "Phone Connect error",
+    "context": "Unpair failed",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:176",
-    "comment": ""
+    "comment": "Phone Connect error"
   },
   {
     "term": "Unpin",
@@ -12979,9 +12979,9 @@
   },
   {
     "term": "Uptime:",
-    "context": "uptime label in footer",
+    "context": "Uptime:",
     "reference": "Modals/ProcessListModal.qml:508",
-    "comment": ""
+    "comment": "uptime label in footer"
   },
   {
     "term": "Urgent Color",
@@ -13057,15 +13057,15 @@
   },
   {
     "term": "Use a security key for lock screen authentication.",
-    "context": "lock screen U2F security key setting",
+    "context": "Use a security key for lock screen authentication.",
     "reference": "Modules/Settings/LockScreenTab.qml:35",
-    "comment": ""
+    "comment": "lock screen U2F security key setting"
   },
   {
     "term": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
-    "context": "wallpaper settings disable description",
+    "context": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
     "reference": "Modules/Settings/WallpaperTab.qml:1251",
-    "comment": ""
+    "comment": "wallpaper settings disable description"
   },
   {
     "term": "Use animated wave progress bars for media playback",
@@ -13285,9 +13285,9 @@
   },
   {
     "term": "Verification",
-    "context": "Phone Connect pairing verification key label",
+    "context": "Verification",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:70",
-    "comment": ""
+    "comment": "Phone Connect pairing verification key label"
   },
   {
     "term": "Version",
@@ -13321,9 +13321,9 @@
   },
   {
     "term": "Vibrant",
-    "context": "matugen color scheme option",
+    "context": "Vibrant",
     "reference": "Common/Theme.qml:471",
-    "comment": ""
+    "comment": "matugen color scheme option"
   },
   {
     "term": "Vibrant palette with playful saturation.",
@@ -13411,15 +13411,15 @@
   },
   {
     "term": "Wallpaper",
-    "context": "greeter settings link",
+    "context": "Wallpaper",
     "reference": "Widgets/KeybindItem.qml:1097, Widgets/KeybindItem.qml:1104, Widgets/KeybindItem.qml:1113, Modals/Greeter/GreeterCompletePage.qml:381, Modals/Settings/SettingsSidebar.qml:76, Modules/Settings/DisplayWidgetsTab.qml:43, Modules/Settings/WallpaperTab.qml:63",
-    "comment": ""
+    "comment": "greeter settings link"
   },
   {
     "term": "Wallpaper Error",
-    "context": "wallpaper error status",
+    "context": "Wallpaper Error",
     "reference": "Modules/Settings/ThemeColorsTab.qml:466",
-    "comment": ""
+    "comment": "wallpaper error status"
   },
   {
     "term": "Wallpaper Monitor",
@@ -13435,15 +13435,15 @@
   },
   {
     "term": "Wallpaper processing failed",
-    "context": "wallpaper processing error",
+    "context": "Wallpaper processing failed",
     "reference": "Modules/Settings/ThemeColorsTab.qml:483",
-    "comment": ""
+    "comment": "wallpaper processing error"
   },
   {
     "term": "Wallpaper processing failed - check wallpaper path",
-    "context": "wallpaper error",
+    "context": "Wallpaper processing failed - check wallpaper path",
     "reference": "Modules/Settings/ThemeColorsTab.qml:310",
-    "comment": ""
+    "comment": "wallpaper error"
   },
   {
     "term": "Wallpapers",
@@ -13465,9 +13465,9 @@
   },
   {
     "term": "Warnings",
-    "context": "greeter doctor page status card",
+    "context": "Warnings",
     "reference": "Modals/Greeter/GreeterDoctorPage.qml:259",
-    "comment": ""
+    "comment": "greeter doctor page status card"
   },
   {
     "term": "Wave Progress Bars",
@@ -13489,15 +13489,15 @@
   },
   {
     "term": "Welcome",
-    "context": "greeter modal window title",
+    "context": "Welcome",
     "reference": "Modals/Greeter/GreeterModal.qml:89",
-    "comment": ""
+    "comment": "greeter modal window title"
   },
   {
     "term": "Welcome to DankMaterialShell",
-    "context": "greeter welcome page title",
+    "context": "Welcome to DankMaterialShell",
     "reference": "Modals/Greeter/GreeterWelcomePage.qml:47",
-    "comment": ""
+    "comment": "greeter welcome page title"
   },
   {
     "term": "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window",
@@ -13579,9 +13579,9 @@
   },
   {
     "term": "WiFi off",
-    "context": "network status",
+    "context": "WiFi off",
     "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:308",
-    "comment": ""
+    "comment": "network status"
   },
   {
     "term": "Wide (BT2020)",
@@ -13639,15 +13639,15 @@
   },
   {
     "term": "Widgets",
-    "context": "settings_displays",
+    "context": "Widgets",
     "reference": "Modals/Settings/SettingsSidebar.qml:120, Modals/Settings/SettingsSidebar.qml:224",
-    "comment": ""
+    "comment": "settings_displays"
   },
   {
     "term": "Widgets, layout, style",
-    "context": "greeter dankbar description",
+    "context": "Widgets, layout, style",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:406",
-    "comment": ""
+    "comment": "greeter dankbar description"
   },
   {
     "term": "Width",
@@ -13747,9 +13747,9 @@
   },
   {
     "term": "Wipe",
-    "context": "wallpaper transition option",
+    "context": "Wipe",
     "reference": "Modules/Settings/WallpaperTab.qml:1165",
-    "comment": ""
+    "comment": "wallpaper transition option"
   },
   {
     "term": "Workspace",
@@ -13813,9 +13813,9 @@
   },
   {
     "term": "Write:",
-    "context": "disk write label",
+    "context": "Write:",
     "reference": "Modules/ProcessList/DisksView.qml:91",
-    "comment": ""
+    "comment": "disk write label"
   },
   {
     "term": "X Axis",
@@ -13837,9 +13837,9 @@
   },
   {
     "term": "Yesterday",
-    "context": "notification history filter",
+    "context": "Yesterday",
     "reference": "Modules/Notifications/Center/HistoryNotificationList.qml:102",
-    "comment": ""
+    "comment": "notification history filter"
   },
   {
     "term": "You have unsaved changes. Save before closing this tab?",
@@ -13867,15 +13867,15 @@
   },
   {
     "term": "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.",
-    "context": "qt theme env error body",
+    "context": "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.",
     "reference": "Modules/Settings/ThemeColorsTab.qml:2464",
-    "comment": ""
+    "comment": "qt theme env error body"
   },
   {
     "term": "You're All Set!",
-    "context": "greeter completion page title",
+    "context": "You're All Set!",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:105",
-    "comment": ""
+    "comment": "greeter completion page title"
   },
   {
     "term": "Your system is up to date!",
@@ -13903,9 +13903,9 @@
   },
   {
     "term": "by %1",
-    "context": "author attribution",
+    "context": "by %1",
     "reference": "Modules/Settings/PluginBrowser.qml:539, Modules/Settings/ThemeBrowser.qml:527",
-    "comment": ""
+    "comment": "author attribution"
   },
   {
     "term": "days",
@@ -13921,15 +13921,15 @@
   },
   {
     "term": "device",
-    "context": "Generic device name | Generic device name fallback",
+    "context": "device",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:91, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:272",
-    "comment": ""
+    "comment": "Generic device name | Generic device name fallback"
   },
   {
     "term": "devices connected",
-    "context": "KDE Connect status multiple devices",
+    "context": "devices connected",
     "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:38",
-    "comment": ""
+    "comment": "KDE Connect status multiple devices"
   },
   {
     "term": "dgop not available",
@@ -14023,9 +14023,9 @@
   },
   {
     "term": "matugen not found - install matugen package for dynamic theming",
-    "context": "matugen error",
+    "context": "matugen not found - install matugen package for dynamic theming",
     "reference": "Modules/Settings/ThemeColorsTab.qml:308",
-    "comment": ""
+    "comment": "matugen error"
   },
   {
     "term": "minutes",
@@ -14059,9 +14059,9 @@
   },
   {
     "term": "niri shortcuts config",
-    "context": "greeter keybinds niri description",
+    "context": "niri shortcuts config",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:414",
-    "comment": ""
+    "comment": "greeter keybinds niri description"
   },
   {
     "term": "niri/dms Discord",
@@ -14137,9 +14137,9 @@
   },
   {
     "term": "procs",
-    "context": "short for processes",
+    "context": "procs",
     "reference": "Modules/ProcessList/ProcessListPopout.qml:288",
-    "comment": ""
+    "comment": "short for processes"
   },
   {
     "term": "r/niri Subreddit",
@@ -14155,9 +14155,9 @@
   },
   {
     "term": "source",
-    "context": "source code link",
+    "context": "source",
     "reference": "Modules/Settings/PluginBrowser.qml:540",
-    "comment": ""
+    "comment": "source code link"
   },
   {
     "term": "this app",
@@ -14281,8 +14281,8 @@
   },
   {
     "term": "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help",
-    "context": "Keyboard hints when enter-to-paste is enabled",
+    "context": "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:30",
-    "comment": ""
+    "comment": "Keyboard hints when enter-to-paste is enabled"
   }
 ]
