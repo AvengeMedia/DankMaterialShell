@@ -93,7 +93,7 @@ Item {
 
                     SettingsToggleRow {
                         tab: "sounds"
-                        tags: ["sound", "login", "startup"]
+                        tags: ["sound", "login", "startup", "boot"]
                         settingKey: "soundLogin"
                         text: I18n.tr("Login")
                         description: I18n.tr("Play sound after logging in")
