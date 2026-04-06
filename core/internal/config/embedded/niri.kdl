@@ -224,6 +224,7 @@ window-rule {
     open-floating false
 }
 window-rule {
+    match app-id=r#"^org\.gnome\.Calculator$"#
     match app-id=r#"^gnome-calculator$"#
     match app-id=r#"^galculator$"#
     match app-id=r#"^blueman-manager$"#
