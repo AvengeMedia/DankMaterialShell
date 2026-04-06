@@ -537,12 +537,39 @@ Item {
             id: popoutBlur
             targetWindow: contentWindow
             blurEnabled: root.effectiveSurfaceBlurEnabled
+
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            blurX: contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr) - contentContainer.horizontalConnectorExtent * s
-            blurY: contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s
-            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s : 0
-            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s : 0
-            blurRadius: Theme.connectedSurfaceRadius
+
+            // Connected mode: clamp animY/animX to popup bounds so blur grows from the
+            // bar edge in sync with the slide-in animation, never entering the bar area.
+            readonly property real _dyClamp: (contentContainer.barTop || contentContainer.barBottom)
+                ? Math.max(-contentContainer.height, Math.min(contentContainer.animY, contentContainer.height))
+                : 0
+            readonly property real _dxClamp: (contentContainer.barLeft || contentContainer.barRight)
+                ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width))
+                : 0
+
+            blurX: Theme.isConnectedEffect
+                ? contentContainer.x + (contentContainer.barRight ? _dxClamp : 0)
+                : contentContainer.x + contentContainer.width * (1 - s) * 0.5
+                  + Theme.snap(contentContainer.animX, root.dpr)
+                  - contentContainer.horizontalConnectorExtent * s
+            blurY: Theme.isConnectedEffect
+                ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0)
+                : contentContainer.y + contentContainer.height * (1 - s) * 0.5
+                  + Theme.snap(contentContainer.animY, root.dpr)
+                  - contentContainer.verticalConnectorExtent * s
+            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0)
+                ? (Theme.isConnectedEffect
+                    ? Math.max(0, contentContainer.width - Math.abs(_dxClamp))
+                    : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s)
+                : 0
+            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0)
+                ? (Theme.isConnectedEffect
+                    ? Math.max(0, contentContainer.height - Math.abs(_dyClamp))
+                    : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s)
+                : 0
+            blurRadius: Theme.isConnectedEffect ? Theme.connectedCornerRadius : Theme.connectedSurfaceRadius
         }
 
         WlrLayershell.namespace: root.layerNamespace
