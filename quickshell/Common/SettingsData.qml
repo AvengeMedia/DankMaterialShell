@@ -301,6 +301,7 @@ Singleton {
     property var workspaceNameIcons: ({})
     property bool waveProgressEnabled: true
     property bool scrollTitleEnabled: true
+    property bool mediaAdaptiveWidthEnabled: true
     property bool audioVisualizerEnabled: true
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5

@@ -46,6 +46,13 @@ Item {
                     onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
                 }
 
+                SettingsToggleRow {
+                    text: I18n.tr("Adaptive Media Width")
+                    description: I18n.tr("Shrink the media widget to fit shorter song titles while still respecting the configured maximum size")
+                    checked: SettingsData.mediaAdaptiveWidthEnabled
+                    onToggled: checked => SettingsData.set("mediaAdaptiveWidthEnabled", checked)
+                }
+
                 SettingsDropdownRow {
                     property var scrollOptsInternal: ["volume", "song", "nothing"]
                     property var scrollOptsDisplay: [I18n.tr("Change Volume", "media scroll wheel option"), I18n.tr("Change Song", "media scroll wheel option"), I18n.tr("Nothing", "media scroll wheel option")]
