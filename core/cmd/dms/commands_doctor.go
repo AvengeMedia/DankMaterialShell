@@ -820,10 +820,14 @@ func checkOptionalDependencies() []checkResult {
 	results = append(results, checkImageFormatPlugins()...)
 
 	terminals := []string{"ghostty", "kitty", "alacritty", "foot", "wezterm"}
-	if idx := slices.IndexFunc(terminals, utils.CommandExists); idx >= 0 {
-		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusOK, terminals[idx], "", optionalFeaturesURL})
+	terminals = slices.DeleteFunc(terminals, func(t string) bool {
+		return !utils.CommandExists(t)
+	})
+
+	if len(terminals) > 0 {
+		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusOK, strings.Join(terminals, ", "), "", optionalFeaturesURL})
 	} else {
-		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusWarn, "None found", "Install ghostty, kitty, or alacritty", optionalFeaturesURL})
+		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusWarn, "None found", "Install ghostty, kitty, foot or alacritty", optionalFeaturesURL})
 	}
 
 	networkResult, err := network.DetectNetworkStack()
