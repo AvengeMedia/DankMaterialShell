@@ -31,6 +31,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/trayrecovery"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
@@ -72,6 +73,7 @@ var clipboardManager *clipboard.Manager
 var dbusManager *serverDbus.Manager
 var wlContext *wlcontext.SharedContext
 var themeModeManager *thememode.Manager
+var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
 var geoClientInstance geolocation.Client
 
@@ -391,6 +393,18 @@ func InitializeThemeModeManager() error {
 	themeModeManager = manager
 
 	log.Info("Theme mode automation manager initialized")
+	return nil
+}
+
+func InitializeTrayRecoveryManager() error {
+	manager, err := trayrecovery.NewManager()
+	if err != nil {
+		return err
+	}
+
+	trayRecoveryManager = manager
+
+	log.Info("TrayRecovery manager initialized")
 	return nil
 }
 
@@ -1325,6 +1339,9 @@ func cleanupManagers() {
 	if themeModeManager != nil {
 		themeModeManager.Close()
 	}
+	if trayRecoveryManager != nil {
+		trayRecoveryManager.Close()
+	}
 	if wlContext != nil {
 		wlContext.Close()
 	}
@@ -1609,6 +1626,18 @@ func Start(printDocs bool) error {
 			themeModeManager.WatchLoginctl(loginctlManager)
 		}()
 	}
+
+	go func() {
+		<-loginctlReady
+		if loginctlManager == nil {
+			return
+		}
+		if err := InitializeTrayRecoveryManager(); err != nil {
+			log.Warnf("TrayRecovery manager unavailable: %v", err)
+		} else {
+			trayRecoveryManager.WatchLoginctl(loginctlManager)
+		}
+	}()
 
 	go func() {
 		geoClient := geolocation.NewClient()
