@@ -50,14 +50,11 @@ DankPopout {
     }
 
     function show() {
-        if (!clipboardAvailable) {
-            ToastService.showError(I18n.tr("Clipboard service not available"));
-            return;
-        }
         open();
         activeImageLoads = 0;
         ClipboardService.reset();
-        ClipboardService.refresh();
+        if (clipboardAvailable)
+            ClipboardService.refresh();
         keyboardController.reset();
 
         Qt.callLater(function () {
@@ -122,10 +119,10 @@ DankPopout {
     onBackgroundClicked: hide()
 
     onShouldBeVisibleChanged: {
-        if (!shouldBeVisible) {
+        if (!shouldBeVisible)
             return;
-        }
-        ClipboardService.refresh();
+        if (clipboardAvailable)
+            ClipboardService.refresh();
         keyboardController.reset();
         Qt.callLater(function () {
             if (contentLoader.item?.searchField) {

@@ -60,15 +60,12 @@ DankModal {
     }
 
     function show() {
-        if (!clipboardAvailable) {
-            ToastService.showError(I18n.tr("Clipboard service not available"));
-            return;
-        }
         open();
         activeImageLoads = 0;
         shouldHaveFocus = true;
         ClipboardService.reset();
-        ClipboardService.refresh();
+        if (clipboardAvailable)
+            ClipboardService.refresh();
         keyboardController.reset();
 
         Qt.callLater(function () {

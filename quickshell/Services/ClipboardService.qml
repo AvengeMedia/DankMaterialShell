@@ -255,6 +255,12 @@ Singleton {
         return pinnedEntries.some(pinnedEntry => pinnedEntry.hash === entryHash);
     }
 
+    onClipboardAvailableChanged: {
+        if (!clipboardAvailable || refCount <= 0)
+            return;
+        refresh();
+    }
+
     Connections {
         target: DMSService
         enabled: root.refCount > 0
