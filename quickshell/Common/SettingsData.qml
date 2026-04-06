@@ -237,6 +237,21 @@ Singleton {
     onFrameBlurEnabledChanged: saveSettings()
     property int previousDirectionalMode: 1
     onPreviousDirectionalModeChanged: saveSettings()
+    property var connectedFrameBarStyleBackups: ({})
+    onConnectedFrameBarStyleBackupsChanged: saveSettings()
+    readonly property bool connectedFrameModeActive: frameEnabled
+        && motionEffect === SettingsData.AnimationEffect.Directional
+        && directionalAnimationMode === 3
+    onConnectedFrameModeActiveChanged: {
+        if (_loading)
+            return;
+        if (connectedFrameModeActive) {
+            _captureConnectedFrameBarStyleBackups(barConfigs, true);
+            _enforceConnectedModeBarStyleReset();
+        } else {
+            _restoreConnectedFrameBarStyleBackups();
+        }
+    }
 
     readonly property color effectiveFrameColor: {
         const fc = frameColor;
@@ -1333,6 +1348,7 @@ Singleton {
             _loading = false;
         }
         loadPluginSettings();
+        Qt.callLater(() => _reconcileConnectedFrameBarStyles());
     }
 
     property var _pendingMigration: null
@@ -1444,6 +1460,149 @@ Singleton {
         if (_pluginSettingsLoading || _pluginParseError)
             return;
         pluginSettingsFile.setText(JSON.stringify(pluginSettings, null, 2));
+    }
+
+    function _connectedFrameBarStyleSnapshot(config) {
+        return {
+            "shadowIntensity": config?.shadowIntensity ?? 0,
+            "squareCorners": config?.squareCorners ?? false,
+            "gothCornersEnabled": config?.gothCornersEnabled ?? false,
+            "borderEnabled": config?.borderEnabled ?? false
+        };
+    }
+
+    function _hasConnectedFrameBarStyleBackups() {
+        return connectedFrameBarStyleBackups && Object.keys(connectedFrameBarStyleBackups).length > 0;
+    }
+
+    function _captureConnectedFrameBarStyleBackups(configs, overwriteExisting) {
+        if (!Array.isArray(configs))
+            return;
+
+        const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
+        const validIds = {};
+        let changed = false;
+
+        for (let i = 0; i < configs.length; i++) {
+            const config = configs[i];
+            if (!config?.id)
+                continue;
+            validIds[config.id] = true;
+
+            if (!overwriteExisting && nextBackups[config.id] !== undefined)
+                continue;
+
+            const snapshot = _connectedFrameBarStyleSnapshot(config);
+            if (JSON.stringify(nextBackups[config.id]) !== JSON.stringify(snapshot)) {
+                nextBackups[config.id] = snapshot;
+                changed = true;
+            }
+        }
+
+        if (overwriteExisting) {
+            for (const barId in nextBackups) {
+                if (validIds[barId])
+                    continue;
+                delete nextBackups[barId];
+                changed = true;
+            }
+        }
+
+        if (changed)
+            connectedFrameBarStyleBackups = nextBackups;
+    }
+
+    function _restoreConnectedFrameBarStyleBackups() {
+        if (!_hasConnectedFrameBarStyleBackups())
+            return;
+
+        const backups = connectedFrameBarStyleBackups || {};
+        const configs = JSON.parse(JSON.stringify(barConfigs));
+        let changed = false;
+
+        for (let i = 0; i < configs.length; i++) {
+            const backup = backups[configs[i].id];
+            if (!backup)
+                continue;
+            for (const key in backup) {
+                if (configs[i][key] === backup[key])
+                    continue;
+                configs[i][key] = backup[key];
+                changed = true;
+            }
+        }
+
+        if (changed)
+            barConfigs = configs;
+        connectedFrameBarStyleBackups = ({});
+        if (changed)
+            updateBarConfigs();
+    }
+
+    function _reconcileConnectedFrameBarStyles() {
+        if (connectedFrameModeActive) {
+            if (!_hasConnectedFrameBarStyleBackups())
+                _captureConnectedFrameBarStyleBackups(barConfigs, true);
+            _enforceConnectedModeBarStyleReset();
+            return;
+        }
+        _restoreConnectedFrameBarStyleBackups();
+    }
+
+    function _sanitizeBarConfigForConnectedFrame(config) {
+        if (!connectedFrameModeActive || !config)
+            return config;
+
+        let changed = false;
+        const sanitized = Object.assign({}, config);
+
+        if ((sanitized.shadowIntensity ?? 0) !== 0) {
+            sanitized.shadowIntensity = 0;
+            changed = true;
+        }
+        if (sanitized.squareCorners ?? false) {
+            sanitized.squareCorners = false;
+            changed = true;
+        }
+        if (sanitized.gothCornersEnabled ?? false) {
+            sanitized.gothCornersEnabled = false;
+            changed = true;
+        }
+        if (sanitized.borderEnabled ?? false) {
+            sanitized.borderEnabled = false;
+            changed = true;
+        }
+
+        return changed ? sanitized : config;
+    }
+
+    function _sanitizeBarConfigsForConnectedFrame(configs) {
+        if (!connectedFrameModeActive || !Array.isArray(configs))
+            return {
+                "configs": configs,
+                "changed": false
+            };
+
+        let changed = false;
+        const sanitizedConfigs = configs.map(config => {
+            const sanitized = _sanitizeBarConfigForConnectedFrame(config);
+            if (sanitized !== config)
+                changed = true;
+            return sanitized;
+        });
+
+        return {
+            "configs": changed ? sanitizedConfigs : configs,
+            "changed": changed
+        };
+    }
+
+    function _enforceConnectedModeBarStyleReset() {
+        const result = _sanitizeBarConfigsForConnectedFrame(barConfigs);
+        if (!result.changed)
+            return;
+        barConfigs = result.configs;
+        updateBarConfigs();
     }
 
     function detectAvailableIconThemes() {
@@ -1593,7 +1752,7 @@ Singleton {
         const spacing = barSpacing !== undefined ? barSpacing : (defaultBar?.spacing ?? 4);
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
         const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
-        const isConnected = frameEnabled && motionEffect === 1 && directionalAnimationMode === 3;
+        const isConnected = connectedFrameModeActive;
         const bottomGap = isConnected ? 0 : Math.max(0, rawBottomGap);
 
         const useAutoGaps = (barConfig && barConfig.popupGapsAuto !== undefined) ? barConfig.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
@@ -1717,7 +1876,7 @@ Singleton {
         const screenWidth = screen.width;
         const screenHeight = screen.height;
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
-        const isConnected = frameEnabled && motionEffect === 1 && directionalAnimationMode === 3;
+        const isConnected = connectedFrameModeActive;
         const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
         const bottomGap = isConnected ? 0 : rawBottomGap;
 
@@ -1832,7 +1991,9 @@ Singleton {
     function addBarConfig(config) {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         configs.push(config);
-        barConfigs = configs;
+        if (connectedFrameModeActive)
+            _captureConnectedFrameBarStyleBackups(configs, false);
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
         updateBarConfigs();
     }
 
@@ -1844,7 +2005,7 @@ Singleton {
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
 
         Object.assign(configs[index], updates);
-        barConfigs = configs;
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
         updateBarConfigs();
 
         if (positionChanged) {
@@ -1898,6 +2059,11 @@ Singleton {
             return;
         const configs = barConfigs.filter(cfg => cfg.id !== barId);
         barConfigs = configs;
+        if (connectedFrameBarStyleBackups?.[barId] !== undefined) {
+            const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
+            delete nextBackups[barId];
+            connectedFrameBarStyleBackups = nextBackups;
+        }
         updateBarConfigs();
     }
 

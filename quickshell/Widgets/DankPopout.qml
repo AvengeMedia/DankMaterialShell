@@ -539,9 +539,13 @@ Item {
             blurEnabled: root.effectiveSurfaceBlurEnabled
 
             readonly property real s: Math.min(1, contentContainer.scaleValue)
+            readonly property bool trackBlurFromBarEdge: Theme.isConnectedEffect
+                || (typeof SettingsData !== "undefined"
+                    && Theme.isDirectionalEffect
+                    && SettingsData.directionalAnimationMode !== 2)
 
-            // Connected mode: clamp animY/animX to popup bounds so blur grows from the
-            // bar edge in sync with the slide-in animation, never entering the bar area.
+            // Directional popouts clip to the bar edge, so the blur needs to grow from
+            // that same edge instead of translating through the bar before settling.
             readonly property real _dyClamp: (contentContainer.barTop || contentContainer.barBottom)
                 ? Math.max(-contentContainer.height, Math.min(contentContainer.animY, contentContainer.height))
                 : 0
@@ -549,23 +553,23 @@ Item {
                 ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width))
                 : 0
 
-            blurX: Theme.isConnectedEffect
+            blurX: trackBlurFromBarEdge
                 ? contentContainer.x + (contentContainer.barRight ? _dxClamp : 0)
                 : contentContainer.x + contentContainer.width * (1 - s) * 0.5
                   + Theme.snap(contentContainer.animX, root.dpr)
                   - contentContainer.horizontalConnectorExtent * s
-            blurY: Theme.isConnectedEffect
+            blurY: trackBlurFromBarEdge
                 ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0)
                 : contentContainer.y + contentContainer.height * (1 - s) * 0.5
                   + Theme.snap(contentContainer.animY, root.dpr)
                   - contentContainer.verticalConnectorExtent * s
             blurWidth: (shouldBeVisible && contentWrapper.opacity > 0)
-                ? (Theme.isConnectedEffect
+                ? (trackBlurFromBarEdge
                     ? Math.max(0, contentContainer.width - Math.abs(_dxClamp))
                     : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s)
                 : 0
             blurHeight: (shouldBeVisible && contentWrapper.opacity > 0)
-                ? (Theme.isConnectedEffect
+                ? (trackBlurFromBarEdge
                     ? Math.max(0, contentContainer.height - Math.abs(_dyClamp))
                     : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s)
                 : 0
