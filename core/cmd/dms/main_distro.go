@@ -28,7 +28,7 @@ func init() {
 func main() {
 	clipboard.MaybeServeAndExit()
 
-	if os.Geteuid() == 0 {
+	if os.Geteuid() == 0 && !isReadOnlyCommand(os.Args) {
 		log.Fatal("This program should not be run as root. Exiting.")
 	}
 
