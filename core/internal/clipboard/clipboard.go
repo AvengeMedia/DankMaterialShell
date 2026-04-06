@@ -1,7 +1,6 @@
 package clipboard
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -14,7 +13,7 @@ import (
 )
 
 func Copy(data []byte, mimeType string) error {
-	return CopyReader(bytes.NewReader(data), mimeType, false, false)
+	return copyForkCached(data, mimeType, false)
 }
 
 func CopyOpts(data []byte, mimeType string, foreground, pasteOnce bool) error {
@@ -34,7 +33,7 @@ func CopyOpts(data []byte, mimeType string, foreground, pasteOnce bool) error {
 			return nil
 		}, mimeType, pasteOnce)
 	}
-	return CopyReader(bytes.NewReader(data), mimeType, foreground, pasteOnce)
+	return copyForkCached(data, mimeType, pasteOnce)
 }
 
 func CopyReader(data io.Reader, mimeType string, foreground, pasteOnce bool) error {
@@ -42,6 +41,53 @@ func CopyReader(data io.Reader, mimeType string, foreground, pasteOnce bool) err
 		return copyFork(data, mimeType, pasteOnce)
 	}
 	return copyServeReader(data, mimeType, pasteOnce)
+}
+
+func copyForkCached(data []byte, mimeType string, pasteOnce bool) error {
+	cacheFile, err := createClipboardCacheFile()
+	if err != nil {
+		return fmt.Errorf("create cache file: %w", err)
+	}
+	cachePath := cacheFile.Name()
+
+	if _, err := cacheFile.Write(data); err != nil {
+		cacheFile.Close()
+		os.Remove(cachePath)
+		return fmt.Errorf("write cache file: %w", err)
+	}
+	if err := cacheFile.Close(); err != nil {
+		os.Remove(cachePath)
+		return fmt.Errorf("close cache file: %w", err)
+	}
+
+	args := []string{os.Args[0], "cl", "copy", "--foreground", "--cache-file", cachePath}
+	if pasteOnce {
+		args = append(args, "--paste-once")
+	}
+	args = append(args, "--type", mimeType)
+
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stdin = nil
+	cmd.Stderr = nil
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	cmd.Env = append(os.Environ(), "DMS_CLIP_FORKED=1")
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		os.Remove(cachePath)
+		return fmt.Errorf("stdout pipe: %w", err)
+	}
+
+	if err := cmd.Start(); err != nil {
+		os.Remove(cachePath)
+		return fmt.Errorf("start: %w", err)
+	}
+
+	var buf [1]byte
+	if _, err := stdout.Read(buf[:]); err != nil {
+		return fmt.Errorf("waiting for clipboard ready: %w", err)
+	}
+	return nil
 }
 
 func copyFork(data io.Reader, mimeType string, pasteOnce bool) error {
@@ -97,6 +143,19 @@ func signalReady() {
 		return
 	}
 	os.Stdout.Write([]byte{1})
+}
+
+func ServeCacheFile(path, mimeType string, pasteOnce bool) error {
+	defer os.Remove(path)
+	return copyServeWithWriter(func(writer io.Writer) error {
+		f, err := os.Open(path)
+		if err != nil {
+			return fmt.Errorf("open cache file: %w", err)
+		}
+		defer f.Close()
+		_, err = io.Copy(writer, f)
+		return err
+	}, mimeType, pasteOnce)
 }
 
 func copyServeReader(data io.Reader, mimeType string, pasteOnce bool) error {

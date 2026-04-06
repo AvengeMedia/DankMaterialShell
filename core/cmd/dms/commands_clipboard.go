@@ -53,6 +53,7 @@ var (
 	clipCopyPasteOnce  bool
 	clipCopyType       string
 	clipCopyDownload   bool
+	clipCopyCacheFile  string
 	clipJSONOutput     bool
 )
 
@@ -191,6 +192,8 @@ func init() {
 	clipCopyCmd.Flags().BoolVarP(&clipCopyPasteOnce, "paste-once", "o", false, "Exit after first paste")
 	clipCopyCmd.Flags().StringVarP(&clipCopyType, "type", "t", "text/plain;charset=utf-8", "MIME type")
 	clipCopyCmd.Flags().BoolVarP(&clipCopyDownload, "download", "d", false, "Download URL as image and copy as file")
+	clipCopyCmd.Flags().StringVar(&clipCopyCacheFile, "cache-file", "", "")
+	clipCopyCmd.Flags().MarkHidden("cache-file")
 
 	clipWatchCmd.Flags().BoolVar(&clipJSONOutput, "json", false, "Output as JSON")
 	clipHistoryCmd.Flags().BoolVar(&clipJSONOutput, "json", false, "Output as JSON")
@@ -221,6 +224,13 @@ func init() {
 }
 
 func runClipCopy(cmd *cobra.Command, args []string) {
+	if clipCopyCacheFile != "" {
+		if err := clipboard.ServeCacheFile(clipCopyCacheFile, clipCopyType, clipCopyPasteOnce); err != nil {
+			log.Fatalf("serve cache file: %v", err)
+		}
+		return
+	}
+
 	var data []byte
 	copyFromStdin := false
 
