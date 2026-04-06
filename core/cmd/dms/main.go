@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 )
 
@@ -28,6 +29,8 @@ func init() {
 }
 
 func main() {
+	clipboard.MaybeServeAndExit()
+
 	if os.Geteuid() == 0 {
 		log.Fatal("This program should not be run as root. Exiting.")
 	}
