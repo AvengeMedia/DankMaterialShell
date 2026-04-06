@@ -969,6 +969,7 @@ Item {
             axis: barWindow.axis
             barSpacing: barConfig?.spacing ?? 4
             barConfig: topBarContent.barConfig
+            widgetData: parent.widgetData
             isAutoHideBar: topBarContent.barConfig?.autoHide ?? false
             isAtBottom: barWindow.axis?.edge === "bottom"
             visible: SettingsData.getFilteredScreens("systemTray").includes(barWindow.screen) && SystemTray.items.values.length > 0

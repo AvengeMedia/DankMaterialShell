@@ -39,7 +39,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -437,7 +437,7 @@ Column {
 
                         Row {
                             spacing: Theme.spacingXS
-                            visible: modelData.id === "clock" || modelData.id === "focusedWindow" || modelData.id === "keyboard_layout_name" || modelData.id === "appsDock"
+                            visible: modelData.id === "clock" || modelData.id === "focusedWindow" || modelData.id === "keyboard_layout_name" || modelData.id === "appsDock" || modelData.id === "systemTray"
 
                             DankActionButton {
                                 id: compactModeButton
@@ -540,6 +540,39 @@ Column {
                                     appsDockContextMenu.x = xPos;
                                     appsDockContextMenu.y = yPos;
                                     appsDockContextMenu.open();
+                                }
+                            }
+
+                            DankActionButton {
+                                id: trayMenuButton
+                                buttonSize: 32
+                                visible: modelData.id === "systemTray"
+                                iconName: "more_vert"
+                                iconSize: 18
+                                iconColor: Theme.outline
+                                onClicked: {
+                                    trayContextMenu.widgetData = modelData;
+                                    trayContextMenu.sectionId = root.sectionId;
+                                    trayContextMenu.widgetIndex = index;
+
+                                    var buttonPos = trayMenuButton.mapToItem(root, 0, 0);
+                                    var popupWidth = trayContextMenu.width;
+                                    var popupHeight = trayContextMenu.height;
+
+                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
+                                    if (xPos < 0)
+                                        xPos = buttonPos.x + trayMenuButton.width + Theme.spacingS;
+
+                                    var yPos = buttonPos.y - popupHeight / 2 + trayMenuButton.height / 2;
+                                    if (yPos < 0) {
+                                        yPos = Theme.spacingS;
+                                    } else if (yPos + popupHeight > root.height) {
+                                        yPos = root.height - popupHeight - Theme.spacingS;
+                                    }
+
+                                    trayContextMenu.x = xPos;
+                                    trayContextMenu.y = yPos;
+                                    trayContextMenu.open();
                                 }
                             }
 
@@ -924,6 +957,88 @@ Column {
                         onPressed: {
                             gbToggle.checked = !gbToggle.checked;
                             root.showInGbChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, gbToggle.checked);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Popup {
+        id: trayContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
+
+        width: 220
+        height: contentColumn.implicitHeight + Theme.spacingS * 2
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+            Column {
+                id: contentColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: trayOverflowArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "arrow_selector_tool"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Use Inline Expansion")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: trayOverflowToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false
+                    }
+
+                    MouseArea {
+                        id: trayOverflowArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            const newValue = !(trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false);
+                            root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayUseInlineExpansion", newValue);
                         }
                     }
                 }
