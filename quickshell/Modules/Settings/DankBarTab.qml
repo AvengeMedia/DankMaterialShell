@@ -27,6 +27,7 @@ Item {
         const pos = selectedBarConfig?.position ?? SettingsData.Position.Top;
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
+    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
 
     Timer {
         id: horizontalBarChangeDebounce
@@ -1411,6 +1412,31 @@ Item {
                         property: "value"
                         value: selectedBarConfig?.widgetOutlineThickness ?? 1
                         restoreMode: Binding.RestoreBinding
+            Item {
+                visible: dankBarTab.connectedFrameModeActive
+                width: parent.width
+                implicitHeight: connectedFrameStyleNote.implicitHeight + Theme.spacingS * 2
+
+                Row {
+                    id: connectedFrameStyleNote
+                    x: Theme.spacingM
+                    width: parent.width - Theme.spacingM * 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingS
+
+                    DankIcon {
+                        name: "frame_source"
+                        size: Theme.fontSizeMedium
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Connected Frame mode keeps bar shadow override, border, and corner overrides off while active")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width - Theme.fontSizeMedium - Theme.spacingS
                     }
                 }
             }
@@ -1423,6 +1449,8 @@ Item {
                 collapsible: true
                 expanded: false
                 visible: selectedBarConfig?.enabled
+                enabled: !dankBarTab.connectedFrameModeActive
+                opacity: dankBarTab.connectedFrameModeActive ? 0.5 : 1.0
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"
