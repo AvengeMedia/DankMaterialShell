@@ -109,14 +109,39 @@ func updateArchLinux() error {
 	}
 
 	var packageName string
-	if isArchPackageInstalled("dms-shell-bin") {
-		packageName = "dms-shell-bin"
+	var isAUR bool
+	if isArchPackageInstalled("dms-shell") {
+		packageName = "dms-shell"
 	} else if isArchPackageInstalled("dms-shell-git") {
 		packageName = "dms-shell-git"
+		isAUR = true
+	} else if isArchPackageInstalled("dms-shell-bin") {
+		packageName = "dms-shell-bin"
+		isAUR = true
 	} else {
-		fmt.Println("Info: Neither dms-shell-bin nor dms-shell-git package found.")
+		fmt.Println("Info: No dms-shell package found.")
 		fmt.Println("Info: Falling back to git-based update method...")
 		return updateOtherDistros()
+	}
+
+	if !isAUR {
+		fmt.Printf("This will update %s using pacman.\n", packageName)
+		if !confirmUpdate() {
+			return errdefs.ErrUpdateCancelled
+		}
+
+		fmt.Printf("\nRunning: sudo pacman -S %s\n", packageName)
+		cmd := exec.Command("sudo", "pacman", "-S", "--noconfirm", packageName)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("Error: Failed to update using pacman: %v\n", err)
+			return err
+		}
+
+		fmt.Println("dms successfully updated")
+		return nil
 	}
 
 	var helper string

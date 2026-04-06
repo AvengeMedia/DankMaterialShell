@@ -242,11 +242,7 @@ func (a *ArchDistribution) getDMSMapping(variant deps.PackageVariant) PackageMap
 		return PackageMapping{Name: "dms-shell-git", Repository: RepoTypeAUR}
 	}
 
-	if a.packageInstalled("dms-shell-bin") {
-		return PackageMapping{Name: "dms-shell-bin", Repository: RepoTypeAUR}
-	}
-
-	return PackageMapping{Name: "dms-shell-bin", Repository: RepoTypeAUR}
+	return PackageMapping{Name: "dms-shell", Repository: RepoTypeSystem}
 }
 
 func (a *ArchDistribution) detectXwaylandSatellite() deps.Dependency {
@@ -540,7 +536,7 @@ func (a *ArchDistribution) reorderAURPackages(packages []string) []string {
 	var dmsShell []string
 
 	for _, pkg := range packages {
-		if pkg == "dms-shell-git" || pkg == "dms-shell-bin" {
+		if pkg == "dms-shell-git" {
 			dmsShell = append(dmsShell, pkg)
 		} else {
 			isDep := false
@@ -621,7 +617,7 @@ func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, 
 		}
 	}
 
-	if pkg == "dms-shell-git" || pkg == "dms-shell-bin" {
+	if pkg == "dms-shell-git" {
 		srcinfoPath := filepath.Join(packageDir, ".SRCINFO")
 		depsToRemove := []string{
 			"depends = quickshell",
@@ -644,15 +640,7 @@ func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, 
 	}
 
 	srcinfoPath = filepath.Join(packageDir, ".SRCINFO")
-	if pkg == "dms-shell-bin" {
-		progressChan <- InstallProgressMsg{
-			Phase:      PhaseAURPackages,
-			Progress:   startProgress + 0.35*(endProgress-startProgress),
-			Step:       fmt.Sprintf("Skipping dependency installation for %s (manually managed)...", pkg),
-			IsComplete: false,
-			LogOutput:  fmt.Sprintf("Dependencies for %s are installed separately", pkg),
-		}
-	} else {
+	{
 		progressChan <- InstallProgressMsg{
 			Phase:       PhaseAURPackages,
 			Progress:    startProgress + 0.3*(endProgress-startProgress),
@@ -739,42 +727,9 @@ func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, 
 		CommandInfo: "sudo pacman -U built-package",
 	}
 
-	// Find .pkg.tar* files - for split packages, install the base and any installed compositor variants
 	var files []string
-	if pkg == "dms-shell-git" || pkg == "dms-shell-bin" {
-		// For DMS split packages, install base package
-		pattern := filepath.Join(packageDir, fmt.Sprintf("%s-%s*.pkg.tar*", pkg, "*"))
-		matches, err := filepath.Glob(pattern)
-		if err == nil {
-			for _, match := range matches {
-				basename := filepath.Base(match)
-				// Always include base package
-				if !strings.Contains(basename, "hyprland") && !strings.Contains(basename, "niri") {
-					files = append(files, match)
-				}
-			}
-		}
-
-		// Also update compositor-specific packages if they're installed
-		if strings.HasSuffix(pkg, "-git") {
-			if a.packageInstalled("dms-shell-hyprland-git") {
-				hyprlandPattern := filepath.Join(packageDir, "dms-shell-hyprland-git-*.pkg.tar*")
-				if hyprlandMatches, err := filepath.Glob(hyprlandPattern); err == nil && len(hyprlandMatches) > 0 {
-					files = append(files, hyprlandMatches[0])
-				}
-			}
-			if a.packageInstalled("dms-shell-niri-git") {
-				niriPattern := filepath.Join(packageDir, "dms-shell-niri-git-*.pkg.tar*")
-				if niriMatches, err := filepath.Glob(niriPattern); err == nil && len(niriMatches) > 0 {
-					files = append(files, niriMatches[0])
-				}
-			}
-		}
-	} else {
-		// For other packages, install all built packages
-		matches, _ := filepath.Glob(filepath.Join(packageDir, "*.pkg.tar*"))
-		files = matches
-	}
+	matches, _ := filepath.Glob(filepath.Join(packageDir, "*.pkg.tar*"))
+	files = matches
 
 	if len(files) == 0 {
 		return fmt.Errorf("no package files found after building %s", pkg)
