@@ -281,7 +281,7 @@ Item {
                     tags: ["frame", "connected", "popout", "corner", "animation"]
                     text: I18n.tr("Connected Mode")
                     description: I18n.tr("Popouts emerge flush from the bar edge as one continuous piece (based on Slide)")
-                    checked: SettingsData.motionEffect === 1 && SettingsData.directionalAnimationMode === 3
+                    checked: SettingsData.connectedFrameModeActive
                     onToggled: checked => {
                         if (checked) {
                             if (SettingsData.directionalAnimationMode !== 3)

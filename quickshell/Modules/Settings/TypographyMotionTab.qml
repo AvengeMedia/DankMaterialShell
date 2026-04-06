@@ -207,7 +207,7 @@ Item {
                     settingKey: "directionalAnimationMode"
                     text: I18n.tr("Directional Behavior")
                     description: {
-                        if (SettingsData.directionalAnimationMode === 3 && SettingsData.frameEnabled)
+                        if (SettingsData.connectedFrameModeActive)
                             return I18n.tr("Popouts emerge flush from the bar edge as a single continuous piece, with corner connectors bridging the junction");
                         return I18n.tr("How the popout emerges from the DankBar");
                     }
