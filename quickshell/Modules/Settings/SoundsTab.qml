@@ -93,6 +93,16 @@ Item {
 
                     SettingsToggleRow {
                         tab: "sounds"
+                        tags: ["sound", "login", "startup", "boot"]
+                        settingKey: "soundLogin"
+                        text: I18n.tr("Login")
+                        description: I18n.tr("Play sound after logging in")
+                        checked: SettingsData.soundLogin
+                        onToggled: checked => SettingsData.set("soundLogin", checked)
+                    }
+
+                    SettingsToggleRow {
+                        tab: "sounds"
                         tags: ["sound", "notification", "new"]
                         settingKey: "soundNewNotification"
                         text: I18n.tr("New Notification")

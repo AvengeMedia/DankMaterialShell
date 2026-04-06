@@ -221,10 +221,22 @@ Item {
         }
     }
 
+    Timer {
+        id: loginSoundTimer
+        // Half a second delay before playing login sound, otherwise the sound may be cut off
+        // 50 is the minimum that seems to work, but 500 is safer
+        interval: 500
+        repeat: false
+        onTriggered: {
+            AudioService.playLoginSoundIfApplicable();
+        }
+    }
+
     Component.onCompleted: {
         dockRecreateDebounce.start();
         // Force PolkitService singleton to initialize
         PolkitService.polkitAvailable;
+        loginSoundTimer.start();
     }
 
     Loader {

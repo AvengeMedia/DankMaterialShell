@@ -434,6 +434,7 @@ Singleton {
     property bool soundNewNotification: true
     property bool soundVolumeChanged: true
     property bool soundPluggedIn: true
+    property bool soundLogin: false
 
     property int acMonitorTimeout: 0
     property int acLockTimeout: 0

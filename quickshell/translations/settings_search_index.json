@@ -5102,6 +5102,26 @@
     "description": "Play sounds for system events"
   },
   {
+    "section": "soundLogin",
+    "label": "Login",
+    "tabIndex": 15,
+    "category": "Sounds",
+    "keywords": [
+      "after",
+      "audio",
+      "boot",
+      "effects",
+      "logging",
+      "login",
+      "play",
+      "sfx",
+      "sound",
+      "sounds",
+      "startup"
+    ],
+    "description": "Play sound after logging in"
+  },
+  {
     "section": "soundNewNotification",
     "label": "New Notification",
     "tabIndex": 15,
