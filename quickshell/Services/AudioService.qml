@@ -68,6 +68,16 @@ Singleton {
         }
     }
 
+    // Used in playLoginSoundIfApplicable()
+    Process {
+        id: loginSoundChecker
+        onExited: (exitCode) => {
+            if (exitCode === 0) {
+                playLoginSound();
+            }
+    }
+}
+
     function getAvailableSinks() {
         const hidden = SessionData.hiddenOutputDeviceNames ?? [];
         return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
@@ -687,15 +697,27 @@ EOFCONFIG
         loginSound.play();
     }
 
-    function playVolumeChangeSoundIfEnabled() {
-        if (SettingsData.soundsEnabled && SettingsData.soundVolumeChanged && !notificationsAudioMuted) {
-            playVolumeChangeSound();
+    function playLoginSoundIfApplicable() {
+        if (SettingsData.soundsEnabled && SettingsData.soundLogin && !notificationsAudioMuted) {
+            // plays login sound on session start, but only if a specific file doesn't exist,
+            // to prevent it from playing on every DMS restart during the session
+            const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR");
+            const sessionId = Quickshell.env("XDG_SESSION_ID") || "0";
+
+            if (!runtimeDir) return;
+
+            const loginFile = `${runtimeDir}/danklinux.login-${sessionId}`;
+
+            // if file doesn't exist, touch it (0)
+            // If it exists, do nothing (1)
+            loginSoundChecker.command = ["sh", "-c", `[ ! -f ${loginFile} ] && touch ${loginFile}`];
+            loginSoundChecker.running = true;
         }
     }
 
-    function playLoginSoundIfEnabled() {
-        if (SettingsData.soundsEnabled && SettingsData.soundLogin && !notificationsAudioMuted) {
-            playLoginSound();
+    function playVolumeChangeSoundIfEnabled() {
+        if (SettingsData.soundsEnabled && SettingsData.soundVolumeChanged && !notificationsAudioMuted) {
+            playVolumeChangeSound();
         }
     }
 

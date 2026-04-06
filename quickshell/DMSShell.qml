@@ -228,8 +228,7 @@ Item {
         interval: 500
         repeat: false
         onTriggered: {
-            AudioService.loginSoundRequested = true;
-            AudioService.playLoginSoundIfEnabled();
+            AudioService.playLoginSoundIfApplicable();
         }
     }
 
