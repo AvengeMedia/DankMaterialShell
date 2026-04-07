@@ -297,6 +297,78 @@ FloatingWindow {
         }
     }
 
+    component SectionHeader: StyledText {
+        property string title
+        text: title
+        font.pixelSize: Theme.fontSizeMedium
+        font.weight: Font.Medium
+        color: Theme.primary
+        topPadding: Theme.spacingM
+        bottomPadding: Theme.spacingXS
+        width: parent.width
+        horizontalAlignment: Text.AlignLeft
+    }
+
+    component CheckboxRow: Row {
+        property alias checked: checkbox.checked
+        property alias label: labelText.text
+        property bool indeterminate: false
+        spacing: Theme.spacingS
+        height: 24
+
+        Rectangle {
+            id: checkbox
+            property bool checked: false
+            width: 20
+            height: 20
+            radius: 4
+            color: parent.indeterminate ? Theme.surfaceVariant : (checked ? Theme.primary : "transparent")
+            border.color: parent.indeterminate ? Theme.outlineButton : (checked ? Theme.primary : Theme.outlineButton)
+            border.width: 2
+            anchors.verticalCenter: parent.verticalCenter
+
+            DankIcon {
+                anchors.centerIn: parent
+                name: parent.parent.indeterminate ? "remove" : "check"
+                size: 12
+                color: parent.parent.indeterminate ? Theme.surfaceVariantText : Theme.background
+                visible: parent.checked || parent.parent.indeterminate
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    if (parent.parent.indeterminate) {
+                        parent.parent.indeterminate = false;
+                        parent.checked = true;
+                    } else {
+                        parent.checked = !parent.checked;
+                    }
+                }
+            }
+        }
+
+        StyledText {
+            id: labelText
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceText
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
+    component InputField: Rectangle {
+        id: inputFieldRect
+        default property alias contentData: inputFieldRect.data
+        property bool hasFocus: false
+        width: parent.width
+        height: root.inputFieldHeight
+        radius: Theme.cornerRadius
+        color: Theme.surfaceHover
+        border.color: hasFocus ? Theme.primary : Theme.outlineStrong
+        border.width: hasFocus ? 2 : 1
+    }
+
     FocusScope {
         anchors.fill: parent
         focus: true
@@ -375,7 +447,7 @@ FloatingWindow {
                 width: flickable.width - Theme.spacingM
                 spacing: Theme.spacingXS
 
-                WindowRuleInputField {
+                InputField {
                     hasFocus: nameInput.activeFocus
                     DankTextField {
                         id: nameInput
@@ -388,11 +460,11 @@ FloatingWindow {
                     }
                 }
 
-                WindowRuleSectionHeader {
+                SectionHeader {
                     title: I18n.tr("Match Criteria")
                 }
 
-                WindowRuleInputField {
+                InputField {
                     hasFocus: appIdInput.activeFocus
                     DankTextField {
                         id: appIdInput
@@ -409,7 +481,7 @@ FloatingWindow {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    WindowRuleInputField {
+                    InputField {
                         width: addTitleBtn.visible ? parent.width - addTitleBtn.width - Theme.spacingS : parent.width
                         hasFocus: titleInput.activeFocus
                         DankTextField {
@@ -442,7 +514,7 @@ FloatingWindow {
                     }
                 }
 
-                WindowRuleSectionHeader {
+                SectionHeader {
                     title: I18n.tr("Window Opening")
                 }
 
@@ -450,24 +522,24 @@ FloatingWindow {
                     width: parent.width
                     spacing: Theme.spacingL
 
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: floatingToggle
                         label: I18n.tr("Float")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: maximizedToggle
                         label: I18n.tr("Maximize")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: fullscreenToggle
                         label: I18n.tr("Fullscreen")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: maximizedToEdgesToggle
                         label: I18n.tr("Max to Edges")
                         visible: isNiri
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: openFocusedToggle
                         label: I18n.tr("Focus")
                         visible: isNiri
@@ -491,7 +563,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: outputInput.activeFocus
                             DankTextField {
@@ -518,7 +590,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: workspaceInput.activeFocus
                             DankTextField {
@@ -551,7 +623,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: columnWidthInput.activeFocus
                             DankTextField {
@@ -578,7 +650,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: windowHeightInput.activeFocus
                             DankTextField {
@@ -594,7 +666,7 @@ FloatingWindow {
                     }
                 }
 
-                WindowRuleSectionHeader {
+                SectionHeader {
                     title: I18n.tr("Dynamic Properties")
                 }
 
@@ -602,7 +674,7 @@ FloatingWindow {
                     width: parent.width
                     spacing: Theme.spacingM
 
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: opacityEnabled
                         label: I18n.tr("Opacity")
                         anchors.verticalCenter: parent.verticalCenter
@@ -624,19 +696,19 @@ FloatingWindow {
                     spacing: Theme.spacingL
                     visible: isNiri
 
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: vrrToggle
                         label: I18n.tr("VRR On-Demand")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: clipToGeometryToggle
                         label: I18n.tr("Clip to Geometry")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: tiledStateToggle
                         label: I18n.tr("Tiled State")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: drawBorderBgToggle
                         label: I18n.tr("Border with BG")
                     }
@@ -697,7 +769,7 @@ FloatingWindow {
                     spacing: Theme.spacingM
                     visible: isNiri
 
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: scrollFactorEnabled
                         label: I18n.tr("Scroll Factor")
                         anchors.verticalCenter: parent.verticalCenter
@@ -718,7 +790,7 @@ FloatingWindow {
                     width: parent.width
                     spacing: Theme.spacingM
 
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: cornerRadiusEnabled
                         label: I18n.tr("Corner Radius")
                         anchors.verticalCenter: parent.verticalCenter
@@ -735,7 +807,7 @@ FloatingWindow {
                     }
                 }
 
-                WindowRuleSectionHeader {
+                SectionHeader {
                     title: I18n.tr("Size Constraints")
                 }
 
@@ -755,7 +827,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: minWidthInput.activeFocus
                             DankTextField {
@@ -782,7 +854,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: maxWidthInput.activeFocus
                             DankTextField {
@@ -809,7 +881,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: minHeightInput.activeFocus
                             DankTextField {
@@ -836,7 +908,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: maxHeightInput.activeFocus
                             DankTextField {
@@ -852,7 +924,7 @@ FloatingWindow {
                     }
                 }
 
-                WindowRuleSectionHeader {
+                SectionHeader {
                     title: I18n.tr("Hyprland Options")
                     visible: isHyprland
                 }
@@ -862,43 +934,43 @@ FloatingWindow {
                     spacing: Theme.spacingL
                     visible: isHyprland
 
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: tileToggle
                         label: I18n.tr("Tile")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: noFocusToggle
                         label: I18n.tr("No Focus")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: noBorderToggle
                         label: I18n.tr("No Border")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: noShadowToggle
                         label: I18n.tr("No Shadow")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: noDimToggle
                         label: I18n.tr("No Dim")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: noBlurToggle
                         label: I18n.tr("No Blur")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: noAnimToggle
                         label: I18n.tr("No Anim")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: noRoundingToggle
                         label: I18n.tr("No Rounding")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: pinToggle
                         label: I18n.tr("Pin")
                     }
-                    WindowRuleCheckboxRow {
+                    CheckboxRow {
                         id: opaqueToggle
                         label: I18n.tr("Opaque")
                     }
@@ -921,7 +993,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: sizeInput.activeFocus
                             DankTextField {
@@ -948,7 +1020,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: moveInput.activeFocus
                             DankTextField {
@@ -981,7 +1053,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: monitorInput.activeFocus
                             DankTextField {
@@ -1008,7 +1080,7 @@ FloatingWindow {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        WindowRuleInputField {
+                        InputField {
                             width: parent.width
                             hasFocus: hyprWorkspaceInput.activeFocus
                             DankTextField {
