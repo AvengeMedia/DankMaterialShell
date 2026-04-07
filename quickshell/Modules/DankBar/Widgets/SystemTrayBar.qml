@@ -16,8 +16,11 @@ BasePill {
     enableCursor: false
 
     property var parentWindow: null
+    property var widgetData: null
+    property string section: "right"
     property bool isAtBottom: false
     property bool isAutoHideBar: false
+    property bool useOverflowPopup: !widgetData?.trayUseInlineExpansion
     readonly property var hiddenTrayIds: {
         const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
         return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
@@ -38,6 +41,76 @@ BasePill {
             return id;
         }
         return `${id}::${tooltipTitle}`;
+    }
+
+    function trayIconSourceFor(trayItem) {
+        let icon = trayItem && trayItem.icon;
+        if (typeof icon === 'string' || icon instanceof String) {
+            if (icon === "")
+                return "";
+            if (icon.includes("?path=")) {
+                const split = icon.split("?path=");
+                if (split.length !== 2)
+                    return icon;
+                const name = split[0];
+                const path = split[1];
+                let fileName = name.substring(name.lastIndexOf("/") + 1);
+                if (fileName.startsWith("dropboxstatus")) {
+                    fileName = `hicolor/16x16/status/${fileName}`;
+                }
+                return `file://${path}/${fileName}`;
+            }
+            if (icon.startsWith("/") && !icon.startsWith("file://"))
+                return `file://${icon}`;
+            return icon;
+        }
+        return "";
+    }
+
+    function activateInlineTrayItem(trayItem, anchorItem) {
+        if (!trayItem)
+            return;
+        if (!trayItem.onlyMenu) {
+            trayItem.activate();
+            return;
+        }
+        if (!trayItem.hasMenu)
+            return;
+        root.showForTrayItem(trayItem, anchorItem, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+    }
+
+    function openInlineTrayContextMenu(trayItem, areaItem, mouse, anchorItem) {
+        if (!trayItem) {
+            return;
+        }
+        if (!trayItem.hasMenu) {
+            const gp = areaItem.mapToGlobal(mouse.x, mouse.y);
+            root.callContextMenuFallback(trayItem.id, Math.round(gp.x), Math.round(gp.y));
+            return;
+        }
+        root.showForTrayItem(trayItem, anchorItem, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+    }
+
+    function toggleIconName() {
+        const edge = root.axis?.edge;
+        if (root.useOverflowPopup) {
+            switch (edge) {
+            case "left":
+                return root.menuOpen ? "keyboard_arrow_left" : "keyboard_arrow_right";
+            case "right":
+                return root.menuOpen ? "keyboard_arrow_right" : "keyboard_arrow_left";
+            case "bottom":
+                return root.menuOpen ? "keyboard_arrow_down" : "keyboard_arrow_up";
+            case "top":
+                return root.menuOpen ? "keyboard_arrow_up" : "keyboard_arrow_down";
+            }
+        }
+
+        if (edge === "left" || edge === "right") {
+            return root.menuOpen == (root.section !== "right") ? "keyboard_arrow_up" : "keyboard_arrow_down";
+        }
+
+        return root.menuOpen != (root.section === "right") ? "keyboard_arrow_left" : "keyboard_arrow_right";
     }
 
     // ! TODO - replace with either native dbus client (like plugins use) or just a DMS cli or something
@@ -78,6 +151,13 @@ BasePill {
                 item: item
             }))
     readonly property var hiddenBarItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property bool reverseInlineHorizontal: !useOverflowPopup && !isVerticalOrientation && section === "right"
+    readonly property bool reverseInlineVertical: !useOverflowPopup && isVerticalOrientation && section === "right"
+    readonly property var displayedMainBarItems: reverseInlineHorizontal ? [...mainBarItems].reverse() : mainBarItems
+    readonly property var displayedInlineExpandedItems: (reverseInlineHorizontal ? [...hiddenBarItems].reverse() : hiddenBarItems).map(item => ({
+                key: getTrayItemKey(item),
+                item: item
+            }))
 
     function moveTrayItemInFullOrder(visibleFromIndex, visibleToIndex) {
         if (visibleFromIndex === visibleToIndex || visibleFromIndex < 0 || visibleToIndex < 0)
@@ -103,6 +183,7 @@ BasePill {
     property int dropTargetIndex: -1
     property bool suppressShiftAnimation: false
     readonly property bool hasHiddenItems: allTrayItems.length > mainBarItems.length
+    readonly property bool inlineExpanded: hasHiddenItems && !useOverflowPopup && menuOpen
     visible: allTrayItems.length > 0
     opacity: allTrayItems.length > 0 ? 1 : 0
 
@@ -198,10 +279,11 @@ BasePill {
         id: rowComp
         Row {
             spacing: 0
+            layoutDirection: root.reverseInlineHorizontal ? Qt.RightToLeft : Qt.LeftToRight
 
             Repeater {
                 model: ScriptModel {
-                    values: root.mainBarItems
+                    values: root.displayedMainBarItems
                     objectProp: "key"
                 }
 
@@ -209,29 +291,7 @@ BasePill {
                     id: delegateRoot
                     property var trayItem: modelData.item
                     property string itemKey: modelData.key
-                    property string iconSource: {
-                        let icon = trayItem && trayItem.icon;
-                        if (typeof icon === 'string' || icon instanceof String) {
-                            if (icon === "")
-                                return "";
-                            if (icon.includes("?path=")) {
-                                const split = icon.split("?path=");
-                                if (split.length !== 2)
-                                    return icon;
-                                const name = split[0];
-                                const path = split[1];
-                                let fileName = name.substring(name.lastIndexOf("/") + 1);
-                                if (fileName.startsWith("dropboxstatus")) {
-                                    fileName = `hicolor/16x16/status/${fileName}`;
-                                }
-                                return `file://${path}/${fileName}`;
-                            }
-                            if (icon.startsWith("/") && !icon.startsWith("file://"))
-                                return `file://${icon}`;
-                            return icon;
-                        }
-                        return "";
-                    }
+                    property string iconSource: root.trayIconSourceFor(trayItem)
 
                     width: root.trayItemSize
                     height: root.barThickness
@@ -371,7 +431,8 @@ BasePill {
                             }
                             if (!delegateRoot.trayItem.hasMenu)
                                 return;
-                            root.menuOpen = false;
+                            if (root.useOverflowPopup)
+                                root.menuOpen = false;
                             root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
                         }
 
@@ -380,8 +441,8 @@ BasePill {
                                 const distance = Math.abs(mouse.x - dragHandler.dragStartPos.x);
                                 if (distance > 5) {
                                     dragHandler.dragging = true;
-                                    root.draggedIndex = index;
-                                    root.dropTargetIndex = index;
+                                    root.draggedIndex = root.reverseInlineHorizontal ? (root.mainBarItems.length - 1 - index) : index;
+                                    root.dropTargetIndex = root.draggedIndex;
                                 }
                             }
                             if (!dragHandler.dragging)
@@ -391,7 +452,8 @@ BasePill {
                             dragHandler.dragAxisOffset = axisOffset;
                             const itemSize = root.trayItemSize;
                             const slotOffset = Math.round(axisOffset / itemSize);
-                            const newTargetIndex = Math.max(0, Math.min(root.mainBarItems.length - 1, index + slotOffset));
+                            const visualTargetIndex = Math.max(0, Math.min(root.mainBarItems.length - 1, index + slotOffset));
+                            const newTargetIndex = root.reverseInlineHorizontal ? (root.mainBarItems.length - 1 - visualTargetIndex) : visualTargetIndex;
                             if (newTargetIndex !== root.dropTargetIndex) {
                                 root.dropTargetIndex = newTargetIndex;
                             }
@@ -407,7 +469,8 @@ BasePill {
                                 root.callContextMenuFallback(delegateRoot.trayItem.id, Math.round(gp.x), Math.round(gp.y));
                                 return;
                             }
-                            root.menuOpen = false;
+                            if (root.useOverflowPopup)
+                                root.menuOpen = false;
                             root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
                         }
                     }
@@ -429,7 +492,7 @@ BasePill {
 
                     DankIcon {
                         anchors.centerIn: parent
-                        name: root.menuOpen ? "expand_less" : "expand_more"
+                        name: root.toggleIconName()
                         size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                         color: Theme.widgetTextColor
                     }
@@ -451,6 +514,301 @@ BasePill {
                     }
                 }
             }
+
+            Repeater {
+                model: ScriptModel {
+                    values: root.displayedInlineExpandedItems
+                    objectProp: "key"
+                }
+
+                delegate: inlineExpandedTrayItemDelegate
+            }
+        }
+    }
+
+    Component {
+        id: inlineExpandedTrayItemDelegate
+
+        Item {
+            property var trayItem: modelData.item
+            property string itemKey: modelData.key
+            property string iconSource: root.trayIconSourceFor(trayItem)
+
+            width: root.isVerticalOrientation ? root.barThickness : (root.inlineExpanded ? root.trayItemSize : 0)
+            height: root.isVerticalOrientation ? (root.inlineExpanded ? root.trayItemSize : 0) : root.barThickness
+            visible: width > 0 || height > 0
+
+            Behavior on width {
+                enabled: !root.isVerticalOrientation
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            Behavior on height {
+                enabled: root.isVerticalOrientation
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            Rectangle {
+                id: inlineVisualContent
+                width: root.trayItemSize
+                height: root.trayItemSize
+                x: root.isVerticalOrientation ? Math.round((parent.width - width) / 2) : (root.reverseInlineHorizontal ? parent.width - width : 0)
+                y: root.isVerticalOrientation ? (root.reverseInlineVertical ? parent.height - height : 0) : Math.round((parent.height - height) / 2)
+                radius: Theme.cornerRadius
+                color: inlineTrayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                opacity: root.inlineExpanded ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+
+                IconImage {
+                    id: inlineIconImg
+                    anchors.centerIn: parent
+                    width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    source: iconSource
+                    asynchronous: true
+                    smooth: true
+                    mipmap: true
+                    visible: status === Image.Ready
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: !inlineIconImg.visible
+                    text: {
+                        const itemId = trayItem?.id || "";
+                        if (!itemId)
+                            return "?";
+                        return itemId.charAt(0).toUpperCase();
+                    }
+                    font.pixelSize: 10
+                    color: Theme.widgetTextColor
+                }
+
+                DankRipple {
+                    id: inlineItemRipple
+                    cornerRadius: Theme.cornerRadius
+                }
+            }
+
+            MouseArea {
+                id: inlineTrayItemArea
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                cursorShape: Qt.PointingHandCursor
+                enabled: root.inlineExpanded
+
+                onPressed: mouse => {
+                    const pos = mapToItem(inlineVisualContent, mouse.x, mouse.y);
+                    inlineItemRipple.trigger(pos.x, pos.y);
+                }
+
+                onClicked: mouse => {
+                    if (mouse.button === Qt.LeftButton) {
+                        root.activateInlineTrayItem(trayItem, inlineVisualContent);
+                        return;
+                    }
+                    if (mouse.button !== Qt.RightButton)
+                        return;
+                    root.openInlineTrayContextMenu(trayItem, inlineTrayItemArea, mouse, inlineVisualContent);
+                }
+            }
+        }
+    }
+
+    Component {
+        id: verticalMainTrayItemDelegate
+
+        Item {
+            property var trayItem: modelData.item
+            property string itemKey: modelData.key
+            property string iconSource: root.trayIconSourceFor(trayItem)
+
+            width: root.barThickness
+            height: root.trayItemSize
+            z: dragHandler.dragging ? 100 : 0
+
+            property real shiftOffset: {
+                if (root.draggedIndex < 0)
+                    return 0;
+                if (index === root.draggedIndex)
+                    return 0;
+                const dragIdx = root.draggedIndex;
+                const dropIdx = root.dropTargetIndex;
+                const shiftAmount = root.trayItemSize;
+                if (dropIdx < 0)
+                    return 0;
+                if (dragIdx < dropIdx && index > dragIdx && index <= dropIdx)
+                    return -shiftAmount;
+                if (dragIdx > dropIdx && index >= dropIdx && index < dragIdx)
+                    return shiftAmount;
+                return 0;
+            }
+
+            transform: Translate {
+                y: shiftOffset
+                Behavior on y {
+                    enabled: !root.suppressShiftAnimation
+                    NumberAnimation {
+                        duration: 150
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
+            Item {
+                id: dragHandler
+                anchors.fill: parent
+                property bool dragging: false
+                property point dragStartPos: Qt.point(0, 0)
+                property real dragAxisOffset: 0
+                property bool longPressing: false
+
+                Timer {
+                    id: longPressTimer
+                    interval: 400
+                    repeat: false
+                    onTriggered: dragHandler.longPressing = true
+                }
+            }
+
+            Rectangle {
+                id: visualContent
+                width: root.trayItemSize
+                height: root.trayItemSize
+                anchors.centerIn: parent
+                radius: Theme.cornerRadius
+                color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                border.width: dragHandler.dragging ? 2 : 0
+                border.color: Theme.primary
+                opacity: dragHandler.dragging ? 0.8 : 1.0
+
+                transform: Translate {
+                    y: dragHandler.dragging ? dragHandler.dragAxisOffset : 0
+                }
+
+                IconImage {
+                    id: iconImg
+                    anchors.centerIn: parent
+                    width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    source: iconSource
+                    asynchronous: true
+                    smooth: true
+                    mipmap: true
+                    visible: status === Image.Ready
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: !iconImg.visible
+                    text: {
+                        const itemId = trayItem?.id || "";
+                        if (!itemId)
+                            return "?";
+                        return itemId.charAt(0).toUpperCase();
+                    }
+                    font.pixelSize: 10
+                    color: Theme.widgetTextColor
+                }
+
+                DankRipple {
+                    id: itemRipple
+                    cornerRadius: Theme.cornerRadius
+                }
+            }
+
+            MouseArea {
+                id: trayItemArea
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                cursorShape: dragHandler.longPressing ? Qt.DragMoveCursor : Qt.PointingHandCursor
+
+                onPressed: mouse => {
+                    const pos = mapToItem(visualContent, mouse.x, mouse.y);
+                    itemRipple.trigger(pos.x, pos.y);
+                    if (mouse.button === Qt.LeftButton) {
+                        dragHandler.dragStartPos = Qt.point(mouse.x, mouse.y);
+                        longPressTimer.start();
+                    }
+                }
+
+                onReleased: mouse => {
+                    longPressTimer.stop();
+                    const wasDragging = dragHandler.dragging;
+                    const didReorder = wasDragging && root.dropTargetIndex >= 0 && root.dropTargetIndex !== root.draggedIndex;
+
+                    if (didReorder) {
+                        root.suppressShiftAnimation = true;
+                        root.moveTrayItemInFullOrder(root.draggedIndex, root.dropTargetIndex);
+                        Qt.callLater(() => root.suppressShiftAnimation = false);
+                    }
+
+                    dragHandler.longPressing = false;
+                    dragHandler.dragging = false;
+                    dragHandler.dragAxisOffset = 0;
+                    root.draggedIndex = -1;
+                    root.dropTargetIndex = -1;
+
+                    if (wasDragging || mouse.button !== Qt.LeftButton)
+                        return;
+
+                    if (!trayItem)
+                        return;
+                    if (!trayItem.onlyMenu) {
+                        trayItem.activate();
+                        return;
+                    }
+                    if (!trayItem.hasMenu)
+                        return;
+                    if (root.useOverflowPopup)
+                        root.menuOpen = false;
+                    root.showForTrayItem(trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+                }
+
+                onPositionChanged: mouse => {
+                    if (dragHandler.longPressing && !dragHandler.dragging) {
+                        const distance = Math.abs(mouse.y - dragHandler.dragStartPos.y);
+                        if (distance > 5) {
+                            dragHandler.dragging = true;
+                            root.draggedIndex = index;
+                            root.dropTargetIndex = root.draggedIndex;
+                        }
+                    }
+                    if (!dragHandler.dragging)
+                        return;
+
+                    const axisOffset = mouse.y - dragHandler.dragStartPos.y;
+                    dragHandler.dragAxisOffset = axisOffset;
+                    const itemSize = root.trayItemSize;
+                    const slotOffset = Math.round(axisOffset / itemSize);
+                    const newTargetIndex = Math.max(0, Math.min(root.mainBarItems.length - 1, index + slotOffset));
+                    if (newTargetIndex !== root.dropTargetIndex) {
+                        root.dropTargetIndex = newTargetIndex;
+                    }
+                }
+
+                onClicked: mouse => {
+                    if (dragHandler.dragging)
+                        return;
+                    if (mouse.button !== Qt.RightButton)
+                        return;
+                    root.openInlineTrayContextMenu(trayItem, trayItemArea, mouse, visualContent);
+                }
+            }
         }
     }
 
@@ -459,219 +817,23 @@ BasePill {
         Column {
             spacing: 0
 
+            // Column lacks layoutDirection, so we use four repeaters with mutually exclusive models to control whether main items or expanded items appear above/ below the toggle button.
+            // When reverseInlineVertical is true the first and third repeaters are empty and the second and fourth are active, and vice-versa.
+            // Because items are swapped between repeaters rather than reversed within a single list, vertical drag-and-drop indices don't need remapping (unlike the horizontal RightToLeft case).
             Repeater {
                 model: ScriptModel {
-                    values: root.mainBarItems
+                    values: root.reverseInlineVertical ? [] : root.displayedMainBarItems
                     objectProp: "key"
                 }
+                delegate: verticalMainTrayItemDelegate
+            }
 
-                delegate: Item {
-                    id: delegateRoot
-                    property var trayItem: modelData.item
-                    property string itemKey: modelData.key
-                    property string iconSource: {
-                        let icon = trayItem && trayItem.icon;
-                        if (typeof icon === 'string' || icon instanceof String) {
-                            if (icon === "")
-                                return "";
-                            if (icon.includes("?path=")) {
-                                const split = icon.split("?path=");
-                                if (split.length !== 2)
-                                    return icon;
-                                const name = split[0];
-                                const path = split[1];
-                                let fileName = name.substring(name.lastIndexOf("/") + 1);
-                                if (fileName.startsWith("dropboxstatus")) {
-                                    fileName = `hicolor/16x16/status/${fileName}`;
-                                }
-                                return `file://${path}/${fileName}`;
-                            }
-                            if (icon.startsWith("/") && !icon.startsWith("file://"))
-                                return `file://${icon}`;
-                            return icon;
-                        }
-                        return "";
-                    }
-
-                    width: root.barThickness
-                    height: root.trayItemSize
-                    z: dragHandler.dragging ? 100 : 0
-
-                    property real shiftOffset: {
-                        if (root.draggedIndex < 0)
-                            return 0;
-                        if (index === root.draggedIndex)
-                            return 0;
-                        const dragIdx = root.draggedIndex;
-                        const dropIdx = root.dropTargetIndex;
-                        const shiftAmount = root.trayItemSize;
-                        if (dropIdx < 0)
-                            return 0;
-                        if (dragIdx < dropIdx && index > dragIdx && index <= dropIdx)
-                            return -shiftAmount;
-                        if (dragIdx > dropIdx && index >= dropIdx && index < dragIdx)
-                            return shiftAmount;
-                        return 0;
-                    }
-
-                    transform: Translate {
-                        y: delegateRoot.shiftOffset
-                        Behavior on y {
-                            enabled: !root.suppressShiftAnimation
-                            NumberAnimation {
-                                duration: 150
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-                    }
-
-                    Item {
-                        id: dragHandler
-                        anchors.fill: parent
-                        property bool dragging: false
-                        property point dragStartPos: Qt.point(0, 0)
-                        property real dragAxisOffset: 0
-                        property bool longPressing: false
-
-                        Timer {
-                            id: longPressTimer
-                            interval: 400
-                            repeat: false
-                            onTriggered: dragHandler.longPressing = true
-                        }
-                    }
-
-                    Rectangle {
-                        id: visualContent
-                        width: root.trayItemSize
-                        height: root.trayItemSize
-                        anchors.centerIn: parent
-                        radius: Theme.cornerRadius
-                        color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
-                        border.width: dragHandler.dragging ? 2 : 0
-                        border.color: Theme.primary
-                        opacity: dragHandler.dragging ? 0.8 : 1.0
-
-                        transform: Translate {
-                            y: dragHandler.dragging ? dragHandler.dragAxisOffset : 0
-                        }
-
-                        IconImage {
-                            id: iconImg
-                            anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                            source: delegateRoot.iconSource
-                            asynchronous: true
-                            smooth: true
-                            mipmap: true
-                            visible: status === Image.Ready
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-                            visible: !iconImg.visible
-                            text: {
-                                const itemId = trayItem?.id || "";
-                                if (!itemId)
-                                    return "?";
-                                return itemId.charAt(0).toUpperCase();
-                            }
-                            font.pixelSize: 10
-                            color: Theme.widgetTextColor
-                        }
-
-                        DankRipple {
-                            id: itemRipple
-                            cornerRadius: Theme.cornerRadius
-                        }
-                    }
-
-                    MouseArea {
-                        id: trayItemArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                        cursorShape: dragHandler.longPressing ? Qt.DragMoveCursor : Qt.PointingHandCursor
-
-                        onPressed: mouse => {
-                            const pos = mapToItem(visualContent, mouse.x, mouse.y);
-                            itemRipple.trigger(pos.x, pos.y);
-                            if (mouse.button === Qt.LeftButton) {
-                                dragHandler.dragStartPos = Qt.point(mouse.x, mouse.y);
-                                longPressTimer.start();
-                            }
-                        }
-
-                        onReleased: mouse => {
-                            longPressTimer.stop();
-                            const wasDragging = dragHandler.dragging;
-                            const didReorder = wasDragging && root.dropTargetIndex >= 0 && root.dropTargetIndex !== root.draggedIndex;
-
-                            if (didReorder) {
-                                root.suppressShiftAnimation = true;
-                                root.moveTrayItemInFullOrder(root.draggedIndex, root.dropTargetIndex);
-                                Qt.callLater(() => root.suppressShiftAnimation = false);
-                            }
-
-                            dragHandler.longPressing = false;
-                            dragHandler.dragging = false;
-                            dragHandler.dragAxisOffset = 0;
-                            root.draggedIndex = -1;
-                            root.dropTargetIndex = -1;
-
-                            if (wasDragging || mouse.button !== Qt.LeftButton)
-                                return;
-
-                            if (!delegateRoot.trayItem)
-                                return;
-                            if (!delegateRoot.trayItem.onlyMenu) {
-                                delegateRoot.trayItem.activate();
-                                return;
-                            }
-                            if (!delegateRoot.trayItem.hasMenu)
-                                return;
-                            root.menuOpen = false;
-                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
-                        }
-
-                        onPositionChanged: mouse => {
-                            if (dragHandler.longPressing && !dragHandler.dragging) {
-                                const distance = Math.abs(mouse.y - dragHandler.dragStartPos.y);
-                                if (distance > 5) {
-                                    dragHandler.dragging = true;
-                                    root.draggedIndex = index;
-                                    root.dropTargetIndex = index;
-                                }
-                            }
-                            if (!dragHandler.dragging)
-                                return;
-
-                            const axisOffset = mouse.y - dragHandler.dragStartPos.y;
-                            dragHandler.dragAxisOffset = axisOffset;
-                            const itemSize = root.trayItemSize;
-                            const slotOffset = Math.round(axisOffset / itemSize);
-                            const newTargetIndex = Math.max(0, Math.min(root.mainBarItems.length - 1, index + slotOffset));
-                            if (newTargetIndex !== root.dropTargetIndex) {
-                                root.dropTargetIndex = newTargetIndex;
-                            }
-                        }
-
-                        onClicked: mouse => {
-                            if (dragHandler.dragging)
-                                return;
-                            if (mouse.button !== Qt.RightButton)
-                                return;
-                            if (!delegateRoot.trayItem?.hasMenu) {
-                                const gp = trayItemArea.mapToGlobal(mouse.x, mouse.y);
-                                root.callContextMenuFallback(delegateRoot.trayItem.id, Math.round(gp.x), Math.round(gp.y));
-                                return;
-                            }
-                            root.menuOpen = false;
-                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
-                        }
-                    }
+            Repeater {
+                model: ScriptModel {
+                    values: root.reverseInlineVertical ? root.displayedInlineExpandedItems : []
+                    objectProp: "key"
                 }
+                delegate: inlineExpandedTrayItemDelegate
             }
 
             Item {
@@ -689,14 +851,7 @@ BasePill {
 
                     DankIcon {
                         anchors.centerIn: parent
-                        name: {
-                            const edge = root.axis?.edge;
-                            if (edge === "left") {
-                                return root.menuOpen ? "chevron_left" : "chevron_right";
-                            } else {
-                                return root.menuOpen ? "chevron_right" : "chevron_left";
-                            }
-                        }
+                        name: root.toggleIconName()
                         size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                         color: Theme.widgetTextColor
                     }
@@ -718,6 +873,22 @@ BasePill {
                     }
                 }
             }
+
+            Repeater {
+                model: ScriptModel {
+                    values: root.reverseInlineVertical ? [] : root.displayedInlineExpandedItems
+                    objectProp: "key"
+                }
+                delegate: inlineExpandedTrayItemDelegate
+            }
+
+            Repeater {
+                model: ScriptModel {
+                    values: root.reverseInlineVertical ? root.displayedMainBarItems : []
+                    objectProp: "key"
+                }
+                delegate: verticalMainTrayItemDelegate
+            }
         }
     }
 
@@ -733,7 +904,7 @@ BasePill {
             blurRadius: Theme.cornerRadius
         }
 
-        visible: root.menuOpen
+        visible: root.useOverflowPopup && root.menuOpen
         screen: root.parentScreen
         WlrLayershell.layer: WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
@@ -749,13 +920,14 @@ BasePill {
 
         HyprlandFocusGrab {
             windows: [overflowMenu]
-            active: CompositorService.useHyprlandFocusGrab && root.menuOpen
+            active: CompositorService.useHyprlandFocusGrab && root.useOverflowPopup && root.menuOpen
         }
 
         Connections {
             target: PopoutManager
             function onPopoutOpening() {
-                root.menuOpen = false;
+                if (root.useOverflowPopup)
+                    root.menuOpen = false;
             }
         }
 
@@ -1021,30 +1193,7 @@ BasePill {
 
                     delegate: Rectangle {
                         property var trayItem: modelData
-                        property string iconSource: {
-                            let icon = trayItem?.icon;
-                            if (typeof icon === 'string' || icon instanceof String) {
-                                if (icon === "")
-                                    return "";
-                                if (icon.includes("?path=")) {
-                                    const split = icon.split("?path=");
-                                    if (split.length !== 2)
-                                        return icon;
-                                    const name = split[0];
-                                    const path = split[1];
-                                    let fileName = name.substring(name.lastIndexOf("/") + 1);
-                                    if (fileName.startsWith("dropboxstatus")) {
-                                        fileName = `hicolor/16x16/status/${fileName}`;
-                                    }
-                                    return `file://${path}/${fileName}`;
-                                }
-                                if (icon.startsWith("/") && !icon.startsWith("file://")) {
-                                    return `file://${icon}`;
-                                }
-                                return icon;
-                            }
-                            return "";
-                        }
+                        property string iconSource: root.trayIconSourceFor(trayItem)
 
                         width: root.trayItemSize + 4
                         height: root.trayItemSize + 4
@@ -1313,7 +1462,8 @@ BasePill {
                 onVisibleChanged: {
                     if (visible) {
                         updatePosition();
-                        root.menuOpen = false;
+                        if (root.useOverflowPopup)
+                            root.menuOpen = false;
                         PopoutManager.closeAllPopouts();
                         ModalManager.closeAllModalsExcept(null);
                     }
