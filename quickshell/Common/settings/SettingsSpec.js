@@ -140,6 +140,7 @@ var SPEC = {
     workspaceNameIcons: { def: {} },
     waveProgressEnabled: { def: true },
     scrollTitleEnabled: { def: true },
+    mediaAdaptiveWidthEnabled: { def: true },
     audioVisualizerEnabled: { def: true },
     audioScrollMode: { def: "volume" },
     audioWheelScrollAmount: { def: 5 },
