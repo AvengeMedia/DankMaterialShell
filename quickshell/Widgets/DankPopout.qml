@@ -34,6 +34,8 @@ Item {
     property bool _resizeActive: false
     property real _surfaceMarginLeft: 0
     property real _surfaceW: 0
+    property string _connectedChromeToken: ""
+    property int _connectedChromeSerial: 0
 
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
@@ -151,6 +153,98 @@ Item {
         setBarContext(pos, bottomGap);
     }
 
+    function _nextConnectedChromeToken() {
+        _connectedChromeSerial += 1;
+        return layerNamespace + ":" + _connectedChromeSerial + ":" + (new Date()).getTime();
+    }
+
+    function _connectedChromeState(visibleOverride) {
+        const visible = visibleOverride !== undefined ? !!visibleOverride : contentWindow.visible;
+        return {
+            "visible": visible,
+            "barSide": contentContainer.connectedBarSide,
+            "bodyX": root.alignedX,
+            "bodyY": root.alignedY,
+            "bodyW": root.alignedWidth,
+            "bodyH": root.alignedHeight,
+            "animX": contentContainer.animX,
+            "animY": contentContainer.animY,
+            "screen": root.screen ? root.screen.name : ""
+        };
+    }
+
+    function _publishConnectedChromeState(forceClaim, visibleOverride) {
+        if (!SettingsData.connectedFrameModeActive || !root.screen || !_connectedChromeToken)
+            return;
+
+        const state = _connectedChromeState(visibleOverride);
+        if (forceClaim || !ConnectedModeState.hasPopoutOwner(_connectedChromeToken)) {
+            ConnectedModeState.claimPopout(_connectedChromeToken, state);
+        } else {
+            ConnectedModeState.updatePopout(_connectedChromeToken, state);
+        }
+    }
+
+    function _releaseConnectedChromeState() {
+        if (_connectedChromeToken)
+            ConnectedModeState.releasePopout(_connectedChromeToken);
+        _connectedChromeToken = "";
+    }
+
+    // ─── Exposed animation state for ConnectedModeState ────────────────────
+    readonly property real contentAnimX: contentContainer.animX
+    readonly property real contentAnimY: contentContainer.animY
+
+    // ─── ConnectedModeState sync ────────────────────────────────────────────
+    function _syncPopoutChromeState() {
+        if (!SettingsData.connectedFrameModeActive) {
+            _releaseConnectedChromeState();
+            return;
+        }
+        if (!root.screen) {
+            _releaseConnectedChromeState();
+            return;
+        }
+        if (!contentWindow.visible && !shouldBeVisible)
+            return;
+        if (!_connectedChromeToken)
+            _connectedChromeToken = _nextConnectedChromeToken();
+        _publishConnectedChromeState(contentWindow.visible && !ConnectedModeState.hasPopoutOwner(_connectedChromeToken));
+    }
+
+    onAlignedXChanged: _syncPopoutChromeState()
+    onAlignedYChanged: _syncPopoutChromeState()
+    onAlignedWidthChanged: _syncPopoutChromeState()
+    onContentAnimXChanged: _syncPopoutChromeState()
+    onContentAnimYChanged: _syncPopoutChromeState()
+    onScreenChanged: _syncPopoutChromeState()
+    onEffectiveBarPositionChanged: _syncPopoutChromeState()
+
+    Connections {
+        target: contentWindow
+        function onVisibleChanged() {
+            if (contentWindow.visible)
+                root._publishConnectedChromeState(true);
+            else
+                root._releaseConnectedChromeState();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onConnectedFrameModeActiveChanged() {
+            if (SettingsData.connectedFrameModeActive) {
+                if (contentWindow.visible || root.shouldBeVisible) {
+                    if (!root._connectedChromeToken)
+                        root._connectedChromeToken = root._nextConnectedChromeToken();
+                    root._publishConnectedChromeState(true);
+                }
+            } else {
+                root._releaseConnectedChromeState();
+            }
+        }
+    }
+
     readonly property bool useBackgroundWindow: !CompositorService.isHyprland || CompositorService.useHyprlandFocusGrab
 
     function updateSurfacePosition() {
@@ -186,6 +280,13 @@ Item {
             contentContainer.animX = Theme.snap(contentContainer.offsetX, root.dpr);
             contentContainer.animY = Theme.snap(contentContainer.offsetY, root.dpr);
             contentContainer.scaleValue = root.animationScaleCollapsed;
+        }
+
+        if (SettingsData.connectedFrameModeActive) {
+            _connectedChromeToken = _nextConnectedChromeToken();
+            _publishConnectedChromeState(true, true);
+        } else {
+            _connectedChromeToken = "";
         }
 
         if (useBackgroundWindow) {
@@ -254,11 +355,14 @@ Item {
         }
     }
 
+    Component.onDestruction: _releaseConnectedChromeState()
+
     readonly property real screenWidth: screen ? screen.width : 0
     readonly property real screenHeight: screen ? screen.height : 0
     readonly property real dpr: screen ? screen.devicePixelRatio : 1
     readonly property real frameInset: {
-        if (!SettingsData.frameEnabled) return 0;
+        if (!SettingsData.frameEnabled)
+            return 0;
         const ft = SettingsData.frameThickness;
         const fr = SettingsData.frameRounding;
         const ccr = Theme.connectedCornerRadius;
@@ -324,6 +428,7 @@ Item {
     }
 
     onAlignedHeightChanged: {
+        _syncPopoutChromeState();
         if (!suspendShadowWhileResizing || !shouldBeVisible)
             return;
         _resizeActive = true;
@@ -536,43 +641,20 @@ Item {
         WindowBlur {
             id: popoutBlur
             targetWindow: contentWindow
-            blurEnabled: root.effectiveSurfaceBlurEnabled
+            blurEnabled: root.effectiveSurfaceBlurEnabled && !SettingsData.connectedFrameModeActive
 
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: Theme.isConnectedEffect
-                || (typeof SettingsData !== "undefined"
-                    && Theme.isDirectionalEffect
-                    && SettingsData.directionalAnimationMode !== 2)
+            readonly property bool trackBlurFromBarEdge: Theme.isConnectedEffect || (typeof SettingsData !== "undefined" && Theme.isDirectionalEffect && SettingsData.directionalAnimationMode !== 2)
 
             // Directional popouts clip to the bar edge, so the blur needs to grow from
             // that same edge instead of translating through the bar before settling.
-            readonly property real _dyClamp: (contentContainer.barTop || contentContainer.barBottom)
-                ? Math.max(-contentContainer.height, Math.min(contentContainer.animY, contentContainer.height))
-                : 0
-            readonly property real _dxClamp: (contentContainer.barLeft || contentContainer.barRight)
-                ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width))
-                : 0
+            readonly property real _dyClamp: (contentContainer.barTop || contentContainer.barBottom) ? Math.max(-contentContainer.height, Math.min(contentContainer.animY, contentContainer.height)) : 0
+            readonly property real _dxClamp: (contentContainer.barLeft || contentContainer.barRight) ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width)) : 0
 
-            blurX: trackBlurFromBarEdge
-                ? contentContainer.x + (contentContainer.barRight ? _dxClamp : 0)
-                : contentContainer.x + contentContainer.width * (1 - s) * 0.5
-                  + Theme.snap(contentContainer.animX, root.dpr)
-                  - contentContainer.horizontalConnectorExtent * s
-            blurY: trackBlurFromBarEdge
-                ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0)
-                : contentContainer.y + contentContainer.height * (1 - s) * 0.5
-                  + Theme.snap(contentContainer.animY, root.dpr)
-                  - contentContainer.verticalConnectorExtent * s
-            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0)
-                ? (trackBlurFromBarEdge
-                    ? Math.max(0, contentContainer.width - Math.abs(_dxClamp))
-                    : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s)
-                : 0
-            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0)
-                ? (trackBlurFromBarEdge
-                    ? Math.max(0, contentContainer.height - Math.abs(_dyClamp))
-                    : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s)
-                : 0
+            blurX: trackBlurFromBarEdge ? contentContainer.x + (contentContainer.barRight ? _dxClamp : 0) : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr) - contentContainer.horizontalConnectorExtent * s
+            blurY: trackBlurFromBarEdge ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0) : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s
+            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.width - Math.abs(_dxClamp)) : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s) : 0
+            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) : 0
             blurRadius: Theme.isConnectedEffect ? Theme.connectedCornerRadius : Theme.connectedSurfaceRadius
         }
 
@@ -663,9 +745,7 @@ Item {
             readonly property string connectedBarSide: barTop ? "top" : (barBottom ? "bottom" : (barLeft ? "left" : "right"))
             readonly property real surfaceRadius: Theme.connectedSurfaceRadius
             readonly property color surfaceColor: Theme.popupLayerColor(Theme.surfaceContainer)
-            readonly property color surfaceBorderColor: Theme.isConnectedEffect
-                ? "transparent"
-                : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
+            readonly property color surfaceBorderColor: Theme.isConnectedEffect ? "transparent" : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
             readonly property real surfaceBorderWidth: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
             readonly property real surfaceTopLeftRadius: Theme.isConnectedEffect && (barTop || barLeft) ? 0 : surfaceRadius
             readonly property real surfaceTopRightRadius: Theme.isConnectedEffect && (barTop || barRight) ? 0 : surfaceRadius
@@ -821,13 +901,9 @@ Item {
             Item {
                 id: directionalClipMask
 
-                readonly property bool shouldClip: Theme.isDirectionalEffect
-                    && typeof SettingsData !== "undefined"
-                    && SettingsData.directionalAnimationMode > 0
+                readonly property bool shouldClip: Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0
                 readonly property real clipOversize: 1000
-                readonly property real connectedClipAllowance: Theme.isConnectedEffect
-                    ? Math.ceil(root.shadowRenderPadding + BlurService.borderWidth + 2)
-                    : 0
+                readonly property real connectedClipAllowance: Theme.isConnectedEffect ? Math.ceil(root.shadowRenderPadding + BlurService.borderWidth + 2) : 0
 
                 clip: shouldClip
 
@@ -908,7 +984,7 @@ Item {
 
                             Item {
                                 anchors.fill: parent
-                                visible: Theme.isConnectedEffect
+                                visible: Theme.isConnectedEffect && !SettingsData.connectedFrameModeActive
                                 clip: false
 
                                 Rectangle {
@@ -930,6 +1006,7 @@ Item {
                                     spacing: 0
                                     connectorRadius: Theme.connectedCornerRadius
                                     color: contentContainer.surfaceColor
+                                    dpr: root.dpr
                                     x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
                                     y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
                                 }
@@ -941,6 +1018,7 @@ Item {
                                     spacing: 0
                                     connectorRadius: Theme.connectedCornerRadius
                                     color: contentContainer.surfaceColor
+                                    dpr: root.dpr
                                     x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
                                     y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
                                 }
@@ -985,28 +1063,6 @@ Item {
                                     color: contentContainer.surfaceColor
                                     border.color: contentContainer.surfaceBorderColor
                                     border.width: contentContainer.surfaceBorderWidth
-                                }
-
-                                ConnectedCorner {
-                                    visible: Theme.isConnectedEffect
-                                    barSide: contentContainer.connectedBarSide
-                                    placement: "left"
-                                    spacing: 0
-                                    connectorRadius: Theme.connectedCornerRadius
-                                    color: contentContainer.surfaceColor
-                                    x: Theme.snap(contentContainer.connectorX(0, contentWrapper.width, placement, spacing), root.dpr)
-                                    y: Theme.snap(contentContainer.connectorY(0, contentWrapper.height, placement, spacing), root.dpr)
-                                }
-
-                                ConnectedCorner {
-                                    visible: Theme.isConnectedEffect
-                                    barSide: contentContainer.connectedBarSide
-                                    placement: "right"
-                                    spacing: 0
-                                    connectorRadius: Theme.connectedCornerRadius
-                                    color: contentContainer.surfaceColor
-                                    x: Theme.snap(contentContainer.connectorX(0, contentWrapper.width, placement, spacing), root.dpr)
-                                    y: Theme.snap(contentContainer.connectorY(0, contentWrapper.height, placement, spacing), root.dpr)
                                 }
                             }
 

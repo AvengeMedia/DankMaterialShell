@@ -975,7 +975,7 @@ Singleton {
     readonly property bool isConnectedEffect: AnimVariants.isConnectedEffect
     readonly property real connectedCornerRadius: {
         if (typeof SettingsData === "undefined") return 12;
-        return SettingsData.frameEnabled ? SettingsData.frameRounding : cornerRadius;
+        return SettingsData.connectedFrameModeActive ? SettingsData.frameRounding : cornerRadius;
     }
     readonly property color connectedSurfaceColor: {
         if (typeof SettingsData === "undefined")
