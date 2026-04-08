@@ -56,6 +56,9 @@ Item {
                     settingKey: "frameRounding"
                     tags: ["frame", "border", "rounding", "radius", "corner"]
                     text: I18n.tr("Border Radius")
+                    description: SettingsData.connectedFrameModeActive
+                        ? I18n.tr("Controls the radius of the frame and all connected popout, dock, and modal surfaces while Connected Mode is active")
+                        : I18n.tr("Controls the frame border radius. This also becomes the connected surface radius whenever Connected Mode is active")
                     unit: "px"
                     minimum: 0
                     maximum: 100

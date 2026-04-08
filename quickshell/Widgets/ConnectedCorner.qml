@@ -2,17 +2,7 @@ import QtQuick
 import QtQuick.Shapes
 import qs.Common
 
-// ConnectedCorner — Seam-complement connector that fills the void between
-// a bar's rounded corner and a popout's flush edge, creating a seamless junction.
-//
-// Usage: Place as a sibling to contentWrapper inside unrollCounteract (DankPopout)
-// or as a sibling to dockBackground (Dock). Position using contentWrapper.x/y.
-//
-// barSide:   "top" | "bottom" | "left" | "right"  — which edge the bar is on
-// placement: "left" | "right"                      — which lateral end of that edge
-// spacing:   gap between bar surface and popout surface (storedBarSpacing, ~4px)
-// connectorRadius: bar corner radius to match (frameRounding or Theme.cornerRadius)
-// color:     fill color matching the popout surface
+// Concave arc connector filling the gap between a bar corner and an adjacent surface.
 
 Item {
     id: root
@@ -22,9 +12,13 @@ Item {
     property real spacing: 4
     property real connectorRadius: 12
     property color color: "transparent"
+    property real edgeStrokeWidth: 0
+    property color edgeStrokeColor: color
+    property real dpr: 1
 
     readonly property bool isHorizontalBar: barSide === "top" || barSide === "bottom"
     readonly property bool isPlacementLeft: placement === "left"
+    readonly property real _edgeStrokeWidth: Math.max(0, edgeStrokeWidth)
     readonly property string arcCorner: {
         if (barSide === "top")
             return isPlacementLeft ? "bottomLeft" : "bottomRight";
@@ -113,37 +107,46 @@ Item {
         }
     }
 
-    // Horizontal bar: connector is tall (bridges vertical gap), narrow (corner radius wide)
-    // Vertical bar: connector is wide (bridges horizontal gap), short (corner radius tall)
     width: isHorizontalBar ? connectorRadius : (spacing + connectorRadius)
     height: isHorizontalBar ? (spacing + connectorRadius) : connectorRadius
 
     Shape {
-        anchors.fill: parent
+        x: -root._edgeStrokeWidth
+        y: -root._edgeStrokeWidth
+        width: root.width + root._edgeStrokeWidth * 2
+        height: root.height + root._edgeStrokeWidth * 2
+        asynchronous: false
+        antialiasing: true
         preferredRendererType: Shape.CurveRenderer
+        layer.enabled: true
+        layer.smooth: true
+        layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
         ShapePath {
             fillColor: root.color
-            strokeColor: "transparent"
-            strokeWidth: 0
-            startX: root.pathStartX
-            startY: root.pathStartY
+            strokeColor: root._edgeStrokeWidth > 0 ? root.edgeStrokeColor : "transparent"
+            strokeWidth: root._edgeStrokeWidth * 2
+            joinStyle: ShapePath.RoundJoin
+            capStyle: ShapePath.RoundCap
+            fillRule: ShapePath.WindingFill
+            startX: root.pathStartX + root._edgeStrokeWidth
+            startY: root.pathStartY + root._edgeStrokeWidth
 
             PathLine {
-                x: root.firstLineX
-                y: root.firstLineY
+                x: root.firstLineX + root._edgeStrokeWidth
+                y: root.firstLineY + root._edgeStrokeWidth
             }
 
             PathLine {
-                x: root.secondLineX
-                y: root.secondLineY
+                x: root.secondLineX + root._edgeStrokeWidth
+                y: root.secondLineY + root._edgeStrokeWidth
             }
 
             PathAngleArc {
-                centerX: root.arcCenterX
-                centerY: root.arcCenterY
-                radiusX: root.width
-                radiusY: root.height
+                centerX: root.arcCenterX + root._edgeStrokeWidth
+                centerY: root.arcCenterY + root._edgeStrokeWidth
+                radiusX: root.connectorRadius
+                radiusY: root.connectorRadius
                 startAngle: root.arcStartAngle
                 sweepAngle: root.arcSweepAngle
             }

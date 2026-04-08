@@ -11,9 +11,7 @@ import qs.Modules.Settings.Widgets
 Item {
     id: themeColorsTab
 
-    readonly property bool connectedFrameModeActive: SettingsData.frameEnabled
-        && SettingsData.motionEffect === 1
-        && SettingsData.directionalAnimationMode === 3
+    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
     property var cachedIconThemes: SettingsData.availableIconThemes
     property var cachedCursorThemes: SettingsData.availableCursorThemes
     property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
@@ -1639,7 +1637,9 @@ Item {
                     tags: ["corner", "radius", "rounded", "square"]
                     settingKey: "cornerRadius"
                     text: I18n.tr("Corner Radius")
-                    description: I18n.tr("0 = square corners")
+                    description: themeColorsTab.connectedFrameModeActive
+                        ? I18n.tr("Controls general UI rounding. Connected frame popouts, docks, and modal surfaces follow Border Radius in the Frame tab while Connected Frame mode is active")
+                        : I18n.tr("0 = square corners")
                     value: SettingsData.cornerRadius
                     minimum: 0
                     maximum: 32
