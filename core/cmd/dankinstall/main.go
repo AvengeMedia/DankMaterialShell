@@ -132,26 +132,7 @@ func runHeadless() error {
 		// downstream components (distros, config deployer) that write to it.
 		// Use an explicit stop signal because this code does not own the
 		// runner log channel and cannot assume it will be closed.
-		logCh := runner.GetLogChan()
-		drainStop := make(chan struct{})
-		drainDone := make(chan struct{})
-		go func() {
-			defer close(drainDone)
-			for {
-				select {
-				case <-drainStop:
-					return
-				case _, ok := <-logCh:
-					if !ok {
-						return
-					}
-				}
-			}
-		}()
-		defer func() {
-			close(drainStop)
-			<-drainDone
-		}()
+		defer drainLogChan(runner.GetLogChan())()
 	}
 
 	if err := runner.Run(); err != nil {
@@ -194,26 +175,7 @@ func runTUI() error {
 		// downstream components (distros, config deployer) that write to it.
 		// Use an explicit stop signal because this code does not own the
 		// model log channel and cannot assume it will be closed.
-		logCh := model.GetLogChan()
-		drainStop := make(chan struct{})
-		drainDone := make(chan struct{})
-		go func() {
-			defer close(drainDone)
-			for {
-				select {
-				case <-drainStop:
-					return
-				case _, ok := <-logCh:
-					if !ok {
-						return
-					}
-				}
-			}
-		}()
-		defer func() {
-			close(drainStop)
-			<-drainDone
-		}()
+		defer drainLogChan(model.GetLogChan())()
 	}
 
 	p := tea.NewProgram(model, tea.WithAltScreen())
@@ -228,4 +190,30 @@ func runTUI() error {
 		fmt.Printf("\nFull logs are available at: %s\n", logFilePath)
 	}
 	return nil
+}
+
+// drainLogChan starts a goroutine that discards all messages from logCh,
+// preventing blocking sends from deadlocking downstream components. It returns
+// a cleanup function that signals the goroutine to stop and waits for it to
+// exit. Callers should defer the returned function.
+func drainLogChan(logCh <-chan string) func() {
+	drainStop := make(chan struct{})
+	drainDone := make(chan struct{})
+	go func() {
+		defer close(drainDone)
+		for {
+			select {
+			case <-drainStop:
+				return
+			case _, ok := <-logCh:
+				if !ok {
+					return
+				}
+			}
+		}
+	}()
+	return func() {
+		close(drainStop)
+		<-drainDone
+	}
 }
