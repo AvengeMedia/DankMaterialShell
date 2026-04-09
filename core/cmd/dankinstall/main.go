@@ -30,8 +30,8 @@ var rootCmd = &cobra.Command{
 	Short: "Install DankMaterialShell and its dependencies",
 	Long: `dankinstall sets up DankMaterialShell with your chosen compositor and terminal.
 
-Without flags, it launches an interactive TUI. When --compositor and --term
-are provided, it runs in headless (unattended) mode suitable for scripting.
+Without flags, it launches an interactive TUI. Providing either --compositor
+or --term activates headless (unattended) mode, which requires both flags.
 
 Headless mode requires cached sudo credentials. Run 'sudo -v' beforehand, or
 configure passwordless sudo for your user.`,
