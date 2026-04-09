@@ -21,7 +21,14 @@ type FileLogger struct {
 
 func NewFileLogger() (*FileLogger, error) {
 	timestamp := time.Now().Unix()
-	logPath := fmt.Sprintf("/tmp/dankinstall-%d.log", timestamp)
+
+	// Use DANKINSTALL_LOG_DIR if set, otherwise fall back to /var/tmp.
+	// /var/tmp survives arch-chroot (unlike /tmp which gets a fresh tmpfs).
+	logDir := os.Getenv("DANKINSTALL_LOG_DIR")
+	if logDir == "" {
+		logDir = "/var/tmp"
+	}
+	logPath := fmt.Sprintf("%s/dankinstall-%d.log", logDir, timestamp)
 
 	file, err := os.Create(logPath)
 	if err != nil {
