@@ -150,3 +150,28 @@ func TestLog(t *testing.T) {
 	}
 	// If we reach here without hanging, the non-blocking send works
 }
+
+func TestRunRequiresYes(t *testing.T) {
+	// Verify that ErrConfirmationRequired is a distinct sentinel error
+	if ErrConfirmationRequired == nil {
+		t.Fatal("ErrConfirmationRequired should not be nil")
+	}
+	expected := "confirmation required: pass --yes to proceed"
+	if ErrConfirmationRequired.Error() != expected {
+		t.Errorf("ErrConfirmationRequired = %q, want %q", ErrConfirmationRequired.Error(), expected)
+	}
+}
+
+func TestConfigYesStoredCorrectly(t *testing.T) {
+	// Yes=false (default) should be stored
+	rNo := NewRunner(Config{Compositor: "niri", Terminal: "ghostty", Yes: false})
+	if rNo.cfg.Yes {
+		t.Error("cfg.Yes = true, want false")
+	}
+
+	// Yes=true should be stored
+	rYes := NewRunner(Config{Compositor: "niri", Terminal: "ghostty", Yes: true})
+	if !rYes.cfg.Yes {
+		t.Error("cfg.Yes = false, want true")
+	}
+}

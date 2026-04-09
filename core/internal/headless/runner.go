@@ -13,6 +13,10 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
 )
 
+// ErrConfirmationRequired is returned when --yes is not set and the user
+// must explicitly confirm the operation.
+var ErrConfirmationRequired = fmt.Errorf("confirmation required: pass --yes to proceed")
+
 // Config holds all CLI parameters for unattended installation.
 type Config struct {
 	Compositor  string // "niri" or "hyprland"
@@ -150,6 +154,15 @@ func (r *Runner) Run() error {
 		fmt.Fprintf(os.Stdout, "%s%-30s %s\n", marker, dep.Name, status)
 	}
 	fmt.Fprintln(os.Stdout)
+
+	// 5b. Require explicit confirmation unless --yes is set
+	if !r.cfg.Yes {
+		fmt.Fprintln(os.Stdout, "The above packages will be installed and all configurations will be replaced.")
+		fmt.Fprintln(os.Stdout, "Existing config files will be backed up before replacement.")
+		fmt.Fprintln(os.Stdout, "Re-run with --yes (-y) to proceed.")
+		r.log("Aborted: --yes not set")
+		return ErrConfirmationRequired
+	}
 
 	// 6. Authenticate sudo
 	sudoPassword, err := r.resolveSudoPassword()
