@@ -124,6 +124,8 @@ Singleton {
 
     property string vpnLastConnected: ""
 
+    property string lastPlayerIdentity: ""
+
     property var deviceMaxVolumes: ({})
     property var hiddenOutputDeviceNames: []
     property var hiddenInputDeviceNames: []

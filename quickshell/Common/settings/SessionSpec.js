@@ -75,6 +75,8 @@ var SPEC = {
 
     vpnLastConnected: { def: "" },
 
+    lastPlayerIdentity: { def: "" },
+
     deviceMaxVolumes: { def: {} },
     hiddenOutputDeviceNames: { def: [] },
     hiddenInputDeviceNames: { def: [] },
