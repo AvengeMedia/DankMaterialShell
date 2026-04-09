@@ -8,11 +8,12 @@ QtObject {
     property var modelData
     property int topMargin: 0
     readonly property bool compactMode: SettingsData.notificationCompactMode
+    readonly property bool connectedFrameMode: SettingsData.connectedFrameModeActive
     readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
     readonly property real popupIconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
-    readonly property real popupSpacing: compactMode ? 0 : Theme.spacingXS
+    readonly property real popupSpacing: connectedFrameMode ? 0 : (compactMode ? 0 : Theme.spacingXS)
     readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
     readonly property int baseNotificationHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing + popupSpacing
     property var popupWindows: []

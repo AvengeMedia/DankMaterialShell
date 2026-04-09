@@ -19,7 +19,7 @@ Singleton {
         })
 
     // Popout state (updated by DankPopout when connectedFrameModeActive)
-    property string popoutOwnerToken: ""
+    property string popoutOwnerId: ""
     property bool popoutVisible: false
     property string popoutBarSide: "top"
     property real popoutBodyX: 0
@@ -36,20 +36,20 @@ Singleton {
     // Dock slide offsets — hot-path updates separated from full geometry state
     property var dockSlides: ({})
 
-    function hasPopoutOwner(token) {
-        return !!token && popoutOwnerToken === token;
+    function hasPopoutOwner(claimId) {
+        return !!claimId && popoutOwnerId === claimId;
     }
 
-    function claimPopout(token, state) {
-        if (!token)
+    function claimPopout(claimId, state) {
+        if (!claimId)
             return false;
 
-        popoutOwnerToken = token;
-        return updatePopout(token, state);
+        popoutOwnerId = claimId;
+        return updatePopout(claimId, state);
     }
 
-    function updatePopout(token, state) {
-        if (!hasPopoutOwner(token) || !state)
+    function updatePopout(claimId, state) {
+        if (!hasPopoutOwner(claimId) || !state)
             return false;
 
         if (state.visible !== undefined)
@@ -74,11 +74,11 @@ Singleton {
         return true;
     }
 
-    function releasePopout(token) {
-        if (!hasPopoutOwner(token))
+    function releasePopout(claimId) {
+        if (!hasPopoutOwner(claimId))
             return false;
 
-        popoutOwnerToken = "";
+        popoutOwnerId = "";
         popoutVisible = false;
         popoutBarSide = "top";
         popoutBodyX = 0;
@@ -148,6 +148,57 @@ Singleton {
             next[k] = dockSlides[k];
         next[screenName] = { "x": Number(x), "y": Number(y) };
         dockSlides = next;
+        return true;
+    }
+
+    // ─── Notification state (per screen, updated by NotificationSurface) ──────
+
+    readonly property var emptyNotificationState: ({
+        "visible": false,
+        "barSide": "top",
+        "bodyX": 0,
+        "bodyY": 0,
+        "bodyW": 0,
+        "bodyH": 0
+    })
+
+    property var notificationStates: ({})
+
+    function _cloneNotificationStates() {
+        const next = {};
+        for (const screenName in notificationStates)
+            next[screenName] = notificationStates[screenName];
+        return next;
+    }
+
+    function _normalizeNotificationState(state) {
+        return {
+            "visible": !!(state && state.visible),
+            "barSide": state && state.barSide ? state.barSide : "top",
+            "bodyX": Number(state && state.bodyX !== undefined ? state.bodyX : 0),
+            "bodyY": Number(state && state.bodyY !== undefined ? state.bodyY : 0),
+            "bodyW": Number(state && state.bodyW !== undefined ? state.bodyW : 0),
+            "bodyH": Number(state && state.bodyH !== undefined ? state.bodyH : 0)
+        };
+    }
+
+    function setNotificationState(screenName, state) {
+        if (!screenName || !state)
+            return false;
+
+        const next = _cloneNotificationStates();
+        next[screenName] = _normalizeNotificationState(state);
+        notificationStates = next;
+        return true;
+    }
+
+    function clearNotificationState(screenName) {
+        if (!screenName || !notificationStates[screenName])
+            return false;
+
+        const next = _cloneNotificationStates();
+        delete next[screenName];
+        notificationStates = next;
         return true;
     }
 }
