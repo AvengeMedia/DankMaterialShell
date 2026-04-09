@@ -39,11 +39,10 @@ type LayerSurface struct {
 	wlSurface   *client.Surface
 	layerSurf   *wlr_layer_shell.ZwlrLayerSurfaceV1
 	viewport    *wp_viewporter.WpViewport
-	wlPool      *client.ShmPool
-	wlBuffer    *client.Buffer
-	bufferBusy  bool
-	oldPool     *client.ShmPool
-	oldBuffer   *client.Buffer
+	wlPools     [2]*client.ShmPool
+	wlBuffers   [2]*client.Buffer
+	slotBusy    [2]bool
+	needsRedraw bool
 	scopyBuffer *client.Buffer
 	configured  bool
 	hidden      bool
@@ -136,6 +135,7 @@ func (p *Picker) Run() (*Color, error) {
 			break
 		}
 
+		p.flushRedraws()
 		p.checkDone()
 	}
 
@@ -161,6 +161,15 @@ func (p *Picker) checkDone() {
 			p.running = false
 			return
 		}
+	}
+}
+
+func (p *Picker) flushRedraws() {
+	for _, ls := range p.surfaces {
+		if !ls.needsRedraw {
+			continue
+		}
+		p.redrawSurface(ls)
 	}
 }
 
@@ -507,47 +516,45 @@ func (p *Picker) captureForSurface(ls *LayerSurface) {
 }
 
 func (p *Picker) redrawSurface(ls *LayerSurface) {
+	slot := ls.state.FrontIndex()
+	if ls.slotBusy[slot] {
+		ls.needsRedraw = true
+		return
+	}
+
 	var renderBuf *ShmBuffer
-	if ls.hidden {
+	switch {
+	case ls.hidden:
 		renderBuf = ls.state.RedrawScreenOnly()
-	} else {
+	default:
 		renderBuf = ls.state.Redraw()
 	}
 	if renderBuf == nil {
 		return
 	}
 
-	if ls.oldBuffer != nil {
-		ls.oldBuffer.Destroy()
-		ls.oldBuffer = nil
-	}
-	if ls.oldPool != nil {
-		ls.oldPool.Destroy()
-		ls.oldPool = nil
+	ls.needsRedraw = false
+
+	if ls.wlPools[slot] == nil {
+		pool, err := p.shm.CreatePool(renderBuf.Fd(), int32(renderBuf.Size()))
+		if err != nil {
+			return
+		}
+		ls.wlPools[slot] = pool
+
+		wlBuffer, err := pool.CreateBuffer(0, int32(renderBuf.Width), int32(renderBuf.Height), int32(renderBuf.Stride), uint32(ls.state.ScreenFormat()))
+		if err != nil {
+			return
+		}
+		ls.wlBuffers[slot] = wlBuffer
+
+		s := slot
+		wlBuffer.SetReleaseHandler(func(e client.BufferReleaseEvent) {
+			ls.slotBusy[s] = false
+		})
 	}
 
-	ls.oldPool = ls.wlPool
-	ls.oldBuffer = ls.wlBuffer
-	ls.wlPool = nil
-	ls.wlBuffer = nil
-
-	pool, err := p.shm.CreatePool(renderBuf.Fd(), int32(renderBuf.Size()))
-	if err != nil {
-		return
-	}
-	ls.wlPool = pool
-
-	wlBuffer, err := pool.CreateBuffer(0, int32(renderBuf.Width), int32(renderBuf.Height), int32(renderBuf.Stride), uint32(ls.state.ScreenFormat()))
-	if err != nil {
-		return
-	}
-	ls.wlBuffer = wlBuffer
-
-	lsRef := ls
-	wlBuffer.SetReleaseHandler(func(e client.BufferReleaseEvent) {
-		lsRef.bufferBusy = false
-	})
-	ls.bufferBusy = true
+	ls.slotBusy[slot] = true
 
 	logicalW, logicalH := ls.state.LogicalSize()
 	if logicalW == 0 || logicalH == 0 {
@@ -566,7 +573,7 @@ func (p *Picker) redrawSurface(ls *LayerSurface) {
 		}
 		_ = ls.wlSurface.SetBufferScale(bufferScale)
 	}
-	_ = ls.wlSurface.Attach(wlBuffer, 0, 0)
+	_ = ls.wlSurface.Attach(ls.wlBuffers[slot], 0, 0)
 	_ = ls.wlSurface.Damage(0, 0, int32(logicalW), int32(logicalH))
 	_ = ls.wlSurface.Commit()
 
@@ -634,7 +641,7 @@ func (p *Picker) setupPointerHandlers() {
 		}
 
 		p.activeSurface.state.OnPointerMotion(e.SurfaceX, e.SurfaceY)
-		p.redrawSurface(p.activeSurface)
+		p.activeSurface.needsRedraw = true
 	})
 
 	p.pointer.SetLeaveHandler(func(e client.PointerLeaveEvent) {
@@ -655,7 +662,7 @@ func (p *Picker) setupPointerHandlers() {
 			return
 		}
 		p.activeSurface.state.OnPointerMotion(e.SurfaceX, e.SurfaceY)
-		p.redrawSurface(p.activeSurface)
+		p.activeSurface.needsRedraw = true
 	})
 
 	p.pointer.SetButtonHandler(func(e client.PointerButtonEvent) {
@@ -679,17 +686,13 @@ func (p *Picker) cleanup() {
 		if ls.scopyBuffer != nil {
 			ls.scopyBuffer.Destroy()
 		}
-		if ls.oldBuffer != nil {
-			ls.oldBuffer.Destroy()
-		}
-		if ls.oldPool != nil {
-			ls.oldPool.Destroy()
-		}
-		if ls.wlBuffer != nil {
-			ls.wlBuffer.Destroy()
-		}
-		if ls.wlPool != nil {
-			ls.wlPool.Destroy()
+		for i := range ls.wlBuffers {
+			if ls.wlBuffers[i] != nil {
+				ls.wlBuffers[i].Destroy()
+			}
+			if ls.wlPools[i] != nil {
+				ls.wlPools[i].Destroy()
+			}
 		}
 		if ls.viewport != nil {
 			ls.viewport.Destroy()

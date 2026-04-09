@@ -6,6 +6,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import qs.Services
 
 Singleton {
     id: root
@@ -58,6 +59,10 @@ Singleton {
     }
 
     readonly property bool screensharingActive: {
+        if (CompositorService.isNiri && NiriService.hasActiveCast) {
+            return true
+        }
+
         if (!Pipewire.ready || !Pipewire.nodes?.values) {
             return false
         }
@@ -69,6 +74,12 @@ Singleton {
             }
 
             if ((node.type & PwNodeType.VideoSource) === PwNodeType.VideoSource) {
+                if (looksLikeScreencast(node)) {
+                    return true
+                }
+            }
+
+            if (node.properties && node.properties["media.class"] === "Stream/Output/Video") {
                 if (looksLikeScreencast(node)) {
                     return true
                 }
@@ -110,8 +121,9 @@ Singleton {
         }
         const appName = (node.properties && node.properties["application.name"] || "").toLowerCase()
         const nodeName = (node.name || "").toLowerCase()
-        const combined = appName + " " + nodeName
-        return /xdg-desktop-portal|xdpw|screencast|screen|gnome shell|kwin|obs/.test(combined)
+        const mediaName = (node.properties && node.properties["media.name"] || "").toLowerCase()
+        const combined = appName + " " + nodeName + " " + mediaName
+        return /xdg-desktop-portal|xdpw|screencast|screen-cast|screen|gnome shell|kwin|obs|niri/.test(combined)
     }
 
     function getMicrophoneStatus() {

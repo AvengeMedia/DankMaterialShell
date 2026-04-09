@@ -100,7 +100,7 @@ DankPopout {
                 if (currentPlayer && currentPlayer !== player && currentPlayer.canPause) {
                     currentPlayer.pause();
                 }
-                MprisController.activePlayer = player;
+                MprisController.setActivePlayer(player);
                 root.__hideDropdowns();
             }
             onDeviceSelected: device => {

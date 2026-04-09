@@ -274,6 +274,12 @@ func (s *SurfaceState) FrontRenderBuffer() *ShmBuffer {
 	return s.renderBufs[s.front]
 }
 
+func (s *SurfaceState) FrontIndex() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.front
+}
+
 func (s *SurfaceState) SwapBuffers() {
 	s.mu.Lock()
 	s.front ^= 1
