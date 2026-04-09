@@ -188,7 +188,7 @@ Headless mode activates when `--compositor` or `--term` is provided.
 
 ### Log file location
 
-`dankinstall` writes logs to `/var/tmp` by default.
+`dankinstall` writes logs to `/tmp` by default.
 Set the `DANKINSTALL_LOG_DIR` environment variable to override the log directory.
 
 ## Supported Distributions
