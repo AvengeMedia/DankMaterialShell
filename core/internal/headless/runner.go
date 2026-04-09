@@ -315,7 +315,7 @@ func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]
 //
 // Returns:
 //   - nil when --replace-configs-all is set (deployer treats nil as "replace all")
-//   - a map with all known configs set to false when neither flag is set (safe default)
+//   - a map with all known configs set to false when neither flag is set (deploy only if config file is missing on disk)
 //   - a map with requested configs true, all others false for --replace-configs
 //   - an error when both flags are set or an invalid config name is given
 func (r *Runner) buildReplaceConfigs() (map[string]bool, error) {
