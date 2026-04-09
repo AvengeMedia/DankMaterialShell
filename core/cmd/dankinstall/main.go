@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/headless"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -64,6 +65,26 @@ func main() {
 
 func runDankinstall(cmd *cobra.Command, args []string) error {
 	headlessMode := compositor != "" || term != ""
+
+	if !headlessMode {
+		// Reject headless-only flags when running in TUI mode.
+		headlessOnly := []string{
+			"include-deps",
+			"exclude-deps",
+			"replace-configs",
+			"replace-configs-all",
+			"yes",
+		}
+		var set []string
+		for _, name := range headlessOnly {
+			if cmd.Flags().Changed(name) {
+				set = append(set, "--"+name)
+			}
+		}
+		if len(set) > 0 {
+			return fmt.Errorf("flags %s are only valid in headless mode (requires both --compositor and --term)", strings.Join(set, ", "))
+		}
+	}
 
 	if headlessMode {
 		return runHeadless()
