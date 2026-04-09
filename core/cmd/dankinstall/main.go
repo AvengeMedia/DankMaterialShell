@@ -127,6 +127,16 @@ func runHeadless() error {
 				fmt.Fprintf(os.Stderr, "Warning: Failed to close log file: %v\n", err)
 			}
 		}()
+	} else {
+		// Drain the log channel to prevent blocking sends from deadlocking
+		// downstream components (distros, config deployer) that write to it.
+		drainDone := make(chan struct{})
+		go func() {
+			defer close(drainDone)
+			for range runner.GetLogChan() {
+			}
+		}()
+		defer func() { <-drainDone }()
 	}
 
 	if err := runner.Run(); err != nil {
@@ -164,6 +174,16 @@ func runTUI() error {
 
 	if fileLogger != nil {
 		fileLogger.StartListening(model.GetLogChan())
+	} else {
+		// Drain the log channel to prevent blocking sends from deadlocking
+		// downstream components (distros, config deployer) that write to it.
+		drainDone := make(chan struct{})
+		go func() {
+			defer close(drainDone)
+			for range model.GetLogChan() {
+			}
+		}()
+		defer func() { <-drainDone }()
 	}
 
 	p := tea.NewProgram(model, tea.WithAltScreen())
