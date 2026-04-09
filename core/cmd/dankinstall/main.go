@@ -130,13 +130,28 @@ func runHeadless() error {
 	} else {
 		// Drain the log channel to prevent blocking sends from deadlocking
 		// downstream components (distros, config deployer) that write to it.
+		// Use an explicit stop signal because this code does not own the
+		// runner log channel and cannot assume it will be closed.
+		logCh := runner.GetLogChan()
+		drainStop := make(chan struct{})
 		drainDone := make(chan struct{})
 		go func() {
 			defer close(drainDone)
-			for range runner.GetLogChan() {
+			for {
+				select {
+				case <-drainStop:
+					return
+				case _, ok := <-logCh:
+					if !ok {
+						return
+					}
+				}
 			}
 		}()
-		defer func() { <-drainDone }()
+		defer func() {
+			close(drainStop)
+			<-drainDone
+		}()
 	}
 
 	if err := runner.Run(); err != nil {
@@ -177,13 +192,28 @@ func runTUI() error {
 	} else {
 		// Drain the log channel to prevent blocking sends from deadlocking
 		// downstream components (distros, config deployer) that write to it.
+		// Use an explicit stop signal because this code does not own the
+		// model log channel and cannot assume it will be closed.
+		logCh := model.GetLogChan()
+		drainStop := make(chan struct{})
 		drainDone := make(chan struct{})
 		go func() {
 			defer close(drainDone)
-			for range model.GetLogChan() {
+			for {
+				select {
+				case <-drainStop:
+					return
+				case _, ok := <-logCh:
+					if !ok {
+						return
+					}
+				}
 			}
 		}()
-		defer func() { <-drainDone }()
+		defer func() {
+			close(drainStop)
+			<-drainDone
+		}()
 	}
 
 	p := tea.NewProgram(model, tea.WithAltScreen())
