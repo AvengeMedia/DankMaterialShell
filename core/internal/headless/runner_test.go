@@ -175,3 +175,166 @@ func TestConfigYesStoredCorrectly(t *testing.T) {
 		t.Error("cfg.Yes = false, want true")
 	}
 }
+
+func TestValidConfigNamesCompleteness(t *testing.T) {
+	// orderedConfigNames and validConfigNames must stay in sync.
+	if len(orderedConfigNames) != len(validConfigNames) {
+		t.Fatalf("orderedConfigNames has %d entries but validConfigNames has %d",
+			len(orderedConfigNames), len(validConfigNames))
+	}
+
+	// Every entry in orderedConfigNames must exist in validConfigNames.
+	for _, name := range orderedConfigNames {
+		if _, ok := validConfigNames[name]; !ok {
+			t.Errorf("orderedConfigNames contains %q which is missing from validConfigNames", name)
+		}
+	}
+
+	// validConfigNames must have no extra keys not in orderedConfigNames.
+	ordered := make(map[string]bool, len(orderedConfigNames))
+	for _, name := range orderedConfigNames {
+		ordered[name] = true
+	}
+	for key := range validConfigNames {
+		if !ordered[key] {
+			t.Errorf("validConfigNames contains %q which is missing from orderedConfigNames", key)
+		}
+	}
+}
+
+func TestBuildReplaceConfigs(t *testing.T) {
+	allDeployerKeys := []string{"Niri", "Hyprland", "Ghostty", "Kitty", "Alacritty"}
+
+	tests := []struct {
+		name           string
+		replaceConfigs []string
+		replaceAll     bool
+		wantNil        bool     // expect nil (replace all)
+		wantEnabled    []string // deployer keys that should be true
+		wantErr        bool
+	}{
+		{
+			name:        "neither flag set",
+			wantNil:     false,
+			wantEnabled: nil, // all should be false
+		},
+		{
+			name:       "replace-configs-all",
+			replaceAll: true,
+			wantNil:    true,
+		},
+		{
+			name:           "specific configs",
+			replaceConfigs: []string{"niri", "ghostty"},
+			wantNil:        false,
+			wantEnabled:    []string{"Niri", "Ghostty"},
+		},
+		{
+			name:           "both flags set",
+			replaceConfigs: []string{"niri"},
+			replaceAll:     true,
+			wantErr:        true,
+		},
+		{
+			name:           "invalid config name",
+			replaceConfigs: []string{"foo"},
+			wantErr:        true,
+		},
+		{
+			name:           "case insensitive",
+			replaceConfigs: []string{"NIRI", "Ghostty"},
+			wantNil:        false,
+			wantEnabled:    []string{"Niri", "Ghostty"},
+		},
+		{
+			name:           "single config",
+			replaceConfigs: []string{"kitty"},
+			wantNil:        false,
+			wantEnabled:    []string{"Kitty"},
+		},
+		{
+			name:           "whitespace entry",
+			replaceConfigs: []string{"  ", "niri"},
+			wantNil:        false,
+			wantEnabled:    []string{"Niri"},
+		},
+		{
+			name:           "duplicate entry",
+			replaceConfigs: []string{"niri", "niri"},
+			wantNil:        false,
+			wantEnabled:    []string{"Niri"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := NewRunner(Config{
+				ReplaceConfigs:    tt.replaceConfigs,
+				ReplaceConfigsAll: tt.replaceAll,
+			})
+			got, err := r.buildReplaceConfigs()
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("buildReplaceConfigs() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr {
+				return
+			}
+			if tt.wantNil {
+				if got != nil {
+					t.Fatalf("buildReplaceConfigs() = %v, want nil", got)
+				}
+				return
+			}
+			if got == nil {
+				t.Fatal("buildReplaceConfigs() = nil, want non-nil map")
+			}
+
+			// All known deployer keys must be present
+			for _, key := range allDeployerKeys {
+				if _, exists := got[key]; !exists {
+					t.Errorf("missing deployer key %q in result map", key)
+				}
+			}
+
+			// Build enabled set for easy lookup
+			enabledSet := make(map[string]bool)
+			for _, k := range tt.wantEnabled {
+				enabledSet[k] = true
+			}
+
+			for _, key := range allDeployerKeys {
+				want := enabledSet[key]
+				if got[key] != want {
+					t.Errorf("replaceConfigs[%q] = %v, want %v", key, got[key], want)
+				}
+			}
+		})
+	}
+}
+
+func TestConfigReplaceConfigsStoredCorrectly(t *testing.T) {
+	r := NewRunner(Config{
+		Compositor:        "niri",
+		Terminal:          "ghostty",
+		ReplaceConfigs:    []string{"niri", "ghostty"},
+		ReplaceConfigsAll: false,
+	})
+	if len(r.cfg.ReplaceConfigs) != 2 {
+		t.Errorf("len(ReplaceConfigs) = %d, want 2", len(r.cfg.ReplaceConfigs))
+	}
+	if r.cfg.ReplaceConfigsAll {
+		t.Error("ReplaceConfigsAll = true, want false")
+	}
+
+	r2 := NewRunner(Config{
+		Compositor:        "niri",
+		Terminal:          "ghostty",
+		ReplaceConfigsAll: true,
+	})
+	if !r2.cfg.ReplaceConfigsAll {
+		t.Error("ReplaceConfigsAll = false, want true")
+	}
+	if len(r2.cfg.ReplaceConfigs) != 0 {
+		t.Errorf("len(ReplaceConfigs) = %d, want 0", len(r2.cfg.ReplaceConfigs))
+	}
+}

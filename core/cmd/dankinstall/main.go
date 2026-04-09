@@ -15,11 +15,13 @@ var Version = "dev"
 
 // Flag variables bound via pflag
 var (
-	compositor  string
-	term        string
-	includeDeps []string
-	excludeDeps []string
-	yes         bool
+	compositor        string
+	term              string
+	includeDeps       []string
+	excludeDeps       []string
+	replaceConfigs    []string
+	replaceConfigsAll bool
+	yes               bool
 )
 
 var rootCmd = &cobra.Command{
@@ -42,6 +44,8 @@ func init() {
 	rootCmd.Flags().StringVarP(&term, "term", "t", "", "Terminal emulator to install: ghostty, kitty, or alacritty (enables headless mode)")
 	rootCmd.Flags().StringSliceVar(&includeDeps, "include-deps", []string{}, "Optional deps to enable (e.g. dms-greeter)")
 	rootCmd.Flags().StringSliceVar(&excludeDeps, "exclude-deps", []string{}, "Deps to skip during installation")
+	rootCmd.Flags().StringSliceVar(&replaceConfigs, "replace-configs", []string{}, "Deploy only named configs (e.g. niri,ghostty)")
+	rootCmd.Flags().BoolVar(&replaceConfigsAll, "replace-configs-all", false, "Deploy and replace all configurations")
 	rootCmd.Flags().BoolVarP(&yes, "yes", "y", false, "Auto-confirm all prompts")
 }
 
@@ -76,11 +80,13 @@ func runHeadless() error {
 	}
 
 	cfg := headless.Config{
-		Compositor:  compositor,
-		Terminal:    term,
-		IncludeDeps: includeDeps,
-		ExcludeDeps: excludeDeps,
-		Yes:         yes,
+		Compositor:        compositor,
+		Terminal:          term,
+		IncludeDeps:       includeDeps,
+		ExcludeDeps:       excludeDeps,
+		ReplaceConfigs:    replaceConfigs,
+		ReplaceConfigsAll: replaceConfigsAll,
+		Yes:               yes,
 	}
 
 	runner := headless.NewRunner(cfg)

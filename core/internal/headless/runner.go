@@ -17,13 +17,30 @@ import (
 // must explicitly confirm the operation.
 var ErrConfirmationRequired = fmt.Errorf("confirmation required: pass --yes to proceed")
 
+// validConfigNames maps lowercase CLI input to the deployer key used in
+// replaceConfigs. Keep in sync with the config types checked by
+// shouldReplaceConfig in deployer.go.
+var validConfigNames = map[string]string{
+	"niri":      "Niri",
+	"hyprland":  "Hyprland",
+	"ghostty":   "Ghostty",
+	"kitty":     "Kitty",
+	"alacritty": "Alacritty",
+}
+
+// orderedConfigNames defines the canonical order for config names in output.
+// Must be kept in sync with validConfigNames.
+var orderedConfigNames = []string{"niri", "hyprland", "ghostty", "kitty", "alacritty"}
+
 // Config holds all CLI parameters for unattended installation.
 type Config struct {
-	Compositor  string // "niri" or "hyprland"
-	Terminal    string // "ghostty", "kitty", or "alacritty"
-	IncludeDeps []string
-	ExcludeDeps []string
-	Yes         bool
+	Compositor        string // "niri" or "hyprland"
+	Terminal          string // "ghostty", "kitty", or "alacritty"
+	IncludeDeps       []string
+	ExcludeDeps       []string
+	ReplaceConfigs    []string // specific configs to deploy (e.g. "niri", "ghostty")
+	ReplaceConfigsAll bool     // deploy/replace all configurations
+	Yes               bool
 }
 
 // Runner orchestrates unattended (headless) installation.
@@ -60,7 +77,13 @@ func (r *Runner) Run() error {
 		return err
 	}
 
-	// 2. Detect OS
+	// 2. Build replace-configs map
+	replaceConfigs, err := r.buildReplaceConfigs()
+	if err != nil {
+		return err
+	}
+
+	// 3. Detect OS
 	r.log("Detecting operating system...")
 	osInfo, err := distros.GetOSInfo()
 	if err != nil {
@@ -73,13 +96,13 @@ func (r *Runner) Run() error {
 
 	fmt.Fprintf(os.Stdout, "Detected: %s (%s)\n", osInfo.PrettyName, osInfo.Architecture)
 
-	// 3. Create distribution instance
+	// 4. Create distribution instance
 	distro, err := distros.NewDistribution(osInfo.Distribution.ID, r.logChan)
 	if err != nil {
 		return fmt.Errorf("failed to initialize distribution: %w", err)
 	}
 
-	// 4. Detect dependencies
+	// 5. Detect dependencies
 	r.log("Detecting dependencies...")
 	fmt.Fprintln(os.Stdout, "Detecting dependencies...")
 	dependencies, err := distro.DetectDependenciesWithTerminal(context.Background(), wm, terminal)
@@ -87,7 +110,7 @@ func (r *Runner) Run() error {
 		return fmt.Errorf("dependency detection failed: %w", err)
 	}
 
-	// 5. Apply include/exclude filters and build disabled/reinstall maps
+	// 6. Apply include/exclude filters and build disabled/reinstall maps
 	disabledItems := make(map[string]bool)
 	reinstallItems := make(map[string]bool)
 
@@ -155,22 +178,36 @@ func (r *Runner) Run() error {
 	}
 	fmt.Fprintln(os.Stdout)
 
-	// 5b. Require explicit confirmation unless --yes is set
+	// 6b. Require explicit confirmation unless --yes is set
 	if !r.cfg.Yes {
-		fmt.Fprintln(os.Stdout, "The above packages will be installed and all configurations will be replaced.")
-		fmt.Fprintln(os.Stdout, "Existing config files will be backed up before replacement.")
+		if replaceConfigs == nil {
+			// --replace-configs-all
+			fmt.Fprintln(os.Stdout, "Packages will be installed and all configurations will be replaced.")
+			fmt.Fprintln(os.Stdout, "Existing config files will be backed up before replacement.")
+		} else if r.anyConfigEnabled(replaceConfigs) {
+			var names []string
+			for _, cliName := range orderedConfigNames {
+				deployerKey := validConfigNames[cliName]
+				if replaceConfigs[deployerKey] {
+					names = append(names, deployerKey)
+				}
+			}
+			fmt.Fprintf(os.Stdout, "Packages will be installed. The following configurations will be replaced (with backups): %s\n", strings.Join(names, ", "))
+		} else {
+			fmt.Fprintln(os.Stdout, "Packages will be installed. No configurations will be deployed.")
+		}
 		fmt.Fprintln(os.Stdout, "Re-run with --yes (-y) to proceed.")
 		r.log("Aborted: --yes not set")
 		return ErrConfirmationRequired
 	}
 
-	// 6. Authenticate sudo
+	// 7. Authenticate sudo
 	sudoPassword, err := r.resolveSudoPassword()
 	if err != nil {
 		return err
 	}
 
-	// 7. Install packages
+	// 8. Install packages
 	fmt.Fprintln(os.Stdout, "Installing packages...")
 	r.log("Starting package installation")
 
@@ -207,7 +244,7 @@ func (r *Runner) Run() error {
 		return fmt.Errorf("package installation failed: %w", err)
 	}
 
-	// 8. Greeter setup (if dms-greeter was included)
+	// 9. Greeter setup (if dms-greeter was included)
 	if !disabledItems["dms-greeter"] && r.depExists(dependencies, "dms-greeter") {
 		compositorName := "niri"
 		if wm == deps.WindowManagerHyprland {
@@ -224,7 +261,7 @@ func (r *Runner) Run() error {
 		}
 	}
 
-	// 9. Deploy configurations (replace all existing configs in headless mode)
+	// 10. Deploy configurations
 	fmt.Fprintln(os.Stdout, "Deploying configurations...")
 	r.log("Starting configuration deployment")
 
@@ -234,7 +271,7 @@ func (r *Runner) Run() error {
 		wm,
 		terminal,
 		dependencies,
-		nil, // replaceConfigs=nil means replace all
+		replaceConfigs,
 		reinstallItems,
 	)
 	if err != nil {
@@ -257,6 +294,46 @@ func (r *Runner) Run() error {
 	fmt.Fprintln(os.Stdout, "\nInstallation complete!")
 	r.log("Headless installation completed successfully")
 	return nil
+}
+
+// buildReplaceConfigs converts the --replace-configs / --replace-configs-all
+// flags into the map[string]bool consumed by the config deployer.
+//
+// Returns:
+//   - nil when --replace-configs-all is set (deployer treats nil as "replace all")
+//   - a map with all known configs set to false when neither flag is set (safe default)
+//   - a map with requested configs true, all others false for --replace-configs
+//   - an error when both flags are set or an invalid config name is given
+func (r *Runner) buildReplaceConfigs() (map[string]bool, error) {
+	hasSpecific := len(r.cfg.ReplaceConfigs) > 0
+	if hasSpecific && r.cfg.ReplaceConfigsAll {
+		return nil, fmt.Errorf("--replace-configs and --replace-configs-all are mutually exclusive")
+	}
+
+	if r.cfg.ReplaceConfigsAll {
+		return nil, nil
+	}
+
+	// Build a map with all known configs explicitly set to false
+	result := make(map[string]bool, len(validConfigNames))
+	for _, cliName := range orderedConfigNames {
+		result[validConfigNames[cliName]] = false
+	}
+
+	// Enable only the requested configs
+	for _, name := range r.cfg.ReplaceConfigs {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+		deployerKey, ok := validConfigNames[strings.ToLower(name)]
+		if !ok {
+			return nil, fmt.Errorf("--replace-configs: unknown config %q; valid values: niri, hyprland, ghostty, kitty, alacritty", name)
+		}
+		result[deployerKey] = true
+	}
+
+	return result, nil
 }
 
 func (r *Runner) log(message string) {
@@ -305,6 +382,15 @@ func (r *Runner) resolveSudoPassword() (string, error) {
 			"  1. Run 'sudo -v' before dankinstall to cache credentials\n" +
 			"  2. Configure passwordless sudo for your user",
 	)
+}
+
+func (r *Runner) anyConfigEnabled(m map[string]bool) bool {
+	for _, v := range m {
+		if v {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *Runner) depExists(dependencies []deps.Dependency, name string) bool {
