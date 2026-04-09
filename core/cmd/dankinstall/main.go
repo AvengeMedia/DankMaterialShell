@@ -32,7 +32,9 @@ are provided, it runs in headless (unattended) mode suitable for scripting.
 
 Headless mode requires cached sudo credentials. Run 'sudo -v' beforehand, or
 configure passwordless sudo for your user.`,
-	Run: runDankinstall,
+	RunE:          runDankinstall,
+	SilenceErrors: true,
+	SilenceUsage:  true,
 }
 
 func init() {
@@ -50,29 +52,27 @@ func main() {
 	}
 
 	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-func runDankinstall(cmd *cobra.Command, args []string) {
+func runDankinstall(cmd *cobra.Command, args []string) error {
 	headlessMode := compositor != "" || term != ""
 
 	if headlessMode {
-		runHeadless()
-	} else {
-		runTUI()
+		return runHeadless()
 	}
+	return runTUI()
 }
 
-func runHeadless() {
+func runHeadless() error {
 	// Validate required flags
 	if compositor == "" {
-		fmt.Fprintln(os.Stderr, "Error: --compositor is required for headless mode (niri or hyprland)")
-		os.Exit(1)
+		return fmt.Errorf("--compositor is required for headless mode (niri or hyprland)")
 	}
 	if term == "" {
-		fmt.Fprintln(os.Stderr, "Error: --term is required for headless mode (ghostty, kitty, or alacritty)")
-		os.Exit(1)
+		return fmt.Errorf("--term is required for headless mode (ghostty, kitty, or alacritty)")
 	}
 
 	cfg := headless.Config{
@@ -102,19 +102,19 @@ func runHeadless() {
 	}
 
 	if err := runner.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		if fileLogger != nil {
 			fmt.Fprintf(os.Stderr, "\nFull logs are available at: %s\n", fileLogger.GetLogPath())
 		}
-		os.Exit(1)
+		return err
 	}
 
 	if fileLogger != nil {
 		fmt.Printf("\nFull logs are available at: %s\n", fileLogger.GetLogPath())
 	}
+	return nil
 }
 
-func runTUI() {
+func runTUI() error {
 	fileLogger, err := log.NewFileLogger()
 	if err != nil {
 		fmt.Printf("Warning: Failed to create log file: %v\n", err)
@@ -140,14 +140,14 @@ func runTUI() {
 
 	p := tea.NewProgram(model, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
-		fmt.Printf("Error running program: %v\n", err)
 		if logFilePath != "" {
-			fmt.Printf("\nFull logs are available at: %s\n", logFilePath)
+			fmt.Fprintf(os.Stderr, "\nFull logs are available at: %s\n", logFilePath)
 		}
-		os.Exit(1)
+		return fmt.Errorf("error running program: %w", err)
 	}
 
 	if logFilePath != "" {
 		fmt.Printf("\nFull logs are available at: %s\n", logFilePath)
 	}
+	return nil
 }
