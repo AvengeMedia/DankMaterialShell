@@ -135,6 +135,24 @@ func (a *ArchDistribution) packageInstalled(pkg string) bool {
 	return err == nil
 }
 
+// isDepSatisfied checks if a dependency is satisfied by any installed package,
+// including via "provides". Unlike packageInstalled (pacman -Q, exact name
+// match), this uses pacman -T which respects provides declarations.
+// For example, if quickshell-git provides=('quickshell'), then
+// isDepSatisfied("quickshell") returns true even though quickshell itself
+// is not installed.
+func (a *ArchDistribution) isDepSatisfied(dep string) bool {
+	// pacman -T prints dependencies that are NOT satisfied.
+	// Exit code 0 = all satisfied; non-zero = unsatisfied deps found.
+	cmd := exec.Command("pacman", "-T", dep)
+	output, err := cmd.Output()
+	if err != nil {
+		return false // error or unsatisfied
+	}
+	// If output is empty, the dep is satisfied
+	return len(strings.TrimSpace(string(output))) == 0
+}
+
 // parseSRCINFODeps reads a .SRCINFO file and returns runtime dep and makedep package
 func parseSRCINFODeps(srcinfoPath string) (deps []string, makedeps []string, err error) {
 	data, err := os.ReadFile(srcinfoPath)
@@ -323,6 +341,54 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 	}
 
 	systemPkgs, aurPkgs, manualPkgs, variantMap := a.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+
+	// Ensure the correct compositor provider is explicitly included
+	// so pacman doesn't auto-resolve dms-shell-compositor to the wrong provider.
+	if slices.Contains(systemPkgs, "dms-shell") {
+		switch wm {
+		case deps.WindowManagerHyprland:
+			if !slices.Contains(systemPkgs, "dms-shell-hyprland") {
+				systemPkgs = append(systemPkgs, "dms-shell-hyprland")
+			}
+		case deps.WindowManagerNiri:
+			if !slices.Contains(systemPkgs, "dms-shell-niri") {
+				systemPkgs = append(systemPkgs, "dms-shell-niri")
+			}
+		}
+	}
+
+	// Pre-install AUR packages that provide virtual deps needed by
+	// system packages. quickshell-git provides "quickshell", which dms-shell
+	// depends on. If we let system packages install first, pacman resolves
+	// "quickshell" to the archlinuxcn quickshell package, which later conflicts
+	// with quickshell-git.
+	var preInstallAUR []string
+	var remainingAUR []string
+	for _, pkg := range aurPkgs {
+		if pkg == "quickshell-git" {
+			preInstallAUR = append(preInstallAUR, pkg)
+		} else {
+			remainingAUR = append(remainingAUR, pkg)
+		}
+	}
+
+	if len(preInstallAUR) > 0 {
+		progressChan <- InstallProgressMsg{
+			Phase:      PhaseAURPackages,
+			Progress:   0.13,
+			Step:       fmt.Sprintf("Pre-installing %d AUR provider packages...", len(preInstallAUR)),
+			IsComplete: false,
+			LogOutput:  fmt.Sprintf("Pre-installing AUR providers: %s", strings.Join(preInstallAUR, ", ")),
+		}
+		for i, pkg := range preInstallAUR {
+			startProg := 0.13 + float64(i)*(0.30-0.13)/float64(len(preInstallAUR))
+			endProg := 0.13 + float64(i+1)*(0.30-0.13)/float64(len(preInstallAUR))
+			if err := a.installSingleAURPackage(ctx, pkg, sudoPassword, progressChan, startProg, endProg); err != nil {
+				return fmt.Errorf("failed to pre-install AUR provider package %s: %w", pkg, err)
+			}
+		}
+	}
+	aurPkgs = remainingAUR
 
 	// Phase 3: System Packages
 	if len(systemPkgs) > 0 {
@@ -659,7 +725,7 @@ func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, 
 		var aurPkgs []string
 
 		for _, dep := range append(runtimeDeps, makeDeps...) {
-			if seen[dep] || a.packageInstalled(dep) {
+			if seen[dep] || a.isDepSatisfied(dep) {
 				continue
 			}
 			seen[dep] = true
