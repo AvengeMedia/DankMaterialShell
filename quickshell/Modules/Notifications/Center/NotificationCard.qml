@@ -34,11 +34,12 @@ Rectangle {
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real collapsedContentHeight: Math.max(iconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
     readonly property real baseCardHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing
+    readonly property bool connectedFrameMode: SettingsData.connectedFrameModeActive
 
     width: parent ? parent.width : 400
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
-    radius: Theme.cornerRadius
+    radius: connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     scale: (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
     readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
     readonly property var shadowElevation: Theme.elevationLevel1
@@ -100,6 +101,8 @@ Rectangle {
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
             return Theme.primaryHoverLight;
         }
+        if (connectedFrameMode)
+            return Theme.popupLayerColor(Theme.surfaceContainerHigh);
         return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
     }
     border.color: {
@@ -959,9 +962,9 @@ Rectangle {
     Behavior on height {
         enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
-            duration: root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
+            duration: root.connectedFrameMode ? Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded) : (root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasized
+            easing.bezierCurve: root.connectedFrameMode ? (root.expanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : Theme.expressiveCurves.emphasized
             onRunningChanged: {
                 if (running) {
                     root.isAnimating = true;

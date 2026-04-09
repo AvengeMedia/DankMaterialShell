@@ -26,11 +26,12 @@ Item {
     property bool closeOnEscapeKey: true
     property bool closeOnBackgroundClick: true
     property string animationType: "scale"
-    property int animationDuration: Theme.modalAnimationDuration
+    readonly property bool connectedMotionParity: Theme.isConnectedEffect
+    property int animationDuration: connectedMotionParity ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
     property real animationScaleCollapsed: Theme.effectScaleCollapsed
     property real animationOffset: Theme.effectAnimOffset
-    property list<real> animationEnterCurve: Theme.variantModalEnterCurve
-    property list<real> animationExitCurve: Theme.variantModalExitCurve
+    property list<real> animationEnterCurve: connectedMotionParity ? Theme.variantPopoutEnterCurve : Theme.variantModalEnterCurve
+    property list<real> animationExitCurve: connectedMotionParity ? Theme.variantPopoutExitCurve : Theme.variantModalExitCurve
     property color backgroundColor: Theme.surfaceContainer
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 0
