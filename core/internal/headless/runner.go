@@ -110,9 +110,11 @@ func (r *Runner) Run() error {
 		return fmt.Errorf("dependency detection failed: %w", err)
 	}
 
-	// 6. Apply include/exclude filters and build disabled/reinstall maps
+	// 5. Apply include/exclude filters and build the disabled-items map.
+	// Headless mode does not currently collect any explicit reinstall selections,
+	// so keep reinstallItems nil instead of constructing an always-empty map.
 	disabledItems := make(map[string]bool)
-	reinstallItems := make(map[string]bool)
+	var reinstallItems map[string]bool
 
 	// dms-greeter is opt-in (disabled by default), matching TUI behavior
 	for i := range dependencies {
