@@ -158,7 +158,7 @@ curl -fsSL https://install.danklinux.com | sh
 Headless mode requires cached sudo credentials. Run `sudo -v` first:
 
 ```bash
-sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty
+sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty -y
 sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t kitty --include-deps dms-greeter -y
 ```
 
@@ -168,7 +168,13 @@ sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t ki
 | `--term <ghostty|kitty|alacritty>` | `-t` | Terminal emulator (required for headless) |
 | `--include-deps <name,...>` | | Enable optional dependencies (e.g. `dms-greeter`) |
 | `--exclude-deps <name,...>` | | Skip specific dependencies |
-| `--yes` | `-y` | Auto-confirm all prompts |
+| `--replace-configs <name,...>` | | Replace specific configuration files (mutually exclusive with `--replace-configs-all`) |
+| `--replace-configs-all` | | Replace all configuration files (mutually exclusive with `--replace-configs`) |
+| `--yes` | `-y` | Required for headless mode — confirms installation without interactive prompts |
+
+Headless mode requires `--yes` to proceed; without it, the installer exits with an error.
+Configuration files are not replaced by default unless `--replace-configs` or `--replace-configs-all` is specified.
+`dms-greeter` is disabled by default; use `--include-deps dms-greeter` to enable it.
 
 When no flags are provided, `dankinstall` launches the interactive TUI.
 
