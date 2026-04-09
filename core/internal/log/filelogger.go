@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sync"
 	"time"
@@ -22,13 +23,15 @@ type FileLogger struct {
 func NewFileLogger() (*FileLogger, error) {
 	timestamp := time.Now().Unix()
 
-	// Use DANKINSTALL_LOG_DIR if set, otherwise fall back to /var/tmp.
-	// /var/tmp survives arch-chroot (unlike /tmp which gets a fresh tmpfs).
+	// Use DANKINSTALL_LOG_DIR if set, otherwise fall back to /tmp.
 	logDir := os.Getenv("DANKINSTALL_LOG_DIR")
 	if logDir == "" {
-		logDir = "/var/tmp"
+		logDir = "/tmp"
 	}
-	logPath := fmt.Sprintf("%s/dankinstall-%d.log", logDir, timestamp)
+	if err := os.MkdirAll(logDir, 0o755); err != nil {
+		return nil, fmt.Errorf("failed to create log directory: %w", err)
+	}
+	logPath := filepath.Join(logDir, fmt.Sprintf("dankinstall-%d.log", timestamp))
 
 	file, err := os.Create(logPath)
 	if err != nil {
