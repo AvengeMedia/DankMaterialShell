@@ -112,8 +112,8 @@ PanelWindow {
 
         readonly property bool _active: ConnectedModeState.popoutVisible && ConnectedModeState.popoutScreen === win._screenName
 
-        readonly property real _dyClamp: (ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom") ? Math.max(-ConnectedModeState.popoutBodyH, Math.min(ConnectedModeState.popoutAnimY, ConnectedModeState.popoutBodyH)) : 0
-        readonly property real _dxClamp: (ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right") ? Math.max(-ConnectedModeState.popoutBodyW, Math.min(ConnectedModeState.popoutAnimX, ConnectedModeState.popoutBodyW)) : 0
+        readonly property real _dyClamp: (ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom") ? Math.max(-ConnectedModeState.popoutBodyH, Math.min(ConnectedModeState.popoutAnimY * 1.02, ConnectedModeState.popoutBodyH)) : 0
+        readonly property real _dxClamp: (ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right") ? Math.max(-ConnectedModeState.popoutBodyW, Math.min(ConnectedModeState.popoutAnimX * 1.02, ConnectedModeState.popoutBodyW)) : 0
 
         x: _active ? ConnectedModeState.popoutBodyX + (ConnectedModeState.popoutBarSide === "right" ? _dxClamp : 0) : 0
         y: _active ? ConnectedModeState.popoutBodyY + (ConnectedModeState.popoutBarSide === "bottom" ? _dyClamp : 0) : 0
@@ -218,60 +218,6 @@ PanelWindow {
         height: _active ? win._dockConnectorRadius() * 2 : 0
     }
 
-    Item {
-        id: _popoutLeftConnectorBlurAnchor
-        opacity: 0
-
-        readonly property bool _active: win._popoutArcVisible()
-        readonly property real _w: win._popoutConnectorWidth(0)
-        readonly property real _h: win._popoutConnectorHeight(0)
-
-        x: _active ? Theme.snap(win._popoutConnectorX(ConnectedModeState.popoutBodyX, ConnectedModeState.popoutBodyW, "left", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._popoutConnectorY(ConnectedModeState.popoutBodyY, ConnectedModeState.popoutBodyH, "left", 0), win._dpr) : 0
-        width: _active ? _w : 0
-        height: _active ? _h : 0
-    }
-
-    Item {
-        id: _popoutRightConnectorBlurAnchor
-        opacity: 0
-
-        readonly property bool _active: win._popoutArcVisible()
-        readonly property real _w: win._popoutConnectorWidth(0)
-        readonly property real _h: win._popoutConnectorHeight(0)
-
-        x: _active ? Theme.snap(win._popoutConnectorX(ConnectedModeState.popoutBodyX, ConnectedModeState.popoutBodyW, "right", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._popoutConnectorY(ConnectedModeState.popoutBodyY, ConnectedModeState.popoutBodyH, "right", 0), win._dpr) : 0
-        width: _active ? _w : 0
-        height: _active ? _h : 0
-    }
-
-    Item {
-        id: _popoutLeftConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _popoutLeftConnectorBlurAnchor.width > 0 && _popoutLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(ConnectedModeState.popoutBarSide, "left")
-
-        x: _active ? win._connectorCutoutX(_popoutLeftConnectorBlurAnchor.x, _popoutLeftConnectorBlurAnchor.width, _arcCorner) : 0
-        y: _active ? win._connectorCutoutY(_popoutLeftConnectorBlurAnchor.y, _popoutLeftConnectorBlurAnchor.height, _arcCorner) : 0
-        width: _active ? win._effectivePopoutCcr * 2 : 0
-        height: _active ? win._effectivePopoutCcr * 2 : 0
-    }
-
-    Item {
-        id: _popoutRightConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _popoutRightConnectorBlurAnchor.width > 0 && _popoutRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(ConnectedModeState.popoutBarSide, "right")
-
-        x: _active ? win._connectorCutoutX(_popoutRightConnectorBlurAnchor.x, _popoutRightConnectorBlurAnchor.width, _arcCorner) : 0
-        y: _active ? win._connectorCutoutY(_popoutRightConnectorBlurAnchor.y, _popoutRightConnectorBlurAnchor.height, _arcCorner) : 0
-        width: _active ? win._effectivePopoutCcr * 2 : 0
-        height: _active ? win._effectivePopoutCcr * 2 : 0
-    }
-
     Region {
         id: _staticBlurRegion
         x: 0
@@ -289,30 +235,10 @@ PanelWindow {
         // ── Connected popout blur regions ──
         Region {
             item: _popoutBodyBlurAnchor
-            readonly property string _bs: ConnectedModeState.popoutBarSide
-            topLeftRadius: (_bs === "top" || _bs === "left") ? win._effectivePopoutCcr : win._surfaceRadius
-            topRightRadius: (_bs === "top" || _bs === "right") ? win._effectivePopoutCcr : win._surfaceRadius
-            bottomLeftRadius: (_bs === "bottom" || _bs === "left") ? win._effectivePopoutCcr : win._surfaceRadius
-            bottomRightRadius: (_bs === "bottom" || _bs === "right") ? win._effectivePopoutCcr : win._surfaceRadius
+            radius: win._surfaceRadius
         }
         Region {
             item: _popoutBodyBlurCap
-        }
-        Region {
-            item: _popoutLeftConnectorBlurAnchor
-            Region {
-                item: _popoutLeftConnectorCutout
-                intersection: Intersection.Subtract
-                radius: win._effectivePopoutCcr
-            }
-        }
-        Region {
-            item: _popoutRightConnectorBlurAnchor
-            Region {
-                item: _popoutRightConnectorCutout
-                intersection: Intersection.Subtract
-                radius: win._effectivePopoutCcr
-            }
         }
 
         // ── Connected dock blur regions ──
@@ -343,37 +269,7 @@ PanelWindow {
         }
     }
 
-    // ─── Connector position helpers (mirror DankPopout / Dock logic) ──────────
-
-    function _popoutConnectorWidth(spacing) {
-        const barSide = ConnectedModeState.popoutBarSide;
-        return (barSide === "top" || barSide === "bottom") ? win._effectivePopoutCcr : (spacing + win._effectivePopoutCcr);
-    }
-
-    function _popoutConnectorHeight(spacing) {
-        const barSide = ConnectedModeState.popoutBarSide;
-        return (barSide === "top" || barSide === "bottom") ? (spacing + win._effectivePopoutCcr) : win._effectivePopoutCcr;
-    }
-
-    function _popoutConnectorX(baseX, bodyWidth, placement, spacing) {
-        const barSide = ConnectedModeState.popoutBarSide;
-        const seamX = (barSide === "top" || barSide === "bottom") ? (placement === "left" ? baseX : baseX + bodyWidth) : (barSide === "left" ? baseX : baseX + bodyWidth);
-        const w = _popoutConnectorWidth(spacing);
-        if (barSide === "top" || barSide === "bottom")
-            return placement === "left" ? seamX - w : seamX;
-        return barSide === "left" ? seamX : seamX - w;
-    }
-
-    function _popoutConnectorY(baseY, bodyHeight, placement, spacing) {
-        const barSide = ConnectedModeState.popoutBarSide;
-        const seamY = barSide === "top" ? baseY : barSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
-        const h = _popoutConnectorHeight(spacing);
-        if (barSide === "top")
-            return seamY;
-        if (barSide === "bottom")
-            return seamY - h;
-        return placement === "left" ? seamY - h : seamY;
-    }
+    // ─── Connector position helpers (dock) ─────────────────────────────────
 
     function _dockBodyBlurRadius() {
         return _dockBodyBlurAnchor._active ? Math.max(0, Math.min(win._surfaceRadius, _dockBodyBlurAnchor.width / 2, _dockBodyBlurAnchor.height / 2)) : win._surfaceRadius;
@@ -660,55 +556,26 @@ PanelWindow {
 
             Item {
                 id: _popoutClip
-                x: win._popoutClipX()
-                y: win._popoutClipY()
-                width: win._popoutClipWidth()
-                height: win._popoutClipHeight()
+                readonly property bool _barHoriz: ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom"
+                // Expand clip by ccr on bar axis to include arc columns
+                x: win._popoutClipX() - (_barHoriz ? win._effectivePopoutCcr : 0)
+                y: win._popoutClipY() - (_barHoriz ? 0 : win._effectivePopoutCcr)
+                width: win._popoutClipWidth() + (_barHoriz ? win._effectivePopoutCcr * 2 : 0)
+                height: win._popoutClipHeight() + (_barHoriz ? 0 : win._effectivePopoutCcr * 2)
                 clip: true
 
-                Rectangle {
-                    id: _popoutFill
-                    x: win._popoutBodyXInClip()
-                    y: win._popoutBodyYInClip()
-                    width: win._popoutBodyFullWidth()
-                    height: win._popoutBodyFullHeight()
-                    color: win._opaqueSurfaceColor
-                    z: 1
-                    topLeftRadius: (ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "left") ? 0 : win._surfaceRadius
-                    topRightRadius: (ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "right") ? 0 : win._surfaceRadius
-                    bottomLeftRadius: (ConnectedModeState.popoutBarSide === "bottom" || ConnectedModeState.popoutBarSide === "left") ? 0 : win._surfaceRadius
-                    bottomRightRadius: (ConnectedModeState.popoutBarSide === "bottom" || ConnectedModeState.popoutBarSide === "right") ? 0 : win._surfaceRadius
+                ConnectedShape {
+                    id: _popoutShape
+                    visible: _popoutBodyBlurAnchor._active && _popoutBodyBlurAnchor.width > 0 && _popoutBodyBlurAnchor.height > 0
+                    barSide: ConnectedModeState.popoutBarSide
+                    bodyWidth: win._popoutClipWidth()
+                    bodyHeight: win._popoutClipHeight()
+                    connectorRadius: win._effectivePopoutCcr
+                    surfaceRadius: win._surfaceRadius
+                    fillColor: win._opaqueSurfaceColor
+                    x: 0
+                    y: 0
                 }
-            }
-
-            ConnectedCorner {
-                id: _connPopoutLeft
-                visible: win._popoutArcVisible()
-                barSide: ConnectedModeState.popoutBarSide
-                placement: "left"
-                spacing: 0
-                connectorRadius: win._effectivePopoutCcr
-                color: win._opaqueSurfaceColor
-                edgeStrokeWidth: win._seamOverlap
-                edgeStrokeColor: win._opaqueSurfaceColor
-                dpr: win._dpr
-                x: Theme.snap(win._popoutConnectorX(ConnectedModeState.popoutBodyX, ConnectedModeState.popoutBodyW, "left", 0) - _popoutChrome.x, win._dpr)
-                y: Theme.snap(win._popoutConnectorY(ConnectedModeState.popoutBodyY, ConnectedModeState.popoutBodyH, "left", 0) - _popoutChrome.y, win._dpr)
-            }
-
-            ConnectedCorner {
-                id: _connPopoutRight
-                visible: win._popoutArcVisible()
-                barSide: ConnectedModeState.popoutBarSide
-                placement: "right"
-                spacing: 0
-                connectorRadius: win._effectivePopoutCcr
-                color: win._opaqueSurfaceColor
-                edgeStrokeWidth: win._seamOverlap
-                edgeStrokeColor: win._opaqueSurfaceColor
-                dpr: win._dpr
-                x: Theme.snap(win._popoutConnectorX(ConnectedModeState.popoutBodyX, ConnectedModeState.popoutBodyW, "right", 0) - _popoutChrome.x, win._dpr)
-                y: Theme.snap(win._popoutConnectorY(ConnectedModeState.popoutBodyY, ConnectedModeState.popoutBodyH, "right", 0) - _popoutChrome.y, win._dpr)
             }
         }
 
