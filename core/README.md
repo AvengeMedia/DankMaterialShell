@@ -10,7 +10,7 @@ Go-based backend for DankMaterialShell providing system integration, IPC, and in
 Command-line interface and daemon for shell management and system control.
 
 **dankinstall**
-Distribution-aware installer with TUI for deploying DMS and compositor configurations on Arch, Fedora, Debian, Ubuntu, openSUSE, and Gentoo.
+Distribution-aware installer for deploying DMS and compositor configurations on Arch, Fedora, Debian, Ubuntu, openSUSE, and Gentoo. Supports both an interactive TUI and a headless (unattended) mode via CLI flags.
 
 ## System Integration
 
@@ -147,9 +147,30 @@ go-wayland-scanner -i internal/proto/xml/wlr-gamma-control-unstable-v1.xml \
 
 ## Installation via dankinstall
 
+**Interactive (TUI):**
+
 ```bash
 curl -fsSL https://install.danklinux.com | sh
 ```
+
+**Headless (unattended):**
+
+Headless mode requires cached sudo credentials. Run `sudo -v` first:
+
+```bash
+sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty
+sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t kitty --include-deps dms-greeter -y
+```
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--compositor <niri\|hyprland>` | `-c` | Compositor/WM to install (required for headless) |
+| `--term <ghostty\|kitty\|alacritty>` | `-t` | Terminal emulator (required for headless) |
+| `--include-deps <name,...>` | | Enable optional dependencies (e.g. `dms-greeter`) |
+| `--exclude-deps <name,...>` | | Skip specific dependencies |
+| `--yes` | `-y` | Auto-confirm all prompts |
+
+When no flags are provided, `dankinstall` launches the interactive TUI.
 
 ## Supported Distributions
 
