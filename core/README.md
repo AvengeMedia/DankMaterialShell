@@ -178,6 +178,19 @@ Configuration files are not replaced by default unless `--replace-configs` or `-
 
 When no flags are provided, `dankinstall` launches the interactive TUI.
 
+### Headless mode validation rules
+
+Headless mode activates when `--compositor` or `--term` is provided.
+
+- Both `--compositor` and `--term` are required; providing only one results in an error.
+- Headless-only flags (`--include-deps`, `--exclude-deps`, `--replace-configs`, `--replace-configs-all`, `--yes`) are rejected in TUI mode.
+- Positional arguments are not accepted.
+
+### Log file location
+
+`dankinstall` writes logs to `/var/tmp` by default.
+Set the `DANKINSTALL_LOG_DIR` environment variable to override the log directory.
+
 ## Supported Distributions
 
 Arch, Fedora, Debian, Ubuntu, openSUSE, Gentoo (and derivatives)
