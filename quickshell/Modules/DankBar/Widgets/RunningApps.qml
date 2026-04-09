@@ -271,7 +271,7 @@ BasePill {
                         radius: Theme.cornerRadius
                         color: {
                             if (isFocused) {
-                                return mouseArea.containsMouse ? Theme.primarySelected : Theme.withAlpha(Theme.primary, 0.2);
+                                return mouseArea.containsMouse ? Theme.primarySelected : Theme.withAlpha(Theme.primary, 0.45);
                             }
                             return mouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
                         }
@@ -526,7 +526,7 @@ BasePill {
                         radius: Theme.cornerRadius
                         color: {
                             if (isFocused) {
-                                return mouseArea.containsMouse ? Theme.primarySelected : Theme.withAlpha(Theme.primary, 0.2);
+                                return mouseArea.containsMouse ? Theme.primarySelected : Theme.withAlpha(Theme.primary, 0.45);
                             }
                             return mouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
                         }
