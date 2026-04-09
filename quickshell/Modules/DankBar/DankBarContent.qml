@@ -1438,12 +1438,21 @@ Item {
             parentScreen: barWindow.screen
             onClicked: {
                 systemUpdateLoader.active = true;
+                if (!systemUpdateLoader.item)
+                    return;
+                const popout = systemUpdateLoader.item;
                 const effectiveBarConfig = topBarContent.barConfig;
                 const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (systemUpdateLoader.item && systemUpdateLoader.item.setBarContext) {
-                    systemUpdateLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
+                if (popout.setBarContext) {
+                    popout.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
                 }
-                systemUpdateLoader.item?.toggle();
+                if (popout.setTriggerPosition) {
+                    const globalPos = visualContent.mapToItem(null, 0, 0);
+                    const currentScreen = parentScreen || Screen;
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barWindow.effectiveBarThickness, visualWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
+                    popout.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
+                }
+                PopoutManager.requestPopout(popout, undefined, "systemUpdate");
             }
         }
     }
