@@ -164,8 +164,8 @@ sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t ki
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--compositor <niri\|hyprland>` | `-c` | Compositor/WM to install (required for headless) |
-| `--term <ghostty\|kitty\|alacritty>` | `-t` | Terminal emulator (required for headless) |
+| `--compositor <niri|hyprland>` | `-c` | Compositor/WM to install (required for headless) |
+| `--term <ghostty|kitty|alacritty>` | `-t` | Terminal emulator (required for headless) |
 | `--include-deps <name,...>` | | Enable optional dependencies (e.g. `dms-greeter`) |
 | `--exclude-deps <name,...>` | | Skip specific dependencies |
 | `--yes` | `-y` | Auto-confirm all prompts |
