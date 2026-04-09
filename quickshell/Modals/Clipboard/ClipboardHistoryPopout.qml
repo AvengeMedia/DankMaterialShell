@@ -53,8 +53,6 @@ DankPopout {
         open();
         activeImageLoads = 0;
         ClipboardService.reset();
-        if (clipboardAvailable)
-            ClipboardService.refresh();
         keyboardController.reset();
 
         Qt.callLater(function () {
@@ -121,8 +119,16 @@ DankPopout {
     onShouldBeVisibleChanged: {
         if (!shouldBeVisible)
             return;
-        if (clipboardAvailable)
-            ClipboardService.refresh();
+        if (clipboardAvailable) {
+            if (Theme.isConnectedEffect) {
+                Qt.callLater(() => {
+                    if (root.shouldBeVisible)
+                        ClipboardService.refresh();
+                });
+            } else {
+                ClipboardService.refresh();
+            }
+        }
         keyboardController.reset();
         Qt.callLater(function () {
             if (contentLoader.item?.searchField) {

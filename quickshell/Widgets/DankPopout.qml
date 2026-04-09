@@ -36,7 +36,7 @@ Item {
     property bool _resizeActive: false
     property real _surfaceMarginLeft: 0
     property real _surfaceW: 0
-    property string _connectedChromeToken: ""
+    property string _chromeClaimId: ""
     property int _connectedChromeSerial: 0
 
     property real storedBarThickness: Theme.barHeight - 4
@@ -155,7 +155,7 @@ Item {
         setBarContext(pos, bottomGap);
     }
 
-    function _nextConnectedChromeToken() {
+    function _nextChromeClaimId() {
         _connectedChromeSerial += 1;
         return layerNamespace + ":" + _connectedChromeSerial + ":" + (new Date()).getTime();
     }
@@ -176,21 +176,21 @@ Item {
     }
 
     function _publishConnectedChromeState(forceClaim, visibleOverride) {
-        if (!SettingsData.connectedFrameModeActive || !root.screen || !_connectedChromeToken)
+        if (!root.frameOwnsConnectedChrome || !root.screen || !_chromeClaimId)
             return;
 
         const state = _connectedChromeState(visibleOverride);
-        if (forceClaim || !ConnectedModeState.hasPopoutOwner(_connectedChromeToken)) {
-            ConnectedModeState.claimPopout(_connectedChromeToken, state);
+        if (forceClaim || !ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
+            ConnectedModeState.claimPopout(_chromeClaimId, state);
         } else {
-            ConnectedModeState.updatePopout(_connectedChromeToken, state);
+            ConnectedModeState.updatePopout(_chromeClaimId, state);
         }
     }
 
     function _releaseConnectedChromeState() {
-        if (_connectedChromeToken)
-            ConnectedModeState.releasePopout(_connectedChromeToken);
-        _connectedChromeToken = "";
+        if (_chromeClaimId)
+            ConnectedModeState.releasePopout(_chromeClaimId);
+        _chromeClaimId = "";
     }
 
     // ─── Exposed animation state for ConnectedModeState ────────────────────
@@ -199,7 +199,7 @@ Item {
 
     // ─── ConnectedModeState sync ────────────────────────────────────────────
     function _syncPopoutChromeState() {
-        if (!SettingsData.connectedFrameModeActive) {
+        if (!root.frameOwnsConnectedChrome) {
             _releaseConnectedChromeState();
             return;
         }
@@ -209,9 +209,9 @@ Item {
         }
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        if (!_connectedChromeToken)
-            _connectedChromeToken = _nextConnectedChromeToken();
-        _publishConnectedChromeState(contentWindow.visible && !ConnectedModeState.hasPopoutOwner(_connectedChromeToken));
+        if (!_chromeClaimId)
+            _chromeClaimId = _nextChromeClaimId();
+        _publishConnectedChromeState(contentWindow.visible && !ConnectedModeState.hasPopoutOwner(_chromeClaimId));
     }
 
     onAlignedXChanged: _syncPopoutChromeState()
@@ -235,10 +235,10 @@ Item {
     Connections {
         target: SettingsData
         function onConnectedFrameModeActiveChanged() {
-            if (SettingsData.connectedFrameModeActive) {
+            if (root.frameOwnsConnectedChrome) {
                 if (contentWindow.visible || root.shouldBeVisible) {
-                    if (!root._connectedChromeToken)
-                        root._connectedChromeToken = root._nextConnectedChromeToken();
+                    if (!root._chromeClaimId)
+                        root._chromeClaimId = root._nextChromeClaimId();
                     root._publishConnectedChromeState(true);
                 }
             } else {
@@ -248,6 +248,9 @@ Item {
     }
 
     readonly property bool useBackgroundWindow: !CompositorService.isHyprland || CompositorService.useHyprlandFocusGrab
+    readonly property bool frameOwnsConnectedChrome: SettingsData.connectedFrameModeActive
+        && !!root.screen
+        && SettingsData.isScreenInPreferences(root.screen, SettingsData.frameScreenPreferences)
 
     function updateSurfacePosition() {
         if (useBackgroundWindow && shouldBeVisible) {
@@ -284,11 +287,11 @@ Item {
             contentContainer.scaleValue = root.animationScaleCollapsed;
         }
 
-        if (SettingsData.connectedFrameModeActive) {
-            _connectedChromeToken = _nextConnectedChromeToken();
+        if (root.frameOwnsConnectedChrome) {
+            _chromeClaimId = _nextChromeClaimId();
             _publishConnectedChromeState(true, true);
         } else {
-            _connectedChromeToken = "";
+            _chromeClaimId = "";
         }
 
         if (useBackgroundWindow) {
@@ -643,7 +646,7 @@ Item {
         WindowBlur {
             id: popoutBlur
             targetWindow: contentWindow
-            blurEnabled: root.effectiveSurfaceBlurEnabled && !SettingsData.connectedFrameModeActive
+            blurEnabled: root.effectiveSurfaceBlurEnabled && !root.frameOwnsConnectedChrome
 
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             readonly property bool trackBlurFromBarEdge: Theme.isConnectedEffect || (typeof SettingsData !== "undefined" && Theme.isDirectionalEffect && SettingsData.directionalAnimationMode !== 2)
@@ -986,7 +989,7 @@ Item {
 
                             Item {
                                 anchors.fill: parent
-                                visible: Theme.isConnectedEffect && !SettingsData.connectedFrameModeActive
+                                visible: Theme.isConnectedEffect && !root.frameOwnsConnectedChrome
                                 clip: false
 
                                 Rectangle {

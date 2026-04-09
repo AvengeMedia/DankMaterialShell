@@ -16,7 +16,7 @@ Item {
     property bool spotlightOpen: false
     property bool keyboardActive: false
     property bool contentVisible: false
-    readonly property bool launcherMotionVisible: Theme.isDirectionalEffect ? spotlightOpen : _motionActive
+    readonly property bool launcherMotionVisible: Theme.isConnectedEffect ? _motionActive : (Theme.isDirectionalEffect ? spotlightOpen : _motionActive)
     property var spotlightContent: launcherContentLoader.item
     property bool openedFromOverview: false
     property bool isClosing: false
@@ -68,6 +68,9 @@ Item {
     readonly property real modalY: (screenHeight - modalHeight) / 2
 
     readonly property bool connectedSurfaceOverride: Theme.isConnectedEffect
+    readonly property int launcherAnimationDuration: Theme.isConnectedEffect ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
+    readonly property list<real> launcherEnterCurve: Theme.isConnectedEffect ? Theme.variantPopoutEnterCurve : Theme.variantModalEnterCurve
+    readonly property list<real> launcherExitCurve: Theme.isConnectedEffect ? Theme.variantPopoutExitCurve : Theme.variantModalExitCurve
     readonly property color backgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     readonly property real cornerRadius: connectedSurfaceOverride ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     readonly property color borderColor: {
@@ -272,7 +275,7 @@ Item {
 
     Timer {
         id: closeCleanupTimer
-        interval: Theme.variantCloseInterval(Theme.modalAnimationDuration)
+        interval: Theme.variantCloseInterval(root.launcherAnimationDuration)
         repeat: false
         onTriggered: {
             isClosing = false;
@@ -395,8 +398,8 @@ Item {
             Behavior on opacity {
                 enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                 DankAnim {
-                    duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
-                    easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                    duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                    easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
                 }
             }
         }
@@ -513,47 +516,32 @@ Item {
                 return -Math.max((root.shadowPad || 0) + Theme.effectAnimOffset, 40);
             }
 
-            // animX/animY are Behavior-animated — DankPopout pattern
-            property real animX: 0
-            property real animY: 0
-            property real scaleValue: Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed)
-
-            Component.onCompleted: {
-                animX = Theme.snap(root._motionActive ? 0 : collapsedMotionX, root.dpr);
-                animY = Theme.snap(root._motionActive ? 0 : collapsedMotionY, root.dpr);
-                scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed));
-            }
-
-            Connections {
-                target: root
-                function on_MotionActiveChanged() {
-                    contentContainer.animX = Theme.snap(root._motionActive ? 0 : root._frozenMotionX, root.dpr);
-                    contentContainer.animY = Theme.snap(root._motionActive ? 0 : root._frozenMotionY, root.dpr);
-                    contentContainer.scaleValue = root._motionActive ? 1.0 : (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed));
-                }
-            }
+            // Declarative bindings — snap applied at render layer (contentWrapper x/y)
+            property real animX: root._motionActive ? 0 : root._frozenMotionX
+            property real animY: root._motionActive ? 0 : root._frozenMotionY
+            property real scaleValue: root._motionActive ? 1.0 : (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed))
 
             Behavior on animX {
                 enabled: root.animationsEnabled
                 DankAnim {
-                    duration: Theme.variantDuration(Theme.modalAnimationDuration, root._motionActive)
-                    easing.bezierCurve: root._motionActive ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                    duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
+                    easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
                 }
             }
 
             Behavior on animY {
                 enabled: root.animationsEnabled
                 DankAnim {
-                    duration: Theme.variantDuration(Theme.modalAnimationDuration, root._motionActive)
-                    easing.bezierCurve: root._motionActive ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                    duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
+                    easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
                 }
             }
 
             Behavior on scaleValue {
                 enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2))
                 DankAnim {
-                    duration: Theme.variantDuration(Theme.modalAnimationDuration, root._motionActive)
-                    easing.bezierCurve: root._motionActive ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                    duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
+                    easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
                 }
             }
 
@@ -609,8 +597,8 @@ Item {
                         Behavior on opacity {
                             enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                             DankAnim {
-                                duration: Math.round(Theme.variantDuration(Theme.modalAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
-                                easing.bezierCurve: launcherMotionVisible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                                duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                                easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
                             }
                         }
 

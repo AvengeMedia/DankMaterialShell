@@ -16,7 +16,7 @@ PanelWindow {
         blurY: content.y + content.cardInset + swipeTx.y + tx.y
         blurWidth: !win._finalized ? Math.max(0, content.width - content.cardInset * 2) : 0
         blurHeight: !win._finalized ? Math.max(0, content.height - content.cardInset * 2) : 0
-        blurRadius: Theme.cornerRadius
+        blurRadius: SettingsData.connectedFrameModeActive ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     }
 
     WlrLayershell.namespace: "dms:notification-popup"
