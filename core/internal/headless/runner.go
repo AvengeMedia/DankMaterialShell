@@ -113,44 +113,11 @@ func (r *Runner) Run() error {
 	// 5. Apply include/exclude filters and build the disabled-items map.
 	// Headless mode does not currently collect any explicit reinstall selections,
 	// so keep reinstallItems nil instead of constructing an always-empty map.
-	disabledItems := make(map[string]bool)
+	disabledItems, err := r.buildDisabledItems(dependencies)
+	if err != nil {
+		return err
+	}
 	var reinstallItems map[string]bool
-
-	// dms-greeter is opt-in (disabled by default), matching TUI behavior
-	for i := range dependencies {
-		if dependencies[i].Name == "dms-greeter" {
-			disabledItems["dms-greeter"] = true
-			break
-		}
-	}
-
-	// Process --include-deps (enable items that are disabled by default)
-	for _, name := range r.cfg.IncludeDeps {
-		name = strings.TrimSpace(name)
-		if name == "" {
-			continue
-		}
-		if !r.depExists(dependencies, name) {
-			return fmt.Errorf("--include-deps: unknown dependency %q", name)
-		}
-		delete(disabledItems, name)
-	}
-
-	// Process --exclude-deps (disable items)
-	for _, name := range r.cfg.ExcludeDeps {
-		name = strings.TrimSpace(name)
-		if name == "" {
-			continue
-		}
-		if !r.depExists(dependencies, name) {
-			return fmt.Errorf("--exclude-deps: unknown dependency %q", name)
-		}
-		// Don't allow excluding DMS itself
-		if name == "dms (DankMaterialShell)" {
-			return fmt.Errorf("--exclude-deps: cannot exclude required package %q", name)
-		}
-		disabledItems[name] = true
-	}
 
 	// Print dependency summary
 	fmt.Fprintln(os.Stdout, "\nDependencies:")
@@ -296,6 +263,51 @@ func (r *Runner) Run() error {
 	fmt.Fprintln(os.Stdout, "\nInstallation complete!")
 	r.log("Headless installation completed successfully")
 	return nil
+}
+
+// buildDisabledItems computes the set of dependencies that should be skipped
+// during installation, applying the --include-deps and --exclude-deps filters.
+// dms-greeter is disabled by default (opt-in), matching TUI behavior.
+func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]bool, error) {
+	disabledItems := make(map[string]bool)
+
+	// dms-greeter is opt-in (disabled by default), matching TUI behavior
+	for i := range dependencies {
+		if dependencies[i].Name == "dms-greeter" {
+			disabledItems["dms-greeter"] = true
+			break
+		}
+	}
+
+	// Process --include-deps (enable items that are disabled by default)
+	for _, name := range r.cfg.IncludeDeps {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+		if !r.depExists(dependencies, name) {
+			return nil, fmt.Errorf("--include-deps: unknown dependency %q", name)
+		}
+		delete(disabledItems, name)
+	}
+
+	// Process --exclude-deps (disable items)
+	for _, name := range r.cfg.ExcludeDeps {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+		if !r.depExists(dependencies, name) {
+			return nil, fmt.Errorf("--exclude-deps: unknown dependency %q", name)
+		}
+		// Don't allow excluding DMS itself
+		if name == "dms (DankMaterialShell)" {
+			return nil, fmt.Errorf("--exclude-deps: cannot exclude required package %q", name)
+		}
+		disabledItems[name] = true
+	}
+
+	return disabledItems, nil
 }
 
 // buildReplaceConfigs converts the --replace-configs / --replace-configs-all

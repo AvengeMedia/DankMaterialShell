@@ -1,6 +1,7 @@
 package headless
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -336,5 +337,123 @@ func TestConfigReplaceConfigsStoredCorrectly(t *testing.T) {
 	}
 	if len(r2.cfg.ReplaceConfigs) != 0 {
 		t.Errorf("len(ReplaceConfigs) = %d, want 0", len(r2.cfg.ReplaceConfigs))
+	}
+}
+
+func TestBuildDisabledItems(t *testing.T) {
+	dependencies := []deps.Dependency{
+		{Name: "niri", Status: deps.StatusInstalled},
+		{Name: "ghostty", Status: deps.StatusMissing},
+		{Name: "dms (DankMaterialShell)", Status: deps.StatusInstalled},
+		{Name: "dms-greeter", Status: deps.StatusMissing},
+		{Name: "waybar", Status: deps.StatusMissing},
+	}
+
+	tests := []struct {
+		name         string
+		includeDeps  []string
+		excludeDeps  []string
+		deps         []deps.Dependency // nil means use the shared fixture
+		wantErr      bool
+		errContains  string   // substring expected in error message
+		wantDisabled []string // dep names that should be in disabledItems
+		wantEnabled  []string // dep names that should NOT be in disabledItems (extra check)
+	}{
+		{
+			name:         "no flags set, dms-greeter disabled by default",
+			wantDisabled: []string{"dms-greeter"},
+			wantEnabled:  []string{"niri", "ghostty", "waybar"},
+		},
+		{
+			name:        "include dms-greeter enables it",
+			includeDeps: []string{"dms-greeter"},
+			wantEnabled: []string{"dms-greeter"},
+		},
+		{
+			name:         "exclude a regular dep",
+			excludeDeps:  []string{"waybar"},
+			wantDisabled: []string{"dms-greeter", "waybar"},
+		},
+		{
+			name:        "include unknown dep returns error",
+			includeDeps: []string{"nonexistent"},
+			wantErr:     true,
+			errContains: "--include-deps",
+		},
+		{
+			name:        "exclude unknown dep returns error",
+			excludeDeps: []string{"nonexistent"},
+			wantErr:     true,
+			errContains: "--exclude-deps",
+		},
+		{
+			name:        "exclude DMS itself is forbidden",
+			excludeDeps: []string{"dms (DankMaterialShell)"},
+			wantErr:     true,
+			errContains: "cannot exclude required package",
+		},
+		{
+			name:         "include and exclude same dep",
+			includeDeps:  []string{"dms-greeter"},
+			excludeDeps:  []string{"dms-greeter"},
+			wantDisabled: []string{"dms-greeter"},
+		},
+		{
+			name:        "whitespace entries are skipped",
+			includeDeps: []string{"  ", "dms-greeter"},
+			wantEnabled: []string{"dms-greeter"},
+		},
+		{
+			name: "no dms-greeter in deps, nothing disabled by default",
+			deps: []deps.Dependency{
+				{Name: "niri", Status: deps.StatusInstalled},
+			},
+			wantEnabled: []string{"niri"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := NewRunner(Config{
+				IncludeDeps: tt.includeDeps,
+				ExcludeDeps: tt.excludeDeps,
+			})
+			d := tt.deps
+			if d == nil {
+				d = dependencies
+			}
+			got, err := r.buildDisabledItems(d)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("buildDisabledItems() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr {
+				if tt.errContains != "" && !strings.Contains(err.Error(), tt.errContains) {
+					t.Errorf("error %q does not contain %q", err.Error(), tt.errContains)
+				}
+				return
+			}
+			if got == nil {
+				t.Fatal("buildDisabledItems() returned nil map, want non-nil")
+			}
+
+			// Check expected disabled items
+			for _, name := range tt.wantDisabled {
+				if !got[name] {
+					t.Errorf("expected %q to be disabled, but it is not", name)
+				}
+			}
+
+			// Check expected enabled items (should not be in the map or be false)
+			for _, name := range tt.wantEnabled {
+				if got[name] {
+					t.Errorf("expected %q to NOT be disabled, but it is", name)
+				}
+			}
+
+			// If wantDisabled is empty, the map should have length 0
+			if len(tt.wantDisabled) == 0 && len(got) != 0 {
+				t.Errorf("expected empty disabledItems map, got %v", got)
+			}
+		})
 	}
 }
