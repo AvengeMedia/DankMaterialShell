@@ -231,7 +231,10 @@ Singleton {
             return;
         isChecking = true;
         hasError = false;
-        if (updChecker.length > 0) {
+        if (pkgManager === "paru" || pkgManager === "yay") {
+            const repoCmd = updChecker.length > 0 ? updChecker : `${pkgManager} -Qu`;
+            updateChecker.command = ["sh", "-c", `(${repoCmd} 2>/dev/null; ${pkgManager} -Qua 2>/dev/null) || true`];
+        } else if (updChecker.length > 0) {
             updateChecker.command = [updChecker].concat(updateCheckerParams[updChecker].listUpdatesSettings.params);
         } else {
             updateChecker.command = [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesSettings.params);
