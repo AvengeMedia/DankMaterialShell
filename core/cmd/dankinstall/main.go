@@ -34,6 +34,7 @@ are provided, it runs in headless (unattended) mode suitable for scripting.
 
 Headless mode requires cached sudo credentials. Run 'sudo -v' beforehand, or
 configure passwordless sudo for your user.`,
+	Args:          cobra.NoArgs,
 	RunE:          runDankinstall,
 	SilenceErrors: true,
 	SilenceUsage:  true,
