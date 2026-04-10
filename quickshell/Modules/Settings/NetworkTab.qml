@@ -18,6 +18,7 @@ Item {
     property string expandedVpnUuid: ""
     property string expandedWifiSsid: ""
     property string expandedEthDevice: ""
+    property string expandedCellularUuid: ""
     property int maxPinnedWifiNetworks: 3
 
     Component.onCompleted: {
@@ -90,6 +91,89 @@ Item {
 
     ConfirmModal {
         id: forgetNetworkConfirm
+    }
+
+    // SIM PIN Entry Dialog
+    Rectangle {
+        id: simPinDialog
+        visible: false
+        anchors.centerIn: parent
+        width: 320
+        height: simPinColumn.height + Theme.spacingL * 2
+        radius: Theme.cornerRadius
+        color: Theme.surfaceContainerHigh
+        border.width: 1
+        border.color: Theme.outline
+        z: 100
+
+        Column {
+            id: simPinColumn
+            anchors.centerIn: parent
+            width: parent.width - Theme.spacingL * 2
+            spacing: Theme.spacingM
+
+            StyledText {
+                text: I18n.tr("Enter SIM PIN")
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            StyledText {
+                text: I18n.tr("Tries left: %1").arg(NetworkService.pinTriesLeft)
+                font.pixelSize: Theme.fontSizeSmall
+                color: NetworkService.pinTriesLeft <= 1 ? Theme.error : Theme.surfaceVariantText
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                visible: NetworkService.pinTriesLeft < 3
+            }
+
+            DankTextField {
+                id: simPinInput
+                width: parent.width
+                placeholderText: I18n.tr("PIN code")
+                echoMode: TextInput.Password
+                maximumLength: 8
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[0-9]*$/
+                }
+            }
+
+            Row {
+                width: parent.width
+                spacing: Theme.spacingM
+
+                DankButton {
+                    text: I18n.tr("Cancel")
+                    backgroundColor: "transparent"
+                    textColor: Theme.primary
+                    onClicked: {
+                        simPinDialog.visible = false;
+                        simPinInput.text = "";
+                    }
+                }
+
+                DankButton {
+                    text: I18n.tr("Submit")
+                    backgroundColor: Theme.primary
+                    textColor: Theme.onPrimary
+                    enabled: simPinInput.text.length >= 4
+                    onClicked: {
+                        NetworkService.submitSIMPin(simPinInput.text);
+                        simPinDialog.visible = false;
+                        simPinInput.text = "";
+                    }
+                }
+            }
+        }
+
+        function open() {
+            simPinInput.text = "";
+            simPinInput.forceActiveFocus();
+            visible = true;
+        }
     }
 
     DankFlickable {
@@ -1501,6 +1585,231 @@ Item {
                                                     }
                                                 }
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Cellular Section
+            StyledRect {
+                width: parent.width
+                height: cellularSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                visible: NetworkService.cellularAvailable
+
+                Column {
+                    id: cellularSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: NetworkService.cellularEnabled ? (NetworkService.simLocked ? "sim_card_alert" : "signal_cellular_4_bar") : "signal_cellular_off"
+                            size: Theme.iconSize
+                            color: NetworkService.cellularConnected ? Theme.primary : (NetworkService.simLocked ? Theme.error : Theme.surfaceText)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            width: parent.width - Theme.iconSize - Theme.spacingM - cellularControls.width - Theme.spacingM
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            StyledText {
+                                text: I18n.tr("Cellular / Mobile Data")
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                                width: parent.width
+                                horizontalAlignment: Text.AlignLeft
+                            }
+
+                            StyledText {
+                                text: {
+                                    if (NetworkService.cellularToggling)
+                                        return I18n.tr("Toggling...");
+                                    if (!NetworkService.cellularEnabled)
+                                        return I18n.tr("Disabled");
+                                    if (NetworkService.simLocked)
+                                        return I18n.tr("SIM locked - PIN required");
+                                    if (NetworkService.cellularConnected)
+                                        return NetworkService.cellularOperator || I18n.tr("Connected");
+                                    return I18n.tr("Not connected");
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: NetworkService.cellularConnected ? Theme.primary : (NetworkService.simLocked ? Theme.error : Theme.surfaceVariantText)
+                                width: parent.width
+                                horizontalAlignment: Text.AlignLeft
+                            }
+                        }
+
+                        Row {
+                            id: cellularControls
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+
+                            DankActionButton {
+                                iconName: "vpn_key"
+                                buttonSize: 32
+                                visible: NetworkService.simLocked && NetworkService.cellularEnabled
+                                iconColor: Theme.error
+                                onClicked: {
+                                    NetworkService.getSIMPinTriesLeft();
+                                    simPinDialog.open();
+                                }
+                            }
+
+                            DankToggle {
+                                checked: NetworkService.cellularEnabled
+                                enabled: !NetworkService.cellularToggling
+                                onToggled: checked => {
+                                    NetworkService.setCellularEnabled(checked);
+                                }
+                            }
+                        }
+                    }
+
+                    // Signal strength indicator
+                    Row {
+                        width: parent.width
+                        visible: NetworkService.cellularConnected && NetworkService.cellularSignal > 0
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: {
+                                const strength = NetworkService.cellularSignal;
+                                if (strength >= 75) return "signal_cellular_4_bar";
+                                if (strength >= 50) return "signal_cellular_3_bar";
+                                if (strength >= 25) return "signal_cellular_2_bar";
+                                return "signal_cellular_1_bar";
+                            }
+                            size: 18
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: NetworkService.cellularSignal + "%"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: "•"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            visible: NetworkService.cellularTechnology !== ""
+                        }
+
+                        StyledText {
+                            text: NetworkService.cellularTechnology
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            visible: NetworkService.cellularTechnology !== ""
+                        }
+                    }
+
+                    // IP address
+                    StyledText {
+                        text: NetworkService.cellularIP
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        visible: NetworkService.cellularConnected && NetworkService.cellularIP !== ""
+                    }
+
+                    // Saved Connections Header
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        visible: NetworkService.cellularProfiles.length > 0
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Saved Profiles")
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        width: parent.width
+                        horizontalAlignment: Text.AlignLeft
+                        visible: NetworkService.cellularProfiles.length > 0
+                    }
+
+                    // Cellular Profiles List
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
+                        visible: NetworkService.cellularProfiles.length > 0
+
+                        Repeater {
+                            model: NetworkService.cellularProfiles
+
+                            delegate: Rectangle {
+                                required property var modelData
+                                required property int index
+
+                                readonly property bool isActive: NetworkService.isActiveCellularUuid(modelData.uuid)
+
+                                width: parent.width
+                                height: 48
+                                radius: Theme.cornerRadius
+                                color: cellularMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                                border.width: isActive ? 2 : 0
+                                border.color: Theme.primary
+
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: Theme.spacingM
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: Theme.spacingS
+
+                                    DankIcon {
+                                        name: isActive ? "signal_cellular_4_bar" : "signal_cellular_off"
+                                        size: 20
+                                        color: isActive ? Theme.primary : Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+
+                                        StyledText {
+                                            text: modelData.name || I18n.tr("Unknown")
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            color: isActive ? Theme.primary : Theme.surfaceText
+                                            font.weight: isActive ? Font.Medium : Font.Normal
+                                        }
+
+                                        StyledText {
+                                            text: modelData.apn ? I18n.tr("APN: %1").arg(modelData.apn) : ""
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceVariantText
+                                            visible: modelData.apn !== ""
+                                        }
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: cellularMouseArea
+
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (isActive) {
+                                            NetworkService.disconnectCellular();
+                                        } else {
+                                            NetworkService.connectCellular(modelData.uuid);
                                         }
                                     }
                                 }

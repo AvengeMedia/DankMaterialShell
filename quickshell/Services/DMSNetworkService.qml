@@ -92,6 +92,25 @@ Singleton {
     property alias isBusy: root.vpnIsBusy
     property alias connected: root.vpnConnected
 
+    // Cellular properties
+    property bool cellularAvailable: false
+    property bool cellularEnabled: false
+    property bool cellularConnected: false
+    property string cellularIP: ""
+    property string cellularInterface: ""
+    property string cellularOperator: ""
+    property string cellularTechnology: ""
+    property int cellularSignal: 0
+    property var cellularDevices: []
+    property var cellularConnections: []
+    property var cellularProfiles: []
+    property var cellularActive: []
+    property bool cellularToggling: false
+    property bool simLocked: false
+    property bool pinRequired: false
+    property int pinTriesLeft: 3
+    property string pendingCellularUuid: ""
+
     property string networkInfoSSID: ""
     property string networkInfoDetails: ""
     property bool networkInfoLoading: false
@@ -286,6 +305,29 @@ Singleton {
 
         if (state.vpnProfiles) {
             vpnProfiles = state.vpnProfiles;
+        }
+
+        // Update cellular state
+        cellularAvailable = networkAvailable && state.backend === "networkmanager";
+        if (cellularAvailable) {
+            cellularEnabled = state.cellularEnabled || false;
+            cellularConnected = state.cellularConnected || false;
+            cellularIP = state.cellularIP || "";
+            cellularInterface = state.cellularDevice || "";
+            cellularOperator = state.cellularOperator || "";
+            cellularTechnology = state.cellularTechnology || "";
+            cellularSignal = state.cellularSignal || 0;
+            cellularDevices = state.cellularDevices || [];
+            cellularConnections = state.cellularConnections || [];
+            cellularProfiles = state.cellularProfiles || [];
+            cellularActive = state.cellularActive || [];
+
+            // Check for SIM lock from first device
+            if (state.cellularDevices && state.cellularDevices.length > 0) {
+                const dev = state.cellularDevices[0];
+                simLocked = dev.simLocked || false;
+                pinRequired = dev.pinRequired || false;
+            }
         }
 
         const previousVpnActive = vpnActive;
@@ -940,5 +982,166 @@ Singleton {
                 Qt.callLater(() => getState());
             }
         });
+    }
+
+    // Cellular functions
+    function getCellularState() {
+        if (!networkAvailable)
+            return;
+        DMSService.sendRequest("network.cellular.enabled", null, response => {
+            if (response.result) {
+                cellularEnabled = response.result.enabled || false;
+            }
+        });
+    }
+
+    function setCellularEnabled(enabled) {
+        if (!networkAvailable || cellularToggling)
+            return;
+        cellularToggling = true;
+
+        const method = enabled ? "network.cellular.enable" : "network.cellular.disable";
+        DMSService.sendRequest(method, null, response => {
+            cellularToggling = false;
+            if (response.error) {
+                ToastService.showError(I18n.tr("Failed to toggle cellular"), response.error);
+            } else {
+                cellularEnabled = enabled;
+                Qt.callLater(() => getState());
+            }
+        });
+    }
+
+    function getCellularDevices() {
+        if (!networkAvailable)
+            return;
+        DMSService.sendRequest("network.cellular.devices", null, response => {
+            if (response.result) {
+                cellularDevices = response.result;
+                // Update SIM lock status from first device
+                if (response.result.length > 0) {
+                    const dev = response.result[0];
+                    simLocked = dev.simLocked || false;
+                    pinRequired = dev.pinRequired || false;
+                }
+            }
+        });
+    }
+
+    function getCellularConnections() {
+        if (!networkAvailable)
+            return;
+        DMSService.sendRequest("network.cellular.connections", null, response => {
+            if (response.result) {
+                cellularConnections = response.result;
+            }
+        });
+    }
+
+    function getCellularProfiles() {
+        if (!networkAvailable)
+            return;
+        DMSService.sendRequest("network.cellular.profiles", null, response => {
+            if (response.result) {
+                cellularProfiles = response.result;
+            }
+        });
+    }
+
+    function getActiveCellular() {
+        if (!networkAvailable)
+            return;
+        DMSService.sendRequest("network.cellular.active", null, response => {
+            if (response.result) {
+                cellularActive = response.result;
+            }
+        });
+    }
+
+    function connectCellular(uuid) {
+        if (!networkAvailable || !cellularEnabled)
+            return;
+        pendingCellularUuid = uuid;
+
+        const params = { uuid: uuid };
+        DMSService.sendRequest("network.cellular.connect", params, response => {
+            if (response.error) {
+                ToastService.showError(I18n.tr("Failed to connect cellular"), response.error);
+                pendingCellularUuid = "";
+            } else {
+                ToastService.showInfo(I18n.tr("Cellular connecting..."));
+                Qt.callLater(() => getState());
+            }
+        });
+    }
+
+    function disconnectCellular() {
+        if (!networkAvailable)
+            return;
+        DMSService.sendRequest("network.cellular.disconnect", null, response => {
+            if (response.error) {
+                ToastService.showError(I18n.tr("Failed to disconnect cellular"), response.error);
+            } else {
+                ToastService.showInfo(I18n.tr("Cellular disconnected"));
+                Qt.callLater(() => getState());
+            }
+        });
+    }
+
+    function getSIMStatus(device) {
+        if (!networkAvailable)
+            return;
+        const params = device ? { device: device } : null;
+        DMSService.sendRequest("network.cellular.simStatus", params, response => {
+            if (response.result) {
+                simLocked = response.result.simLocked || false;
+                pinRequired = response.result.pinRequired || false;
+            }
+        });
+    }
+
+    function submitSIMPin(pin, device) {
+        if (!networkAvailable)
+            return;
+        const params = { pin: pin };
+        if (device)
+            params.device = device;
+
+        DMSService.sendRequest("network.cellular.submitPin", params, response => {
+            if (response.error) {
+                ToastService.showError(I18n.tr("Failed to submit PIN"), response.error);
+                // Refresh PIN tries left
+                getSIMPinTriesLeft(device);
+            } else {
+                ToastService.showInfo(I18n.tr("PIN submitted successfully"));
+                simLocked = false;
+                Qt.callLater(() => getState());
+            }
+        });
+    }
+
+    function getSIMPinTriesLeft(device) {
+        if (!networkAvailable)
+            return;
+        const params = device ? { device: device } : null;
+        DMSService.sendRequest("network.cellular.pinTriesLeft", params, response => {
+            if (response.result) {
+                pinTriesLeft = response.result.triesLeft || 3;
+            }
+        });
+    }
+
+    function isActiveCellularUuid(uuid) {
+        return cellularActive && cellularActive.some(a => a.uuid === uuid);
+    }
+
+    function refreshCellularState() {
+        if (networkAvailable) {
+            getCellularState();
+            getCellularDevices();
+            getCellularConnections();
+            getCellularProfiles();
+            getActiveCellular();
+        }
     }
 }

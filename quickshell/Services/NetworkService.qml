@@ -87,6 +87,24 @@ Singleton {
     property string credentialsReason: activeService?.credentialsReason ?? ""
     property bool credentialsRequested: activeService?.credentialsRequested ?? false
 
+    // Cellular properties
+    property bool cellularAvailable: activeService?.cellularAvailable ?? false
+    property bool cellularEnabled: activeService?.cellularEnabled ?? false
+    property bool cellularConnected: activeService?.cellularConnected ?? false
+    property string cellularIP: activeService?.cellularIP ?? ""
+    property string cellularInterface: activeService?.cellularInterface ?? ""
+    property string cellularOperator: activeService?.cellularOperator ?? ""
+    property string cellularTechnology: activeService?.cellularTechnology ?? ""
+    property int cellularSignal: activeService?.cellularSignal ?? 0
+    property var cellularDevices: activeService?.cellularDevices ?? []
+    property var cellularConnections: activeService?.cellularConnections ?? []
+    property var cellularProfiles: activeService?.cellularProfiles ?? []
+    property var cellularActive: activeService?.cellularActive ?? []
+    property bool cellularToggling: activeService?.cellularToggling ?? false
+    property bool simLocked: activeService?.simLocked ?? false
+    property bool pinRequired: activeService?.pinRequired ?? false
+    property int pinTriesLeft: activeService?.pinTriesLeft ?? 3
+
     signal networksUpdated
     signal connectionChanged
     signal credentialsNeeded(string token, string ssid, string setting, var fields, var hints, string reason, string connType, string connName, string vpnService, var fieldsInfo)
@@ -308,6 +326,80 @@ Singleton {
     function setWifiDeviceOverride(deviceName) {
         if (activeService && activeService.setWifiDeviceOverride) {
             activeService.setWifiDeviceOverride(deviceName);
+        }
+    }
+
+    // Cellular functions
+    function setCellularEnabled(enabled) {
+        if (activeService && activeService.setCellularEnabled) {
+            activeService.setCellularEnabled(enabled);
+        }
+    }
+
+    function getCellularDevices() {
+        if (activeService && activeService.getCellularDevices) {
+            activeService.getCellularDevices();
+        }
+    }
+
+    function getCellularConnections() {
+        if (activeService && activeService.getCellularConnections) {
+            activeService.getCellularConnections();
+        }
+    }
+
+    function getCellularProfiles() {
+        if (activeService && activeService.getCellularProfiles) {
+            activeService.getCellularProfiles();
+        }
+    }
+
+    function getActiveCellular() {
+        if (activeService && activeService.getActiveCellular) {
+            activeService.getActiveCellular();
+        }
+    }
+
+    function connectCellular(uuid) {
+        if (activeService && activeService.connectCellular) {
+            activeService.connectCellular(uuid);
+        }
+    }
+
+    function disconnectCellular() {
+        if (activeService && activeService.disconnectCellular) {
+            activeService.disconnectCellular();
+        }
+    }
+
+    function getSIMStatus(device) {
+        if (activeService && activeService.getSIMStatus) {
+            activeService.getSIMStatus(device);
+        }
+    }
+
+    function submitSIMPin(pin, device) {
+        if (activeService && activeService.submitSIMPin) {
+            activeService.submitSIMPin(pin, device);
+        }
+    }
+
+    function getSIMPinTriesLeft(device) {
+        if (activeService && activeService.getSIMPinTriesLeft) {
+            activeService.getSIMPinTriesLeft(device);
+        }
+    }
+
+    function isActiveCellularUuid(uuid) {
+        if (activeService && activeService.isActiveCellularUuid) {
+            return activeService.isActiveCellularUuid(uuid);
+        }
+        return false;
+    }
+
+    function refreshCellularState() {
+        if (activeService && activeService.refreshCellularState) {
+            activeService.refreshCellularState();
         }
     }
 }

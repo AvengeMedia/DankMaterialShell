@@ -97,6 +97,8 @@ func TestNetworkManagerBackend_HandleNetworkManagerChange(t *testing.T) {
 
 	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{}, nil).Maybe()
 	mockNM.EXPECT().GetPropertyPrimaryConnection().Return(nil, nil).Maybe()
+	mockNM.EXPECT().GetPropertyWwanEnabled().Return(false, nil).Maybe()
+	mockNM.EXPECT().GetDevices().Return([]gonetworkmanager.Device{}, nil).Maybe()
 
 	changes := map[string]dbus.Variant{
 		"PrimaryConnection": dbus.MakeVariant("/"),
@@ -135,6 +137,8 @@ func TestNetworkManagerBackend_HandleNetworkManagerChange_ActiveConnections(t *t
 
 	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{}, nil)
 	mockNM.EXPECT().GetPropertyPrimaryConnection().Return(nil, nil).Maybe()
+	mockNM.EXPECT().GetPropertyWwanEnabled().Return(false, nil).Maybe()
+	mockNM.EXPECT().GetDevices().Return([]gonetworkmanager.Device{}, nil).Maybe()
 
 	changes := map[string]dbus.Variant{
 		"ActiveConnections": dbus.MakeVariant([]any{}),
@@ -153,6 +157,8 @@ func TestNetworkManagerBackend_HandleDeviceChange(t *testing.T) {
 
 	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{}, nil).Maybe()
 	mockNM.EXPECT().GetPropertyPrimaryConnection().Return(nil, nil).Maybe()
+	mockNM.EXPECT().GetPropertyWwanEnabled().Return(false, nil).Maybe()
+	mockNM.EXPECT().GetDevices().Return([]gonetworkmanager.Device{}, nil).Maybe()
 
 	changes := map[string]dbus.Variant{
 		"State": dbus.MakeVariant(uint32(100)),
@@ -168,6 +174,9 @@ func TestNetworkManagerBackend_HandleDeviceChange_Ip4Config(t *testing.T) {
 
 	backend, err := NewNetworkManagerBackend(mockNM)
 	assert.NoError(t, err)
+
+	mockNM.EXPECT().GetPropertyWwanEnabled().Return(false, nil).Maybe()
+	mockNM.EXPECT().GetDevices().Return([]gonetworkmanager.Device{}, nil).Maybe()
 
 	changes := map[string]dbus.Variant{
 		"Ip4Config": dbus.MakeVariant("/"),

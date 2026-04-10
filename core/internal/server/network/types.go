@@ -13,6 +13,7 @@ const (
 	StatusDisconnected NetworkStatus = "disconnected"
 	StatusEthernet     NetworkStatus = "ethernet"
 	StatusWiFi         NetworkStatus = "wifi"
+	StatusCellular     NetworkStatus = "cellular"
 	StatusVPN          NetworkStatus = "vpn"
 )
 
@@ -22,6 +23,7 @@ const (
 	PreferenceAuto     ConnectionPreference = "auto"
 	PreferenceWiFi     ConnectionPreference = "wifi"
 	PreferenceEthernet ConnectionPreference = "ethernet"
+	PreferenceCellular ConnectionPreference = "cellular"
 )
 
 type WiFiNetwork struct {
@@ -113,6 +115,17 @@ type NetworkState struct {
 	WiFiNetworks           []WiFiNetwork        `json:"wifiNetworks"`
 	WiFiDevices            []WiFiDevice         `json:"wifiDevices"`
 	WiredConnections       []WiredConnection    `json:"wiredConnections"`
+	CellularIP             string               `json:"cellularIP"`
+	CellularDevice         string               `json:"cellularDevice"`
+	CellularConnected      bool                 `json:"cellularConnected"`
+	CellularEnabled        bool                 `json:"cellularEnabled"`
+	CellularOperator       string               `json:"cellularOperator"`
+	CellularTechnology     string               `json:"cellularTechnology"`
+	CellularSignal         uint8                `json:"cellularSignal"`
+	CellularDevices        []CellularDevice     `json:"cellularDevices"`
+	CellularProfiles       []CellularProfile    `json:"cellularProfiles"`
+	CellularActive         []CellularActive     `json:"cellularActive"`
+	CellularConnections    []CellularConnection `json:"cellularConnections"`
 	VPNProfiles            []VPNProfile         `json:"vpnProfiles"`
 	VPNActive              []VPNActive          `json:"vpnActive"`
 	IsConnecting           bool                 `json:"isConnecting"`
@@ -144,6 +157,79 @@ type WiredConnection struct {
 	UUID     string          `json:"uuid"`
 	Type     string          `json:"type"`
 	IsActive bool            `json:"isActive"`
+}
+
+type CellularDevice struct {
+	Name        string `json:"name"`
+	HwAddress   string `json:"hwAddress"`
+	State       string `json:"state"`
+	Connected   bool   `json:"connected"`
+	IP          string `json:"ip,omitempty"`
+	Operator    string `json:"operator,omitempty"`
+	Technology  string `json:"technology,omitempty"`
+	Signal      uint8  `json:"signal,omitempty"`
+	IMEI        string `json:"imei,omitempty"`
+	SimLocked   bool   `json:"simLocked,omitempty"`
+	PinRequired bool   `json:"pinRequired,omitempty"`
+}
+
+type SIMPinRequest struct {
+	Token        string `json:"token"`
+	Device       string `json:"device"`
+	IMEI         string `json:"imei,omitempty"`
+	Operator     string `json:"operator,omitempty"`
+	PinTriesLeft int    `json:"pinTriesLeft,omitempty"`
+}
+
+type SIMPinResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+}
+
+type CellularConnection struct {
+	Path     dbus.ObjectPath `json:"path"`
+	ID       string          `json:"id"`
+	UUID     string          `json:"uuid"`
+	Type     string          `json:"type"`
+	IsActive bool            `json:"isActive"`
+	APN      string          `json:"apn,omitempty"`
+}
+
+type CellularProfile struct {
+	UUID        string `json:"uuid"`
+	Name        string `json:"name"`
+	APN         string `json:"apn,omitempty"`
+	Username    string `json:"username,omitempty"`
+	Autoconnect bool   `json:"autoconnect"`
+}
+
+type CellularActive struct {
+	Name       string `json:"name"`
+	UUID       string `json:"uuid"`
+	Device     string `json:"device,omitempty"`
+	State      string `json:"state,omitempty"`
+	IP         string `json:"ip,omitempty"`
+	Gateway    string `json:"gateway,omitempty"`
+	Operator   string `json:"operator,omitempty"`
+	Technology string `json:"technology,omitempty"`
+}
+
+type CellularIPConfig struct {
+	IPs     []string `json:"ips"`
+	Gateway string   `json:"gateway"`
+	DNS     string   `json:"dns"`
+}
+
+type CellularNetworkInfoResponse struct {
+	UUID       string           `json:"uuid"`
+	IFace      string           `json:"iface"`
+	HwAddr     string           `json:"hwAddr"`
+	IMEI       string           `json:"imei"`
+	Operator   string           `json:"operator"`
+	Technology string           `json:"technology"`
+	Signal     uint8            `json:"signal"`
+	IPv4       CellularIPConfig `json:"IPv4s"`
+	IPv6       CellularIPConfig `json:"IPv6s"`
 }
 
 type PriorityUpdate struct {
