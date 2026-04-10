@@ -206,6 +206,7 @@ func (r *Runner) Run() error {
 		}
 		if msg.LogOutput != "" {
 			r.log(msg.LogOutput)
+			fmt.Fprintf(os.Stdout, "    %s\n", msg.LogOutput)
 		}
 	}
 
