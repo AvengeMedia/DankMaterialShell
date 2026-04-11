@@ -10,7 +10,7 @@ Go-based backend for DankMaterialShell providing system integration, IPC, and in
 Command-line interface and daemon for shell management and system control.
 
 **dankinstall**
-Distribution-aware installer with TUI for deploying DMS and compositor configurations on Arch, Fedora, Debian, Ubuntu, openSUSE, and Gentoo.
+Distribution-aware installer for deploying DMS and compositor configurations on Arch, Fedora, Debian, Ubuntu, openSUSE, and Gentoo. Supports both an interactive TUI and a headless (unattended) mode via CLI flags.
 
 ## System Integration
 
@@ -147,9 +147,49 @@ go-wayland-scanner -i internal/proto/xml/wlr-gamma-control-unstable-v1.xml \
 
 ## Installation via dankinstall
 
+**Interactive (TUI):**
+
 ```bash
 curl -fsSL https://install.danklinux.com | sh
 ```
+
+**Headless (unattended):**
+
+Headless mode requires cached sudo credentials. Run `sudo -v` first:
+
+```bash
+sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty -y
+sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t kitty --include-deps dms-greeter -y
+```
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--compositor <niri|hyprland>` | `-c` | Compositor/WM to install (required for headless) |
+| `--term <ghostty|kitty|alacritty>` | `-t` | Terminal emulator (required for headless) |
+| `--include-deps <name,...>` | | Enable optional dependencies (e.g. `dms-greeter`) |
+| `--exclude-deps <name,...>` | | Skip specific dependencies |
+| `--replace-configs <name,...>` | | Replace specific configuration files (mutually exclusive with `--replace-configs-all`) |
+| `--replace-configs-all` | | Replace all configuration files (mutually exclusive with `--replace-configs`) |
+| `--yes` | `-y` | Required for headless mode — confirms installation without interactive prompts |
+
+Headless mode requires `--yes` to proceed; without it, the installer exits with an error.
+Configuration files are not replaced by default unless `--replace-configs` or `--replace-configs-all` is specified.
+`dms-greeter` is disabled by default; use `--include-deps dms-greeter` to enable it.
+
+When no flags are provided, `dankinstall` launches the interactive TUI.
+
+### Headless mode validation rules
+
+Headless mode activates when `--compositor` or `--term` is provided.
+
+- Both `--compositor` and `--term` are required; providing only one results in an error.
+- Headless-only flags (`--include-deps`, `--exclude-deps`, `--replace-configs`, `--replace-configs-all`, `--yes`) are rejected in TUI mode.
+- Positional arguments are not accepted.
+
+### Log file location
+
+`dankinstall` writes logs to `/tmp` by default.
+Set the `DANKINSTALL_LOG_DIR` environment variable to override the log directory.
 
 ## Supported Distributions
 
