@@ -212,6 +212,7 @@ type CellularActive struct {
 	Gateway    string `json:"gateway,omitempty"`
 	Operator   string `json:"operator,omitempty"`
 	Technology string `json:"technology,omitempty"`
+	Signal     uint8  `json:"signal,omitempty"`
 }
 
 type CellularIPConfig struct {

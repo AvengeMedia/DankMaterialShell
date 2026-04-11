@@ -1054,6 +1054,14 @@ Singleton {
         DMSService.sendRequest("network.cellular.active", null, response => {
             if (response.result) {
                 cellularActive = response.result;
+                // Update individual properties from first active connection
+                if (Array.isArray(response.result) && response.result.length > 0) {
+                    const active = response.result[0];
+                    cellularOperator = active.operator || "";
+                    cellularTechnology = active.technology || "";
+                    cellularSignal = active.signal || 0;
+                    cellularInterface = active.device || "";
+                }
             }
         });
     }

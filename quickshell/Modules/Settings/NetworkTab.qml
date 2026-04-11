@@ -1609,6 +1609,8 @@ Item {
                     anchors.margins: Theme.spacingL
                     spacing: Theme.spacingM
 
+                    readonly property bool isExpanded: networkTab.expandedCellularUuid !== ""
+
                     Row {
                         width: parent.width
                         spacing: Theme.spacingM
@@ -1669,6 +1671,36 @@ Item {
                                 }
                             }
 
+                            Rectangle {
+                                width: 28
+                                height: 28
+                                radius: 14
+                                color: cellularExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                visible: NetworkService.cellularConnected
+
+                                DankIcon {
+                                    anchors.centerIn: parent
+                                    name: cellularSection.isExpanded ? "expand_less" : "expand_more"
+                                    size: 18
+                                    color: Theme.surfaceText
+                                }
+
+                                MouseArea {
+                                    id: cellularExpandBtn
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (cellularSection.isExpanded) {
+                                            networkTab.expandedCellularUuid = "";
+                                        } else {
+                                            networkTab.expandedCellularUuid = NetworkService.cellularActive[0]?.uuid || "cellular";
+                                            NetworkService.getActiveCellular();
+                                        }
+                                    }
+                                }
+                            }
+
                             DankToggle {
                                 checked: NetworkService.cellularEnabled
                                 enabled: !NetworkService.cellularToggling
@@ -1723,7 +1755,103 @@ Item {
                         text: NetworkService.cellularIP
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
-                        visible: NetworkService.cellularConnected && NetworkService.cellularIP !== ""
+                        visible: NetworkService.cellularConnected && NetworkService.cellularIP !== "" && !cellularSection.isExpanded
+                    }
+
+                    // Expanded Cellular Details
+                    Item {
+                        width: parent.width
+                        height: cellularDetailsColumn.implicitHeight + Theme.spacingM * 2
+                        visible: cellularSection.isExpanded && NetworkService.cellularConnected
+
+                        Column {
+                            id: cellularDetailsColumn
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            spacing: Theme.spacingS
+
+                            Rectangle {
+                                width: parent.width
+                                height: 1
+                                color: Theme.outlineLight
+                            }
+
+                            Flow {
+                                width: parent.width
+                                spacing: Theme.spacingXS
+
+                                Repeater {
+                                    model: {
+                                        const fields = [];
+                                        const signal = NetworkService.cellularSignal;
+                                        const tech = NetworkService.cellularTechnology;
+                                        const op = NetworkService.cellularOperator;
+                                        const ip = NetworkService.cellularIP;
+                                        const iface = NetworkService.cellularInterface;
+
+                                        if (signal > 0)
+                                            fields.push({
+                                                label: I18n.tr("Signal"),
+                                                value: signal + "%"
+                                            });
+                                        if (tech && tech !== "")
+                                            fields.push({
+                                                label: I18n.tr("Technology"),
+                                                value: tech
+                                            });
+                                        if (op && op !== "")
+                                            fields.push({
+                                                label: I18n.tr("Operator"),
+                                                value: op
+                                            });
+                                        if (ip && ip !== "")
+                                            fields.push({
+                                                label: I18n.tr("IP"),
+                                                value: ip
+                                            });
+                                        if (iface && iface !== "")
+                                            fields.push({
+                                                label: I18n.tr("Interface"),
+                                                value: iface
+                                            });
+                                        return fields;
+                                    }
+
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        required property int index
+
+                                        width: cellularFieldContent.width + Theme.spacingM * 2
+                                        height: 32
+                                        radius: Theme.cornerRadius - 2
+                                        color: Theme.surfaceContainerHigh
+                                        border.width: 1
+                                        border.color: Theme.outlineLight
+
+                                        Row {
+                                            id: cellularFieldContent
+                                            anchors.centerIn: parent
+                                            spacing: Theme.spacingXS
+
+                                            StyledText {
+                                                text: modelData.label + ":"
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            StyledText {
+                                                text: modelData.value
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                font.weight: Font.Medium
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     // Saved Connections Header

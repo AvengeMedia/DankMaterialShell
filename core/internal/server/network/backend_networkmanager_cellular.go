@@ -11,6 +11,181 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
+// ModemManager D-Bus constants
+const (
+	mmInterface      = "org.freedesktop.ModemManager1"
+	mmModemInterface = "org.freedesktop.ModemManager1.Modem"
+	mmModem3GPP      = "org.freedesktop.ModemManager1.Modem.Modem3gpp"
+	mmModemCDMA      = "org.freedesktop.ModemManager1.Modem.ModemCdma"
+	mmPath           = "/org/freedesktop/ModemManager1"
+	mmObjectManager  = "org.freedesktop.DBus.ObjectManager"
+)
+
+// getModemManagerCellularDetails fetches cellular details from ModemManager via D-Bus
+func (b *NetworkManagerBackend) getModemManagerCellularDetails(iface string) (operator, technology string, signal uint8) {
+	log.Debug("getModemManagerCellularDetails called for interface: %s", iface)
+
+	if b.dbusConn == nil {
+		log.Warn("D-Bus connection is nil, cannot fetch ModemManager data")
+		return "", "", 0
+	}
+
+	// Get list of modems from ObjectManager
+	var result map[dbus.ObjectPath]map[string]map[string]dbus.Variant
+	err := b.dbusConn.Object(mmInterface, mmPath).Call(mmObjectManager+".GetManagedObjects", 0).Store(&result)
+	if err != nil {
+		log.Error("Failed to get ModemManager modems: %v", err)
+		return "", "", 0
+	}
+
+	log.Debug("Found %d ModemManager objects", len(result))
+
+	// Find the modem matching our interface
+	for _, obj := range result {
+		modemData, ok := obj[mmModemInterface]
+		if !ok {
+			continue
+		}
+
+		// Get the primary port/interface
+		var device string
+		if v, ok := modemData["PrimaryPort"]; ok {
+			device = v.Value().(string)
+		} else if v, ok := modemData["Device"]; ok {
+			device = v.Value().(string)
+		}
+
+		log.Debug("Checking modem with device: %s against iface: %s", device, iface)
+
+		// Match by interface name (e.g., "wwan0mbim0")
+		if device != iface && !strings.Contains(device, iface) && !strings.Contains(iface, device) {
+			log.Debug("Modem device %s does not match interface %s", device, iface)
+			continue
+		}
+
+		log.Debug("Found matching modem for interface %s", iface)
+
+		// Get signal quality
+		if v, ok := modemData["SignalQuality"]; ok {
+			// SignalQuality is a struct (array) with [signal_strength, recent]
+			sigData := v.Value().([]interface{})
+			if len(sigData) > 0 {
+				switch val := sigData[0].(type) {
+				case uint32:
+					signal = uint8(val)
+				case int32:
+					signal = uint8(val)
+				case uint8:
+					signal = val
+				}
+			}
+		}
+
+		// Get access technology
+		if v, ok := modemData["AccessTechnologies"]; ok {
+			tech := v.Value().(uint32)
+			technology = convertAccessTechnology(tech)
+		}
+
+		// Try 3GPP interface for operator name
+		if gppData, ok := obj[mmModem3GPP]; ok {
+			if v, ok := gppData["OperatorName"]; ok {
+				operator = v.Value().(string)
+			}
+		}
+
+		// Fallback to CDMA interface for operator name
+		if operator == "" {
+			if cdmaData, ok := obj[mmModemCDMA]; ok {
+				if v, ok := cdmaData["Nid"]; ok {
+					nid := v.Value().(uint32)
+					operator = fmt.Sprintf("CDMA Network %d", nid)
+				}
+			}
+		}
+
+		// Get operator from 3GPP registration state if not found
+		if operator == "" {
+			if gppData, ok := obj[mmModem3GPP]; ok {
+				if v, ok := gppData["RegistrationState"]; ok {
+					state := v.Value().(uint32)
+					// 1 = idle, 2 = home, 3 = searching, 4 = denied, 5 = roaming
+					if state == 2 {
+						operator = "Home Network"
+					} else if state == 5 {
+						operator = "Roaming"
+					}
+				}
+			}
+		}
+
+		log.Debug("ModemManager cellular details for %s: operator=%s, tech=%s, signal=%d", iface, operator, technology, signal)
+		return operator, technology, signal
+	}
+
+	log.Warn("No matching modem found for interface %s", iface)
+	return "", "", 0
+}
+
+// convertAccessTechnology converts ModemManager access tech bits to string
+func convertAccessTechnology(tech uint32) string {
+	// ModemManager MM_MODEM_ACCESS_TECHNOLOGY_* constants
+	const (
+		MM_MODEM_ACCESS_TECHNOLOGY_UNKNOWN    = 0
+		MM_MODEM_ACCESS_TECHNOLOGY_GPRS       = 1 << 0
+		MM_MODEM_ACCESS_TECHNOLOGY_EDGE       = 1 << 1
+		MM_MODEM_ACCESS_TECHNOLOGY_UMTS       = 1 << 2
+		MM_MODEM_ACCESS_TECHNOLOGY_HSDPA      = 1 << 3
+		MM_MODEM_ACCESS_TECHNOLOGY_HSUPA      = 1 << 4
+		MM_MODEM_ACCESS_TECHNOLOGY_HSPA       = 1 << 5
+		MM_MODEM_ACCESS_TECHNOLOGY_HSPA_PLUS  = 1 << 6
+		MM_MODEM_ACCESS_TECHNOLOGY_1XRTT      = 1 << 7
+		MM_MODEM_ACCESS_TECHNOLOGY_EVDO0      = 1 << 8
+		MM_MODEM_ACCESS_TECHNOLOGY_EVDOA      = 1 << 9
+		MM_MODEM_ACCESS_TECHNOLOGY_EVDOB      = 1 << 10
+		MM_MODEM_ACCESS_TECHNOLOGY_LTE        = 1 << 11
+		MM_MODEM_ACCESS_TECHNOLOGY_5GNR       = 1 << 12
+		MM_MODEM_ACCESS_TECHNOLOGY_LTE_CAT_M  = 1 << 13
+		MM_MODEM_ACCESS_TECHNOLOGY_LTE_NB_IOT = 1 << 14
+	)
+
+	// Return the highest/best technology
+	switch {
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_5GNR != 0:
+		return "5G"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_LTE != 0:
+		return "4G"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_LTE_CAT_M != 0:
+		return "LTE-M"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_LTE_NB_IOT != 0:
+		return "NB-IoT"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_HSPA_PLUS != 0:
+		return "HSPA+"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_HSPA != 0:
+		return "HSPA"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_HSDPA != 0:
+		return "HSDPA"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_HSUPA != 0:
+		return "HSUPA"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_UMTS != 0:
+		return "3G"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_EDGE != 0:
+		return "EDGE"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_GPRS != 0:
+		return "GPRS"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_EVDOB != 0:
+		return "EV-DO B"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_EVDOA != 0:
+		return "EV-DO A"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_EVDO0 != 0:
+		return "EV-DO"
+	case tech&MM_MODEM_ACCESS_TECHNOLOGY_1XRTT != 0:
+		return "1xRTT"
+	default:
+		return ""
+	}
+}
+
 func (b *NetworkManagerBackend) GetCellularEnabled() (bool, error) {
 	nm := b.nmConn.(gonetworkmanager.NetworkManager)
 	return nm.GetPropertyWwanEnabled()
@@ -474,11 +649,24 @@ func (b *NetworkManagerBackend) ListActiveCellular() ([]CellularActive, error) {
 			}
 		}
 
+		// Get device for this connection to match with ModemManager
+		deviceName := ""
+		if dev, err := activeConn.GetPropertyDevices(); err == nil && len(dev) > 0 {
+			deviceName, _ = dev[0].GetPropertyInterface()
+		}
+
+		// Fetch cellular details from ModemManager
+		operator, technology, signal := b.getModemManagerCellularDetails(deviceName)
+
 		active = append(active, CellularActive{
-			Name:  connID,
-			UUID:  connUUID,
-			State: stateStr,
-			IP:    ip,
+			Name:       connID,
+			UUID:       connUUID,
+			State:      stateStr,
+			IP:         ip,
+			Device:     deviceName,
+			Operator:   operator,
+			Technology: technology,
+			Signal:     signal,
 		})
 	}
 
@@ -809,13 +997,8 @@ func (b *NetworkManagerBackend) updateCellularState() {
 			}
 		}
 
-		// Try to get modem-specific info via Generic device
-		operator := ""
-		technology := ""
-		signal := uint8(0)
-
-		// For now, these would require ModemManager D-Bus access
-		// which is more complex. We'll use placeholder values.
+		// Try to get modem-specific info via ModemManager
+		operator, technology, signal := b.getModemManagerCellularDetails(name)
 
 		cellDev := CellularDevice{
 			Name:       name,

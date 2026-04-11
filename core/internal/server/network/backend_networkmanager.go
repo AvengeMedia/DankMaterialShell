@@ -136,6 +136,17 @@ func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*Netwo
 }
 
 func (b *NetworkManagerBackend) Initialize() error {
+	// Initialize D-Bus connection for ModemManager queries
+	if b.dbusConn == nil {
+		conn, err := dbus.ConnectSystemBus()
+		if err != nil {
+			log.Error("Failed to connect to D-Bus system bus for ModemManager: %v", err)
+		} else {
+			b.dbusConn = conn
+			log.Debug("D-Bus system bus connection established for ModemManager")
+		}
+	}
+
 	nm := b.nmConn.(gonetworkmanager.NetworkManager)
 
 	if s, err := gonetworkmanager.NewSettings(); err == nil {
