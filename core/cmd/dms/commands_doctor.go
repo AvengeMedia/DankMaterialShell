@@ -82,7 +82,7 @@ func (ds *DoctorStatus) OKCount() int {
 }
 
 var (
-	quickshellVersionRegex = regexp.MustCompile(`quickshell (\d+\.\d+\.\d+)`)
+	quickshellVersionRegex = regexp.MustCompile(`(?i)quickshell (\d+\.\d+\.\d+)`)
 	hyprlandVersionRegex   = regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
 	niriVersionRegex       = regexp.MustCompile(`niri (\d+\.\d+)`)
 	swayVersionRegex       = regexp.MustCompile(`sway version (\d+\.\d+)`)
