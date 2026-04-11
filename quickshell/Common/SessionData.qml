@@ -61,6 +61,26 @@ Singleton {
     property var monitorWallpapersLight: ({})
     property var monitorWallpapersDark: ({})
     property var monitorWallpaperFillModes: ({})
+
+    // Map: screenName -> { scrollX, scrollY } (0-100 range, like workspace percentage)
+    property var monitorScrollPositions: ({})
+
+    function setMonitorScrollPosition(screenName, scrollX, scrollY) {
+        var newPositions = Object.assign({}, monitorScrollPositions);
+        newPositions[screenName] = { scrollX: scrollX, scrollY: scrollY };
+        monitorScrollPositions = newPositions;
+    }
+
+    function getMonitorScrollPosition(screenName) {
+        return monitorScrollPositions[screenName] || { scrollX: 50, scrollY: 50 };
+    }
+
+    function clearMonitorScrollPosition(screenName) {
+        var newPositions = Object.assign({}, monitorScrollPositions);
+        delete newPositions[screenName];
+        monitorScrollPositions = newPositions;
+    }
+
     property string wallpaperTransition: "fade"
     readonly property var availableWallpaperTransitions: ["none", "fade", "wipe", "disc", "stripes", "iris bloom", "pixelate", "portal"]
     property var includedTransitions: availableWallpaperTransitions.filter(t => t !== "none")
