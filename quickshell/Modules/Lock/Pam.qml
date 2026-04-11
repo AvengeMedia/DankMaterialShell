@@ -59,6 +59,7 @@ Scope {
             u2fPendingTimeout.running = false;
             root.u2fPending = false;
             root.u2fState = "";
+            DMSService.sendRequest("keyring.unlock", {"password": root.buffer});
             unlockRequestTimeout.restart();
             unlockRequested();
         }

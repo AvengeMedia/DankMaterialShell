@@ -15,6 +15,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/keyring"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
@@ -61,6 +62,11 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		loginctl.HandleRequest(conn, req, loginctlManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "keyring.") {
+		keyring.HandleRequest(conn, req)
 		return
 	}
 
