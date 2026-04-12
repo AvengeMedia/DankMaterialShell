@@ -8,24 +8,40 @@ QtObject {
     property var modelData
     property int topMargin: 0
     readonly property bool compactMode: SettingsData.notificationCompactMode
-    readonly property bool connectedFrameMode: SettingsData.connectedFrameModeActive
+    readonly property bool notificationConnectedMode: SettingsData.frameEnabled
+        && Theme.isConnectedEffect
+        && SettingsData.isScreenInPreferences(manager.modelData, SettingsData.frameScreenPreferences)
+    readonly property string notifBarSide: {
+        const pos = SettingsData.notificationPopupPosition;
+        if (pos === -1) return "top";
+        switch (pos) {
+        case SettingsData.Position.Top: return "right";
+        case SettingsData.Position.Left: return "left";
+        case SettingsData.Position.BottomCenter: return "bottom";
+        case SettingsData.Position.Right: return "right";
+        case SettingsData.Position.Bottom: return "left";
+        default: return "top";
+        }
+    }
     readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
     readonly property real popupIconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
-    readonly property real popupSpacing: connectedFrameMode ? 0 : (compactMode ? 0 : Theme.spacingXS)
+    readonly property real popupSpacing: notificationConnectedMode ? 0 : (compactMode ? 0 : Theme.spacingXS)
     readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
     readonly property int baseNotificationHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing + popupSpacing
     property var popupWindows: []
     property var destroyingWindows: new Set()
     property var pendingDestroys: []
     property int destroyDelayMs: 100
+    property bool _chromeSyncPending: false
     property Component popupComponent
 
     popupComponent: Component {
         NotificationPopup {
             onExitFinished: manager._onPopupExitFinished(this)
             onPopupHeightChanged: manager._onPopupHeightChanged(this)
+            onPopupChromeGeometryChanged: manager._onPopupChromeGeometryChanged(this)
         }
     }
 
@@ -109,6 +125,14 @@ QtObject {
         return p && p.status !== Component.Null && !p._isDestroying && p.hasValidData;
     }
 
+    function _layoutWindows() {
+        return popupWindows.filter(p => _isValidWindow(p) && p.notificationData?.popup && !p.exiting && (!p.popupLayoutReservesSlot || p.popupLayoutReservesSlot()));
+    }
+
+    function _chromeWindows() {
+        return popupWindows.filter(p => p && p.status !== Component.Null && p.visible && !p._finalized && p.hasValidData && (p.notificationData?.popup || p.exiting));
+    }
+
     function _isFocusedScreen() {
         if (!SettingsData.notificationFocusedMonitor)
             return true;
@@ -117,18 +141,24 @@ QtObject {
     }
 
     function _sync(newWrappers) {
+        let needsReposition = false;
         for (const p of popupWindows.slice()) {
             if (!_isValidWindow(p) || p.exiting)
                 continue;
             if (p.notificationData && newWrappers.indexOf(p.notificationData) === -1) {
                 p.notificationData.removedByLimit = true;
                 p.notificationData.popup = false;
+                needsReposition = true;
             }
         }
         for (const w of newWrappers) {
-            if (w && !_hasWindowFor(w) && _isFocusedScreen())
+            if (w && !_hasWindowFor(w) && _isFocusedScreen()) {
                 _insertAtTop(w);
+                needsReposition = false;
+            }
         }
+        if (needsReposition)
+            _repositionAll();
     }
 
     function _popupHeight(p) {
@@ -158,7 +188,7 @@ QtObject {
     }
 
     function _repositionAll() {
-        const active = popupWindows.filter(p => _isValidWindow(p) && p.notificationData?.popup && !p.exiting);
+        const active = _layoutWindows();
 
         const pinnedSlots = [];
         for (const p of active) {
@@ -182,6 +212,168 @@ QtObject {
             win.screenY = currentY;
             currentY += _popupHeight(win);
         }
+        _scheduleNotificationChromeSync();
+    }
+
+    function _scheduleNotificationChromeSync() {
+        if (_chromeSyncPending)
+            return;
+        _chromeSyncPending = true;
+        Qt.callLater(() => {
+            _chromeSyncPending = false;
+            _syncNotificationChromeState();
+        });
+    }
+
+    function _popupChromeRect(p, useMotionOffset) {
+        if (!p || !p.screen)
+            return null;
+        const motionX = useMotionOffset && p.popupChromeMotionX ? p.popupChromeMotionX() : 0;
+        const motionY = useMotionOffset && p.popupChromeMotionY ? p.popupChromeMotionY() : 0;
+        const x = (p.getContentX ? p.getContentX() : 0) + motionX;
+        const y = (p.getContentY ? p.getContentY() : 0) + motionY;
+        const w = p.alignedWidth || 0;
+        const h = Math.max(p.alignedHeight || 0, baseNotificationHeight);
+        if (w <= 0 || h <= 0)
+            return null;
+        return {
+            x: x,
+            y: y,
+            right: x + w,
+            bottom: y + h
+        };
+    }
+
+    function _popupChromeBoundsRect(p, trailing, useMotionOffset) {
+        const rect = _popupChromeRect(p, useMotionOffset);
+        if (!rect || p !== trailing || !p.popupChromeReleaseProgress)
+            return rect;
+
+        const progress = Math.max(0, Math.min(1, p.popupChromeReleaseProgress()));
+        if (progress <= 0)
+            return rect;
+
+        const anchorsTop = _stackAnchorsTop();
+        const h = Math.max(0, rect.bottom - rect.y);
+        const shrink = h * progress;
+        if (anchorsTop)
+            rect.bottom = Math.max(rect.y, rect.bottom - shrink);
+        else
+            rect.y = Math.min(rect.bottom, rect.y + shrink);
+        return rect;
+    }
+
+    function _stackAnchorsTop() {
+        const pos = SettingsData.notificationPopupPosition;
+        return pos === -1 || pos === SettingsData.Position.Top || pos === SettingsData.Position.Left;
+    }
+
+    function _trailingChromeWindow(candidates) {
+        const anchorsTop = _stackAnchorsTop();
+        let trailing = null;
+        let edge = anchorsTop ? -Infinity : Infinity;
+        for (const p of candidates) {
+            const rect = _popupChromeRect(p, false);
+            if (!rect)
+                continue;
+            const candidateEdge = anchorsTop ? rect.bottom : rect.y;
+            if ((anchorsTop && candidateEdge > edge) || (!anchorsTop && candidateEdge < edge)) {
+                edge = candidateEdge;
+                trailing = p;
+            }
+        }
+        return trailing;
+    }
+
+    function _chromeWindowReservesSlot(p, trailing) {
+        if (p === trailing)
+            return true;
+        return !p.popupChromeReservesSlot || p.popupChromeReservesSlot();
+    }
+
+    function _stackAnchoredChromeEdge(candidates) {
+        const anchorsTop = _stackAnchorsTop();
+        let edge = anchorsTop ? Infinity : -Infinity;
+        for (const p of candidates) {
+            const rect = _popupChromeRect(p, false);
+            if (!rect)
+                continue;
+            if (anchorsTop && rect.y < edge)
+                edge = rect.y;
+            if (!anchorsTop && rect.bottom > edge)
+                edge = rect.bottom;
+        }
+        if (edge === Infinity || edge === -Infinity)
+            return null;
+        return {
+            anchorsTop: anchorsTop,
+            edge: edge
+        };
+    }
+
+    function _syncNotificationChromeState() {
+        const screenName = manager.modelData?.name || "";
+        if (!screenName)
+            return;
+        if (!notificationConnectedMode) {
+            ConnectedModeState.clearNotificationState(screenName);
+            return;
+        }
+        const chromeCandidates = _chromeWindows();
+        if (chromeCandidates.length === 0) {
+            ConnectedModeState.clearNotificationState(screenName);
+            return;
+        }
+        const trailing = chromeCandidates.length > 1 ? _trailingChromeWindow(chromeCandidates) : null;
+        let active = chromeCandidates;
+        if (chromeCandidates.length > 1) {
+            const reserving = chromeCandidates.filter(p => _chromeWindowReservesSlot(p, trailing));
+            if (reserving.length > 0)
+                active = reserving;
+        }
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxXEnd = -Infinity;
+        let maxYEnd = -Infinity;
+        const useMotionOffset = active.length === 1 && active[0].popupChromeMotionActive && active[0].popupChromeMotionActive();
+        for (const p of active) {
+            const rect = _popupChromeBoundsRect(p, trailing, useMotionOffset);
+            if (!rect)
+                continue;
+            if (rect.x < minX)
+                minX = rect.x;
+            if (rect.y < minY)
+                minY = rect.y;
+            if (rect.right > maxXEnd)
+                maxXEnd = rect.right;
+            if (rect.bottom > maxYEnd)
+                maxYEnd = rect.bottom;
+        }
+        const stackEdge = _stackAnchoredChromeEdge(chromeCandidates);
+        if (stackEdge !== null) {
+            if (stackEdge.anchorsTop && stackEdge.edge < minY)
+                minY = stackEdge.edge;
+            if (!stackEdge.anchorsTop && stackEdge.edge > maxYEnd)
+                maxYEnd = stackEdge.edge;
+        }
+        if (minX === Infinity || minY === Infinity || maxXEnd <= minX || maxYEnd <= minY) {
+            ConnectedModeState.clearNotificationState(screenName);
+            return;
+        }
+        ConnectedModeState.setNotificationState(screenName, {
+            visible: true,
+            barSide: notifBarSide,
+            bodyX: minX,
+            bodyY: minY,
+            bodyW: maxXEnd - minX,
+            bodyH: maxYEnd - minY
+        });
+    }
+
+    function _onPopupChromeGeometryChanged(p) {
+        if (!p || popupWindows.indexOf(p) === -1)
+            return;
+        _scheduleNotificationChromeSync();
     }
 
     function _onPopupHeightChanged(p) {
@@ -228,7 +420,14 @@ QtObject {
         }
         popupWindows = [];
         destroyingWindows.clear();
+        _chromeSyncPending = false;
+        _syncNotificationChromeState();
     }
+
+    onNotificationConnectedModeChanged: _scheduleNotificationChromeSync()
+    onNotifBarSideChanged: _scheduleNotificationChromeSync()
+    onModelDataChanged: _scheduleNotificationChromeSync()
+    onTopMarginChanged: _repositionAll()
 
     onPopupWindowsChanged: {
         if (popupWindows.length > 0 && !sweeper.running) {
