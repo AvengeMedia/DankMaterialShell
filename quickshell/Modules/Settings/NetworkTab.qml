@@ -18,6 +18,7 @@ Item {
     property string expandedVpnUuid: ""
     property string expandedWifiSsid: ""
     property string expandedEthDevice: ""
+    property string expandedCellularUuid: ""
     property int maxPinnedWifiNetworks: 3
 
     Component.onCompleted: {
@@ -90,6 +91,89 @@ Item {
 
     ConfirmModal {
         id: forgetNetworkConfirm
+    }
+
+    // SIM PIN Entry Dialog
+    Rectangle {
+        id: simPinDialog
+        visible: false
+        anchors.centerIn: parent
+        width: 320
+        height: simPinColumn.height + Theme.spacingL * 2
+        radius: Theme.cornerRadius
+        color: Theme.surfaceContainerHigh
+        border.width: 1
+        border.color: Theme.outline
+        z: 100
+
+        Column {
+            id: simPinColumn
+            anchors.centerIn: parent
+            width: parent.width - Theme.spacingL * 2
+            spacing: Theme.spacingM
+
+            StyledText {
+                text: I18n.tr("Enter SIM PIN")
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            StyledText {
+                text: I18n.tr("Tries left: %1").arg(NetworkService.pinTriesLeft)
+                font.pixelSize: Theme.fontSizeSmall
+                color: NetworkService.pinTriesLeft <= 1 ? Theme.error : Theme.surfaceVariantText
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                visible: NetworkService.pinTriesLeft < 3
+            }
+
+            DankTextField {
+                id: simPinInput
+                width: parent.width
+                placeholderText: I18n.tr("PIN code")
+                echoMode: TextInput.Password
+                maximumLength: 8
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[0-9]*$/
+                }
+            }
+
+            Row {
+                width: parent.width
+                spacing: Theme.spacingM
+
+                DankButton {
+                    text: I18n.tr("Cancel")
+                    backgroundColor: "transparent"
+                    textColor: Theme.primary
+                    onClicked: {
+                        simPinDialog.visible = false;
+                        simPinInput.text = "";
+                    }
+                }
+
+                DankButton {
+                    text: I18n.tr("Submit")
+                    backgroundColor: Theme.primary
+                    textColor: Theme.onPrimary
+                    enabled: simPinInput.text.length >= 4
+                    onClicked: {
+                        NetworkService.submitSIMPin(simPinInput.text);
+                        simPinDialog.visible = false;
+                        simPinInput.text = "";
+                    }
+                }
+            }
+        }
+
+        function open() {
+            simPinInput.text = "";
+            simPinInput.forceActiveFocus();
+            visible = true;
+        }
     }
 
     DankFlickable {
@@ -1501,6 +1585,359 @@ Item {
                                                     }
                                                 }
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Cellular Section
+            StyledRect {
+                width: parent.width
+                height: cellularSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                visible: NetworkService.cellularAvailable
+
+                Column {
+                    id: cellularSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    readonly property bool isExpanded: networkTab.expandedCellularUuid !== ""
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: NetworkService.cellularEnabled ? (NetworkService.simLocked ? "sim_card_alert" : "signal_cellular_4_bar") : "signal_cellular_off"
+                            size: Theme.iconSize
+                            color: NetworkService.cellularConnected ? Theme.primary : (NetworkService.simLocked ? Theme.error : Theme.surfaceText)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            width: parent.width - Theme.iconSize - Theme.spacingM - cellularControls.width - Theme.spacingM
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            StyledText {
+                                text: I18n.tr("Cellular / Mobile Data")
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                                width: parent.width
+                                horizontalAlignment: Text.AlignLeft
+                            }
+
+                            StyledText {
+                                text: {
+                                    if (NetworkService.cellularToggling)
+                                        return I18n.tr("Toggling...");
+                                    if (!NetworkService.cellularEnabled)
+                                        return I18n.tr("Disabled");
+                                    if (NetworkService.simLocked)
+                                        return I18n.tr("SIM locked - PIN required");
+                                    if (NetworkService.cellularConnected)
+                                        return NetworkService.cellularOperator || I18n.tr("Connected");
+                                    return I18n.tr("Not connected");
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: NetworkService.cellularConnected ? Theme.primary : (NetworkService.simLocked ? Theme.error : Theme.surfaceVariantText)
+                                width: parent.width
+                                horizontalAlignment: Text.AlignLeft
+                            }
+                        }
+
+                        Row {
+                            id: cellularControls
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+
+                            DankActionButton {
+                                iconName: "vpn_key"
+                                buttonSize: 32
+                                visible: NetworkService.simLocked && NetworkService.cellularEnabled
+                                iconColor: Theme.error
+                                onClicked: {
+                                    NetworkService.getSIMPinTriesLeft();
+                                    simPinDialog.open();
+                                }
+                            }
+
+                            Rectangle {
+                                width: 28
+                                height: 28
+                                radius: 14
+                                color: cellularExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                visible: NetworkService.cellularConnected
+
+                                DankIcon {
+                                    anchors.centerIn: parent
+                                    name: cellularSection.isExpanded ? "expand_less" : "expand_more"
+                                    size: 18
+                                    color: Theme.surfaceText
+                                }
+
+                                MouseArea {
+                                    id: cellularExpandBtn
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (cellularSection.isExpanded) {
+                                            networkTab.expandedCellularUuid = "";
+                                        } else {
+                                            networkTab.expandedCellularUuid = NetworkService.cellularActive[0]?.uuid || "cellular";
+                                            NetworkService.getActiveCellular();
+                                        }
+                                    }
+                                }
+                            }
+
+                            DankToggle {
+                                checked: NetworkService.cellularEnabled
+                                enabled: !NetworkService.cellularToggling
+                                onToggled: checked => {
+                                    NetworkService.setCellularEnabled(checked);
+                                }
+                            }
+                        }
+                    }
+
+                    // Signal strength indicator
+                    Row {
+                        width: parent.width
+                        visible: NetworkService.cellularConnected && NetworkService.cellularSignal > 0
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: {
+                                const strength = NetworkService.cellularSignal;
+                                if (strength >= 75) return "signal_cellular_4_bar";
+                                if (strength >= 50) return "signal_cellular_3_bar";
+                                if (strength >= 25) return "signal_cellular_2_bar";
+                                return "signal_cellular_1_bar";
+                            }
+                            size: 18
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: NetworkService.cellularSignal + "%"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: "•"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            visible: NetworkService.cellularTechnology !== ""
+                        }
+
+                        StyledText {
+                            text: NetworkService.cellularTechnology
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            visible: NetworkService.cellularTechnology !== ""
+                        }
+                    }
+
+                    // IP address
+                    StyledText {
+                        text: NetworkService.cellularIP
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        visible: NetworkService.cellularConnected && NetworkService.cellularIP !== "" && !cellularSection.isExpanded
+                    }
+
+                    // Expanded Cellular Details
+                    Item {
+                        width: parent.width
+                        height: cellularDetailsColumn.implicitHeight + Theme.spacingM * 2
+                        visible: cellularSection.isExpanded && NetworkService.cellularConnected
+
+                        Column {
+                            id: cellularDetailsColumn
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            spacing: Theme.spacingS
+
+                            Rectangle {
+                                width: parent.width
+                                height: 1
+                                color: Theme.outlineLight
+                            }
+
+                            Flow {
+                                width: parent.width
+                                spacing: Theme.spacingXS
+
+                                Repeater {
+                                    model: {
+                                        const fields = [];
+                                        const signal = NetworkService.cellularSignal;
+                                        const tech = NetworkService.cellularTechnology;
+                                        const op = NetworkService.cellularOperator;
+                                        const ip = NetworkService.cellularIP;
+                                        const iface = NetworkService.cellularInterface;
+
+                                        if (signal > 0)
+                                            fields.push({
+                                                label: I18n.tr("Signal"),
+                                                value: signal + "%"
+                                            });
+                                        if (tech && tech !== "")
+                                            fields.push({
+                                                label: I18n.tr("Technology"),
+                                                value: tech
+                                            });
+                                        if (op && op !== "")
+                                            fields.push({
+                                                label: I18n.tr("Operator"),
+                                                value: op
+                                            });
+                                        if (ip && ip !== "")
+                                            fields.push({
+                                                label: I18n.tr("IP"),
+                                                value: ip
+                                            });
+                                        if (iface && iface !== "")
+                                            fields.push({
+                                                label: I18n.tr("Interface"),
+                                                value: iface
+                                            });
+                                        return fields;
+                                    }
+
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        required property int index
+
+                                        width: cellularFieldContent.width + Theme.spacingM * 2
+                                        height: 32
+                                        radius: Theme.cornerRadius - 2
+                                        color: Theme.surfaceContainerHigh
+                                        border.width: 1
+                                        border.color: Theme.outlineLight
+
+                                        Row {
+                                            id: cellularFieldContent
+                                            anchors.centerIn: parent
+                                            spacing: Theme.spacingXS
+
+                                            StyledText {
+                                                text: modelData.label + ":"
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            StyledText {
+                                                text: modelData.value
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                font.weight: Font.Medium
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Saved Connections Header
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        visible: NetworkService.cellularProfiles.length > 0
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Saved Profiles")
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        width: parent.width
+                        horizontalAlignment: Text.AlignLeft
+                        visible: NetworkService.cellularProfiles.length > 0
+                    }
+
+                    // Cellular Profiles List
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
+                        visible: NetworkService.cellularProfiles.length > 0
+
+                        Repeater {
+                            model: NetworkService.cellularProfiles
+
+                            delegate: Rectangle {
+                                required property var modelData
+                                required property int index
+
+                                readonly property bool isActive: NetworkService.isActiveCellularUuid(modelData.uuid)
+
+                                width: parent.width
+                                height: 48
+                                radius: Theme.cornerRadius
+                                color: cellularMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                                border.width: isActive ? 2 : 0
+                                border.color: Theme.primary
+
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: Theme.spacingM
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: Theme.spacingS
+
+                                    DankIcon {
+                                        name: isActive ? "signal_cellular_4_bar" : "signal_cellular_off"
+                                        size: 20
+                                        color: isActive ? Theme.primary : Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+
+                                        StyledText {
+                                            text: modelData.name || I18n.tr("Unknown")
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            color: isActive ? Theme.primary : Theme.surfaceText
+                                            font.weight: isActive ? Font.Medium : Font.Normal
+                                        }
+
+                                        StyledText {
+                                            text: modelData.apn ? I18n.tr("APN: %1").arg(modelData.apn) : ""
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceVariantText
+                                            visible: modelData.apn !== ""
+                                        }
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: cellularMouseArea
+
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (isActive) {
+                                            NetworkService.disconnectCellular();
+                                        } else {
+                                            NetworkService.connectCellular(modelData.uuid);
                                         }
                                     }
                                 }

@@ -112,3 +112,9 @@ bin/
 .direnv/
 quickshell/dms-plugins
 __pycache__
+
+
+# maybe remove
+distro/arch
+quickshell/.qmlls.ini
+quickshell/.qs-build/

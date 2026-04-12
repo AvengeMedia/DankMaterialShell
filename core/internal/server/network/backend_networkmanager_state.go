@@ -61,6 +61,8 @@ func (b *NetworkManagerBackend) updatePrimaryConnection() error {
 		b.state.NetworkStatus = StatusEthernet
 	case "802-11-wireless":
 		b.state.NetworkStatus = StatusWiFi
+	case "gsm", "cdma":
+		b.state.NetworkStatus = StatusCellular
 	case "vpn", "wireguard":
 		b.state.NetworkStatus = StatusVPN
 	default:

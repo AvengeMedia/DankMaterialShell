@@ -131,3 +131,67 @@ func (b *IWDBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
 
 	return FormatWiFiQRString("WPA", ssid, passphrase), nil
 }
+
+func (b *IWDBackend) GetCellularEnabled() (bool, error) {
+	return false, fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) SetCellularEnabled(enabled bool) error {
+	return fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) GetCellularDevices() []CellularDevice {
+	return []CellularDevice{}
+}
+
+func (b *IWDBackend) GetCellularConnections() ([]CellularConnection, error) {
+	return []CellularConnection{}, nil
+}
+
+func (b *IWDBackend) GetCellularNetworkDetails(uuid string) (*CellularNetworkInfoResponse, error) {
+	return nil, fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) ConnectCellular(uuid string) error {
+	return fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) DisconnectCellular() error {
+	return fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) DisconnectCellularDevice(device string) error {
+	return fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) ActivateCellularConnection(uuid string) error {
+	return fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) ListCellularProfiles() ([]CellularProfile, error) {
+	return []CellularProfile{}, nil
+}
+
+func (b *IWDBackend) ListActiveCellular() ([]CellularActive, error) {
+	return []CellularActive{}, nil
+}
+
+func (b *IWDBackend) GetCellularProfile(uuidOrName string) (*CellularProfile, error) {
+	return nil, fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) UpdateCellularProfile(uuid string, updates map[string]any) error {
+	return fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) GetSIMStatus(device string) (*CellularDevice, error) {
+	return nil, fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) SubmitSIMPin(device string, pin string) error {
+	return fmt.Errorf("cellular not supported by iwd backend")
+}
+
+func (b *IWDBackend) GetSIMPinTriesLeft(device string) (int, error) {
+	return 0, fmt.Errorf("cellular not supported by iwd backend")
+}

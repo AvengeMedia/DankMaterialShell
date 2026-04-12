@@ -12,14 +12,17 @@ Rectangle {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    readonly property real cellularBarHeight: cellularBar.visible ? cellularBar.height + Theme.spacingS : 0
+
     implicitHeight: {
         if (height > 0)
             return height;
+        let h = headerRow.height + cellularBarHeight;
         if (NetworkService.wifiToggling)
-            return headerRow.height + wifiToggleContent.height + Theme.spacingM;
+            return h + wifiToggleContent.height + Theme.spacingM;
         if (NetworkService.wifiEnabled)
-            return headerRow.height + wifiContent.height + Theme.spacingM;
-        return headerRow.height + wifiOffContent.height + Theme.spacingM;
+            return h + wifiContent.height + Theme.spacingM;
+        return h + wifiOffContent.height + Theme.spacingM;
     }
     radius: Theme.cornerRadius
     color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
@@ -282,7 +285,7 @@ Rectangle {
         anchors.top: headerRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: cellularBar.visible ? cellularBar.top : parent.bottom
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
         visible: currentPreferenceIndex === 0 && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
@@ -509,7 +512,7 @@ Rectangle {
         anchors.top: headerRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: cellularBar.visible ? cellularBar.top : parent.bottom
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
         visible: currentPreferenceIndex === 1 && NetworkService.wifiEnabled && !NetworkService.wifiToggling && !wifiScanningOverlay.visible
@@ -875,6 +878,79 @@ Rectangle {
 
             onTriggered: {
                 NetworkService.forgetWifiNetwork(networkContextMenu.currentSSID);
+            }
+        }
+    }
+
+    // Cellular status bar
+    Rectangle {
+        id: cellularBar
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: Theme.spacingM
+        anchors.rightMargin: Theme.spacingM
+        anchors.bottomMargin: Theme.spacingS
+        height: cellularBarRow.implicitHeight + Theme.spacingS * 2
+        radius: Theme.cornerRadius
+        color: Theme.surfaceLight
+        visible: NetworkService.cellularAvailable
+
+        Row {
+            id: cellularBarRow
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: Theme.spacingM
+            anchors.rightMargin: Theme.spacingM
+            spacing: Theme.spacingS
+
+            DankIcon {
+                name: NetworkService.cellularEnabled ? (NetworkService.cellularConnected ? "signal_cellular_4_bar" : "signal_cellular_connected_no_internet_4_bar") : "signal_cellular_off"
+                size: 20
+                color: NetworkService.cellularConnected ? Theme.primary : Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Column {
+                width: parent.width - 20 - cellularToggle.width - Theme.spacingS * 3
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 1
+
+                StyledText {
+                    text: I18n.tr("Cellular")
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    elide: Text.ElideRight
+                    width: parent.width
+                }
+
+                StyledText {
+                    text: {
+                        if (NetworkService.cellularToggling)
+                            return I18n.tr("Toggling...");
+                        if (!NetworkService.cellularEnabled)
+                            return I18n.tr("Off");
+                        if (NetworkService.cellularConnected)
+                            return NetworkService.cellularOperator || I18n.tr("Connected");
+                        return I18n.tr("Not connected");
+                    }
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: NetworkService.cellularConnected ? Theme.primary : Theme.surfaceVariantText
+                    elide: Text.ElideRight
+                    width: parent.width
+                }
+            }
+
+            DankToggle {
+                id: cellularToggle
+                checked: NetworkService.cellularEnabled
+                enabled: !NetworkService.cellularToggling
+                anchors.verticalCenter: parent.verticalCenter
+                onToggled: checked => {
+                    NetworkService.setCellularEnabled(checked);
+                }
             }
         }
     }
