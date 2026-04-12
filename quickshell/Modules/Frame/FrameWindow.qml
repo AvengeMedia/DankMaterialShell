@@ -44,6 +44,7 @@ PanelWindow {
             "x": 0,
             "y": 0
         })
+    readonly property var _notifState: ConnectedModeState.notificationStates[win._screenName] || ConnectedModeState.emptyNotificationState
 
     // ─── Connected chrome convenience properties ──────────────────────────────
     readonly property bool _connectedActive: win._frameActive && SettingsData.connectedFrameModeActive
@@ -218,6 +219,18 @@ PanelWindow {
         height: _active ? win._dockConnectorRadius() * 2 : 0
     }
 
+    Item {
+        id: _notifBodyBlurAnchor
+        visible: false
+
+        readonly property bool _active: win._frameActive && win._notifState.visible && win._notifState.bodyW > 0 && win._notifState.bodyH > 0
+
+        x: _active ? Theme.snap(win._notifState.bodyX, win._dpr) : 0
+        y: _active ? Theme.snap(win._notifState.bodyY, win._dpr) : 0
+        width: _active ? Theme.snap(win._notifState.bodyW, win._dpr) : 0
+        height: _active ? Theme.snap(win._notifState.bodyH, win._dpr) : 0
+    }
+
     Region {
         id: _staticBlurRegion
         x: 0
@@ -266,6 +279,11 @@ PanelWindow {
                 intersection: Intersection.Subtract
                 radius: win._dockConnectorRadius()
             }
+        }
+
+        Region {
+            item: _notifBodyBlurAnchor
+            radius: win._surfaceRadius
         }
     }
 
@@ -528,7 +546,7 @@ PanelWindow {
 
     FrameBorder {
         anchors.fill: parent
-        visible: win._frameActive
+        visible: win._frameActive && !win._connectedActive
         cutoutTopInset: win.cutoutTopInset
         cutoutBottomInset: win.cutoutBottomInset
         cutoutLeftInset: win.cutoutLeftInset
@@ -539,98 +557,141 @@ PanelWindow {
     // ─── Connected chrome fills ───────────────────────────────────────────────
 
     Item {
-        id: _connectedChrome
+        id: _connectedSurfaceLayer
         anchors.fill: parent
         visible: win._connectedActive
+        opacity: win._surfaceOpacity
+        layer.enabled: opacity < 1
+        layer.smooth: false
+
+        FrameBorder {
+            anchors.fill: parent
+            borderColor: win._opaqueSurfaceColor
+            cutoutTopInset: win.cutoutTopInset
+            cutoutBottomInset: win.cutoutBottomInset
+            cutoutLeftInset: win.cutoutLeftInset
+            cutoutRightInset: win.cutoutRightInset
+            cutoutRadius: win.cutoutRadius
+        }
 
         Item {
-            id: _popoutChrome
-            visible: ConnectedModeState.popoutVisible && ConnectedModeState.popoutScreen === win._screenName
-            x: win._popoutChromeX()
-            y: win._popoutChromeY()
-            width: win._popoutChromeWidth()
-            height: win._popoutChromeHeight()
-            opacity: win._surfaceOpacity
-            layer.enabled: opacity < 1
-            layer.smooth: false
+            id: _connectedChrome
+            anchors.fill: parent
+            visible: true
 
             Item {
-                id: _popoutClip
-                readonly property bool _barHoriz: ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom"
-                // Expand clip by ccr on bar axis to include arc columns
-                x: win._popoutClipX() - (_barHoriz ? win._effectivePopoutCcr : 0)
-                y: win._popoutClipY() - (_barHoriz ? 0 : win._effectivePopoutCcr)
-                width: win._popoutClipWidth() + (_barHoriz ? win._effectivePopoutCcr * 2 : 0)
-                height: win._popoutClipHeight() + (_barHoriz ? 0 : win._effectivePopoutCcr * 2)
-                clip: true
+                id: _popoutChrome
+                visible: ConnectedModeState.popoutVisible && ConnectedModeState.popoutScreen === win._screenName
+                x: win._popoutChromeX()
+                y: win._popoutChromeY()
+                width: win._popoutChromeWidth()
+                height: win._popoutChromeHeight()
 
-                ConnectedShape {
-                    id: _popoutShape
-                    visible: _popoutBodyBlurAnchor._active && _popoutBodyBlurAnchor.width > 0 && _popoutBodyBlurAnchor.height > 0
-                    barSide: ConnectedModeState.popoutBarSide
-                    bodyWidth: win._popoutClipWidth()
-                    bodyHeight: win._popoutClipHeight()
-                    connectorRadius: win._effectivePopoutCcr
-                    surfaceRadius: win._surfaceRadius
-                    fillColor: win._opaqueSurfaceColor
-                    x: 0
-                    y: 0
+                Item {
+                    id: _popoutClip
+                    readonly property bool _barHoriz: ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom"
+                    // Expand clip by ccr on bar axis to include arc columns
+                    x: win._popoutClipX() - (_barHoriz ? win._effectivePopoutCcr : 0)
+                    y: win._popoutClipY() - (_barHoriz ? 0 : win._effectivePopoutCcr)
+                    width: win._popoutClipWidth() + (_barHoriz ? win._effectivePopoutCcr * 2 : 0)
+                    height: win._popoutClipHeight() + (_barHoriz ? 0 : win._effectivePopoutCcr * 2)
+                    clip: true
+
+                    ConnectedShape {
+                        id: _popoutShape
+                        visible: _popoutBodyBlurAnchor._active && _popoutBodyBlurAnchor.width > 0 && _popoutBodyBlurAnchor.height > 0
+                        barSide: ConnectedModeState.popoutBarSide
+                        bodyWidth: win._popoutClipWidth()
+                        bodyHeight: win._popoutClipHeight()
+                        connectorRadius: win._effectivePopoutCcr
+                        surfaceRadius: win._surfaceRadius
+                        fillColor: win._opaqueSurfaceColor
+                        x: 0
+                        y: 0
+                    }
+                }
+            }
+
+            Item {
+                id: _dockChrome
+                visible: _dockBodyBlurAnchor._active
+                x: win._dockChromeX()
+                y: win._dockChromeY()
+                width: win._dockChromeWidth()
+                height: win._dockChromeHeight()
+
+                Rectangle {
+                    id: _dockFill
+                    x: win._dockBodyXInChrome()
+                    y: win._dockBodyYInChrome()
+                    width: _dockBodyBlurAnchor.width + win._dockFillOverlapX() * 2
+                    height: _dockBodyBlurAnchor.height + win._dockFillOverlapY() * 2
+                    color: win._opaqueSurfaceColor
+                    z: 1
+
+                    readonly property string _dockSide: win._dockState.barSide
+                    readonly property real _dockRadius: win._dockBodyBlurRadius()
+                    topLeftRadius: (_dockSide === "top" || _dockSide === "left") ? 0 : _dockRadius
+                    topRightRadius: (_dockSide === "top" || _dockSide === "right") ? 0 : _dockRadius
+                    bottomLeftRadius: (_dockSide === "bottom" || _dockSide === "left") ? 0 : _dockRadius
+                    bottomRightRadius: (_dockSide === "bottom" || _dockSide === "right") ? 0 : _dockRadius
+                }
+
+                ConnectedCorner {
+                    id: _connDockLeft
+                    visible: _dockBodyBlurAnchor._active
+                    barSide: win._dockState.barSide
+                    placement: "left"
+                    spacing: 0
+                    connectorRadius: win._dockConnectorRadius()
+                    color: win._opaqueSurfaceColor
+                    dpr: win._dpr
+                    x: Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "left", 0) - _dockChrome.x, win._dpr)
+                    y: Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "left", 0) - _dockChrome.y, win._dpr)
+                }
+
+                ConnectedCorner {
+                    id: _connDockRight
+                    visible: _dockBodyBlurAnchor._active
+                    barSide: win._dockState.barSide
+                    placement: "right"
+                    spacing: 0
+                    connectorRadius: win._dockConnectorRadius()
+                    color: win._opaqueSurfaceColor
+                    dpr: win._dpr
+                    x: Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "right", 0) - _dockChrome.x, win._dpr)
+                    y: Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "right", 0) - _dockChrome.y, win._dpr)
                 }
             }
         }
 
         Item {
-            id: _dockChrome
-            visible: _dockBodyBlurAnchor._active
-            x: win._dockChromeX()
-            y: win._dockChromeY()
-            width: win._dockChromeWidth()
-            height: win._dockChromeHeight()
-            opacity: win._surfaceOpacity
-            layer.enabled: opacity < 1
-            layer.smooth: false
+            id: _notifChrome
+            visible: _notifBodyBlurAnchor._active
 
-            Rectangle {
-                id: _dockFill
-                x: win._dockBodyXInChrome()
-                y: win._dockBodyYInChrome()
-                width: _dockBodyBlurAnchor.width + win._dockFillOverlapX() * 2
-                height: _dockBodyBlurAnchor.height + win._dockFillOverlapY() * 2
-                color: win._opaqueSurfaceColor
-                z: 1
+            readonly property string _notifSide: win._notifState.barSide
+            readonly property bool _isHoriz: _notifSide === "top" || _notifSide === "bottom"
+            readonly property real _notifCcr: Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, (_isHoriz ? _notifBodyBlurAnchor.width : _notifBodyBlurAnchor.height) / 2)), win._dpr)
+            readonly property real _sideUnderlap: _isHoriz ? 0 : win._seamOverlap
+            readonly property real _bodyW: Theme.snap(_notifBodyBlurAnchor.width + _sideUnderlap, win._dpr)
+            readonly property real _bodyH: Theme.snap(_notifBodyBlurAnchor.height, win._dpr)
 
-                readonly property string _dockSide: win._dockState.barSide
-                readonly property real _dockRadius: win._dockBodyBlurRadius()
-                topLeftRadius: (_dockSide === "top" || _dockSide === "left") ? 0 : _dockRadius
-                topRightRadius: (_dockSide === "top" || _dockSide === "right") ? 0 : _dockRadius
-                bottomLeftRadius: (_dockSide === "bottom" || _dockSide === "left") ? 0 : _dockRadius
-                bottomRightRadius: (_dockSide === "bottom" || _dockSide === "right") ? 0 : _dockRadius
-            }
+            z: _isHoriz ? 0 : -1
+            x: Theme.snap(_notifBodyBlurAnchor.x - (_isHoriz ? _notifCcr : (_notifSide === "left" ? _sideUnderlap : 0)), win._dpr)
+            y: Theme.snap(_notifBodyBlurAnchor.y - (_isHoriz ? 0 : _notifCcr), win._dpr)
+            width: _isHoriz ? Theme.snap(_bodyW + _notifCcr * 2, win._dpr) : _bodyW
+            height: Theme.snap(_bodyH + (_isHoriz ? 0 : _notifCcr * 2), win._dpr)
 
-            ConnectedCorner {
-                id: _connDockLeft
-                visible: _dockBodyBlurAnchor._active
-                barSide: win._dockState.barSide
-                placement: "left"
-                spacing: 0
-                connectorRadius: win._dockConnectorRadius()
-                color: win._opaqueSurfaceColor
-                dpr: win._dpr
-                x: Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "left", 0) - _dockChrome.x, win._dpr)
-                y: Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "left", 0) - _dockChrome.y, win._dpr)
-            }
-
-            ConnectedCorner {
-                id: _connDockRight
-                visible: _dockBodyBlurAnchor._active
-                barSide: win._dockState.barSide
-                placement: "right"
-                spacing: 0
-                connectorRadius: win._dockConnectorRadius()
-                color: win._opaqueSurfaceColor
-                dpr: win._dpr
-                x: Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "right", 0) - _dockChrome.x, win._dpr)
-                y: Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "right", 0) - _dockChrome.y, win._dpr)
+            ConnectedShape {
+                visible: _notifBodyBlurAnchor._active && _notifBodyBlurAnchor.width > 0 && _notifBodyBlurAnchor.height > 0
+                barSide: _notifChrome._notifSide
+                bodyWidth: _notifChrome._bodyW
+                bodyHeight: _notifChrome._bodyH
+                connectorRadius: _notifChrome._notifCcr
+                surfaceRadius: win._surfaceRadius
+                fillColor: win._opaqueSurfaceColor
+                x: 0
+                y: 0
             }
         }
     }

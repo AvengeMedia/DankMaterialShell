@@ -14,27 +14,22 @@ Item {
     required property real cutoutLeftInset
     required property real cutoutRightInset
     required property real cutoutRadius
+    property color borderColor: Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
 
     Rectangle {
         id: borderRect
 
         anchors.fill: parent
-        // Bake frameOpacity into the color alpha rather than using the `opacity` property.
-        // Qt Quick can skip layer.effect processing on items with opacity < 1 as an
-        // optimization, causing the MultiEffect inverted mask to stop working and the
-        // Rectangle to render as a plain square at low opacity values.
-        color: Qt.rgba(SettingsData.effectiveFrameColor.r,
-                       SettingsData.effectiveFrameColor.g,
-                       SettingsData.effectiveFrameColor.b,
-                       SettingsData.frameOpacity)
+        // Bake frameOpacity into the color alpha rather than using the `opacity` property
+        color: root.borderColor
 
         layer.enabled: true
         layer.effect: MultiEffect {
-            maskSource:        cutoutMask
-            maskEnabled:       true
-            maskInverted:      true
-            maskThresholdMin:  0.5
-            maskSpreadAtMin:   1
+            maskSource: cutoutMask
+            maskEnabled: true
+            maskInverted: true
+            maskThresholdMin: 0.5
+            maskSpreadAtMin: 1
         }
     }
 
@@ -47,11 +42,11 @@ Item {
 
         Rectangle {
             anchors {
-                fill:         parent
-                topMargin:    root.cutoutTopInset
+                fill: parent
+                topMargin: root.cutoutTopInset
                 bottomMargin: root.cutoutBottomInset
-                leftMargin:   root.cutoutLeftInset
-                rightMargin:  root.cutoutRightInset
+                leftMargin: root.cutoutLeftInset
+                rightMargin: root.cutoutRightInset
             }
             radius: root.cutoutRadius
         }

@@ -10,13 +10,29 @@ import qs.Widgets
 PanelWindow {
     id: win
 
+    readonly property bool connectedFrameMode: SettingsData.frameEnabled
+        && Theme.isConnectedEffect
+        && SettingsData.isScreenInPreferences(win.screen, SettingsData.frameScreenPreferences)
+    readonly property string notifBarSide: {
+        const pos = SettingsData.notificationPopupPosition;
+        if (pos === -1) return "top";
+        switch (pos) {
+        case SettingsData.Position.Top: return "right";
+        case SettingsData.Position.Left: return "left";
+        case SettingsData.Position.BottomCenter: return "bottom";
+        case SettingsData.Position.Right: return "right";
+        case SettingsData.Position.Bottom: return "left";
+        default: return "top";
+        }
+    }
+
     WindowBlur {
         targetWindow: win
         blurX: content.x + content.cardInset + swipeTx.x + tx.x
         blurY: content.y + content.cardInset + swipeTx.y + tx.y
-        blurWidth: !win._finalized ? Math.max(0, content.width - content.cardInset * 2) : 0
-        blurHeight: !win._finalized ? Math.max(0, content.height - content.cardInset * 2) : 0
-        blurRadius: SettingsData.connectedFrameModeActive ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+        blurWidth: !win._finalized && !win.connectedFrameMode ? Math.max(0, content.width - content.cardInset * 2) : 0
+        blurHeight: !win._finalized && !win.connectedFrameMode ? Math.max(0, content.height - content.cardInset * 2) : 0
+        blurRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     }
 
     WlrLayershell.namespace: "dms:notification-popup"
@@ -84,6 +100,7 @@ PanelWindow {
     signal exitStarted
     signal exitFinished
     signal popupHeightChanged
+    signal popupChromeGeometryChanged
 
     function startExit() {
         if (exiting || _isDestroying) {
@@ -91,6 +108,7 @@ PanelWindow {
         }
         exiting = true;
         exitStarted();
+        popupChromeGeometryChanged();
         exitAnim.restart();
         exitWatchdog.restart();
         if (NotificationService.removeFromVisibleNotifications)
@@ -171,6 +189,7 @@ PanelWindow {
             duration: Theme.variantDuration(descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration, descriptionExpanded)
             easing.type: Easing.BezierSpline
             easing.bezierCurve: descriptionExpanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            onFinished: win.popupHeightChanged()
         }
     }
 
@@ -263,12 +282,24 @@ PanelWindow {
         });
     }
 
+    function _frameEdgeInset(side) {
+        if (!screen)
+            return 0;
+        const edges = SettingsData.getActiveBarEdgesForScreen(screen);
+        const raw = edges.includes(side) ? SettingsData.frameBarSize : SettingsData.frameThickness;
+        return Math.max(0, Math.round(Theme.px(raw, dpr)));
+    }
+
     function getTopMargin() {
         const popupPos = SettingsData.notificationPopupPosition;
         const isTop = isTopCenter || popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Left;
         if (!isTop)
             return 0;
 
+        if (connectedFrameMode) {
+            const cornerClear = isCenterPosition ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            return _frameEdgeInset("top") + cornerClear + screenY;
+        }
         const barInfo = getBarInfo();
         const base = barInfo.topBar > 0 ? barInfo.topBar : Theme.popupDistance;
         return base + screenY;
@@ -280,6 +311,10 @@ PanelWindow {
         if (!isBottom)
             return 0;
 
+        if (connectedFrameMode) {
+            const cornerClear = isCenterPosition ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            return _frameEdgeInset("bottom") + cornerClear + screenY;
+        }
         const barInfo = getBarInfo();
         const base = barInfo.bottomBar > 0 ? barInfo.bottomBar : Theme.popupDistance;
         return base + screenY;
@@ -294,6 +329,8 @@ PanelWindow {
         if (!isLeft)
             return 0;
 
+        if (connectedFrameMode)
+            return _frameEdgeInset("left");
         const barInfo = getBarInfo();
         return barInfo.leftBar > 0 ? barInfo.leftBar : Theme.popupDistance;
     }
@@ -307,6 +344,8 @@ PanelWindow {
         if (!isRight)
             return 0;
 
+        if (connectedFrameMode)
+            return _frameEdgeInset("right");
         const barInfo = getBarInfo();
         return barInfo.rightBar > 0 ? barInfo.rightBar : Theme.popupDistance;
     }
@@ -351,10 +390,64 @@ PanelWindow {
         return Theme.snap(getContentY() - windowShadowPad, dpr);
     }
 
+    function _swipeDismissTarget() {
+        return (content.swipeDismissDirection < 0 ? -1 : 1) * content.width;
+    }
+
+    function _frameEdgeSwipeDirection() {
+        const popupPos = SettingsData.notificationPopupPosition;
+        return (popupPos === SettingsData.Position.Left || popupPos === SettingsData.Position.Bottom) ? -1 : 1;
+    }
+
+    function _swipeDismissesTowardFrameEdge() {
+        return content.swipeDismissDirection === _frameEdgeSwipeDirection();
+    }
+
+    function popupChromeMotionActive() {
+        return exiting || content.swipeActive || content.swipeDismissing || Math.abs(content.swipeOffset) > 0.5;
+    }
+
+    function popupLayoutReservesSlot() {
+        return !content.swipeDismissing;
+    }
+
+    function popupChromeReservesSlot() {
+        return !content.swipeDismissing;
+    }
+
+    function popupChromeReleaseProgress() {
+        if (content.swipeDismissing)
+            return Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
+        if (!exiting)
+            return 0;
+        const exitOffset = isCenterPosition ? tx.y : tx.x;
+        return Math.max(0, Math.min(1, Math.abs(exitOffset) / Math.max(1, exitTravel)));
+    }
+
+    function popupChromeMotionX() {
+        if (!popupChromeMotionActive() || isCenterPosition)
+            return 0;
+        const motion = content.swipeOffset + tx.x;
+        if (content.swipeDismissing && !_swipeDismissesTowardFrameEdge())
+            return exiting ? Theme.snap(tx.x, dpr) : 0;
+        if (content.swipeActive && motion * _frameEdgeSwipeDirection() < 0)
+            return 0;
+        return Theme.snap(motion, dpr);
+    }
+
+    function popupChromeMotionY() {
+        return popupChromeMotionActive() ? Theme.snap(tx.y, dpr) : 0;
+    }
+
     readonly property bool screenValid: win.screen && !_isDestroying
     readonly property real dpr: screenValid ? CompositorService.getScreenScale(win.screen) : 1
     readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2)), dpr)
     readonly property real alignedHeight: Theme.px(Math.max(0, implicitHeight - (windowShadowPad * 2)), dpr)
+    onScreenYChanged: popupChromeGeometryChanged()
+    onScreenChanged: popupChromeGeometryChanged()
+    onConnectedFrameModeChanged: popupChromeGeometryChanged()
+    onAlignedWidthChanged: popupChromeGeometryChanged()
+    onAlignedHeightChanged: popupChromeGeometryChanged()
 
     Item {
         id: content
@@ -363,7 +456,7 @@ PanelWindow {
         y: Theme.snap(windowShadowPad, dpr)
         width: alignedWidth
         height: alignedHeight
-        visible: !win._finalized
+        visible: !win._finalized && !chromeOnlyExit
         scale: cardHoverHandler.hovered ? 1.01 : 1.0
         transformOrigin: Item.Center
 
@@ -375,13 +468,25 @@ PanelWindow {
         }
 
         property real swipeOffset: 0
-        readonly property real dismissThreshold: isCenterPosition ? height * 0.4 : width * 0.35
+        property real swipeDismissDirection: 1
+        property bool chromeOnlyExit: false
+        readonly property real dismissThreshold: width * 0.35
         readonly property real swipeFadeStartRatio: 0.75
-        readonly property real swipeTravelDistance: isCenterPosition ? height : width
+        readonly property real swipeTravelDistance: width
         readonly property real swipeFadeStartOffset: swipeTravelDistance * swipeFadeStartRatio
         readonly property real swipeFadeDistance: Math.max(1, swipeTravelDistance - swipeFadeStartOffset)
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
+        onSwipeDismissingChanged: {
+            if (!win.connectedFrameMode)
+                return;
+            win.popupHeightChanged();
+            win.popupChromeGeometryChanged();
+        }
+        onSwipeOffsetChanged: {
+            if (win.connectedFrameMode)
+                win.popupChromeGeometryChanged();
+        }
 
         readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !BlurService.enabled
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
@@ -422,7 +527,7 @@ PanelWindow {
             shadowOffsetX: content.shadowOffsetX
             shadowOffsetY: content.shadowOffsetY
             shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
-            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
+            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
@@ -431,10 +536,14 @@ PanelWindow {
             sourceRect.y: content.shadowRenderPadding + content.cardInset
             sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
             sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
-            sourceRect.radius: Theme.cornerRadius
-            sourceRect.color: Theme.readableSurface
-            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.outlineMedium
-            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 1
+            sourceRect.radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+            sourceRect.color: win.connectedFrameMode ? Theme.popupLayerColor(Theme.surfaceContainer) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            sourceRect.antialiasing: true
+            sourceRect.layer.enabled: win.connectedFrameMode
+            sourceRect.layer.smooth: true
+            sourceRect.layer.textureSize: win.connectedFrameMode && win.dpr > 1 ? Qt.size(Math.ceil(sourceRect.width * win.dpr), Math.ceil(sourceRect.height * win.dpr)) : Qt.size(0, 0)
+            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
+            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
 
             Rectangle {
                 x: bgShadowLayer.sourceRect.x
@@ -470,11 +579,10 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             anchors.margins: content.cardInset
-            radius: Theme.cornerRadius
-            antialiasing: true
+            radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
             color: "transparent"
-            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-            border.width: BlurService.enabled ? BlurService.borderWidth : 1
+            border.color: win.connectedFrameMode ? "transparent" : BlurService.borderColor
+            border.width: win.connectedFrameMode ? 0 : BlurService.borderWidth
             z: 100
         }
 
@@ -872,14 +980,15 @@ PanelWindow {
         DragHandler {
             id: swipeDragHandler
             target: null
-            xAxis.enabled: !isCenterPosition
-            yAxis.enabled: isCenterPosition
+            xAxis.enabled: true
+            yAxis.enabled: false
 
             onActiveChanged: {
                 if (active || win.exiting || content.swipeDismissing)
                     return;
 
                 if (Math.abs(content.swipeOffset) > content.dismissThreshold) {
+                    content.swipeDismissDirection = content.swipeOffset < 0 ? -1 : 1;
                     content.swipeDismissing = true;
                     swipeDismissAnim.start();
                 } else {
@@ -891,15 +1000,7 @@ PanelWindow {
                 if (win.exiting)
                     return;
 
-                const raw = isCenterPosition ? translation.y : translation.x;
-                if (isTopCenter) {
-                    content.swipeOffset = Math.min(0, raw);
-                } else if (isBottomCenter) {
-                    content.swipeOffset = Math.max(0, raw);
-                } else {
-                    const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-                    content.swipeOffset = isLeft ? Math.min(0, raw) : Math.max(0, raw);
-                }
+                content.swipeOffset = translation.x;
             }
         }
 
@@ -930,20 +1031,28 @@ PanelWindow {
             id: swipeDismissAnim
             target: content
             property: "swipeOffset"
-            to: isTopCenter ? -content.height : isBottomCenter ? content.height : (SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom ? -content.width : content.width)
+            to: win._swipeDismissTarget()
             duration: Theme.notificationExitDuration
             easing.type: Easing.OutCubic
             onStopped: {
-                NotificationService.dismissNotification(notificationData);
-                win.forceExit();
+                const inwardConnectedExit = win.connectedFrameMode && !win.isCenterPosition && !win._swipeDismissesTowardFrameEdge();
+                if (inwardConnectedExit)
+                    content.chromeOnlyExit = true;
+                if (win.connectedFrameMode && (win.isCenterPosition || inwardConnectedExit)) {
+                    win.startExit();
+                    NotificationService.dismissNotification(notificationData);
+                } else {
+                    NotificationService.dismissNotification(notificationData);
+                    win.forceExit();
+                }
             }
         }
 
         transform: [
             Translate {
                 id: swipeTx
-                x: isCenterPosition ? 0 : content.swipeOffset
-                y: isCenterPosition ? content.swipeOffset : 0
+                x: content.swipeOffset
+                y: 0
             },
             Translate {
                 id: tx
@@ -954,6 +1063,14 @@ PanelWindow {
                     return isLeft ? -entryTravel : entryTravel;
                 }
                 y: isTopCenter ? -entryTravel : isBottomCenter ? entryTravel : 0
+                onXChanged: {
+                    if (win.connectedFrameMode)
+                        win.popupChromeGeometryChanged();
+                }
+                onYChanged: {
+                    if (win.connectedFrameMode)
+                        win.popupChromeGeometryChanged();
+                }
             }
         ]
     }

@@ -114,7 +114,7 @@ Item {
                 }
                 radiusX: root._cr
                 radiusY: root._cr
-                direction: PathArc.Counterclockwise
+                direction: root.barSide === "bottom" ? PathArc.Clockwise : PathArc.Counterclockwise
             }
 
             // Body edge to first convex corner
@@ -169,7 +169,7 @@ Item {
                 }
                 radiusX: root._sr
                 radiusY: root._sr
-                direction: PathArc.Clockwise
+                direction: root.barSide === "bottom" ? PathArc.Counterclockwise : PathArc.Clockwise
             }
 
             // Far edge
@@ -224,7 +224,7 @@ Item {
                 }
                 radiusX: root._sr
                 radiusY: root._sr
-                direction: PathArc.Clockwise
+                direction: root.barSide === "bottom" ? PathArc.Counterclockwise : PathArc.Clockwise
             }
 
             // Body edge to second concave arc
@@ -279,7 +279,7 @@ Item {
                 }
                 radiusX: root._cr
                 radiusY: root._cr
-                direction: PathArc.Counterclockwise
+                direction: root.barSide === "bottom" ? PathArc.Clockwise : PathArc.Counterclockwise
             }
         }
     }
