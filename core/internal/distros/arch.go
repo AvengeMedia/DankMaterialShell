@@ -324,21 +324,6 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 
 	systemPkgs, aurPkgs, manualPkgs, variantMap := a.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
-	// Ensure the correct compositor provider is explicitly included
-	// so pacman doesn't auto-resolve dms-shell-compositor to the wrong provider.
-	if slices.Contains(systemPkgs, "dms-shell") {
-		switch wm {
-		case deps.WindowManagerHyprland:
-			if !slices.Contains(systemPkgs, "dms-shell-hyprland") {
-				systemPkgs = append(systemPkgs, "dms-shell-hyprland")
-			}
-		case deps.WindowManagerNiri:
-			if !slices.Contains(systemPkgs, "dms-shell-niri") {
-				systemPkgs = append(systemPkgs, "dms-shell-niri")
-			}
-		}
-	}
-
 	if slices.Contains(aurPkgs, "quickshell-git") && slices.Contains(systemPkgs, "dms-shell") {
 		if err := a.preinstallQuickshellGit(ctx, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to preinstall quickshell-git: %w", err)
