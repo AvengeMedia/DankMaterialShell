@@ -324,6 +324,13 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 
 	systemPkgs, aurPkgs, manualPkgs, variantMap := a.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
+	if slices.Contains(aurPkgs, "quickshell-git") && slices.Contains(systemPkgs, "dms-shell") {
+		if err := a.preinstallQuickshellGit(ctx, sudoPassword, progressChan); err != nil {
+			return fmt.Errorf("failed to preinstall quickshell-git: %w", err)
+		}
+		aurPkgs = slices.DeleteFunc(aurPkgs, func(p string) bool { return p == "quickshell-git" })
+	}
+
 	// Phase 3: System Packages
 	if len(systemPkgs) > 0 {
 		progressChan <- InstallProgressMsg{
@@ -441,6 +448,37 @@ func (a *ArchDistribution) categorizePackages(dependencies []deps.Dependency, wm
 	return systemPkgs, aurPkgs, manualPkgs, variantMap
 }
 
+func (a *ArchDistribution) preinstallQuickshellGit(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if a.packageInstalled("quickshell-git") {
+		return nil
+	}
+
+	if a.packageInstalled("quickshell") {
+		progressChan <- InstallProgressMsg{
+			Phase:       PhaseAURPackages,
+			Progress:    0.15,
+			Step:        "Removing stable quickshell...",
+			IsComplete:  false,
+			NeedsSudo:   true,
+			CommandInfo: "sudo pacman -Rdd --noconfirm quickshell",
+			LogOutput:   "Removing stable quickshell so quickshell-git can be installed",
+		}
+		cmd := ExecSudoCommand(ctx, sudoPassword, "pacman -Rdd --noconfirm quickshell")
+		if err := a.runWithProgress(cmd, progressChan, PhaseAURPackages, 0.15, 0.18); err != nil {
+			return fmt.Errorf("failed to remove stable quickshell: %w", err)
+		}
+	}
+
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseAURPackages,
+		Progress:    0.18,
+		Step:        "Building quickshell-git before system packages...",
+		IsComplete:  false,
+		CommandInfo: "Installing quickshell-git ahead of dms-shell to avoid conflict",
+	}
+	return a.installSingleAURPackage(ctx, "quickshell-git", sudoPassword, progressChan, 0.18, 0.32)
+}
+
 func (a *ArchDistribution) installSystemPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	if len(packages) == 0 {
 		return nil
@@ -449,6 +487,9 @@ func (a *ArchDistribution) installSystemPackages(ctx context.Context, packages [
 	a.log(fmt.Sprintf("Installing system packages: %s", strings.Join(packages, ", ")))
 
 	args := []string{"pacman", "-S", "--needed", "--noconfirm"}
+	if slices.Contains(packages, "dms-shell") {
+		args = append(args, "--assume-installed", "dms-shell-compositor=1")
+	}
 	args = append(args, packages...)
 
 	progressChan <- InstallProgressMsg{
