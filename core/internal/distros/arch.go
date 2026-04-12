@@ -135,24 +135,6 @@ func (a *ArchDistribution) packageInstalled(pkg string) bool {
 	return err == nil
 }
 
-// isDepSatisfied checks if a dependency is satisfied by any installed package,
-// including via "provides". Unlike packageInstalled (pacman -Q, exact name
-// match), this uses pacman -T which respects provides declarations.
-// For example, if quickshell-git provides=('quickshell'), then
-// isDepSatisfied("quickshell") returns true even though quickshell itself
-// is not installed.
-func (a *ArchDistribution) isDepSatisfied(dep string) bool {
-	// pacman -T prints dependencies that are NOT satisfied.
-	// Exit code 0 = all satisfied; non-zero = unsatisfied deps found.
-	cmd := exec.Command("pacman", "-T", dep)
-	output, err := cmd.Output()
-	if err != nil {
-		return false // error or unsatisfied
-	}
-	// If output is empty, the dep is satisfied
-	return len(strings.TrimSpace(string(output))) == 0
-}
-
 // parseSRCINFODeps reads a .SRCINFO file and returns runtime dep and makedep package
 func parseSRCINFODeps(srcinfoPath string) (deps []string, makedeps []string, err error) {
 	data, err := os.ReadFile(srcinfoPath)
@@ -725,7 +707,7 @@ func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, 
 		var aurPkgs []string
 
 		for _, dep := range append(runtimeDeps, makeDeps...) {
-			if seen[dep] || a.isDepSatisfied(dep) {
+			if seen[dep] || a.packageInstalled(dep) {
 				continue
 			}
 			seen[dep] = true
