@@ -1051,7 +1051,19 @@ Singleton {
         }
 
         function status(): string {
-            return root.nightModeEnabled ? "Night mode is enabled" : "Night mode is disabled";
+            const parts = ["Night mode is " + (root.nightModeEnabled ? "enabled" : "disabled")];
+            parts.push("Temperature: " + SessionData.nightModeTemperature + "K");
+            if (SessionData.nightModeAutoEnabled) {
+                parts.push("Automation: " + SessionData.nightModeAutoMode);
+                parts.push("Day temperature: " + SessionData.nightModeHighTemperature + "K");
+            }
+            if (DisplayService.gammaCurrentTemp > 0)
+                parts.push("Current: " + DisplayService.gammaCurrentTemp + "K");
+            return parts.join("\n");
+        }
+
+        function getTemperature(): string {
+            return SessionData.nightModeTemperature.toString();
         }
 
         function temperature(value: string): string {
