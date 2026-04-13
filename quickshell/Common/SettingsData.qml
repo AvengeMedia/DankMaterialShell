@@ -556,24 +556,24 @@ Singleton {
 
     property bool enableFprint: false
     property int maxFprintTries: 15
-    property bool fprintdAvailable: false
-    property bool lockFingerprintCanEnable: false
-    property bool lockFingerprintReady: false
-    property string lockFingerprintReason: "probe_failed"
-    property bool greeterFingerprintCanEnable: false
-    property bool greeterFingerprintReady: false
-    property string greeterFingerprintReason: "probe_failed"
-    property string greeterFingerprintSource: "none"
+    readonly property bool fprintdAvailable: Processes.fprintdAvailable
+    readonly property bool lockFingerprintCanEnable: Processes.lockFingerprintCanEnable
+    readonly property bool lockFingerprintReady: Processes.lockFingerprintReady
+    readonly property string lockFingerprintReason: Processes.lockFingerprintReason
+    readonly property bool greeterFingerprintCanEnable: Processes.greeterFingerprintCanEnable
+    readonly property bool greeterFingerprintReady: Processes.greeterFingerprintReady
+    readonly property string greeterFingerprintReason: Processes.greeterFingerprintReason
+    readonly property string greeterFingerprintSource: Processes.greeterFingerprintSource
     property bool enableU2f: false
     property string u2fMode: "or"
-    property bool u2fAvailable: false
-    property bool lockU2fCanEnable: false
-    property bool lockU2fReady: false
-    property string lockU2fReason: "probe_failed"
-    property bool greeterU2fCanEnable: false
-    property bool greeterU2fReady: false
-    property string greeterU2fReason: "probe_failed"
-    property string greeterU2fSource: "none"
+    readonly property bool u2fAvailable: Processes.u2fAvailable
+    readonly property bool lockU2fCanEnable: Processes.lockU2fCanEnable
+    readonly property bool lockU2fReady: Processes.lockU2fReady
+    readonly property string lockU2fReason: Processes.lockU2fReason
+    readonly property bool greeterU2fCanEnable: Processes.greeterU2fCanEnable
+    readonly property bool greeterU2fReady: Processes.greeterU2fReady
+    readonly property string greeterU2fReason: Processes.greeterU2fReason
+    readonly property string greeterU2fSource: Processes.greeterU2fSource
     property string lockScreenActiveMonitor: "all"
     property string lockScreenInactiveColor: "#000000"
     property int lockScreenNotificationMode: 0
@@ -1063,7 +1063,6 @@ Singleton {
     function refreshAuthAvailability() {
         if (isGreeterMode)
             return;
-        Processes.settingsRoot = root;
         Processes.detectAuthCapabilities();
     }
 
