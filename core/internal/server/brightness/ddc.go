@@ -490,5 +490,32 @@ func (b *DDCBackend) valueToPercent(value int, max int, exponential bool) int {
 	return percent
 }
 
+func (b *DDCBackend) WaitPending() {
+    done := make(chan struct{})
+    b.debounceMutex.Lock()
+    hasPending := len(b.debouncePending) > 0
+    b.debounceMutex.Unlock()
+
+    if !hasPending {
+        return
+    }
+
+    // Poll until all pending sets are flushed
+    go func() {
+        for {
+            time.Sleep(10 * time.Millisecond)
+            b.debounceMutex.Lock()
+            pending := len(b.debouncePending)
+            b.debounceMutex.Unlock()
+            if pending == 0 {
+                close(done)
+                return
+            }
+        }
+    }()
+
+    <-done
+}
+
 func (b *DDCBackend) Close() {
 }
