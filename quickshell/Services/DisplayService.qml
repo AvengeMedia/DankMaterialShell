@@ -819,6 +819,7 @@ Singleton {
             if (event.event === "unlock" || event.event === "resume") {
                 suppressOsd = true;
                 osdSuppressTimer.restart();
+                evaluateNightMode();
             }
         }
 

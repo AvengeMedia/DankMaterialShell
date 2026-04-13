@@ -3,8 +3,11 @@ package wayland
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
+	"io"
 	"os"
+	"slices"
 	"syscall"
 	"time"
 
@@ -73,7 +76,10 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 		m.post(func() {
 			log.Info("Gamma control enabled at startup")
 			gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
-			if err := m.setupOutputControls(m.availableOutputs, gammaMgr); err != nil {
+			m.availOutputsMu.RLock()
+			outs := slices.Clone(m.availableOutputs)
+			m.availOutputsMu.RUnlock()
+			if err := m.setupOutputControls(outs, gammaMgr); err != nil {
 				log.Errorf("Failed to initialize gamma controls: %v", err)
 				return
 			}
@@ -170,6 +176,7 @@ func (m *Manager) setupRegistry() error {
 			})
 			if gammaMgr != nil {
 				outputs = append(outputs, output)
+				m.addAvailableOutput(output)
 			}
 			m.outputRegNames.Store(outputID, e.Name)
 
@@ -204,6 +211,11 @@ func (m *Manager) setupRegistry() error {
 			}
 			if foundOut.gammaControl != nil {
 				foundOut.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
+				foundOut.gammaControl = nil
+			}
+			m.removeAvailableOutput(foundOut.output)
+			if foundOut.output != nil && !foundOut.output.IsZombie() {
+				_ = foundOut.output.Release()
 			}
 			m.outputs.Delete(foundID)
 
@@ -288,14 +300,28 @@ func (m *Manager) setupControlHandlers(state *outputState, control *wlr_gamma_co
 			if !ok {
 				return
 			}
+			if ctrl, ok := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1); ok && ctrl != nil && !ctrl.IsZombie() {
+				ctrl.Destroy()
+			}
+			out.gammaControl = nil
 			out.failed = true
 			out.rampSize = 0
 			out.retryCount++
 			out.lastFailTime = time.Now()
 
+			if !m.outputStillValid(out) {
+				return
+			}
+
 			backoff := time.Duration(300<<uint(min(out.retryCount-1, 4))) * time.Millisecond
 			time.AfterFunc(backoff, func() {
 				m.post(func() {
+					if !m.outputStillValid(out) {
+						return
+					}
+					if _, stillTracked := m.outputs.Load(outputID); !stillTracked {
+						return
+					}
 					m.recreateOutputControl(out)
 				})
 			})
@@ -303,12 +329,75 @@ func (m *Manager) setupControlHandlers(state *outputState, control *wlr_gamma_co
 	})
 }
 
+func (m *Manager) addAvailableOutput(o *wlclient.Output) {
+	if o == nil {
+		return
+	}
+	m.availOutputsMu.Lock()
+	defer m.availOutputsMu.Unlock()
+	if slices.Contains(m.availableOutputs, o) {
+		return
+	}
+	m.availableOutputs = append(m.availableOutputs, o)
+}
+
+func (m *Manager) removeAvailableOutput(o *wlclient.Output) {
+	if o == nil {
+		return
+	}
+	m.availOutputsMu.Lock()
+	defer m.availOutputsMu.Unlock()
+	m.availableOutputs = slices.DeleteFunc(m.availableOutputs, func(existing *wlclient.Output) bool {
+		return existing == o
+	})
+}
+
+func (m *Manager) outputStillValid(out *outputState) bool {
+	switch {
+	case out == nil:
+		return false
+	case out.output == nil:
+		return false
+	case out.output.IsZombie():
+		return false
+	}
+	m.availOutputsMu.RLock()
+	defer m.availOutputsMu.RUnlock()
+	return slices.Contains(m.availableOutputs, out.output)
+}
+
+func isConnectionDeadErr(err error) bool {
+	switch {
+	case err == nil:
+		return false
+	case errors.Is(err, syscall.EPIPE):
+		return true
+	case errors.Is(err, syscall.ECONNRESET):
+		return true
+	case errors.Is(err, syscall.EBADF):
+		return true
+	case errors.Is(err, io.EOF):
+		return true
+	}
+	return false
+}
+
 func (m *Manager) addOutputControl(output *wlclient.Output) error {
+	switch {
+	case m.connectionDead.Load():
+		return nil
+	case output == nil || output.IsZombie():
+		return nil
+	}
+
 	outputID := output.ID()
 	gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
 
 	control, err := gammaMgr.GetGammaControl(output)
 	if err != nil {
+		if isConnectionDeadErr(err) {
+			m.markConnectionDead(err)
+		}
 		return err
 	}
 
@@ -329,16 +418,19 @@ func (m *Manager) recreateOutputControl(out *outputState) error {
 	enabled := m.config.Enabled
 	m.configMutex.RUnlock()
 
-	if !enabled || !m.controlsInitialized {
+	switch {
+	case m.connectionDead.Load():
+		return nil
+	case !enabled || !m.controlsInitialized:
+		return nil
+	case out.isVirtual:
+		return nil
+	case out.retryCount >= 10:
+		return nil
+	case !m.outputStillValid(out):
 		return nil
 	}
 	if _, ok := m.outputs.Load(out.id); !ok {
-		return nil
-	}
-	if out.isVirtual {
-		return nil
-	}
-	if out.retryCount >= 10 {
 		return nil
 	}
 
@@ -347,8 +439,16 @@ func (m *Manager) recreateOutputControl(out *outputState) error {
 		return fmt.Errorf("no gamma manager")
 	}
 
+	if existing, ok := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1); ok && existing != nil && !existing.IsZombie() {
+		existing.Destroy()
+		out.gammaControl = nil
+	}
+
 	control, err := gammaMgr.GetGammaControl(out.output)
 	if err != nil {
+		if isConnectionDeadErr(err) {
+			m.markConnectionDead(err)
+		}
 		return err
 	}
 
@@ -356,6 +456,13 @@ func (m *Manager) recreateOutputControl(out *outputState) error {
 	out.gammaControl = control
 	out.failed = false
 	return nil
+}
+
+func (m *Manager) markConnectionDead(err error) {
+	if m.connectionDead.Swap(true) {
+		return
+	}
+	log.Errorf("gamma: wayland connection appears dead (%v); pausing gamma operations", err)
 }
 
 func (m *Manager) recalcSchedule(now time.Time) {
@@ -690,11 +797,12 @@ func (m *Manager) applyGamma(temp int) {
 	gamma := m.config.Gamma
 	m.configMutex.RUnlock()
 
-	if !m.controlsInitialized {
+	switch {
+	case m.connectionDead.Load():
 		return
-	}
-
-	if m.lastAppliedTemp == temp && m.lastAppliedGamma == gamma {
+	case !m.controlsInitialized:
+		return
+	case m.lastAppliedTemp == temp && m.lastAppliedGamma == gamma:
 		return
 	}
 
@@ -714,7 +822,14 @@ func (m *Manager) applyGamma(temp int) {
 	var jobs []job
 
 	for _, out := range outs {
-		if out.failed || out.rampSize == 0 {
+		switch {
+		case out.failed:
+			continue
+		case out.rampSize == 0:
+			continue
+		case out.gammaControl == nil:
+			continue
+		case !m.outputStillValid(out):
 			continue
 		}
 		ramp := GenerateGammaRamp(out.rampSize, temp, gamma)
@@ -732,18 +847,16 @@ func (m *Manager) applyGamma(temp int) {
 	}
 
 	for _, j := range jobs {
-		if err := m.setGammaBytes(j.out, j.data); err != nil {
-			log.Warnf("gamma: failed to set output %d: %v", j.out.id, err)
-			j.out.failed = true
-			j.out.rampSize = 0
-			outID := j.out.id
-			time.AfterFunc(300*time.Millisecond, func() {
-				m.post(func() {
-					if out, ok := m.outputs.Load(outID); ok && out.failed {
-						m.recreateOutputControl(out)
-					}
-				})
-			})
+		err := m.setGammaBytes(j.out, j.data)
+		if err == nil {
+			continue
+		}
+		log.Warnf("gamma: failed to set output %d: %v", j.out.id, err)
+		j.out.failed = true
+		j.out.rampSize = 0
+		if isConnectionDeadErr(err) {
+			m.markConnectionDead(err)
+			return
 		}
 	}
 
@@ -752,6 +865,14 @@ func (m *Manager) applyGamma(temp int) {
 }
 
 func (m *Manager) setGammaBytes(out *outputState, data []byte) error {
+	if out.gammaControl == nil {
+		return fmt.Errorf("no gamma control")
+	}
+	ctrl, ok := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
+	if !ok || ctrl == nil || ctrl.IsZombie() {
+		return fmt.Errorf("gamma control invalid")
+	}
+
 	fd, err := MemfdCreate("gamma-ramp", 0)
 	if err != nil {
 		return err
@@ -774,7 +895,6 @@ func (m *Manager) setGammaBytes(out *outputState, data []byte) error {
 	}
 	syscall.Seek(fd, 0, 0)
 
-	ctrl := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
 	return ctrl.SetGamma(fd)
 }
 
@@ -882,10 +1002,10 @@ func (m *Manager) dbusMonitor() {
 }
 
 func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
-	if sig.Name != "org.freedesktop.login1.Manager.PrepareForSleep" {
+	switch {
+	case sig.Name != "org.freedesktop.login1.Manager.PrepareForSleep":
 		return
-	}
-	if len(sig.Body) == 0 {
+	case len(sig.Body) == 0:
 		return
 	}
 	preparing, ok := sig.Body[0].(bool)
@@ -899,25 +1019,32 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 		return
 	}
 	time.AfterFunc(500*time.Millisecond, func() {
-		m.post(func() {
-			m.configMutex.RLock()
-			stillEnabled := m.config.Enabled
-			m.configMutex.RUnlock()
-			if !stillEnabled || !m.controlsInitialized {
-				return
-			}
-			m.outputs.Range(func(_ uint32, out *outputState) bool {
-				if out.gammaControl != nil {
-					out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
-					out.gammaControl = nil
-				}
-				out.retryCount = 0
-				out.failed = false
-				m.recreateOutputControl(out)
-				return true
-			})
-		})
+		m.post(m.handleResume)
 	})
+}
+
+func (m *Manager) handleResume() {
+	m.configMutex.RLock()
+	stillEnabled := m.config.Enabled
+	m.configMutex.RUnlock()
+
+	switch {
+	case !stillEnabled:
+		return
+	case !m.controlsInitialized:
+		return
+	case m.connectionDead.Load():
+		return
+	}
+
+	// Compositors (Niri, Hyprland, wlroots-based) re-apply the cached gamma
+	// ramp to DRM on resume; gamma_control objects stay valid. We just need
+	// to force a resend so the schedule catches up with the current time of
+	// day — the original #1235 regression was caused by lastAppliedTemp
+	// matching and the send being skipped.
+	m.recalcSchedule(time.Now())
+	m.lastAppliedTemp = 0
+	m.applyCurrentTemp("resume")
 }
 
 func (m *Manager) triggerUpdate() {
@@ -1058,7 +1185,10 @@ func (m *Manager) SetEnabled(enabled bool) {
 	case enabled && !m.controlsInitialized:
 		m.post(func() {
 			gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
-			if err := m.setupOutputControls(m.availableOutputs, gammaMgr); err != nil {
+			m.availOutputsMu.RLock()
+			outs := slices.Clone(m.availableOutputs)
+			m.availOutputsMu.RUnlock()
+			if err := m.setupOutputControls(outs, gammaMgr); err != nil {
 				log.Errorf("gamma: failed to create controls: %v", err)
 				return
 			}

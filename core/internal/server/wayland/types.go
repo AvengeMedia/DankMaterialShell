@@ -3,6 +3,7 @@ package wayland
 import (
 	"math"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
@@ -71,9 +72,11 @@ type Manager struct {
 	registry            *wlclient.Registry
 	gammaControl        any
 	availableOutputs    []*wlclient.Output
+	availOutputsMu      sync.RWMutex
 	outputRegNames      syncmap.Map[uint32, uint32]
 	outputs             syncmap.Map[uint32, *outputState]
 	controlsInitialized bool
+	connectionDead      atomic.Bool
 
 	cmdq  chan cmd
 	alive bool
