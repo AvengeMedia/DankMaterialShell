@@ -218,7 +218,9 @@ func (b *DDCBackend) SetBrightnessWithExponent(id string, value int, exponential
 	if timer, exists := b.debounceTimers[id]; exists {
 		timer.Reset(200 * time.Millisecond)
 	} else {
+		b.debounceWg.Add(1)
 		b.debounceTimers[id] = time.AfterFunc(200*time.Millisecond, func() {
+			defer b.debounceWg.Done()
 			b.debounceMutex.Lock()
 			pending, exists := b.debouncePending[id]
 			if exists {
@@ -492,29 +494,16 @@ func (b *DDCBackend) valueToPercent(value int, max int, exponential bool) int {
 
 func (b *DDCBackend) WaitPending() {
     done := make(chan struct{})
-    b.debounceMutex.Lock()
-    hasPending := len(b.debouncePending) > 0
-    b.debounceMutex.Unlock()
-
-    if !hasPending {
-        return
-    }
-
-    // Poll until all pending sets are flushed
     go func() {
-        for {
-            time.Sleep(10 * time.Millisecond)
-            b.debounceMutex.Lock()
-            pending := len(b.debouncePending)
-            b.debounceMutex.Unlock()
-            if pending == 0 {
-                close(done)
-                return
-            }
-        }
+        b.debounceWg.Wait()
+        close(done)
     }()
 
-    <-done
+	select {
+	case <- done:
+	case <- time.After(5 * time.Second):
+			log.Debug("WaitPending timed out waiting for DDC writes")
+	}
 }
 
 func (b *DDCBackend) Close() {
