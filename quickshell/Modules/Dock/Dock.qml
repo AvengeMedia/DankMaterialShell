@@ -712,7 +712,7 @@ Variants {
 
                         Rectangle {
                             anchors.fill: parent
-                            visible: !SettingsData.connectedFrameModeActive
+                            visible: !SettingsData.connectedFrameModeActive && !(Theme.isConnectedEffect && dock.reveal)
                             color: dock.surfaceColor
                             topLeftRadius: dock.surfaceTopLeftRadius
                             topRightRadius: dock.surfaceTopRightRadius
@@ -722,7 +722,7 @@ Variants {
 
                         Rectangle {
                             anchors.fill: parent
-                            visible: !SettingsData.connectedFrameModeActive
+                            visible: !SettingsData.connectedFrameModeActive && !(Theme.isConnectedEffect && dock.reveal)
                             color: "transparent"
                             topLeftRadius: dock.surfaceTopLeftRadius
                             topRightRadius: dock.surfaceTopRightRadius
@@ -740,28 +740,16 @@ Variants {
                         onHeightChanged: dock._syncDockChromeState()
                     }
 
-                    ConnectedCorner {
+                    ConnectedShape {
                         visible: Theme.isConnectedEffect && dock.reveal && !SettingsData.connectedFrameModeActive
                         barSide: dock.connectedBarSide
-                        placement: "left"
-                        spacing: 0
+                        bodyWidth: dockBackground.width
+                        bodyHeight: dockBackground.height
                         connectorRadius: Theme.connectedCornerRadius
-                        color: dock.surfaceColor
-                        dpr: dock._dpr
-                        x: Theme.snap(dock.connectorX(dockBackground.x, dockBackground.width, placement, spacing), dock._dpr)
-                        y: Theme.snap(dock.connectorY(dockBackground.y, dockBackground.height, placement, spacing), dock._dpr)
-                    }
-
-                    ConnectedCorner {
-                        visible: Theme.isConnectedEffect && dock.reveal && !SettingsData.connectedFrameModeActive
-                        barSide: dock.connectedBarSide
-                        placement: "right"
-                        spacing: 0
-                        connectorRadius: Theme.connectedCornerRadius
-                        color: dock.surfaceColor
-                        dpr: dock._dpr
-                        x: Theme.snap(dock.connectorX(dockBackground.x, dockBackground.width, placement, spacing), dock._dpr)
-                        y: Theme.snap(dock.connectorY(dockBackground.y, dockBackground.height, placement, spacing), dock._dpr)
+                        surfaceRadius: dock.surfaceRadius
+                        fillColor: dock.surfaceColor
+                        x: dockBackground.x - bodyX
+                        y: dockBackground.y - bodyY
                     }
 
                     Shape {
