@@ -77,6 +77,7 @@ PanelWindow {
     readonly property color _opaqueSurfaceColor: Qt.rgba(_surfaceColor.r, _surfaceColor.g, _surfaceColor.b, 1)
     readonly property real _surfaceRadius: Theme.connectedSurfaceRadius
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
+    readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
 
     function _regionInt(value) {
         return Math.max(0, Math.round(Theme.px(value, win._dpr)));
@@ -794,7 +795,8 @@ PanelWindow {
         anchors.fill: parent
         visible: win._connectedActive
         opacity: win._surfaceOpacity
-        layer.enabled: true // Always need a layer to apply Shadow or Opacity in MultiEffect, or at least if elevationEnabled/opacity < 1
+        // Skip FBO when neither elevation nor alpha blend is active
+        layer.enabled: (!win._disableLayer && Theme.elevationEnabled) || win._surfaceOpacity < 1
         layer.smooth: false
 
         layer.effect: MultiEffect {
@@ -806,7 +808,7 @@ PanelWindow {
             blurEnabled: false
             maskEnabled: false
 
-            shadowEnabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+            shadowEnabled: !win._disableLayer && Theme.elevationEnabled
             shadowBlur: Math.max(0, Math.min(1, _shadowBlur / Math.max(1, Theme.elevationBlurMax)))
             shadowScale: 1 + (2 * _shadowSpread) / Math.max(1, Math.min(_connectedSurfaceLayer.width, _connectedSurfaceLayer.height))
             shadowHorizontalOffset: Theme.elevationOffsetXFor(level, Theme.elevationLightDirection, 4)
