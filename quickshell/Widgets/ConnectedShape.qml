@@ -40,6 +40,7 @@ Item {
         anchors.fill: parent
         asynchronous: false
         preferredRendererType: Shape.CurveRenderer
+        antialiasing: true
 
         ShapePath {
             fillColor: root.fillColor

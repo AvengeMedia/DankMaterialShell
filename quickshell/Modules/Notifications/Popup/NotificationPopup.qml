@@ -41,6 +41,7 @@ PanelWindow {
     required property string notificationId
     readonly property bool hasValidData: notificationData && notificationData.notification
     readonly property alias hovered: cardHoverHandler.hovered
+    readonly property alias swipeActive: content.swipeActive
     property int screenY: 0
     property bool exiting: false
     property bool _isDestroying: false
@@ -64,8 +65,8 @@ PanelWindow {
     readonly property real exitTravel: {
         if (directionalEffect) {
             if (isCenterPosition)
-                return content.height + entryTravel;
-            return content.width + entryTravel;
+                return Math.max(1, content.height);
+            return Math.max(1, content.width);
         }
         if (depthEffect)
             return Math.round(entryTravel * 1.35);
@@ -186,7 +187,7 @@ PanelWindow {
         enabled: !exiting && !_isDestroying
         NumberAnimation {
             id: implicitHeightAnim
-            duration: Theme.variantDuration(descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration, descriptionExpanded)
+            duration: descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: descriptionExpanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             onFinished: win.popupHeightChanged()
@@ -237,7 +238,8 @@ PanelWindow {
     readonly property real maxPopupShadowBlurPx: Math.max((Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined) ? Theme.elevationLevel3.blurPx : 12, (Theme.elevationLevel4 && Theme.elevationLevel4.blurPx !== undefined) ? Theme.elevationLevel4.blurPx : 16)
     readonly property real maxPopupShadowOffsetXPx: Math.max(Math.abs(Theme.elevationOffsetX(Theme.elevationLevel3)), Math.abs(Theme.elevationOffsetX(Theme.elevationLevel4)))
     readonly property real maxPopupShadowOffsetYPx: Math.max(Math.abs(Theme.elevationOffsetY(Theme.elevationLevel3, 6)), Math.abs(Theme.elevationOffsetY(Theme.elevationLevel4, 8)))
-    readonly property real windowShadowPad: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
+    readonly property bool popupWindowShadowActive: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !connectedFrameMode
+    readonly property real windowShadowPad: popupWindowShadowActive ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
 
     anchors.top: true
     anchors.left: true
@@ -404,7 +406,7 @@ PanelWindow {
     }
 
     function popupChromeMotionActive() {
-        return exiting || content.swipeActive || content.swipeDismissing || Math.abs(content.swipeOffset) > 0.5;
+        return popupChromeOpenProgress() < 1 || exiting || content.swipeActive || content.swipeDismissing || Math.abs(content.swipeOffset) > 0.5;
     }
 
     function popupLayoutReservesSlot() {
@@ -415,13 +417,30 @@ PanelWindow {
         return !content.swipeDismissing;
     }
 
+    function _chromeMotionOffset() {
+        return isCenterPosition ? tx.y : tx.x;
+    }
+
+    function _chromeCardTravel() {
+        return Math.max(1, isCenterPosition ? alignedHeight : alignedWidth);
+    }
+
+    function popupChromeOpenProgress() {
+        if (exiting || content.swipeDismissing)
+            return 1;
+        return Math.max(0, Math.min(1, 1 - Math.abs(_chromeMotionOffset()) / _chromeCardTravel()));
+    }
+
     function popupChromeReleaseProgress() {
+        if (exiting)
+            return Math.max(0, Math.min(1, Math.abs(_chromeMotionOffset()) / _chromeCardTravel()));
         if (content.swipeDismissing)
             return Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
-        if (!exiting)
-            return 0;
-        const exitOffset = isCenterPosition ? tx.y : tx.x;
-        return Math.max(0, Math.min(1, Math.abs(exitOffset) / Math.max(1, exitTravel)));
+        return 0;
+    }
+
+    function popupChromeFollowsCardMotion() {
+        return content.swipeActive || (content.swipeDismissing && !exiting);
     }
 
     function popupChromeMotionX() {
@@ -488,7 +507,7 @@ PanelWindow {
                 win.popupChromeGeometryChanged();
         }
 
-        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !BlurService.enabled
+        readonly property bool shadowsAllowed: win.popupWindowShadowActive
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
         readonly property real cardInset: Theme.snap(4, win.dpr)
         readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)) + 8), win.dpr) : 0
@@ -527,7 +546,7 @@ PanelWindow {
             shadowOffsetX: content.shadowOffsetX
             shadowOffsetY: content.shadowOffsetY
             shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
-            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
+            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
@@ -1089,7 +1108,7 @@ PanelWindow {
             return isLeft ? -entryTravel : entryTravel;
         }
         to: 0
-        duration: Theme.variantDuration(Theme.notificationEnterDuration, true)
+        duration: Theme.notificationEnterDuration
         easing.type: Easing.BezierSpline
         easing.bezierCurve: Theme.variantPopoutEnterCurve
         onStopped: {
@@ -1122,7 +1141,7 @@ PanelWindow {
                 const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
                 return isLeft ? -exitTravel : exitTravel;
             }
-            duration: Theme.variantDuration(Theme.notificationExitDuration, false)
+            duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.variantPopoutExitCurve
         }
@@ -1132,7 +1151,7 @@ PanelWindow {
             property: "opacity"
             from: 1
             to: Theme.isDirectionalEffect ? 1 : 0
-            duration: Theme.variantDuration(Theme.notificationExitDuration, false)
+            duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.variantPopoutExitCurve
         }
@@ -1142,7 +1161,7 @@ PanelWindow {
             property: "scale"
             from: 1
             to: Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed
-            duration: Theme.variantDuration(Theme.notificationExitDuration, false)
+            duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.variantPopoutExitCurve
         }
