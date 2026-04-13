@@ -91,6 +91,14 @@ Singleton {
         return true;
     }
 
+    function setPopoutAnim(claimId, animX, animY) {
+        if (!hasPopoutOwner(claimId))
+            return false;
+        popoutAnimX = animX;
+        popoutAnimY = animY;
+        return true;
+    }
+
     function _cloneDockStates() {
         const next = {};
         for (const screenName in dockStates)
