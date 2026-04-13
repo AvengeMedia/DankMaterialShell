@@ -35,6 +35,9 @@ QtObject {
     property var pendingDestroys: []
     property int destroyDelayMs: 100
     property bool _chromeSyncPending: false
+    readonly property real chromeOpenProgressThreshold: 0.10
+    readonly property real chromeReleaseTailStart: 0.90
+    readonly property real chromeReleaseDropProgress: 0.995
     property Component popupComponent
 
     popupComponent: Component {
@@ -130,7 +133,20 @@ QtObject {
     }
 
     function _chromeWindows() {
-        return popupWindows.filter(p => p && p.status !== Component.Null && p.visible && !p._finalized && p.hasValidData && (p.notificationData?.popup || p.exiting));
+        return popupWindows.filter(p => {
+            if (!p || p.status === Component.Null || !p.visible || p._finalized || !p.hasValidData)
+                return false;
+            if (!p.notificationData?.popup && !p.exiting)
+                return false;
+            if (!p.exiting && p.popupChromeOpenProgress && p.popupChromeOpenProgress() < chromeOpenProgressThreshold)
+                return false;
+            // Keep the connected shell until the card is almost fully closed.
+            if (p.exiting && !p.swipeActive && p.popupChromeReleaseProgress) {
+                if (p.popupChromeReleaseProgress() > chromeReleaseDropProgress)
+                    return false;
+            }
+            return true;
+        });
     }
 
     function _isFocusedScreen() {
@@ -225,23 +241,72 @@ QtObject {
         });
     }
 
+    function _clamp01(value) {
+        return Math.max(0, Math.min(1, value));
+    }
+
+    function _clipRectFromBarSide(rect, visibleFraction) {
+        const fraction = _clamp01(visibleFraction);
+        const w = Math.max(0, rect.right - rect.x);
+        const h = Math.max(0, rect.bottom - rect.y);
+
+        if (notifBarSide === "right") {
+            rect.x = rect.right - w * fraction;
+        } else if (notifBarSide === "left") {
+            rect.right = rect.x + w * fraction;
+        } else if (notifBarSide === "bottom") {
+            rect.y = rect.bottom - h * fraction;
+        } else {
+            rect.bottom = rect.y + h * fraction;
+        }
+        return rect;
+    }
+
+    function _popupChromeVisibleFraction(p) {
+        if (p.exiting && p.popupChromeReleaseProgress)
+            return 1 - _chromeReleaseTailProgress(p.popupChromeReleaseProgress());
+        if (!p.exiting && p.popupChromeOpenProgress)
+            return _clamp01(p.popupChromeOpenProgress());
+        return 1;
+    }
+
     function _popupChromeRect(p, useMotionOffset) {
         if (!p || !p.screen)
             return null;
-        const motionX = useMotionOffset && p.popupChromeMotionX ? p.popupChromeMotionX() : 0;
-        const motionY = useMotionOffset && p.popupChromeMotionY ? p.popupChromeMotionY() : 0;
-        const x = (p.getContentX ? p.getContentX() : 0) + motionX;
-        const y = (p.getContentY ? p.getContentY() : 0) + motionY;
+        const x = p.getContentX ? p.getContentX() : 0;
+        const y = p.getContentY ? p.getContentY() : 0;
         const w = p.alignedWidth || 0;
         const h = Math.max(p.alignedHeight || 0, baseNotificationHeight);
         if (w <= 0 || h <= 0)
             return null;
-        return {
+        const rect = {
             x: x,
             y: y,
             right: x + w,
             bottom: y + h
         };
+
+        if (!useMotionOffset)
+            return rect;
+
+        if (p.popupChromeFollowsCardMotion && p.popupChromeFollowsCardMotion()) {
+            const motionX = p.popupChromeMotionX ? p.popupChromeMotionX() : 0;
+            const motionY = p.popupChromeMotionY ? p.popupChromeMotionY() : 0;
+            rect.x += motionX;
+            rect.y += motionY;
+            rect.right += motionX;
+            rect.bottom += motionY;
+            return rect;
+        }
+
+        return _clipRectFromBarSide(rect, _popupChromeVisibleFraction(p));
+    }
+
+    function _chromeReleaseTailProgress(rawProgress) {
+        const progress = Math.max(0, Math.min(1, rawProgress));
+        if (progress <= chromeReleaseTailStart)
+            return 0;
+        return Math.max(0, Math.min(1, (progress - chromeReleaseTailStart) / Math.max(0.001, 1 - chromeReleaseTailStart)));
     }
 
     function _popupChromeBoundsRect(p, trailing, useMotionOffset) {
@@ -249,7 +314,7 @@ QtObject {
         if (!rect || p !== trailing || !p.popupChromeReleaseProgress)
             return rect;
 
-        const progress = Math.max(0, Math.min(1, p.popupChromeReleaseProgress()));
+        const progress = _chromeReleaseTailProgress(p.popupChromeReleaseProgress());
         if (progress <= 0)
             return rect;
 

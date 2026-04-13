@@ -906,9 +906,13 @@ Item {
             Item {
                 id: directionalClipMask
 
-                readonly property bool shouldClip: Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0
+                readonly property bool shouldClip: (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0) || Theme.isConnectedEffect
                 readonly property real clipOversize: 1000
-                readonly property real connectedClipAllowance: Theme.isConnectedEffect ? Math.ceil(root.shadowRenderPadding + BlurService.borderWidth + 2) : 0
+                readonly property real connectedClipAllowance: {
+                    if (!Theme.isConnectedEffect) return 0;
+                    if (root.frameOwnsConnectedChrome) return 0;
+                    return -Theme.connectedCornerRadius;
+                }
 
                 clip: shouldClip
 
@@ -985,7 +989,7 @@ Item {
                             borderColor: contentContainer.surfaceBorderColor
                             borderWidth: contentContainer.surfaceBorderWidth
                             useCustomSource: Theme.isConnectedEffect
-                            shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                            shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !root.frameOwnsConnectedChrome
 
                             Item {
                                 anchors.fill: parent
@@ -1061,6 +1065,7 @@ Item {
 
                                 Rectangle {
                                     anchors.fill: parent
+                                    antialiasing: true
                                     topLeftRadius: contentContainer.surfaceTopLeftRadius
                                     topRightRadius: contentContainer.surfaceTopRightRadius
                                     bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
