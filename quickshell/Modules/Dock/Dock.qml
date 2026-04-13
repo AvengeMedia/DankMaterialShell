@@ -227,6 +227,20 @@ Variants {
             ConnectedModeState.setDockSlide(dock._dockScreenName, dockSlide.x, dockSlide.y);
         }
 
+        property bool _slideSyncPending: false
+        function _queueSlideSync() {
+            if (!SettingsData.connectedFrameModeActive)
+                return;
+            if (_slideSyncPending)
+                return;
+            _slideSyncPending = true;
+            Qt.callLater(dock._flushSlideSync);
+        }
+        function _flushSlideSync() {
+            _slideSyncPending = false;
+            dock._syncDockSlide();
+        }
+
         property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData)
         property bool revealSticky: false
 
@@ -677,12 +691,8 @@ Variants {
                             }
                         }
 
-                        onXChanged: {
-                            dock._syncDockSlide();
-                        }
-                        onYChanged: {
-                            dock._syncDockSlide();
-                        }
+                        onXChanged: dock._queueSlideSync()
+                        onYChanged: dock._queueSlideSync()
                     }
 
                     Item {

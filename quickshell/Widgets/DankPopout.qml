@@ -195,6 +195,9 @@ Item {
     readonly property real contentAnimX: contentContainer.animX
     readonly property real contentAnimY: contentContainer.animY
 
+    property bool _animSyncPending: false
+    property bool _fullSyncPending: false
+
     // ─── ConnectedModeState sync ────────────────────────────────────────────
     function _syncPopoutChromeState() {
         if (!root.frameOwnsConnectedChrome) {
@@ -212,11 +215,41 @@ Item {
         _publishConnectedChromeState(contentWindow.visible && !ConnectedModeState.hasPopoutOwner(_chromeClaimId));
     }
 
-    onAlignedXChanged: _syncPopoutChromeState()
-    onAlignedYChanged: _syncPopoutChromeState()
-    onAlignedWidthChanged: _syncPopoutChromeState()
-    onContentAnimXChanged: _syncPopoutChromeState()
-    onContentAnimYChanged: _syncPopoutChromeState()
+    function _flushAnimSync() {
+        _animSyncPending = false;
+        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+            return;
+        if (!contentWindow.visible && !shouldBeVisible)
+            return;
+        ConnectedModeState.setPopoutAnim(_chromeClaimId, contentContainer.animX, contentContainer.animY);
+    }
+
+    function _queueAnimSync() {
+        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+            return;
+        if (_animSyncPending)
+            return;
+        _animSyncPending = true;
+        Qt.callLater(root._flushAnimSync);
+    }
+
+    function _flushFullSync() {
+        _fullSyncPending = false;
+        _syncPopoutChromeState();
+    }
+
+    function _queueFullSync() {
+        if (_fullSyncPending)
+            return;
+        _fullSyncPending = true;
+        Qt.callLater(root._flushFullSync);
+    }
+
+    onAlignedXChanged: _queueFullSync()
+    onAlignedYChanged: _queueFullSync()
+    onAlignedWidthChanged: _queueFullSync()
+    onContentAnimXChanged: _queueAnimSync()
+    onContentAnimYChanged: _queueAnimSync()
     onScreenChanged: _syncPopoutChromeState()
     onEffectiveBarPositionChanged: _syncPopoutChromeState()
 
