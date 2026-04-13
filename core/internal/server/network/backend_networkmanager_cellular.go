@@ -68,7 +68,7 @@ func (b *NetworkManagerBackend) getModemManagerCellularDetails(iface string) (op
 		// Get signal quality
 		if v, ok := modemData["SignalQuality"]; ok {
 			// SignalQuality is a struct (array) with [signal_strength, recent]
-			sigData := v.Value().([]interface{})
+			sigData := v.Value().([]any)
 			if len(sigData) > 0 {
 				switch val := sigData[0].(type) {
 				case uint32:
@@ -110,9 +110,10 @@ func (b *NetworkManagerBackend) getModemManagerCellularDetails(iface string) (op
 				if v, ok := gppData["RegistrationState"]; ok {
 					state := v.Value().(uint32)
 					// 1 = idle, 2 = home, 3 = searching, 4 = denied, 5 = roaming
-					if state == 2 {
+					switch state {
+					case 2:
 						operator = "Home Network"
-					} else if state == 5 {
+					case 5:
 						operator = "Roaming"
 					}
 				}
