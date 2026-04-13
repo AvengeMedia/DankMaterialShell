@@ -1321,7 +1321,8 @@ Singleton {
     }
 
     function loadCustomThemeFromFile(filePath) {
-        customThemeFileView.path = filePath;
+        customThemeFileView.path = Paths.expandTilde(filePath);
+        Qt.callLater(function() { customThemeFileView.reload(); });
     }
 
     function reloadCustomThemeVariant() {
@@ -1967,6 +1968,7 @@ Singleton {
 
     FileView {
         id: customThemeFileView
+        blockLoading: false
         watchChanges: currentTheme === "custom"
 
         function parseAndLoadTheme() {
