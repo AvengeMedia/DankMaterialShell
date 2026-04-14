@@ -204,6 +204,8 @@ var SPEC = {
     dankLauncherV2BorderColor: { def: "primary" },
     dankLauncherV2ShowFooter: { def: true },
     dankLauncherV2UnloadOnClose: { def: false },
+    dankLauncherV2IncludeFilesInAll: { def: false },
+    dankLauncherV2IncludeFoldersInAll: { def: false },
 
     useAutoLocation: { def: false },
     weatherEnabled: { def: true },

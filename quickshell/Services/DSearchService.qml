@@ -138,7 +138,8 @@ Singleton {
             }
         }
 
-        Proc.runCommand("dsearch-search", args, (stdout, exitCode) => {
+        const procId = "dsearch-search-" + (params?.type || "all");
+        Proc.runCommand(procId, args, (stdout, exitCode) => {
             if (exitCode === 0) {
                 try {
                     const response = JSON.parse(stdout);

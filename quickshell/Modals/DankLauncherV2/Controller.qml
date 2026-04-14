@@ -352,7 +352,8 @@ Item {
         searchQuery = query;
         searchDebounce.restart();
 
-        if (searchMode !== "plugins" && (searchMode === "files" || query.startsWith("/")) && query.length > 0) {
+        var filesInAll = searchMode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll);
+        if (searchMode !== "plugins" && (searchMode === "files" || query.startsWith("/") || filesInAll) && query.length > 0) {
             fileSearchDebounce.restart();
         }
     }
@@ -369,7 +370,8 @@ Item {
         searchMode = mode;
         modeChanged(mode);
         performSearch();
-        if (mode === "files") {
+        var filesInAll = mode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll) && searchQuery.length > 0;
+        if (mode === "files" || filesInAll) {
             fileSearchDebounce.restart();
         }
     }
@@ -927,10 +929,22 @@ Item {
         if (!DSearchService.dsearchAvailable)
             return;
         var fileQuery = "";
+        var effectiveType = fileSearchType || "all";
+        var includeFiles = SettingsData.dankLauncherV2IncludeFilesInAll;
+        var includeFolders = SettingsData.dankLauncherV2IncludeFoldersInAll;
+
         if (searchQuery.startsWith("/")) {
             fileQuery = searchQuery.substring(1).trim();
         } else if (searchMode === "files") {
             fileQuery = searchQuery.trim();
+        } else if (searchMode === "all" && (includeFiles || includeFolders)) {
+            fileQuery = searchQuery.trim();
+            if (includeFiles && !includeFolders)
+                effectiveType = "file";
+            else if (!includeFiles && includeFolders)
+                effectiveType = "dir";
+            else
+                effectiveType = "all";
         } else {
             return;
         }
@@ -941,109 +955,129 @@ Item {
         }
 
         isFileSearching = true;
-        var params = {
-            limit: 20,
-            fuzzy: true,
-            sort: fileSearchSort || "score",
-            desc: true
-        };
 
-        if (DSearchService.supportsTypeFilter) {
-            params.type = (fileSearchType && fileSearchType !== "all") ? fileSearchType : "all";
-        }
-        if (fileSearchExt) {
-            params.ext = fileSearchExt;
-        }
-        if (fileSearchFolder) {
-            params.folder = fileSearchFolder;
-        }
+        var splitBothTypes = searchMode === "all" && includeFiles && includeFolders && DSearchService.supportsTypeFilter;
+        var queryTypes = splitBothTypes ? ["file", "dir"] : [effectiveType];
+        var pending = queryTypes.length;
+        var aggregatedItems = [];
 
-        DSearchService.search(fileQuery, params, function (response) {
-            isFileSearching = false;
-            if (response.error)
-                return;
-            var fileItems = [];
-            var hits = response.result?.hits || [];
+        for (var t = 0; t < queryTypes.length; t++) {
+            var queryType = queryTypes[t];
+            var params = {
+                limit: 20,
+                fuzzy: true,
+                sort: fileSearchSort || "score",
+                desc: true
+            };
 
-            for (var i = 0; i < hits.length; i++) {
-                var hit = hits[i];
-                var docTypes = hit.locations?.doc_type;
-                var isDir = docTypes ? !!docTypes["dir"] : false;
-                fileItems.push(transformFileResult({
-                    path: hit.id || "",
-                    score: hit.score || 0,
-                    is_dir: isDir
-                }));
+            if (DSearchService.supportsTypeFilter) {
+                params.type = (queryType && queryType !== "all") ? queryType : "all";
+            }
+            if (fileSearchExt) {
+                params.ext = fileSearchExt;
+            }
+            if (fileSearchFolder) {
+                params.folder = fileSearchFolder;
             }
 
-            var fileSections = [];
-            var showType = fileSearchType || "all";
+            DSearchService.search(fileQuery, params, function (response) {
+                pending--;
+                if (!response.error) {
+                    var hits = response.result?.hits || [];
+                    for (var i = 0; i < hits.length; i++) {
+                        var hit = hits[i];
+                        var docTypes = hit.locations?.doc_type;
+                        var isDir = docTypes ? !!docTypes["dir"] : false;
+                        aggregatedItems.push(transformFileResult({
+                            path: hit.id || "",
+                            score: hit.score || 0,
+                            is_dir: isDir
+                        }));
+                    }
+                }
+                if (pending > 0)
+                    return;
 
-            if (showType === "all" && DSearchService.supportsTypeFilter) {
-                var onlyFiles = [];
-                var onlyDirs = [];
-                for (var j = 0; j < fileItems.length; j++) {
-                    if (fileItems[j].data?.is_dir)
-                        onlyDirs.push(fileItems[j]);
-                    else
-                        onlyFiles.push(fileItems[j]);
-                }
-                if (onlyFiles.length > 0) {
-                    fileSections.push({
-                        id: "files",
-                        title: I18n.tr("Files"),
-                        icon: "insert_drive_file",
-                        priority: 4,
-                        items: onlyFiles,
-                        collapsed: collapsedSections["files"] || false,
-                        flatStartIndex: 0
-                    });
-                }
-                if (onlyDirs.length > 0) {
-                    fileSections.push({
-                        id: "folders",
-                        title: I18n.tr("Folders"),
-                        icon: "folder",
-                        priority: 4.1,
-                        items: onlyDirs,
-                        collapsed: collapsedSections["folders"] || false,
-                        flatStartIndex: 0
-                    });
-                }
-            } else {
-                var filesIcon = showType === "dir" ? "folder" : showType === "file" ? "insert_drive_file" : "folder";
-                var filesTitle = showType === "dir" ? I18n.tr("Folders") : I18n.tr("Files");
-                if (fileItems.length > 0) {
-                    fileSections.push({
-                        id: "files",
-                        title: filesTitle,
-                        icon: filesIcon,
-                        priority: 4,
-                        items: fileItems,
-                        collapsed: collapsedSections["files"] || false,
-                        flatStartIndex: 0
-                    });
-                }
-            }
-
-            var newSections;
-            if (searchMode === "files") {
-                newSections = fileSections;
-            } else {
-                var existingNonFile = sections.filter(function (s) {
-                    return s.id !== "files" && s.id !== "folders";
-                });
-                newSections = existingNonFile.concat(fileSections);
-            }
-            newSections.sort(function (a, b) {
-                return a.priority - b.priority;
+                isFileSearching = false;
+                _applyFileSearchResults(aggregatedItems, effectiveType);
             });
-            _applyHighlights(newSections, searchQuery);
-            flatModel = Scorer.flattenSections(newSections);
-            sections = newSections;
-            selectedFlatIndex = getFirstItemIndex();
-            updateSelectedItem();
+        }
+    }
+
+    function _applyFileSearchResults(fileItems, effectiveType) {
+        var fileSections = [];
+        var showType = effectiveType;
+        var order = SettingsData.launcherPluginOrder || [];
+        var filesOrderIdx = order.indexOf("__files");
+        var foldersOrderIdx = order.indexOf("__folders");
+        var filesPriority = filesOrderIdx !== -1 ? 2.6 + filesOrderIdx * 0.01 : 4;
+        var foldersPriority = foldersOrderIdx !== -1 ? 2.6 + foldersOrderIdx * 0.01 : 4.1;
+
+        if (showType === "all" && DSearchService.supportsTypeFilter) {
+            var onlyFiles = [];
+            var onlyDirs = [];
+            for (var j = 0; j < fileItems.length; j++) {
+                if (fileItems[j].data?.is_dir)
+                    onlyDirs.push(fileItems[j]);
+                else
+                    onlyFiles.push(fileItems[j]);
+            }
+            if (onlyFiles.length > 0) {
+                fileSections.push({
+                    id: "files",
+                    title: I18n.tr("Files"),
+                    icon: "insert_drive_file",
+                    priority: filesPriority,
+                    items: onlyFiles,
+                    collapsed: collapsedSections["files"] || false,
+                    flatStartIndex: 0
+                });
+            }
+            if (onlyDirs.length > 0) {
+                fileSections.push({
+                    id: "folders",
+                    title: I18n.tr("Folders"),
+                    icon: "folder",
+                    priority: foldersPriority,
+                    items: onlyDirs,
+                    collapsed: collapsedSections["folders"] || false,
+                    flatStartIndex: 0
+                });
+            }
+        } else {
+            var filesIcon = showType === "dir" ? "folder" : showType === "file" ? "insert_drive_file" : "folder";
+            var filesTitle = showType === "dir" ? I18n.tr("Folders") : I18n.tr("Files");
+            var singlePriority = showType === "dir" ? foldersPriority : filesPriority;
+            if (fileItems.length > 0) {
+                fileSections.push({
+                    id: "files",
+                    title: filesTitle,
+                    icon: filesIcon,
+                    priority: singlePriority,
+                    items: fileItems,
+                    collapsed: collapsedSections["files"] || false,
+                    flatStartIndex: 0
+                });
+            }
+        }
+
+        var newSections;
+        if (searchMode === "files") {
+            newSections = fileSections;
+        } else {
+            var existingNonFile = sections.filter(function (s) {
+                return s.id !== "files" && s.id !== "folders";
+            });
+            newSections = existingNonFile.concat(fileSections);
+        }
+        newSections.sort(function (a, b) {
+            return a.priority - b.priority;
         });
+        _applyHighlights(newSections, searchQuery);
+        flatModel = Scorer.flattenSections(newSections);
+        sections = newSections;
+        selectedFlatIndex = getFirstItemIndex();
+        updateSelectedItem();
     }
 
     function searchApps(query) {
@@ -1276,7 +1310,11 @@ Item {
     function buildDynamicSectionDefs(items) {
         var baseDefs = sectionDefinitions.slice();
         var pluginSections = {};
-        var basePriority = 2.6;
+        var order = SettingsData.launcherPluginOrder || [];
+        var orderMap = {};
+        for (var k = 0; k < order.length; k++)
+            orderMap[order[k]] = k;
+        var unorderedPriority = 2.6 + order.length * 0.01;
 
         for (var i = 0; i < items.length; i++) {
             var section = items[i].section;
@@ -1287,19 +1325,25 @@ Item {
             var pluginId = section.substring(7);
             var meta = getPluginMetadata(pluginId);
             var viewPref = getPluginViewPref(pluginId);
+            var orderIdx = orderMap[pluginId];
+            var priority;
+            if (orderIdx !== undefined) {
+                priority = 2.6 + orderIdx * 0.01;
+            } else {
+                priority = unorderedPriority;
+                unorderedPriority += 0.01;
+            }
 
             pluginSections[section] = {
                 id: section,
                 title: meta.name,
                 icon: meta.icon,
-                priority: basePriority,
+                priority: priority,
                 defaultViewMode: viewPref.mode || "list"
             };
 
             if (viewPref.mode)
                 setPluginViewPreference(section, viewPref.mode, viewPref.enforced);
-
-            basePriority += 0.01;
         }
 
         for (var sectionId in pluginSections) {
