@@ -43,6 +43,7 @@ QtObject {
     popupComponent: Component {
         NotificationPopup {
             onExitFinished: manager._onPopupExitFinished(this)
+            onExitStarted: manager._onPopupExitStarted(this)
             onPopupHeightChanged: manager._onPopupHeightChanged(this)
             onPopupChromeGeometryChanged: manager._onPopupChromeGeometryChanged(this)
         }
@@ -263,9 +264,14 @@ QtObject {
     }
 
     function _popupChromeVisibleFraction(p) {
-        if (p.exiting && p.popupChromeReleaseProgress)
-            return 1 - _chromeReleaseTailProgress(p.popupChromeReleaseProgress());
-        if (!p.exiting && p.popupChromeOpenProgress)
+        if (p.popupChromeReleaseProgress) {
+            const rel = p.popupChromeReleaseProgress();
+            if (p.exiting)
+                return Math.max(0, 1 - rel);
+            if (rel > 0)
+                return p.swipeDismissTowardEdge ? Math.max(0, 1 - rel) : 1 - _chromeReleaseTailProgress(rel);
+        }
+        if (p.popupChromeOpenProgress)
             return _clamp01(p.popupChromeOpenProgress());
         return 1;
     }
@@ -389,6 +395,7 @@ QtObject {
             ConnectedModeState.clearNotificationState(screenName);
             return;
         }
+
         const trailing = chromeCandidates.length > 1 ? _trailingChromeWindow(chromeCandidates) : null;
         let active = chromeCandidates;
         if (chromeCandidates.length > 1) {
@@ -396,6 +403,7 @@ QtObject {
             if (reserving.length > 0)
                 active = reserving;
         }
+
         let minX = Infinity;
         let minY = Infinity;
         let maxXEnd = -Infinity;
@@ -445,6 +453,12 @@ QtObject {
         if (!p || p.exiting || p._isDestroying)
             return;
         if (popupWindows.indexOf(p) === -1)
+            return;
+        _repositionAll();
+    }
+
+    function _onPopupExitStarted(p) {
+        if (!p || popupWindows.indexOf(p) === -1)
             return;
         _repositionAll();
     }
