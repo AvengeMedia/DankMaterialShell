@@ -36,6 +36,8 @@ Item {
     property real _surfaceW: 0
     property string _chromeClaimId: ""
     property int _connectedChromeSerial: 0
+    property real _chromeAnimTravelX: 1
+    property real _chromeAnimTravelY: 1
 
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
@@ -158,6 +160,33 @@ Item {
         return layerNamespace + ":" + _connectedChromeSerial + ":" + (new Date()).getTime();
     }
 
+    function _captureChromeAnimTravel() {
+        _chromeAnimTravelX = Math.max(1, Math.abs(contentContainer.offsetX));
+        _chromeAnimTravelY = Math.max(1, Math.abs(contentContainer.offsetY));
+    }
+
+    function _connectedChromeAnimX() {
+        const barSide = contentContainer.connectedBarSide;
+        if (barSide !== "left" && barSide !== "right")
+            return contentContainer.animX;
+
+        const extent = Math.max(0, root.alignedWidth);
+        const progress = Math.min(1, Math.abs(contentContainer.animX) / Math.max(1, _chromeAnimTravelX));
+        const offset = Theme.snap(extent * progress, root.dpr);
+        return contentContainer.animX < 0 ? -offset : offset;
+    }
+
+    function _connectedChromeAnimY() {
+        const barSide = contentContainer.connectedBarSide;
+        if (barSide !== "top" && barSide !== "bottom")
+            return contentContainer.animY;
+
+        const extent = Math.max(0, root.alignedHeight);
+        const progress = Math.min(1, Math.abs(contentContainer.animY) / Math.max(1, _chromeAnimTravelY));
+        const offset = Theme.snap(extent * progress, root.dpr);
+        return contentContainer.animY < 0 ? -offset : offset;
+    }
+
     function _connectedChromeState(visibleOverride) {
         const visible = visibleOverride !== undefined ? !!visibleOverride : contentWindow.visible;
         return {
@@ -167,8 +196,8 @@ Item {
             "bodyY": root.alignedY,
             "bodyW": root.alignedWidth,
             "bodyH": root.alignedHeight,
-            "animX": contentContainer.animX,
-            "animY": contentContainer.animY,
+            "animX": _connectedChromeAnimX(),
+            "animY": _connectedChromeAnimY(),
             "screen": root.screen ? root.screen.name : ""
         };
     }
@@ -195,7 +224,6 @@ Item {
     readonly property real contentAnimX: contentContainer.animX
     readonly property real contentAnimY: contentContainer.animY
 
-    property bool _animSyncPending: false
     property bool _fullSyncPending: false
 
     // ─── ConnectedModeState sync ────────────────────────────────────────────
@@ -215,22 +243,17 @@ Item {
         _publishConnectedChromeState(contentWindow.visible && !ConnectedModeState.hasPopoutOwner(_chromeClaimId));
     }
 
-    function _flushAnimSync() {
-        _animSyncPending = false;
+    function _syncPopoutAnim(axis) {
         if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        ConnectedModeState.setPopoutAnim(_chromeClaimId, contentContainer.animX, contentContainer.animY);
-    }
-
-    function _queueAnimSync() {
-        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+        const barSide = contentContainer.connectedBarSide;
+        const syncX = axis === "x" && (barSide === "left" || barSide === "right");
+        const syncY = axis === "y" && (barSide === "top" || barSide === "bottom");
+        if (!syncX && !syncY)
             return;
-        if (_animSyncPending)
-            return;
-        _animSyncPending = true;
-        Qt.callLater(root._flushAnimSync);
+        ConnectedModeState.setPopoutAnim(_chromeClaimId, syncX ? _connectedChromeAnimX() : undefined, syncY ? _connectedChromeAnimY() : undefined);
     }
 
     function _flushFullSync() {
@@ -248,8 +271,8 @@ Item {
     onAlignedXChanged: _queueFullSync()
     onAlignedYChanged: _queueFullSync()
     onAlignedWidthChanged: _queueFullSync()
-    onContentAnimXChanged: _queueAnimSync()
-    onContentAnimYChanged: _queueAnimSync()
+    onContentAnimXChanged: _syncPopoutAnim("x")
+    onContentAnimYChanged: _syncPopoutAnim("y")
     onScreenChanged: _syncPopoutChromeState()
     onEffectiveBarPositionChanged: _syncPopoutChromeState()
 
@@ -298,6 +321,7 @@ Item {
         closeTimer.stop();
         isClosing = false;
         animationsEnabled = false;
+        _primeContent = true;
 
         // Snapshot mask geometry
         _frozenMaskX = maskX;
@@ -316,6 +340,7 @@ Item {
             contentContainer.animX = Theme.snap(contentContainer.offsetX, root.dpr);
             contentContainer.animY = Theme.snap(contentContainer.offsetY, root.dpr);
             contentContainer.scaleValue = root.animationScaleCollapsed;
+            _captureChromeAnimTravel();
         }
 
         if (root.frameOwnsConnectedChrome) {
@@ -893,14 +918,22 @@ Item {
                 animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr);
                 animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr);
                 scaleValue = root.shouldBeVisible ? 1.0 : computedScaleCollapsed;
+                root._captureChromeAnimTravel();
             }
 
-            onOffsetXChanged: animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr)
-            onOffsetYChanged: animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr)
+            onOffsetXChanged: {
+                if (!root.shouldBeVisible)
+                    animX = Theme.snap(offsetX, root.dpr);
+            }
+            onOffsetYChanged: {
+                if (!root.shouldBeVisible)
+                    animY = Theme.snap(offsetY, root.dpr);
+            }
 
             Connections {
                 target: root
                 function onShouldBeVisibleChanged() {
+                    root._captureChromeAnimTravel();
                     contentContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetX, root.dpr);
                     contentContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetY, root.dpr);
                     contentContainer.scaleValue = root.shouldBeVisible ? 1.0 : contentContainer.computedScaleCollapsed;
