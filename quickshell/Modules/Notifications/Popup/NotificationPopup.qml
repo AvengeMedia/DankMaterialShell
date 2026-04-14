@@ -42,6 +42,14 @@ PanelWindow {
     readonly property bool hasValidData: notificationData && notificationData.notification
     readonly property alias hovered: cardHoverHandler.hovered
     readonly property alias swipeActive: content.swipeActive
+    readonly property alias swipeDismissing: content.swipeDismissing
+    readonly property bool swipeDismissTowardEdge: {
+        if (content.swipeDismissing)
+            return _swipeDismissesTowardFrameEdge();
+        if (content.swipeActive)
+            return content.swipeOffset * _frameEdgeSwipeDirection() > 0;
+        return false;
+    }
     property int screenY: 0
     property bool exiting: false
     property bool _isDestroying: false
@@ -432,15 +440,23 @@ PanelWindow {
     }
 
     function popupChromeReleaseProgress() {
-        if (exiting)
-            return Math.max(0, Math.min(1, Math.abs(_chromeMotionOffset()) / _chromeCardTravel()));
+        if (exiting) {
+            const exitRel = Math.max(0, Math.min(1, Math.abs(_chromeMotionOffset()) / _chromeCardTravel()));
+            if (content.swipeDismissing) {
+                const swipeRel = Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
+                return Math.max(exitRel, swipeRel);
+            }
+            return exitRel;
+        }
         if (content.swipeDismissing)
+            return Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
+        if (content.swipeActive && content.swipeOffset * _frameEdgeSwipeDirection() > 0)
             return Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
         return 0;
     }
 
     function popupChromeFollowsCardMotion() {
-        return content.swipeActive || (content.swipeDismissing && !exiting);
+        return false;
     }
 
     function popupChromeMotionX() {
@@ -1059,7 +1075,7 @@ PanelWindow {
                 const inwardConnectedExit = win.connectedFrameMode && !win.isCenterPosition && !win._swipeDismissesTowardFrameEdge();
                 if (inwardConnectedExit)
                     content.chromeOnlyExit = true;
-                if (win.connectedFrameMode && (win.isCenterPosition || inwardConnectedExit)) {
+                if (win.connectedFrameMode) {
                     win.startExit();
                     NotificationService.dismissNotification(notificationData);
                 } else {
