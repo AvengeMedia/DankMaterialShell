@@ -795,8 +795,8 @@ PanelWindow {
         anchors.fill: parent
         visible: win._connectedActive
         opacity: win._surfaceOpacity
-        // Skip FBO when neither elevation nor alpha blend is active
-        layer.enabled: (!win._disableLayer && Theme.elevationEnabled) || win._surfaceOpacity < 1
+        // Skip FBO when disabled, or when neither elevation nor alpha blend is active
+        layer.enabled: !win._disableLayer && (Theme.elevationEnabled || win._surfaceOpacity < 1)
         layer.smooth: false
 
         layer.effect: MultiEffect {

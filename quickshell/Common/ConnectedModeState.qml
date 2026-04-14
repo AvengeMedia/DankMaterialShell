@@ -94,8 +94,16 @@ Singleton {
     function setPopoutAnim(claimId, animX, animY) {
         if (!hasPopoutOwner(claimId))
             return false;
-        popoutAnimX = animX;
-        popoutAnimY = animY;
+        if (animX !== undefined) {
+            const nextX = Number(animX);
+            if (!isNaN(nextX) && popoutAnimX !== nextX)
+                popoutAnimX = nextX;
+        }
+        if (animY !== undefined) {
+            const nextY = Number(animY);
+            if (!isNaN(nextY) && popoutAnimY !== nextY)
+                popoutAnimY = nextY;
+        }
         return true;
     }
 
