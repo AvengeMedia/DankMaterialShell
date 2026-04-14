@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "آداپتور‌ها"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "افزودن"
   },
@@ -1363,6 +1366,9 @@
   },
   "Connecting to Device": {
     "Connecting to Device": "درحال اتصال به دستگاه"
+  },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
   },
   "Connecting...": {
     "Connecting...": "درحال اتصال..."
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "رنگ مانیتور غیر‌فعال"
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "اضافه‌کردن گذارها"
   },
@@ -3461,6 +3473,9 @@
   "Logging in...": {
     "Logging in...": ""
   },
+  "Login": {
+    "Login": ""
+  },
   "Login Authentication": {
     "Login Authentication": ""
   },
@@ -3685,6 +3700,12 @@
   },
   "Memory usage indicator": {
     "Memory usage indicator": "نشانگر میزان مصرف حافظه"
+  },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
   },
   "Message": {
     "Message": "پیام"
@@ -4624,6 +4645,9 @@
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
+  },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "وقتی اعلان جدید وارد شد صدا را پخش کن"
@@ -5825,6 +5849,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "هنگامی که میکروفون، دوربین یا اشتراک‌گذاری صفحه فعال باشد نشان داده می‌شود"
   },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+  },
   "Shutdown": {
     "Shutdown": "خاموش‌کردن"
   },
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "استفاده از واحد‌های بریتانیایی  (°F, mph, inHg) به جای واحد‌های متریک (°C, km/h, hPa)"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "استفاده از فونت monospace"

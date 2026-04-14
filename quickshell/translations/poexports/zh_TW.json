@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "轉接器"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "新增"
   },
@@ -1363,6 +1366,9 @@
   },
   "Connecting to Device": {
     "Connecting to Device": "正在連接裝置"
+  },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
   },
   "Connecting...": {
     "Connecting...": "連線中..."
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "非活動監視器顏色"
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "包括過渡"
   },
@@ -3461,6 +3473,9 @@
   "Logging in...": {
     "Logging in...": "正在登入..."
   },
+  "Login": {
+    "Login": ""
+  },
   "Login Authentication": {
     "Login Authentication": "登入驗證"
   },
@@ -3685,6 +3700,12 @@
   },
   "Memory usage indicator": {
     "Memory usage indicator": "記憶體使用率指示器"
+  },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
   },
   "Message": {
     "Message": "訊息"
@@ -4624,6 +4645,9 @@
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "螢幕鎖定時播放影片。"
+  },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "收到新通知時播放音效"
@@ -5825,6 +5849,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "顯示麥克風、攝影機或螢幕共用處於活動狀態"
   },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+  },
   "Shutdown": {
     "Shutdown": "關機"
   },
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "使用英制單位（°F, mph, inHg）而非公制單位（°C, km/h, hPa）"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "使用等寬字體"

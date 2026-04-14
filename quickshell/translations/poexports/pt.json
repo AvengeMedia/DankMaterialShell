@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "Adaptadores"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "Adicionar"
   },
@@ -1363,6 +1366,9 @@
   },
   "Connecting to Device": {
     "Connecting to Device": "Conectando ao Dispositivo"
+  },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
   },
   "Connecting...": {
     "Connecting...": "Conectando..."
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Cor do Monitor Inativo"
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "Incluir Transições"
   },
@@ -3461,6 +3473,9 @@
   "Logging in...": {
     "Logging in...": ""
   },
+  "Login": {
+    "Login": ""
+  },
   "Login Authentication": {
     "Login Authentication": ""
   },
@@ -3685,6 +3700,12 @@
   },
   "Memory usage indicator": {
     "Memory usage indicator": "Indicador de uso de memória"
+  },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
   },
   "Message": {
     "Message": "Mensagem"
@@ -4624,6 +4645,9 @@
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
+  },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Reproduzir som ao conectar o cabo de energia"
@@ -5825,6 +5849,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Mostra quando microfone, câmera, ou compartilhamento de tela está ativado"
   },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+  },
   "Shutdown": {
     "Shutdown": "Desligar"
   },
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Usar unidades Imperiais (°F, mph, inHg) ao invés de Métricas (°C, km/h, hPa)"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Usar Fonte Monoespaçada"

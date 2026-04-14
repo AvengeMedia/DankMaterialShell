@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "Adapterek"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "Hozzáadás"
   },
@@ -534,7 +537,7 @@
     "Architecture": "Architektúra"
   },
   "Are you sure you want to kill session \"%1\"?": {
-    "Are you sure you want to kill session \"%1\"?": "Biztosan le akarod állítani a(z) „%1\" munkamenetet?"
+    "Are you sure you want to kill session \"%1\"?": "Biztosan le meg akarod szakítani a(z) „%1\" munkamenetet?"
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Képernyő-elrendezés és a felbontás, frissítési frekvencia, valamint VRR beállítása"
@@ -975,7 +978,7 @@
     "Caps Lock": "Caps Lock"
   },
   "Caps Lock Indicator": {
-    "Caps Lock Indicator": "Caps Lock jelző"
+    "Caps Lock Indicator": "Caps Lock-jelző"
   },
   "Caps Lock is on": {
     "Caps Lock is on": "A Caps Lock be van kapcsolva"
@@ -1074,10 +1077,10 @@
     "Choose the logo displayed on the launcher button in DankBar": "Válaszd ki a DankBar indítógombján megjelenő logót"
   },
   "Choose where notification popups appear on screen": {
-    "Choose where notification popups appear on screen": "Hol jelenjenek meg a felugró értesítések a képernyőn"
+    "Choose where notification popups appear on screen": "A felugró értesítések megjelenési helye"
   },
   "Choose where on-screen displays appear on screen": {
-    "Choose where on-screen displays appear on screen": "Hol jelenjenek meg a képernyőkijelzők"
+    "Choose where on-screen displays appear on screen": "A képernyőkijelzők megjelenítési helye"
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Válaszd ki, mely kijelzők mutassák ezt a widgetet"
@@ -1230,7 +1233,7 @@
     "Color theme for syntax highlighting. %1 themes available.": "Színtéma a szintaxiskiemeléshez. %1 téma érhető el."
   },
   "Color theme from DMS registry": {
-    "Color theme from DMS registry": "Színtéma a DMS regiszterből"
+    "Color theme from DMS registry": "Színtéma a DMS-regiszterből"
   },
   "Colorful": {
     "Colorful": "Színes"
@@ -1364,6 +1367,9 @@
   "Connecting to Device": {
     "Connecting to Device": "Csatlakozás az eszközhöz"
   },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
+  },
   "Connecting...": {
     "Connecting...": "Csatlakozás…"
   },
@@ -1407,13 +1413,13 @@
     "Controls opacity of all popouts, modals, and their content layers": "Az összes felugró ablak, kizárólagos párbeszédablak és tartalomréteg átlátszósága"
   },
   "Controls shadow cast direction for elevation layers": {
-    "Controls shadow cast direction for elevation layers": "Szabályozza az árnyékvetés irányát a kiemelési rétegekhez"
+    "Controls shadow cast direction for elevation layers": "Az árnyékvetés iránya a kiemelési rétegekhez"
   },
   "Controls the base blur radius and offset of shadows": {
-    "Controls the base blur radius and offset of shadows": "Szabályozza az árnyékok alap elmosási sugarát és eltolását"
+    "Controls the base blur radius and offset of shadows": "Az árnyékok alap elmosási sugara és eltolása"
   },
   "Controls the transparency of the shadow": {
-    "Controls the transparency of the shadow": "Szabályozza az árnyék átlátszóságát"
+    "Controls the transparency of the shadow": "Az árnyék átlátszósága"
   },
   "Convenience options for the login screen. Sync to apply.": {
     "Convenience options for the login screen. Sync to apply.": "Kényelmi beállítások a bejelentkezési képernyőhöz. Szinkronizálj az alkalmazáshoz."
@@ -1677,7 +1683,7 @@
     "Dark mode harmony": "Sötét mód (harmónia)"
   },
   "Darken Modal Background": {
-    "Darken Modal Background": "Kizárólagos háttér sötétítése"
+    "Darken Modal Background": "Kizárólagos ablak háttérének sötétítése"
   },
   "Date Format": {
     "Date Format": "Dátumformátum"
@@ -2166,7 +2172,7 @@
     "Enter command or script path": "Add meg a parancsot vagy a szkript útvonalát"
   },
   "Enter credentials for ": {
-    "Enter credentials for ": "Add meg a hitelesítő adatokat: "
+    "Enter credentials for ": "Add meg a hitelesítő adatokat ehhez: "
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "Zárolási képernyő egyéni formátumának megadása (pl., dddd, MMMM d)"
@@ -2190,7 +2196,7 @@
     "Enter passkey for ": "Párosítási kód megadása ehhez: "
   },
   "Enter password for ": {
-    "Enter password for ": "Add meg a jelszót: "
+    "Enter password for ": "Add meg a jelszót ehhez: "
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Írd be ezt a párosítási kódot ehhez: "
@@ -2223,7 +2229,7 @@
     "Exact": "Pontos egyezés"
   },
   "Exclusive Zone Offset": {
-    "Exclusive Zone Offset": "Exkluzív zóna eltolás"
+    "Exclusive Zone Offset": "Exkluzív zóna eltolása"
   },
   "Experimental Feature": {
     "Experimental Feature": "Kísérleti funkció"
@@ -2391,7 +2397,7 @@
     "Failed to remove printer from class": "Nem sikerült eltávolítani a nyomtatót az osztályból"
   },
   "Failed to restart audio system": {
-    "Failed to restart audio system": "Nem sikerült újraindítani az hangrendszert"
+    "Failed to restart audio system": "Nem sikerült újraindítani a hangrendszert"
   },
   "Failed to restart job": {
     "Failed to restart job": "Nem sikerült újraindítani a feladatot"
@@ -2406,7 +2412,7 @@
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Nem sikerült futtatni a 'dms greeter status' parancsot. Győződj meg róla, hogy a DMS telepítve van, és a dms benne van a PATH környezeti változóban."
   },
   "Failed to save audio config": {
-    "Failed to save audio config": "Nem sikerült menteni az hangkonfigurációt"
+    "Failed to save audio config": "Nem sikerült menteni a hangkonfigurációt"
   },
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "Nem sikerült menteni a vágólap beállítást"
@@ -2637,7 +2643,7 @@
     "Force HDR": "HDR kényszerítése"
   },
   "Force Kill (SIGKILL)": {
-    "Force Kill (SIGKILL)": "Kényszerített leállítás (SIGKILL)"
+    "Force Kill (SIGKILL)": "Kényszerített megszakítás (SIGKILL)"
   },
   "Force Wide Color": {
     "Force Wide Color": "Széles színskála kényszerítése"
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Inaktív monitor színe"
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "Átmenetekkel együtt"
   },
@@ -3150,7 +3162,7 @@
     "Install Theme": "Téma telepítése"
   },
   "Install color themes from the DMS theme registry": {
-    "Install color themes from the DMS theme registry": "Színtémák telepítése a DMS téma-regiszterből"
+    "Install color themes from the DMS theme registry": "Színtémák telepítése a DMS-témaregiszterből"
   },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": "Telepítés befejezve. Az üdvözlőképernyő telepítve lett."
@@ -3258,13 +3270,13 @@
     "Keys": "Billentyűk"
   },
   "Kill": {
-    "Kill": "Leállítás"
+    "Kill": "Megszakítás"
   },
   "Kill Process": {
-    "Kill Process": "Folyamat bezárása"
+    "Kill Process": "Folyamat megszakítása"
   },
   "Kill Session": {
-    "Kill Session": "Munkamenet leállítása"
+    "Kill Session": "Munkamenet megszakítása"
   },
   "Ko-fi": {
     "Ko-fi": "Ko-fi"
@@ -3460,6 +3472,9 @@
   },
   "Logging in...": {
     "Logging in...": "Bejelentkezés…"
+  },
+  "Login": {
+    "Login": ""
   },
   "Login Authentication": {
     "Login Authentication": "Bejelentkezési hitelesítés"
@@ -3686,6 +3701,12 @@
   "Memory usage indicator": {
     "Memory usage indicator": "Memóriahasználat-jelző"
   },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
+  },
   "Message": {
     "Message": "Üzenet"
   },
@@ -3828,7 +3849,7 @@
     "Muted palette with subdued, calming tones.": "Visszafogott paletta, tompa, nyugtató tónusokkal."
   },
   "NM not supported": {
-    "NM not supported": "A NM nem támogatott"
+    "NM not supported": "Az NM nem támogatott"
   },
   "Name": {
     "Name": "Név"
@@ -4491,7 +4512,7 @@
     "Pad hours (02:00 vs 2:00)": "Órák kiegészítése nullával (02:00 vs 2:00)"
   },
   "Padding": {
-    "Padding": "Kitöltés"
+    "Padding": "Belső margó"
   },
   "Pair": {
     "Pair": "Párosítás"
@@ -4625,6 +4646,9 @@
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Videó lejátszása a képernyő zárolásakor."
   },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
+  },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Hang lejátszása az értesítések érkezésekor"
   },
@@ -4632,7 +4656,7 @@
     "Play sound when power cable is connected": "Hang lejátszása a tápkábel csatlakoztatásakor"
   },
   "Play sound when volume is adjusted": {
-    "Play sound when volume is adjusted": "Hang lejátszása a hang állításakor"
+    "Play sound when volume is adjusted": "Hang lejátszása a hangerő állításakor"
   },
   "Play sounds for system events": {
     "Play sounds for system events": "Hang lejátszása rendszereseményekkor"
@@ -5825,6 +5849,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Megjelenik, ha a mikrofon, kamera vagy képernyőmegosztás aktív"
   },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+  },
   "Shutdown": {
     "Shutdown": "Leállítás"
   },
@@ -5841,7 +5868,7 @@
     "Size Constraints": "Méretkorlátozások"
   },
   "Size Offset": {
-    "Size Offset": "Méret eltolás"
+    "Size Offset": "Méret eltolása"
   },
   "Sizing": {
     "Sizing": "Méretezés"
@@ -6126,7 +6153,7 @@
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "A rendszerfigyeléshez a „dgop” eszköz szükséges.\nTelepítsd a dgop-ot a funkció használatához."
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
-    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "A DMS_SOCKET környezeti változó nincs beállítva, vagy a socket nem elérhető. Az automatizált bővítménykezeléshez a DMS_SOCKET szükséges."
+    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "A DMS_SOCKET környezeti változó nincs beállítva, vagy a socket nem elérhető. Az automatizált bővítménykezeléshez DMS_SOCKET szükséges."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Az alábbi beállítások módosítják a GTK és Qt beállításokat. Ha meg szeretnéd őrizni a jelenlegi konfigurációt, készíts róluk biztonsági másolatot (qt5ct.conf|qt6ct.conf és ~/.config/gtk-3.0|gtk-4.0)."
@@ -6249,7 +6276,7 @@
     "To update, run the following command:": "A frissítéshez futtasd a következő parancsot:"
   },
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
-    "To use this DMS bind, remove or change the keybind in your config.kdl": "A DMS billentyű használatához távolítsd el vagy módosítsd a billentyűkombinációt a config.kdl fájlban"
+    "To use this DMS bind, remove or change the keybind in your config.kdl": "A DMS-billentyű használatához távolítsd el vagy módosítsd a billentyűkombinációt a config.kdl fájlban"
   },
   "Toast Messages": {
     "Toast Messages": "Felugró üzenetek"
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Angolszász mértékegységek (°F, mph, inHg) használata a metrikus (°C, km/h, hPa) helyett"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Rögzített szélességű betűtípus használata"
@@ -7086,7 +7116,7 @@
     "up": "fel"
   },
   "update dms for NM integration.": {
-    "update dms for NM integration.": "dms frissítése a NM integrációhoz."
+    "update dms for NM integration.": "frissítsd a dms-t az NM integrációhoz."
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 ettől: %2"
