@@ -10,7 +10,7 @@ Rectangle {
     LayoutMirroring.childrenInherit: true
 
     property bool isActive: BatteryService.batteryAvailable && (BatteryService.isCharging || BatteryService.isPluggedIn)
-    property bool enabled: BatteryService.batteryAvailable
+    enabled: BatteryService.batteryAvailable
 
     signal clicked
 

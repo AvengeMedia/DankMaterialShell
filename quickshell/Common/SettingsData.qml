@@ -444,11 +444,13 @@ Singleton {
     property int acSuspendTimeout: 0
     property int acSuspendBehavior: SettingsData.SuspendBehavior.Suspend
     property string acProfileName: ""
+    property int acPostLockMonitorTimeout: 0
     property int batteryMonitorTimeout: 0
     property int batteryLockTimeout: 0
     property int batterySuspendTimeout: 0
     property int batterySuspendBehavior: SettingsData.SuspendBehavior.Suspend
     property string batteryProfileName: ""
+    property int batteryPostLockMonitorTimeout: 0
     property int batteryChargeLimit: 100
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true

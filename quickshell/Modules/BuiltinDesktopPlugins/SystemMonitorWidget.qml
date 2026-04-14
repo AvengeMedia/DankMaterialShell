@@ -37,7 +37,7 @@ Item {
     readonly property var cfg: instanceData?.config ?? null
     readonly property bool isInstance: instanceId !== "" && cfg !== null
 
-    property bool enabled: isInstance ? (instanceData?.enabled ?? true) : SettingsData.systemMonitorEnabled
+    enabled: isInstance ? (instanceData?.enabled ?? true) : SettingsData.systemMonitorEnabled
     property bool showHeader: isInstance ? (cfg.showHeader ?? true) : SettingsData.systemMonitorShowHeader
     property real transparency: isInstance ? (cfg.transparency ?? 0.8) : SettingsData.systemMonitorTransparency
     property string colorMode: isInstance ? (cfg.colorMode ?? "primary") : SettingsData.systemMonitorColorMode

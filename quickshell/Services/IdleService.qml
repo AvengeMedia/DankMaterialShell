@@ -36,12 +36,16 @@ Singleton {
     readonly property int lockTimeout: isOnBattery ? SettingsData.batteryLockTimeout : SettingsData.acLockTimeout
     readonly property int suspendTimeout: isOnBattery ? SettingsData.batterySuspendTimeout : SettingsData.acSuspendTimeout
     readonly property int suspendBehavior: isOnBattery ? SettingsData.batterySuspendBehavior : SettingsData.acSuspendBehavior
+    readonly property int postLockMonitorTimeout: isOnBattery ? SettingsData.batteryPostLockMonitorTimeout : SettingsData.acPostLockMonitorTimeout
+    readonly property bool postLockMonitorActive: isShellLocked && postLockMonitorTimeout > 0
 
     readonly property bool mediaPlaying: MprisController.activePlayer !== null && MprisController.activePlayer.isPlaying
 
     onMonitorTimeoutChanged: _rearmIdleMonitors()
     onLockTimeoutChanged: _rearmIdleMonitors()
     onSuspendTimeoutChanged: _rearmIdleMonitors()
+    onPostLockMonitorTimeoutChanged: _rearmIdleMonitors()
+    onIsShellLockedChanged: _rearmIdleMonitors()
 
     function _rearmIdleMonitors() {
         _enableGate = false;
@@ -60,6 +64,7 @@ Singleton {
     signal requestSuspend
 
     property var monitorOffMonitor: null
+    property var postLockMonitorOffMonitor: null
     property var lockMonitor: null
     property var suspendMonitor: null
     property var lockComponent: null
@@ -96,7 +101,7 @@ Singleton {
             monitorOffMonitor = Qt.createQmlObject(qmlString, root, "IdleService.MonitorOffMonitor");
             monitorOffMonitor.timeout = Qt.binding(() => root.monitorTimeout > 0 ? root.monitorTimeout : 86400);
             monitorOffMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            monitorOffMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.monitorTimeout > 0);
+            monitorOffMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.monitorTimeout > 0 && !root.postLockMonitorActive);
             monitorOffMonitor.isIdleChanged.connect(function () {
                 if (monitorOffMonitor.isIdle) {
                     if (SettingsData.fadeToDpmsEnabled) {
@@ -108,6 +113,18 @@ Singleton {
                     if (SettingsData.fadeToDpmsEnabled) {
                         root.cancelFadeToDpms();
                     }
+                    root.requestMonitorOn();
+                }
+            });
+
+            postLockMonitorOffMonitor = Qt.createQmlObject(qmlString, root, "IdleService.PostLockMonitorOffMonitor");
+            postLockMonitorOffMonitor.timeout = Qt.binding(() => root.postLockMonitorTimeout > 0 ? root.postLockMonitorTimeout : 86400);
+            postLockMonitorOffMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
+            postLockMonitorOffMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.postLockMonitorActive);
+            postLockMonitorOffMonitor.isIdleChanged.connect(function () {
+                if (postLockMonitorOffMonitor.isIdle) {
+                    root.requestMonitorOff();
+                } else {
                     root.requestMonitorOn();
                 }
             });

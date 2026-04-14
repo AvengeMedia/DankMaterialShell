@@ -10,7 +10,6 @@ StyledRect {
     property color iconColor: Theme.surfaceText
     property color backgroundColor: "transparent"
     property bool circular: true
-    property bool enabled: true
     property int buttonSize: 32
     property var tooltipText: null
     property string tooltipSide: "bottom"
