@@ -493,16 +493,16 @@ func (b *DDCBackend) valueToPercent(value int, max int, exponential bool) int {
 }
 
 func (b *DDCBackend) WaitPending() {
-    done := make(chan struct{})
-    go func() {
-        b.debounceWg.Wait()
-        close(done)
-    }()
+	done := make(chan struct{})
+	go func() {
+		b.debounceWg.Wait()
+		close(done)
+	}()
 
 	select {
-	case <- done:
-	case <- time.After(5 * time.Second):
-			log.Debug("WaitPending timed out waiting for DDC writes")
+	case <-done:
+	case <-time.After(5 * time.Second):
+		log.Debug("WaitPending timed out waiting for DDC writes")
 	}
 }
 
