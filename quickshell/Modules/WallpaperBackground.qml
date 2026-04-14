@@ -773,7 +773,7 @@ Variants {
                 id: srcParallax
                 sourceItem: root.effectiveScrolling && imageMetrics.ready && parallaxImage.status === Image.Ready ? parallaxImage : null
                 hideSource: false
-                live: false
+                live: true
                 mipmap: false
                 recursive: false
                 textureSize: Qt.size(imageMetrics.canvasWidth, imageMetrics.canvasHeight)
