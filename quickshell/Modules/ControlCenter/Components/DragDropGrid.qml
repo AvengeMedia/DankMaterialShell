@@ -260,7 +260,7 @@ Column {
                     }
                 case "audioOutput":
                     {
-                        if (!AudioService.sink)
+                        if (!AudioService.sink?.audio)
                             return "volume_off";
                         let volume = AudioService.sink.audio.volume;
                         let muted = AudioService.sink.audio.muted;
@@ -276,7 +276,7 @@ Column {
                     }
                 case "audioInput":
                     {
-                        if (!AudioService.source)
+                        if (!AudioService.source?.audio)
                             return "mic_off";
                         let muted = AudioService.source.audio.muted;
                         return muted ? "mic_off" : "mic";
@@ -369,7 +369,7 @@ Column {
                     }
                 case "audioOutput":
                     {
-                        if (!AudioService.sink)
+                        if (!AudioService.sink?.audio)
                             return I18n.tr("Select device", "audio status");
                         if (AudioService.sink.audio.muted)
                             return I18n.tr("Muted", "audio status");
@@ -380,7 +380,7 @@ Column {
                     }
                 case "audioInput":
                     {
-                        if (!AudioService.source)
+                        if (!AudioService.source?.audio)
                             return I18n.tr("Select device", "audio status");
                         if (AudioService.source.audio.muted)
                             return I18n.tr("Muted", "audio status");
@@ -412,9 +412,9 @@ Column {
                 case "bluetooth":
                     return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled);
                 case "audioOutput":
-                    return !!(AudioService.sink && !AudioService.sink.audio.muted);
+                    return !!(AudioService.sink?.audio && !AudioService.sink.audio.muted);
                 case "audioInput":
-                    return !!(AudioService.source && !AudioService.source.audio.muted);
+                    return !!(AudioService.source?.audio && !AudioService.source.audio.muted);
                 default:
                     return false;
                 }
