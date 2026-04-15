@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Services
@@ -25,7 +24,7 @@ Item {
     }
     property bool usePlayerVolume: activePlayer && activePlayer.volumeSupported && !__isChromeBrowser
     property real currentVolume: usePlayerVolume ? activePlayer.volume : (AudioService.sink?.audio?.volume ?? 0)
-    property bool volumeAvailable: (activePlayer && activePlayer.volumeSupported && !__isChromeBrowser) || (AudioService.sink && AudioService.sink.audio)
+    property bool volumeAvailable: !!((activePlayer && activePlayer.volumeSupported && !__isChromeBrowser) || (AudioService.sink && AudioService.sink.audio))
     property var availableDevices: {
         const hidden = SessionData.hiddenOutputDeviceNames ?? [];
         return Pipewire.nodes.values.filter(node => {
@@ -328,8 +327,8 @@ Item {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    if (modelData) {
-                                        Pipewire.preferredDefaultAudioSink = modelData;
+                                    if (modelData && modelData.name) {
+                                        AudioService.setDefaultSinkByName(modelData.name);
                                         root.deviceSelected(modelData);
                                     }
                                 }

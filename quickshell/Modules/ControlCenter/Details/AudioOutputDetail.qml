@@ -355,8 +355,8 @@ Rectangle {
                             deviceRipple.trigger(mapped.x, mapped.y);
                         }
                         onClicked: {
-                            if (modelData) {
-                                Pipewire.preferredDefaultAudioSink = modelData;
+                            if (modelData && modelData.name) {
+                                AudioService.setDefaultSinkByName(modelData.name);
                             }
                         }
                     }
