@@ -29,6 +29,8 @@ Singleton {
     property real popoutAnimX: 0
     property real popoutAnimY: 0
     property string popoutScreen: ""
+    property bool popoutOmitStartConnector: false
+    property bool popoutOmitEndConnector: false
 
     // Dock state (updated by Dock when connectedFrameModeActive), keyed by screen.name
     property var dockStates: ({})
@@ -70,6 +72,10 @@ Singleton {
             popoutAnimY = Number(state.animY);
         if (state.screen !== undefined)
             popoutScreen = state.screen || "";
+        if (state.omitStartConnector !== undefined)
+            popoutOmitStartConnector = !!state.omitStartConnector;
+        if (state.omitEndConnector !== undefined)
+            popoutOmitEndConnector = !!state.omitEndConnector;
 
         return true;
     }
@@ -88,6 +94,8 @@ Singleton {
         popoutAnimX = 0;
         popoutAnimY = 0;
         popoutScreen = "";
+        popoutOmitStartConnector = false;
+        popoutOmitEndConnector = false;
         return true;
     }
 
@@ -175,7 +183,9 @@ Singleton {
         "bodyX": 0,
         "bodyY": 0,
         "bodyW": 0,
-        "bodyH": 0
+        "bodyH": 0,
+        "omitStartConnector": false,
+        "omitEndConnector": false
     })
 
     property var notificationStates: ({})
@@ -194,7 +204,9 @@ Singleton {
             "bodyX": Number(state && state.bodyX !== undefined ? state.bodyX : 0),
             "bodyY": Number(state && state.bodyY !== undefined ? state.bodyY : 0),
             "bodyW": Number(state && state.bodyW !== undefined ? state.bodyW : 0),
-            "bodyH": Number(state && state.bodyH !== undefined ? state.bodyH : 0)
+            "bodyH": Number(state && state.bodyH !== undefined ? state.bodyH : 0),
+            "omitStartConnector": !!(state && state.omitStartConnector),
+            "omitEndConnector": !!(state && state.omitEndConnector)
         };
     }
 

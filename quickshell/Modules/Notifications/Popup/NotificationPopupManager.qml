@@ -11,6 +11,7 @@ QtObject {
     readonly property bool notificationConnectedMode: SettingsData.frameEnabled
         && Theme.isConnectedEffect
         && SettingsData.isScreenInPreferences(manager.modelData, SettingsData.frameScreenPreferences)
+    readonly property bool closeGapNotifications: notificationConnectedMode && SettingsData.frameCloseGaps
     readonly property string notifBarSide: {
         const pos = SettingsData.notificationPopupPosition;
         if (pos === -1) return "top";
@@ -339,6 +340,23 @@ QtObject {
         return pos === -1 || pos === SettingsData.Position.Top || pos === SettingsData.Position.Left;
     }
 
+    function _frameEdgeInset(side) {
+        if (!manager.modelData)
+            return 0;
+        const edges = SettingsData.getActiveBarEdgesForScreen(manager.modelData);
+        const raw = edges.includes(side) ? SettingsData.frameBarSize : SettingsData.frameThickness;
+        const dpr = CompositorService.getScreenScale(manager.modelData);
+        return Math.max(0, Math.round(Theme.px(raw, dpr)));
+    }
+
+    function _closeGapChromeAnchorEdge(anchorsTop) {
+        if (!closeGapNotifications || !manager.modelData)
+            return null;
+        if (anchorsTop)
+            return _frameEdgeInset("top") + topMargin;
+        return manager.modelData.height - _frameEdgeInset("bottom") - topMargin;
+    }
+
     function _trailingChromeWindow(candidates) {
         const anchorsTop = _stackAnchorsTop();
         let trailing = null;
@@ -429,6 +447,14 @@ QtObject {
             if (!stackEdge.anchorsTop && stackEdge.edge > maxYEnd)
                 maxYEnd = stackEdge.edge;
         }
+        const anchorsTop = stackEdge !== null ? stackEdge.anchorsTop : _stackAnchorsTop();
+        const closeGapAnchorEdge = _closeGapChromeAnchorEdge(anchorsTop);
+        if (closeGapAnchorEdge !== null) {
+            if (anchorsTop)
+                minY = closeGapAnchorEdge;
+            else
+                maxYEnd = closeGapAnchorEdge;
+        }
         if (minX === Infinity || minY === Infinity || maxXEnd <= minX || maxYEnd <= minY) {
             ConnectedModeState.clearNotificationState(screenName);
             return;
@@ -439,8 +465,22 @@ QtObject {
             bodyX: minX,
             bodyY: minY,
             bodyW: maxXEnd - minX,
-            bodyH: maxYEnd - minY
+            bodyH: maxYEnd - minY,
+            omitStartConnector: _notificationOmitStartConnector(),
+            omitEndConnector: _notificationOmitEndConnector()
         });
+    }
+
+    function _notificationOmitStartConnector() {
+        return closeGapNotifications
+            && (SettingsData.notificationPopupPosition === SettingsData.Position.Top
+                || SettingsData.notificationPopupPosition === SettingsData.Position.Left);
+    }
+
+    function _notificationOmitEndConnector() {
+        return closeGapNotifications
+            && (SettingsData.notificationPopupPosition === SettingsData.Position.Right
+                || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom);
     }
 
     function _onPopupChromeGeometryChanged(p) {
@@ -504,6 +544,7 @@ QtObject {
     }
 
     onNotificationConnectedModeChanged: _scheduleNotificationChromeSync()
+    onCloseGapNotificationsChanged: _scheduleNotificationChromeSync()
     onNotifBarSideChanged: _scheduleNotificationChromeSync()
     onModelDataChanged: _scheduleNotificationChromeSync()
     onTopMarginChanged: _repositionAll()

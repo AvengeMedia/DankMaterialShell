@@ -66,12 +66,34 @@ PanelWindow {
         const crossSize = isHoriz ? _popoutBodyBlurAnchor.width : _popoutBodyBlurAnchor.height;
         return Math.max(0, Math.min(win._ccr, extent, crossSize / 2));
     }
+    readonly property real _effectivePopoutFarCcr: {
+        const isHoriz = ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom";
+        const crossSize = isHoriz ? _popoutBodyBlurAnchor.width : _popoutBodyBlurAnchor.height;
+        return Math.max(0, Math.min(win._ccr, win._surfaceRadius, crossSize / 2));
+    }
+    readonly property real _effectivePopoutStartCcr: ConnectedModeState.popoutOmitStartConnector ? 0 : win._effectivePopoutCcr
+    readonly property real _effectivePopoutEndCcr: ConnectedModeState.popoutOmitEndConnector ? 0 : win._effectivePopoutCcr
+    readonly property real _effectivePopoutFarStartCcr: ConnectedModeState.popoutOmitStartConnector ? win._effectivePopoutFarCcr : 0
+    readonly property real _effectivePopoutFarEndCcr: ConnectedModeState.popoutOmitEndConnector ? win._effectivePopoutFarCcr : 0
+    readonly property real _effectivePopoutMaxCcr: Math.max(win._effectivePopoutStartCcr, win._effectivePopoutEndCcr)
+    readonly property real _effectivePopoutFarExtent: Math.max(win._effectivePopoutFarStartCcr, win._effectivePopoutFarEndCcr)
     readonly property real _effectiveNotifCcr: {
         const isHoriz = win._notifState.barSide === "top" || win._notifState.barSide === "bottom";
         const crossSize = isHoriz ? _notifBodyBlurAnchor.width : _notifBodyBlurAnchor.height;
         const extent = isHoriz ? _notifBodyBlurAnchor.height : _notifBodyBlurAnchor.width;
         return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, extent, crossSize / 2)), win._dpr);
     }
+    readonly property real _effectiveNotifFarCcr: {
+        const isHoriz = win._notifState.barSide === "top" || win._notifState.barSide === "bottom";
+        const crossSize = isHoriz ? _notifBodySceneBlurAnchor.width : _notifBodySceneBlurAnchor.height;
+        return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, crossSize / 2)), win._dpr);
+    }
+    readonly property real _effectiveNotifStartCcr: win._notifState.omitStartConnector ? 0 : win._effectiveNotifCcr
+    readonly property real _effectiveNotifEndCcr: win._notifState.omitEndConnector ? 0 : win._effectiveNotifCcr
+    readonly property real _effectiveNotifFarStartCcr: win._notifState.omitStartConnector ? win._effectiveNotifFarCcr : 0
+    readonly property real _effectiveNotifFarEndCcr: win._notifState.omitEndConnector ? win._effectiveNotifFarCcr : 0
+    readonly property real _effectiveNotifMaxCcr: Math.max(win._effectiveNotifStartCcr, win._effectiveNotifEndCcr)
+    readonly property real _effectiveNotifFarExtent: Math.max(win._effectiveNotifFarStartCcr, win._effectiveNotifFarEndCcr)
     readonly property color _surfaceColor: Theme.connectedSurfaceColor
     readonly property real _surfaceOpacity: _surfaceColor.a
     readonly property color _opaqueSurfaceColor: Qt.rgba(_surfaceColor.r, _surfaceColor.g, _surfaceColor.b, 1)
@@ -121,8 +143,8 @@ PanelWindow {
 
         readonly property bool _active: ConnectedModeState.popoutVisible && ConnectedModeState.popoutScreen === win._screenName
 
-        readonly property real _dyClamp: (ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom") ? Math.max(-ConnectedModeState.popoutBodyH, Math.min(ConnectedModeState.popoutAnimY * 1.02, ConnectedModeState.popoutBodyH)) : 0
-        readonly property real _dxClamp: (ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right") ? Math.max(-ConnectedModeState.popoutBodyW, Math.min(ConnectedModeState.popoutAnimX * 1.02, ConnectedModeState.popoutBodyW)) : 0
+        readonly property real _dyClamp: (ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom") ? Math.max(-ConnectedModeState.popoutBodyH, Math.min(ConnectedModeState.popoutAnimY, ConnectedModeState.popoutBodyH)) : 0
+        readonly property real _dxClamp: (ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right") ? Math.max(-ConnectedModeState.popoutBodyW, Math.min(ConnectedModeState.popoutAnimX, ConnectedModeState.popoutBodyW)) : 0
 
         x: _active ? ConnectedModeState.popoutBodyX + (ConnectedModeState.popoutBarSide === "right" ? _dxClamp : 0) : 0
         y: _active ? ConnectedModeState.popoutBodyY + (ConnectedModeState.popoutBarSide === "bottom" ? _dyClamp : 0) : 0
@@ -177,9 +199,10 @@ PanelWindow {
         id: _popoutLeftConnectorBlurAnchor
         opacity: 0
 
-        readonly property bool _active: _popoutBodyBlurAnchor._active && win._effectivePopoutCcr > 0
-        readonly property real _w: win._popoutConnectorWidth(0)
-        readonly property real _h: win._popoutConnectorHeight(0)
+        readonly property real _radius: win._popoutConnectorRadius("left")
+        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+        readonly property real _w: win._popoutConnectorWidth(0, "left")
+        readonly property real _h: win._popoutConnectorHeight(0, "left")
 
         x: _active ? Theme.snap(win._popoutConnectorX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, "left", 0), win._dpr) : 0
         y: _active ? Theme.snap(win._popoutConnectorY(_popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, "left", 0), win._dpr) : 0
@@ -191,9 +214,10 @@ PanelWindow {
         id: _popoutRightConnectorBlurAnchor
         opacity: 0
 
-        readonly property bool _active: _popoutBodyBlurAnchor._active && win._effectivePopoutCcr > 0
-        readonly property real _w: win._popoutConnectorWidth(0)
-        readonly property real _h: win._popoutConnectorHeight(0)
+        readonly property real _radius: win._popoutConnectorRadius("right")
+        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+        readonly property real _w: win._popoutConnectorWidth(0, "right")
+        readonly property real _h: win._popoutConnectorHeight(0, "right")
 
         x: _active ? Theme.snap(win._popoutConnectorX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, "right", 0), win._dpr) : 0
         y: _active ? Theme.snap(win._popoutConnectorY(_popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, "right", 0), win._dpr) : 0
@@ -207,11 +231,12 @@ PanelWindow {
 
         readonly property bool _active: _popoutLeftConnectorBlurAnchor.width > 0 && _popoutLeftConnectorBlurAnchor.height > 0
         readonly property string _arcCorner: win._connectorArcCorner(ConnectedModeState.popoutBarSide, "left")
+        readonly property real _radius: win._popoutConnectorRadius("left")
 
-        x: _active ? win._connectorCutoutX(_popoutLeftConnectorBlurAnchor.x, _popoutLeftConnectorBlurAnchor.width, _arcCorner, win._effectivePopoutCcr) : 0
-        y: _active ? win._connectorCutoutY(_popoutLeftConnectorBlurAnchor.y, _popoutLeftConnectorBlurAnchor.height, _arcCorner, win._effectivePopoutCcr) : 0
-        width: _active ? win._effectivePopoutCcr * 2 : 0
-        height: _active ? win._effectivePopoutCcr * 2 : 0
+        x: _active ? win._connectorCutoutX(_popoutLeftConnectorBlurAnchor.x, _popoutLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_popoutLeftConnectorBlurAnchor.y, _popoutLeftConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
     }
 
     Item {
@@ -220,11 +245,96 @@ PanelWindow {
 
         readonly property bool _active: _popoutRightConnectorBlurAnchor.width > 0 && _popoutRightConnectorBlurAnchor.height > 0
         readonly property string _arcCorner: win._connectorArcCorner(ConnectedModeState.popoutBarSide, "right")
+        readonly property real _radius: win._popoutConnectorRadius("right")
 
-        x: _active ? win._connectorCutoutX(_popoutRightConnectorBlurAnchor.x, _popoutRightConnectorBlurAnchor.width, _arcCorner, win._effectivePopoutCcr) : 0
-        y: _active ? win._connectorCutoutY(_popoutRightConnectorBlurAnchor.y, _popoutRightConnectorBlurAnchor.height, _arcCorner, win._effectivePopoutCcr) : 0
-        width: _active ? win._effectivePopoutCcr * 2 : 0
-        height: _active ? win._effectivePopoutCcr * 2 : 0
+        x: _active ? win._connectorCutoutX(_popoutRightConnectorBlurAnchor.x, _popoutRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_popoutRightConnectorBlurAnchor.y, _popoutRightConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
+        id: _popoutFarStartConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._effectivePopoutFarStartCcr
+        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farConnectorX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.width, _popoutBodyBlurAnchor.height, ConnectedModeState.popoutBarSide, "left", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farConnectorY(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.width, _popoutBodyBlurAnchor.height, ConnectedModeState.popoutBarSide, "left", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _popoutFarStartBodyBlurCap
+        opacity: 0
+
+        readonly property real _radius: win._effectivePopoutFarStartCcr
+        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farBodyCapX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, ConnectedModeState.popoutBarSide, "left", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farBodyCapY(_popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, ConnectedModeState.popoutBarSide, "left", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _popoutFarEndBodyBlurCap
+        opacity: 0
+
+        readonly property real _radius: win._effectivePopoutFarEndCcr
+        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farBodyCapX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, ConnectedModeState.popoutBarSide, "right", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farBodyCapY(_popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, ConnectedModeState.popoutBarSide, "right", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _popoutFarEndConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._effectivePopoutFarEndCcr
+        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farConnectorX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.width, _popoutBodyBlurAnchor.height, ConnectedModeState.popoutBarSide, "right", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farConnectorY(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.width, _popoutBodyBlurAnchor.height, ConnectedModeState.popoutBarSide, "right", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _popoutFarStartConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _popoutFarStartConnectorBlurAnchor.width > 0 && _popoutFarStartConnectorBlurAnchor.height > 0
+        readonly property string _barSide: win._farConnectorBarSide(ConnectedModeState.popoutBarSide, "left")
+        readonly property string _placement: win._farConnectorPlacement(ConnectedModeState.popoutBarSide, "left")
+        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property real _radius: win._effectivePopoutFarStartCcr
+
+        x: _active ? win._connectorCutoutX(_popoutFarStartConnectorBlurAnchor.x, _popoutFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_popoutFarStartConnectorBlurAnchor.y, _popoutFarStartConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
+        id: _popoutFarEndConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _popoutFarEndConnectorBlurAnchor.width > 0 && _popoutFarEndConnectorBlurAnchor.height > 0
+        readonly property string _barSide: win._farConnectorBarSide(ConnectedModeState.popoutBarSide, "right")
+        readonly property string _placement: win._farConnectorPlacement(ConnectedModeState.popoutBarSide, "right")
+        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property real _radius: win._effectivePopoutFarEndCcr
+
+        x: _active ? win._connectorCutoutX(_popoutFarEndConnectorBlurAnchor.x, _popoutFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_popoutFarEndConnectorBlurAnchor.y, _popoutFarEndConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
     }
 
     Item {
@@ -294,16 +404,29 @@ PanelWindow {
     }
 
     Item {
+        id: _notifBodySceneBlurAnchor
+        visible: false
+
+        readonly property bool _active: _notifBodyBlurAnchor._active
+
+        x: _active ? Theme.snap(win._notifBodySceneX(), win._dpr) : 0
+        y: _active ? Theme.snap(win._notifBodySceneY(), win._dpr) : 0
+        width: _active ? Theme.snap(win._notifBodySceneWidth(), win._dpr) : 0
+        height: _active ? Theme.snap(win._notifBodySceneHeight(), win._dpr) : 0
+    }
+
+    Item {
         id: _notifBodyBlurCap
         opacity: 0
 
         readonly property string _side: win._notifState.barSide
-        readonly property bool _active: _notifBodyBlurAnchor._active && _notifBodyBlurAnchor.width > 0 && _notifBodyBlurAnchor.height > 0 && win._notifConnectorRadius() > 0
-        readonly property real _capWidth: (_side === "left" || _side === "right") ? Math.min(win._notifConnectorRadius(), _notifBodyBlurAnchor.width) : _notifBodyBlurAnchor.width
-        readonly property real _capHeight: (_side === "top" || _side === "bottom") ? Math.min(win._notifConnectorRadius(), _notifBodyBlurAnchor.height) : _notifBodyBlurAnchor.height
+        readonly property real _capRadius: win._notifMaxConnectorRadius()
+        readonly property bool _active: _notifBodySceneBlurAnchor._active && _notifBodySceneBlurAnchor.width > 0 && _notifBodySceneBlurAnchor.height > 0 && _capRadius > 0
+        readonly property real _capWidth: (_side === "left" || _side === "right") ? Math.min(_capRadius, _notifBodySceneBlurAnchor.width) : _notifBodySceneBlurAnchor.width
+        readonly property real _capHeight: (_side === "top" || _side === "bottom") ? Math.min(_capRadius, _notifBodySceneBlurAnchor.height) : _notifBodySceneBlurAnchor.height
 
-        x: !_active ? 0 : (_side === "right" ? _notifBodyBlurAnchor.x + _notifBodyBlurAnchor.width - _capWidth : _notifBodyBlurAnchor.x)
-        y: !_active ? 0 : (_side === "bottom" ? _notifBodyBlurAnchor.y + _notifBodyBlurAnchor.height - _capHeight : _notifBodyBlurAnchor.y)
+        x: !_active ? 0 : (_side === "right" ? _notifBodySceneBlurAnchor.x + _notifBodySceneBlurAnchor.width - _capWidth : _notifBodySceneBlurAnchor.x)
+        y: !_active ? 0 : (_side === "bottom" ? _notifBodySceneBlurAnchor.y + _notifBodySceneBlurAnchor.height - _capHeight : _notifBodySceneBlurAnchor.y)
         width: _active ? _capWidth : 0
         height: _active ? _capHeight : 0
     }
@@ -312,12 +435,13 @@ PanelWindow {
         id: _notifLeftConnectorBlurAnchor
         opacity: 0
 
-        readonly property bool _active: _notifBodyBlurAnchor._active && win._notifConnectorRadius() > 0
-        readonly property real _w: win._notifConnectorWidth(0)
-        readonly property real _h: win._notifConnectorHeight(0)
+        readonly property real _radius: win._notifConnectorRadius("left")
+        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+        readonly property real _w: win._notifConnectorWidth(0, "left")
+        readonly property real _h: win._notifConnectorHeight(0, "left")
 
-        x: _active ? Theme.snap(win._notifConnectorX(_notifBodyBlurAnchor.x, _notifBodyBlurAnchor.width, "left", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._notifConnectorY(_notifBodyBlurAnchor.y, _notifBodyBlurAnchor.height, "left", 0), win._dpr) : 0
+        x: _active ? Theme.snap(win._notifConnectorX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, "left", 0), win._dpr) : 0
+        y: _active ? Theme.snap(win._notifConnectorY(_notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, "left", 0), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -326,12 +450,13 @@ PanelWindow {
         id: _notifRightConnectorBlurAnchor
         opacity: 0
 
-        readonly property bool _active: _notifBodyBlurAnchor._active && win._notifConnectorRadius() > 0
-        readonly property real _w: win._notifConnectorWidth(0)
-        readonly property real _h: win._notifConnectorHeight(0)
+        readonly property real _radius: win._notifConnectorRadius("right")
+        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+        readonly property real _w: win._notifConnectorWidth(0, "right")
+        readonly property real _h: win._notifConnectorHeight(0, "right")
 
-        x: _active ? Theme.snap(win._notifConnectorX(_notifBodyBlurAnchor.x, _notifBodyBlurAnchor.width, "right", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._notifConnectorY(_notifBodyBlurAnchor.y, _notifBodyBlurAnchor.height, "right", 0), win._dpr) : 0
+        x: _active ? Theme.snap(win._notifConnectorX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, "right", 0), win._dpr) : 0
+        y: _active ? Theme.snap(win._notifConnectorY(_notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, "right", 0), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -342,11 +467,12 @@ PanelWindow {
 
         readonly property bool _active: _notifLeftConnectorBlurAnchor.width > 0 && _notifLeftConnectorBlurAnchor.height > 0
         readonly property string _arcCorner: win._connectorArcCorner(win._notifState.barSide, "left")
+        readonly property real _radius: win._notifConnectorRadius("left")
 
-        x: _active ? win._connectorCutoutX(_notifLeftConnectorBlurAnchor.x, _notifLeftConnectorBlurAnchor.width, _arcCorner, win._notifConnectorRadius()) : 0
-        y: _active ? win._connectorCutoutY(_notifLeftConnectorBlurAnchor.y, _notifLeftConnectorBlurAnchor.height, _arcCorner, win._notifConnectorRadius()) : 0
-        width: _active ? win._notifConnectorRadius() * 2 : 0
-        height: _active ? win._notifConnectorRadius() * 2 : 0
+        x: _active ? win._connectorCutoutX(_notifLeftConnectorBlurAnchor.x, _notifLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_notifLeftConnectorBlurAnchor.y, _notifLeftConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
     }
 
     Item {
@@ -355,11 +481,96 @@ PanelWindow {
 
         readonly property bool _active: _notifRightConnectorBlurAnchor.width > 0 && _notifRightConnectorBlurAnchor.height > 0
         readonly property string _arcCorner: win._connectorArcCorner(win._notifState.barSide, "right")
+        readonly property real _radius: win._notifConnectorRadius("right")
 
-        x: _active ? win._connectorCutoutX(_notifRightConnectorBlurAnchor.x, _notifRightConnectorBlurAnchor.width, _arcCorner, win._notifConnectorRadius()) : 0
-        y: _active ? win._connectorCutoutY(_notifRightConnectorBlurAnchor.y, _notifRightConnectorBlurAnchor.height, _arcCorner, win._notifConnectorRadius()) : 0
-        width: _active ? win._notifConnectorRadius() * 2 : 0
-        height: _active ? win._notifConnectorRadius() * 2 : 0
+        x: _active ? win._connectorCutoutX(_notifRightConnectorBlurAnchor.x, _notifRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_notifRightConnectorBlurAnchor.y, _notifRightConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
+        id: _notifFarStartConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._effectiveNotifFarStartCcr
+        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farConnectorX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.width, _notifBodySceneBlurAnchor.height, win._notifState.barSide, "left", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farConnectorY(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.width, _notifBodySceneBlurAnchor.height, win._notifState.barSide, "left", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _notifFarStartBodyBlurCap
+        opacity: 0
+
+        readonly property real _radius: win._effectiveNotifFarStartCcr
+        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farBodyCapX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, win._notifState.barSide, "left", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farBodyCapY(_notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, win._notifState.barSide, "left", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _notifFarEndBodyBlurCap
+        opacity: 0
+
+        readonly property real _radius: win._effectiveNotifFarEndCcr
+        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farBodyCapX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, win._notifState.barSide, "right", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farBodyCapY(_notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, win._notifState.barSide, "right", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _notifFarEndConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._effectiveNotifFarEndCcr
+        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farConnectorX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.width, _notifBodySceneBlurAnchor.height, win._notifState.barSide, "right", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farConnectorY(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.width, _notifBodySceneBlurAnchor.height, win._notifState.barSide, "right", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _notifFarStartConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _notifFarStartConnectorBlurAnchor.width > 0 && _notifFarStartConnectorBlurAnchor.height > 0
+        readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "left")
+        readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "left")
+        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property real _radius: win._effectiveNotifFarStartCcr
+
+        x: _active ? win._connectorCutoutX(_notifFarStartConnectorBlurAnchor.x, _notifFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_notifFarStartConnectorBlurAnchor.y, _notifFarStartConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
+        id: _notifFarEndConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _notifFarEndConnectorBlurAnchor.width > 0 && _notifFarEndConnectorBlurAnchor.height > 0
+        readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "right")
+        readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "right")
+        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property real _radius: win._effectiveNotifFarEndCcr
+
+        x: _active ? win._connectorCutoutX(_notifFarEndConnectorBlurAnchor.x, _notifFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_notifFarEndConnectorBlurAnchor.y, _notifFarEndConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
     }
 
     Region {
@@ -389,7 +600,7 @@ PanelWindow {
             Region {
                 item: _popoutLeftConnectorCutout
                 intersection: Intersection.Subtract
-                radius: win._effectivePopoutCcr
+                radius: win._popoutConnectorRadius("left")
             }
         }
         Region {
@@ -397,7 +608,29 @@ PanelWindow {
             Region {
                 item: _popoutRightConnectorCutout
                 intersection: Intersection.Subtract
-                radius: win._effectivePopoutCcr
+                radius: win._popoutConnectorRadius("right")
+            }
+        }
+        Region {
+            item: _popoutFarStartBodyBlurCap
+        }
+        Region {
+            item: _popoutFarEndBodyBlurCap
+        }
+        Region {
+            item: _popoutFarStartConnectorBlurAnchor
+            Region {
+                item: _popoutFarStartConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._effectivePopoutFarStartCcr
+            }
+        }
+        Region {
+            item: _popoutFarEndConnectorBlurAnchor
+            Region {
+                item: _popoutFarEndConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._effectivePopoutFarEndCcr
             }
         }
 
@@ -427,7 +660,7 @@ PanelWindow {
         }
 
         Region {
-            item: _notifBodyBlurAnchor
+            item: _notifBodySceneBlurAnchor
             radius: win._surfaceRadius
         }
         Region {
@@ -438,7 +671,7 @@ PanelWindow {
             Region {
                 item: _notifLeftConnectorCutout
                 intersection: Intersection.Subtract
-                radius: win._notifConnectorRadius()
+                radius: win._notifConnectorRadius("left")
             }
         }
         Region {
@@ -446,7 +679,29 @@ PanelWindow {
             Region {
                 item: _notifRightConnectorCutout
                 intersection: Intersection.Subtract
-                radius: win._notifConnectorRadius()
+                radius: win._notifConnectorRadius("right")
+            }
+        }
+        Region {
+            item: _notifFarStartBodyBlurCap
+        }
+        Region {
+            item: _notifFarEndBodyBlurCap
+        }
+        Region {
+            item: _notifFarStartConnectorBlurAnchor
+            Region {
+                item: _notifFarStartConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._effectiveNotifFarStartCcr
+            }
+        }
+        Region {
+            item: _notifFarEndConnectorBlurAnchor
+            Region {
+                item: _notifFarEndConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._effectiveNotifFarEndCcr
             }
         }
     }
@@ -500,19 +755,68 @@ PanelWindow {
         return placement === "left" ? seamY - h : seamY;
     }
 
-    function _notifConnectorRadius() {
-        return win._effectiveNotifCcr;
+    function _notifSideUnderlap() {
+        const side = win._notifState.barSide;
+        return (side === "left" || side === "right") ? win._seamOverlap : 0;
     }
 
-    function _notifConnectorWidth(spacing) {
+    function _notifStartUnderlap() {
+        return win._notifState.omitStartConnector ? win._seamOverlap : 0;
+    }
+
+    function _notifEndUnderlap() {
+        return win._notifState.omitEndConnector ? win._seamOverlap : 0;
+    }
+
+    function _notifBodySceneX() {
+        const side = win._notifState.barSide;
+        const isHoriz = side === "top" || side === "bottom";
+        if (isHoriz)
+            return _notifBodyBlurAnchor.x - win._notifStartUnderlap();
+        return _notifBodyBlurAnchor.x - (side === "left" ? win._notifSideUnderlap() : 0);
+    }
+
+    function _notifBodySceneY() {
+        const side = win._notifState.barSide;
+        const isHoriz = side === "top" || side === "bottom";
+        if (isHoriz)
+            return _notifBodyBlurAnchor.y;
+        return _notifBodyBlurAnchor.y - win._notifStartUnderlap();
+    }
+
+    function _notifBodySceneWidth() {
+        const side = win._notifState.barSide;
+        const isHoriz = side === "top" || side === "bottom";
+        if (isHoriz)
+            return _notifBodyBlurAnchor.width + win._notifStartUnderlap() + win._notifEndUnderlap();
+        return _notifBodyBlurAnchor.width + win._notifSideUnderlap();
+    }
+
+    function _notifBodySceneHeight() {
+        const side = win._notifState.barSide;
+        const isHoriz = side === "top" || side === "bottom";
+        if (isHoriz)
+            return _notifBodyBlurAnchor.height;
+        return _notifBodyBlurAnchor.height + win._notifStartUnderlap() + win._notifEndUnderlap();
+    }
+
+    function _notifConnectorRadius(placement) {
+        return placement === "right" ? win._effectiveNotifEndCcr : win._effectiveNotifStartCcr;
+    }
+
+    function _notifMaxConnectorRadius() {
+        return win._effectiveNotifMaxCcr;
+    }
+
+    function _notifConnectorWidth(spacing, placement) {
         const isVert = win._notifState.barSide === "left" || win._notifState.barSide === "right";
-        const radius = win._notifConnectorRadius();
+        const radius = win._notifConnectorRadius(placement);
         return isVert ? (spacing + radius) : radius;
     }
 
-    function _notifConnectorHeight(spacing) {
+    function _notifConnectorHeight(spacing, placement) {
         const isVert = win._notifState.barSide === "left" || win._notifState.barSide === "right";
-        const radius = win._notifConnectorRadius();
+        const radius = win._notifConnectorRadius(placement);
         return isVert ? radius : (spacing + radius);
     }
 
@@ -520,7 +824,7 @@ PanelWindow {
         const notifSide = win._notifState.barSide;
         const isVert = notifSide === "left" || notifSide === "right";
         const seamX = !isVert ? (placement === "left" ? baseX : baseX + bodyWidth) : (notifSide === "left" ? baseX : baseX + bodyWidth);
-        const w = _notifConnectorWidth(spacing);
+        const w = _notifConnectorWidth(spacing, placement);
         if (!isVert)
             return placement === "left" ? seamX - w : seamX;
         return notifSide === "left" ? seamX : seamX - w;
@@ -529,7 +833,7 @@ PanelWindow {
     function _notifConnectorY(baseY, bodyHeight, placement, spacing) {
         const notifSide = win._notifState.barSide;
         const seamY = notifSide === "top" ? baseY : notifSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
-        const h = _notifConnectorHeight(spacing);
+        const h = _notifConnectorHeight(spacing, placement);
         if (notifSide === "top")
             return seamY;
         if (notifSide === "bottom")
@@ -537,15 +841,19 @@ PanelWindow {
         return placement === "left" ? seamY - h : seamY;
     }
 
-    function _popoutConnectorWidth(spacing) {
+    function _popoutConnectorRadius(placement) {
+        return placement === "right" ? win._effectivePopoutEndCcr : win._effectivePopoutStartCcr;
+    }
+
+    function _popoutConnectorWidth(spacing, placement) {
         const isVert = ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right";
-        const radius = win._effectivePopoutCcr;
+        const radius = win._popoutConnectorRadius(placement);
         return isVert ? (spacing + radius) : radius;
     }
 
-    function _popoutConnectorHeight(spacing) {
+    function _popoutConnectorHeight(spacing, placement) {
         const isVert = ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right";
-        const radius = win._effectivePopoutCcr;
+        const radius = win._popoutConnectorRadius(placement);
         return isVert ? radius : (spacing + radius);
     }
 
@@ -553,7 +861,7 @@ PanelWindow {
         const popoutSide = ConnectedModeState.popoutBarSide;
         const isVert = popoutSide === "left" || popoutSide === "right";
         const seamX = !isVert ? (placement === "left" ? baseX : baseX + bodyWidth) : (popoutSide === "left" ? baseX : baseX + bodyWidth);
-        const w = _popoutConnectorWidth(spacing);
+        const w = _popoutConnectorWidth(spacing, placement);
         if (!isVert)
             return placement === "left" ? seamX - w : seamX;
         return popoutSide === "left" ? seamX : seamX - w;
@@ -562,7 +870,7 @@ PanelWindow {
     function _popoutConnectorY(baseY, bodyHeight, placement, spacing) {
         const popoutSide = ConnectedModeState.popoutBarSide;
         const seamY = popoutSide === "top" ? baseY : popoutSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
-        const h = _popoutConnectorHeight(spacing);
+        const h = _popoutConnectorHeight(spacing, placement);
         if (popoutSide === "top")
             return seamY;
         if (popoutSide === "bottom")
@@ -598,27 +906,27 @@ PanelWindow {
 
     function _popoutBlurCapThickness() {
         const extent = win._popoutArcExtent();
-        return Math.max(0, Math.min(win._effectivePopoutCcr, extent - win._surfaceRadius));
+        return Math.max(0, Math.min(win._effectivePopoutMaxCcr, extent - win._surfaceRadius));
     }
 
     function _popoutChromeX() {
         const barSide = ConnectedModeState.popoutBarSide;
-        return ConnectedModeState.popoutBodyX - ((barSide === "top" || barSide === "bottom") ? win._effectivePopoutCcr : 0);
+        return ConnectedModeState.popoutBodyX - ((barSide === "top" || barSide === "bottom") ? win._effectivePopoutStartCcr : 0);
     }
 
     function _popoutChromeY() {
         const barSide = ConnectedModeState.popoutBarSide;
-        return ConnectedModeState.popoutBodyY - ((barSide === "left" || barSide === "right") ? win._effectivePopoutCcr : 0);
+        return ConnectedModeState.popoutBodyY - ((barSide === "left" || barSide === "right") ? win._effectivePopoutStartCcr : 0);
     }
 
     function _popoutChromeWidth() {
         const barSide = ConnectedModeState.popoutBarSide;
-        return ConnectedModeState.popoutBodyW + ((barSide === "top" || barSide === "bottom") ? win._effectivePopoutCcr * 2 : 0);
+        return ConnectedModeState.popoutBodyW + ((barSide === "top" || barSide === "bottom") ? win._effectivePopoutStartCcr + win._effectivePopoutEndCcr : 0);
     }
 
     function _popoutChromeHeight() {
         const barSide = ConnectedModeState.popoutBarSide;
-        return ConnectedModeState.popoutBodyH + ((barSide === "left" || barSide === "right") ? win._effectivePopoutCcr * 2 : 0);
+        return ConnectedModeState.popoutBodyH + ((barSide === "left" || barSide === "right") ? win._effectivePopoutStartCcr + win._effectivePopoutEndCcr : 0);
     }
 
     function _popoutClipX() {
@@ -635,6 +943,34 @@ PanelWindow {
 
     function _popoutClipHeight() {
         return _popoutBodyBlurAnchor.height + win._popoutFillOverlapY() * 2;
+    }
+
+    function _popoutShapeBodyOffsetX() {
+        const side = ConnectedModeState.popoutBarSide;
+        if (side === "top" || side === "bottom")
+            return win._effectivePopoutStartCcr;
+        return side === "right" ? win._effectivePopoutFarExtent : 0;
+    }
+
+    function _popoutShapeBodyOffsetY() {
+        const side = ConnectedModeState.popoutBarSide;
+        if (side === "top" || side === "bottom")
+            return side === "bottom" ? win._effectivePopoutFarExtent : 0;
+        return win._effectivePopoutStartCcr;
+    }
+
+    function _popoutShapeWidth() {
+        const side = ConnectedModeState.popoutBarSide;
+        if (side === "top" || side === "bottom")
+            return win._popoutClipWidth() + win._effectivePopoutStartCcr + win._effectivePopoutEndCcr;
+        return win._popoutClipWidth() + win._effectivePopoutFarExtent;
+    }
+
+    function _popoutShapeHeight() {
+        const side = ConnectedModeState.popoutBarSide;
+        if (side === "top" || side === "bottom")
+            return win._popoutClipHeight() + win._effectivePopoutFarExtent;
+        return win._popoutClipHeight() + win._effectivePopoutStartCcr + win._effectivePopoutEndCcr;
     }
 
     function _popoutBodyXInClip() {
@@ -679,6 +1015,54 @@ PanelWindow {
 
     function _dockBodyYInChrome() {
         return ((win._dockState.barSide === "left" || win._dockState.barSide === "right") ? win._dockConnectorRadius() : 0) - win._dockFillOverlapY();
+    }
+
+    function _farConnectorBarSide(sourceSide, placement) {
+        if (sourceSide === "top" || sourceSide === "bottom")
+            return placement === "left" ? "left" : "right";
+        return placement === "left" ? "top" : "bottom";
+    }
+
+    function _farConnectorPlacement(sourceSide, placement) {
+        if (sourceSide === "top")
+            return "right";
+        if (sourceSide === "bottom")
+            return "left";
+        if (sourceSide === "left")
+            return "right";
+        return "left";
+    }
+
+    function _farConnectorX(baseX, baseY, bodyWidth, bodyHeight, sourceSide, placement, radius) {
+        if (sourceSide === "top" || sourceSide === "bottom")
+            return placement === "left" ? baseX : baseX + bodyWidth - radius;
+        if (sourceSide === "left")
+            return baseX + bodyWidth;
+        return baseX - radius;
+    }
+
+    function _farConnectorY(baseX, baseY, bodyWidth, bodyHeight, sourceSide, placement, radius) {
+        if (sourceSide === "top")
+            return baseY + bodyHeight;
+        if (sourceSide === "bottom")
+            return baseY - radius;
+        return placement === "left" ? baseY : baseY + bodyHeight - radius;
+    }
+
+    function _farBodyCapX(baseX, bodyWidth, sourceSide, placement, radius) {
+        if (sourceSide === "top" || sourceSide === "bottom")
+            return placement === "left" ? baseX : baseX + bodyWidth - radius;
+        if (sourceSide === "left")
+            return baseX + bodyWidth - radius;
+        return baseX;
+    }
+
+    function _farBodyCapY(baseY, bodyHeight, sourceSide, placement, radius) {
+        if (sourceSide === "top")
+            return baseY + bodyHeight - radius;
+        if (sourceSide === "bottom")
+            return baseY;
+        return placement === "left" ? baseY : baseY + bodyHeight - radius;
     }
 
     function _connectorArcCorner(barSide, placement) {
@@ -754,6 +1138,9 @@ PanelWindow {
             _blurRebuildTimer.restart();
         }
         function onConnectedFrameModeActiveChanged() {
+            _blurRebuildTimer.restart();
+        }
+        function onFrameCloseGapsChanged() {
             _blurRebuildTimer.restart();
         }
     }
@@ -842,12 +1229,10 @@ PanelWindow {
 
                 Item {
                     id: _popoutClip
-                    readonly property bool _barHoriz: ConnectedModeState.popoutBarSide === "top" || ConnectedModeState.popoutBarSide === "bottom"
-                    // Expand clip by ccr on bar axis to include arc columns
-                    x: win._popoutClipX() - (_barHoriz ? win._effectivePopoutCcr : 0)
-                    y: win._popoutClipY() - (_barHoriz ? 0 : win._effectivePopoutCcr)
-                    width: win._popoutClipWidth() + (_barHoriz ? win._effectivePopoutCcr * 2 : 0)
-                    height: win._popoutClipHeight() + (_barHoriz ? 0 : win._effectivePopoutCcr * 2)
+                    x: win._popoutClipX() - win._popoutShapeBodyOffsetX()
+                    y: win._popoutClipY() - win._popoutShapeBodyOffsetY()
+                    width: win._popoutShapeWidth()
+                    height: win._popoutShapeHeight()
                     clip: true
 
                     ConnectedShape {
@@ -857,6 +1242,10 @@ PanelWindow {
                         bodyWidth: win._popoutClipWidth()
                         bodyHeight: win._popoutClipHeight()
                         connectorRadius: win._effectivePopoutCcr
+                        startConnectorRadius: win._effectivePopoutStartCcr
+                        endConnectorRadius: win._effectivePopoutEndCcr
+                        farStartConnectorRadius: win._effectivePopoutFarStartCcr
+                        farEndConnectorRadius: win._effectivePopoutFarEndCcr
                         surfaceRadius: win._surfaceRadius
                         fillColor: win._opaqueSurfaceColor
                         x: 0
@@ -920,27 +1309,34 @@ PanelWindow {
 
         Item {
             id: _notifChrome
-            visible: _notifBodyBlurAnchor._active
+            visible: _notifBodySceneBlurAnchor._active
 
             readonly property string _notifSide: win._notifState.barSide
             readonly property bool _isHoriz: _notifSide === "top" || _notifSide === "bottom"
-            readonly property real _notifCcr: win._effectiveNotifCcr
-            readonly property real _sideUnderlap: _isHoriz ? 0 : win._seamOverlap
-            readonly property real _bodyW: Theme.snap(_notifBodyBlurAnchor.width + _sideUnderlap, win._dpr)
-            readonly property real _bodyH: Theme.snap(_notifBodyBlurAnchor.height, win._dpr)
+            readonly property real _startCcr: win._effectiveNotifStartCcr
+            readonly property real _endCcr: win._effectiveNotifEndCcr
+            readonly property real _farExtent: win._effectiveNotifFarExtent
+            readonly property real _bodyOffsetX: _isHoriz ? _startCcr : (_notifSide === "right" ? _farExtent : 0)
+            readonly property real _bodyOffsetY: _isHoriz ? (_notifSide === "bottom" ? _farExtent : 0) : _startCcr
+            readonly property real _bodyW: Theme.snap(_notifBodySceneBlurAnchor.width, win._dpr)
+            readonly property real _bodyH: Theme.snap(_notifBodySceneBlurAnchor.height, win._dpr)
 
             z: _isHoriz ? 0 : -1
-            x: Theme.snap(_notifBodyBlurAnchor.x - (_isHoriz ? _notifCcr : (_notifSide === "left" ? _sideUnderlap : 0)), win._dpr)
-            y: Theme.snap(_notifBodyBlurAnchor.y - (_isHoriz ? 0 : _notifCcr), win._dpr)
-            width: _isHoriz ? Theme.snap(_bodyW + _notifCcr * 2, win._dpr) : _bodyW
-            height: Theme.snap(_bodyH + (_isHoriz ? 0 : _notifCcr * 2), win._dpr)
+            x: Theme.snap(_notifBodySceneBlurAnchor.x - _bodyOffsetX, win._dpr)
+            y: Theme.snap(_notifBodySceneBlurAnchor.y - _bodyOffsetY, win._dpr)
+            width: _isHoriz ? Theme.snap(_bodyW + _startCcr + _endCcr, win._dpr) : Theme.snap(_bodyW + _farExtent, win._dpr)
+            height: _isHoriz ? Theme.snap(_bodyH + _farExtent, win._dpr) : Theme.snap(_bodyH + _startCcr + _endCcr, win._dpr)
 
             ConnectedShape {
-                visible: _notifBodyBlurAnchor._active && _notifBodyBlurAnchor.width > 0 && _notifBodyBlurAnchor.height > 0
+                visible: _notifBodySceneBlurAnchor._active && _notifBodySceneBlurAnchor.width > 0 && _notifBodySceneBlurAnchor.height > 0
                 barSide: _notifChrome._notifSide
                 bodyWidth: _notifChrome._bodyW
                 bodyHeight: _notifChrome._bodyH
-                connectorRadius: _notifChrome._notifCcr
+                connectorRadius: win._effectiveNotifCcr
+                startConnectorRadius: _notifChrome._startCcr
+                endConnectorRadius: _notifChrome._endCcr
+                farStartConnectorRadius: win._effectiveNotifFarStartCcr
+                farEndConnectorRadius: win._effectiveNotifFarEndCcr
                 surfaceRadius: win._surfaceRadius
                 fillColor: win._opaqueSurfaceColor
                 x: 0

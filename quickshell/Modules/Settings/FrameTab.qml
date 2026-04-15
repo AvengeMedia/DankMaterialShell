@@ -262,7 +262,7 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "toolbar"
-                title: I18n.tr("Bar Integration")
+                title: I18n.tr("Integrations")
                 settingKey: "frameBarIntegration"
                 collapsible: true
                 expanded: true
@@ -283,7 +283,7 @@ Item {
                     settingKey: "directionalAnimationMode"
                     tags: ["frame", "connected", "popout", "corner", "animation"]
                     text: I18n.tr("Connected Mode")
-                    description: I18n.tr("Popouts emerge flush from the bar edge as one continuous piece (based on Slide)")
+                    description: I18n.tr("Popouts emerge flush from the bar edge as one continuous piece")
                     checked: SettingsData.connectedFrameModeActive
                     onToggled: checked => {
                         if (checked) {
@@ -301,6 +301,18 @@ Item {
                         function onDirectionalAnimationModeChanged() {}
                         function onMotionEffectChanged() {}
                     }
+                }
+
+                SettingsToggleRow {
+                    visible: SettingsData.frameEnabled
+                    settingKey: "frameCloseGaps"
+                    tags: ["frame", "connected", "gap", "edge", "flush", "popout", "notification"]
+                    text: I18n.tr("Close the Gaps")
+                    description: I18n.tr("Connected popouts and notification corners sit flush against the frame edge")
+                    checked: SettingsData.frameCloseGaps
+                    enabled: SettingsData.connectedFrameModeActive
+                    opacity: enabled ? 1.0 : 0.5
+                    onToggled: checked => SettingsData.set("frameCloseGaps", checked)
                 }
             }
 
