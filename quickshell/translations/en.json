@@ -662,7 +662,7 @@
   {
     "term": "Active Color",
     "context": "Active Color",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2627",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2742",
     "comment": ""
   },
   {
@@ -702,6 +702,12 @@
     "comment": ""
   },
   {
+    "term": "Adaptive Media Width",
+    "context": "Adaptive Media Width",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:50",
+    "comment": ""
+  },
+  {
     "term": "Add",
     "context": "Add",
     "reference": "Widgets/KeybindItem.qml:1830, Modules/Plugins/ListSettingWithInput.qml:126, Modules/Settings/DesktopWidgetsTab.qml:152",
@@ -734,7 +740,7 @@
   {
     "term": "Add Widget",
     "context": "Add Widget",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:771, Modules/Settings/WidgetSelectionPopup.qml:93, Modules/Settings/DesktopWidgetsTab.qml:95, Modules/ControlCenter/Components/EditControls.qml:61, Modules/ControlCenter/Components/EditControls.qml:164",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:804, Modules/Settings/WidgetSelectionPopup.qml:93, Modules/Settings/DesktopWidgetsTab.qml:95, Modules/ControlCenter/Components/EditControls.qml:61, Modules/ControlCenter/Components/EditControls.qml:164",
     "comment": ""
   },
   {
@@ -776,7 +782,7 @@
   {
     "term": "Adjust volume per scroll indent",
     "context": "Adjust volume per scroll indent",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:82",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:89",
     "comment": ""
   },
   {
@@ -800,7 +806,7 @@
   {
     "term": "All",
     "context": "All",
-    "reference": "Modals/ProcessListModal.qml:377, Services/AppSearchService.qml:698, Services/AppSearchService.qml:719, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:660, Modals/DankLauncherV2/LauncherContent.qml:348, Modals/DankLauncherV2/LauncherContent.qml:624, Modules/ProcessList/ProcessListPopout.qml:155, Modules/Settings/WidgetsTabSection.qml:2361, Modules/Settings/WidgetsTabSection.qml:2415, Modules/Settings/KeybindsTab.qml:410, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:94, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:97, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:109, Modules/Notifications/Center/HistoryNotificationList.qml:87",
+    "reference": "Modals/ProcessListModal.qml:377, Services/AppSearchService.qml:698, Services/AppSearchService.qml:719, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:662, Modals/DankLauncherV2/LauncherContent.qml:348, Modals/DankLauncherV2/LauncherContent.qml:624, Modules/ProcessList/ProcessListPopout.qml:155, Modules/Settings/WidgetsTabSection.qml:2476, Modules/Settings/WidgetsTabSection.qml:2530, Modules/Settings/KeybindsTab.qml:410, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:94, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:97, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:109, Modules/Notifications/Center/HistoryNotificationList.qml:87",
     "comment": "notification history filter"
   },
   {
@@ -866,7 +872,7 @@
   {
     "term": "Always on icons",
     "context": "Always on icons",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1629",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1744",
     "comment": ""
   },
   {
@@ -938,7 +944,7 @@
   {
     "term": "App Customizations",
     "context": "App Customizations",
-    "reference": "Modules/Settings/LauncherTab.qml:967",
+    "reference": "Modules/Settings/LauncherTab.qml:1029",
     "comment": ""
   },
   {
@@ -1016,7 +1022,7 @@
   {
     "term": "Applying authentication changes…",
     "context": "Applying authentication changes…",
-    "reference": "Common/settings/Processes.qml:528",
+    "reference": "Common/settings/Processes.qml:483",
     "comment": ""
   },
   {
@@ -1034,7 +1040,7 @@
   {
     "term": "Apps Dock Settings",
     "context": "Apps Dock Settings",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2311",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2426",
     "comment": ""
   },
   {
@@ -1046,13 +1052,13 @@
   {
     "term": "Apps are ordered by usage frequency, then last used, then alphabetically.",
     "context": "Apps are ordered by usage frequency, then last used, then alphabetically.",
-    "reference": "Modules/Settings/LauncherTab.qml:1113",
+    "reference": "Modules/Settings/LauncherTab.qml:1175",
     "comment": ""
   },
   {
     "term": "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.",
     "context": "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.",
-    "reference": "Modules/Settings/LauncherTab.qml:990",
+    "reference": "Modules/Settings/LauncherTab.qml:1052",
     "comment": ""
   },
   {
@@ -1088,7 +1094,7 @@
   {
     "term": "Audio",
     "context": "Audio",
-    "reference": "Modals/Settings/SettingsSidebar.qml:245, Modules/Settings/WidgetsTabSection.qml:1124, Modules/Settings/WidgetsTabSection.qml:1333",
+    "reference": "Modals/Settings/SettingsSidebar.qml:245, Modules/Settings/WidgetsTabSection.qml:1239, Modules/Settings/WidgetsTabSection.qml:1448",
     "comment": ""
   },
   {
@@ -1142,7 +1148,7 @@
   {
     "term": "Audio system restarted",
     "context": "Audio system restarted",
-    "reference": "Services/AudioService.qml:263",
+    "reference": "Services/AudioService.qml:274",
     "comment": ""
   },
   {
@@ -1190,7 +1196,7 @@
   {
     "term": "Authentication changes applied.",
     "context": "Authentication changes applied.",
-    "reference": "Common/settings/Processes.qml:501",
+    "reference": "Common/settings/Processes.qml:456",
     "comment": ""
   },
   {
@@ -1208,7 +1214,7 @@
   {
     "term": "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.",
     "context": "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.",
-    "reference": "Common/settings/Processes.qml:136",
+    "reference": "Common/settings/Processes.qml:286",
     "comment": ""
   },
   {
@@ -1334,7 +1340,7 @@
   {
     "term": "Autofill last remembered query when opened",
     "context": "Autofill last remembered query when opened",
-    "reference": "Modules/Settings/LauncherTab.qml:839",
+    "reference": "Modules/Settings/LauncherTab.qml:883",
     "comment": ""
   },
   {
@@ -1454,7 +1460,7 @@
   {
     "term": "Back",
     "context": "Back",
-    "reference": "Modals/Greeter/GreeterModal.qml:285, Modules/DankBar/Widgets/SystemTrayBar.qml:1579",
+    "reference": "Modals/Greeter/GreeterModal.qml:285, Modules/DankBar/Widgets/SystemTrayBar.qml:1729",
     "comment": "greeter back button"
   },
   {
@@ -1484,7 +1490,7 @@
   {
     "term": "Background authentication sync failed. Trying terminal mode.",
     "context": "Background authentication sync failed. Trying terminal mode.",
-    "reference": "Common/settings/Processes.qml:512",
+    "reference": "Common/settings/Processes.qml:467",
     "comment": ""
   },
   {
@@ -1550,7 +1556,7 @@
   {
     "term": "Battery",
     "context": "Battery",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1169, Modules/Settings/WidgetsTabSection.qml:1333, Modules/Settings/PowerSleepTab.qml:59, Modules/Settings/WidgetsTab.qml:176, Modules/ControlCenter/Models/WidgetModel.qml:161, Modules/ControlCenter/Widgets/BatteryPill.qml:17",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1284, Modules/Settings/WidgetsTabSection.qml:1448, Modules/Settings/PowerSleepTab.qml:59, Modules/Settings/WidgetsTab.qml:176, Modules/ControlCenter/Models/WidgetModel.qml:161, Modules/ControlCenter/Widgets/BatteryPill.qml:17",
     "comment": ""
   },
   {
@@ -1640,7 +1646,7 @@
   {
     "term": "Bluetooth",
     "context": "Bluetooth",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1114, Modules/Settings/WidgetsTabSection.qml:1333, Modules/ControlCenter/Models/WidgetModel.qml:110, Modules/ControlCenter/Components/DragDropGrid.qml:313",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1229, Modules/Settings/WidgetsTabSection.qml:1448, Modules/ControlCenter/Models/WidgetModel.qml:110, Modules/ControlCenter/Components/DragDropGrid.qml:313",
     "comment": "bluetooth status"
   },
   {
@@ -1766,7 +1772,7 @@
   {
     "term": "Bottom Section",
     "context": "Bottom Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1085",
+    "reference": "Modules/Settings/WidgetsTab.qml:1087",
     "comment": ""
   },
   {
@@ -1778,7 +1784,7 @@
   {
     "term": "Brightness",
     "context": "Brightness",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1154, Modules/Settings/WidgetsTabSection.qml:1333, Modules/Settings/DockTab.qml:484, Modules/Settings/LauncherTab.qml:276, Modules/Settings/OSDTab.qml:117",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1269, Modules/Settings/WidgetsTabSection.qml:1448, Modules/Settings/DockTab.qml:484, Modules/Settings/LauncherTab.qml:276, Modules/Settings/OSDTab.qml:117",
     "comment": ""
   },
   {
@@ -1790,7 +1796,7 @@
   {
     "term": "Brightness Value",
     "context": "Brightness Value",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1159, Modules/Settings/WidgetsTabSection.qml:1333",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1274, Modules/Settings/WidgetsTabSection.qml:1448",
     "comment": ""
   },
   {
@@ -1802,7 +1808,7 @@
   {
     "term": "Browse",
     "context": "Browse",
-    "reference": "Modals/DankLauncherV2/Controller.qml:160, Modals/DankLauncherV2/Controller.qml:1201, Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/GreeterTab.qml:683, Modules/Settings/PluginsTab.qml:209, Modules/Settings/LockScreenTab.qml:327",
+    "reference": "Modals/DankLauncherV2/Controller.qml:160, Modals/DankLauncherV2/Controller.qml:1235, Modules/Settings/ThemeColorsTab.qml:289, Modules/Settings/GreeterTab.qml:683, Modules/Settings/PluginsTab.qml:209, Modules/Settings/LockScreenTab.qml:327",
     "comment": "theme category option"
   },
   {
@@ -1904,7 +1910,7 @@
   {
     "term": "Camera",
     "context": "Camera",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1710",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1825",
     "comment": ""
   },
   {
@@ -1964,7 +1970,7 @@
   {
     "term": "Center Section",
     "context": "Center Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1018",
+    "reference": "Modules/Settings/WidgetsTab.qml:1020",
     "comment": ""
   },
   {
@@ -1988,13 +1994,13 @@
   {
     "term": "Change Song",
     "context": "Change Song",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:51",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:58",
     "comment": "media scroll wheel option"
   },
   {
     "term": "Change Volume",
     "context": "Change Volume",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:51",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:58",
     "comment": "media scroll wheel option"
   },
   {
@@ -2204,7 +2210,7 @@
   {
     "term": "Clear All",
     "context": "Clear All",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:76, Modals/Clipboard/ClipboardHistoryPopout.qml:151, Modals/Clipboard/ClipboardHistoryModal.qml:149, Modules/Settings/PrinterTab.qml:1370, Modules/DankBar/Widgets/ClipboardButton.qml:254",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:76, Modals/Clipboard/ClipboardHistoryPopout.qml:148, Modals/Clipboard/ClipboardHistoryModal.qml:146, Modules/Settings/PrinterTab.qml:1370, Modules/DankBar/Widgets/ClipboardButton.qml:254",
     "comment": ""
   },
   {
@@ -2332,12 +2338,6 @@
     "context": "Clipboard sent",
     "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:117, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:300",
     "comment": "KDE Connect clipboard action | Phone Connect clipboard action"
-  },
-  {
-    "term": "Clipboard service not available",
-    "context": "Clipboard service not available",
-    "reference": "Modals/Clipboard/ClipboardHistoryPopout.qml:54, Modals/Clipboard/ClipboardHistoryModal.qml:64",
-    "comment": ""
   },
   {
     "term": "Clipboard works but nothing saved to disk",
@@ -2480,7 +2480,7 @@
   {
     "term": "Colorize Active",
     "context": "Colorize Active",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2587",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2702",
     "comment": ""
   },
   {
@@ -2546,7 +2546,7 @@
   {
     "term": "Compact Mode",
     "context": "Compact Mode",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:563, Modules/Settings/WidgetsTabSection.qml:2088",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:596, Modules/Settings/WidgetsTabSection.qml:2203",
     "comment": ""
   },
   {
@@ -2730,6 +2730,12 @@
     "comment": ""
   },
   {
+    "term": "Connecting to clipboard service…",
+    "context": "Connecting to clipboard service…",
+    "reference": "Modals/Clipboard/ClipboardContent.qml:125, Modals/Clipboard/ClipboardContent.qml:184",
+    "comment": ""
+  },
+  {
     "term": "Connecting...",
     "context": "Connecting...",
     "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:297",
@@ -2798,7 +2804,7 @@
   {
     "term": "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.",
     "context": "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.",
-    "reference": "Modules/Settings/LauncherTab.qml:649",
+    "reference": "Modules/Settings/LauncherTab.qml:675",
     "comment": ""
   },
   {
@@ -2918,7 +2924,7 @@
   {
     "term": "Copy path",
     "context": "Copy path",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1080",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1114",
     "comment": ""
   },
   {
@@ -3026,7 +3032,7 @@
   {
     "term": "Current Monitor",
     "context": "Current Monitor",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2244",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2359",
     "comment": "Running apps filter: only show apps from the same monitor"
   },
   {
@@ -3062,7 +3068,7 @@
   {
     "term": "Current Workspace",
     "context": "Current Workspace",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2192",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2307",
     "comment": "Running apps filter: only show apps from the active workspace"
   },
   {
@@ -3602,7 +3608,7 @@
   {
     "term": "Device names updated",
     "context": "Device names updated",
-    "reference": "Services/AudioService.qml:263",
+    "reference": "Services/AudioService.qml:274",
     "comment": ""
   },
   {
@@ -3728,7 +3734,7 @@
   {
     "term": "Disk Usage Display",
     "context": "Disk Usage Display",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:973",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1088",
     "comment": ""
   },
   {
@@ -3968,7 +3974,7 @@
   {
     "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
     "context": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
-    "reference": "Modules/Settings/WidgetsTab.qml:928",
+    "reference": "Modules/Settings/WidgetsTab.qml:930",
     "comment": ""
   },
   {
@@ -4280,13 +4286,13 @@
   {
     "term": "Enlarge on Hover",
     "context": "Enlarge on Hover",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2686",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2801",
     "comment": ""
   },
   {
     "term": "Enlargement %",
     "context": "Enlargement %",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2725",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2840",
     "comment": ""
   },
   {
@@ -4724,19 +4730,19 @@
   {
     "term": "Failed to parse plugin_settings.json",
     "context": "Failed to parse plugin_settings.json",
-    "reference": "Common/SettingsData.qml:1377",
+    "reference": "Common/SettingsData.qml:1380",
     "comment": ""
   },
   {
     "term": "Failed to parse session.json",
     "context": "Failed to parse session.json",
-    "reference": "Common/SessionData.qml:206, Common/SessionData.qml:285",
+    "reference": "Common/SessionData.qml:208, Common/SessionData.qml:287",
     "comment": ""
   },
   {
     "term": "Failed to parse settings.json",
     "context": "Failed to parse settings.json",
-    "reference": "Common/SettingsData.qml:1280, Common/SettingsData.qml:2780",
+    "reference": "Common/SettingsData.qml:1283, Common/SettingsData.qml:2783",
     "comment": ""
   },
   {
@@ -4784,7 +4790,7 @@
   {
     "term": "Failed to restart audio system",
     "context": "Failed to restart audio system",
-    "reference": "Services/AudioService.qml:267",
+    "reference": "Services/AudioService.qml:278",
     "comment": ""
   },
   {
@@ -4814,7 +4820,7 @@
   {
     "term": "Failed to save audio config",
     "context": "Failed to save audio config",
-    "reference": "Services/AudioService.qml:152",
+    "reference": "Services/AudioService.qml:163",
     "comment": ""
   },
   {
@@ -5018,7 +5024,7 @@
   {
     "term": "Files",
     "context": "Files",
-    "reference": "Modals/DankLauncherV2/Controller.qml:167, Modals/DankLauncherV2/Controller.qml:994, Modals/DankLauncherV2/Controller.qml:1015, Modals/DankLauncherV2/LauncherContent.qml:358, Modals/DankLauncherV2/LauncherContent.qml:629",
+    "reference": "Modals/DankLauncherV2/Controller.qml:167, Modals/DankLauncherV2/Controller.qml:1028, Modals/DankLauncherV2/Controller.qml:1049, Modals/DankLauncherV2/LauncherContent.qml:358, Modals/DankLauncherV2/LauncherContent.qml:629, Modules/Settings/LauncherTab.qml:642",
     "comment": ""
   },
   {
@@ -5210,7 +5216,7 @@
   {
     "term": "Folders",
     "context": "Folders",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1005, Modals/DankLauncherV2/Controller.qml:1015, Modals/DankLauncherV2/LauncherContent.qml:634",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1039, Modals/DankLauncherV2/Controller.qml:1049, Modals/DankLauncherV2/LauncherContent.qml:634, Modules/Settings/LauncherTab.qml:653",
     "comment": ""
   },
   {
@@ -5654,7 +5660,7 @@
   {
     "term": "Group by App",
     "context": "Group by App",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2140, Modules/Settings/DockTab.qml:157",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2255, Modules/Settings/DockTab.qml:157",
     "comment": ""
   },
   {
@@ -5780,7 +5786,7 @@
   {
     "term": "Hidden Apps",
     "context": "Hidden Apps",
-    "reference": "Modules/Settings/LauncherTab.qml:849",
+    "reference": "Modules/Settings/LauncherTab.qml:911",
     "comment": ""
   },
   {
@@ -5792,7 +5798,7 @@
   {
     "term": "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.",
     "context": "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.",
-    "reference": "Modules/Settings/LauncherTab.qml:879",
+    "reference": "Modules/Settings/LauncherTab.qml:941",
     "comment": ""
   },
   {
@@ -5822,7 +5828,7 @@
   {
     "term": "Hide Indicators",
     "context": "Hide Indicators",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2534",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2649",
     "comment": ""
   },
   {
@@ -6098,7 +6104,7 @@
   {
     "term": "Icon Size %",
     "context": "Icon Size %",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2776",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2891",
     "comment": ""
   },
   {
@@ -6174,6 +6180,18 @@
     "comment": ""
   },
   {
+    "term": "Include Files in All Tab",
+    "context": "Include Files in All Tab",
+    "reference": "Modules/Settings/LauncherTab.qml:891",
+    "comment": ""
+  },
+  {
+    "term": "Include Folders in All Tab",
+    "context": "Include Folders in All Tab",
+    "reference": "Modules/Settings/LauncherTab.qml:900",
+    "comment": ""
+  },
+  {
     "term": "Include Transitions",
     "context": "Include Transitions",
     "reference": "Modules/Settings/WallpaperTab.qml:1201",
@@ -6182,7 +6200,7 @@
   {
     "term": "Include desktop actions (shortcuts) in search results.",
     "context": "Include desktop actions (shortcuts) in search results.",
-    "reference": "Modules/Settings/LauncherTab.qml:830",
+    "reference": "Modules/Settings/LauncherTab.qml:874",
     "comment": ""
   },
   {
@@ -6560,13 +6578,13 @@
   {
     "term": "Large",
     "context": "Large",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1948",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2063",
     "comment": ""
   },
   {
     "term": "Largest",
     "context": "Largest",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1953",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2068",
     "comment": ""
   },
   {
@@ -6578,49 +6596,49 @@
   {
     "term": "Last launched %1",
     "context": "Last launched %1",
-    "reference": "Modules/Settings/LauncherTab.qml:1206",
+    "reference": "Modules/Settings/LauncherTab.qml:1268",
     "comment": ""
   },
   {
     "term": "Last launched %1 day ago",
     "context": "Last launched %1 day ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1205",
+    "reference": "Modules/Settings/LauncherTab.qml:1267",
     "comment": ""
   },
   {
     "term": "Last launched %1 days ago",
     "context": "Last launched %1 days ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1205",
+    "reference": "Modules/Settings/LauncherTab.qml:1267",
     "comment": ""
   },
   {
     "term": "Last launched %1 hour ago",
     "context": "Last launched %1 hour ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1203",
+    "reference": "Modules/Settings/LauncherTab.qml:1265",
     "comment": ""
   },
   {
     "term": "Last launched %1 hours ago",
     "context": "Last launched %1 hours ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1203",
+    "reference": "Modules/Settings/LauncherTab.qml:1265",
     "comment": ""
   },
   {
     "term": "Last launched %1 minute ago",
     "context": "Last launched %1 minute ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1201",
+    "reference": "Modules/Settings/LauncherTab.qml:1263",
     "comment": ""
   },
   {
     "term": "Last launched %1 minutes ago",
     "context": "Last launched %1 minutes ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1201",
+    "reference": "Modules/Settings/LauncherTab.qml:1263",
     "comment": ""
   },
   {
     "term": "Last launched just now",
     "context": "Last launched just now",
-    "reference": "Modules/Settings/LauncherTab.qml:1199",
+    "reference": "Modules/Settings/LauncherTab.qml:1261",
     "comment": ""
   },
   {
@@ -6632,7 +6650,7 @@
   {
     "term": "Launch",
     "context": "Launch",
-    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:154, Modals/DankLauncherV2/Controller.qml:1068, Modals/DankLauncherV2/Controller.qml:1461",
+    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:154, Modals/DankLauncherV2/Controller.qml:1102, Modals/DankLauncherV2/Controller.qml:1505",
     "comment": ""
   },
   {
@@ -6704,7 +6722,7 @@
   {
     "term": "Left Section",
     "context": "Left Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:951",
+    "reference": "Modules/Settings/WidgetsTab.qml:953",
     "comment": ""
   },
   {
@@ -6921,6 +6939,12 @@
     "term": "Logging in...",
     "context": "Logging in...",
     "reference": "Modules/Greetd/GreeterContent.qml:1015",
+    "comment": ""
+  },
+  {
+    "term": "Login",
+    "context": "Login",
+    "reference": "Modules/Settings/SoundsTab.qml:98",
     "comment": ""
   },
   {
@@ -7148,7 +7172,7 @@
   {
     "term": "Max Pinned Apps",
     "context": "Max Pinned Apps",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2335",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2450",
     "comment": ""
   },
   {
@@ -7160,7 +7184,7 @@
   {
     "term": "Max Running Apps",
     "context": "Max Running Apps",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2389",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2504",
     "comment": ""
   },
   {
@@ -7346,7 +7370,7 @@
   {
     "term": "Medium",
     "context": "Medium",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:212, Modules/Settings/TypographyMotionTab.qml:315, Modules/Settings/TypographyMotionTab.qml:399, Modules/Settings/WidgetsTabSection.qml:1943, Modules/Settings/NotificationsTab.qml:337",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:212, Modules/Settings/TypographyMotionTab.qml:315, Modules/Settings/TypographyMotionTab.qml:399, Modules/Settings/WidgetsTabSection.qml:2058, Modules/Settings/NotificationsTab.qml:337",
     "comment": ""
   },
   {
@@ -7374,6 +7398,18 @@
     "comment": ""
   },
   {
+    "term": "Merge indexed file results into the All tab (requires dsearch).",
+    "context": "Merge indexed file results into the All tab (requires dsearch).",
+    "reference": "Modules/Settings/LauncherTab.qml:892",
+    "comment": ""
+  },
+  {
+    "term": "Merge indexed folder results into the All tab (requires dsearch).",
+    "context": "Merge indexed folder results into the All tab (requires dsearch).",
+    "reference": "Modules/Settings/LauncherTab.qml:901",
+    "comment": ""
+  },
+  {
     "term": "Message",
     "context": "Message",
     "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:73",
@@ -7388,7 +7424,7 @@
   {
     "term": "Microphone",
     "context": "Microphone",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1139, Modules/Settings/WidgetsTabSection.qml:1333, Modules/Settings/WidgetsTabSection.qml:1658",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1254, Modules/Settings/WidgetsTabSection.qml:1448, Modules/Settings/WidgetsTabSection.qml:1773",
     "comment": ""
   },
   {
@@ -7400,7 +7436,7 @@
   {
     "term": "Microphone Volume",
     "context": "Microphone Volume",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1144, Modules/Settings/WidgetsTabSection.qml:1333",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1259, Modules/Settings/WidgetsTabSection.qml:1448",
     "comment": ""
   },
   {
@@ -7418,7 +7454,7 @@
   {
     "term": "Middle Section",
     "context": "Middle Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1018",
+    "reference": "Modules/Settings/WidgetsTab.qml:1020",
     "comment": ""
   },
   {
@@ -7688,7 +7724,7 @@
   {
     "term": "Network",
     "context": "Network",
-    "reference": "Services/CupsService.qml:134, Modals/Settings/SettingsSidebar.qml:232, Modules/ProcessList/PerformanceView.qml:112, Modules/Settings/WidgetsTabSection.qml:1094, Modules/Settings/WidgetsTabSection.qml:1333, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:229, Modules/ControlCenter/Details/NetworkDetail.qml:88, Modules/ControlCenter/Models/WidgetModel.qml:101",
+    "reference": "Services/CupsService.qml:134, Modals/Settings/SettingsSidebar.qml:232, Modules/ProcessList/PerformanceView.qml:112, Modules/Settings/WidgetsTabSection.qml:1209, Modules/Settings/WidgetsTabSection.qml:1448, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:229, Modules/ControlCenter/Details/NetworkDetail.qml:88, Modules/ControlCenter/Models/WidgetModel.qml:101",
     "comment": ""
   },
   {
@@ -7748,7 +7784,7 @@
   {
     "term": "Never used",
     "context": "Never used",
-    "reference": "Modules/Settings/LauncherTab.qml:1191",
+    "reference": "Modules/Settings/LauncherTab.qml:1253",
     "comment": ""
   },
   {
@@ -7772,7 +7808,7 @@
   {
     "term": "New Notification",
     "context": "New Notification",
-    "reference": "Modules/Settings/SoundsTab.qml:98",
+    "reference": "Modules/Settings/SoundsTab.qml:108",
     "comment": ""
   },
   {
@@ -8012,7 +8048,7 @@
   {
     "term": "No app customizations.",
     "context": "No app customizations.",
-    "reference": "Modules/Settings/LauncherTab.qml:1064",
+    "reference": "Modules/Settings/LauncherTab.qml:1126",
     "comment": ""
   },
   {
@@ -8024,7 +8060,7 @@
   {
     "term": "No apps have been launched yet.",
     "context": "No apps have been launched yet.",
-    "reference": "Modules/Settings/LauncherTab.qml:1234",
+    "reference": "Modules/Settings/LauncherTab.qml:1296",
     "comment": ""
   },
   {
@@ -8132,7 +8168,7 @@
   {
     "term": "No hidden apps.",
     "context": "No hidden apps.",
-    "reference": "Modules/Settings/LauncherTab.qml:954",
+    "reference": "Modules/Settings/LauncherTab.qml:1016",
     "comment": ""
   },
   {
@@ -8174,7 +8210,7 @@
   {
     "term": "No launcher plugins installed.",
     "context": "No launcher plugins installed.",
-    "reference": "Modules/Settings/LauncherTab.qml:811",
+    "reference": "Modules/Settings/LauncherTab.qml:855",
     "comment": ""
   },
   {
@@ -8312,7 +8348,7 @@
   {
     "term": "No trigger",
     "context": "No trigger",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1203, Modules/Settings/LauncherTab.qml:742",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1237, Modules/Settings/LauncherTab.qml:768",
     "comment": ""
   },
   {
@@ -8456,7 +8492,7 @@
   {
     "term": "Notepad",
     "context": "Notepad",
-    "reference": "DMSShell.qml:814, Services/AppSearchService.qml:179, Modules/Settings/WidgetsTab.qml:232",
+    "reference": "DMSShell.qml:826, Services/AppSearchService.qml:179, Modules/Settings/WidgetsTab.qml:232",
     "comment": "Notepad"
   },
   {
@@ -8474,7 +8510,7 @@
   {
     "term": "Nothing",
     "context": "Nothing",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:51",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:58",
     "comment": "media scroll wheel option"
   },
   {
@@ -8672,7 +8708,7 @@
   {
     "term": "Open",
     "context": "Open",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1072, Modals/DankLauncherV2/Controller.qml:1076, Modals/DankLauncherV2/Controller.qml:1080, Modules/Notepad/NotepadTextEditor.qml:790, Modules/Settings/NetworkTab.qml:1201, Modules/Settings/NetworkTab.qml:1448, Modules/ControlCenter/Details/NetworkDetail.qml:609, Modules/Notifications/Center/NotificationCard.qml:716, Modules/Notifications/Center/NotificationCard.qml:852",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1106, Modals/DankLauncherV2/Controller.qml:1110, Modals/DankLauncherV2/Controller.qml:1114, Modules/Notepad/NotepadTextEditor.qml:790, Modules/Settings/NetworkTab.qml:1201, Modules/Settings/NetworkTab.qml:1448, Modules/ControlCenter/Details/NetworkDetail.qml:609, Modules/Notifications/Center/NotificationCard.qml:716, Modules/Notifications/Center/NotificationCard.qml:852",
     "comment": ""
   },
   {
@@ -8702,7 +8738,7 @@
   {
     "term": "Open folder",
     "context": "Open folder",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1080",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1114",
     "comment": ""
   },
   {
@@ -8714,7 +8750,7 @@
   {
     "term": "Open in terminal",
     "context": "Open in terminal",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1080",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1114",
     "comment": ""
   },
   {
@@ -8726,7 +8762,7 @@
   {
     "term": "Open with...",
     "context": "Open with...",
-    "reference": "DMSShell.qml:648, Modals/BrowserPickerModal.qml:11",
+    "reference": "DMSShell.qml:660, Modals/BrowserPickerModal.qml:11",
     "comment": ""
   },
   {
@@ -8852,7 +8888,7 @@
   {
     "term": "Overflow",
     "context": "Overflow",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2319",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2434",
     "comment": ""
   },
   {
@@ -9134,7 +9170,7 @@
   {
     "term": "Percentage",
     "context": "Percentage",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:983, Modules/Settings/WidgetsTab.qml:125",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1098, Modules/Settings/WidgetsTab.qml:125",
     "comment": ""
   },
   {
@@ -9252,21 +9288,27 @@
     "comment": ""
   },
   {
+    "term": "Play sound after logging in",
+    "context": "Play sound after logging in",
+    "reference": "Modules/Settings/SoundsTab.qml:99",
+    "comment": ""
+  },
+  {
     "term": "Play sound when new notification arrives",
     "context": "Play sound when new notification arrives",
-    "reference": "Modules/Settings/SoundsTab.qml:99",
+    "reference": "Modules/Settings/SoundsTab.qml:109",
     "comment": ""
   },
   {
     "term": "Play sound when power cable is connected",
     "context": "Play sound when power cable is connected",
-    "reference": "Modules/Settings/SoundsTab.qml:120",
+    "reference": "Modules/Settings/SoundsTab.qml:130",
     "comment": ""
   },
   {
     "term": "Play sound when volume is adjusted",
     "context": "Play sound when volume is adjusted",
-    "reference": "Modules/Settings/SoundsTab.qml:109",
+    "reference": "Modules/Settings/SoundsTab.qml:119",
     "comment": ""
   },
   {
@@ -9302,7 +9344,7 @@
   {
     "term": "Plugged In",
     "context": "Plugged In",
-    "reference": "Services/BatteryService.qml:159, Services/BatteryService.qml:165, Modules/Settings/SoundsTab.qml:119",
+    "reference": "Services/BatteryService.qml:159, Services/BatteryService.qml:165, Modules/Settings/SoundsTab.qml:129",
     "comment": "battery status"
   },
   {
@@ -9524,7 +9566,7 @@
   {
     "term": "Precip",
     "context": "Precip",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:437",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:441",
     "comment": ""
   },
   {
@@ -9578,7 +9620,7 @@
   {
     "term": "Pressure",
     "context": "Pressure",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:449, Modules/DankDash/WeatherTab.qml:94, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:1034",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:94, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:1034",
     "comment": ""
   },
   {
@@ -9620,7 +9662,7 @@
   {
     "term": "Printer",
     "context": "Printer",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1179, Modules/Settings/WidgetsTabSection.qml:1333",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1294, Modules/Settings/WidgetsTabSection.qml:1448",
     "comment": ""
   },
   {
@@ -9890,7 +9932,7 @@
   {
     "term": "Recently Used Apps",
     "context": "Recently Used Apps",
-    "reference": "Modules/Settings/LauncherTab.qml:1077",
+    "reference": "Modules/Settings/LauncherTab.qml:1139",
     "comment": ""
   },
   {
@@ -9944,19 +9986,19 @@
   {
     "term": "Remaining",
     "context": "Remaining",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:993",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1108",
     "comment": ""
   },
   {
     "term": "Remaining / Total",
     "context": "Remaining / Total",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:998",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1113",
     "comment": ""
   },
   {
     "term": "Remember Last Query",
     "context": "Remember Last Query",
-    "reference": "Modules/Settings/LauncherTab.qml:838",
+    "reference": "Modules/Settings/LauncherTab.qml:882",
     "comment": ""
   },
   {
@@ -10082,7 +10124,7 @@
   {
     "term": "Reset",
     "context": "Reset",
-    "reference": "Modals/DankLauncherV2/LauncherContent.qml:1009, Modules/Settings/WidgetsTab.qml:897, Modules/ControlCenter/Components/EditControls.qml:232",
+    "reference": "Modals/DankLauncherV2/LauncherContent.qml:1009, Modules/Settings/WidgetsTab.qml:899, Modules/ControlCenter/Components/EditControls.qml:232",
     "comment": ""
   },
   {
@@ -10184,7 +10226,7 @@
   {
     "term": "Right Section",
     "context": "Right Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1085",
+    "reference": "Modules/Settings/WidgetsTab.qml:1087",
     "comment": ""
   },
   {
@@ -10310,7 +10352,7 @@
   {
     "term": "Running Apps Settings",
     "context": "Running Apps Settings",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2061",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2176",
     "comment": ""
   },
   {
@@ -10478,13 +10520,13 @@
   {
     "term": "Screen Sharing",
     "context": "Screen Sharing",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1189, Modules/Settings/WidgetsTabSection.qml:1333",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1304, Modules/Settings/WidgetsTabSection.qml:1448",
     "comment": ""
   },
   {
     "term": "Screen sharing",
     "context": "Screen sharing",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1762",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1877",
     "comment": ""
   },
   {
@@ -10508,7 +10550,7 @@
   {
     "term": "Scroll Wheel",
     "context": "Scroll Wheel",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:53, Modules/Settings/DankBarTab.qml:719",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:60, Modules/Settings/DankBarTab.qml:719",
     "comment": ""
   },
   {
@@ -10526,7 +10568,7 @@
   {
     "term": "Scroll wheel behavior on media widget",
     "context": "Scroll wheel behavior on media widget",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:54",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:61",
     "comment": ""
   },
   {
@@ -10538,13 +10580,13 @@
   {
     "term": "Search App Actions",
     "context": "Search App Actions",
-    "reference": "Modules/Settings/LauncherTab.qml:829",
+    "reference": "Modules/Settings/LauncherTab.qml:873",
     "comment": ""
   },
   {
     "term": "Search Options",
     "context": "Search Options",
-    "reference": "Modules/Settings/LauncherTab.qml:823",
+    "reference": "Modules/Settings/LauncherTab.qml:867",
     "comment": ""
   },
   {
@@ -10664,7 +10706,7 @@
   {
     "term": "Select",
     "context": "Select",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1336",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1380",
     "comment": ""
   },
   {
@@ -10676,7 +10718,7 @@
   {
     "term": "Select Bar",
     "context": "Select Bar",
-    "reference": "Modules/Settings/WidgetsTab.qml:812",
+    "reference": "Modules/Settings/WidgetsTab.qml:814",
     "comment": ""
   },
   {
@@ -11120,7 +11162,7 @@
   {
     "term": "Show Badge",
     "context": "Show Badge",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2465",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2580",
     "comment": ""
   },
   {
@@ -11372,7 +11414,7 @@
   {
     "term": "Show Swap",
     "context": "Show Swap",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:845",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:878",
     "comment": ""
   },
   {
@@ -11474,7 +11516,7 @@
   {
     "term": "Show in GB",
     "context": "Show in GB",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:898",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:931",
     "comment": ""
   },
   {
@@ -11652,6 +11694,12 @@
     "comment": ""
   },
   {
+    "term": "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size",
+    "context": "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:51",
+    "comment": ""
+  },
+  {
     "term": "Shutdown",
     "context": "Shutdown",
     "reference": "Services/CupsService.qml:815",
@@ -11714,7 +11762,7 @@
   {
     "term": "Small",
     "context": "Small",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1938",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2053",
     "comment": ""
   },
   {
@@ -12116,7 +12164,7 @@
   {
     "term": "System sounds are not available. Install %1 for sound support.",
     "context": "System sounds are not available. Install %1 for sound support.",
-    "reference": "Modules/Settings/SoundsTab.qml:149",
+    "reference": "Modules/Settings/SoundsTab.qml:159",
     "comment": ""
   },
   {
@@ -12164,7 +12212,7 @@
   {
     "term": "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.",
     "context": "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.",
-    "reference": "Common/settings/Processes.qml:553",
+    "reference": "Common/settings/Processes.qml:506",
     "comment": ""
   },
   {
@@ -12176,7 +12224,7 @@
   {
     "term": "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.",
     "context": "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.",
-    "reference": "Common/settings/Processes.qml:549",
+    "reference": "Common/settings/Processes.qml:502",
     "comment": ""
   },
   {
@@ -12194,7 +12242,7 @@
   {
     "term": "Terminal opened. Complete authentication setup there; it will close automatically when done.",
     "context": "Terminal opened. Complete authentication setup there; it will close automatically when done.",
-    "reference": "Common/settings/Processes.qml:548",
+    "reference": "Common/settings/Processes.qml:502",
     "comment": ""
   },
   {
@@ -12614,13 +12662,13 @@
   {
     "term": "Top Section",
     "context": "Top Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:951",
+    "reference": "Modules/Settings/WidgetsTab.qml:953",
     "comment": ""
   },
   {
     "term": "Total",
     "context": "Total",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:988",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1103",
     "comment": ""
   },
   {
@@ -12680,7 +12728,7 @@
   {
     "term": "Trigger: %1",
     "context": "Trigger: %1",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1202, Modules/Settings/LauncherTab.qml:742",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1236, Modules/Settings/LauncherTab.qml:768",
     "comment": ""
   },
   {
@@ -12818,7 +12866,7 @@
   {
     "term": "Unknown App",
     "context": "Unknown App",
-    "reference": "Modules/Settings/LauncherTab.qml:1182",
+    "reference": "Modules/Settings/LauncherTab.qml:1244",
     "comment": ""
   },
   {
@@ -13032,6 +13080,12 @@
     "comment": ""
   },
   {
+    "term": "Use Inline Expansion",
+    "context": "Use Inline Expansion",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1016",
+    "comment": ""
+  },
+  {
     "term": "Use Monospace Font",
     "context": "Use Monospace Font",
     "reference": "Modules/Notepad/NotepadSettings.qml:130",
@@ -13208,7 +13262,7 @@
   {
     "term": "VPN",
     "context": "VPN",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1104, Modules/Settings/WidgetsTabSection.qml:1333, Modules/Settings/WidgetsTab.qml:183, Modules/Settings/NetworkTab.qml:1544, Modules/ControlCenter/Models/WidgetModel.qml:187, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:15",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1219, Modules/Settings/WidgetsTabSection.qml:1448, Modules/Settings/WidgetsTab.qml:183, Modules/Settings/NetworkTab.qml:1544, Modules/ControlCenter/Models/WidgetModel.qml:187, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:15",
     "comment": ""
   },
   {
@@ -13364,7 +13418,7 @@
   {
     "term": "Visual Effects",
     "context": "Visual Effects",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2506",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2621",
     "comment": ""
   },
   {
@@ -13382,13 +13436,13 @@
   {
     "term": "Volume",
     "context": "Volume",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1129, Modules/Settings/WidgetsTabSection.qml:1333, Modules/Settings/OSDTab.qml:93",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1244, Modules/Settings/WidgetsTabSection.qml:1448, Modules/Settings/OSDTab.qml:93",
     "comment": ""
   },
   {
     "term": "Volume Changed",
     "context": "Volume Changed",
-    "reference": "Modules/Settings/SoundsTab.qml:108",
+    "reference": "Modules/Settings/SoundsTab.qml:118",
     "comment": ""
   },
   {
@@ -13598,7 +13652,7 @@
   {
     "term": "Widget Management",
     "context": "Widget Management",
-    "reference": "Modules/Settings/WidgetsTab.qml:864",
+    "reference": "Modules/Settings/WidgetsTab.qml:866",
     "comment": ""
   },
   {

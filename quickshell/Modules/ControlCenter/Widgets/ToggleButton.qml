@@ -11,7 +11,6 @@ Rectangle {
     property string iconName: ""
     property string text: ""
     property bool isActive: false
-    property bool enabled: true
     property string secondaryText: ""
     property real iconRotation: 0
 

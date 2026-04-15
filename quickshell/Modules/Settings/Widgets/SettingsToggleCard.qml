@@ -17,7 +17,6 @@ StyledRect {
     property string description: ""
     property string iconName: ""
     property bool checked: false
-    property bool enabled: true
 
     default property alias content: expandedContent.children
     readonly property bool hasContent: expandedContent.children.length > 0

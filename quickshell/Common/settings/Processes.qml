@@ -25,16 +25,10 @@ Singleton {
 
     property string fingerprintProbeOutput: ""
     property int fingerprintProbeExitCode: 0
-    property bool fingerprintProbeStreamFinished: false
-    property bool fingerprintProbeExited: false
-    property string fingerprintProbeState: "probe_failed"
+    property bool fingerprintProbeFinalized: false
 
-    property string pamSupportProbeOutput: ""
-    property bool pamSupportProbeStreamFinished: false
-    property bool pamSupportProbeExited: false
-    property int pamSupportProbeExitCode: 0
-    property bool pamFprintSupportDetected: false
-    property bool pamU2fSupportDetected: false
+    property string pamProbeOutput: ""
+    property bool pamProbeFinalized: false
 
     readonly property string homeDir: Quickshell.env("HOME") || ""
     readonly property string u2fKeysPath: homeDir ? homeDir + "/.config/Yubico/u2f_keys" : ""
@@ -54,40 +48,189 @@ Singleton {
 
     readonly property var forcedFprintAvailable: envFlag("DMS_FORCE_FPRINT_AVAILABLE")
     readonly property var forcedU2fAvailable: envFlag("DMS_FORCE_U2F_AVAILABLE")
-    property bool authApplyRunning: false
-    property bool authApplyQueued: false
-    property bool authApplyRerunRequested: false
-    property bool authApplyTerminalFallbackFromPrecheck: false
-    property string authApplyStdout: ""
-    property string authApplyStderr: ""
-    property string authApplySudoProbeStderr: ""
-    property string authApplyTerminalFallbackStderr: ""
 
-    function detectQtTools() {
-        qtToolsDetectionProcess.running = true;
+    // --- Derived auth probe state ---
+
+    readonly property bool pamFprintSupportDetected: pamProbeFinalized && pamProbeOutput.includes("pam_fprintd.so:true")
+    readonly property bool pamU2fSupportDetected: pamProbeFinalized && pamProbeOutput.includes("pam_u2f.so:true")
+
+    readonly property string fingerprintProbeState: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable ? "ready" : "probe_failed";
+        if (!fingerprintProbeFinalized)
+            return "probe_failed";
+        return parseFingerprintProbe(fingerprintProbeExitCode, fingerprintProbeOutput, pamFprintSupportDetected);
     }
 
-    function detectAuthCapabilities() {
-        if (!settingsRoot)
-            return;
+    // --- Lock fingerprint capabilities ---
 
+    readonly property bool lockFingerprintCanEnable: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable;
+        switch (fingerprintProbeState) {
+        case "ready":
+        case "missing_enrollment":
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    readonly property bool lockFingerprintReady: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable;
+        return fingerprintProbeState === "ready";
+    }
+
+    readonly property string lockFingerprintReason: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable ? "ready" : "probe_failed";
+        return fingerprintProbeState;
+    }
+
+    // --- Greeter fingerprint capabilities ---
+
+    readonly property bool greeterFingerprintCanEnable: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable;
+        if (greeterPamHasFprint)
+            return fingerprintProbeState !== "missing_reader";
+        switch (fingerprintProbeState) {
+        case "ready":
+        case "missing_enrollment":
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    readonly property bool greeterFingerprintReady: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable;
+        return fingerprintProbeState === "ready";
+    }
+
+    readonly property string greeterFingerprintReason: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable ? "ready" : "probe_failed";
+        if (greeterPamHasFprint) {
+            switch (fingerprintProbeState) {
+            case "ready":
+                return "configured_externally";
+            case "missing_enrollment":
+                return "missing_enrollment";
+            case "missing_reader":
+                return "missing_reader";
+            default:
+                return "probe_failed";
+            }
+        }
+        return fingerprintProbeState;
+    }
+
+    readonly property string greeterFingerprintSource: {
+        if (forcedFprintAvailable !== null)
+            return forcedFprintAvailable ? "dms" : "none";
+        if (greeterPamHasFprint)
+            return "pam";
+        switch (fingerprintProbeState) {
+        case "ready":
+        case "missing_enrollment":
+            return "dms";
+        default:
+            return "none";
+        }
+    }
+
+    // --- Lock U2F capabilities ---
+
+    readonly property bool lockU2fReady: {
+        if (forcedU2fAvailable !== null)
+            return forcedU2fAvailable;
+        return lockU2fCustomConfigDetected || homeU2fKeysDetected;
+    }
+
+    readonly property bool lockU2fCanEnable: {
+        if (forcedU2fAvailable !== null)
+            return forcedU2fAvailable;
+        return lockU2fReady || pamU2fSupportDetected;
+    }
+
+    readonly property string lockU2fReason: {
+        if (forcedU2fAvailable !== null)
+            return forcedU2fAvailable ? "ready" : "probe_failed";
+        if (lockU2fReady)
+            return "ready";
+        if (lockU2fCanEnable)
+            return "missing_key_registration";
+        return "missing_pam_support";
+    }
+
+    // --- Greeter U2F capabilities ---
+
+    readonly property bool greeterU2fReady: {
+        if (forcedU2fAvailable !== null)
+            return forcedU2fAvailable;
+        if (greeterPamHasU2f)
+            return true;
+        return homeU2fKeysDetected;
+    }
+
+    readonly property bool greeterU2fCanEnable: {
+        if (forcedU2fAvailable !== null)
+            return forcedU2fAvailable;
+        if (greeterPamHasU2f)
+            return true;
+        return greeterU2fReady || pamU2fSupportDetected;
+    }
+
+    readonly property string greeterU2fReason: {
+        if (forcedU2fAvailable !== null)
+            return forcedU2fAvailable ? "ready" : "probe_failed";
+        if (greeterPamHasU2f)
+            return "configured_externally";
+        if (greeterU2fReady)
+            return "ready";
+        if (greeterU2fCanEnable)
+            return "missing_key_registration";
+        return "missing_pam_support";
+    }
+
+    readonly property string greeterU2fSource: {
+        if (forcedU2fAvailable !== null)
+            return forcedU2fAvailable ? "dms" : "none";
+        if (greeterPamHasU2f)
+            return "pam";
+        if (greeterU2fCanEnable)
+            return "dms";
+        return "none";
+    }
+
+    // --- Aggregates ---
+
+    readonly property bool fprintdAvailable: lockFingerprintReady || greeterFingerprintReady
+    readonly property bool u2fAvailable: lockU2fReady || greeterU2fReady
+
+    // --- Auth detection ---
+
+    readonly property var _fprintProbeCommand: ["sh", "-c", "if command -v fprintd-list >/dev/null 2>&1; then fprintd-list \"${USER:-$(id -un)}\" 2>&1; else printf '__missing_command__\\n'; exit 127; fi"]
+    readonly property var _pamProbeCommand: ["sh", "-c", "for module in pam_fprintd.so pam_u2f.so; do found=false; for dir in /usr/lib64/security /usr/lib/security /lib/security /lib/x86_64-linux-gnu/security /usr/lib/x86_64-linux-gnu/security /usr/lib/aarch64-linux-gnu/security /run/current-system/sw/lib/security; do if [ -f \"$dir/$module\" ]; then found=true; break; fi; done; printf '%s:%s\\n' \"$module\" \"$found\"; done"]
+
+    function detectAuthCapabilities() {
         if (forcedFprintAvailable === null) {
-            fingerprintProbeOutput = "";
-            fingerprintProbeStreamFinished = false;
-            fingerprintProbeExited = false;
-            fingerprintProbeProcess.running = true;
-        } else {
-            fingerprintProbeState = forcedFprintAvailable ? "ready" : "probe_failed";
+            fingerprintProbeFinalized = false;
+            Proc.runCommand("fprint-probe", _fprintProbeCommand, (output, exitCode) => {
+                fingerprintProbeOutput = output || "";
+                fingerprintProbeExitCode = exitCode;
+                fingerprintProbeFinalized = true;
+            }, 0);
         }
 
-        pamFprintSupportDetected = false;
-        pamU2fSupportDetected = false;
-        pamSupportProbeOutput = "";
-        pamSupportProbeStreamFinished = false;
-        pamSupportProbeExited = false;
-        pamSupportDetectionProcess.running = true;
-
-        recomputeAuthCapabilities();
+        pamProbeFinalized = false;
+        Proc.runCommand("pam-probe", _pamProbeCommand, (output, _exitCode) => {
+            pamProbeOutput = output || "";
+            pamProbeFinalized = true;
+        }, 0);
     }
 
     function detectFprintd() {
@@ -98,9 +241,16 @@ Singleton {
         detectAuthCapabilities();
     }
 
-    function checkPluginSettings() {
-        pluginSettingsCheckProcess.running = true;
-    }
+    // --- Auth apply pipeline ---
+
+    property bool authApplyRunning: false
+    property bool authApplyQueued: false
+    property bool authApplyRerunRequested: false
+    property bool authApplyTerminalFallbackFromPrecheck: false
+    property string authApplyStdout: ""
+    property string authApplyStderr: ""
+    property string authApplySudoProbeStderr: ""
+    property string authApplyTerminalFallbackStderr: ""
 
     function scheduleAuthApply() {
         if (!settingsRoot || settingsRoot.isGreeterMode)
@@ -146,6 +296,8 @@ Singleton {
             authApplyDebounce.restart();
     }
 
+    // --- PAM parsing helpers ---
+
     function stripPamComment(line) {
         if (!line)
             return "";
@@ -189,15 +341,7 @@ Singleton {
     function greeterPamStackHasModule(moduleName) {
         if (pamModuleEnabled(greetdPamText, moduleName))
             return true;
-        const includedPamStacks = [
-            ["system-auth", systemAuthPamText],
-            ["common-auth", commonAuthPamText],
-            ["password-auth", passwordAuthPamText],
-            ["system-login", systemLoginPamText],
-            ["system-local-login", systemLocalLoginPamText],
-            ["common-auth-pc", commonAuthPcPamText],
-            ["login", loginPamText]
-        ];
+        const includedPamStacks = [["system-auth", systemAuthPamText], ["common-auth", commonAuthPamText], ["password-auth", passwordAuthPamText], ["system-login", systemLoginPamText], ["system-local-login", systemLocalLoginPamText], ["common-auth-pc", commonAuthPcPamText], ["login", loginPamText]];
         for (let i = 0; i < includedPamStacks.length; i++) {
             const stack = includedPamStacks[i];
             if (pamTextIncludesFile(greetdPamText, stack[0]) && pamModuleEnabled(stack[1], moduleName))
@@ -205,6 +349,8 @@ Singleton {
         }
         return false;
     }
+
+    // --- Fingerprint probe output parsing ---
 
     function hasEnrolledFingerprintOutput(output) {
         const lower = (output || "").toLowerCase();
@@ -223,21 +369,15 @@ Singleton {
 
     function hasMissingFingerprintEnrollmentOutput(output) {
         const lower = (output || "").toLowerCase();
-        return lower.includes("no fingers enrolled")
-            || lower.includes("no fingerprints enrolled")
-            || lower.includes("no prints enrolled");
+        return lower.includes("no fingers enrolled") || lower.includes("no fingerprints enrolled") || lower.includes("no prints enrolled");
     }
 
     function hasMissingFingerprintReaderOutput(output) {
         const lower = (output || "").toLowerCase();
-        return lower.includes("no devices available")
-            || lower.includes("no device available")
-            || lower.includes("no devices found")
-            || lower.includes("list_devices failed")
-            || lower.includes("no device");
+        return lower.includes("no devices available") || lower.includes("no device available") || lower.includes("no devices found") || lower.includes("list_devices failed") || lower.includes("no device");
     }
 
-    function parseFingerprintProbe(exitCode, output) {
+    function parseFingerprintProbe(exitCode, output, pamFprintDetected) {
         if (hasEnrolledFingerprintOutput(output))
             return "ready";
         if (hasMissingFingerprintEnrollmentOutput(output))
@@ -248,164 +388,17 @@ Singleton {
             return "missing_enrollment";
         if (exitCode === 127 || (output || "").includes("__missing_command__"))
             return "probe_failed";
-        return pamFprintSupportDetected ? "probe_failed" : "missing_pam_support";
+        return pamFprintDetected ? "probe_failed" : "missing_pam_support";
     }
 
-    function setLockFingerprintCapability(canEnable, ready, reason) {
-        settingsRoot.lockFingerprintCanEnable = canEnable;
-        settingsRoot.lockFingerprintReady = ready;
-        settingsRoot.lockFingerprintReason = reason;
+    // --- Qt tools detection ---
+
+    function detectQtTools() {
+        qtToolsDetectionProcess.running = true;
     }
 
-    function setLockU2fCapability(canEnable, ready, reason) {
-        settingsRoot.lockU2fCanEnable = canEnable;
-        settingsRoot.lockU2fReady = ready;
-        settingsRoot.lockU2fReason = reason;
-    }
-
-    function setGreeterFingerprintCapability(canEnable, ready, reason, source) {
-        settingsRoot.greeterFingerprintCanEnable = canEnable;
-        settingsRoot.greeterFingerprintReady = ready;
-        settingsRoot.greeterFingerprintReason = reason;
-        settingsRoot.greeterFingerprintSource = source;
-    }
-
-    function setGreeterU2fCapability(canEnable, ready, reason, source) {
-        settingsRoot.greeterU2fCanEnable = canEnable;
-        settingsRoot.greeterU2fReady = ready;
-        settingsRoot.greeterU2fReason = reason;
-        settingsRoot.greeterU2fSource = source;
-    }
-
-    function recomputeFingerprintCapabilities() {
-        if (forcedFprintAvailable !== null) {
-            const reason = forcedFprintAvailable ? "ready" : "probe_failed";
-            const source = forcedFprintAvailable ? "dms" : "none";
-            setLockFingerprintCapability(forcedFprintAvailable, forcedFprintAvailable, reason);
-            setGreeterFingerprintCapability(forcedFprintAvailable, forcedFprintAvailable, reason, source);
-            return;
-        }
-
-        const state = fingerprintProbeState;
-
-        switch (state) {
-        case "ready":
-            setLockFingerprintCapability(true, true, "ready");
-            break;
-        case "missing_enrollment":
-            setLockFingerprintCapability(true, false, "missing_enrollment");
-            break;
-        case "missing_reader":
-            setLockFingerprintCapability(false, false, "missing_reader");
-            break;
-        case "missing_pam_support":
-            setLockFingerprintCapability(false, false, "missing_pam_support");
-            break;
-        default:
-            setLockFingerprintCapability(false, false, "probe_failed");
-            break;
-        }
-
-        if (greeterPamHasFprint) {
-            switch (state) {
-            case "ready":
-                setGreeterFingerprintCapability(true, true, "configured_externally", "pam");
-                break;
-            case "missing_enrollment":
-                setGreeterFingerprintCapability(true, false, "missing_enrollment", "pam");
-                break;
-            case "missing_reader":
-                setGreeterFingerprintCapability(false, false, "missing_reader", "pam");
-                break;
-            default:
-                setGreeterFingerprintCapability(true, false, "probe_failed", "pam");
-                break;
-            }
-            return;
-        }
-
-        switch (state) {
-        case "ready":
-            setGreeterFingerprintCapability(true, true, "ready", "dms");
-            break;
-        case "missing_enrollment":
-            setGreeterFingerprintCapability(true, false, "missing_enrollment", "dms");
-            break;
-        case "missing_reader":
-            setGreeterFingerprintCapability(false, false, "missing_reader", "none");
-            break;
-        case "missing_pam_support":
-            setGreeterFingerprintCapability(false, false, "missing_pam_support", "none");
-            break;
-        default:
-            setGreeterFingerprintCapability(false, false, "probe_failed", "none");
-            break;
-        }
-    }
-
-    function recomputeU2fCapabilities() {
-        if (forcedU2fAvailable !== null) {
-            const reason = forcedU2fAvailable ? "ready" : "probe_failed";
-            const source = forcedU2fAvailable ? "dms" : "none";
-            setLockU2fCapability(forcedU2fAvailable, forcedU2fAvailable, reason);
-            setGreeterU2fCapability(forcedU2fAvailable, forcedU2fAvailable, reason, source);
-            return;
-        }
-
-        const lockReady = lockU2fCustomConfigDetected || homeU2fKeysDetected;
-        const lockCanEnable = lockReady || pamU2fSupportDetected;
-        const lockReason = lockReady ? "ready" : (lockCanEnable ? "missing_key_registration" : "missing_pam_support");
-        setLockU2fCapability(lockCanEnable, lockReady, lockReason);
-
-        if (greeterPamHasU2f) {
-            setGreeterU2fCapability(true, true, "configured_externally", "pam");
-            return;
-        }
-
-        const greeterReady = homeU2fKeysDetected;
-        const greeterCanEnable = greeterReady || pamU2fSupportDetected;
-        const greeterReason = greeterReady ? "ready" : (greeterCanEnable ? "missing_key_registration" : "missing_pam_support");
-        setGreeterU2fCapability(greeterCanEnable, greeterReady, greeterReason, greeterCanEnable ? "dms" : "none");
-    }
-
-    function recomputeAuthCapabilities() {
-        if (!settingsRoot)
-            return;
-        recomputeFingerprintCapabilities();
-        recomputeU2fCapabilities();
-        settingsRoot.fprintdAvailable = settingsRoot.lockFingerprintReady || settingsRoot.greeterFingerprintReady;
-        settingsRoot.u2fAvailable = settingsRoot.lockU2fReady || settingsRoot.greeterU2fReady;
-    }
-
-    function finalizeFingerprintProbe() {
-        if (!fingerprintProbeStreamFinished || !fingerprintProbeExited)
-            return;
-        fingerprintProbeState = parseFingerprintProbe(fingerprintProbeExitCode, fingerprintProbeOutput);
-        recomputeAuthCapabilities();
-    }
-
-    function finalizePamSupportProbe() {
-        if (!pamSupportProbeStreamFinished || !pamSupportProbeExited)
-            return;
-
-        pamFprintSupportDetected = false;
-        pamU2fSupportDetected = false;
-
-        const lines = (pamSupportProbeOutput || "").trim().split(/\r?\n/);
-        for (let i = 0; i < lines.length; i++) {
-            const parts = lines[i].split(":");
-            if (parts.length !== 2)
-                continue;
-            if (parts[0] === "pam_fprintd.so")
-                pamFprintSupportDetected = parts[1] === "true";
-            else if (parts[0] === "pam_u2f.so")
-                pamU2fSupportDetected = parts[1] === "true";
-        }
-
-        if (forcedFprintAvailable === null && fingerprintProbeState === "missing_pam_support")
-            fingerprintProbeState = parseFingerprintProbe(fingerprintProbeExitCode, fingerprintProbeOutput);
-
-        recomputeAuthCapabilities();
+    function checkPluginSettings() {
+        pluginSettingsCheckProcess.running = true;
     }
 
     property var qtToolsDetectionProcess: Process {
@@ -430,44 +423,6 @@ Singleton {
                     }
                 }
             }
-        }
-    }
-
-    property var fingerprintProbeProcess: Process {
-        command: ["sh", "-c", "if command -v fprintd-list >/dev/null 2>&1; then fprintd-list \"${USER:-$(id -un)}\" 2>&1; else printf '__missing_command__\\n'; exit 127; fi"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.fingerprintProbeOutput = text || "";
-                root.fingerprintProbeStreamFinished = true;
-                root.finalizeFingerprintProbe();
-            }
-        }
-
-        onExited: function (exitCode) {
-            root.fingerprintProbeExitCode = exitCode;
-            root.fingerprintProbeExited = true;
-            root.finalizeFingerprintProbe();
-        }
-    }
-
-    property var pamSupportDetectionProcess: Process {
-        command: ["sh", "-c", "for module in pam_fprintd.so pam_u2f.so; do found=false; for dir in /usr/lib64/security /usr/lib/security /lib/security /lib/x86_64-linux-gnu/security /usr/lib/x86_64-linux-gnu/security /usr/lib/aarch64-linux-gnu/security /run/current-system/sw/lib/security; do if [ -f \"$dir/$module\" ]; then found=true; break; fi; done; printf '%s:%s\\n' \"$module\" \"$found\"; done"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.pamSupportProbeOutput = text || "";
-                root.pamSupportProbeStreamFinished = true;
-                root.finalizePamSupportProbe();
-            }
-        }
-
-        onExited: function (exitCode) {
-            root.pamSupportProbeExitCode = exitCode;
-            root.pamSupportProbeExited = true;
-            root.finalizePamSupportProbe();
         }
     }
 
@@ -544,9 +499,7 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                const message = root.authApplyTerminalFallbackFromPrecheck
-                    ? I18n.tr("Terminal opened. Complete authentication setup there; it will close automatically when done.")
-                    : I18n.tr("Terminal fallback opened. Complete authentication setup there; it will close automatically when done.");
+                const message = root.authApplyTerminalFallbackFromPrecheck ? I18n.tr("Terminal opened. Complete authentication setup there; it will close automatically when done.") : I18n.tr("Terminal fallback opened. Complete authentication setup there; it will close automatically when done.");
                 ToastService.showInfo(message, "", "", "auth-sync");
             } else {
                 let details = (root.authApplyTerminalFallbackStderr || "").trim();
@@ -560,140 +513,80 @@ Singleton {
         id: greetdPamWatcher
         path: "/etc/pam.d/greetd"
         printErrors: false
-        onLoaded: {
-            root.greetdPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.greetdPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.greetdPamText = text()
+        onLoadFailed: root.greetdPamText = ""
     }
 
     FileView {
         id: systemAuthPamWatcher
         path: "/etc/pam.d/system-auth"
         printErrors: false
-        onLoaded: {
-            root.systemAuthPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.systemAuthPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.systemAuthPamText = text()
+        onLoadFailed: root.systemAuthPamText = ""
     }
 
     FileView {
         id: commonAuthPamWatcher
         path: "/etc/pam.d/common-auth"
         printErrors: false
-        onLoaded: {
-            root.commonAuthPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.commonAuthPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.commonAuthPamText = text()
+        onLoadFailed: root.commonAuthPamText = ""
     }
 
     FileView {
         id: passwordAuthPamWatcher
         path: "/etc/pam.d/password-auth"
         printErrors: false
-        onLoaded: {
-            root.passwordAuthPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.passwordAuthPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.passwordAuthPamText = text()
+        onLoadFailed: root.passwordAuthPamText = ""
     }
 
     FileView {
         id: systemLoginPamWatcher
         path: "/etc/pam.d/system-login"
         printErrors: false
-        onLoaded: {
-            root.systemLoginPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.systemLoginPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.systemLoginPamText = text()
+        onLoadFailed: root.systemLoginPamText = ""
     }
 
     FileView {
         id: systemLocalLoginPamWatcher
         path: "/etc/pam.d/system-local-login"
         printErrors: false
-        onLoaded: {
-            root.systemLocalLoginPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.systemLocalLoginPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.systemLocalLoginPamText = text()
+        onLoadFailed: root.systemLocalLoginPamText = ""
     }
 
     FileView {
         id: commonAuthPcPamWatcher
         path: "/etc/pam.d/common-auth-pc"
         printErrors: false
-        onLoaded: {
-            root.commonAuthPcPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.commonAuthPcPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.commonAuthPcPamText = text()
+        onLoadFailed: root.commonAuthPcPamText = ""
     }
 
     FileView {
         id: loginPamWatcher
         path: "/etc/pam.d/login"
         printErrors: false
-        onLoaded: {
-            root.loginPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.loginPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.loginPamText = text()
+        onLoadFailed: root.loginPamText = ""
     }
 
     FileView {
         id: dankshellU2fPamWatcher
         path: "/etc/pam.d/dankshell-u2f"
         printErrors: false
-        onLoaded: {
-            root.dankshellU2fPamText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.dankshellU2fPamText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.dankshellU2fPamText = text()
+        onLoadFailed: root.dankshellU2fPamText = ""
     }
 
     FileView {
         id: u2fKeysWatcher
         path: root.u2fKeysPath
         printErrors: false
-        onLoaded: {
-            root.u2fKeysText = text();
-            root.recomputeAuthCapabilities();
-        }
-        onLoadFailed: {
-            root.u2fKeysText = "";
-            root.recomputeAuthCapabilities();
-        }
+        onLoaded: root.u2fKeysText = text()
+        onLoadFailed: root.u2fKeysText = ""
     }
 
     property var pluginSettingsCheckProcess: Process {

@@ -1983,6 +1983,51 @@
     "icon": "visibility_off"
   },
   {
+    "section": "dankLauncherV2IncludeFilesInAll",
+    "label": "Include Files in All Tab",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "all",
+      "drawer",
+      "dsearch",
+      "file",
+      "files",
+      "include",
+      "indexed",
+      "launcher",
+      "menu",
+      "merge",
+      "results",
+      "start",
+      "tab"
+    ],
+    "description": "Merge indexed file results into the All tab (requires dsearch)."
+  },
+  {
+    "section": "dankLauncherV2IncludeFoldersInAll",
+    "label": "Include Folders in All Tab",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "all",
+      "dirs",
+      "drawer",
+      "dsearch",
+      "folder",
+      "folders",
+      "include",
+      "indexed",
+      "launcher",
+      "menu",
+      "merge",
+      "results",
+      "start",
+      "tab"
+    ],
+    "description": "Merge indexed folder results into the All tab (requires dsearch)."
+  },
+  {
     "section": "launcherLogoColorInvertOnMode",
     "label": "Invert on mode change",
     "tabIndex": 9,

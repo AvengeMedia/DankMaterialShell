@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "מתאמים"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "הוספה"
   },
@@ -1363,6 +1366,9 @@
   },
   "Connecting to Device": {
     "Connecting to Device": "מתחבר להתקן"
+  },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
   },
   "Connecting...": {
     "Connecting...": "מתחבר..."
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "צבע למסך הלא פעיל"
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "כלול/כללי מעברים"
   },
@@ -3461,6 +3473,9 @@
   "Logging in...": {
     "Logging in...": "מתחבר..."
   },
+  "Login": {
+    "Login": ""
+  },
   "Login Authentication": {
     "Login Authentication": "הזדהות בכניסה"
   },
@@ -3685,6 +3700,12 @@
   },
   "Memory usage indicator": {
     "Memory usage indicator": "מחוון שימוש בזיכרון"
+  },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
   },
   "Message": {
     "Message": "הודעה"
@@ -4625,6 +4646,9 @@
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "נגן/י וידאו כאשר המסך ננעל."
   },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
+  },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "ניגון צליל כשהתראה חדשה מגיעה"
   },
@@ -4977,7 +5001,7 @@
     "Remaining / Total": "נותר / סה״כ"
   },
   "Remember Last Query": {
-    "Remember Last Query": "זכור/זכרי שאילתה אחרונה"
+    "Remember Last Query": "זכירת הבקשה האחרונה"
   },
   "Remember last session": {
     "Remember last session": "זכירת ההפעלה האחרונה"
@@ -5703,7 +5727,7 @@
     "Show Weather Condition": "הצגת תנאי מזג האוויר"
   },
   "Show Week Number": {
-    "Show Week Number": "הצג/י מספר שבוע"
+    "Show Week Number": "הצגת מספר שבוע"
   },
   "Show Welcome": {
     "Show Welcome": "הצגת המסך ״ברוכים הבאים״"
@@ -5824,6 +5848,9 @@
   },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "מוצג כאשר המיקרופון, המצלמה או שיתוף המסך פעילים"
+  },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
   },
   "Shutdown": {
     "Shutdown": "כיבוי"
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "השתמש/י ביחידות אימפריאליות (°F, mph, inHg) במקום מטריות (°C, km/h, hPa)"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "השתמש/י בגופן ברוחב קבוע"

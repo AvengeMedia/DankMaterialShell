@@ -111,7 +111,7 @@
     "1 day": "1 dia"
   },
   "1 device connected": {
-    "1 device connected": ""
+    "1 device connected": "1 dispositivo conectado"
   },
   "1 event": {
     "1 event": "1 evento"
@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "Adaptadores"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "Añadir"
   },
@@ -423,7 +426,7 @@
     "Alternative (OR)": ""
   },
   "Always Active": {
-    "Always Active": ""
+    "Always Active": "Siempre activo"
   },
   "Always Show Percentage": {
     "Always Show Percentage": "Mostrar siempre el porcentaje"
@@ -486,7 +489,7 @@
     "App Theming": ""
   },
   "Appearance": {
-    "Appearance": ""
+    "Appearance": "Apariencia"
   },
   "Application Dock": {
     "Application Dock": "Dock de aplicaciones"
@@ -531,7 +534,7 @@
     "Apps with notification popups muted. Unmute or delete to remove.": ""
   },
   "Architecture": {
-    "Architecture": ""
+    "Architecture": "Arquitectura"
   },
   "Are you sure you want to kill session \"%1\"?": {
     "Are you sure you want to kill session \"%1\"?": ""
@@ -1107,7 +1110,7 @@
     "Clear All Jobs": "Borrar todos los trabajos"
   },
   "Clear History?": {
-    "Clear History?": ""
+    "Clear History?": "Limpiar historia?"
   },
   "Clear Sky": {
     "Clear Sky": ""
@@ -1167,7 +1170,7 @@
     "Clipboard sent": ""
   },
   "Clipboard service not available": {
-    "Clipboard service not available": "Servicioi de portapapeles no disponible"
+    "Clipboard service not available": "Servicio de portapapeles no disponible"
   },
   "Clipboard works but nothing saved to disk": {
     "Clipboard works but nothing saved to disk": "El portapapeles funciona pero no se guarda nada en el disco"
@@ -1344,7 +1347,7 @@
     "Connect": "Conectar"
   },
   "Connect to Hidden Network": {
-    "Connect to Hidden Network": ""
+    "Connect to Hidden Network": "Conectar a una red oculta"
   },
   "Connect to VPN": {
     "Connect to VPN": "Conectar a una VPN"
@@ -1363,6 +1366,9 @@
   },
   "Connecting to Device": {
     "Connecting to Device": "Conectando al dispositivo"
+  },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
   },
   "Connecting...": {
     "Connecting...": "Conectando..."
@@ -1446,7 +1452,7 @@
     "Copy Full Command": ""
   },
   "Copy HTML": {
-    "Copy HTML": ""
+    "Copy HTML": "Copiar HTML"
   },
   "Copy Name": {
     "Copy Name": ""
@@ -1455,10 +1461,10 @@
     "Copy PID": "Copiar ID del Proceso"
   },
   "Copy Text": {
-    "Copy Text": ""
+    "Copy Text": "Copiar texto"
   },
   "Copy path": {
-    "Copy path": ""
+    "Copy path": "Copiar ubicación"
   },
   "Corner Radius": {
     "Corner Radius": "Radio de la esquina"
@@ -1548,10 +1554,10 @@
     "Cursor Include Missing": ""
   },
   "Cursor Size": {
-    "Cursor Size": ""
+    "Cursor Size": "Tamaño del cursor"
   },
   "Cursor Theme": {
-    "Cursor Theme": ""
+    "Cursor Theme": "Tema del cursor"
   },
   "Custom": {
     "Custom": "Personal"
@@ -1857,7 +1863,7 @@
     "Disk": "Disco"
   },
   "Disk I/O": {
-    "Disk I/O": ""
+    "Disk I/O": "E/S de disco"
   },
   "Disk Usage": {
     "Disk Usage": "Uso de disco"
@@ -1866,7 +1872,7 @@
     "Disk Usage Display": ""
   },
   "Disks": {
-    "Disks": ""
+    "Disks": "Discos"
   },
   "Dismiss": {
     "Dismiss": "Descartar"
@@ -1938,7 +1944,7 @@
     "Displays the active keyboard layout and allows switching": "Muestra la distribución de teclado activa y permite cambiarla"
   },
   "Distribution": {
-    "Distribution": ""
+    "Distribution": "Distribución"
   },
   "Diverse palette spanning the full spectrum.": {
     "Diverse palette spanning the full spectrum.": "Paleta variada con toda la gama de colores."
@@ -2184,7 +2190,7 @@
     "Enter launch prefix (e.g., 'uwsm-app')": "Introduce prefijo de lanzamiento (e.j.,'uwsm-app')"
   },
   "Enter network name and password": {
-    "Enter network name and password": ""
+    "Enter network name and password": "Ingrese el nombre y la contraseña de la red"
   },
   "Enter passkey for ": {
     "Enter passkey for ": "Ingresar clave para "
@@ -2247,7 +2253,7 @@
     "External Wallpaper Management": "Manejo externo del fondo de pantalla"
   },
   "Extra Arguments": {
-    "Extra Arguments": ""
+    "Extra Arguments": "Argumentos extra"
   },
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: Accionar • F10: Ayudar"
@@ -2481,10 +2487,10 @@
     "Feels": "Sensación"
   },
   "Feels Like": {
-    "Feels Like": "Temperatura"
+    "Feels Like": "Sensación térmica"
   },
   "Feels Like %1°": {
-    "Feels Like %1°": ""
+    "Feels Like %1°": "Sensación térmica %1°"
   },
   "Fidelity": {
     "Fidelity": ""
@@ -2724,7 +2730,7 @@
     "GPU": "GPU"
   },
   "GPU Monitoring": {
-    "GPU Monitoring": ""
+    "GPU Monitoring": "Monitorización de GPU"
   },
   "GPU Temperature": {
     "GPU Temperature": "Temperatura de GPU"
@@ -2853,7 +2859,7 @@
     "HSV": "HSV"
   },
   "HTML copied to clipboard": {
-    "HTML copied to clipboard": ""
+    "HTML copied to clipboard": "HTML copiado al portapapeles"
   },
   "Health": {
     "Health": "Salud"
@@ -2916,7 +2922,7 @@
     "Hide Updater Widget": "Ocultar widget de actualizacion"
   },
   "Hide When Typing": {
-    "Hide When Typing": ""
+    "Hide When Typing": "Ocultar cuando se tipea"
   },
   "Hide When Windows Open": {
     "Hide When Windows Open": "Ocultar opciones cuando hay ventanas abiertas"
@@ -2925,7 +2931,7 @@
     "Hide cursor after inactivity (0 = disabled)": ""
   },
   "Hide cursor when pressing keyboard keys": {
-    "Hide cursor when pressing keyboard keys": ""
+    "Hide cursor when pressing keyboard keys": "Ocultar cursor cuando se presionan teclas"
   },
   "Hide cursor when using touch input": {
     "Hide cursor when using touch input": ""
@@ -3039,7 +3045,7 @@
     "ISO Date": ""
   },
   "Icon": {
-    "Icon": ""
+    "Icon": "Icono"
   },
   "Icon Scale": {
     "Icon Scale": ""
@@ -3085,6 +3091,12 @@
   },
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Color del monitor inactivo"
+  },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
   },
   "Include Transitions": {
     "Include Transitions": "Incluir transiciones"
@@ -3189,7 +3201,7 @@
     "Intelligent Auto-hide": ""
   },
   "Intensity": {
-    "Intensity": ""
+    "Intensity": "Intensidad"
   },
   "Interface:": {
     "Interface:": "Interfaz:"
@@ -3461,6 +3473,9 @@
   "Logging in...": {
     "Logging in...": ""
   },
+  "Login": {
+    "Login": ""
+  },
   "Login Authentication": {
     "Login Authentication": ""
   },
@@ -3686,8 +3701,14 @@
   "Memory usage indicator": {
     "Memory usage indicator": "Indicador del uso de memoria"
   },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
+  },
   "Message": {
-    "Message": ""
+    "Message": "Mensaje"
   },
   "Message Content": {
     "Message Content": ""
@@ -3780,10 +3801,10 @@
     "Morning": "Mañana"
   },
   "Mount Points": {
-    "Mount Points": ""
+    "Mount Points": "Puntos de montaje"
   },
   "Mouse pointer appearance": {
-    "Mouse pointer appearance": ""
+    "Mouse pointer appearance": "Apariencia del cursor del ratón"
   },
   "Mouse pointer size in pixels": {
     "Mouse pointer size in pixels": ""
@@ -3900,7 +3921,7 @@
     "New group name...": ""
   },
   "Next": {
-    "Next": ""
+    "Next": "Siguiente"
   },
   "Next Transition": {
     "Next Transition": "Siguiente transicion"
@@ -3963,7 +3984,7 @@
     "No GPU detected": "No se detecta GPU"
   },
   "No GPUs detected": {
-    "No GPUs detected": ""
+    "No GPUs detected": "No se detectaron GPUs"
   },
   "No History": {
     "No History": ""
@@ -3987,7 +4008,7 @@
     "No Weather": ""
   },
   "No Weather Data": {
-    "No Weather Data": ""
+    "No Weather Data": "Sin datos climáticos"
   },
   "No Weather Data Available": {
     "No Weather Data Available": "No hay datos meteorológicos disponibles"
@@ -4035,7 +4056,7 @@
     "No devices": ""
   },
   "No devices connected": {
-    "No devices connected": ""
+    "No devices connected": "No hay dispositivos conectados"
   },
   "No devices found": {
     "No devices found": "No se encontraron dispositivos"
@@ -4050,7 +4071,7 @@
     "No drivers found": "No se encontraron controladores"
   },
   "No errors": {
-    "No errors": ""
+    "No errors": "Sin errores"
   },
   "No features enabled": {
     "No features enabled": "Ninguna función activada"
@@ -4170,7 +4191,7 @@
     "No wallpapers found\n\nClick the folder icon below to browse": ""
   },
   "No warnings": {
-    "No warnings": ""
+    "No warnings": "Sin alertas"
   },
   "No widgets added. Click \"Add Widget\" to get started.": {
     "No widgets added. Click \"Add Widget\" to get started.": ""
@@ -4215,7 +4236,7 @@
     "Not connected": "No conectado"
   },
   "Not detected": {
-    "Not detected": ""
+    "Not detected": "No detectado"
   },
   "Not paired": {
     "Not paired": ""
@@ -4625,6 +4646,9 @@
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
   },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
+  },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Reproducir sonido al recibir una nueva notificación"
   },
@@ -4746,7 +4770,7 @@
     "Power Saver": ""
   },
   "Power off monitors on lock": {
-    "Power off monitors on lock": ""
+    "Power off monitors on lock": "Apagar monitores al bloquearse"
   },
   "Power profile management available": {
     "Power profile management available": "Gestión del perfil de potencia disponible"
@@ -4851,10 +4875,10 @@
     "Process Count": "Conteo de procesos"
   },
   "Processes": {
-    "Processes": ""
+    "Processes": "Procesos"
   },
   "Processes:": {
-    "Processes:": ""
+    "Processes:": "Procesos:"
   },
   "Processing": {
     "Processing": "Procesando"
@@ -5319,7 +5343,7 @@
     "Security": "Seguridad"
   },
   "Security & privacy": {
-    "Security & privacy": ""
+    "Security & privacy": "Seguridad y privacidad"
   },
   "Security key mode": {
     "Security key mode": ""
@@ -5379,7 +5403,7 @@
     "Select an image file...": "Selecciona un archivo de imagen..."
   },
   "Select at least one provider": {
-    "Select at least one provider": ""
+    "Select at least one provider": "Seleccione al menos un proveedor"
   },
   "Select device": {
     "Select device": ""
@@ -5825,6 +5849,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Muestra si micrófono, cámara o pantalla están en uso"
   },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+  },
   "Shutdown": {
     "Shutdown": "Apagar"
   },
@@ -5895,7 +5922,7 @@
     "Space between windows (gappih/gappiv/gappoh/gappov)": ""
   },
   "Space between windows (gaps_in and gaps_out)": {
-    "Space between windows (gaps_in and gaps_out)": ""
+    "Space between windows (gaps_in and gaps_out)": "Espacio entre ventanas (hueco_in y hueco_ext)"
   },
   "Spacer": {
     "Spacer": "Espaciador"
@@ -6147,7 +6174,7 @@
     "Theme Registry": ""
   },
   "Themes": {
-    "Themes": ""
+    "Themes": "Temas"
   },
   "Thickness": {
     "Thickness": "Espesor"
@@ -6282,7 +6309,7 @@
     "Too many failed attempts - account may be locked": ""
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "Herrramientas"
   },
   "Top": {
     "Top": "Arriba"
@@ -6420,7 +6447,7 @@
     "Unknown Device": "Dispositivo desconocido"
   },
   "Unknown GPU": {
-    "Unknown GPU": ""
+    "Unknown GPU": "GPU desconocida"
   },
   "Unknown Monitor": {
     "Unknown Monitor": "Monitor desconocido"
@@ -6492,7 +6519,7 @@
     "Uptime:": ""
   },
   "Urgent Color": {
-    "Urgent Color": ""
+    "Urgent Color": "Color para urgencia"
   },
   "Usage Tips": {
     "Usage Tips": ""
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Usar unidades imperiales (°F, mph, inHg) en lugar de métricas (°C, km/h, hPa)"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Usar fuente monoespaciada"
@@ -6537,7 +6567,7 @@
     "Use animated wave progress bars for media playback": "Utilizar barras de progreso con efecto de ola para la reproducción de medios"
   },
   "Use custom border size": {
-    "Use custom border size": ""
+    "Use custom border size": "Usar un tamaño de borde personalizado"
   },
   "Use custom border/focus-ring width": {
     "Use custom border/focus-ring width": ""
@@ -6732,7 +6762,7 @@
     "Warning": "Advertencia"
   },
   "Warnings": {
-    "Warnings": ""
+    "Warnings": "Alertas"
   },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Barras de progreso en forma de onda"
@@ -6744,7 +6774,7 @@
     "Weather Widget": "Clima"
   },
   "Welcome": {
-    "Welcome": ""
+    "Welcome": "Bienvenido"
   },
   "Welcome to DankMaterialShell": {
     "Welcome to DankMaterialShell": ""
@@ -6960,10 +6990,10 @@
     "detached": ""
   },
   "device": {
-    "device": ""
+    "device": "dispositivo"
   },
   "devices connected": {
-    "devices connected": ""
+    "devices connected": "dispositivos conectados"
   },
   "dgop not available": {
     "dgop not available": "dgop no disponible"

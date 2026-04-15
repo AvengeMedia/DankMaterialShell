@@ -158,18 +158,26 @@ func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfo
 
 		channel := frequencyToChannel(freq)
 
+		isConnected := ssid == currentSSID && bssid == currentBSSID
+		rate := maxBitrate / 1000
+		if isConnected {
+			if devBitrate, err := w.GetPropertyBitrate(); err == nil && devBitrate > 0 {
+				rate = devBitrate / 1000
+			}
+		}
+
 		network := WiFiNetwork{
 			SSID:        ssid,
 			BSSID:       bssid,
 			Signal:      strength,
 			Secured:     secured,
 			Enterprise:  enterprise,
-			Connected:   ssid == currentSSID && bssid == currentBSSID,
+			Connected:   isConnected,
 			Saved:       savedSSIDs[ssid],
 			Autoconnect: autoconnectMap[ssid],
 			Frequency:   freq,
 			Mode:        modeStr,
-			Rate:        maxBitrate / 1000,
+			Rate:        rate,
 			Channel:     channel,
 		}
 
@@ -514,19 +522,27 @@ func (b *NetworkManagerBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
 
 		channel := frequencyToChannel(freq)
 
+		isConnected := ssid == currentSSID
+		rate := maxBitrate / 1000
+		if isConnected {
+			if devBitrate, err := w.GetPropertyBitrate(); err == nil && devBitrate > 0 {
+				rate = devBitrate / 1000
+			}
+		}
+
 		network := WiFiNetwork{
 			SSID:        ssid,
 			BSSID:       bssid,
 			Signal:      strength,
 			Secured:     secured,
 			Enterprise:  enterprise,
-			Connected:   ssid == currentSSID,
+			Connected:   isConnected,
 			Saved:       savedSSIDs[ssid],
 			Autoconnect: autoconnectMap[ssid],
 			Hidden:      hiddenSSIDs[ssid],
 			Frequency:   freq,
 			Mode:        modeStr,
-			Rate:        maxBitrate / 1000,
+			Rate:        rate,
 			Channel:     channel,
 		}
 
@@ -1062,19 +1078,27 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 
 				channel := frequencyToChannel(freq)
 
+				isConnected := connected && apSSID == ssid
+				rate := maxBitrate / 1000
+				if isConnected {
+					if devBitrate, err := devInfo.wireless.GetPropertyBitrate(); err == nil && devBitrate > 0 {
+						rate = devBitrate / 1000
+					}
+				}
+
 				network := WiFiNetwork{
 					SSID:        apSSID,
 					BSSID:       apBSSID,
 					Signal:      strength,
 					Secured:     secured,
 					Enterprise:  enterprise,
-					Connected:   connected && apSSID == ssid,
+					Connected:   isConnected,
 					Saved:       savedSSIDs[apSSID],
 					Autoconnect: autoconnectMap[apSSID],
 					Hidden:      hiddenSSIDs[apSSID],
 					Frequency:   freq,
 					Mode:        modeStr,
-					Rate:        maxBitrate / 1000,
+					Rate:        rate,
 					Channel:     channel,
 					Device:      name,
 				}
