@@ -235,6 +235,8 @@ Singleton {
     onFrameShowOnOverviewChanged: saveSettings()
     property bool frameBlurEnabled: true
     onFrameBlurEnabledChanged: saveSettings()
+    property bool frameCloseGaps: false
+    onFrameCloseGapsChanged: saveSettings()
     property int previousDirectionalMode: 1
     onPreviousDirectionalModeChanged: saveSettings()
     property var connectedFrameBarStyleBackups: ({})

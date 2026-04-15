@@ -307,7 +307,9 @@ PanelWindow {
             return 0;
 
         if (connectedFrameMode) {
-            const cornerClear = isCenterPosition ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps)
+                ? 0
+                : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("top") + cornerClear + screenY;
         }
         const barInfo = getBarInfo();
@@ -322,7 +324,9 @@ PanelWindow {
             return 0;
 
         if (connectedFrameMode) {
-            const cornerClear = isCenterPosition ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps)
+                ? 0
+                : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("bottom") + cornerClear + screenY;
         }
         const barInfo = getBarInfo();

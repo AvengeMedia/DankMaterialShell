@@ -198,7 +198,9 @@ Item {
             "bodyH": root.alignedHeight,
             "animX": _connectedChromeAnimX(),
             "animY": _connectedChromeAnimY(),
-            "screen": root.screen ? root.screen.name : ""
+            "screen": root.screen ? root.screen.name : "",
+            "omitStartConnector": root._closeGapOmitStartConnector(),
+            "omitEndConnector": root._closeGapOmitEndConnector()
         };
     }
 
@@ -298,6 +300,9 @@ Item {
             } else {
                 root._releaseConnectedChromeState();
             }
+        }
+        function onFrameCloseGapsChanged() {
+            root._syncPopoutChromeState();
         }
     }
 
@@ -421,6 +426,7 @@ Item {
     readonly property real screenWidth: screen ? screen.width : 0
     readonly property real screenHeight: screen ? screen.height : 0
     readonly property real dpr: screen ? screen.devicePixelRatio : 1
+    readonly property bool closeFrameGapsActive: SettingsData.frameCloseGaps && frameOwnsConnectedChrome
     readonly property real frameInset: {
         if (!SettingsData.frameEnabled)
             return 0;
@@ -433,6 +439,83 @@ Item {
         const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 6;
         const gap = useAutoGaps ? Math.max(6, storedBarSpacing) : manualGapValue;
         return Math.max(ft + gap, fr);
+    }
+
+    function _popupGapValue() {
+        const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
+        const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
+        const rawPopupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
+        return Theme.isConnectedEffect ? 0 : rawPopupGap;
+    }
+
+    function _frameEdgeInset(side) {
+        if (!SettingsData.frameEnabled || !root.screen)
+            return 0;
+        const edges = SettingsData.getActiveBarEdgesForScreen(root.screen);
+        const raw = edges.includes(side) ? SettingsData.frameBarSize : SettingsData.frameThickness;
+        return Math.max(0, raw);
+    }
+
+    function _edgeGapFor(side, popupGap) {
+        if (root.closeFrameGapsActive)
+            return Math.max(popupGap, _frameEdgeInset(side));
+        return Math.max(popupGap, frameInset);
+    }
+
+    function _sideAdjacentClearance(side) {
+        switch (side) {
+        case "left":
+            return adjacentBarClearance(adjacentBarInfo.leftBar);
+        case "right":
+            return adjacentBarClearance(adjacentBarInfo.rightBar);
+        case "top":
+            return adjacentBarClearance(adjacentBarInfo.topBar);
+        case "bottom":
+            return adjacentBarClearance(adjacentBarInfo.bottomBar);
+        default:
+            return 0;
+        }
+    }
+
+    function _nearFrameBound(value, bound) {
+        return Math.abs(value - bound) <= Math.max(1, Theme.hairline(root.dpr) * 2);
+    }
+
+    function _closeGapClampedToFrameSide(side) {
+        if (!root.closeFrameGapsActive)
+            return false;
+        const popupGap = _popupGapValue();
+        const edgeGap = _edgeGapFor(side, popupGap);
+        const adjacentGap = _sideAdjacentClearance(side);
+        if (edgeGap < adjacentGap - Math.max(1, Theme.hairline(root.dpr) * 2))
+            return false;
+
+        switch (side) {
+        case "left":
+            return _nearFrameBound(root.alignedX, edgeGap);
+        case "right":
+            return _nearFrameBound(root.alignedX, screenWidth - popupWidth - edgeGap);
+        case "top":
+            return _nearFrameBound(root.alignedY, edgeGap);
+        case "bottom":
+            return _nearFrameBound(root.alignedY, screenHeight - popupHeight - edgeGap);
+        default:
+            return false;
+        }
+    }
+
+    function _closeGapOmitStartConnector() {
+        const side = contentContainer.connectedBarSide;
+        if (side === "top" || side === "bottom")
+            return _closeGapClampedToFrameSide("left");
+        return _closeGapClampedToFrameSide("top");
+    }
+
+    function _closeGapOmitEndConnector() {
+        const side = contentContainer.connectedBarSide;
+        if (side === "top" || side === "bottom")
+            return _closeGapClampedToFrameSide("right");
+        return _closeGapClampedToFrameSide("bottom");
     }
 
     readonly property var shadowLevel: Theme.elevationLevel3
@@ -510,47 +593,43 @@ Item {
     }
 
     readonly property real alignedX: Theme.snap((() => {
-            const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
-            const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
-            const rawPopupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
-            const popupGap = Theme.isConnectedEffect ? 0 : rawPopupGap;
-            const edgeGap = Math.max(popupGap, frameInset);
+            const popupGap = _popupGapValue();
+            const edgeGapLeft = _edgeGapFor("left", popupGap);
+            const edgeGapRight = _edgeGapFor("right", popupGap);
             const anchorX = Theme.isConnectedEffect ? connectedAnchorX : triggerX;
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Left:
                 // bar on left: left side is bar-adjacent (popupGap), right side is frame-perpendicular (edgeGap)
-                return Math.max(popupGap, Math.min(screenWidth - popupWidth - edgeGap, anchorX));
+                return Math.max(popupGap, Math.min(screenWidth - popupWidth - edgeGapRight, anchorX));
             case SettingsData.Position.Right:
                 // bar on right: right side is bar-adjacent (popupGap), left side is frame-perpendicular (edgeGap)
-                return Math.max(edgeGap, Math.min(screenWidth - popupWidth - popupGap, anchorX - popupWidth));
+                return Math.max(edgeGapLeft, Math.min(screenWidth - popupWidth - popupGap, anchorX - popupWidth));
             default:
                 const rawX = triggerX + (triggerWidth / 2) - (popupWidth / 2);
-                const minX = Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.leftBar));
-                const maxX = screenWidth - popupWidth - Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.rightBar));
+                const minX = Math.max(edgeGapLeft, adjacentBarClearance(adjacentBarInfo.leftBar));
+                const maxX = screenWidth - popupWidth - Math.max(edgeGapRight, adjacentBarClearance(adjacentBarInfo.rightBar));
                 return Math.max(minX, Math.min(maxX, rawX));
             }
         })(), dpr)
 
     readonly property real alignedY: Theme.snap((() => {
-            const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
-            const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
-            const rawPopupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
-            const popupGap = Theme.isConnectedEffect ? 0 : rawPopupGap;
-            const edgeGap = Math.max(popupGap, frameInset);
+            const popupGap = _popupGapValue();
+            const edgeGapTop = _edgeGapFor("top", popupGap);
+            const edgeGapBottom = _edgeGapFor("bottom", popupGap);
             const anchorY = Theme.isConnectedEffect ? connectedAnchorY : triggerY;
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Bottom:
                 // bar on bottom: bottom side is bar-adjacent (popupGap), top side is frame-perpendicular (edgeGap)
-                return Math.max(edgeGap, Math.min(screenHeight - popupHeight - popupGap, anchorY - popupHeight));
+                return Math.max(edgeGapTop, Math.min(screenHeight - popupHeight - popupGap, anchorY - popupHeight));
             case SettingsData.Position.Top:
                 // bar on top: top side is bar-adjacent (popupGap), bottom side is frame-perpendicular (edgeGap)
-                return Math.max(popupGap, Math.min(screenHeight - popupHeight - edgeGap, anchorY));
+                return Math.max(popupGap, Math.min(screenHeight - popupHeight - edgeGapBottom, anchorY));
             default:
                 const rawY = triggerY - (popupHeight / 2);
-                const minY = Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.topBar));
-                const maxY = screenHeight - popupHeight - Math.max(edgeGap, adjacentBarClearance(adjacentBarInfo.bottomBar));
+                const minY = Math.max(edgeGapTop, adjacentBarClearance(adjacentBarInfo.topBar));
+                const maxY = screenHeight - popupHeight - Math.max(edgeGapBottom, adjacentBarClearance(adjacentBarInfo.bottomBar));
                 return Math.max(minY, Math.min(maxY, rawY));
             }
         })(), dpr)

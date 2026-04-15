@@ -553,7 +553,8 @@ var SPEC = {
     frameScreenPreferences: { def: ["all"] },
     frameBarSize: { def: 40 },
     frameShowOnOverview: { def: false },
-    frameBlurEnabled: { def: true }
+    frameBlurEnabled: { def: true },
+    frameCloseGaps: { def: false }
 };
 
 function getValidKeys() {
