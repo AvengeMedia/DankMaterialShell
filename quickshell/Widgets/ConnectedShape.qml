@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Shapes
 import qs.Common
 
-// Unified connected silhouette: body + concave arcs as one ShapePath.
-// PathArc pattern — 4 arcs + 4 lines, no sibling alignment.
+// Unified connected silhouette: body + near/far concave arcs as one ShapePath.
+// Keeping the connected chrome in one path avoids sibling alignment seams.
 
 Item {
     id: root
@@ -14,6 +14,10 @@ Item {
     property real bodyHeight: 0
 
     property real connectorRadius: 12
+    property real startConnectorRadius: connectorRadius
+    property real endConnectorRadius: connectorRadius
+    property real farStartConnectorRadius: 0
+    property real farEndConnectorRadius: 0
 
     property real surfaceRadius: 12
 
@@ -21,20 +25,36 @@ Item {
 
     // ── Derived layout ──
     readonly property bool _horiz: barSide === "top" || barSide === "bottom"
-    readonly property real _cr: Math.max(0, connectorRadius)
+    readonly property real _sc: Math.max(0, startConnectorRadius)
+    readonly property real _ec: Math.max(0, endConnectorRadius)
+    readonly property real _fsc: Math.max(0, farStartConnectorRadius)
+    readonly property real _fec: Math.max(0, farEndConnectorRadius)
+    readonly property real _firstCr: barSide === "left" ? _sc : _ec
+    readonly property real _secondCr: barSide === "left" ? _ec : _sc
+    readonly property real _firstFarCr: barSide === "left" ? _fsc : _fec
+    readonly property real _secondFarCr: barSide === "left" ? _fec : _fsc
+    readonly property real _farExtent: Math.max(_fsc, _fec)
     readonly property real _sr: Math.max(0, Math.min(surfaceRadius, (_horiz ? bodyWidth : bodyHeight) / 2, (_horiz ? bodyHeight : bodyWidth) / 2))
+    readonly property real _firstSr: _firstFarCr > 0 ? 0 : _sr
+    readonly property real _secondSr: _secondFarCr > 0 ? 0 : _sr
+    readonly property real _firstFarInset: _firstFarCr > 0 ? _firstFarCr : _firstSr
+    readonly property real _secondFarInset: _secondFarCr > 0 ? _secondFarCr : _secondSr
 
     // Root-level aliases — PathArc/PathLine elements can't use `parent`.
     readonly property real _bw: bodyWidth
     readonly property real _bh: bodyHeight
-    readonly property real _totalW: _horiz ? _bw + _cr * 2 : _bw
-    readonly property real _totalH: _horiz ? _bh : _bh + _cr * 2
+    readonly property real _bodyLeft: _horiz ? _sc : (barSide === "right" ? _farExtent : 0)
+    readonly property real _bodyRight: _bodyLeft + _bw
+    readonly property real _bodyTop: _horiz ? (barSide === "bottom" ? _farExtent : 0) : _sc
+    readonly property real _bodyBottom: _bodyTop + _bh
+    readonly property real _totalW: _horiz ? _bw + _sc + _ec : _bw + _farExtent
+    readonly property real _totalH: _horiz ? _bh + _farExtent : _bh + _sc + _ec
 
     width: _totalW
     height: _totalH
 
-    readonly property real bodyX: _horiz ? _cr : 0
-    readonly property real bodyY: _horiz ? 0 : _cr
+    readonly property real bodyX: root._bodyLeft
+    readonly property real bodyY: root._bodyTop
 
     Shape {
         anchors.fill: parent
@@ -94,27 +114,27 @@ Item {
                 relativeX: {
                     switch (root.barSide) {
                     case "left":
-                        return root._cr;
+                        return root._firstCr;
                     case "right":
-                        return -root._cr;
+                        return -root._firstCr;
                     default:
-                        return -root._cr;
+                        return -root._firstCr;
                     }
                 }
                 relativeY: {
                     switch (root.barSide) {
                     case "bottom":
-                        return -root._cr;
+                        return -root._firstCr;
                     case "left":
-                        return root._cr;
+                        return root._firstCr;
                     case "right":
-                        return -root._cr;
+                        return -root._firstCr;
                     default:
-                        return root._cr;
+                        return root._firstCr;
                     }
                 }
-                radiusX: root._cr
-                radiusY: root._cr
+                radiusX: root._firstCr
+                radiusY: root._firstCr
                 direction: root.barSide === "bottom" ? PathArc.Clockwise : PathArc.Counterclockwise
             }
 
@@ -123,23 +143,23 @@ Item {
                 x: {
                     switch (root.barSide) {
                     case "left":
-                        return root._bw - root._sr;
+                        return root._bodyRight - root._firstSr;
                     case "right":
-                        return root._sr;
+                        return root._bodyLeft + root._firstSr;
                     default:
-                        return root._totalW - root._cr;
+                        return root._bodyRight;
                     }
                 }
                 y: {
                     switch (root.barSide) {
                     case "bottom":
-                        return root._sr;
+                        return root._bodyTop + root._firstSr;
                     case "left":
-                        return root._cr;
+                        return root._bodyTop;
                     case "right":
-                        return root._cr + root._bh;
+                        return root._bodyBottom;
                     default:
-                        return root._totalH - root._sr;
+                        return root._bodyBottom - root._firstSr;
                     }
                 }
             }
@@ -149,28 +169,82 @@ Item {
                 relativeX: {
                     switch (root.barSide) {
                     case "left":
-                        return root._sr;
+                        return root._firstSr;
                     case "right":
-                        return -root._sr;
+                        return -root._firstSr;
                     default:
-                        return -root._sr;
+                        return -root._firstSr;
                     }
                 }
                 relativeY: {
                     switch (root.barSide) {
                     case "bottom":
-                        return -root._sr;
+                        return -root._firstSr;
                     case "left":
-                        return root._sr;
+                        return root._firstSr;
                     case "right":
-                        return -root._sr;
+                        return -root._firstSr;
                     default:
-                        return root._sr;
+                        return root._firstSr;
                     }
                 }
-                radiusX: root._sr
-                radiusY: root._sr
+                radiusX: root._firstSr
+                radiusY: root._firstSr
                 direction: root.barSide === "bottom" ? PathArc.Counterclockwise : PathArc.Clockwise
+            }
+
+            // Opposite-side connector 1
+            PathLine {
+                x: {
+                    switch (root.barSide) {
+                    case "left":
+                        return root._firstFarCr > 0 ? root._bodyRight + root._firstFarCr : root._bodyRight;
+                    case "right":
+                        return root._firstFarCr > 0 ? root._bodyLeft - root._firstFarCr : root._bodyLeft;
+                    default:
+                        return root._firstFarCr > 0 ? root._bodyRight : root._bodyRight - root._firstSr;
+                    }
+                }
+                y: {
+                    switch (root.barSide) {
+                    case "bottom":
+                        return root._firstFarCr > 0 ? root._bodyTop - root._firstFarCr : root._bodyTop;
+                    case "left":
+                        return root._firstFarCr > 0 ? root._bodyTop : root._bodyTop + root._firstSr;
+                    case "right":
+                        return root._firstFarCr > 0 ? root._bodyBottom : root._bodyBottom - root._firstSr;
+                    default:
+                        return root._firstFarCr > 0 ? root._bodyBottom + root._firstFarCr : root._bodyBottom;
+                    }
+                }
+            }
+
+            PathArc {
+                relativeX: {
+                    switch (root.barSide) {
+                    case "left":
+                        return -root._firstFarCr;
+                    case "right":
+                        return root._firstFarCr;
+                    default:
+                        return -root._firstFarCr;
+                    }
+                }
+                relativeY: {
+                    switch (root.barSide) {
+                    case "bottom":
+                        return root._firstFarCr;
+                    case "left":
+                        return root._firstFarCr;
+                    case "right":
+                        return -root._firstFarCr;
+                    default:
+                        return -root._firstFarCr;
+                    }
+                }
+                radiusX: root._firstFarCr
+                radiusY: root._firstFarCr
+                direction: root.barSide === "bottom" ? PathArc.Clockwise : PathArc.Counterclockwise
             }
 
             // Far edge
@@ -178,23 +252,77 @@ Item {
                 x: {
                     switch (root.barSide) {
                     case "left":
-                        return root._bw;
+                        return root._bodyRight;
                     case "right":
-                        return 0;
+                        return root._bodyLeft;
                     default:
-                        return root._cr + root._sr;
+                        return root._bodyLeft + root._secondFarInset;
                     }
                 }
                 y: {
                     switch (root.barSide) {
                     case "bottom":
-                        return 0;
+                        return root._bodyTop;
                     case "left":
-                        return root._cr + root._bh - root._sr;
+                        return root._bodyBottom - root._secondFarInset;
                     case "right":
-                        return root._cr + root._sr;
+                        return root._bodyTop + root._secondFarInset;
                     default:
-                        return root._totalH;
+                        return root._bodyBottom;
+                    }
+                }
+            }
+
+            // Opposite-side connector 2
+            PathArc {
+                relativeX: {
+                    switch (root.barSide) {
+                    case "left":
+                        return root._secondFarCr;
+                    case "right":
+                        return -root._secondFarCr;
+                    default:
+                        return -root._secondFarCr;
+                    }
+                }
+                relativeY: {
+                    switch (root.barSide) {
+                    case "bottom":
+                        return -root._secondFarCr;
+                    case "left":
+                        return root._secondFarCr;
+                    case "right":
+                        return -root._secondFarCr;
+                    default:
+                        return root._secondFarCr;
+                    }
+                }
+                radiusX: root._secondFarCr
+                radiusY: root._secondFarCr
+                direction: root.barSide === "bottom" ? PathArc.Clockwise : PathArc.Counterclockwise
+            }
+
+            PathLine {
+                x: {
+                    switch (root.barSide) {
+                    case "left":
+                        return root._secondFarCr > 0 ? root._bodyRight : root._bodyRight;
+                    case "right":
+                        return root._secondFarCr > 0 ? root._bodyLeft : root._bodyLeft;
+                    default:
+                        return root._secondFarCr > 0 ? root._bodyLeft : root._bodyLeft + root._secondSr;
+                    }
+                }
+                y: {
+                    switch (root.barSide) {
+                    case "bottom":
+                        return root._secondFarCr > 0 ? root._bodyTop : root._bodyTop;
+                    case "left":
+                        return root._secondFarCr > 0 ? root._bodyBottom : root._bodyBottom - root._secondSr;
+                    case "right":
+                        return root._secondFarCr > 0 ? root._bodyTop : root._bodyTop + root._secondSr;
+                    default:
+                        return root._secondFarCr > 0 ? root._bodyBottom : root._bodyBottom;
                     }
                 }
             }
@@ -204,27 +332,27 @@ Item {
                 relativeX: {
                     switch (root.barSide) {
                     case "left":
-                        return -root._sr;
+                        return -root._secondSr;
                     case "right":
-                        return root._sr;
+                        return root._secondSr;
                     default:
-                        return -root._sr;
+                        return -root._secondSr;
                     }
                 }
                 relativeY: {
                     switch (root.barSide) {
                     case "bottom":
-                        return root._sr;
+                        return root._secondSr;
                     case "left":
-                        return root._sr;
+                        return root._secondSr;
                     case "right":
-                        return -root._sr;
+                        return -root._secondSr;
                     default:
-                        return -root._sr;
+                        return -root._secondSr;
                     }
                 }
-                radiusX: root._sr
-                radiusY: root._sr
+                radiusX: root._secondSr
+                radiusY: root._secondSr
                 direction: root.barSide === "bottom" ? PathArc.Counterclockwise : PathArc.Clockwise
             }
 
@@ -233,23 +361,23 @@ Item {
                 x: {
                     switch (root.barSide) {
                     case "left":
-                        return root._cr;
+                        return root._bodyLeft + root._ec;
                     case "right":
-                        return root._bw - root._cr;
+                        return root._bodyRight - root._sc;
                     default:
-                        return root._cr;
+                        return root._bodyLeft;
                     }
                 }
                 y: {
                     switch (root.barSide) {
                     case "bottom":
-                        return root._totalH - root._cr;
+                        return root._bodyBottom - root._sc;
                     case "left":
-                        return root._cr + root._bh;
+                        return root._bodyBottom;
                     case "right":
-                        return root._cr;
+                        return root._bodyTop;
                     default:
-                        return root._cr;
+                        return root._bodyTop + root._sc;
                     }
                 }
             }
@@ -259,27 +387,27 @@ Item {
                 relativeX: {
                     switch (root.barSide) {
                     case "left":
-                        return -root._cr;
+                        return -root._secondCr;
                     case "right":
-                        return root._cr;
+                        return root._secondCr;
                     default:
-                        return -root._cr;
+                        return -root._secondCr;
                     }
                 }
                 relativeY: {
                     switch (root.barSide) {
                     case "bottom":
-                        return root._cr;
+                        return root._secondCr;
                     case "left":
-                        return root._cr;
+                        return root._secondCr;
                     case "right":
-                        return -root._cr;
+                        return -root._secondCr;
                     default:
-                        return -root._cr;
+                        return -root._secondCr;
                     }
                 }
-                radiusX: root._cr
-                radiusY: root._cr
+                radiusX: root._secondCr
+                radiusY: root._secondCr
                 direction: root.barSide === "bottom" ? PathArc.Clockwise : PathArc.Counterclockwise
             }
         }
