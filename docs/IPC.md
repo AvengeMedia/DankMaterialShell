@@ -502,6 +502,9 @@ Notepad/scratchpad modal control for quick note-taking.
 - `open` - Show notepad modal
 - `close` - Hide notepad modal
 - `toggle` - Toggle notepad modal visibility
+- `expand` - Expand the active notepad width and open it if hidden
+- `collapse` - Collapse the active notepad width without changing visibility
+- `toggleExpand` - Toggle the active notepad width between collapsed and expanded
 
 ### Target: `dash`
 Dashboard popup control with tab selection for overview, media, and weather information.
@@ -610,6 +613,15 @@ dms ipc call powermenu toggle
 # Open notepad
 dms ipc call notepad toggle
 
+# Open the active notepad expanded
+dms ipc call notepad expand
+
+# Collapse the active notepad width
+dms ipc call notepad collapse
+
+# Toggle the active notepad width
+dms ipc call notepad toggleExpand
+
 # Show dashboard with specific tabs
 dms ipc call dash open overview
 dms ipc call dash toggle media
@@ -647,6 +659,8 @@ binds {
     Mod+Space { spawn "qs" "-c" "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+V { spawn "qs" "-c" "dms" "ipc" "call" "clipboard" "toggle"; }
     Mod+P { spawn "qs" "-c" "dms" "ipc" "call" "notepad" "toggle"; }
+    Mod+Shift+P { spawn "qs" "-c" "dms" "ipc" "call" "notepad" "expand"; }
+    Mod+Ctrl+P { spawn "qs" "-c" "dms" "ipc" "call" "notepad" "toggleExpand"; }
     Mod+X { spawn "qs" "-c" "dms" "ipc" "call" "powermenu" "toggle"; }
     XF86AudioRaiseVolume { spawn "qs" "-c" "dms" "ipc" "call" "audio" "increment" "3"; }
     XF86MonBrightnessUp { spawn "qs" "-c" "dms" "ipc" "call" "brightness" "increment" "5" ""; }
@@ -658,6 +672,8 @@ binds {
 bind = SUPER, Space, exec, qs -c dms ipc call spotlight toggle
 bind = SUPER, V, exec, qs -c dms ipc call clipboard toggle
 bind = SUPER, P, exec, qs -c dms ipc call notepad toggle
+bind = SUPER SHIFT, P, exec, qs -c dms ipc call notepad expand
+bind = SUPER CTRL, P, exec, qs -c dms ipc call notepad toggleExpand
 bind = SUPER, X, exec, qs -c dms ipc call powermenu toggle
 bind = SUPER, slash, exec, qs -c dms ipc call hypr toggleBinds
 bind = SUPER, Tab, exec, qs -c dms ipc call hypr toggleOverview

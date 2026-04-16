@@ -71,16 +71,46 @@ Singleton {
     // Used in playLoginSoundIfApplicable()
     Process {
         id: loginSoundChecker
-        onExited: (exitCode) => {
+        onExited: exitCode => {
             if (exitCode === 0) {
                 playLoginSound();
             }
+        }
     }
-}
 
     function getAvailableSinks() {
         const hidden = SessionData.hiddenOutputDeviceNames ?? [];
         return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
+    }
+
+    // Resolve a PwNode by name from the live typed list and assign it as the
+    // default sink. Going through Pipewire.nodes.values directly (no .filter
+    // / spread / .sort / property var) avoids QML type erasure to QObject*,
+    // which newer quickshell rejects when assigning to preferredDefaultAudioSink.
+    function setDefaultSinkByName(name) {
+        if (!name)
+            return false;
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            const node = Pipewire.nodes.values[i];
+            if (node && node.name === name && node.audio && node.isSink && !node.isStream) {
+                Pipewire.preferredDefaultAudioSink = node;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function setDefaultSourceByName(name) {
+        if (!name)
+            return false;
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            const node = Pipewire.nodes.values[i];
+            if (node && node.name === name && node.audio && !node.isSink && !node.isStream) {
+                Pipewire.preferredDefaultAudioSource = node;
+                return true;
+            }
+        }
+        return false;
     }
 
     function cycleAudioOutput() {
@@ -92,7 +122,8 @@ Singleton {
         const currentIndex = sinks.findIndex(s => s.name === currentName);
         const nextIndex = (currentIndex + 1) % sinks.length;
         const nextSink = sinks[nextIndex];
-        Pipewire.preferredDefaultAudioSink = nextSink;
+        if (!setDefaultSinkByName(nextSink.name))
+            Pipewire.preferredDefaultAudioSink = nextSink;
         const name = displayName(nextSink);
         audioOutputCycled(name, sinkIcon(nextSink));
         return name;
@@ -650,7 +681,6 @@ EOFCONFIG
                     }
                 }
             `, root, "AudioService.LoginSound");
-
         } catch (e) {
             console.warn("AudioService: Error creating sound players:", e);
         }
@@ -704,7 +734,8 @@ EOFCONFIG
             const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR");
             const sessionId = Quickshell.env("XDG_SESSION_ID") || "0";
 
-            if (!runtimeDir) return;
+            if (!runtimeDir)
+                return;
 
             const loginFile = `${runtimeDir}/danklinux.login-${sessionId}`;
 

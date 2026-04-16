@@ -52,10 +52,13 @@ PanelWindow {
     anchors.bottom: true
     anchors.right: true
 
+    // Expandable: fixed max surface width; strip width is slideContainer only (keeps blur/mask aligned).
     implicitWidth: expandable ? expandedWidthValue : slideoutWidth
     implicitHeight: modelData ? modelData.height : 800
 
     color: "transparent"
+
+    readonly property bool slideoutBlurActive: root.visible && BlurService.enabled
 
     WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.exclusiveZone: 0
@@ -64,12 +67,13 @@ PanelWindow {
     readonly property real dpr: CompositorService.getScreenScale(root.screen)
     readonly property real alignedWidth: Theme.px(expandable && expandedWidth ? expandedWidthValue : slideoutWidth, dpr)
     readonly property real alignedHeight: Theme.px(modelData ? modelData.height : 800, dpr)
+    readonly property real slideoutSlideSnapX: Theme.snap(slideContainer.slideOffset, dpr)
 
     mask: Region {
         item: Rectangle {
-            x: root.width - alignedWidth
+            x: root.width - slideContainer.width
             y: 0
-            width: alignedWidth
+            width: slideContainer.width
             height: root.height
         }
     }
@@ -105,9 +109,11 @@ PanelWindow {
             }
         }
 
+        // Expandable only; mask/blur bind to slideContainer geometry so they track this animation.
         Behavior on width {
+            enabled: root.expandable
             NumberAnimation {
-                duration: 250
+                duration: Theme.popoutAnimationDuration
                 easing.type: Easing.OutCubic
             }
         }
@@ -124,12 +130,14 @@ PanelWindow {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             width: parent.width
-            x: Theme.snap(slideContainer.slideOffset, root.dpr)
+            x: root.slideoutSlideSnapX
 
             Rectangle {
                 anchors.fill: parent
                 color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, contentRect.effectiveTransparency)
                 radius: Theme.cornerRadius
+                border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+                border.width: BlurService.borderWidth
             }
 
             Column {
@@ -205,5 +213,15 @@ PanelWindow {
                 }
             }
         }
+    }
+
+    // Blur region from slideContainer (not layered contentRect); position uses x + slideoutSlideSnapX, not mapToItem(root).
+    WindowBlur {
+        targetWindow: root
+        blurX: root.slideoutBlurActive ? slideContainer.x + root.slideoutSlideSnapX : 0
+        blurY: root.slideoutBlurActive ? slideContainer.y : 0
+        blurWidth: root.slideoutBlurActive ? slideContainer.width : 0
+        blurHeight: root.slideoutBlurActive ? slideContainer.height : 0
+        blurRadius: Theme.cornerRadius
     }
 }

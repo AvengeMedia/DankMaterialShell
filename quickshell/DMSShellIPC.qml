@@ -310,6 +310,37 @@ Item {
             return "NOTEPAD_TOGGLE_FAILED";
         }
 
+        function expand(): string {
+            var instance = getActiveNotepadInstance();
+            if (instance) {
+                instance.expandedWidth = true;
+                if (!instance.isVisible)
+                    instance.show();
+                return "NOTEPAD_EXPAND_SUCCESS";
+            }
+            return "NOTEPAD_EXPAND_FAILED";
+        }
+
+        function collapse(): string {
+            var instance = getActiveNotepadInstance();
+            if (instance) {
+                instance.expandedWidth = false;
+                if (!instance.isVisible)
+                    instance.show();
+                return "NOTEPAD_COLLAPSE_SUCCESS";
+            }
+            return "NOTEPAD_COLLAPSE_FAILED";
+        }
+
+        function toggleExpand(): string {
+            var instance = getActiveNotepadInstance();
+            if (instance) {
+                instance.expandedWidth = !instance.expandedWidth;
+                return "NOTEPAD_TOGGLE_EXPAND_SUCCESS";
+            }
+            return "NOTEPAD_TOGGLE_EXPAND_FAILED";
+        }
+
         target: "notepad"
     }
 

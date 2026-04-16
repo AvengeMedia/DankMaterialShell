@@ -35,7 +35,7 @@ Row {
             cursorShape: Qt.PointingHandCursor
             onPressed: mouse => iconRipple.trigger(mouse.x, mouse.y)
             onClicked: {
-                if (defaultSink) {
+                if (defaultSink?.audio) {
                     SessionData.suppressOSDTemporarily();
                     defaultSink.audio.muted = !defaultSink.audio.muted;
                 }
@@ -45,7 +45,7 @@ Row {
         DankIcon {
             anchors.centerIn: parent
             name: {
-                if (!defaultSink)
+                if (!defaultSink?.audio)
                     return "volume_off";
 
                 let volume = defaultSink.audio.volume;
@@ -62,18 +62,18 @@ Row {
                 return "volume_up";
             }
             size: Theme.iconSize
-            color: defaultSink && !defaultSink.audio.muted && defaultSink.audio.volume > 0 ? Theme.primary : Theme.surfaceText
+            color: defaultSink?.audio && !defaultSink.audio.muted && defaultSink.audio.volume > 0 ? Theme.primary : Theme.surfaceText
         }
     }
 
     DankSlider {
         id: volumeSlider
 
-        readonly property real actualVolumePercent: defaultSink ? Math.round(defaultSink.audio.volume * 100) : 0
+        readonly property real actualVolumePercent: defaultSink?.audio ? Math.round(defaultSink.audio.volume * 100) : 0
 
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
-        enabled: defaultSink !== null
+        enabled: defaultSink?.audio != null
         minimum: 0
         maximum: AudioService.sinkMaxVolume
         showValue: true
@@ -83,7 +83,7 @@ Row {
         trackColor: root.sliderTrackColor.a > 0 ? root.sliderTrackColor : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
         onSliderValueChanged: function (newValue) {
-            if (defaultSink) {
+            if (defaultSink?.audio) {
                 SessionData.suppressOSDTemporarily();
                 defaultSink.audio.volume = newValue / 100.0;
                 if (newValue > 0 && defaultSink.audio.muted) {
@@ -97,7 +97,7 @@ Row {
     Binding {
         target: volumeSlider
         property: "value"
-        value: defaultSink ? Math.min(AudioService.sinkMaxVolume, Math.round(defaultSink.audio.volume * 100)) : 0
+        value: defaultSink?.audio ? Math.min(AudioService.sinkMaxVolume, Math.round(defaultSink.audio.volume * 100)) : 0
         when: !volumeSlider.isDragging
     }
 }
