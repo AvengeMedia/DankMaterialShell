@@ -236,12 +236,35 @@ Singleton {
         };
     }
 
+    function _sameNotificationGeometry(a, b) {
+        if (!a || !b)
+            return false;
+        return Math.abs(Number(a.bodyX) - Number(b.bodyX)) < 0.5
+            && Math.abs(Number(a.bodyY) - Number(b.bodyY)) < 0.5
+            && Math.abs(Number(a.bodyW) - Number(b.bodyW)) < 0.5
+            && Math.abs(Number(a.bodyH) - Number(b.bodyH)) < 0.5;
+    }
+
+    function _sameNotificationState(a, b) {
+        if (!a || !b)
+            return false;
+        return a.visible === b.visible
+            && a.barSide === b.barSide
+            && a.omitStartConnector === b.omitStartConnector
+            && a.omitEndConnector === b.omitEndConnector
+            && _sameNotificationGeometry(a, b);
+    }
+
     function setNotificationState(screenName, state) {
         if (!screenName || !state)
             return false;
 
+        const normalized = _normalizeNotificationState(state);
+        if (_sameNotificationState(notificationStates[screenName], normalized))
+            return true;
+
         const next = _cloneNotificationStates();
-        next[screenName] = _normalizeNotificationState(state);
+        next[screenName] = normalized;
         notificationStates = next;
         return true;
     }

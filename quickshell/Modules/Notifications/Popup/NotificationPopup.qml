@@ -25,6 +25,9 @@ PanelWindow {
         default: return "top";
         }
     }
+    readonly property int inlineExpandDuration: Theme.notificationInlineExpandDuration
+    readonly property int inlineCollapseDuration: Theme.notificationInlineCollapseDuration
+    property bool inlineHeightAnimating: false
 
     WindowBlur {
         targetWindow: win
@@ -57,6 +60,7 @@ PanelWindow {
     property real _lastReportedAlignedHeight: -1
     property real _storedTopMargin: 0
     property real _storedBottomMargin: 0
+    property bool _inlineGeometryReady: false
     readonly property bool directionalEffect: Theme.isDirectionalEffect
     readonly property bool depthEffect: Theme.isDepthEffect
     readonly property real entryTravel: {
@@ -84,14 +88,8 @@ PanelWindow {
     property bool descriptionExpanded: false
     readonly property bool hasExpandableBody: (notificationData?.htmlBody || "").replace(/<[^>]*>/g, "").trim().length > 0
     onDescriptionExpandedChanged: {
-        popupHeightChanged();
-    }
-    onImplicitHeightChanged: {
-        const aligned = Theme.px(implicitHeight, dpr);
-        if (Math.abs(aligned - _lastReportedAlignedHeight) < 0.5)
-            return;
-        _lastReportedAlignedHeight = aligned;
-        popupHeightChanged();
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
     }
 
     readonly property bool compactMode: SettingsData.notificationCompactMode
@@ -182,23 +180,86 @@ PanelWindow {
             return basePopupHeightPrivacy;
         if (!descriptionExpanded)
             return basePopupHeight;
-        const bodyTextHeight = bodyText.contentHeight || 0;
+        const bodyTextHeight = expandedBodyMeasure.contentHeight || bodyText.contentHeight || 0;
         const collapsedBodyHeight = Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2);
         if (bodyTextHeight > collapsedBodyHeight + 2)
             return basePopupHeight + bodyTextHeight - collapsedBodyHeight;
         return basePopupHeight;
     }
+    readonly property real targetAlignedHeight: Theme.px(Math.max(0, contentImplicitHeight), dpr)
+    property real renderedAlignedHeight: targetAlignedHeight
+    property real allocatedAlignedHeight: targetAlignedHeight
+    readonly property bool inlineGeometryGrowing: targetAlignedHeight >= renderedAlignedHeight
+    readonly property bool contentAnchorsTop: isTopCenter
+        || SettingsData.notificationPopupPosition === SettingsData.Position.Top
+        || SettingsData.notificationPopupPosition === SettingsData.Position.Left
+    readonly property real renderedContentOffsetY: contentAnchorsTop ? 0 : Math.max(0, allocatedAlignedHeight - renderedAlignedHeight)
     implicitWidth: contentImplicitWidth + (windowShadowPad * 2)
-    implicitHeight: contentImplicitHeight + (windowShadowPad * 2)
+    implicitHeight: allocatedAlignedHeight + (windowShadowPad * 2)
 
-    Behavior on implicitHeight {
+    function inlineMotionDuration(growing) {
+        return growing ? inlineExpandDuration : inlineCollapseDuration;
+    }
+
+    function syncInlineTargetHeight() {
+        const target = Math.max(0, Number(targetAlignedHeight));
+        if (isNaN(target))
+            return;
+
+        if (!_inlineGeometryReady) {
+            renderedHeightAnim.stop();
+            renderedAlignedHeight = target;
+            allocatedAlignedHeight = target;
+            _lastReportedAlignedHeight = target;
+            return;
+        }
+
+        const currentRendered = Math.max(0, Number(renderedAlignedHeight));
+        const nextAllocation = Math.max(target, currentRendered, allocatedAlignedHeight);
+        if (Math.abs(nextAllocation - allocatedAlignedHeight) >= 0.5)
+            allocatedAlignedHeight = nextAllocation;
+
+        if (Math.abs(target - renderedAlignedHeight) < 0.5) {
+            finishInlineHeightAnimation();
+            return;
+        }
+
+        renderedAlignedHeight = target;
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
+        if (inlineMotionDuration(target >= currentRendered) <= 0)
+            Qt.callLater(() => finishInlineHeightAnimation());
+    }
+
+    function finishInlineHeightAnimation() {
+        const target = Math.max(0, Number(targetAlignedHeight));
+        if (isNaN(target))
+            return;
+        if (Math.abs(renderedAlignedHeight - target) >= 0.5)
+            renderedAlignedHeight = target;
+        if (Math.abs(allocatedAlignedHeight - target) >= 0.5)
+            allocatedAlignedHeight = target;
+        _lastReportedAlignedHeight = renderedAlignedHeight;
+        popupHeightChanged();
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
+    }
+
+    onTargetAlignedHeightChanged: syncInlineTargetHeight()
+    onAllocatedAlignedHeightChanged: {
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
+    }
+
+    Behavior on renderedAlignedHeight {
         enabled: !exiting && !_isDestroying
         NumberAnimation {
-            id: implicitHeightAnim
-            duration: descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
+            id: renderedHeightAnim
+            duration: win.inlineMotionDuration(win.inlineGeometryGrowing)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: descriptionExpanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
-            onFinished: win.popupHeightChanged()
+            easing.bezierCurve: win.inlineGeometryGrowing ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            onRunningChanged: win.inlineHeightAnimating = running
+            onFinished: win.finishInlineHeightAnimation()
         }
     }
 
@@ -208,7 +269,11 @@ PanelWindow {
         }
     }
     Component.onCompleted: {
-        _lastReportedAlignedHeight = Theme.px(implicitHeight, dpr);
+        renderedHeightAnim.stop();
+        renderedAlignedHeight = targetAlignedHeight;
+        allocatedAlignedHeight = targetAlignedHeight;
+        _inlineGeometryReady = true;
+        _lastReportedAlignedHeight = renderedAlignedHeight;
         _storedTopMargin = getTopMargin();
         _storedBottomMargin = getBottomMargin();
         if (SettingsData.notificationPopupPrivacyMode)
@@ -379,7 +444,7 @@ PanelWindow {
         return Theme.snap(screen.width - alignedWidth - barRight, dpr);
     }
 
-    function getContentY() {
+    function getAllocatedContentY() {
         if (!screen)
             return 0;
 
@@ -389,7 +454,11 @@ PanelWindow {
         const isTop = isTopCenter || popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Left;
         if (isTop)
             return Theme.snap(barTop, dpr);
-        return Theme.snap(screen.height - alignedHeight - barBottom, dpr);
+        return Theme.snap(screen.height - allocatedAlignedHeight - barBottom, dpr);
+    }
+
+    function getContentY() {
+        return Theme.snap(getAllocatedContentY() + renderedContentOffsetY, dpr);
     }
 
     function getWindowLeftMargin() {
@@ -401,7 +470,7 @@ PanelWindow {
     function getWindowTopMargin() {
         if (!screen)
             return 0;
-        return Theme.snap(getContentY() - windowShadowPad, dpr);
+        return Theme.snap(getAllocatedContentY() - windowShadowPad, dpr);
     }
 
     function _swipeDismissTarget() {
@@ -481,7 +550,7 @@ PanelWindow {
     readonly property bool screenValid: win.screen && !_isDestroying
     readonly property real dpr: screenValid ? CompositorService.getScreenScale(win.screen) : 1
     readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2)), dpr)
-    readonly property real alignedHeight: Theme.px(Math.max(0, implicitHeight - (windowShadowPad * 2)), dpr)
+    readonly property real alignedHeight: renderedAlignedHeight
     onScreenYChanged: popupChromeGeometryChanged()
     onScreenChanged: popupChromeGeometryChanged()
     onConnectedFrameModeChanged: popupChromeGeometryChanged()
@@ -492,11 +561,11 @@ PanelWindow {
         id: content
 
         x: Theme.snap(windowShadowPad, dpr)
-        y: Theme.snap(windowShadowPad, dpr)
+        y: Theme.snap(windowShadowPad + renderedContentOffsetY, dpr)
         width: alignedWidth
         height: alignedHeight
         visible: !win._finalized && !chromeOnlyExit
-        scale: cardHoverHandler.hovered ? 1.01 : 1.0
+        scale: (!win.inlineHeightAnimating && cardHoverHandler.hovered) ? 1.01 : 1.0
         transformOrigin: Item.Center
 
         Behavior on scale {
@@ -537,21 +606,21 @@ PanelWindow {
 
         Behavior on shadowBlurPx {
             NumberAnimation {
-                duration: win.descriptionExpanded ? Theme.notificationExpandDuration : Theme.shortDuration
+                duration: win.inlineHeightAnimating ? win.inlineExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
 
         Behavior on shadowOffsetX {
             NumberAnimation {
-                duration: win.descriptionExpanded ? Theme.notificationExpandDuration : Theme.shortDuration
+                duration: win.inlineHeightAnimating ? win.inlineExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
 
         Behavior on shadowOffsetY {
             NumberAnimation {
-                duration: win.descriptionExpanded ? Theme.notificationExpandDuration : Theme.shortDuration
+                duration: win.inlineHeightAnimating ? win.inlineExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
@@ -652,10 +721,23 @@ PanelWindow {
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
+            StyledText {
+                id: expandedBodyMeasure
+
+                visible: false
+                width: Math.max(0, backgroundContainer.width - Theme.spacingL - (Theme.spacingL + Theme.notificationHoverRevealMargin) - popupIconSize - Theme.spacingM)
+                text: notificationData ? (notificationData.htmlBody || "") : ""
+                font.pixelSize: Theme.fontSizeSmall
+                elide: Text.ElideNone
+                horizontalAlignment: Text.AlignLeft
+                maximumLineCount: -1
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            }
+
             Item {
                 id: notificationContent
 
-                readonly property real expandedTextHeight: bodyText.contentHeight || 0
+                readonly property real expandedTextHeight: expandedBodyMeasure.contentHeight || bodyText.contentHeight || 0
                 readonly property real collapsedBodyHeight: Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)
                 readonly property real effectiveCollapsedHeight: (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) ? win.privacyCollapsedContentHeight : win.collapsedContentHeight
                 readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedBodyHeight + 2) ? (expandedTextHeight - collapsedBodyHeight) : 0
@@ -823,7 +905,7 @@ PanelWindow {
                                     win.descriptionExpanded = !win.descriptionExpanded;
                             }
 
-                            propagateComposedEvents: true
+                            propagateComposedEvents: false
                             onPressed: mouse => {
                                 if (parent.hoveredLink)
                                     mouse.accepted = false;
