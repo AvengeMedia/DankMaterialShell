@@ -50,6 +50,103 @@ type NiriParser struct {
 	conflictingConfigs map[string]*NiriKeyBinding
 }
 
+func parseKDL(data []byte) (*document.Document, error) {
+	return kdl.Parse(strings.NewReader(normalizeKDLBraces(string(data))))
+}
+
+func normalizeKDLBraces(input string) string {
+	var sb strings.Builder
+	sb.Grow(len(input))
+
+	var prev byte
+	n := len(input)
+	for i := 0; i < n; {
+		c := input[i]
+
+		switch {
+		case c == '"':
+			end := findStringEnd(input, i)
+			sb.WriteString(input[i:end])
+			prev = '"'
+			i = end
+		case c == '/' && i+1 < n && input[i+1] == '/':
+			end := findLineCommentEnd(input, i)
+			sb.WriteString(input[i:end])
+			prev = '\n'
+			i = end
+		case c == '/' && i+1 < n && input[i+1] == '*':
+			end := findBlockCommentEnd(input, i)
+			sb.WriteString(input[i:end])
+			prev = '/'
+			i = end
+		case c == '{' && prev != 0 && !isBraceAdjacentSpace(prev):
+			sb.WriteByte(' ')
+			sb.WriteByte(c)
+			prev = c
+			i++
+		default:
+			sb.WriteByte(c)
+			prev = c
+			i++
+		}
+	}
+
+	return sb.String()
+}
+
+func findStringEnd(s string, start int) int {
+	n := len(s)
+	for i := start + 1; i < n; {
+		switch s[i] {
+		case '\\':
+			i += 2
+		case '"':
+			return i + 1
+		default:
+			i++
+		}
+	}
+	return n
+}
+
+func findLineCommentEnd(s string, start int) int {
+	for i := start + 2; i < len(s); i++ {
+		if s[i] == '\n' {
+			return i
+		}
+	}
+	return len(s)
+}
+
+func findBlockCommentEnd(s string, start int) int {
+	n := len(s)
+	depth := 1
+	for i := start + 2; i < n && depth > 0; {
+		switch {
+		case i+1 < n && s[i] == '/' && s[i+1] == '*':
+			depth++
+			i += 2
+		case i+1 < n && s[i] == '*' && s[i+1] == '/':
+			depth--
+			i += 2
+			if depth == 0 {
+				return i
+			}
+		default:
+			i++
+		}
+	}
+	return n
+}
+
+func isBraceAdjacentSpace(b byte) bool {
+	switch b {
+	case ' ', '\t', '\n', '\r', '{':
+		return true
+	}
+	return false
+}
+
 func NewNiriParser(configDir string) *NiriParser {
 	return &NiriParser{
 		configDir:          configDir,
@@ -91,7 +188,7 @@ func (p *NiriParser) parseDMSBindsDirectly(dmsBindsPath string, section *NiriSec
 		return
 	}
 
-	doc, err := kdl.Parse(strings.NewReader(string(data)))
+	doc, err := parseKDL(data)
 	if err != nil {
 		return
 	}
@@ -159,7 +256,7 @@ func (p *NiriParser) parseFile(filePath, sectionName string) (*NiriSection, erro
 		return nil, fmt.Errorf("failed to read %s: %w", absPath, err)
 	}
 
-	doc, err := kdl.Parse(strings.NewReader(string(data)))
+	doc, err := parseKDL(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse KDL in %s: %w", absPath, err)
 	}
