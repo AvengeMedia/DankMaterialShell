@@ -16,8 +16,7 @@ DankListView {
     property bool listInitialized: false
     property int swipingCardIndex: -1
     property real swipingCardOffset: 0
-    property real __pendingStableHeight: 0
-    property real __heightUpdateThreshold: 20
+    property bool _stableHeightUpdatePending: false
     readonly property real shadowBlurPx: Theme.elevationEnabled ? ((Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined) ? Theme.elevationLevel1.blurPx : 4) : 0
     readonly property real shadowHorizontalGutter: Theme.snap(Math.max(Theme.spacingS, Math.min(32, shadowBlurPx * 1.5 + 6)), 1)
     readonly property real shadowVerticalGutter: Theme.snap(Math.max(Theme.spacingXS, 6), 1)
@@ -27,51 +26,52 @@ DankListView {
         Qt.callLater(() => {
             if (listView) {
                 listView.listInitialized = true;
-                listView.stableContentHeight = listView.contentHeight;
+                listView.syncStableContentHeight(false);
             }
         });
     }
 
-    Timer {
-        id: heightUpdateDebounce
-        interval: Theme.mediumDuration + 20
-        repeat: false
-        onTriggered: {
-            if (!listView.isAnimatingExpansion && Math.abs(listView.__pendingStableHeight - listView.stableContentHeight) > listView.__heightUpdateThreshold) {
-                listView.stableContentHeight = listView.__pendingStableHeight;
-            }
+    function targetContentHeight() {
+        if (count <= 0)
+            return contentHeight;
+
+        let total = topMargin + bottomMargin + Math.max(0, count - 1) * spacing;
+        for (let i = 0; i < count; i++) {
+            const item = itemAtIndex(i);
+            if (!item || item.nonAnimHeight === undefined)
+                return contentHeight;
+            total += item.nonAnimHeight;
         }
+        return Math.max(0, total);
+    }
+
+    function syncStableContentHeight(useTarget) {
+        const nextHeight = useTarget ? targetContentHeight() : contentHeight;
+        if (Math.abs(nextHeight - stableContentHeight) <= 0.5)
+            return;
+        stableContentHeight = nextHeight;
+    }
+
+    function queueStableContentHeightUpdate(useTarget) {
+        if (_stableHeightUpdatePending)
+            return;
+        _stableHeightUpdatePending = true;
+        Qt.callLater(() => {
+            _stableHeightUpdatePending = false;
+            syncStableContentHeight(useTarget || isAnimatingExpansion);
+        });
     }
 
     onContentHeightChanged: {
-        if (!isAnimatingExpansion) {
-            __pendingStableHeight = contentHeight;
-            if (Math.abs(contentHeight - stableContentHeight) > __heightUpdateThreshold) {
-                heightUpdateDebounce.restart();
-            } else {
-                stableContentHeight = contentHeight;
-            }
-        }
+        if (!isAnimatingExpansion)
+            queueStableContentHeightUpdate(false);
     }
 
     onIsAnimatingExpansionChanged: {
         if (isAnimatingExpansion) {
-            heightUpdateDebounce.stop();
-            let delta = 0;
-            for (let i = 0; i < count; i++) {
-                const item = itemAtIndex(i);
-                if (item && item.children[0] && item.children[0].isAnimating) {
-                    const targetDelegateHeight = item.children[0].targetHeight + listView.delegateShadowGutter;
-                    delta += targetDelegateHeight - item.height;
-                }
-            }
-            const targetHeight = contentHeight + delta;
-            // During expansion, always update immediately without threshold check
-            stableContentHeight = targetHeight;
+            syncStableContentHeight(true);
         } else {
-            __pendingStableHeight = contentHeight;
-            heightUpdateDebounce.stop();
-            stableContentHeight = __pendingStableHeight;
+            queueStableContentHeightUpdate(false);
         }
     }
 
@@ -148,11 +148,14 @@ DankListView {
         readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(listView.swipingCardOffset) / width * 0.02 : 1.0
         readonly property real swipeFadeStartOffset: width * 0.75
         readonly property real swipeFadeDistance: Math.max(1, width - swipeFadeStartOffset)
+        readonly property real nonAnimHeight: notificationCard.targetHeight + listView.delegateShadowGutter
 
         Component.onCompleted: {
             Qt.callLater(() => {
-                if (delegateRoot)
+                if (delegateRoot) {
                     delegateRoot.__delegateInitialized = true;
+                    listView.queueStableContentHeightUpdate(listView.isAnimatingExpansion);
+                }
             });
         }
 
@@ -180,6 +183,7 @@ DankListView {
             onIsAnimatingChanged: {
                 if (isAnimating) {
                     listView.isAnimatingExpansion = true;
+                    listView.syncStableContentHeight(true);
                 } else {
                     Qt.callLater(() => {
                         if (!notificationCard || !listView)
@@ -195,6 +199,13 @@ DankListView {
                         listView.isAnimatingExpansion = anyAnimating;
                     });
                 }
+            }
+
+            onTargetHeightChanged: {
+                if (isAnimating || listView.isAnimatingExpansion)
+                    listView.syncStableContentHeight(true);
+                else
+                    listView.queueStableContentHeightUpdate(false);
             }
 
             isGroupSelected: {

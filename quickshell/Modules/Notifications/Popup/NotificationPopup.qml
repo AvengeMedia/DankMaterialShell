@@ -537,21 +537,21 @@ PanelWindow {
 
         Behavior on shadowBlurPx {
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: win.descriptionExpanded ? Theme.notificationExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
 
         Behavior on shadowOffsetX {
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: win.descriptionExpanded ? Theme.notificationExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
 
         Behavior on shadowOffsetY {
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: win.descriptionExpanded ? Theme.notificationExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
@@ -566,7 +566,7 @@ PanelWindow {
             shadowOffsetX: content.shadowOffsetX
             shadowOffsetY: content.shadowOffsetY
             shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
-            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
+            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
@@ -578,39 +578,39 @@ PanelWindow {
             sourceRect.radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
             sourceRect.color: win.connectedFrameMode ? Theme.popupLayerColor(Theme.surfaceContainer) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             sourceRect.antialiasing: true
-            sourceRect.layer.enabled: win.connectedFrameMode
-            sourceRect.layer.smooth: true
-            sourceRect.layer.textureSize: win.connectedFrameMode && win.dpr > 1 ? Qt.size(Math.ceil(sourceRect.width * win.dpr), Math.ceil(sourceRect.height * win.dpr)) : Qt.size(0, 0)
+            sourceRect.layer.enabled: false
+            sourceRect.layer.textureSize: Qt.size(0, 0)
             sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
             sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
+        }
 
-            Rectangle {
-                x: bgShadowLayer.sourceRect.x
-                y: bgShadowLayer.sourceRect.y
-                width: bgShadowLayer.sourceRect.width
-                height: bgShadowLayer.sourceRect.height
-                radius: bgShadowLayer.sourceRect.radius
-                visible: notificationData && notificationData.urgency === NotificationUrgency.Critical
-                opacity: 1
-                clip: true
+        // Keep critical accent outside shadow rendering so connected mode still shows it.
+        Rectangle {
+            x: content.cardInset
+            y: content.cardInset
+            width: Math.max(0, content.width - content.cardInset * 2)
+            height: Math.max(0, content.height - content.cardInset * 2)
+            radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+            visible: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical
+            opacity: 1
+            clip: true
 
-                gradient: Gradient {
-                    orientation: Gradient.Horizontal
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
 
-                    GradientStop {
-                        position: 0
-                        color: Theme.primary
-                    }
+                GradientStop {
+                    position: 0
+                    color: Theme.primary
+                }
 
-                    GradientStop {
-                        position: 0.02
-                        color: Theme.primary
-                    }
+                GradientStop {
+                    position: 0.02
+                    color: Theme.primary
+                }
 
-                    GradientStop {
-                        position: 0.021
-                        color: "transparent"
-                    }
+                GradientStop {
+                    position: 0.021
+                    color: "transparent"
                 }
             }
         }
