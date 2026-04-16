@@ -14,6 +14,7 @@ DankPopout {
     property real stablePopupHeight: 400
     property real _lastAlignedContentHeight: -1
     property bool _pendingSizedOpen: false
+    property bool _heightUpdatePending: false
 
     function updateStablePopupHeight() {
         const item = contentLoader.item;
@@ -28,6 +29,16 @@ DankPopout {
             return;
         _lastAlignedContentHeight = target;
         stablePopupHeight = target;
+    }
+
+    function queueStablePopupHeightUpdate() {
+        if (_heightUpdatePending)
+            return;
+        _heightUpdatePending = true;
+        Qt.callLater(() => {
+            _heightUpdatePending = false;
+            updateStablePopupHeight();
+        });
     }
 
     NotificationKeyboardController {
@@ -128,7 +139,7 @@ DankPopout {
     Connections {
         target: contentLoader.item
         function onImplicitHeightChanged() {
-            root.updateStablePopupHeight();
+            root.queueStablePopupHeightUpdate();
         }
     }
 

@@ -15,6 +15,12 @@ Rectangle {
     property bool userInitiatedExpansion: false
     property bool isAnimating: false
     property bool animateExpansion: true
+    property bool _retainedExpandedContent: false
+    property bool _clipAnimatedContent: false
+    property real expandedContentOpacity: expanded ? 1 : 0
+    property real collapsedContentOpacity: expanded ? 0 : 1
+    readonly property bool renderExpandedContent: expanded || _retainedExpandedContent
+    readonly property bool renderCollapsedContent: !expanded
 
     property bool isGroupSelected: false
     property int selectedNotificationIndex: -1
@@ -56,6 +62,14 @@ Rectangle {
         });
     }
 
+    function expansionMotionDuration() {
+        return root.connectedFrameMode ? Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded) : (root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration);
+    }
+
+    function expansionMotionCurve() {
+        return root.connectedFrameMode ? (root.expanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : Theme.expressiveCurves.emphasized;
+    }
+
     Behavior on scale {
         enabled: listLevelScaleAnimationsEnabled
         NumberAnimation {
@@ -65,6 +79,7 @@ Rectangle {
     }
 
     Behavior on shadowBlurPx {
+        enabled: !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -72,6 +87,7 @@ Rectangle {
     }
 
     Behavior on shadowOffsetXPx {
+        enabled: !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -79,6 +95,7 @@ Rectangle {
     }
 
     Behavior on shadowOffsetYPx {
+        enabled: !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -90,6 +107,24 @@ Rectangle {
         ColorAnimation {
             duration: root.__initialized ? Theme.shortDuration : 0
             easing.type: Theme.standardEasing
+        }
+    }
+
+    Behavior on expandedContentOpacity {
+        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        NumberAnimation {
+            duration: root.expansionMotionDuration()
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.expansionMotionCurve()
+        }
+    }
+
+    Behavior on collapsedContentOpacity {
+        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        NumberAnimation {
+            duration: root.expansionMotionDuration()
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.expansionMotionCurve()
         }
     }
 
@@ -128,7 +163,31 @@ Rectangle {
         }
         return Theme.layerOutlineWidth;
     }
-    clip: false
+    clip: connectedFrameMode && _clipAnimatedContent
+
+    onExpandedChanged: {
+        if (connectedFrameMode && __initialized && userInitiatedExpansion && animateExpansion)
+            _clipAnimatedContent = true;
+        if (expanded) {
+            _retainedExpandedContent = false;
+            return;
+        }
+        if (connectedFrameMode && __initialized && userInitiatedExpansion && animateExpansion)
+            _retainedExpandedContent = true;
+    }
+
+    onHeightChanged: {
+        if (Math.abs(height - targetHeight) > 0.5)
+            return;
+        _clipAnimatedContent = false;
+        if (!expanded && _retainedExpandedContent)
+            _retainedExpandedContent = false;
+    }
+
+    onExpandedContentOpacityChanged: {
+        if (!expanded && _retainedExpandedContent && expandedContentOpacity <= 0.01)
+            _retainedExpandedContent = false;
+    }
 
     HoverHandler {
         id: cardHoverHandler
@@ -148,7 +207,7 @@ Rectangle {
         shadowOffsetX: root.shadowOffsetXPx
         shadowOffsetY: root.shadowOffsetYPx
         shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
-        shadowEnabled: root.shadowsAllowed
+        shadowEnabled: root.shadowsAllowed && !root.connectedFrameMode
     }
 
     Rectangle {
@@ -188,7 +247,8 @@ Rectangle {
         anchors.leftMargin: Theme.spacingL
         anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
         height: collapsedContentHeight + extraHeight
-        visible: !expanded
+        visible: renderCollapsedContent
+        opacity: root.collapsedContentOpacity
 
         DankCircularImage {
             id: iconContainer
@@ -385,7 +445,8 @@ Rectangle {
         anchors.leftMargin: Theme.spacingL
         anchors.rightMargin: Theme.spacingL
         spacing: compactMode ? Theme.spacingXS : Theme.spacingS
-        visible: expanded
+        visible: renderExpandedContent
+        opacity: root.expandedContentOpacity
 
         Item {
             width: parent.width
@@ -828,7 +889,8 @@ Rectangle {
     }
 
     Row {
-        visible: !expanded
+        visible: renderCollapsedContent
+        opacity: root.collapsedContentOpacity
         anchors.right: clearButton.visible ? clearButton.left : parent.right
         anchors.rightMargin: clearButton.visible ? contentSpacing : Theme.spacingL
         anchors.top: collapsedContent.bottom
@@ -885,7 +947,8 @@ Rectangle {
         property bool isHovered: false
         readonly property int actionCount: (notificationGroup?.latestNotification?.actions || []).length
 
-        visible: !expanded && actionCount < 3
+        visible: renderCollapsedContent && actionCount < 3
+        opacity: root.collapsedContentOpacity
         anchors.right: parent.right
         anchors.rightMargin: Theme.spacingL
         anchors.top: collapsedContent.bottom
@@ -916,7 +979,7 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
-        visible: !expanded && (notificationGroup?.count || 0) > 1 && !descriptionExpanded
+        visible: renderCollapsedContent && (notificationGroup?.count || 0) > 1 && !descriptionExpanded
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             root.userInitiatedExpansion = true;
@@ -960,15 +1023,17 @@ Rectangle {
     Behavior on height {
         enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
-            duration: root.connectedFrameMode ? Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded) : (root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration)
+            duration: root.expansionMotionDuration()
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.connectedFrameMode ? (root.expanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : Theme.expressiveCurves.emphasized
+            easing.bezierCurve: root.expansionMotionCurve()
             onRunningChanged: {
                 if (running) {
                     root.isAnimating = true;
                 } else {
                     root.isAnimating = false;
                     root.userInitiatedExpansion = false;
+                    root._retainedExpandedContent = false;
+                    root._clipAnimatedContent = false;
                 }
             }
         }

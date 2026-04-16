@@ -34,8 +34,6 @@ Item {
     property bool fullHeightSurface: false
     property bool _primeContent: false
     property bool _resizeActive: false
-    property real _surfaceMarginLeft: 0
-    property real _surfaceW: 0
     property string _chromeClaimId: ""
     property int _connectedChromeSerial: 0
     property real _chromeAnimTravelX: 1
@@ -51,6 +49,8 @@ Item {
             "rightBar": 0
         })
     property var screen: null
+    // Connected resize uses one full-screen surface; body-sized regions are masks.
+    readonly property bool useBackgroundWindow: false
 
     readonly property real effectiveBarThickness: {
         if (Theme.isConnectedEffect)
@@ -120,12 +120,6 @@ Item {
     }
     readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
 
-    // Snapshot mask geometry to prevent background damage on bar updates
-    property real _frozenMaskX: 0
-    property real _frozenMaskY: 0
-    property real _frozenMaskWidth: 0
-    property real _frozenMaskHeight: 0
-
     function setBarContext(position, bottomGap) {
         effectiveBarPosition = position !== undefined ? position : 0;
         effectiveBarBottomGap = bottomGap !== undefined ? bottomGap : 0;
@@ -183,7 +177,7 @@ Item {
         if (barSide !== "top" && barSide !== "bottom")
             return contentContainer.animY;
 
-        const extent = Math.max(0, root.alignedHeight);
+        const extent = Math.max(0, root.renderedAlignedHeight);
         const progress = Math.min(1, Math.abs(contentContainer.animY) / Math.max(1, _chromeAnimTravelY));
         const offset = Theme.snap(extent * progress, root.dpr);
         return contentContainer.animY < 0 ? -offset : offset;
@@ -195,9 +189,9 @@ Item {
             "visible": visible,
             "barSide": contentContainer.connectedBarSide,
             "bodyX": root.alignedX,
-            "bodyY": root.alignedY,
+            "bodyY": root.renderedAlignedY,
             "bodyW": root.alignedWidth,
-            "bodyH": root.alignedHeight,
+            "bodyH": root.renderedAlignedHeight,
             "animX": _connectedChromeAnimX(),
             "animY": _connectedChromeAnimY(),
             "screen": root.screen ? root.screen.name : "",
@@ -260,16 +254,28 @@ Item {
         ConnectedModeState.setPopoutAnim(_chromeClaimId, syncX ? _connectedChromeAnimX() : undefined, syncY ? _connectedChromeAnimY() : undefined);
     }
 
+    function _syncPopoutBody() {
+        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+            return;
+        if (!contentWindow.visible && !shouldBeVisible)
+            return;
+        ConnectedModeState.setPopoutBody(_chromeClaimId, root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
+    }
+
     function _flushFullSync() {
         _fullSyncPending = false;
-        _syncPopoutChromeState();
+        if (root && typeof root._syncPopoutChromeState === "function")
+            root._syncPopoutChromeState();
     }
 
     function _queueFullSync() {
         if (_fullSyncPending)
             return;
         _fullSyncPending = true;
-        Qt.callLater(root._flushFullSync);
+        Qt.callLater(() => {
+            if (root && typeof root._flushFullSync === "function")
+                root._flushFullSync();
+        });
     }
 
     onAlignedXChanged: _queueFullSync()
@@ -277,6 +283,8 @@ Item {
     onAlignedWidthChanged: _queueFullSync()
     onContentAnimXChanged: _syncPopoutAnim("x")
     onContentAnimYChanged: _syncPopoutAnim("y")
+    onRenderedAlignedYChanged: _syncPopoutBody()
+    onRenderedAlignedHeightChanged: _syncPopoutBody()
     onScreenChanged: _syncPopoutChromeState()
     onEffectiveBarPositionChanged: _syncPopoutChromeState()
 
@@ -308,17 +316,9 @@ Item {
         }
     }
 
-    readonly property bool useBackgroundWindow: !CompositorService.isHyprland || CompositorService.useHyprlandFocusGrab
     readonly property bool frameOwnsConnectedChrome: SettingsData.connectedFrameModeActive
         && !!root.screen
         && SettingsData.isScreenInPreferences(root.screen, SettingsData.frameScreenPreferences)
-
-    function updateSurfacePosition() {
-        if (useBackgroundWindow && shouldBeVisible) {
-            _surfaceMarginLeft = alignedX - shadowBuffer;
-            _surfaceW = alignedWidth + shadowBuffer * 2;
-        }
-    }
 
     property bool animationsEnabled: true
 
@@ -330,16 +330,8 @@ Item {
         animationsEnabled = false;
         _primeContent = true;
 
-        // Snapshot mask geometry
-        _frozenMaskX = maskX;
-        _frozenMaskY = maskY;
-        _frozenMaskWidth = maskWidth;
-        _frozenMaskHeight = maskHeight;
-
         if (_lastOpenedScreen !== null && _lastOpenedScreen !== screen) {
             contentWindow.visible = false;
-            if (useBackgroundWindow)
-                backgroundWindow.visible = false;
         }
         _lastOpenedScreen = screen;
 
@@ -357,19 +349,12 @@ Item {
             _chromeClaimId = "";
         }
 
-        if (useBackgroundWindow) {
-            _surfaceMarginLeft = alignedX - shadowBuffer;
-            _surfaceW = alignedWidth + shadowBuffer * 2;
-            backgroundWindow.visible = true;
-        }
         contentWindow.visible = true;
 
         Qt.callLater(() => {
             animationsEnabled = true;
             shouldBeVisible = true;
             if (shouldBeVisible && screen) {
-                if (useBackgroundWindow)
-                    backgroundWindow.visible = true;
                 contentWindow.visible = true;
                 PopoutManager.showPopout(root);
                 opened();
@@ -415,8 +400,6 @@ Item {
             if (!shouldBeVisible) {
                 isClosing = false;
                 contentWindow.visible = false;
-                if (useBackgroundWindow)
-                    backgroundWindow.visible = false;
                 PopoutManager.hidePopout(root);
                 popoutClosed();
             }
@@ -538,6 +521,27 @@ Item {
     readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
+    property real renderedAlignedY: alignedY
+    property real renderedAlignedHeight: alignedHeight
+    readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
+
+    Behavior on renderedAlignedY {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
+
+    Behavior on renderedAlignedHeight {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
     readonly property real connectedAnchorX: {
         if (!Theme.isConnectedEffect)
             return triggerX;
@@ -574,7 +578,7 @@ Item {
     }
 
     onAlignedHeightChanged: {
-        _syncPopoutChromeState();
+        _queueFullSync();
         if (!suspendShadowWhileResizing || !shouldBeVisible)
             return;
         _resizeActive = true;
@@ -664,117 +668,6 @@ Item {
     }
 
     PanelWindow {
-        id: backgroundWindow
-        screen: root.screen
-        visible: false
-        color: "transparent"
-        Component.onCompleted: {
-            if (typeof updatesEnabled !== "undefined" && !root.overlayContent)
-                updatesEnabled = false;
-        }
-
-        WlrLayershell.namespace: root.layerNamespace + ":background"
-        WlrLayershell.layer: WlrLayershell.Top
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
-        }
-
-        mask: Region {
-            item: maskRect
-            Region {
-                item: contentExclusionRect
-                intersection: Intersection.Subtract
-            }
-        }
-
-        Rectangle {
-            id: maskRect
-            visible: false
-            color: "transparent"
-            x: root._frozenMaskX
-            y: root._frozenMaskY
-            width: (backgroundWindow.visible && backgroundInteractive) ? root._frozenMaskWidth : 0
-            height: (backgroundWindow.visible && backgroundInteractive) ? root._frozenMaskHeight : 0
-        }
-
-        Item {
-            id: contentExclusionRect
-            visible: false
-            x: root.alignedX
-            y: root.alignedY
-            width: root.alignedWidth
-            height: root.alignedHeight
-        }
-
-        Item {
-            id: outsideClickCatcher
-            x: root._frozenMaskX
-            y: root._frozenMaskY
-            width: root._frozenMaskWidth
-            height: root._frozenMaskHeight
-            enabled: root.shouldBeVisible && root.backgroundInteractive
-
-            readonly property real contentLeft: Math.max(0, root.alignedX - x)
-            readonly property real contentTop: Math.max(0, root.alignedY - y)
-            readonly property real contentRight: Math.min(width, contentLeft + root.alignedWidth)
-            readonly property real contentBottom: Math.min(height, contentTop + root.alignedHeight)
-
-            MouseArea {
-                x: 0
-                y: 0
-                width: outsideClickCatcher.width
-                height: Math.max(0, outsideClickCatcher.contentTop)
-                enabled: parent.enabled
-                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                onClicked: root.backgroundClicked()
-            }
-
-            MouseArea {
-                x: 0
-                y: outsideClickCatcher.contentBottom
-                width: outsideClickCatcher.width
-                height: Math.max(0, outsideClickCatcher.height - outsideClickCatcher.contentBottom)
-                enabled: parent.enabled
-                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                onClicked: root.backgroundClicked()
-            }
-
-            MouseArea {
-                x: 0
-                y: outsideClickCatcher.contentTop
-                width: Math.max(0, outsideClickCatcher.contentLeft)
-                height: Math.max(0, outsideClickCatcher.contentBottom - outsideClickCatcher.contentTop)
-                enabled: parent.enabled
-                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                onClicked: root.backgroundClicked()
-            }
-
-            MouseArea {
-                x: outsideClickCatcher.contentRight
-                y: outsideClickCatcher.contentTop
-                width: Math.max(0, outsideClickCatcher.width - outsideClickCatcher.contentRight)
-                height: Math.max(0, outsideClickCatcher.contentBottom - outsideClickCatcher.contentTop)
-                enabled: parent.enabled
-                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                onClicked: root.backgroundClicked()
-            }
-        }
-
-        Loader {
-            id: overlayLoader
-            anchors.fill: parent
-            active: root.overlayContent !== null && backgroundWindow.visible
-            sourceComponent: root.overlayContent
-        }
-    }
-
-    PanelWindow {
         id: contentWindow
         screen: root.screen
         visible: false
@@ -826,27 +719,37 @@ Item {
             return WlrKeyboardFocus.Exclusive;
         }
 
-        readonly property bool _fullHeight: useBackgroundWindow && root.fullHeightSurface
+        readonly property bool _fullHeight: root.fullHeightSurface
         anchors {
             left: true
             top: true
-            right: !useBackgroundWindow
-            bottom: _fullHeight || !useBackgroundWindow
+            right: true
+            bottom: true
         }
 
         WlrLayershell.margins {
-            left: useBackgroundWindow ? root._surfaceMarginLeft : 0
-            top: (useBackgroundWindow && !_fullHeight) ? (root.alignedY - shadowBuffer) : 0
+            left: 0
+            top: 0
         }
 
-        implicitWidth: useBackgroundWindow ? root._surfaceW : 0
-        implicitHeight: (useBackgroundWindow && !_fullHeight) ? (root.alignedHeight + shadowBuffer * 2) : 0
+        implicitWidth: 0
+        implicitHeight: 0
 
-        mask: useBackgroundWindow ? contentInputMask : null
+        mask: contentInputMask
 
         Region {
             id: contentInputMask
-            item: contentMaskRect
+            // Outside-click dismissal needs full-screen input only while interactive.
+            item: (shouldBeVisible && backgroundInteractive) ? fullScreenMaskItem : contentMaskRect
+        }
+
+        Item {
+            id: fullScreenMaskItem
+            visible: false
+            x: 0
+            y: 0
+            width: 32767
+            height: 32767
         }
 
         Item {
@@ -855,18 +758,18 @@ Item {
             x: contentContainer.x - contentContainer.horizontalConnectorExtent
             y: contentContainer.y - contentContainer.verticalConnectorExtent
             width: root.alignedWidth + contentContainer.horizontalConnectorExtent * 2
-            height: root.alignedHeight + contentContainer.verticalConnectorExtent * 2
+            height: root.renderedAlignedHeight + contentContainer.verticalConnectorExtent * 2
         }
 
         MouseArea {
             anchors.fill: parent
-            enabled: !useBackgroundWindow && shouldBeVisible && backgroundInteractive
+            enabled: shouldBeVisible && backgroundInteractive
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
             z: -1
             onClicked: mouse => {
                 const clickX = mouse.x;
                 const clickY = mouse.y;
-                const outsideContent = clickX < root.alignedX || clickX > root.alignedX + root.alignedWidth || clickY < root.alignedY || clickY > root.alignedY + root.alignedHeight;
+                const outsideContent = clickX < root.alignedX || clickX > root.alignedX + root.alignedWidth || clickY < root.renderedAlignedY || clickY > root.renderedAlignedY + root.renderedAlignedHeight;
                 if (!outsideContent)
                     return;
                 backgroundClicked();
@@ -875,10 +778,10 @@ Item {
 
         Item {
             id: contentContainer
-            x: useBackgroundWindow ? shadowBuffer : root.alignedX
-            y: (useBackgroundWindow && !contentWindow._fullHeight) ? shadowBuffer : root.alignedY
+            x: root.alignedX
+            y: root.renderedAlignedY
             width: root.alignedWidth
-            height: root.alignedHeight
+            height: root.renderedAlignedHeight
 
             readonly property bool barTop: effectiveBarPosition === SettingsData.Position.Top
             readonly property bool barBottom: effectiveBarPosition === SettingsData.Position.Bottom
@@ -1084,154 +987,147 @@ Item {
                     return parent.height + clipOversize * 2;
                 }
 
+                // Roll-out clips a wrapper while content and shadow keep full-size geometry.
                 Item {
-                    id: aligner
+                    id: rollOutAdjuster
                     readonly property real baseWidth: contentContainer.width
                     readonly property real baseHeight: contentContainer.height
                     readonly property bool isRollOut: typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect
 
-                    x: (directionalClipMask.x !== 0 ? -directionalClipMask.x : 0) + (isRollOut && contentContainer.barRight ? baseWidth * (1 - contentContainer.scaleValue) : 0)
-                    y: (directionalClipMask.y !== 0 ? -directionalClipMask.y : 0) + (isRollOut && contentContainer.barBottom ? baseHeight * (1 - contentContainer.scaleValue) : 0)
+                    x: directionalClipMask.x !== 0 ? -directionalClipMask.x : 0
+                    y: directionalClipMask.y !== 0 ? -directionalClipMask.y : 0
                     width: isRollOut && (contentContainer.barLeft || contentContainer.barRight) ? Math.max(0, baseWidth * contentContainer.scaleValue) : baseWidth
                     height: isRollOut && (contentContainer.barTop || contentContainer.barBottom) ? Math.max(0, baseHeight * contentContainer.scaleValue) : baseHeight
 
                     clip: isRollOut
 
+                    ElevationShadow {
+                        id: shadowSource
+                        readonly property real connectorExtent: Theme.isConnectedEffect ? Theme.connectedCornerRadius : 0
+                        readonly property real extraLeft: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
+                        readonly property real extraRight: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
+                        readonly property real extraTop: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
+                        readonly property real extraBottom: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
+                        readonly property real bodyX: extraLeft
+                        readonly property real bodyY: extraTop
+                        readonly property real bodyWidth: rollOutAdjuster.baseWidth
+                        readonly property real bodyHeight: rollOutAdjuster.baseHeight
+
+                        width: rollOutAdjuster.baseWidth + extraLeft + extraRight
+                        height: rollOutAdjuster.baseHeight + extraTop + extraBottom
+                        opacity: contentWrapper.opacity
+                        scale: contentWrapper.scale
+                        x: contentWrapper.x - extraLeft
+                        y: contentWrapper.y - extraTop
+                        level: root.shadowLevel
+                        direction: root.effectiveShadowDirection
+                        fallbackOffset: root.shadowFallbackOffset
+                        targetRadius: contentContainer.surfaceRadius
+                        topLeftRadius: contentContainer.surfaceTopLeftRadius
+                        topRightRadius: contentContainer.surfaceTopRightRadius
+                        bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
+                        bottomRightRadius: contentContainer.surfaceBottomRightRadius
+                        targetColor: contentContainer.surfaceColor
+                        borderColor: contentContainer.surfaceBorderColor
+                        borderWidth: contentContainer.surfaceBorderWidth
+                        useCustomSource: Theme.isConnectedEffect
+                        shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !root.frameOwnsConnectedChrome
+
+                        Item {
+                            anchors.fill: parent
+                            visible: Theme.isConnectedEffect && !root.frameOwnsConnectedChrome
+                            clip: false
+
+                            Rectangle {
+                                x: shadowSource.bodyX
+                                y: shadowSource.bodyY
+                                width: shadowSource.bodyWidth
+                                height: shadowSource.bodyHeight
+                                topLeftRadius: contentContainer.surfaceTopLeftRadius
+                                topRightRadius: contentContainer.surfaceTopRightRadius
+                                bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
+                                bottomRightRadius: contentContainer.surfaceBottomRightRadius
+                                color: contentContainer.surfaceColor
+                            }
+
+                            ConnectedCorner {
+                                visible: Theme.isConnectedEffect
+                                barSide: contentContainer.connectedBarSide
+                                placement: "left"
+                                spacing: 0
+                                connectorRadius: Theme.connectedCornerRadius
+                                color: contentContainer.surfaceColor
+                                dpr: root.dpr
+                                x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
+                                y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
+                            }
+
+                            ConnectedCorner {
+                                visible: Theme.isConnectedEffect
+                                barSide: contentContainer.connectedBarSide
+                                placement: "right"
+                                spacing: 0
+                                connectorRadius: Theme.connectedCornerRadius
+                                color: contentContainer.surfaceColor
+                                dpr: root.dpr
+                                x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
+                                y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
+                            }
+                        }
+                    }
+
                     Item {
-                        id: unrollCounteract
-                        x: aligner.isRollOut && contentContainer.barRight ? -(aligner.baseWidth * (1 - contentContainer.scaleValue)) : 0
-                        y: aligner.isRollOut && contentContainer.barBottom ? -(aligner.baseHeight * (1 - contentContainer.scaleValue)) : 0
-                        width: aligner.baseWidth
-                        height: aligner.baseHeight
+                        id: contentWrapper
+                        width: rollOutAdjuster.baseWidth
+                        height: rollOutAdjuster.baseHeight
+                        opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
+                        visible: opacity > 0
 
-                        ElevationShadow {
-                            id: shadowSource
-                            readonly property real connectorExtent: Theme.isConnectedEffect ? Theme.connectedCornerRadius : 0
-                            readonly property real extraLeft: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                            readonly property real extraRight: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                            readonly property real extraTop: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
-                            readonly property real extraBottom: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
-                            readonly property real bodyX: extraLeft
-                            readonly property real bodyY: extraTop
-                            readonly property real bodyWidth: parent.width
-                            readonly property real bodyHeight: parent.height
+                        scale: rollOutAdjuster.isRollOut ? 1.0 : contentContainer.scaleValue
+                        x: Theme.snap(contentContainer.animX + (rollOutAdjuster.baseWidth - width) * (1 - scale) * 0.5, root.dpr)
+                        y: Theme.snap(contentContainer.animY + (rollOutAdjuster.baseHeight - height) * (1 - scale) * 0.5, root.dpr)
 
-                            width: parent.width + extraLeft + extraRight
-                            height: parent.height + extraTop + extraBottom
-                            opacity: contentWrapper.opacity
-                            scale: contentWrapper.scale
-                            x: contentWrapper.x - extraLeft
-                            y: contentWrapper.y - extraTop
-                            level: root.shadowLevel
-                            direction: root.effectiveShadowDirection
-                            fallbackOffset: root.shadowFallbackOffset
-                            targetRadius: contentContainer.surfaceRadius
-                            topLeftRadius: contentContainer.surfaceTopLeftRadius
-                            topRightRadius: contentContainer.surfaceTopRightRadius
-                            bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
-                            bottomRightRadius: contentContainer.surfaceBottomRightRadius
-                            targetColor: contentContainer.surfaceColor
-                            borderColor: contentContainer.surfaceBorderColor
-                            borderWidth: contentContainer.surfaceBorderWidth
-                            useCustomSource: Theme.isConnectedEffect
-                            shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !root.frameOwnsConnectedChrome
+                        layer.enabled: contentWrapper.opacity < 1
+                        layer.smooth: false
+                        layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
-                            Item {
-                                anchors.fill: parent
-                                visible: Theme.isConnectedEffect && !root.frameOwnsConnectedChrome
-                                clip: false
-
-                                Rectangle {
-                                    x: shadowSource.bodyX
-                                    y: shadowSource.bodyY
-                                    width: shadowSource.bodyWidth
-                                    height: shadowSource.bodyHeight
-                                    topLeftRadius: contentContainer.surfaceTopLeftRadius
-                                    topRightRadius: contentContainer.surfaceTopRightRadius
-                                    bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
-                                    bottomRightRadius: contentContainer.surfaceBottomRightRadius
-                                    color: contentContainer.surfaceColor
-                                }
-
-                                ConnectedCorner {
-                                    visible: Theme.isConnectedEffect
-                                    barSide: contentContainer.connectedBarSide
-                                    placement: "left"
-                                    spacing: 0
-                                    connectorRadius: Theme.connectedCornerRadius
-                                    color: contentContainer.surfaceColor
-                                    dpr: root.dpr
-                                    x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
-                                    y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
-                                }
-
-                                ConnectedCorner {
-                                    visible: Theme.isConnectedEffect
-                                    barSide: contentContainer.connectedBarSide
-                                    placement: "right"
-                                    spacing: 0
-                                    connectorRadius: Theme.connectedCornerRadius
-                                    color: contentContainer.surfaceColor
-                                    dpr: root.dpr
-                                    x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
-                                    y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
-                                }
+                        Behavior on opacity {
+                            enabled: !Theme.isDirectionalEffect
+                            NumberAnimation {
+                                duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                             }
                         }
 
                         Item {
-                            id: contentWrapper
-                            width: parent.width
-                            height: parent.height
-                            opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
-                            visible: opacity > 0
+                            anchors.fill: parent
+                            clip: false
+                            visible: !Theme.isConnectedEffect
 
-                            scale: aligner.isRollOut ? 1.0 : contentContainer.scaleValue
-                            x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - scale) * 0.5, root.dpr)
-                            y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - scale) * 0.5, root.dpr)
-
-                            layer.enabled: contentWrapper.opacity < 1
-                            layer.smooth: false
-                            layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
-
-                            Behavior on opacity {
-                                enabled: !Theme.isDirectionalEffect
-                                NumberAnimation {
-                                    duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
-                                    easing.type: Easing.BezierSpline
-                                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                                }
-                            }
-
-                            Item {
+                            Rectangle {
                                 anchors.fill: parent
-                                clip: false
-                                visible: !Theme.isConnectedEffect
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    antialiasing: true
-                                    topLeftRadius: contentContainer.surfaceTopLeftRadius
-                                    topRightRadius: contentContainer.surfaceTopRightRadius
-                                    bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
-                                    bottomRightRadius: contentContainer.surfaceBottomRightRadius
-                                    color: contentContainer.surfaceColor
-                                    border.color: contentContainer.surfaceBorderColor
-                                    border.width: contentContainer.surfaceBorderWidth
-                                }
+                                antialiasing: true
+                                topLeftRadius: contentContainer.surfaceTopLeftRadius
+                                topRightRadius: contentContainer.surfaceTopRightRadius
+                                bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
+                                bottomRightRadius: contentContainer.surfaceBottomRightRadius
+                                color: contentContainer.surfaceColor
+                                border.color: contentContainer.surfaceBorderColor
+                                border.width: contentContainer.surfaceBorderWidth
                             }
+                        }
 
-                            Loader {
-                                id: contentLoader
-                                anchors.fill: parent
-                                active: root._primeContent || shouldBeVisible || contentWindow.visible
-                                asynchronous: false
-                            }
-                        } // closes contentWrapper
-                    } // closes unrollCounteract
-                } // closes aligner
-            } // closes directionalClipMask
-        } // closes contentContainer
+                        Loader {
+                            id: contentLoader
+                            anchors.fill: parent
+                            active: root._primeContent || shouldBeVisible || contentWindow.visible
+                            asynchronous: false
+                        }
+                    }
+                }
+            }
+        }
 
         Item {
             id: focusHelper
@@ -1248,6 +1144,13 @@ Item {
                     event.accepted = true;
                 }
             }
+        }
+
+        Loader {
+            id: overlayLoader
+            anchors.fill: parent
+            active: root.overlayContent !== null && contentWindow.visible
+            sourceComponent: root.overlayContent
         }
     }
 }
