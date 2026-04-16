@@ -148,6 +148,15 @@ BasePill {
     PanelWindow {
         id: contextMenuWindow
 
+        WindowBlur {
+            targetWindow: contextMenuWindow
+            blurX: menuContainer.x
+            blurY: menuContainer.y
+            blurWidth: contextMenuWindow.visible ? menuContainer.width : 0
+            blurHeight: contextMenuWindow.visible ? menuContainer.height : 0
+            blurRadius: Theme.cornerRadius
+        }
+
         WlrLayershell.namespace: "dms:notepad-context-menu"
 
         property bool isVertical: false
@@ -244,8 +253,8 @@ BasePill {
             height: Math.max(60, menuColumn.implicitHeight + Theme.spacingS * 2)
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 1
+            border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
             opacity: contextMenuWindow.visible ? 1 : 0
             visible: opacity > 0

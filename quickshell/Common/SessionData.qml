@@ -29,8 +29,32 @@ Singleton {
 
     property bool isLightMode: false
     property bool doNotDisturb: false
+    property real doNotDisturbUntil: 0
     property bool isSwitchingMode: false
     property bool suppressOSD: true
+
+    Timer {
+        id: dndExpireTimer
+        repeat: false
+        running: false
+        onTriggered: root.setDoNotDisturb(false)
+    }
+
+    function _armDndExpireTimer() {
+        dndExpireTimer.stop();
+        if (!doNotDisturb || doNotDisturbUntil <= 0)
+            return;
+        const remaining = doNotDisturbUntil - Date.now();
+        if (remaining <= 0) {
+            setDoNotDisturb(false);
+            return;
+        }
+        dndExpireTimer.interval = remaining;
+        dndExpireTimer.start();
+    }
+
+    onDoNotDisturbChanged: _armDndExpireTimer()
+    onDoNotDisturbUntilChanged: _armDndExpireTimer()
 
     Timer {
         id: osdSuppressTimer
@@ -49,6 +73,7 @@ Singleton {
         function onSessionResumed() {
             root.suppressOSD = true;
             osdSuppressTimer.restart();
+            root._applyDndExpirySanity();
         }
     }
 
@@ -190,6 +215,7 @@ Singleton {
             }
 
             Store.parse(root, obj);
+            _applyDndExpirySanity();
 
             _loadedSessionSnapshot = getCurrentSessionJson();
             _hasLoaded = true;
@@ -271,6 +297,7 @@ Singleton {
             }
 
             Store.parse(root, obj);
+            _applyDndExpirySanity();
 
             _loadedSessionSnapshot = getCurrentSessionJson();
             _hasLoaded = true;
@@ -286,6 +313,16 @@ Singleton {
             console.error("SessionData: Failed to parse session.json - file will not be overwritten.");
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse session.json"), msg));
         }
+    }
+
+    function _applyDndExpirySanity() {
+        if (doNotDisturb && doNotDisturbUntil > 0 && Date.now() >= doNotDisturbUntil) {
+            doNotDisturb = false;
+            doNotDisturbUntil = 0;
+        } else if (!doNotDisturb && doNotDisturbUntil !== 0) {
+            doNotDisturbUntil = 0;
+        }
+        _armDndExpireTimer();
     }
 
     function saveSettings() {
@@ -357,8 +394,21 @@ Singleton {
         });
     }
 
-    function setDoNotDisturb(enabled) {
+    function setDoNotDisturb(enabled, durationMinutes) {
+        const minutes = Number(durationMinutes) || 0;
         doNotDisturb = enabled;
+        doNotDisturbUntil = (enabled && minutes > 0) ? Date.now() + minutes * 60 * 1000 : 0;
+        saveSettings();
+    }
+
+    function setDoNotDisturbUntilTimestamp(timestampMs) {
+        const target = Number(timestampMs) || 0;
+        if (target <= Date.now()) {
+            setDoNotDisturb(false);
+            return;
+        }
+        doNotDisturb = true;
+        doNotDisturbUntil = target;
         saveSettings();
     }
 

@@ -185,7 +185,7 @@ Popup {
     }
 
     contentItem: Rectangle {
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+        color: BlurService.enabled ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
         radius: Theme.cornerRadius
         border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: BlurService.enabled ? BlurService.borderWidth : 1
@@ -274,7 +274,7 @@ Popup {
                             }
                             if (isSelected)
                                 return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
-                            return menuItemArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent";
+                            return menuItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
                         }
                         opacity: modelData.enabled ? 1 : 0.5
 

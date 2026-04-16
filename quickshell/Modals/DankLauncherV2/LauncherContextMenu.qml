@@ -372,10 +372,10 @@ Popup {
             anchors.fill: parent
             implicitWidth: Math.max(180, menuColumn.implicitWidth + Theme.spacingS * 2)
             implicitHeight: menuColumn.implicitHeight + Theme.spacingS * 2
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            color: BlurService.enabled ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 1
+            border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
             Rectangle {
                 anchors.fill: parent
@@ -438,7 +438,7 @@ Popup {
                                 if (root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex) {
                                     return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
                                 }
-                                return itemMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent";
+                                return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
                             }
 
                             Row {

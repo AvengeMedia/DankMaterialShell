@@ -144,8 +144,46 @@ DankModal {
             return "NOTIFICATION_MODAL_TOGGLE_DND_SUCCESS";
         }
 
+        function enableDoNotDisturbFor(minutes: int): string {
+            if (minutes <= 0) {
+                return "ERROR: minutes must be > 0";
+            }
+            SessionData.setDoNotDisturb(true, minutes);
+            return "NOTIFICATION_MODAL_DND_SET_FOR_" + minutes + "_SUCCESS";
+        }
+
+        function enableDoNotDisturbUntil(timestampMs: string): string {
+            const ts = Number(timestampMs);
+            if (!ts || ts <= Date.now()) {
+                return "ERROR: timestamp must be a future epoch ms";
+            }
+            SessionData.setDoNotDisturbUntilTimestamp(ts);
+            return "NOTIFICATION_MODAL_DND_SET_UNTIL_SUCCESS";
+        }
+
+        function enableDoNotDisturbIndefinitely(): string {
+            SessionData.setDoNotDisturb(true, 0);
+            return "NOTIFICATION_MODAL_DND_INDEFINITE_SUCCESS";
+        }
+
+        function enableDoNotDisturbUntilTomorrowMorning(): string {
+            const now = new Date();
+            const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 8, 0, 0, 0);
+            SessionData.setDoNotDisturbUntilTimestamp(target.getTime());
+            return "NOTIFICATION_MODAL_DND_UNTIL_TOMORROW_SUCCESS";
+        }
+
+        function disableDoNotDisturb(): string {
+            SessionData.setDoNotDisturb(false);
+            return "NOTIFICATION_MODAL_DND_DISABLE_SUCCESS";
+        }
+
         function getDoNotDisturb(): bool {
             return SessionData.doNotDisturb;
+        }
+
+        function getDoNotDisturbUntil(): string {
+            return String(SessionData.doNotDisturbUntil);
         }
 
         function clearAll(): string {

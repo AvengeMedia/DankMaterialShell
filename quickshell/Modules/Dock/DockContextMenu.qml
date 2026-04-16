@@ -230,7 +230,7 @@ PanelWindow {
                     width: parent.width
                     height: 28
                     radius: Theme.cornerRadius
-                    color: windowArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: windowArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                     StyledText {
                         anchors.left: parent.left
@@ -320,7 +320,7 @@ PanelWindow {
                     width: parent.width
                     height: 28
                     radius: Theme.cornerRadius
-                    color: actionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: actionArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                     Row {
                         anchors.left: parent.left
@@ -395,7 +395,7 @@ PanelWindow {
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: pinArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: pinArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                 Row {
                     anchors.left: parent.left
@@ -468,7 +468,7 @@ PanelWindow {
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: nvidiaArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: nvidiaArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                 Row {
                     anchors.left: parent.left

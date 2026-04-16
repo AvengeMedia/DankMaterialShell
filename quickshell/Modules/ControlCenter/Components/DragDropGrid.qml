@@ -163,6 +163,8 @@ Column {
                                 return widgetWidth <= 25 ? smallDiskUsageComponent : diskUsagePillComponent;
                             } else if (id === "colorPicker") {
                                 return colorPickerPillComponent;
+                            } else if (id === "doNotDisturb") {
+                                return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
                             } else {
                                 return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
                             }
@@ -574,6 +576,22 @@ Column {
     }
 
     Component {
+        id: dndPillComponent
+        DndPill {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            width: parent.width
+            height: 60
+
+            onExpandClicked: {
+                if (!root.editMode) {
+                    root.expandClicked(widgetData, widgetIndex);
+                }
+            }
+        }
+    }
+
+    Component {
         id: smallBatteryComponent
         SmallBatteryButton {
             property var widgetData: parent.widgetData || {}
@@ -603,8 +621,6 @@ Column {
                     return DisplayService.nightModeEnabled ? "nightlight" : "dark_mode";
                 case "darkMode":
                     return "contrast";
-                case "doNotDisturb":
-                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off";
                 case "idleInhibitor":
                     return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
                 default:
@@ -618,8 +634,6 @@ Column {
                     return I18n.tr("Night Mode");
                 case "darkMode":
                     return I18n.tr("Dark Mode");
-                case "doNotDisturb":
-                    return I18n.tr("Do Not Disturb");
                 case "idleInhibitor":
                     return SessionService.idleInhibited ? I18n.tr("Keeping Awake") : I18n.tr("Keep Awake");
                 default:
@@ -642,8 +656,6 @@ Column {
                     return DisplayService.nightModeEnabled || false;
                 case "darkMode":
                     return !SessionData.isLightMode;
-                case "doNotDisturb":
-                    return SessionData.doNotDisturb || false;
                 case "idleInhibitor":
                     return SessionService.idleInhibited || false;
                 default:
@@ -668,11 +680,6 @@ Column {
                         const newMode = !SessionData.isLightMode;
                         Theme.screenTransition();
                         Theme.setLightMode(newMode);
-                        break;
-                    }
-                case "doNotDisturb":
-                    {
-                        SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
                         break;
                     }
                 case "idleInhibitor":
