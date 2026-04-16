@@ -215,33 +215,34 @@ func (b *DDCBackend) SetBrightnessWithExponent(id string, value int, exponential
 		callback: callback,
 	}
 
-	if timer, exists := b.debounceTimers[id]; exists {
-		timer.Reset(200 * time.Millisecond)
-	} else {
-		b.debounceWg.Add(1)
-		b.debounceTimers[id] = time.AfterFunc(200*time.Millisecond, func() {
-			defer b.debounceWg.Done()
-			b.debounceMutex.Lock()
-			pending, exists := b.debouncePending[id]
-			if exists {
-				delete(b.debouncePending, id)
-			}
-			b.debounceMutex.Unlock()
-
-			if !exists {
-				return
-			}
-
-			err := b.setBrightnessImmediateWithExponent(id, pending.percent)
-			if err != nil {
-				log.Debugf("Failed to set brightness for %s: %v", id, err)
-			}
-
-			if pending.callback != nil {
-				pending.callback()
-			}
-		})
+	if existing, exists := b.debounceTimers[id]; exists {
+		if existing.Stop() {
+			b.debounceWg.Done()
+		}
 	}
+
+	b.debounceWg.Add(1)
+	b.debounceTimers[id] = time.AfterFunc(200*time.Millisecond, func() {
+		defer b.debounceWg.Done()
+
+		b.debounceMutex.Lock()
+		pending, hasPending := b.debouncePending[id]
+		delete(b.debouncePending, id)
+		delete(b.debounceTimers, id)
+		b.debounceMutex.Unlock()
+
+		if !hasPending {
+			return
+		}
+
+		if err := b.setBrightnessImmediateWithExponent(id, pending.percent); err != nil {
+			log.Debugf("Failed to set brightness for %s: %v", id, err)
+		}
+
+		if pending.callback != nil {
+			pending.callback()
+		}
+	})
 	b.debounceMutex.Unlock()
 
 	return nil
