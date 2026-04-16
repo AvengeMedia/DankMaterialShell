@@ -236,7 +236,6 @@ func runBrightnessSet(cmd *cobra.Command, args []string) {
 			defer ddc.Close()
 			time.Sleep(100 * time.Millisecond)
 			if err := ddc.SetBrightnessWithExponent(deviceID, percent, exponential, exponent, nil); err == nil {
-				ddc.WaitPending()
 				fmt.Printf("Set %s to %d%%\n", deviceID, percent)
 				return
 			}

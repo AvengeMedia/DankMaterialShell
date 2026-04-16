@@ -84,7 +84,6 @@ type DDCBackend struct {
 	debounceMutex   sync.Mutex
 	debounceTimers  map[string]*time.Timer
 	debouncePending map[string]ddcPendingSet
-	debounceWg      sync.WaitGroup
 }
 
 type ddcPendingSet struct {
