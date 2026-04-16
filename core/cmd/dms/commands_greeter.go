@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -13,6 +14,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
@@ -29,7 +31,7 @@ var greeterInstallCmd = &cobra.Command{
 	Use:     "install",
 	Short:   "Install and configure DMS greeter",
 	Long:    "Install greetd and configure it to use DMS as the greeter interface",
-	PreRunE: requireMutableSystemCommand,
+	PreRunE: preRunPrivileged,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		term, _ := cmd.Flags().GetBool("terminal")
@@ -51,9 +53,10 @@ var greeterInstallCmd = &cobra.Command{
 }
 
 var greeterSyncCmd = &cobra.Command{
-	Use:   "sync",
-	Short: "Sync DMS theme and settings with greeter",
-	Long:  "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
+	Use:     "sync",
+	Short:   "Sync DMS theme and settings with greeter",
+	Long:    "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
+	PreRunE: preRunPrivileged,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		auth, _ := cmd.Flags().GetBool("auth")
@@ -82,7 +85,7 @@ var greeterEnableCmd = &cobra.Command{
 	Use:     "enable",
 	Short:   "Enable DMS greeter in greetd config",
 	Long:    "Configure greetd to use DMS as the greeter",
-	PreRunE: requireMutableSystemCommand,
+	PreRunE: preRunPrivileged,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		term, _ := cmd.Flags().GetBool("terminal")
@@ -118,7 +121,7 @@ var greeterUninstallCmd = &cobra.Command{
 	Use:     "uninstall",
 	Short:   "Remove DMS greeter configuration and restore previous display manager",
 	Long:    "Disable greetd, remove DMS managed configs, and restore the system to its pre-DMS-greeter state",
-	PreRunE: requireMutableSystemCommand,
+	PreRunE: preRunPrivileged,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		term, _ := cmd.Flags().GetBool("terminal")
@@ -288,10 +291,7 @@ func uninstallGreeter(nonInteractive bool) error {
 	}
 
 	fmt.Println("\nDisabling greetd...")
-	disableCmd := exec.Command("sudo", "systemctl", "disable", "greetd")
-	disableCmd.Stdout = os.Stdout
-	disableCmd.Stderr = os.Stderr
-	if err := disableCmd.Run(); err != nil {
+	if err := privesc.Run(context.Background(), "", "systemctl", "disable", "greetd"); err != nil {
 		fmt.Printf("  ⚠ Could not disable greetd: %v\n", err)
 	} else {
 		fmt.Println("  ✓ greetd disabled")
@@ -357,10 +357,10 @@ func restorePreDMSGreetdConfig(sudoPassword string) error {
 		}
 		tmp.Close()
 
-		if err := runSudoCommand(sudoPassword, "cp", tmpPath, configPath); err != nil {
+		if err := privesc.Run(context.Background(), sudoPassword, "cp", tmpPath, configPath); err != nil {
 			return fmt.Errorf("failed to restore %s: %w", candidate, err)
 		}
-		if err := runSudoCommand(sudoPassword, "chmod", "644", configPath); err != nil {
+		if err := privesc.Run(context.Background(), sudoPassword, "chmod", "644", configPath); err != nil {
 			return err
 		}
 		fmt.Printf("  ✓ Restored greetd config from %s\n", candidate)
@@ -388,19 +388,12 @@ command = "agreety --cmd /bin/bash"
 	}
 	tmp.Close()
 
-	if err := runSudoCommand(sudoPassword, "cp", tmpPath, configPath); err != nil {
+	if err := privesc.Run(context.Background(), sudoPassword, "cp", tmpPath, configPath); err != nil {
 		return fmt.Errorf("failed to write fallback greetd config: %w", err)
 	}
-	_ = runSudoCommand(sudoPassword, "chmod", "644", configPath)
+	_ = privesc.Run(context.Background(), sudoPassword, "chmod", "644", configPath)
 	fmt.Println("  ✓ Wrote minimal fallback greetd config (configure a greeter command manually if needed)")
 	return nil
-}
-
-func runSudoCommand(_ string, command string, args ...string) error {
-	cmd := exec.Command("sudo", append([]string{command}, args...)...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
 }
 
 // suggestDisplayManagerRestore scans for installed DMs and re-enables one
@@ -421,10 +414,7 @@ func suggestDisplayManagerRestore(nonInteractive bool) {
 
 	enableDM := func(dm string) {
 		fmt.Printf("  Enabling %s...\n", dm)
-		cmd := exec.Command("sudo", "systemctl", "enable", "--force", dm)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
+		if err := privesc.Run(context.Background(), "", "systemctl", "enable", "--force", dm); err != nil {
 			fmt.Printf("  ⚠ Failed to enable %s: %v\n", dm, err)
 		} else {
 			fmt.Printf("  ✓ %s enabled (will take effect on next boot).\n", dm)
@@ -623,10 +613,7 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 
 				if response != "n" && response != "no" {
 					fmt.Printf("\nAdding user to %s group...\n", greeterGroup)
-					addUserCmd := exec.Command("sudo", "usermod", "-aG", greeterGroup, currentUser.Username)
-					addUserCmd.Stdout = os.Stdout
-					addUserCmd.Stderr = os.Stderr
-					if err := addUserCmd.Run(); err != nil {
+					if err := privesc.Run(context.Background(), "", "usermod", "-aG", greeterGroup, currentUser.Username); err != nil {
 						return fmt.Errorf("failed to add user to %s group: %w", greeterGroup, err)
 					}
 					fmt.Printf("✓ User added to %s group\n", greeterGroup)
@@ -846,22 +833,19 @@ func disableDisplayManager(dmName string) (bool, error) {
 	actionTaken := false
 
 	if state.NeedsDisable {
-		var disableCmd *exec.Cmd
-		var actionVerb string
-
-		if state.EnabledState == "static" {
+		var action, actionVerb string
+		switch state.EnabledState {
+		case "static":
 			fmt.Printf("  Masking %s (static service cannot be disabled)...\n", dmName)
-			disableCmd = exec.Command("sudo", "systemctl", "mask", dmName)
+			action = "mask"
 			actionVerb = "masked"
-		} else {
+		default:
 			fmt.Printf("  Disabling %s...\n", dmName)
-			disableCmd = exec.Command("sudo", "systemctl", "disable", dmName)
+			action = "disable"
 			actionVerb = "disabled"
 		}
 
-		disableCmd.Stdout = os.Stdout
-		disableCmd.Stderr = os.Stderr
-		if err := disableCmd.Run(); err != nil {
+		if err := privesc.Run(context.Background(), "", "systemctl", action, dmName); err != nil {
 			return actionTaken, fmt.Errorf("failed to disable/mask %s: %w", dmName, err)
 		}
 
@@ -902,10 +886,7 @@ func ensureGreetdEnabled() error {
 
 	if state.EnabledState == "masked" || state.EnabledState == "masked-runtime" {
 		fmt.Println("  Unmasking greetd...")
-		unmaskCmd := exec.Command("sudo", "systemctl", "unmask", "greetd")
-		unmaskCmd.Stdout = os.Stdout
-		unmaskCmd.Stderr = os.Stderr
-		if err := unmaskCmd.Run(); err != nil {
+		if err := privesc.Run(context.Background(), "", "systemctl", "unmask", "greetd"); err != nil {
 			return fmt.Errorf("failed to unmask greetd: %w", err)
 		}
 		fmt.Println("  ✓ Unmasked greetd")
@@ -917,10 +898,7 @@ func ensureGreetdEnabled() error {
 		fmt.Println("  Enabling greetd service...")
 	}
 
-	enableCmd := exec.Command("sudo", "systemctl", "enable", "--force", "greetd")
-	enableCmd.Stdout = os.Stdout
-	enableCmd.Stderr = os.Stderr
-	if err := enableCmd.Run(); err != nil {
+	if err := privesc.Run(context.Background(), "", "systemctl", "enable", "--force", "greetd"); err != nil {
 		return fmt.Errorf("failed to enable greetd: %w", err)
 	}
 
@@ -950,10 +928,7 @@ func ensureGraphicalTarget() error {
 	currentTargetStr := strings.TrimSpace(string(currentTarget))
 	if currentTargetStr != "graphical.target" {
 		fmt.Printf("\nSetting graphical.target as default (current: %s)...\n", currentTargetStr)
-		setDefaultCmd := exec.Command("sudo", "systemctl", "set-default", "graphical.target")
-		setDefaultCmd.Stdout = os.Stdout
-		setDefaultCmd.Stderr = os.Stderr
-		if err := setDefaultCmd.Run(); err != nil {
+		if err := privesc.Run(context.Background(), "", "systemctl", "set-default", "graphical.target"); err != nil {
 			fmt.Println("⚠ Warning: Failed to set graphical.target as default")
 			fmt.Println("  Greeter may not start on boot. Run manually:")
 			fmt.Println("  sudo systemctl set-default graphical.target")

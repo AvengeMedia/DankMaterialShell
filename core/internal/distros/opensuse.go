@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 func init() {
@@ -249,7 +250,7 @@ func (o *OpenSUSEDistribution) InstallPrerequisites(ctx context.Context, sudoPas
 
 	args := []string{"zypper", "install", "-y"}
 	args = append(args, missingPkgs...)
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+	cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		o.logError("failed to install prerequisites", err)
@@ -485,7 +486,7 @@ func (o *OpenSUSEDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Pac
 				CommandInfo: fmt.Sprintf("sudo zypper addrepo %s", repoURL),
 			}
 
-			cmd := ExecSudoCommand(ctx, sudoPassword,
+			cmd := privesc.ExecCommand(ctx, sudoPassword,
 				fmt.Sprintf("zypper addrepo -f %s", repoURL))
 			if err := o.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.20, 0.22); err != nil {
 				o.log(fmt.Sprintf("OBS repo %s add failed (may already exist): %v", pkg.RepoURL, err))
@@ -506,7 +507,7 @@ func (o *OpenSUSEDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Pac
 			CommandInfo: "sudo zypper --gpg-auto-import-keys refresh",
 		}
 
-		refreshCmd := ExecSudoCommand(ctx, sudoPassword, "zypper --gpg-auto-import-keys refresh")
+		refreshCmd := privesc.ExecCommand(ctx, sudoPassword, "zypper --gpg-auto-import-keys refresh")
 		if err := o.runWithProgress(refreshCmd, progressChan, PhaseSystemPackages, 0.25, 0.27); err != nil {
 			return fmt.Errorf("failed to refresh repositories: %w", err)
 		}
@@ -587,7 +588,7 @@ func (o *OpenSUSEDistribution) disableInstallMediaRepos(ctx context.Context, sud
 	}
 
 	for _, alias := range aliases {
-		cmd := ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("zypper modifyrepo -d '%s'", escapeSingleQuotes(alias)))
+		cmd := privesc.ExecCommand(ctx, sudoPassword, fmt.Sprintf("zypper modifyrepo -d '%s'", privesc.EscapeSingleQuotes(alias)))
 		repoOutput, err := cmd.CombinedOutput()
 		if err != nil {
 			o.log(fmt.Sprintf("Failed to disable install media repo %s: %s", alias, strings.TrimSpace(string(repoOutput))))
@@ -645,7 +646,7 @@ func (o *OpenSUSEDistribution) installZypperPackages(ctx context.Context, packag
 			CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
 		}
 
-		cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+		cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 		return o.runWithProgress(cmd, progressChan, phase, groupStart, groupEnd)
 	}
 
@@ -773,7 +774,7 @@ func (o *OpenSUSEDistribution) installQuickshell(ctx context.Context, variant de
 		CommandInfo: "sudo cmake --install build",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword, "cmake --install build")
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, "cmake --install build")
 	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install quickshell: %w", err)
@@ -797,7 +798,7 @@ func (o *OpenSUSEDistribution) installRust(ctx context.Context, sudoPassword str
 		CommandInfo: "sudo zypper install rustup",
 	}
 
-	rustupInstallCmd := ExecSudoCommand(ctx, sudoPassword, "zypper install -y rustup")
+	rustupInstallCmd := privesc.ExecCommand(ctx, sudoPassword, "zypper install -y rustup")
 	if err := o.runWithProgress(rustupInstallCmd, progressChan, PhaseSystemPackages, 0.82, 0.83); err != nil {
 		return fmt.Errorf("failed to install rustup: %w", err)
 	}

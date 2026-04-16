@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 func init() {
@@ -191,7 +192,7 @@ func (d *DebianDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 		LogOutput:  "Updating APT package lists",
 	}
 
-	updateCmd := ExecSudoCommand(ctx, sudoPassword, "apt-get update")
+	updateCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get update")
 	if err := d.runWithProgress(updateCmd, progressChan, PhasePrerequisites, 0.06, 0.07); err != nil {
 		return fmt.Errorf("failed to update package lists: %w", err)
 	}
@@ -208,7 +209,7 @@ func (d *DebianDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 
 	checkCmd := exec.CommandContext(ctx, "dpkg", "-l", "build-essential")
 	if err := checkCmd.Run(); err != nil {
-		cmd := ExecSudoCommand(ctx, sudoPassword, "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential")
+		cmd := privesc.ExecCommand(ctx, sudoPassword, "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential")
 		if err := d.runWithProgress(cmd, progressChan, PhasePrerequisites, 0.08, 0.09); err != nil {
 			return fmt.Errorf("failed to install build-essential: %w", err)
 		}
@@ -224,7 +225,7 @@ func (d *DebianDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 		LogOutput:   "Installing additional development tools",
 	}
 
-	devToolsCmd := ExecSudoCommand(ctx, sudoPassword,
+	devToolsCmd := privesc.ExecCommand(ctx, sudoPassword,
 		"DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget git cmake ninja-build pkg-config gnupg libxcb-cursor-dev libglib2.0-dev libpolkit-agent-1-dev libjpeg-dev libpugixml-dev")
 	if err := d.runWithProgress(devToolsCmd, progressChan, PhasePrerequisites, 0.10, 0.12); err != nil {
 		return fmt.Errorf("failed to install development tools: %w", err)
@@ -450,7 +451,7 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 			keyringPath := fmt.Sprintf("/etc/apt/keyrings/%s.gpg", repoName)
 
 			// Create keyrings directory if it doesn't exist
-			mkdirCmd := ExecSudoCommand(ctx, sudoPassword, "mkdir -p /etc/apt/keyrings")
+			mkdirCmd := privesc.ExecCommand(ctx, sudoPassword, "mkdir -p /etc/apt/keyrings")
 			if err := mkdirCmd.Run(); err != nil {
 				d.log(fmt.Sprintf("Warning: failed to create keyrings directory: %v", err))
 			}
@@ -464,7 +465,7 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 			}
 
 			keyCmd := fmt.Sprintf("bash -c 'rm -f %s && curl -fsSL %s/Release.key | gpg --batch --dearmor -o %s'", keyringPath, baseURL, keyringPath)
-			cmd := ExecSudoCommand(ctx, sudoPassword, keyCmd)
+			cmd := privesc.ExecCommand(ctx, sudoPassword, keyCmd)
 			if err := d.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.18, 0.20); err != nil {
 				return fmt.Errorf("failed to add OBS GPG key for %s: %w", pkg.RepoURL, err)
 			}
@@ -480,7 +481,7 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 				CommandInfo: fmt.Sprintf("echo '%s' | sudo tee %s", repoLine, listFile),
 			}
 
-			addRepoCmd := ExecSudoCommand(ctx, sudoPassword,
+			addRepoCmd := privesc.ExecCommand(ctx, sudoPassword,
 				fmt.Sprintf("bash -c \"echo '%s' | tee %s\"", repoLine, listFile))
 			if err := d.runWithProgress(addRepoCmd, progressChan, PhaseSystemPackages, 0.20, 0.22); err != nil {
 				return fmt.Errorf("failed to add OBS repo %s: %w", pkg.RepoURL, err)
@@ -500,7 +501,7 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 			CommandInfo: "sudo apt-get update",
 		}
 
-		updateCmd := ExecSudoCommand(ctx, sudoPassword, "apt-get update")
+		updateCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get update")
 		if err := d.runWithProgress(updateCmd, progressChan, PhaseSystemPackages, 0.25, 0.27); err != nil {
 			return fmt.Errorf("failed to update package lists after adding OBS repos: %w", err)
 		}
@@ -546,7 +547,7 @@ func (d *DebianDistribution) installAPTPackages(ctx context.Context, packages []
 			CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
 		}
 
-		cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+		cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 		return d.runWithProgress(cmd, progressChan, PhaseSystemPackages, startProgress, endProgress)
 	}
 
@@ -634,7 +635,7 @@ func (d *DebianDistribution) installBuildDependencies(ctx context.Context, manua
 	args := []string{"apt-get", "install", "-y"}
 	args = append(args, depList...)
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+	cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 	return d.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.80, 0.82)
 }
 
@@ -652,7 +653,7 @@ func (d *DebianDistribution) installRust(ctx context.Context, sudoPassword strin
 		CommandInfo: "sudo apt-get install rustup",
 	}
 
-	rustupInstallCmd := ExecSudoCommand(ctx, sudoPassword, "DEBIAN_FRONTEND=noninteractive apt-get install -y rustup")
+	rustupInstallCmd := privesc.ExecCommand(ctx, sudoPassword, "DEBIAN_FRONTEND=noninteractive apt-get install -y rustup")
 	if err := d.runWithProgress(rustupInstallCmd, progressChan, PhaseSystemPackages, 0.82, 0.83); err != nil {
 		return fmt.Errorf("failed to install rustup: %w", err)
 	}
@@ -691,7 +692,7 @@ func (d *DebianDistribution) installGo(ctx context.Context, sudoPassword string,
 		CommandInfo: "sudo apt-get install golang-go",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword, "DEBIAN_FRONTEND=noninteractive apt-get install -y golang-go")
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, "DEBIAN_FRONTEND=noninteractive apt-get install -y golang-go")
 	return d.runWithProgress(installCmd, progressChan, PhaseSystemPackages, 0.87, 0.90)
 }
 

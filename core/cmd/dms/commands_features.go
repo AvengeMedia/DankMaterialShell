@@ -4,6 +4,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
 	"github.com/spf13/cobra"
@@ -130,12 +132,8 @@ func updateArchLinux() error {
 			return errdefs.ErrUpdateCancelled
 		}
 
-		fmt.Printf("\nRunning: sudo pacman -S %s\n", packageName)
-		cmd := exec.Command("sudo", "pacman", "-S", "--noconfirm", packageName)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
+		fmt.Printf("\nRunning: pacman -S %s\n", packageName)
+		if err := privesc.Run(context.Background(), "", "pacman", "-S", "--noconfirm", packageName); err != nil {
 			fmt.Printf("Error: Failed to update using pacman: %v\n", err)
 			return err
 		}
@@ -479,11 +477,7 @@ func updateDMSBinary() error {
 
 	fmt.Printf("Installing to %s...\n", currentPath)
 
-	replaceCmd := exec.Command("sudo", "install", "-m", "0755", decompressedPath, currentPath)
-	replaceCmd.Stdin = os.Stdin
-	replaceCmd.Stdout = os.Stdout
-	replaceCmd.Stderr = os.Stderr
-	if err := replaceCmd.Run(); err != nil {
+	if err := privesc.Run(context.Background(), "", "install", "-m", "0755", decompressedPath, currentPath); err != nil {
 		return fmt.Errorf("failed to replace binary: %w", err)
 	}
 

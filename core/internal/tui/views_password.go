@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -274,8 +275,7 @@ func (m Model) delayThenReturn() tea.Cmd {
 
 func (m Model) tryFingerprint() tea.Cmd {
 	return func() tea.Msg {
-		clearCmd := exec.Command("sudo", "-k")
-		clearCmd.Run()
+		_ = privesc.ClearCache(context.Background())
 
 		tmpDir := os.TempDir()
 		askpassScript := filepath.Join(tmpDir, fmt.Sprintf("danklinux-fp-%d.sh", time.Now().UnixNano()))
@@ -289,15 +289,9 @@ func (m Model) tryFingerprint() tea.Cmd {
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 
-		cmd := exec.CommandContext(ctx, "sudo", "-A", "-v")
-		cmd.Env = append(os.Environ(), fmt.Sprintf("SUDO_ASKPASS=%s", askpassScript))
-
-		err := cmd.Run()
-
-		if err != nil {
+		if err := privesc.ValidateWithAskpass(ctx, askpassScript); err != nil {
 			return passwordValidMsg{password: "", valid: false}
 		}
-
 		return passwordValidMsg{password: "", valid: true}
 	}
 }
@@ -307,32 +301,9 @@ func (m Model) validatePassword(password string) tea.Cmd {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		cmd := exec.CommandContext(ctx, "sudo", "-S", "-v")
-
-		stdin, err := cmd.StdinPipe()
-		if err != nil {
+		if err := privesc.ValidatePassword(ctx, password); err != nil {
 			return passwordValidMsg{password: "", valid: false}
 		}
-
-		if err := cmd.Start(); err != nil {
-			return passwordValidMsg{password: "", valid: false}
-		}
-
-		_, err = fmt.Fprintf(stdin, "%s\n", password)
-		stdin.Close()
-		if err != nil {
-			return passwordValidMsg{password: "", valid: false}
-		}
-
-		err = cmd.Wait()
-
-		if err != nil {
-			if ctx.Err() == context.DeadlineExceeded {
-				return passwordValidMsg{password: "", valid: false}
-			}
-			return passwordValidMsg{password: "", valid: false}
-		}
-
 		return passwordValidMsg{password: password, valid: true}
 	}
 }

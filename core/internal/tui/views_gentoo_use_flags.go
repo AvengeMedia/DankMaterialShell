@@ -56,14 +56,7 @@ func (m Model) updateGentooUseFlagsState(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.state = StateGentooGCCCheck
 			return m, nil
 		}
-		if checkFingerprintEnabled() {
-			m.state = StateAuthMethodChoice
-			m.selectedConfig = 0
-		} else {
-			m.state = StatePasswordPrompt
-			m.passwordInput.Focus()
-		}
-		return m, nil
+		return m.enterAuthPhase()
 	}
 
 	if keyMsg, ok := msg.(tea.KeyMsg); ok {
@@ -75,14 +68,7 @@ func (m Model) updateGentooUseFlagsState(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.selectedWM == 1 {
 				return m, m.checkGCCVersion()
 			}
-			if checkFingerprintEnabled() {
-				m.state = StateAuthMethodChoice
-				m.selectedConfig = 0
-			} else {
-				m.state = StatePasswordPrompt
-				m.passwordInput.Focus()
-			}
-			return m, nil
+			return m.enterAuthPhase()
 		case "esc":
 			m.state = StateDependencyReview
 			return m, nil
