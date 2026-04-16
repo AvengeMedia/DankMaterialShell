@@ -115,6 +115,32 @@ Singleton {
         return true;
     }
 
+    function setPopoutBody(claimId, bodyX, bodyY, bodyW, bodyH) {
+        if (!hasPopoutOwner(claimId))
+            return false;
+        if (bodyX !== undefined) {
+            const nextX = Number(bodyX);
+            if (!isNaN(nextX) && popoutBodyX !== nextX)
+                popoutBodyX = nextX;
+        }
+        if (bodyY !== undefined) {
+            const nextY = Number(bodyY);
+            if (!isNaN(nextY) && popoutBodyY !== nextY)
+                popoutBodyY = nextY;
+        }
+        if (bodyW !== undefined) {
+            const nextW = Number(bodyW);
+            if (!isNaN(nextW) && popoutBodyW !== nextW)
+                popoutBodyW = nextW;
+        }
+        if (bodyH !== undefined) {
+            const nextH = Number(bodyH);
+            if (!isNaN(nextH) && popoutBodyH !== nextH)
+                popoutBodyH = nextH;
+        }
+        return true;
+    }
+
     function _cloneDockStates() {
         const next = {};
         for (const screenName in dockStates)

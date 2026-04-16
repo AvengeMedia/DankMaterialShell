@@ -36,6 +36,7 @@ QtObject {
     property var pendingDestroys: []
     property int destroyDelayMs: 100
     property bool _chromeSyncPending: false
+    property bool _syncingVisibleNotifications: false
     readonly property real chromeOpenProgressThreshold: 0.10
     readonly property real chromeReleaseTailStart: 0.90
     readonly property real chromeReleaseDropProgress: 0.995
@@ -160,6 +161,7 @@ QtObject {
 
     function _sync(newWrappers) {
         let needsReposition = false;
+        _syncingVisibleNotifications = true;
         for (const p of popupWindows.slice()) {
             if (!_isValidWindow(p) || p.exiting)
                 continue;
@@ -171,10 +173,10 @@ QtObject {
         }
         for (const w of newWrappers) {
             if (w && !_hasWindowFor(w) && _isFocusedScreen()) {
-                _insertAtTop(w);
-                needsReposition = false;
+                needsReposition = _insertAtTop(w, true) || needsReposition;
             }
         }
+        _syncingVisibleNotifications = false;
         if (needsReposition)
             _repositionAll();
     }
@@ -183,9 +185,9 @@ QtObject {
         return (p.alignedHeight || p.implicitHeight || (baseNotificationHeight - popupSpacing)) + popupSpacing;
     }
 
-    function _insertAtTop(wrapper) {
+    function _insertAtTop(wrapper, deferReposition) {
         if (!wrapper)
-            return;
+            return false;
         const notificationId = wrapper?.notification ? wrapper.notification.id : "";
         const win = popupComponent.createObject(null, {
             "notificationData": wrapper,
@@ -194,15 +196,17 @@ QtObject {
             "screen": manager.modelData
         });
         if (!win)
-            return;
+            return false;
         if (!win.hasValidData) {
             win.destroy();
-            return;
+            return false;
         }
         popupWindows.unshift(win);
-        _repositionAll();
+        if (!deferReposition)
+            _repositionAll();
         if (!sweeper.running)
             sweeper.start();
+        return true;
     }
 
     function _repositionAll() {
@@ -319,6 +323,10 @@ QtObject {
     function _popupChromeBoundsRect(p, trailing, useMotionOffset) {
         const rect = _popupChromeRect(p, useMotionOffset);
         if (!rect || p !== trailing || !p.popupChromeReleaseProgress)
+            return rect;
+
+        // Keep maxed-stack chrome anchored while a replacement tail exits.
+        if (p.exiting && p.notificationData?.removedByLimit && _layoutWindows().length > 0)
             return rect;
 
         const progress = _chromeReleaseTailProgress(p.popupChromeReleaseProgress());
@@ -489,16 +497,33 @@ QtObject {
         _scheduleNotificationChromeSync();
     }
 
+    // Coalesce resize repositioning; exit-path moves remain immediate.
+    property bool _repositionPending: false
+
+    function _queueReposition() {
+        if (_repositionPending)
+            return;
+        _repositionPending = true;
+        Qt.callLater(_flushReposition);
+    }
+
+    function _flushReposition() {
+        _repositionPending = false;
+        _repositionAll();
+    }
+
     function _onPopupHeightChanged(p) {
         if (!p || p.exiting || p._isDestroying)
             return;
         if (popupWindows.indexOf(p) === -1)
             return;
-        _repositionAll();
+        _queueReposition();
     }
 
     function _onPopupExitStarted(p) {
         if (!p || popupWindows.indexOf(p) === -1)
+            return;
+        if (_syncingVisibleNotifications)
             return;
         _repositionAll();
     }
