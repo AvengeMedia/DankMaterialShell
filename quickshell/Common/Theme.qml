@@ -1077,6 +1077,9 @@ Singleton {
         return base === 0 ? 0 : Math.round(base * 0.85);
     }
 
+    readonly property int notificationInlineExpandDuration: notificationAnimationBaseDuration === 0 ? 0 : 185
+    readonly property int notificationInlineCollapseDuration: notificationAnimationBaseDuration === 0 ? 0 : 150
+
     readonly property real notificationIconSizeNormal: 56
     readonly property real notificationIconSizeCompact: 48
     readonly property real notificationExpandedIconSizeNormal: 48

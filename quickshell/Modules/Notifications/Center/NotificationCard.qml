@@ -16,6 +16,7 @@ Rectangle {
     property bool userInitiatedExpansion: false
     property bool isAnimating: false
     property bool animateExpansion: true
+    property bool isDescriptionToggleAnimation: false
     property bool _retainedExpandedContent: false
     property bool _clipAnimatedContent: false
     property real expandedContentOpacity: expanded ? 1 : 0
@@ -64,6 +65,8 @@ Rectangle {
     }
 
     function expansionMotionDuration() {
+        if (isDescriptionToggleAnimation)
+            return descriptionExpanded ? Theme.notificationInlineExpandDuration : Theme.notificationInlineCollapseDuration;
         return root.connectedFrameMode ? Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded) : (root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration);
     }
 
@@ -414,6 +417,7 @@ Rectangle {
                         onClicked: mouse => {
                             if (!parent.hoveredLink && (parent.hasMoreText || descriptionExpanded)) {
                                 root.userInitiatedExpansion = true;
+                                root.isDescriptionToggleAnimation = true;
                                 const messageId = (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.notification && notificationGroup.latestNotification.notification.id) ? (notificationGroup.latestNotification.notification.id + "_desc") : "";
                                 NotificationService.toggleMessageExpansion(messageId);
                                 Qt.callLater(() => {
@@ -423,7 +427,7 @@ Rectangle {
                             }
                         }
 
-                        propagateComposedEvents: true
+                        propagateComposedEvents: false
                         onPressed: mouse => {
                             if (parent.hoveredLink)
                                 mouse.accepted = false;
@@ -580,7 +584,12 @@ Rectangle {
                         }
 
                         Behavior on height {
-                            enabled: false
+                            enabled: expandedDelegateWrapper.__delegateInitialized && root.animateExpansion && root.userInitiatedExpansion
+                            NumberAnimation {
+                                duration: root.expansionMotionDuration()
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.expansionMotionCurve()
+                            }
                         }
 
                         Item {
@@ -719,6 +728,7 @@ Rectangle {
                                             onClicked: mouse => {
                                                 if (!parent.hoveredLink && (bodyText.hasMoreText || messageExpanded)) {
                                                     root.userInitiatedExpansion = true;
+                                                    root.isDescriptionToggleAnimation = true;
                                                     NotificationService.toggleMessageExpansion(modelData?.notification?.id || "");
                                                     Qt.callLater(() => {
                                                         if (root && !root.isAnimating)
@@ -727,7 +737,7 @@ Rectangle {
                                                 }
                                             }
 
-                                            propagateComposedEvents: true
+                                            propagateComposedEvents: false
                                             onPressed: mouse => {
                                                 if (parent.hoveredLink) {
                                                     mouse.accepted = false;
@@ -985,6 +995,7 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             root.userInitiatedExpansion = true;
+            root.isDescriptionToggleAnimation = false;
             NotificationService.toggleGroupExpansion(notificationGroup?.key || "");
         }
         z: -1
@@ -1008,6 +1019,7 @@ Rectangle {
             buttonSize: compactMode ? 24 : 28
             onClicked: {
                 root.userInitiatedExpansion = true;
+                root.isDescriptionToggleAnimation = false;
                 NotificationService.toggleGroupExpansion(notificationGroup?.key || "");
             }
         }
@@ -1034,6 +1046,7 @@ Rectangle {
                 } else {
                     root.isAnimating = false;
                     root.userInitiatedExpansion = false;
+                    root.isDescriptionToggleAnimation = false;
                     root._retainedExpandedContent = false;
                     root._clipAnimatedContent = false;
                 }
