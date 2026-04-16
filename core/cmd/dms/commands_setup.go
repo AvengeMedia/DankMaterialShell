@@ -19,7 +19,7 @@ var setupCmd = &cobra.Command{
 	Use:               "setup",
 	Short:             "Deploy DMS configurations",
 	Long:              "Deploy compositor and terminal configurations with interactive prompts",
-	PersistentPreRunE: requireMutableSystemCommand,
+	PersistentPreRunE: preRunPrivileged,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := runSetup(); err != nil {
 			log.Fatalf("Error during setup: %v", err)

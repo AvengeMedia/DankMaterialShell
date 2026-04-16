@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 // ErrConfirmationRequired is returned when --yes is not set and the user
@@ -383,20 +383,41 @@ func (r *Runner) parseTerminal() (deps.Terminal, error) {
 }
 
 func (r *Runner) resolveSudoPassword() (string, error) {
-	// Check if sudo credentials are cached (via sudo -v or NOPASSWD)
-	cmd := exec.Command("sudo", "-n", "true")
-	if err := cmd.Run(); err == nil {
-		r.log("sudo cache is valid, no password needed")
-		fmt.Fprintln(os.Stdout, "sudo: using cached credentials")
+	tool, err := privesc.Detect()
+	if err != nil {
+		return "", err
+	}
+
+	if err := privesc.CheckCached(context.Background()); err == nil {
+		r.log(fmt.Sprintf("%s cache is valid, no password needed", tool.Name()))
+		fmt.Fprintf(os.Stdout, "%s: using cached credentials\n", tool.Name())
 		return "", nil
 	}
 
-	return "", fmt.Errorf(
-		"sudo authentication required but no cached credentials found\n" +
-			"Options:\n" +
-			"  1. Run 'sudo -v' before dankinstall to cache credentials\n" +
-			"  2. Configure passwordless sudo for your user",
-	)
+	switch tool {
+	case privesc.ToolSudo:
+		return "", fmt.Errorf(
+			"sudo authentication required but no cached credentials found\n" +
+				"Options:\n" +
+				"  1. Run 'sudo -v' before dankinstall to cache credentials\n" +
+				"  2. Configure passwordless sudo for your user",
+		)
+	case privesc.ToolDoas:
+		return "", fmt.Errorf(
+			"doas authentication required but no cached credentials found\n" +
+				"Options:\n" +
+				"  1. Run 'doas true' before dankinstall to cache credentials (requires 'persist' in /etc/doas.conf)\n" +
+				"  2. Configure a 'nopass' rule in /etc/doas.conf for your user",
+		)
+	case privesc.ToolRun0:
+		return "", fmt.Errorf(
+			"run0 authentication required but no cached credentials found\n" +
+				"Configure a polkit rule granting your user passwordless privilege\n" +
+				"(see `man polkit` for details on rules in /etc/polkit-1/rules.d/)",
+		)
+	default:
+		return "", fmt.Errorf("unsupported privilege tool: %s", tool)
+	}
 }
 
 func (r *Runner) anyConfigEnabled(m map[string]bool) bool {

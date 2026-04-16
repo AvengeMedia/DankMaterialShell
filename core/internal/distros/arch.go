@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 func init() {
@@ -292,7 +293,7 @@ func (a *ArchDistribution) InstallPrerequisites(ctx context.Context, sudoPasswor
 		LogOutput:   "Installing base-devel development tools",
 	}
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, "pacman -S --needed --noconfirm base-devel")
+	cmd := privesc.ExecCommand(ctx, sudoPassword, "pacman -S --needed --noconfirm base-devel")
 	if err := a.runWithProgress(cmd, progressChan, PhasePrerequisites, 0.08, 0.10); err != nil {
 		return fmt.Errorf("failed to install base-devel: %w", err)
 	}
@@ -463,7 +464,7 @@ func (a *ArchDistribution) preinstallQuickshellGit(ctx context.Context, sudoPass
 			CommandInfo: "sudo pacman -Rdd --noconfirm quickshell",
 			LogOutput:   "Removing stable quickshell so quickshell-git can be installed",
 		}
-		cmd := ExecSudoCommand(ctx, sudoPassword, "pacman -Rdd --noconfirm quickshell")
+		cmd := privesc.ExecCommand(ctx, sudoPassword, "pacman -Rdd --noconfirm quickshell")
 		if err := a.runWithProgress(cmd, progressChan, PhaseAURPackages, 0.15, 0.18); err != nil {
 			return fmt.Errorf("failed to remove stable quickshell: %w", err)
 		}
@@ -501,7 +502,7 @@ func (a *ArchDistribution) installSystemPackages(ctx context.Context, packages [
 		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
 	}
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+	cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 	return a.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.40, 0.60)
 }
 
@@ -779,7 +780,7 @@ func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, 
 	installArgs := []string{"pacman", "-U", "--noconfirm"}
 	installArgs = append(installArgs, files...)
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(installArgs, " "))
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(installArgs, " "))
 
 	fileNames := make([]string, len(files))
 	for i, f := range files {

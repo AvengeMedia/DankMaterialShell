@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 // ManualPackageInstaller provides methods for installing packages from source
@@ -143,7 +144,7 @@ func (m *ManualPackageInstaller) installDgop(ctx context.Context, sudoPassword s
 		CommandInfo: "sudo make install",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword, "make install")
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, "make install")
 	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		m.logError("failed to install dgop", err)
@@ -213,7 +214,7 @@ func (m *ManualPackageInstaller) installNiri(ctx context.Context, sudoPassword s
 		CommandInfo: "dpkg -i niri.deb",
 	}
 
-	installDebCmd := ExecSudoCommand(ctx, sudoPassword,
+	installDebCmd := privesc.ExecCommand(ctx, sudoPassword,
 		fmt.Sprintf("dpkg -i %s/target/debian/niri_*.deb", buildDir))
 
 	output, err := installDebCmd.CombinedOutput()
@@ -324,7 +325,7 @@ func (m *ManualPackageInstaller) installQuickshell(ctx context.Context, variant 
 		CommandInfo: "sudo cmake --install build",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword, "cmake --install build")
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, "cmake --install build")
 	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install quickshell: %w", err)
@@ -387,7 +388,7 @@ func (m *ManualPackageInstaller) installHyprland(ctx context.Context, sudoPasswo
 		CommandInfo: "sudo make install",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword, "make install")
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, "make install")
 	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install Hyprland: %w", err)
@@ -453,7 +454,7 @@ func (m *ManualPackageInstaller) installGhostty(ctx context.Context, sudoPasswor
 		CommandInfo: "sudo cp zig-out/bin/ghostty /usr/local/bin/",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword,
+	installCmd := privesc.ExecCommand(ctx, sudoPassword,
 		fmt.Sprintf("cp %s/zig-out/bin/ghostty /usr/local/bin/", tmpDir))
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install Ghostty: %w", err)
@@ -492,16 +493,11 @@ func (m *ManualPackageInstaller) installMatugen(ctx context.Context, sudoPasswor
 		CommandInfo: fmt.Sprintf("sudo cp %s %s", sourcePath, targetPath),
 	}
 
-	copyCmd := exec.CommandContext(ctx, "sudo", "-S", "cp", sourcePath, targetPath)
-	copyCmd.Stdin = strings.NewReader(sudoPassword + "\n")
-	if err := copyCmd.Run(); err != nil {
+	if err := privesc.Run(ctx, sudoPassword, "cp", sourcePath, targetPath); err != nil {
 		return fmt.Errorf("failed to copy matugen to /usr/local/bin: %w", err)
 	}
 
-	// Make it executable
-	chmodCmd := exec.CommandContext(ctx, "sudo", "-S", "chmod", "+x", targetPath)
-	chmodCmd.Stdin = strings.NewReader(sudoPassword + "\n")
-	if err := chmodCmd.Run(); err != nil {
+	if err := privesc.Run(ctx, sudoPassword, "chmod", "+x", targetPath); err != nil {
 		return fmt.Errorf("failed to make matugen executable: %w", err)
 	}
 
@@ -646,15 +642,11 @@ func (m *ManualPackageInstaller) installXwaylandSatellite(ctx context.Context, s
 		CommandInfo: fmt.Sprintf("sudo cp %s %s", sourcePath, targetPath),
 	}
 
-	copyCmd := exec.CommandContext(ctx, "sudo", "-S", "cp", sourcePath, targetPath)
-	copyCmd.Stdin = strings.NewReader(sudoPassword + "\n")
-	if err := copyCmd.Run(); err != nil {
+	if err := privesc.Run(ctx, sudoPassword, "cp", sourcePath, targetPath); err != nil {
 		return fmt.Errorf("failed to copy xwayland-satellite to /usr/local/bin: %w", err)
 	}
 
-	chmodCmd := exec.CommandContext(ctx, "sudo", "-S", "chmod", "+x", targetPath)
-	chmodCmd.Stdin = strings.NewReader(sudoPassword + "\n")
-	if err := chmodCmd.Run(); err != nil {
+	if err := privesc.Run(ctx, sudoPassword, "chmod", "+x", targetPath); err != nil {
 		return fmt.Errorf("failed to make xwayland-satellite executable: %w", err)
 	}
 
