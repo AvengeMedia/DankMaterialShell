@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
-	"github.com/sblinch/kdl-go"
 	"github.com/sblinch/kdl-go/document"
 )
 
@@ -292,7 +291,7 @@ func (n *NiriProvider) loadOverrideBinds() (map[string]*overrideBind, error) {
 	parser := NewNiriParser(filepath.Dir(overridePath))
 	parser.currentSource = overridePath
 
-	doc, err := kdl.Parse(strings.NewReader(string(data)))
+	doc, err := parseKDL(data)
 	if err != nil {
 		return nil, err
 	}
