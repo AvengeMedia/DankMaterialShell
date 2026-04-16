@@ -141,6 +141,8 @@ QtObject {
                 return false;
             if (!p.notificationData?.popup && !p.exiting)
                 return false;
+            if (p.exiting && p.notificationData?.removedByLimit && _layoutWindows().length > 0)
+                return true;
             if (!p.exiting && p.popupChromeOpenProgress && p.popupChromeOpenProgress() < chromeOpenProgressThreshold)
                 return false;
             // Keep the connected shell until the card is almost fully closed.
@@ -408,6 +410,33 @@ QtObject {
         };
     }
 
+    function _filledMaxStackChromeEdge(candidates, stackEdge) {
+        const layoutWindows = _layoutWindows();
+        if (layoutWindows.length < NotificationService.maxVisibleNotifications)
+            return null;
+        const anchorsTop = _stackAnchorsTop();
+        const layoutAnchorEdge = _stackAnchoredChromeEdge(layoutWindows);
+        const anchorEdge = layoutAnchorEdge !== null ? layoutAnchorEdge : (stackEdge !== null ? stackEdge : _stackAnchoredChromeEdge(candidates));
+        if (anchorEdge === null)
+            return null;
+        let span = 0;
+        for (const p of layoutWindows) {
+            const rect = _popupChromeRect(p, false);
+            if (!rect)
+                continue;
+            span += Math.max(0, rect.bottom - rect.y);
+        }
+        if (span <= 0)
+            return null;
+        if (layoutWindows.length > 1)
+            span += popupSpacing * (layoutWindows.length - 1);
+        return {
+            anchorsTop: anchorsTop,
+            startEdge: anchorEdge.edge,
+            edge: anchorsTop ? anchorEdge.edge + span : anchorEdge.edge - span
+        };
+    }
+
     function _syncNotificationChromeState() {
         const screenName = manager.modelData?.name || "";
         if (!screenName)
@@ -454,6 +483,16 @@ QtObject {
                 minY = stackEdge.edge;
             if (!stackEdge.anchorsTop && stackEdge.edge > maxYEnd)
                 maxYEnd = stackEdge.edge;
+        }
+        const filledMaxStackEdge = _filledMaxStackChromeEdge(chromeCandidates, stackEdge);
+        if (filledMaxStackEdge !== null) {
+            if (filledMaxStackEdge.anchorsTop) {
+                minY = filledMaxStackEdge.startEdge;
+                maxYEnd = filledMaxStackEdge.edge;
+            } else {
+                minY = filledMaxStackEdge.edge;
+                maxYEnd = filledMaxStackEdge.startEdge;
+            }
         }
         const anchorsTop = stackEdge !== null ? stackEdge.anchorsTop : _stackAnchorsTop();
         const closeGapAnchorEdge = _closeGapChromeAnchorEdge(anchorsTop);
