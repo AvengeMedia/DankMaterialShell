@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/blur"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
@@ -509,7 +510,22 @@ func checkWindowManagers() []checkResult {
 		results = append(results, checkResult{catCompositor, "Active", statusInfo, wm, "", doctorDocsURL + "#compositor"})
 	}
 
+	results = append(results, checkCompositorBlurSupport())
+
 	return results
+}
+
+func checkCompositorBlurSupport() checkResult {
+	supported, err := blur.ProbeSupport()
+	if err != nil {
+		return checkResult{catCompositor, "Background Blur", statusInfo, "Unable to verify", err.Error(), doctorDocsURL + "#compositor-checks"}
+	}
+
+	if supported {
+		return checkResult{catCompositor, "Background Blur", statusOK, "Supported", "Compositor supports ext-background-effect-v1", doctorDocsURL + "#compositor-checks"}
+	}
+
+	return checkResult{catCompositor, "Background Blur", statusWarn, "Unsupported", "Compositor does not support ext-background-effect-v1", doctorDocsURL + "#compositor-checks"}
 }
 
 func getVersionFromCommand(cmd, arg string, regex *regexp.Regexp) string {
@@ -553,6 +569,7 @@ func checkQuickshellFeatures() ([]checkResult, bool) {
 	qmlContent := `
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 
 ShellRoot {
 	id: root
@@ -561,6 +578,7 @@ ShellRoot {
 	property bool idleMonitorAvailable: false
 	property bool idleInhibitorAvailable: false
 	property bool shortcutInhibitorAvailable: false
+	property bool backgroundBlurAvailable: false
 
 	Timer {
 		interval: 50
@@ -578,16 +596,18 @@ ShellRoot {
 
 			try {
 				var testItem = Qt.createQmlObject(
-					'import Quickshell.Wayland; import QtQuick; QtObject { ' +
+					'import Quickshell; import Quickshell.Wayland; import QtQuick; QtObject { ' +
 					'readonly property bool hasIdleMonitor: typeof IdleMonitor !== "undefined"; ' +
 					'readonly property bool hasIdleInhibitor: typeof IdleInhibitor !== "undefined"; ' +
-					'readonly property bool hasShortcutInhibitor: typeof ShortcutInhibitor !== "undefined" ' +
+					'readonly property bool hasShortcutInhibitor: typeof ShortcutInhibitor !== "undefined"; ' +
+					'readonly property bool hasBackgroundBlur: typeof BackgroundEffect !== "undefined" ' +
 					'}',
 					root
 				)
 				root.idleMonitorAvailable = testItem.hasIdleMonitor
 				root.idleInhibitorAvailable = testItem.hasIdleInhibitor
 				root.shortcutInhibitorAvailable = testItem.hasShortcutInhibitor
+				root.backgroundBlurAvailable = testItem.hasBackgroundBlur
 				testItem.destroy()
 			} catch (e) {}
 
@@ -595,6 +615,8 @@ ShellRoot {
 			console.warn(root.idleMonitorAvailable ? "FEATURE:IdleMonitor:OK" : "FEATURE:IdleMonitor:UNAVAILABLE")
 			console.warn(root.idleInhibitorAvailable ? "FEATURE:IdleInhibitor:OK" : "FEATURE:IdleInhibitor:UNAVAILABLE")
 			console.warn(root.shortcutInhibitorAvailable ? "FEATURE:ShortcutInhibitor:OK" : "FEATURE:ShortcutInhibitor:UNAVAILABLE")
+
+			console.warn(root.backgroundBlurAvailable ? "FEATURE:BackgroundBlur:OK" : "FEATURE:BackgroundBlur:UNAVAILABLE")
 
 			Quickshell.execDetached(["kill", "-TERM", String(Quickshell.processId)])
 		}
@@ -616,6 +638,7 @@ ShellRoot {
 		{"IdleMonitor", "Idle detection"},
 		{"IdleInhibitor", "Prevent idle/sleep"},
 		{"ShortcutInhibitor", "Allow shortcut management (niri)"},
+		{"BackgroundBlur", "Background blur API support in Quickshell"},
 	}
 
 	var results []checkResult
