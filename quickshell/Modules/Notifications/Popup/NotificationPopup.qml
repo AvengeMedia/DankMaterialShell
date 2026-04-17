@@ -10,19 +10,24 @@ import qs.Widgets
 PanelWindow {
     id: win
 
-    readonly property bool connectedFrameMode: SettingsData.frameEnabled
-        && Theme.isConnectedEffect
-        && SettingsData.isScreenInPreferences(win.screen, SettingsData.frameScreenPreferences)
+    readonly property bool connectedFrameMode: SettingsData.frameEnabled && Theme.isConnectedEffect && SettingsData.isScreenInPreferences(win.screen, SettingsData.frameScreenPreferences)
     readonly property string notifBarSide: {
         const pos = SettingsData.notificationPopupPosition;
-        if (pos === -1) return "top";
+        if (pos === -1)
+            return "top";
         switch (pos) {
-        case SettingsData.Position.Top: return "right";
-        case SettingsData.Position.Left: return "left";
-        case SettingsData.Position.BottomCenter: return "bottom";
-        case SettingsData.Position.Right: return "right";
-        case SettingsData.Position.Bottom: return "left";
-        default: return "top";
+        case SettingsData.Position.Top:
+            return "right";
+        case SettingsData.Position.Left:
+            return "left";
+        case SettingsData.Position.BottomCenter:
+            return "bottom";
+        case SettingsData.Position.Right:
+            return "right";
+        case SettingsData.Position.Bottom:
+            return "left";
+        default:
+            return "top";
         }
     }
     readonly property int inlineExpandDuration: Theme.notificationInlineExpandDuration
@@ -190,9 +195,7 @@ PanelWindow {
     property real renderedAlignedHeight: targetAlignedHeight
     property real allocatedAlignedHeight: targetAlignedHeight
     readonly property bool inlineGeometryGrowing: targetAlignedHeight >= renderedAlignedHeight
-    readonly property bool contentAnchorsTop: isTopCenter
-        || SettingsData.notificationPopupPosition === SettingsData.Position.Top
-        || SettingsData.notificationPopupPosition === SettingsData.Position.Left
+    readonly property bool contentAnchorsTop: isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left
     readonly property real renderedContentOffsetY: contentAnchorsTop ? 0 : Math.max(0, allocatedAlignedHeight - renderedAlignedHeight)
     implicitWidth: contentImplicitWidth + (windowShadowPad * 2)
     implicitHeight: allocatedAlignedHeight + (windowShadowPad * 2)
@@ -252,7 +255,7 @@ PanelWindow {
     }
 
     Behavior on renderedAlignedHeight {
-        enabled: !exiting && !_isDestroying
+        enabled: win.connectedFrameMode && !exiting && !_isDestroying
         NumberAnimation {
             id: renderedHeightAnim
             duration: win.inlineMotionDuration(win.inlineGeometryGrowing)
@@ -364,8 +367,7 @@ PanelWindow {
         return Math.max(0, Math.round(Theme.px(raw, dpr)));
     }
 
-    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !connectedFrameMode && !!screen
-        && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !connectedFrameMode && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
 
     // Frame ON + Connected OFF. frameEdgeInset is the full bar/frame inset
     function _frameGapMargin(side) {
@@ -379,9 +381,7 @@ PanelWindow {
             return 0;
 
         if (connectedFrameMode) {
-            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps)
-                ? 0
-                : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps) ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("top") + cornerClear + screenY;
         }
         if (frameOnlyNoConnected)
@@ -398,9 +398,7 @@ PanelWindow {
             return 0;
 
         if (connectedFrameMode) {
-            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps)
-                ? 0
-                : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps) ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("bottom") + cornerClear + screenY;
         }
         if (frameOnlyNoConnected)
