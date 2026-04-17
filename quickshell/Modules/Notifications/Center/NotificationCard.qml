@@ -114,7 +114,7 @@ Rectangle {
     }
 
     Behavior on expandedContentOpacity {
-        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        enabled: root.connectedFrameMode && root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
             duration: root.expansionMotionDuration()
             easing.type: Easing.BezierSpline
@@ -123,7 +123,7 @@ Rectangle {
     }
 
     Behavior on collapsedContentOpacity {
-        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        enabled: root.connectedFrameMode && root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
             duration: root.expansionMotionDuration()
             easing.type: Easing.BezierSpline
