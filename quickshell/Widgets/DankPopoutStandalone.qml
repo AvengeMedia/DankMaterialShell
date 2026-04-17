@@ -338,10 +338,9 @@ Item {
         screen: root.screen
         visible: false
         color: "transparent"
-        Component.onCompleted: {
-            if (typeof updatesEnabled !== "undefined" && !root.overlayContent)
-                updatesEnabled = false;
-        }
+        // When there's no overlay to render, skip buffer updates. Re-evaluates if
+        // overlayContent is assigned later (e.g., via a dispatcher forwarding it).
+        updatesEnabled: root.overlayContent !== null
 
         WlrLayershell.namespace: root.layerNamespace + ":background"
         WlrLayershell.layer: WlrLayershell.Top

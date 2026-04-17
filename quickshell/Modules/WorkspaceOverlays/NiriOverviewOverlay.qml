@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Modals.DankLauncherV2
 import qs.Services
+import qs.Widgets
 
 Scope {
     id: niriOverviewScope
@@ -124,6 +125,19 @@ Scope {
                     item: overlayVisible && spotlightContainer.visible ? spotlightContainer : null
                 }
 
+                WindowBlur {
+                    targetWindow: overlayWindow
+                    // Track the container's scale so blur shrinks with the content
+                    // during exit — otherwise blur pops away one frame after content.
+                    readonly property real s: Math.min(1, spotlightContainer.scale)
+                    readonly property bool active: spotlightContainer.visible && spotlightContainer.opacity > 0
+                    blurX: spotlightContainer.x + spotlightContainer.width * (1 - s) * 0.5
+                    blurY: spotlightContainer.y + spotlightContainer.height * (1 - s) * 0.5
+                    blurWidth: active ? spotlightContainer.width * s : 0
+                    blurHeight: active ? spotlightContainer.height * s : 0
+                    blurRadius: Theme.cornerRadius
+                }
+
                 onShouldShowSpotlightChanged: {
                     if (shouldShowSpotlight) {
                         if (launcherContent?.controller) {
@@ -202,18 +216,8 @@ Scope {
 
                 Item {
                     id: spotlightContainer
-                    readonly property bool directionalEffect: Theme.isDirectionalEffect
-                    readonly property bool depthEffect: Theme.isDepthEffect
-                    readonly property real collapsedMotionX: depthEffect ? Theme.effectAnimOffset * 0.25 : 0
-                    readonly property real collapsedMotionY: {
-                        if (directionalEffect)
-                            return Math.max(height * 0.85, Theme.effectAnimOffset * 1.1);
-                        if (depthEffect)
-                            return Math.max(Theme.effectAnimOffset * 0.8, 30);
-                        return 0;
-                    }
-                    x: Theme.snap((parent.width - width) / 2 + (overlayWindow.shouldShowSpotlight ? 0 : collapsedMotionX), overlayWindow.dpr)
-                    y: Theme.snap((parent.height - height) / 2 + (overlayWindow.shouldShowSpotlight ? 0 : collapsedMotionY), overlayWindow.dpr)
+                    x: Theme.snap((parent.width - width) / 2, overlayWindow.dpr)
+                    y: Theme.snap((parent.height - height) / 2, overlayWindow.dpr)
 
                     readonly property int baseWidth: {
                         switch (SettingsData.dankLauncherV2Size) {
@@ -244,8 +248,8 @@ Scope {
 
                     readonly property bool animatingOut: niriOverviewScope.isClosing && overlayWindow.isSpotlightScreen
 
-                    scale: Theme.isDirectionalEffect ? 1 : (overlayWindow.shouldShowSpotlight ? 1.0 : Theme.effectScaleCollapsed)
-                    opacity: Theme.isDirectionalEffect ? 1 : (overlayWindow.shouldShowSpotlight ? 1 : 0)
+                    scale: overlayWindow.shouldShowSpotlight ? 1.0 : 0.96
+                    opacity: overlayWindow.shouldShowSpotlight ? 1 : 0
                     visible: overlayWindow.shouldShowSpotlight || animatingOut
                     enabled: overlayWindow.shouldShowSpotlight
 
@@ -255,11 +259,10 @@ Scope {
 
                     Behavior on scale {
                         id: scaleAnimation
-                        enabled: !Theme.isDirectionalEffect
                         NumberAnimation {
-                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
+                            duration: Theme.expressiveDurations.fast
                             easing.type: Easing.BezierSpline
-                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveFastSpatial : Theme.expressiveCurves.standardAccel
                             onRunningChanged: {
                                 if (running || !spotlightContainer.animatingOut)
                                     return;
@@ -269,27 +272,10 @@ Scope {
                     }
 
                     Behavior on opacity {
-                        enabled: !Theme.isDirectionalEffect
                         NumberAnimation {
-                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
+                            duration: Theme.expressiveDurations.fast
                             easing.type: Easing.BezierSpline
-                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                        }
-                    }
-
-                    Behavior on x {
-                        NumberAnimation {
-                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                        }
-                    }
-
-                    Behavior on y {
-                        NumberAnimation {
-                            duration: Theme.variantDuration(Theme.expressiveDurations.fast, overlayWindow.shouldShowSpotlight)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: spotlightContainer.visible ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveFastSpatial : Theme.expressiveCurves.standardAccel
                         }
                     }
 
