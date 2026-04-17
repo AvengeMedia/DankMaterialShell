@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Shapes
-import qs.Common
+import "../Common/ConnectorGeometry.js" as ConnectorGeometry
 
 // Concave arc connector filling the gap between a bar corner and an adjacent surface.
 //
@@ -23,15 +23,7 @@ Item {
     readonly property bool isHorizontalBar: barSide === "top" || barSide === "bottom"
     readonly property bool isPlacementLeft: placement === "left"
     readonly property real _edgeStrokeWidth: Math.max(0, edgeStrokeWidth)
-    readonly property string arcCorner: {
-        if (barSide === "top")
-            return isPlacementLeft ? "bottomLeft" : "bottomRight";
-        if (barSide === "bottom")
-            return isPlacementLeft ? "topLeft" : "topRight";
-        if (barSide === "left")
-            return isPlacementLeft ? "topRight" : "bottomRight";
-        return isPlacementLeft ? "topLeft" : "bottomLeft";
-    }
+    readonly property string arcCorner: ConnectorGeometry.arcCorner(barSide, placement)
     readonly property real pathStartX: {
         switch (arcCorner) {
         case "topLeft":

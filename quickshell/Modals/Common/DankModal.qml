@@ -1,10 +1,12 @@
 import QtQuick
 import qs.Common
+import qs.Services
 
 Item {
     id: root
     readonly property var log: Log.scoped("DankModal")
 
+    readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
     property string layerNamespace: "dms:modal"
     property Component content: null
     property Item directContent: null

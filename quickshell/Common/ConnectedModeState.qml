@@ -38,6 +38,13 @@ Singleton {
     // Dock slide offsets — hot-path updates separated from full geometry state
     property var dockSlides: ({})
 
+    function _cloneDict(src) {
+        const next = {};
+        for (const k in src)
+            next[k] = src[k];
+        return next;
+    }
+
     function hasPopoutOwner(claimId) {
         return !!claimId && popoutOwnerId === claimId;
     }
@@ -141,13 +148,6 @@ Singleton {
         return true;
     }
 
-    function _cloneDockStates() {
-        const next = {};
-        for (const screenName in dockStates)
-            next[screenName] = dockStates[screenName];
-        return next;
-    }
-
     function _normalizeDockState(state) {
         return {
             "reveal": !!(state && state.reveal),
@@ -165,7 +165,7 @@ Singleton {
         if (!screenName || !state)
             return false;
 
-        const next = _cloneDockStates();
+        const next = _cloneDict(dockStates);
         next[screenName] = _normalizeDockState(state);
         dockStates = next;
         return true;
@@ -175,15 +175,13 @@ Singleton {
         if (!screenName || !dockStates[screenName])
             return false;
 
-        const next = _cloneDockStates();
+        const next = _cloneDict(dockStates);
         delete next[screenName];
         dockStates = next;
 
         // Also clear corresponding slide
         if (dockSlides[screenName]) {
-            const nextSlides = {};
-            for (const k in dockSlides)
-                nextSlides[k] = dockSlides[k];
+            const nextSlides = _cloneDict(dockSlides);
             delete nextSlides[screenName];
             dockSlides = nextSlides;
         }
@@ -193,10 +191,11 @@ Singleton {
     function setDockSlide(screenName, x, y) {
         if (!screenName)
             return false;
-        const next = {};
-        for (const k in dockSlides)
-            next[k] = dockSlides[k];
-        next[screenName] = { "x": Number(x), "y": Number(y) };
+        const next = _cloneDict(dockSlides);
+        next[screenName] = {
+            "x": Number(x),
+            "y": Number(y)
+        };
         dockSlides = next;
         return true;
     }
@@ -204,24 +203,17 @@ Singleton {
     // ─── Notification state (per screen, updated by NotificationSurface) ──────
 
     readonly property var emptyNotificationState: ({
-        "visible": false,
-        "barSide": "top",
-        "bodyX": 0,
-        "bodyY": 0,
-        "bodyW": 0,
-        "bodyH": 0,
-        "omitStartConnector": false,
-        "omitEndConnector": false
-    })
+            "visible": false,
+            "barSide": "top",
+            "bodyX": 0,
+            "bodyY": 0,
+            "bodyW": 0,
+            "bodyH": 0,
+            "omitStartConnector": false,
+            "omitEndConnector": false
+        })
 
     property var notificationStates: ({})
-
-    function _cloneNotificationStates() {
-        const next = {};
-        for (const screenName in notificationStates)
-            next[screenName] = notificationStates[screenName];
-        return next;
-    }
 
     function _normalizeNotificationState(state) {
         return {
@@ -239,20 +231,13 @@ Singleton {
     function _sameNotificationGeometry(a, b) {
         if (!a || !b)
             return false;
-        return Math.abs(Number(a.bodyX) - Number(b.bodyX)) < 0.5
-            && Math.abs(Number(a.bodyY) - Number(b.bodyY)) < 0.5
-            && Math.abs(Number(a.bodyW) - Number(b.bodyW)) < 0.5
-            && Math.abs(Number(a.bodyH) - Number(b.bodyH)) < 0.5;
+        return Math.abs(Number(a.bodyX) - Number(b.bodyX)) < 0.5 && Math.abs(Number(a.bodyY) - Number(b.bodyY)) < 0.5 && Math.abs(Number(a.bodyW) - Number(b.bodyW)) < 0.5 && Math.abs(Number(a.bodyH) - Number(b.bodyH)) < 0.5;
     }
 
     function _sameNotificationState(a, b) {
         if (!a || !b)
             return false;
-        return a.visible === b.visible
-            && a.barSide === b.barSide
-            && a.omitStartConnector === b.omitStartConnector
-            && a.omitEndConnector === b.omitEndConnector
-            && _sameNotificationGeometry(a, b);
+        return a.visible === b.visible && a.barSide === b.barSide && a.omitStartConnector === b.omitStartConnector && a.omitEndConnector === b.omitEndConnector && _sameNotificationGeometry(a, b);
     }
 
     function setNotificationState(screenName, state) {
@@ -263,7 +248,7 @@ Singleton {
         if (_sameNotificationState(notificationStates[screenName], normalized))
             return true;
 
-        const next = _cloneNotificationStates();
+        const next = _cloneDict(notificationStates);
         next[screenName] = normalized;
         notificationStates = next;
         return true;
@@ -273,7 +258,7 @@ Singleton {
         if (!screenName || !notificationStates[screenName])
             return false;
 
-        const next = _cloneNotificationStates();
+        const next = _cloneDict(notificationStates);
         delete next[screenName];
         notificationStates = next;
         return true;
@@ -281,26 +266,19 @@ Singleton {
 
     // DankModal / DankLauncherV2Modal State
     readonly property var emptyModalState: ({
-        "visible": false,
-        "barSide": "bottom",
-        "bodyX": 0,
-        "bodyY": 0,
-        "bodyW": 0,
-        "bodyH": 0,
-        "animX": 0,
-        "animY": 0,
-        "omitStartConnector": false,
-        "omitEndConnector": false
-    })
+            "visible": false,
+            "barSide": "bottom",
+            "bodyX": 0,
+            "bodyY": 0,
+            "bodyW": 0,
+            "bodyH": 0,
+            "animX": 0,
+            "animY": 0,
+            "omitStartConnector": false,
+            "omitEndConnector": false
+        })
 
     property var modalStates: ({})
-
-    function _cloneModalStates() {
-        const next = {};
-        for (const screenName in modalStates)
-            next[screenName] = modalStates[screenName];
-        return next;
-    }
 
     function _normalizeModalState(state) {
         return {
@@ -320,22 +298,13 @@ Singleton {
     function _sameModalGeometry(a, b) {
         if (!a || !b)
             return false;
-        return Math.abs(Number(a.bodyX) - Number(b.bodyX)) < 0.5
-            && Math.abs(Number(a.bodyY) - Number(b.bodyY)) < 0.5
-            && Math.abs(Number(a.bodyW) - Number(b.bodyW)) < 0.5
-            && Math.abs(Number(a.bodyH) - Number(b.bodyH)) < 0.5
-            && Math.abs(Number(a.animX) - Number(b.animX)) < 0.5
-            && Math.abs(Number(a.animY) - Number(b.animY)) < 0.5;
+        return Math.abs(Number(a.bodyX) - Number(b.bodyX)) < 0.5 && Math.abs(Number(a.bodyY) - Number(b.bodyY)) < 0.5 && Math.abs(Number(a.bodyW) - Number(b.bodyW)) < 0.5 && Math.abs(Number(a.bodyH) - Number(b.bodyH)) < 0.5 && Math.abs(Number(a.animX) - Number(b.animX)) < 0.5 && Math.abs(Number(a.animY) - Number(b.animY)) < 0.5;
     }
 
     function _sameModalState(a, b) {
         if (!a || !b)
             return false;
-        return a.visible === b.visible
-            && a.barSide === b.barSide
-            && a.omitStartConnector === b.omitStartConnector
-            && a.omitEndConnector === b.omitEndConnector
-            && _sameModalGeometry(a, b);
+        return a.visible === b.visible && a.barSide === b.barSide && a.omitStartConnector === b.omitStartConnector && a.omitEndConnector === b.omitEndConnector && _sameModalGeometry(a, b);
     }
 
     function setModalState(screenName, state) {
@@ -346,7 +315,7 @@ Singleton {
         if (_sameModalState(modalStates[screenName], normalized))
             return true;
 
-        const next = _cloneModalStates();
+        const next = _cloneDict(modalStates);
         next[screenName] = normalized;
         modalStates = next;
         return true;
@@ -356,71 +325,46 @@ Singleton {
         if (!screenName || !modalStates[screenName])
             return false;
 
-        const next = _cloneModalStates();
+        const next = _cloneDict(modalStates);
         delete next[screenName];
         modalStates = next;
         return true;
     }
 
     function setModalAnim(screenName, animX, animY) {
-        if (!screenName)
-            return false;
-        const cur = modalStates[screenName];
+        const cur = screenName ? modalStates[screenName] : null;
         if (!cur)
             return false;
-        let changed = false;
-        const nextAnimX = animX !== undefined ? Number(animX) : cur.animX;
-        const nextAnimY = animY !== undefined ? Number(animY) : cur.animY;
-        if (Math.abs(nextAnimX - cur.animX) >= 0.5 || Math.abs(nextAnimY - cur.animY) >= 0.5) {
-            const updated = {
-                "visible": cur.visible,
-                "barSide": cur.barSide,
-                "bodyX": cur.bodyX,
-                "bodyY": cur.bodyY,
-                "bodyW": cur.bodyW,
-                "bodyH": cur.bodyH,
-                "animX": nextAnimX,
-                "animY": nextAnimY,
-                "omitStartConnector": cur.omitStartConnector,
-                "omitEndConnector": cur.omitEndConnector
-            };
-            const next = _cloneModalStates();
-            next[screenName] = updated;
-            modalStates = next;
-            changed = true;
-        }
-        return changed;
+        const nax = animX !== undefined ? Number(animX) : cur.animX;
+        const nay = animY !== undefined ? Number(animY) : cur.animY;
+        if (Math.abs(nax - cur.animX) < 0.5 && Math.abs(nay - cur.animY) < 0.5)
+            return false;
+        const next = _cloneDict(modalStates);
+        next[screenName] = Object.assign({}, cur, {
+            "animX": nax,
+            "animY": nay
+        });
+        modalStates = next;
+        return true;
     }
 
     function setModalBody(screenName, bodyX, bodyY, bodyW, bodyH) {
-        if (!screenName)
-            return false;
-        const cur = modalStates[screenName];
+        const cur = screenName ? modalStates[screenName] : null;
         if (!cur)
             return false;
         const nx = bodyX !== undefined ? Number(bodyX) : cur.bodyX;
         const ny = bodyY !== undefined ? Number(bodyY) : cur.bodyY;
         const nw = bodyW !== undefined ? Number(bodyW) : cur.bodyW;
         const nh = bodyH !== undefined ? Number(bodyH) : cur.bodyH;
-        if (Math.abs(nx - cur.bodyX) < 0.5
-            && Math.abs(ny - cur.bodyY) < 0.5
-            && Math.abs(nw - cur.bodyW) < 0.5
-            && Math.abs(nh - cur.bodyH) < 0.5)
+        if (Math.abs(nx - cur.bodyX) < 0.5 && Math.abs(ny - cur.bodyY) < 0.5 && Math.abs(nw - cur.bodyW) < 0.5 && Math.abs(nh - cur.bodyH) < 0.5)
             return false;
-        const updated = {
-            "visible": cur.visible,
-            "barSide": cur.barSide,
+        const next = _cloneDict(modalStates);
+        next[screenName] = Object.assign({}, cur, {
             "bodyX": nx,
             "bodyY": ny,
             "bodyW": nw,
-            "bodyH": nh,
-            "animX": cur.animX,
-            "animY": cur.animY,
-            "omitStartConnector": cur.omitStartConnector,
-            "omitEndConnector": cur.omitEndConnector
-        };
-        const next = _cloneModalStates();
-        next[screenName] = updated;
+            "bodyH": nh
+        });
         modalStates = next;
         return true;
     }
@@ -429,21 +373,17 @@ Singleton {
 
     property var dockRetractRequests: ({})
 
-    function _cloneRetractRequests() {
-        const next = {};
-        for (const k in dockRetractRequests)
-            next[k] = dockRetractRequests[k];
-        return next;
-    }
-
     function requestDockRetract(requesterId, screenName, side) {
         if (!requesterId || !screenName || !side)
             return false;
         const existing = dockRetractRequests[requesterId];
         if (existing && existing.screenName === screenName && existing.side === side)
             return true;
-        const next = _cloneRetractRequests();
-        next[requesterId] = { "screenName": screenName, "side": side };
+        const next = _cloneDict(dockRetractRequests);
+        next[requesterId] = {
+            "screenName": screenName,
+            "side": side
+        };
         dockRetractRequests = next;
         return true;
     }
@@ -451,7 +391,7 @@ Singleton {
     function releaseDockRetract(requesterId) {
         if (!requesterId || !dockRetractRequests[requesterId])
             return false;
-        const next = _cloneRetractRequests();
+        const next = _cloneDict(dockRetractRequests);
         delete next[requesterId];
         dockRetractRequests = next;
         return true;
