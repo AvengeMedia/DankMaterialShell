@@ -153,34 +153,27 @@ Item {
         _ensureContentLoadedAndInitialize(query || "", mode || "");
     }
 
-    function show() {
+    function _openCommon(query, mode) {
         closeCleanupTimer.stop();
-
-        var focusedScreen = CompositorService.getFocusedScreen();
+        const focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen && launcherWindow.screen !== focusedScreen) {
             spotlightOpen = false;
             isClosing = false;
             launcherWindow.screen = focusedScreen;
-            Qt.callLater(() => root._finishShow("", ""));
+            Qt.callLater(() => root._finishShow(query, mode));
             return;
         }
-
-        _finishShow("", "");
+        _finishShow(query, mode);
     }
 
+    function show() {
+        _openCommon("", "");
+    }
     function showWithQuery(query) {
-        closeCleanupTimer.stop();
-
-        var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen && launcherWindow.screen !== focusedScreen) {
-            spotlightOpen = false;
-            isClosing = false;
-            launcherWindow.screen = focusedScreen;
-            Qt.callLater(() => root._finishShow(query, ""));
-            return;
-        }
-
-        _finishShow(query, "");
+        _openCommon(query, "");
+    }
+    function showWithMode(mode) {
+        _openCommon("", mode);
     }
 
     function hide() {
@@ -200,30 +193,6 @@ Item {
 
     function toggle() {
         spotlightOpen ? hide() : show();
-    }
-
-    function showWithMode(mode) {
-        closeCleanupTimer.stop();
-
-        var focusedScreen = CompositorService.getFocusedScreen();
-        if (focusedScreen && launcherWindow.screen !== focusedScreen) {
-            spotlightOpen = false;
-            isClosing = false;
-            launcherWindow.screen = focusedScreen;
-            Qt.callLater(() => root._finishShow("", mode));
-            return;
-        }
-
-        spotlightOpen = true;
-        isClosing = false;
-        openedFromOverview = false;
-
-        keyboardActive = true;
-        ModalManager.openModal(modalHandle);
-        if (useHyprlandFocusGrab)
-            focusGrab.active = true;
-
-        _ensureContentLoadedAndInitialize("", mode);
     }
 
     function toggleWithMode(mode) {

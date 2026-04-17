@@ -80,13 +80,13 @@ PanelWindow {
     readonly property real _effectivePopoutMaxCcr: Math.max(win._effectivePopoutStartCcr, win._effectivePopoutEndCcr)
     readonly property real _effectivePopoutFarExtent: Math.max(win._effectivePopoutFarStartCcr, win._effectivePopoutFarEndCcr)
     readonly property real _effectiveNotifCcr: {
-        const isHoriz = win._notifState.barSide === "top" || win._notifState.barSide === "bottom";
+        const isHoriz = ConnectorGeometry.isHorizontal(win._notifState.barSide);
         const crossSize = isHoriz ? _notifBodyBlurAnchor.width : _notifBodyBlurAnchor.height;
         const extent = isHoriz ? _notifBodyBlurAnchor.height : _notifBodyBlurAnchor.width;
         return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, extent, crossSize / 2)), win._dpr);
     }
     readonly property real _effectiveNotifFarCcr: {
-        const isHoriz = win._notifState.barSide === "top" || win._notifState.barSide === "bottom";
+        const isHoriz = ConnectorGeometry.isHorizontal(win._notifState.barSide);
         const crossSize = isHoriz ? _notifBodySceneBlurAnchor.width : _notifBodySceneBlurAnchor.height;
         return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, crossSize / 2)), win._dpr);
     }
@@ -97,13 +97,13 @@ PanelWindow {
     readonly property real _effectiveNotifMaxCcr: Math.max(win._effectiveNotifStartCcr, win._effectiveNotifEndCcr)
     readonly property real _effectiveNotifFarExtent: Math.max(win._effectiveNotifFarStartCcr, win._effectiveNotifFarEndCcr)
     readonly property real _effectiveModalCcr: {
-        const isHoriz = win._modalState.barSide === "top" || win._modalState.barSide === "bottom";
+        const isHoriz = ConnectorGeometry.isHorizontal(win._modalState.barSide);
         const crossSize = isHoriz ? _modalBodyBlurAnchor.width : _modalBodyBlurAnchor.height;
         const extent = isHoriz ? _modalBodyBlurAnchor.height : _modalBodyBlurAnchor.width;
         return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, extent, crossSize / 2)), win._dpr);
     }
     readonly property real _effectiveModalFarCcr: {
-        const isHoriz = win._modalState.barSide === "top" || win._modalState.barSide === "bottom";
+        const isHoriz = ConnectorGeometry.isHorizontal(win._modalState.barSide);
         const crossSize = isHoriz ? _modalBodyBlurAnchor.width : _modalBodyBlurAnchor.height;
         return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, crossSize / 2)), win._dpr);
     }
@@ -428,7 +428,7 @@ PanelWindow {
         readonly property bool _active: win._frameActive && win._modalState.visible && win._modalState.bodyW > 0 && win._modalState.bodyH > 0
 
         // Clamp animX/Y so the blur body shrinks toward the bar edge (same as _popoutBodyBlurAnchor).
-        readonly property real _dyClamp: (win._modalState.barSide === "top" || win._modalState.barSide === "bottom") ? Math.max(-win._modalState.bodyH, Math.min(win._modalState.animY, win._modalState.bodyH)) : 0
+        readonly property real _dyClamp: ConnectorGeometry.isHorizontal(win._modalState.barSide) ? Math.max(-win._modalState.bodyH, Math.min(win._modalState.animY, win._modalState.bodyH)) : 0
         readonly property real _dxClamp: (win._modalState.barSide === "left" || win._modalState.barSide === "right") ? Math.max(-win._modalState.bodyW, Math.min(win._modalState.animX, win._modalState.bodyW)) : 0
 
         x: _active ? Theme.snap(win._modalState.bodyX + (win._modalState.barSide === "right" ? _dxClamp : 0), win._dpr) : 0
@@ -600,11 +600,12 @@ PanelWindow {
         visible: false
 
         readonly property bool _active: _notifBodyBlurAnchor._active
+        readonly property var _scene: _active ? win._notifBodyScene() : null
 
-        x: _active ? Theme.snap(win._notifBodySceneX(), win._dpr) : 0
-        y: _active ? Theme.snap(win._notifBodySceneY(), win._dpr) : 0
-        width: _active ? Theme.snap(win._notifBodySceneWidth(), win._dpr) : 0
-        height: _active ? Theme.snap(win._notifBodySceneHeight(), win._dpr) : 0
+        x: _scene ? Theme.snap(_scene.x, win._dpr) : 0
+        y: _scene ? Theme.snap(_scene.y, win._dpr) : 0
+        width: _scene ? Theme.snap(_scene.width, win._dpr) : 0
+        height: _scene ? Theme.snap(_scene.height, win._dpr) : 0
     }
 
     Item {
@@ -963,7 +964,7 @@ PanelWindow {
 
     function _notifSideUnderlap() {
         const side = win._notifState.barSide;
-        return (side === "left" || side === "right") ? win._seamOverlap : 0;
+        return ConnectorGeometry.isVertical(side) ? win._seamOverlap : 0;
     }
 
     function _notifStartUnderlap() {
@@ -974,36 +975,26 @@ PanelWindow {
         return win._notifState.omitEndConnector ? win._seamOverlap : 0;
     }
 
-    function _notifBodySceneX() {
-        const side = win._notifState.barSide;
-        const isHoriz = side === "top" || side === "bottom";
-        if (isHoriz)
-            return _notifBodyBlurAnchor.x - win._notifStartUnderlap();
-        return _notifBodyBlurAnchor.x - (side === "left" ? win._notifSideUnderlap() : 0);
-    }
-
-    function _notifBodySceneY() {
-        const side = win._notifState.barSide;
-        const isHoriz = side === "top" || side === "bottom";
-        if (isHoriz)
-            return _notifBodyBlurAnchor.y;
-        return _notifBodyBlurAnchor.y - win._notifStartUnderlap();
-    }
-
-    function _notifBodySceneWidth() {
-        const side = win._notifState.barSide;
-        const isHoriz = side === "top" || side === "bottom";
-        if (isHoriz)
-            return _notifBodyBlurAnchor.width + win._notifStartUnderlap() + win._notifEndUnderlap();
-        return _notifBodyBlurAnchor.width + win._notifSideUnderlap();
-    }
-
-    function _notifBodySceneHeight() {
-        const side = win._notifState.barSide;
-        const isHoriz = side === "top" || side === "bottom";
-        if (isHoriz)
-            return _notifBodyBlurAnchor.height;
-        return _notifBodyBlurAnchor.height + win._notifStartUnderlap() + win._notifEndUnderlap();
+    // Notif body scene rect, accounting for start/end/side underlaps per bar orientation.
+    function _notifBodyScene() {
+        const isHoriz = ConnectorGeometry.isHorizontal(win._notifState.barSide);
+        const start = win._notifStartUnderlap();
+        const end = win._notifEndUnderlap();
+        const side = win._notifSideUnderlap();
+        if (isHoriz) {
+            return {
+                "x": _notifBodyBlurAnchor.x - start,
+                "y": _notifBodyBlurAnchor.y,
+                "width": _notifBodyBlurAnchor.width + start + end,
+                "height": _notifBodyBlurAnchor.height
+            };
+        }
+        return {
+            "x": _notifBodyBlurAnchor.x - (win._notifState.barSide === "left" ? side : 0),
+            "y": _notifBodyBlurAnchor.y - start,
+            "width": _notifBodyBlurAnchor.width + side,
+            "height": _notifBodyBlurAnchor.height + start + end
+        };
     }
 
     function _notifConnectorRadius(placement) {
@@ -1027,7 +1018,7 @@ PanelWindow {
     }
 
     function _dockFillOverlapX() {
-        return (win._dockState.barSide === "top" || win._dockState.barSide === "bottom") ? win._seamOverlap : 0;
+        return ConnectorGeometry.isHorizontal(win._dockState.barSide) ? win._seamOverlap : 0;
     }
 
     function _dockFillOverlapY() {
@@ -1035,7 +1026,7 @@ PanelWindow {
     }
 
     function _modalArcExtent() {
-        return (win._modalState.barSide === "top" || win._modalState.barSide === "bottom") ? _modalBodyBlurAnchor.height : _modalBodyBlurAnchor.width;
+        return ConnectorGeometry.isHorizontal(win._modalState.barSide) ? _modalBodyBlurAnchor.height : _modalBodyBlurAnchor.width;
     }
 
     function _modalBlurCapThickness() {
@@ -1100,28 +1091,28 @@ PanelWindow {
 
     function _popoutShapeBodyOffsetX() {
         const side = ConnectedModeState.popoutBarSide;
-        if (side === "top" || side === "bottom")
+        if (ConnectorGeometry.isHorizontal(side))
             return win._effectivePopoutStartCcr;
         return side === "right" ? win._effectivePopoutFarExtent : 0;
     }
 
     function _popoutShapeBodyOffsetY() {
         const side = ConnectedModeState.popoutBarSide;
-        if (side === "top" || side === "bottom")
+        if (ConnectorGeometry.isHorizontal(side))
             return side === "bottom" ? win._effectivePopoutFarExtent : 0;
         return win._effectivePopoutStartCcr;
     }
 
     function _popoutShapeWidth() {
         const side = ConnectedModeState.popoutBarSide;
-        if (side === "top" || side === "bottom")
+        if (ConnectorGeometry.isHorizontal(side))
             return win._popoutClipWidth() + win._effectivePopoutStartCcr + win._effectivePopoutEndCcr;
         return win._popoutClipWidth() + win._effectivePopoutFarExtent;
     }
 
     function _popoutShapeHeight() {
         const side = ConnectedModeState.popoutBarSide;
-        if (side === "top" || side === "bottom")
+        if (ConnectorGeometry.isHorizontal(side))
             return win._popoutClipHeight() + win._effectivePopoutFarExtent;
         return win._popoutClipHeight() + win._effectivePopoutStartCcr + win._effectivePopoutEndCcr;
     }
@@ -1163,7 +1154,7 @@ PanelWindow {
     }
 
     function _dockBodyXInChrome() {
-        return ((win._dockState.barSide === "top" || win._dockState.barSide === "bottom") ? win._dockConnectorRadius() : 0) - win._dockFillOverlapX();
+        return (ConnectorGeometry.isHorizontal(win._dockState.barSide) ? win._dockConnectorRadius() : 0) - win._dockFillOverlapX();
     }
 
     function _dockBodyYInChrome() {
