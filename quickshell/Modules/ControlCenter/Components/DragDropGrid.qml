@@ -265,6 +265,7 @@ Column {
                 }
 
                 Behavior on height {
+                    enabled: SettingsData.connectedFrameModeActive
                     NumberAnimation {
                         duration: Theme.variantDuration(Theme.popoutAnimationDuration, detailHost.active)
                         easing.type: Easing.BezierSpline
