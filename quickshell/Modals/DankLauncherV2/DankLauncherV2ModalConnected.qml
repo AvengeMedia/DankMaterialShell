@@ -96,8 +96,13 @@ Item {
         return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
     }
 
-    // frameEdgeInsetForSide is the full inset; do not add frameBarSize
-    readonly property real _connectedModalX: {
+    // frameEdgeInsetForSide is the full inset; do not add frameBarSize.
+    // Positions the modal flush to the emerge side, centered on the cross axis.
+    readonly property var _connectedModalPos: {
+        const fallback = {
+            "x": (screenWidth - modalWidth) / 2,
+            "y": (screenHeight - modalHeight) / 2
+        };
         switch (resolvedConnectedBarSide) {
         case "top":
         case "bottom":
@@ -105,36 +110,28 @@ Item {
                 const insetL = _frameEdgeInset("left");
                 const insetR = _frameEdgeInset("right");
                 const usable = Math.max(0, screenWidth - insetL - insetR);
-                return insetL + Math.max(0, (usable - modalWidth) / 2);
+                return {
+                    "x": insetL + Math.max(0, (usable - modalWidth) / 2),
+                    "y": resolvedConnectedBarSide === "top" ? _frameEdgeInset("top") : screenHeight - modalHeight - _frameEdgeInset("bottom")
+                };
             }
-        case "left":
-            return _frameEdgeInset("left");
-        case "right":
-            return screenWidth - modalWidth - _frameEdgeInset("right");
-        }
-        return (screenWidth - modalWidth) / 2;
-    }
-
-    readonly property real _connectedModalY: {
-        switch (resolvedConnectedBarSide) {
-        case "top":
-            return _frameEdgeInset("top");
-        case "bottom":
-            return screenHeight - modalHeight - _frameEdgeInset("bottom");
         case "left":
         case "right":
             {
                 const insetT = _frameEdgeInset("top");
                 const insetB = _frameEdgeInset("bottom");
                 const usable = Math.max(0, screenHeight - insetT - insetB);
-                return insetT + Math.max(0, (usable - modalHeight) / 2);
+                return {
+                    "x": resolvedConnectedBarSide === "left" ? _frameEdgeInset("left") : screenWidth - modalWidth - _frameEdgeInset("right"),
+                    "y": insetT + Math.max(0, (usable - modalHeight) / 2)
+                };
             }
         }
-        return (screenHeight - modalHeight) / 2;
+        return fallback;
     }
 
-    readonly property real modalX: frameOwnsConnectedChrome ? _connectedModalX : ((screenWidth - modalWidth) / 2)
-    readonly property real modalY: frameOwnsConnectedChrome ? _connectedModalY : ((screenHeight - modalHeight) / 2)
+    readonly property real modalX: frameOwnsConnectedChrome ? _connectedModalPos.x : ((screenWidth - modalWidth) / 2)
+    readonly property real modalY: frameOwnsConnectedChrome ? _connectedModalPos.y : ((screenHeight - modalHeight) / 2)
 
     readonly property bool connectedSurfaceOverride: Theme.isConnectedEffect
     readonly property int launcherAnimationDuration: Theme.isConnectedEffect ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration

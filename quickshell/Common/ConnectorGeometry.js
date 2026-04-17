@@ -10,6 +10,10 @@ function isVertical(barSide) {
     return barSide === "left" || barSide === "right";
 }
 
+function isHorizontal(barSide) {
+    return barSide === "top" || barSide === "bottom";
+}
+
 function connectorWidth(barSide, spacing, radius) {
     return isVertical(barSide) ? (spacing + radius) : radius;
 }

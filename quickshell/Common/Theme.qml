@@ -986,7 +986,11 @@ Singleton {
         "expressiveEffects": [0.34, 0.8, 0.34, 1, 1, 1]
     }
 
-    // Delegates to AnimVariants.qml for curves, timing, scale, and offsets.
+    // ─── Animation variant proxy ──────────────────────────────────────────────
+    // Theme is the canonical access point for animation variant state. The
+    // aliases below forward to AnimVariants.qml so consumers don't need two
+    // imports. ~200 call sites read through Theme.variantEnterCurve /
+    // Theme.isConnectedEffect / etc. — do NOT migrate to AnimVariants directly.
     readonly property list<real> variantEnterCurve: AnimVariants.variantEnterCurve
     readonly property list<real> variantExitCurve: AnimVariants.variantExitCurve
     readonly property list<real> variantModalEnterCurve: AnimVariants.variantModalEnterCurve
@@ -1000,25 +1004,28 @@ Singleton {
     readonly property bool isDepthEffect: AnimVariants.isDepthEffect
     readonly property bool isConnectedEffect: AnimVariants.isConnectedEffect
     readonly property real connectedCornerRadius: {
-        if (typeof SettingsData === "undefined") return 12;
+        if (typeof SettingsData === "undefined")
+            return 12;
         return SettingsData.connectedFrameModeActive ? SettingsData.frameRounding : cornerRadius;
     }
     readonly property color connectedSurfaceColor: {
         if (typeof SettingsData === "undefined")
             return withAlpha(surfaceContainer, popupTransparency);
-        return isConnectedEffect
-            ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
-            : withAlpha(surfaceContainer, popupTransparency);
+        return isConnectedEffect ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : withAlpha(surfaceContainer, popupTransparency);
     }
     readonly property real connectedSurfaceRadius: isConnectedEffect ? connectedCornerRadius : cornerRadius
-    readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined")
-        ? true
-        : (!isConnectedEffect || SettingsData.frameBlurEnabled)
+    readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined") ? true : (!isConnectedEffect || SettingsData.frameBlurEnabled)
     readonly property real effectScaleCollapsed: AnimVariants.effectScaleCollapsed
     readonly property real effectAnimOffset: AnimVariants.effectAnimOffset
-    function variantDuration(baseDuration, entering) { return AnimVariants.variantDuration(baseDuration, entering); }
-    function variantExitCleanupPadding() { return AnimVariants.variantExitCleanupPadding(); }
-    function variantCloseInterval(baseDuration) { return AnimVariants.variantCloseInterval(baseDuration); }
+    function variantDuration(baseDuration, entering) {
+        return AnimVariants.variantDuration(baseDuration, entering);
+    }
+    function variantExitCleanupPadding() {
+        return AnimVariants.variantExitCleanupPadding();
+    }
+    function variantCloseInterval(baseDuration) {
+        return AnimVariants.variantCloseInterval(baseDuration);
+    }
 
     readonly property var animationPresetDurations: {
         "none": 0,

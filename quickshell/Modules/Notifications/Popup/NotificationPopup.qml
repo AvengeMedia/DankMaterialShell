@@ -564,11 +564,16 @@ PanelWindow {
     readonly property real dpr: screenValid ? CompositorService.getScreenScale(win.screen) : 1
     readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2)), dpr)
     readonly property real alignedHeight: renderedAlignedHeight
-    onScreenYChanged: popupChromeGeometryChanged()
-    onScreenChanged: popupChromeGeometryChanged()
+    onScreenYChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
+    onScreenChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
+    // Intentionally unconditional: Manager needs the signal when frame mode toggles off
     onConnectedFrameModeChanged: popupChromeGeometryChanged()
-    onAlignedWidthChanged: popupChromeGeometryChanged()
-    onAlignedHeightChanged: popupChromeGeometryChanged()
+    onAlignedWidthChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
+    onAlignedHeightChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
 
     Item {
         id: content
