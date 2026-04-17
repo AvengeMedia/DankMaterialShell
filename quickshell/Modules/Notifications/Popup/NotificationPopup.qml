@@ -360,9 +360,16 @@ PanelWindow {
     function _frameEdgeInset(side) {
         if (!screen)
             return 0;
-        const edges = SettingsData.getActiveBarEdgesForScreen(screen);
-        const raw = edges.includes(side) ? SettingsData.frameBarSize : SettingsData.frameThickness;
+        const raw = SettingsData.frameEdgeInsetForSide(screen, side);
         return Math.max(0, Math.round(Theme.px(raw, dpr)));
+    }
+
+    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !connectedFrameMode && !!screen
+        && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+
+    // Frame ON + Connected OFF. frameEdgeInset is the full bar/frame inset
+    function _frameGapMargin(side) {
+        return _frameEdgeInset(side) + Theme.popupDistance;
     }
 
     function getTopMargin() {
@@ -377,6 +384,8 @@ PanelWindow {
                 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("top") + cornerClear + screenY;
         }
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("top") + screenY;
         const barInfo = getBarInfo();
         const base = barInfo.topBar > 0 ? barInfo.topBar : Theme.popupDistance;
         return base + screenY;
@@ -394,6 +403,8 @@ PanelWindow {
                 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("bottom") + cornerClear + screenY;
         }
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("bottom") + screenY;
         const barInfo = getBarInfo();
         const base = barInfo.bottomBar > 0 ? barInfo.bottomBar : Theme.popupDistance;
         return base + screenY;
@@ -410,6 +421,8 @@ PanelWindow {
 
         if (connectedFrameMode)
             return _frameEdgeInset("left");
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("left");
         const barInfo = getBarInfo();
         return barInfo.leftBar > 0 ? barInfo.leftBar : Theme.popupDistance;
     }
@@ -425,6 +438,8 @@ PanelWindow {
 
         if (connectedFrameMode)
             return _frameEdgeInset("right");
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("right");
         const barInfo = getBarInfo();
         return barInfo.rightBar > 0 ? barInfo.rightBar : Theme.popupDistance;
     }
