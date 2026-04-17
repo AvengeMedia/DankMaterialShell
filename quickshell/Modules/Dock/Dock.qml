@@ -144,46 +144,6 @@ Variants {
             return Math.round(v * _dpr) / _dpr;
         }
 
-        function connectorWidth(spacing) {
-            return dock.isVertical ? (spacing + Theme.connectedCornerRadius) : Theme.connectedCornerRadius;
-        }
-
-        function connectorHeight(spacing) {
-            return dock.isVertical ? Theme.connectedCornerRadius : (spacing + Theme.connectedCornerRadius);
-        }
-
-        function connectorSeamX(baseX, bodyWidth, placement) {
-            if (!dock.isVertical)
-                return placement === "left" ? baseX : baseX + bodyWidth;
-            return SettingsData.dockPosition === SettingsData.Position.Left ? baseX : baseX + bodyWidth;
-        }
-
-        function connectorSeamY(baseY, bodyHeight, placement) {
-            if (SettingsData.dockPosition === SettingsData.Position.Top)
-                return baseY;
-            if (SettingsData.dockPosition === SettingsData.Position.Bottom)
-                return baseY + bodyHeight;
-            return placement === "left" ? baseY : baseY + bodyHeight;
-        }
-
-        function connectorX(baseX, bodyWidth, placement, spacing) {
-            const seamX = connectorSeamX(baseX, bodyWidth, placement);
-            const width = connectorWidth(spacing);
-            if (!dock.isVertical)
-                return placement === "left" ? seamX - width : seamX;
-            return SettingsData.dockPosition === SettingsData.Position.Left ? seamX : seamX - width;
-        }
-
-        function connectorY(baseY, bodyHeight, placement, spacing) {
-            const seamY = connectorSeamY(baseY, bodyHeight, placement);
-            const height = connectorHeight(spacing);
-            if (SettingsData.dockPosition === SettingsData.Position.Top)
-                return seamY;
-            if (SettingsData.dockPosition === SettingsData.Position.Bottom)
-                return seamY - height;
-            return placement === "left" ? seamY - height : seamY;
-        }
-
         // ─── ConnectedModeState sync ────────────────────────────────────────
         // Dock window origin in screen-relative coordinates (FrameWindow space).
         function _dockWindowOriginX() {
@@ -383,7 +343,8 @@ Variants {
 
         // Flip `reveal` false when a modal claims this edge; reuses the slide animation
         readonly property bool _modalRetractActive: {
-            if (!dock._dockScreenName) return false;
+            if (!dock._dockScreenName)
+                return false;
             return ConnectedModeState.dockRetractActiveForSide(dock._dockScreenName, dock.connectedBarSide);
         }
 
@@ -688,7 +649,8 @@ Variants {
                                 duration: Theme.isConnectedEffect ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal) : Theme.shortDuration
                                 easing.type: Theme.isConnectedEffect ? Easing.BezierSpline : Easing.OutCubic
                                 easing.bezierCurve: Theme.isConnectedEffect ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : []
-                                onRunningChanged: if (!running) dock._syncDockChromeState()
+                                onRunningChanged: if (!running)
+                                    dock._syncDockChromeState()
                             }
                         }
 
@@ -698,7 +660,8 @@ Variants {
                                 duration: Theme.isConnectedEffect ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal) : Theme.shortDuration
                                 easing.type: Theme.isConnectedEffect ? Easing.BezierSpline : Easing.OutCubic
                                 easing.bezierCurve: Theme.isConnectedEffect ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : []
-                                onRunningChanged: if (!running) dock._syncDockChromeState()
+                                onRunningChanged: if (!running)
+                                    dock._syncDockChromeState()
                             }
                         }
 

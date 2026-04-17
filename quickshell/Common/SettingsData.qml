@@ -244,25 +244,21 @@ Singleton {
     onPreviousDirectionalModeChanged: saveSettings()
     property var connectedFrameBarStyleBackups: ({})
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
-    readonly property bool connectedFrameModeActive: frameEnabled
-        && motionEffect === SettingsData.AnimationEffect.Directional
-        && directionalAnimationMode === 3
+    readonly property bool connectedFrameModeActive: frameEnabled && motionEffect === SettingsData.AnimationEffect.Directional && directionalAnimationMode === 3
     onConnectedFrameModeActiveChanged: {
         if (_loading)
             return;
-        if (connectedFrameModeActive) {
-            _captureConnectedFrameBarStyleBackups(barConfigs, true);
-            _enforceConnectedModeBarStyleReset();
-        } else {
-            _restoreConnectedFrameBarStyleBackups();
-        }
+        _reconcileConnectedFrameBarStyles();
     }
 
     readonly property color effectiveFrameColor: {
         const fc = frameColor;
-        if (!fc || fc === "default") return Theme.surfaceContainer;
-        if (fc === "primary") return Theme.primary;
-        if (fc === "surface") return Theme.surface;
+        if (!fc || fc === "default")
+            return Theme.surfaceContainer;
+        if (fc === "primary")
+            return Theme.primary;
+        if (fc === "surface")
+            return Theme.surface;
         return fc;
     }
 
@@ -1548,43 +1544,8 @@ Singleton {
             updateBarConfigs();
     }
 
-    function _reconcileConnectedFrameBarStyles() {
-        if (connectedFrameModeActive) {
-            if (!_hasConnectedFrameBarStyleBackups())
-                _captureConnectedFrameBarStyleBackups(barConfigs, true);
-            _enforceConnectedModeBarStyleReset();
-            return;
-        }
-        _restoreConnectedFrameBarStyleBackups();
-    }
-
-    function _sanitizeBarConfigForConnectedFrame(config) {
-        if (!connectedFrameModeActive || !config)
-            return config;
-
-        let changed = false;
-        const sanitized = Object.assign({}, config);
-
-        if ((sanitized.shadowIntensity ?? 0) !== 0) {
-            sanitized.shadowIntensity = 0;
-            changed = true;
-        }
-        if (sanitized.squareCorners ?? false) {
-            sanitized.squareCorners = false;
-            changed = true;
-        }
-        if (sanitized.gothCornersEnabled ?? false) {
-            sanitized.gothCornersEnabled = false;
-            changed = true;
-        }
-        if (sanitized.borderEnabled ?? false) {
-            sanitized.borderEnabled = false;
-            changed = true;
-        }
-
-        return changed ? sanitized : config;
-    }
-
+    // Zeroes out connected-mode-hostile fields (shadow, square/goth corners, border).
+    // Returns { configs, changed } — `configs` is the same ref when no change.
     function _sanitizeBarConfigsForConnectedFrame(configs) {
         if (!connectedFrameModeActive || !Array.isArray(configs))
             return {
@@ -1592,26 +1553,53 @@ Singleton {
                 "changed": false
             };
 
-        let changed = false;
-        const sanitizedConfigs = configs.map(config => {
-            const sanitized = _sanitizeBarConfigForConnectedFrame(config);
-            if (sanitized !== config)
-                changed = true;
-            return sanitized;
+        let anyChanged = false;
+        const out = configs.map(cfg => {
+            if (!cfg)
+                return cfg;
+            let dirty = false;
+            const s = Object.assign({}, cfg);
+            if ((s.shadowIntensity ?? 0) !== 0) {
+                s.shadowIntensity = 0;
+                dirty = true;
+            }
+            if (s.squareCorners ?? false) {
+                s.squareCorners = false;
+                dirty = true;
+            }
+            if (s.gothCornersEnabled ?? false) {
+                s.gothCornersEnabled = false;
+                dirty = true;
+            }
+            if (s.borderEnabled ?? false) {
+                s.borderEnabled = false;
+                dirty = true;
+            }
+            if (dirty)
+                anyChanged = true;
+            return dirty ? s : cfg;
         });
-
         return {
-            "configs": changed ? sanitizedConfigs : configs,
-            "changed": changed
+            "configs": anyChanged ? out : configs,
+            "changed": anyChanged
         };
     }
 
-    function _enforceConnectedModeBarStyleReset() {
-        const result = _sanitizeBarConfigsForConnectedFrame(barConfigs);
-        if (!result.changed)
+    // Single entry point for connected-mode bar-style state.
+    //   active  → capture backups (if not yet) and sanitize bar configs
+    //   !active → restore backups
+    function _reconcileConnectedFrameBarStyles() {
+        if (!connectedFrameModeActive) {
+            _restoreConnectedFrameBarStyleBackups();
             return;
-        barConfigs = result.configs;
-        updateBarConfigs();
+        }
+        if (!_hasConnectedFrameBarStyleBackups())
+            _captureConnectedFrameBarStyleBackups(barConfigs, true);
+        const result = _sanitizeBarConfigsForConnectedFrame(barConfigs);
+        if (result.changed) {
+            barConfigs = result.configs;
+            updateBarConfigs();
+        }
     }
 
     function detectAvailableIconThemes() {
@@ -2176,54 +2164,77 @@ Singleton {
     }
 
     function getActiveBarEdgeForScreen(screen) {
-        if (!screen) return "";
+        if (!screen)
+            return "";
         for (var i = 0; i < barConfigs.length; i++) {
             var bc = barConfigs[i];
-            if (!bc.enabled) continue;
+            if (!bc.enabled)
+                continue;
             var prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs)) continue;
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
             switch (bc.position ?? 0) {
-            case SettingsData.Position.Top:    return "top";
-            case SettingsData.Position.Bottom: return "bottom";
-            case SettingsData.Position.Left:   return "left";
-            case SettingsData.Position.Right:  return "right";
+            case SettingsData.Position.Top:
+                return "top";
+            case SettingsData.Position.Bottom:
+                return "bottom";
+            case SettingsData.Position.Left:
+                return "left";
+            case SettingsData.Position.Right:
+                return "right";
             }
         }
         return "";
     }
 
     function getActiveBarEdgesForScreen(screen) {
-        if (!screen) return [];
+        if (!screen)
+            return [];
         var edges = [];
         for (var i = 0; i < barConfigs.length; i++) {
             var bc = barConfigs[i];
-            if (!bc.enabled) continue;
+            if (!bc.enabled)
+                continue;
             var prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs)) continue;
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
             switch (bc.position ?? 0) {
-            case SettingsData.Position.Top:    edges.push("top"); break;
-            case SettingsData.Position.Bottom: edges.push("bottom"); break;
-            case SettingsData.Position.Left:   edges.push("left"); break;
-            case SettingsData.Position.Right:  edges.push("right"); break;
+            case SettingsData.Position.Top:
+                edges.push("top");
+                break;
+            case SettingsData.Position.Bottom:
+                edges.push("bottom");
+                break;
+            case SettingsData.Position.Left:
+                edges.push("left");
+                break;
+            case SettingsData.Position.Right:
+                edges.push("right");
+                break;
             }
         }
         return edges;
     }
 
     function frameEdgeInsetForSide(screen, side) {
-        if (!frameEnabled || !screen) return 0;
+        if (!frameEnabled || !screen)
+            return 0;
         const edges = getActiveBarEdgesForScreen(screen);
         return edges.includes(side) ? frameBarSize : frameThickness;
     }
 
     function getActiveBarThicknessForScreen(screen) {
-        if (frameEnabled) return frameBarSize;
-        if (!screen) return frameThickness;
+        if (frameEnabled)
+            return frameBarSize;
+        if (!screen)
+            return frameThickness;
         for (var i = 0; i < barConfigs.length; i++) {
             var bc = barConfigs[i];
-            if (!bc.enabled) continue;
+            if (!bc.enabled)
+                continue;
             var prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs)) continue;
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
             const innerPadding = bc.innerPadding ?? 4;
             const barT = Math.max(26 + innerPadding * 0.6, Theme.barHeight - 4 - (8 - innerPadding));
             const spacing = bc.spacing ?? 4;
