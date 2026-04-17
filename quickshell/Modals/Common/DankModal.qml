@@ -27,6 +27,33 @@ Item {
     property bool closeOnEscapeKey: true
     property bool closeOnBackgroundClick: true
     property string animationType: "scale"
+
+    // Opposite side from the launcher by default; subclasses may override
+    property string preferredConnectedBarSide: SettingsData.frameModalEmergeSide
+
+    readonly property bool frameConnectedMode: SettingsData.frameEnabled
+        && Theme.isConnectedEffect
+        && !!effectiveScreen
+        && SettingsData.isScreenInPreferences(effectiveScreen, SettingsData.frameScreenPreferences)
+
+    readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
+
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== ""
+
+    function _dockOccupiesSide(side) {
+        if (!SettingsData.showDock) return false;
+        switch (side) {
+        case "top":    return SettingsData.dockPosition === SettingsData.Position.Top;
+        case "bottom": return SettingsData.dockPosition === SettingsData.Position.Bottom;
+        case "left":   return SettingsData.dockPosition === SettingsData.Position.Left;
+        case "right":  return SettingsData.dockPosition === SettingsData.Position.Right;
+        }
+        return false;
+    }
+
+    readonly property bool _dockBlocksEmergence: frameOwnsConnectedChrome
+        && _dockOccupiesSide(resolvedConnectedBarSide)
+
     readonly property bool connectedMotionParity: Theme.isConnectedEffect
     property int animationDuration: connectedMotionParity ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
     property real animationScaleCollapsed: Theme.effectScaleCollapsed
@@ -66,6 +93,107 @@ Item {
     signal backgroundClicked
 
     property bool animationsEnabled: true
+
+    // ─── Connected chrome sync ────────────────────────────────────────────────
+    property string _chromeClaimId: ""
+    property bool _fullSyncPending: false
+
+    function _nextChromeClaimId() {
+        return layerNamespace + ":modal:" + (new Date()).getTime() + ":" + Math.floor(Math.random() * 1000);
+    }
+
+    function _currentScreenName() {
+        return effectiveScreen ? effectiveScreen.name : "";
+    }
+
+    function _publishModalChromeState() {
+        const screenName = _currentScreenName();
+        if (!screenName) return;
+        ConnectedModeState.setModalState(screenName, {
+            "visible": shouldBeVisible || contentWindow.visible,
+            "barSide": resolvedConnectedBarSide,
+            "bodyX": alignedX,
+            "bodyY": alignedY,
+            "bodyW": alignedWidth,
+            "bodyH": alignedHeight,
+            "animX": modalContainer ? modalContainer.animX : 0,
+            "animY": modalContainer ? modalContainer.animY : 0,
+            "omitStartConnector": false,
+            "omitEndConnector": false
+        });
+    }
+
+    function _syncModalChromeState() {
+        if (!frameOwnsConnectedChrome) {
+            _releaseModalChrome();
+            return;
+        }
+        if (!_chromeClaimId)
+            _chromeClaimId = _nextChromeClaimId();
+        _publishModalChromeState();
+        if (_dockBlocksEmergence && (shouldBeVisible || contentWindow.visible))
+            ConnectedModeState.requestDockRetract(_chromeClaimId, _currentScreenName(), resolvedConnectedBarSide);
+        else
+            ConnectedModeState.releaseDockRetract(_chromeClaimId);
+    }
+
+    function _flushFullSync() {
+        _fullSyncPending = false;
+        _syncModalChromeState();
+    }
+
+    function _queueFullSync() {
+        if (_fullSyncPending) return;
+        _fullSyncPending = true;
+        Qt.callLater(() => {
+            if (root && typeof root._flushFullSync === "function")
+                root._flushFullSync();
+        });
+    }
+
+    function _syncModalAnim() {
+        if (!frameOwnsConnectedChrome || !_chromeClaimId) return;
+        const screenName = _currentScreenName();
+        if (!screenName || !modalContainer) return;
+        ConnectedModeState.setModalAnim(screenName, modalContainer.animX, modalContainer.animY);
+    }
+
+    function _syncModalBody() {
+        if (!frameOwnsConnectedChrome || !_chromeClaimId) return;
+        const screenName = _currentScreenName();
+        if (!screenName) return;
+        ConnectedModeState.setModalBody(screenName, alignedX, alignedY, alignedWidth, alignedHeight);
+    }
+
+    function _releaseModalChrome() {
+        if (_chromeClaimId) {
+            ConnectedModeState.releaseDockRetract(_chromeClaimId);
+            _chromeClaimId = "";
+        }
+        const screenName = _currentScreenName();
+        if (screenName)
+            ConnectedModeState.clearModalState(screenName);
+    }
+
+    onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
+    onResolvedConnectedBarSideChanged: _queueFullSync()
+    onShouldBeVisibleChanged: _queueFullSync()
+    onAlignedXChanged: _syncModalBody()
+    onAlignedYChanged: _syncModalBody()
+    onAlignedWidthChanged: _syncModalBody()
+    onAlignedHeightChanged: _syncModalBody()
+
+    Component.onDestruction: _releaseModalChrome()
+
+    Connections {
+        target: contentWindow
+        function onVisibleChanged() {
+            if (contentWindow.visible)
+                root._syncModalChromeState();
+            else
+                root._releaseModalChrome();
+        }
+    }
 
     function open() {
         closeTimer.stop();
@@ -168,9 +296,11 @@ Item {
         }
     }
 
+    // shadowRenderPadding is zeroed when frame owns the chrome
+    // Wayland then clips any content translating past
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
-    readonly property real shadowRenderPadding: (root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
+    readonly property real shadowRenderPadding: (!frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
         if (Theme.isConnectedEffect)
             return 0;
@@ -188,7 +318,47 @@ Item {
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
 
-    readonly property real alignedX: Theme.snap((() => {
+    function _frameEdgeInset(side) {
+        if (!effectiveScreen) return 0;
+        return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
+    }
+
+    // frameEdgeInsetForSide is the full inset; do not add frameBarSize
+    readonly property real _connectedAlignedX: {
+        switch (resolvedConnectedBarSide) {
+        case "top":
+        case "bottom": {
+            const insetL = _frameEdgeInset("left");
+            const insetR = _frameEdgeInset("right");
+            const usable = Math.max(0, screenWidth - insetL - insetR);
+            return insetL + Math.max(0, (usable - alignedWidth) / 2);
+        }
+        case "left":
+            return _frameEdgeInset("left");
+        case "right":
+            return screenWidth - alignedWidth - _frameEdgeInset("right");
+        }
+        return 0;
+    }
+
+    readonly property real _connectedAlignedY: {
+        switch (resolvedConnectedBarSide) {
+        case "top":
+            return _frameEdgeInset("top");
+        case "bottom":
+            return screenHeight - alignedHeight - _frameEdgeInset("bottom");
+        case "left":
+        case "right": {
+            const insetT = _frameEdgeInset("top");
+            const insetB = _frameEdgeInset("bottom");
+            const usable = Math.max(0, screenHeight - insetT - insetB);
+            return insetT + Math.max(0, (usable - alignedHeight) / 2);
+        }
+        }
+        return 0;
+    }
+
+    readonly property real alignedX: Theme.snap(frameOwnsConnectedChrome ? _connectedAlignedX : (() => {
             switch (positioning) {
             case "center":
                 return (screenWidth - alignedWidth) / 2;
@@ -201,7 +371,7 @@ Item {
             }
         })(), dpr)
 
-    readonly property real alignedY: Theme.snap((() => {
+    readonly property real alignedY: Theme.snap(frameOwnsConnectedChrome ? _connectedAlignedY : (() => {
             switch (positioning) {
             case "center":
                 return (screenHeight - alignedHeight) / 2;
@@ -272,12 +442,12 @@ Item {
 
         WindowBlur {
             targetWindow: contentWindow
-            blurEnabled: root.effectiveBlurEnabled
+            blurEnabled: root.effectiveBlurEnabled && !root.frameOwnsConnectedChrome
             readonly property real s: Math.min(1, modalContainer.scaleValue)
             blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
             blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
-            blurWidth: (root.shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.width * s : 0
-            blurHeight: (root.shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.height * s : 0
+            blurWidth: (root.shouldBeVisible && animatedContent.opacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.width * s : 0
+            blurHeight: (root.shouldBeVisible && animatedContent.opacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.height * s : 0
             blurRadius: root.effectiveCornerRadius
         }
 
@@ -393,7 +563,17 @@ Item {
             readonly property real customDistRight: root.screenWidth - customAnchorX
             readonly property real customDistTop: customAnchorY
             readonly property real customDistBottom: root.screenHeight - customAnchorY
+            // Connected emergence: travel from the resolved bar edge, matching DankPopout cadence.
+            readonly property real connectedEmergenceTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
+            readonly property real connectedEmergenceTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
             readonly property real offsetX: {
+                if (root.frameOwnsConnectedChrome) {
+                    switch (root.resolvedConnectedBarSide) {
+                    case "left":  return -connectedEmergenceTravelX;
+                    case "right": return connectedEmergenceTravelX;
+                    }
+                    return 0;
+                }
                 if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect)
                     return 0;
                 if (slide && !directionalEffect && !depthEffect)
@@ -429,6 +609,13 @@ Item {
                 return 0;
             }
             readonly property real offsetY: {
+                if (root.frameOwnsConnectedChrome) {
+                    switch (root.resolvedConnectedBarSide) {
+                    case "top":    return -connectedEmergenceTravelY;
+                    case "bottom": return connectedEmergenceTravelY;
+                    }
+                    return 0;
+                }
                 if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect)
                     return 0;
                 if (slide && !directionalEffect && !depthEffect)
@@ -467,6 +654,9 @@ Item {
 
             property real animX: root.shouldBeVisible ? 0 : root.frozenMotionOffsetX
             property real animY: root.shouldBeVisible ? 0 : root.frozenMotionOffsetY
+
+            onAnimXChanged: if (root.frameOwnsConnectedChrome) root._syncModalAnim()
+            onAnimYChanged: if (root.frameOwnsConnectedChrome) root._syncModalAnim()
 
             readonly property real computedScaleCollapsed: (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect) ? 0.0 : root.animationScaleCollapsed
             property real scaleValue: root.shouldBeVisible ? 1.0 : computedScaleCollapsed
@@ -528,18 +718,18 @@ Item {
                         level: root.shadowLevel
                         fallbackOffset: root.shadowFallbackOffset
                         targetRadius: root.effectiveCornerRadius
-                        targetColor: root.effectiveBackgroundColor
-                        borderColor: root.effectiveBorderColor
-                        borderWidth: root.effectiveBorderWidth
-                        shadowEnabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                        targetColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBackgroundColor
+                        borderColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBorderColor
+                        borderWidth: root.frameOwnsConnectedChrome ? 0 : root.effectiveBorderWidth
+                        shadowEnabled: !root.frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                     }
 
                     Rectangle {
                         anchors.fill: parent
                         radius: root.effectiveCornerRadius
                         color: "transparent"
-                        border.color: root.connectedSurfaceOverride ? "transparent" : BlurService.borderColor
-                        border.width: root.connectedSurfaceOverride ? 0 : BlurService.borderWidth
+                        border.color: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? "transparent" : BlurService.borderColor
+                        border.width: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? 0 : BlurService.borderWidth
                         z: 100
                     }
 

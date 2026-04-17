@@ -314,6 +314,22 @@ Item {
                     opacity: enabled ? 1.0 : 0.5
                     onToggled: checked => SettingsData.set("frameCloseGaps", checked)
                 }
+
+                SettingsButtonGroupRow {
+                    visible: SettingsData.frameEnabled
+                    settingKey: "frameLauncherEmergeSide"
+                    tags: ["frame", "connected", "launcher", "modal", "emerge", "direction", "bottom", "top"]
+                    text: I18n.tr("Launcher Emerge Side")
+                    description: I18n.tr("Which frame edge the Launcher slides in from. Other modals emerge from the opposite side.")
+                    model: [I18n.tr("Bottom"), I18n.tr("Top")]
+                    currentIndex: SettingsData.frameLauncherEmergeSide === "top" ? 1 : 0
+                    enabled: SettingsData.connectedFrameModeActive
+                    opacity: enabled ? 1.0 : 0.5
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected) return;
+                        SettingsData.set("frameLauncherEmergeSide", index === 1 ? "top" : "bottom");
+                    }
+                }
             }
 
             // ── Display Assignment ────────────────────────────────────────────

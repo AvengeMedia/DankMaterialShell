@@ -47,9 +47,11 @@ Variants {
         readonly property string connectedBarSide: SettingsData.dockPosition === SettingsData.Position.Top ? "top" : SettingsData.dockPosition === SettingsData.Position.Bottom ? "bottom" : SettingsData.dockPosition === SettingsData.Position.Left ? "left" : "right"
         readonly property bool connectedBarActiveOnEdge: Theme.isConnectedEffect && !!(dock.screen || modelData) && SettingsData.getActiveBarEdgesForScreen(dock.screen || modelData).includes(connectedBarSide)
         readonly property real connectedJoinInset: {
-            if (!Theme.isConnectedEffect)
-                return 0;
-            return connectedBarActiveOnEdge ? SettingsData.frameBarSize : SettingsData.frameThickness;
+            if (Theme.isConnectedEffect)
+                return connectedBarActiveOnEdge ? SettingsData.frameBarSize : SettingsData.frameThickness;
+            if (SettingsData.frameEnabled)
+                return SettingsData.frameEdgeInsetForSide(dock.screen || modelData, dock.connectedBarSide);
+            return 0;
         }
         readonly property real surfaceRadius: Theme.connectedSurfaceRadius
         readonly property color surfaceColor: Theme.isConnectedEffect ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
@@ -380,7 +382,16 @@ Variants {
             onTriggered: dock.revealSticky = false
         }
 
+        // Flip `reveal` false when a modal claims this edge; reuses the slide animation
+        readonly property bool _modalRetractActive: {
+            if (!dock._dockScreenName) return false;
+            return ConnectedModeState.dockRetractActiveForSide(dock._dockScreenName, dock.connectedBarSide);
+        }
+
         property bool reveal: {
+            if (_modalRetractActive)
+                return false;
+
             if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview) {
                 return true;
             }
