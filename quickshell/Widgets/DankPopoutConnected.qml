@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import "../Common/ConnectorGeometry.js" as ConnectorGeometry
 
 Item {
     id: root
@@ -802,46 +803,6 @@ Item {
             readonly property real horizontalConnectorExtent: Theme.isConnectedEffect && (barTop || barBottom) ? Theme.connectedCornerRadius : 0
             readonly property real verticalConnectorExtent: Theme.isConnectedEffect && (barLeft || barRight) ? Theme.connectedCornerRadius : 0
 
-            function connectorWidth(spacing) {
-                return (barTop || barBottom) ? Theme.connectedCornerRadius : (spacing + Theme.connectedCornerRadius);
-            }
-
-            function connectorHeight(spacing) {
-                return (barTop || barBottom) ? (spacing + Theme.connectedCornerRadius) : Theme.connectedCornerRadius;
-            }
-
-            function connectorSeamX(baseX, bodyWidth, placement) {
-                if (barTop || barBottom)
-                    return placement === "left" ? baseX : baseX + bodyWidth;
-                return barLeft ? baseX : baseX + bodyWidth;
-            }
-
-            function connectorSeamY(baseY, bodyHeight, placement) {
-                if (barTop)
-                    return baseY;
-                if (barBottom)
-                    return baseY + bodyHeight;
-                return placement === "left" ? baseY : baseY + bodyHeight;
-            }
-
-            function connectorX(baseX, bodyWidth, placement, spacing) {
-                const seamX = connectorSeamX(baseX, bodyWidth, placement);
-                const width = connectorWidth(spacing);
-                if (barTop || barBottom)
-                    return placement === "left" ? seamX - width : seamX;
-                return barLeft ? seamX : seamX - width;
-            }
-
-            function connectorY(baseY, bodyHeight, placement, spacing) {
-                const seamY = connectorSeamY(baseY, bodyHeight, placement);
-                const height = connectorHeight(spacing);
-                if (barTop)
-                    return seamY;
-                if (barBottom)
-                    return seamY - height;
-                return placement === "left" ? seamY - height : seamY;
-            }
-
             readonly property real offsetX: {
                 if (directionalEffect) {
                     if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2)
@@ -1057,8 +1018,8 @@ Item {
                                 connectorRadius: Theme.connectedCornerRadius
                                 color: contentContainer.surfaceColor
                                 dpr: root.dpr
-                                x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
-                                y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
+                                x: Theme.snap(ConnectorGeometry.connectorX(contentContainer.connectedBarSide, shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing, Theme.connectedCornerRadius), root.dpr)
+                                y: Theme.snap(ConnectorGeometry.connectorY(contentContainer.connectedBarSide, shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing, Theme.connectedCornerRadius), root.dpr)
                             }
 
                             ConnectedCorner {
@@ -1069,8 +1030,8 @@ Item {
                                 connectorRadius: Theme.connectedCornerRadius
                                 color: contentContainer.surfaceColor
                                 dpr: root.dpr
-                                x: Theme.snap(contentContainer.connectorX(shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing), root.dpr)
-                                y: Theme.snap(contentContainer.connectorY(shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing), root.dpr)
+                                x: Theme.snap(ConnectorGeometry.connectorX(contentContainer.connectedBarSide, shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing, Theme.connectedCornerRadius), root.dpr)
+                                y: Theme.snap(ConnectorGeometry.connectorY(contentContainer.connectedBarSide, shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing, Theme.connectedCornerRadius), root.dpr)
                             }
                         }
                     }

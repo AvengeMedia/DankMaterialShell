@@ -7,6 +7,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/ConnectorGeometry.js" as ConnectorGeometry
 
 PanelWindow {
     id: win
@@ -218,11 +219,11 @@ PanelWindow {
 
         readonly property real _radius: win._popoutConnectorRadius("left")
         readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property real _w: win._popoutConnectorWidth(0, "left")
-        readonly property real _h: win._popoutConnectorHeight(0, "left")
+        readonly property real _w: ConnectorGeometry.connectorWidth(ConnectedModeState.popoutBarSide, 0, win._popoutConnectorRadius("left"))
+        readonly property real _h: ConnectorGeometry.connectorHeight(ConnectedModeState.popoutBarSide, 0, win._popoutConnectorRadius("left"))
 
-        x: _active ? Theme.snap(win._popoutConnectorX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, "left", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._popoutConnectorY(_popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, "left", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(ConnectedModeState.popoutBarSide, _popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, "left", 0, win._popoutConnectorRadius("left")), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(ConnectedModeState.popoutBarSide, _popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, "left", 0, win._popoutConnectorRadius("left")), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -233,11 +234,11 @@ PanelWindow {
 
         readonly property real _radius: win._popoutConnectorRadius("right")
         readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property real _w: win._popoutConnectorWidth(0, "right")
-        readonly property real _h: win._popoutConnectorHeight(0, "right")
+        readonly property real _w: ConnectorGeometry.connectorWidth(ConnectedModeState.popoutBarSide, 0, win._popoutConnectorRadius("right"))
+        readonly property real _h: ConnectorGeometry.connectorHeight(ConnectedModeState.popoutBarSide, 0, win._popoutConnectorRadius("right"))
 
-        x: _active ? Theme.snap(win._popoutConnectorX(_popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, "right", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._popoutConnectorY(_popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, "right", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(ConnectedModeState.popoutBarSide, _popoutBodyBlurAnchor.x, _popoutBodyBlurAnchor.width, "right", 0, win._popoutConnectorRadius("right")), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(ConnectedModeState.popoutBarSide, _popoutBodyBlurAnchor.y, _popoutBodyBlurAnchor.height, "right", 0, win._popoutConnectorRadius("right")), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -247,7 +248,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _popoutLeftConnectorBlurAnchor.width > 0 && _popoutLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(ConnectedModeState.popoutBarSide, "left")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(ConnectedModeState.popoutBarSide, "left")
         readonly property real _radius: win._popoutConnectorRadius("left")
 
         x: _active ? win._connectorCutoutX(_popoutLeftConnectorBlurAnchor.x, _popoutLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -261,7 +262,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _popoutRightConnectorBlurAnchor.width > 0 && _popoutRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(ConnectedModeState.popoutBarSide, "right")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(ConnectedModeState.popoutBarSide, "right")
         readonly property real _radius: win._popoutConnectorRadius("right")
 
         x: _active ? win._connectorCutoutX(_popoutRightConnectorBlurAnchor.x, _popoutRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -329,7 +330,7 @@ PanelWindow {
         readonly property bool _active: _popoutFarStartConnectorBlurAnchor.width > 0 && _popoutFarStartConnectorBlurAnchor.height > 0
         readonly property string _barSide: win._farConnectorBarSide(ConnectedModeState.popoutBarSide, "left")
         readonly property string _placement: win._farConnectorPlacement(ConnectedModeState.popoutBarSide, "left")
-        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
         readonly property real _radius: win._effectivePopoutFarStartCcr
 
         x: _active ? win._connectorCutoutX(_popoutFarStartConnectorBlurAnchor.x, _popoutFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -345,7 +346,7 @@ PanelWindow {
         readonly property bool _active: _popoutFarEndConnectorBlurAnchor.width > 0 && _popoutFarEndConnectorBlurAnchor.height > 0
         readonly property string _barSide: win._farConnectorBarSide(ConnectedModeState.popoutBarSide, "right")
         readonly property string _placement: win._farConnectorPlacement(ConnectedModeState.popoutBarSide, "right")
-        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
         readonly property real _radius: win._effectivePopoutFarEndCcr
 
         x: _active ? win._connectorCutoutX(_popoutFarEndConnectorBlurAnchor.x, _popoutFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -359,11 +360,11 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadius() > 0
-        readonly property real _w: win._dockConnectorWidth(0)
-        readonly property real _h: win._dockConnectorHeight(0)
+        readonly property real _w: ConnectorGeometry.connectorWidth(win._dockState.barSide, 0, win._dockConnectorRadius())
+        readonly property real _h: ConnectorGeometry.connectorHeight(win._dockState.barSide, 0, win._dockConnectorRadius())
 
-        x: _active ? Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "left", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "left", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(win._dockState.barSide, _dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "left", 0, win._dockConnectorRadius()), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(win._dockState.barSide, _dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "left", 0, win._dockConnectorRadius()), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -373,11 +374,11 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadius() > 0
-        readonly property real _w: win._dockConnectorWidth(0)
-        readonly property real _h: win._dockConnectorHeight(0)
+        readonly property real _w: ConnectorGeometry.connectorWidth(win._dockState.barSide, 0, win._dockConnectorRadius())
+        readonly property real _h: ConnectorGeometry.connectorHeight(win._dockState.barSide, 0, win._dockConnectorRadius())
 
-        x: _active ? Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "right", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "right", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(win._dockState.barSide, _dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "right", 0, win._dockConnectorRadius()), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(win._dockState.barSide, _dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "right", 0, win._dockConnectorRadius()), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -387,7 +388,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _dockLeftConnectorBlurAnchor.width > 0 && _dockLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(win._dockState.barSide, "left")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "left")
 
         x: _active ? win._connectorCutoutX(_dockLeftConnectorBlurAnchor.x, _dockLeftConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadius()) : 0
         y: _active ? win._connectorCutoutY(_dockLeftConnectorBlurAnchor.y, _dockLeftConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadius()) : 0
@@ -400,7 +401,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _dockRightConnectorBlurAnchor.width > 0 && _dockRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(win._dockState.barSide, "right")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "right")
 
         x: _active ? win._connectorCutoutX(_dockRightConnectorBlurAnchor.x, _dockRightConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadius()) : 0
         y: _active ? win._connectorCutoutY(_dockRightConnectorBlurAnchor.y, _dockRightConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadius()) : 0
@@ -458,11 +459,11 @@ PanelWindow {
 
         readonly property real _radius: win._modalConnectorRadius("left")
         readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property real _w: win._modalConnectorWidth(0, "left")
-        readonly property real _h: win._modalConnectorHeight(0, "left")
+        readonly property real _w: ConnectorGeometry.connectorWidth(win._modalState.barSide, 0, win._modalConnectorRadius("left"))
+        readonly property real _h: ConnectorGeometry.connectorHeight(win._modalState.barSide, 0, win._modalConnectorRadius("left"))
 
-        x: _active ? Theme.snap(win._modalConnectorX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, "left", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._modalConnectorY(_modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, "left", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(win._modalState.barSide, _modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, "left", 0, win._modalConnectorRadius("left")), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(win._modalState.barSide, _modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, "left", 0, win._modalConnectorRadius("left")), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -473,11 +474,11 @@ PanelWindow {
 
         readonly property real _radius: win._modalConnectorRadius("right")
         readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property real _w: win._modalConnectorWidth(0, "right")
-        readonly property real _h: win._modalConnectorHeight(0, "right")
+        readonly property real _w: ConnectorGeometry.connectorWidth(win._modalState.barSide, 0, win._modalConnectorRadius("right"))
+        readonly property real _h: ConnectorGeometry.connectorHeight(win._modalState.barSide, 0, win._modalConnectorRadius("right"))
 
-        x: _active ? Theme.snap(win._modalConnectorX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, "right", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._modalConnectorY(_modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, "right", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(win._modalState.barSide, _modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, "right", 0, win._modalConnectorRadius("right")), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(win._modalState.barSide, _modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, "right", 0, win._modalConnectorRadius("right")), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -487,7 +488,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _modalLeftConnectorBlurAnchor.width > 0 && _modalLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(win._modalState.barSide, "left")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "left")
         readonly property real _radius: win._modalConnectorRadius("left")
 
         x: _active ? win._connectorCutoutX(_modalLeftConnectorBlurAnchor.x, _modalLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -501,7 +502,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _modalRightConnectorBlurAnchor.width > 0 && _modalRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(win._modalState.barSide, "right")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "right")
         readonly property real _radius: win._modalConnectorRadius("right")
 
         x: _active ? win._connectorCutoutX(_modalRightConnectorBlurAnchor.x, _modalRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -569,7 +570,7 @@ PanelWindow {
         readonly property bool _active: _modalFarStartConnectorBlurAnchor.width > 0 && _modalFarStartConnectorBlurAnchor.height > 0
         readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "left")
         readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "left")
-        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
         readonly property real _radius: win._effectiveModalFarStartCcr
 
         x: _active ? win._connectorCutoutX(_modalFarStartConnectorBlurAnchor.x, _modalFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -585,7 +586,7 @@ PanelWindow {
         readonly property bool _active: _modalFarEndConnectorBlurAnchor.width > 0 && _modalFarEndConnectorBlurAnchor.height > 0
         readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "right")
         readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "right")
-        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
         readonly property real _radius: win._effectiveModalFarEndCcr
 
         x: _active ? win._connectorCutoutX(_modalFarEndConnectorBlurAnchor.x, _modalFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -628,11 +629,11 @@ PanelWindow {
 
         readonly property real _radius: win._notifConnectorRadius("left")
         readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property real _w: win._notifConnectorWidth(0, "left")
-        readonly property real _h: win._notifConnectorHeight(0, "left")
+        readonly property real _w: ConnectorGeometry.connectorWidth(win._notifState.barSide, 0, win._notifConnectorRadius("left"))
+        readonly property real _h: ConnectorGeometry.connectorHeight(win._notifState.barSide, 0, win._notifConnectorRadius("left"))
 
-        x: _active ? Theme.snap(win._notifConnectorX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, "left", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._notifConnectorY(_notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, "left", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(win._notifState.barSide, _notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, "left", 0, win._notifConnectorRadius("left")), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(win._notifState.barSide, _notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, "left", 0, win._notifConnectorRadius("left")), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -643,11 +644,11 @@ PanelWindow {
 
         readonly property real _radius: win._notifConnectorRadius("right")
         readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property real _w: win._notifConnectorWidth(0, "right")
-        readonly property real _h: win._notifConnectorHeight(0, "right")
+        readonly property real _w: ConnectorGeometry.connectorWidth(win._notifState.barSide, 0, win._notifConnectorRadius("right"))
+        readonly property real _h: ConnectorGeometry.connectorHeight(win._notifState.barSide, 0, win._notifConnectorRadius("right"))
 
-        x: _active ? Theme.snap(win._notifConnectorX(_notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, "right", 0), win._dpr) : 0
-        y: _active ? Theme.snap(win._notifConnectorY(_notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, "right", 0), win._dpr) : 0
+        x: _active ? Theme.snap(ConnectorGeometry.connectorX(win._notifState.barSide, _notifBodySceneBlurAnchor.x, _notifBodySceneBlurAnchor.width, "right", 0, win._notifConnectorRadius("right")), win._dpr) : 0
+        y: _active ? Theme.snap(ConnectorGeometry.connectorY(win._notifState.barSide, _notifBodySceneBlurAnchor.y, _notifBodySceneBlurAnchor.height, "right", 0, win._notifConnectorRadius("right")), win._dpr) : 0
         width: _active ? _w : 0
         height: _active ? _h : 0
     }
@@ -657,7 +658,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _notifLeftConnectorBlurAnchor.width > 0 && _notifLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(win._notifState.barSide, "left")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "left")
         readonly property real _radius: win._notifConnectorRadius("left")
 
         x: _active ? win._connectorCutoutX(_notifLeftConnectorBlurAnchor.x, _notifLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -671,7 +672,7 @@ PanelWindow {
         opacity: 0
 
         readonly property bool _active: _notifRightConnectorBlurAnchor.width > 0 && _notifRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: win._connectorArcCorner(win._notifState.barSide, "right")
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "right")
         readonly property real _radius: win._notifConnectorRadius("right")
 
         x: _active ? win._connectorCutoutX(_notifRightConnectorBlurAnchor.x, _notifRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -739,7 +740,7 @@ PanelWindow {
         readonly property bool _active: _notifFarStartConnectorBlurAnchor.width > 0 && _notifFarStartConnectorBlurAnchor.height > 0
         readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "left")
         readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "left")
-        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
         readonly property real _radius: win._effectiveNotifFarStartCcr
 
         x: _active ? win._connectorCutoutX(_notifFarStartConnectorBlurAnchor.x, _notifFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -755,7 +756,7 @@ PanelWindow {
         readonly property bool _active: _notifFarEndConnectorBlurAnchor.width > 0 && _notifFarEndConnectorBlurAnchor.height > 0
         readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "right")
         readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "right")
-        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
         readonly property real _radius: win._effectiveNotifFarEndCcr
 
         x: _active ? win._connectorCutoutX(_notifFarEndConnectorBlurAnchor.x, _notifFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
@@ -960,39 +961,6 @@ PanelWindow {
         return Math.max(0, Math.min(win._ccr, bodyRadius, maxConnectorRadius));
     }
 
-    function _dockConnectorWidth(spacing) {
-        const isVert = win._dockState.barSide === "left" || win._dockState.barSide === "right";
-        const radius = win._dockConnectorRadius();
-        return isVert ? (spacing + radius) : radius;
-    }
-
-    function _dockConnectorHeight(spacing) {
-        const isVert = win._dockState.barSide === "left" || win._dockState.barSide === "right";
-        const radius = win._dockConnectorRadius();
-        return isVert ? radius : (spacing + radius);
-    }
-
-    function _dockConnectorX(baseX, bodyWidth, placement, spacing) {
-        const dockSide = win._dockState.barSide;
-        const isVert = dockSide === "left" || dockSide === "right";
-        const seamX = !isVert ? (placement === "left" ? baseX : baseX + bodyWidth) : (dockSide === "left" ? baseX : baseX + bodyWidth);
-        const w = _dockConnectorWidth(spacing);
-        if (!isVert)
-            return placement === "left" ? seamX - w : seamX;
-        return dockSide === "left" ? seamX : seamX - w;
-    }
-
-    function _dockConnectorY(baseY, bodyHeight, placement, spacing) {
-        const dockSide = win._dockState.barSide;
-        const seamY = dockSide === "top" ? baseY : dockSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
-        const h = _dockConnectorHeight(spacing);
-        if (dockSide === "top")
-            return seamY;
-        if (dockSide === "bottom")
-            return seamY - h;
-        return placement === "left" ? seamY - h : seamY;
-    }
-
     function _notifSideUnderlap() {
         const side = win._notifState.barSide;
         return (side === "left" || side === "right") ? win._seamOverlap : 0;
@@ -1046,74 +1014,8 @@ PanelWindow {
         return win._effectiveNotifMaxCcr;
     }
 
-    function _notifConnectorWidth(spacing, placement) {
-        const isVert = win._notifState.barSide === "left" || win._notifState.barSide === "right";
-        const radius = win._notifConnectorRadius(placement);
-        return isVert ? (spacing + radius) : radius;
-    }
-
-    function _notifConnectorHeight(spacing, placement) {
-        const isVert = win._notifState.barSide === "left" || win._notifState.barSide === "right";
-        const radius = win._notifConnectorRadius(placement);
-        return isVert ? radius : (spacing + radius);
-    }
-
-    function _notifConnectorX(baseX, bodyWidth, placement, spacing) {
-        const notifSide = win._notifState.barSide;
-        const isVert = notifSide === "left" || notifSide === "right";
-        const seamX = !isVert ? (placement === "left" ? baseX : baseX + bodyWidth) : (notifSide === "left" ? baseX : baseX + bodyWidth);
-        const w = _notifConnectorWidth(spacing, placement);
-        if (!isVert)
-            return placement === "left" ? seamX - w : seamX;
-        return notifSide === "left" ? seamX : seamX - w;
-    }
-
-    function _notifConnectorY(baseY, bodyHeight, placement, spacing) {
-        const notifSide = win._notifState.barSide;
-        const seamY = notifSide === "top" ? baseY : notifSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
-        const h = _notifConnectorHeight(spacing, placement);
-        if (notifSide === "top")
-            return seamY;
-        if (notifSide === "bottom")
-            return seamY - h;
-        return placement === "left" ? seamY - h : seamY;
-    }
-
     function _popoutConnectorRadius(placement) {
         return placement === "right" ? win._effectivePopoutEndCcr : win._effectivePopoutStartCcr;
-    }
-
-    function _popoutConnectorWidth(spacing, placement) {
-        const isVert = ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right";
-        const radius = win._popoutConnectorRadius(placement);
-        return isVert ? (spacing + radius) : radius;
-    }
-
-    function _popoutConnectorHeight(spacing, placement) {
-        const isVert = ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right";
-        const radius = win._popoutConnectorRadius(placement);
-        return isVert ? radius : (spacing + radius);
-    }
-
-    function _popoutConnectorX(baseX, bodyWidth, placement, spacing) {
-        const popoutSide = ConnectedModeState.popoutBarSide;
-        const isVert = popoutSide === "left" || popoutSide === "right";
-        const seamX = !isVert ? (placement === "left" ? baseX : baseX + bodyWidth) : (popoutSide === "left" ? baseX : baseX + bodyWidth);
-        const w = _popoutConnectorWidth(spacing, placement);
-        if (!isVert)
-            return placement === "left" ? seamX - w : seamX;
-        return popoutSide === "left" ? seamX : seamX - w;
-    }
-
-    function _popoutConnectorY(baseY, bodyHeight, placement, spacing) {
-        const popoutSide = ConnectedModeState.popoutBarSide;
-        const seamY = popoutSide === "top" ? baseY : popoutSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
-        const h = _popoutConnectorHeight(spacing, placement);
-        if (popoutSide === "top")
-            return seamY;
-        if (popoutSide === "bottom")
-            return seamY - h;
-        return placement === "left" ? seamY - h : seamY;
     }
 
     function _popoutFillOverlapX() {
@@ -1143,39 +1045,6 @@ PanelWindow {
 
     function _modalConnectorRadius(placement) {
         return placement === "right" ? win._effectiveModalEndCcr : win._effectiveModalStartCcr;
-    }
-
-    function _modalConnectorWidth(spacing, placement) {
-        const isVert = win._modalState.barSide === "left" || win._modalState.barSide === "right";
-        const radius = win._modalConnectorRadius(placement);
-        return isVert ? (spacing + radius) : radius;
-    }
-
-    function _modalConnectorHeight(spacing, placement) {
-        const isVert = win._modalState.barSide === "left" || win._modalState.barSide === "right";
-        const radius = win._modalConnectorRadius(placement);
-        return isVert ? radius : (spacing + radius);
-    }
-
-    function _modalConnectorX(baseX, bodyWidth, placement, spacing) {
-        const barSide = win._modalState.barSide;
-        const isVert = barSide === "left" || barSide === "right";
-        const seamX = !isVert ? (placement === "left" ? baseX : baseX + bodyWidth) : (barSide === "left" ? baseX : baseX + bodyWidth);
-        const w = _modalConnectorWidth(spacing, placement);
-        if (!isVert)
-            return placement === "left" ? seamX - w : seamX;
-        return barSide === "left" ? seamX : seamX - w;
-    }
-
-    function _modalConnectorY(baseY, bodyHeight, placement, spacing) {
-        const barSide = win._modalState.barSide;
-        const seamY = barSide === "top" ? baseY : barSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
-        const h = _modalConnectorHeight(spacing, placement);
-        if (barSide === "top")
-            return seamY;
-        if (barSide === "bottom")
-            return seamY - h;
-        return placement === "left" ? seamY - h : seamY;
     }
 
     function _popoutArcExtent() {
@@ -1347,16 +1216,6 @@ PanelWindow {
         if (sourceSide === "bottom")
             return baseY;
         return placement === "left" ? baseY : baseY + bodyHeight - radius;
-    }
-
-    function _connectorArcCorner(barSide, placement) {
-        if (barSide === "top")
-            return placement === "left" ? "bottomLeft" : "bottomRight";
-        if (barSide === "bottom")
-            return placement === "left" ? "topLeft" : "topRight";
-        if (barSide === "left")
-            return placement === "left" ? "topRight" : "bottomRight";
-        return placement === "left" ? "topLeft" : "bottomLeft";
     }
 
     function _connectorCutoutX(connectorX, connectorWidth, arcCorner, radius) {
@@ -1572,8 +1431,8 @@ PanelWindow {
                     connectorRadius: win._dockConnectorRadius()
                     color: win._opaqueSurfaceColor
                     dpr: win._dpr
-                    x: Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "left", 0) - _dockChrome.x, win._dpr)
-                    y: Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "left", 0) - _dockChrome.y, win._dpr)
+                    x: Theme.snap(ConnectorGeometry.connectorX(win._dockState.barSide, _dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "left", 0, win._dockConnectorRadius()) - _dockChrome.x, win._dpr)
+                    y: Theme.snap(ConnectorGeometry.connectorY(win._dockState.barSide, _dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "left", 0, win._dockConnectorRadius()) - _dockChrome.y, win._dpr)
                 }
 
                 ConnectedCorner {
@@ -1585,8 +1444,8 @@ PanelWindow {
                     connectorRadius: win._dockConnectorRadius()
                     color: win._opaqueSurfaceColor
                     dpr: win._dpr
-                    x: Theme.snap(win._dockConnectorX(_dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "right", 0) - _dockChrome.x, win._dpr)
-                    y: Theme.snap(win._dockConnectorY(_dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "right", 0) - _dockChrome.y, win._dpr)
+                    x: Theme.snap(ConnectorGeometry.connectorX(win._dockState.barSide, _dockBodyBlurAnchor.x, _dockBodyBlurAnchor.width, "right", 0, win._dockConnectorRadius()) - _dockChrome.x, win._dpr)
+                    y: Theme.snap(ConnectorGeometry.connectorY(win._dockState.barSide, _dockBodyBlurAnchor.y, _dockBodyBlurAnchor.height, "right", 0, win._dockConnectorRadius()) - _dockChrome.y, win._dpr)
                 }
             }
         }

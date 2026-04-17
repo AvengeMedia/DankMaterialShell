@@ -211,9 +211,7 @@ Item {
                             return I18n.tr("Popouts emerge flush from the bar edge as a single continuous piece, with corner connectors bridging the junction");
                         return I18n.tr("How the popout emerges from the DankBar");
                     }
-                    options: SettingsData.frameEnabled
-                        ? [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll"), I18n.tr("Connected")]
-                        : [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll")]
+                    options: SettingsData.frameEnabled ? [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll"), I18n.tr("Connected")] : [I18n.tr("Overlap"), I18n.tr("Slide"), I18n.tr("Roll")]
                     currentValue: {
                         switch (SettingsData.directionalAnimationMode) {
                         case 1:
@@ -471,12 +469,6 @@ Item {
                     description: I18n.tr("Popouts and Modals follow global Animation Speed (disable to customize independently)")
                     checked: SettingsData.syncComponentAnimationSpeeds
                     onToggled: checked => SettingsData.set("syncComponentAnimationSpeeds", checked)
-
-                    Connections {
-                        target: SettingsData
-                        function onSyncComponentAnimationSpeedsChanged() {
-                        }
-                    }
                 }
             }
 
