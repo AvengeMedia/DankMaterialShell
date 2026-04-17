@@ -281,13 +281,16 @@ FocusScope {
             anchors.rightMargin: root.parentModal?.borderWidth ?? 1
             anchors.bottomMargin: root.parentModal?.borderWidth ?? 1
             readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
-            height: showFooter ? 36 : 0
+            readonly property bool _connectedArcAtFooter: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom")
+            height: showFooter ? (_connectedArcAtFooter ? 76 : 36) : 0
             visible: showFooter
             clip: true
 
             Rectangle {
                 anchors.fill: parent
                 anchors.topMargin: -Theme.cornerRadius
+                // In connected mode the launcher provides the surface so update the toolbar for arcs
+                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false)
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 radius: Theme.cornerRadius
             }
@@ -295,7 +298,7 @@ FocusScope {
             Row {
                 id: modeButtonsRow
                 anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingXS
+                anchors.leftMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 layoutDirection: I18n.isRtl ? Qt.RightToLeft : Qt.LeftToRight
                 spacing: 2
@@ -367,7 +370,7 @@ FocusScope {
             Row {
                 id: hintsRow
                 anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 layoutDirection: I18n.isRtl ? Qt.RightToLeft : Qt.LeftToRight
                 spacing: Theme.spacingM

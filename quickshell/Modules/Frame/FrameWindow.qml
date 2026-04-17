@@ -46,6 +46,7 @@ PanelWindow {
             "y": 0
         })
     readonly property var _notifState: ConnectedModeState.notificationStates[win._screenName] || ConnectedModeState.emptyNotificationState
+    readonly property var _modalState: ConnectedModeState.modalStates[win._screenName] || ConnectedModeState.emptyModalState
 
     // ─── Connected chrome convenience properties ──────────────────────────────
     readonly property bool _connectedActive: win._frameActive && SettingsData.connectedFrameModeActive
@@ -94,6 +95,22 @@ PanelWindow {
     readonly property real _effectiveNotifFarEndCcr: win._notifState.omitEndConnector ? win._effectiveNotifFarCcr : 0
     readonly property real _effectiveNotifMaxCcr: Math.max(win._effectiveNotifStartCcr, win._effectiveNotifEndCcr)
     readonly property real _effectiveNotifFarExtent: Math.max(win._effectiveNotifFarStartCcr, win._effectiveNotifFarEndCcr)
+    readonly property real _effectiveModalCcr: {
+        const isHoriz = win._modalState.barSide === "top" || win._modalState.barSide === "bottom";
+        const crossSize = isHoriz ? _modalBodyBlurAnchor.width : _modalBodyBlurAnchor.height;
+        const extent = isHoriz ? _modalBodyBlurAnchor.height : _modalBodyBlurAnchor.width;
+        return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, extent, crossSize / 2)), win._dpr);
+    }
+    readonly property real _effectiveModalFarCcr: {
+        const isHoriz = win._modalState.barSide === "top" || win._modalState.barSide === "bottom";
+        const crossSize = isHoriz ? _modalBodyBlurAnchor.width : _modalBodyBlurAnchor.height;
+        return Theme.snap(Math.max(0, Math.min(win._ccr, win._surfaceRadius, crossSize / 2)), win._dpr);
+    }
+    readonly property real _effectiveModalStartCcr: win._modalState.omitStartConnector ? 0 : win._effectiveModalCcr
+    readonly property real _effectiveModalEndCcr: win._modalState.omitEndConnector ? 0 : win._effectiveModalCcr
+    readonly property real _effectiveModalFarStartCcr: win._modalState.omitStartConnector ? win._effectiveModalFarCcr : 0
+    readonly property real _effectiveModalFarEndCcr: win._modalState.omitEndConnector ? win._effectiveModalFarCcr : 0
+    readonly property real _effectiveModalFarExtent: Math.max(win._effectiveModalFarStartCcr, win._effectiveModalFarEndCcr)
     readonly property color _surfaceColor: Theme.connectedSurfaceColor
     readonly property real _surfaceOpacity: _surfaceColor.a
     readonly property color _opaqueSurfaceColor: Qt.rgba(_surfaceColor.r, _surfaceColor.g, _surfaceColor.b, 1)
@@ -404,6 +421,180 @@ PanelWindow {
     }
 
     Item {
+        id: _modalBodyBlurAnchor
+        visible: false
+
+        readonly property bool _active: win._frameActive && win._modalState.visible && win._modalState.bodyW > 0 && win._modalState.bodyH > 0
+
+        // Clamp animX/Y so the blur body shrinks toward the bar edge (same as _popoutBodyBlurAnchor).
+        readonly property real _dyClamp: (win._modalState.barSide === "top" || win._modalState.barSide === "bottom") ? Math.max(-win._modalState.bodyH, Math.min(win._modalState.animY, win._modalState.bodyH)) : 0
+        readonly property real _dxClamp: (win._modalState.barSide === "left" || win._modalState.barSide === "right") ? Math.max(-win._modalState.bodyW, Math.min(win._modalState.animX, win._modalState.bodyW)) : 0
+
+        x: _active ? Theme.snap(win._modalState.bodyX + (win._modalState.barSide === "right" ? _dxClamp : 0), win._dpr) : 0
+        y: _active ? Theme.snap(win._modalState.bodyY + (win._modalState.barSide === "bottom" ? _dyClamp : 0), win._dpr) : 0
+        width: _active ? Theme.snap(Math.max(0, win._modalState.bodyW - Math.abs(_dxClamp)), win._dpr) : 0
+        height: _active ? Theme.snap(Math.max(0, win._modalState.bodyH - Math.abs(_dyClamp)), win._dpr) : 0
+    }
+
+    Item {
+        id: _modalBodyBlurCap
+        opacity: 0
+
+        readonly property string _side: win._modalState.barSide
+        readonly property real _capThickness: win._modalBlurCapThickness()
+        readonly property bool _active: _modalBodyBlurAnchor._active && _capThickness > 0 && _modalBodyBlurAnchor.width > 0 && _modalBodyBlurAnchor.height > 0
+        readonly property real _capWidth: (_side === "left" || _side === "right") ? Math.min(_capThickness, _modalBodyBlurAnchor.width) : _modalBodyBlurAnchor.width
+        readonly property real _capHeight: (_side === "top" || _side === "bottom") ? Math.min(_capThickness, _modalBodyBlurAnchor.height) : _modalBodyBlurAnchor.height
+
+        x: !_active ? 0 : (_side === "right" ? _modalBodyBlurAnchor.x + _modalBodyBlurAnchor.width - _capWidth : _modalBodyBlurAnchor.x)
+        y: !_active ? 0 : (_side === "bottom" ? _modalBodyBlurAnchor.y + _modalBodyBlurAnchor.height - _capHeight : _modalBodyBlurAnchor.y)
+        width: _active ? _capWidth : 0
+        height: _active ? _capHeight : 0
+    }
+
+    Item {
+        id: _modalLeftConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._modalConnectorRadius("left")
+        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+        readonly property real _w: win._modalConnectorWidth(0, "left")
+        readonly property real _h: win._modalConnectorHeight(0, "left")
+
+        x: _active ? Theme.snap(win._modalConnectorX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, "left", 0), win._dpr) : 0
+        y: _active ? Theme.snap(win._modalConnectorY(_modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, "left", 0), win._dpr) : 0
+        width: _active ? _w : 0
+        height: _active ? _h : 0
+    }
+
+    Item {
+        id: _modalRightConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._modalConnectorRadius("right")
+        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+        readonly property real _w: win._modalConnectorWidth(0, "right")
+        readonly property real _h: win._modalConnectorHeight(0, "right")
+
+        x: _active ? Theme.snap(win._modalConnectorX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, "right", 0), win._dpr) : 0
+        y: _active ? Theme.snap(win._modalConnectorY(_modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, "right", 0), win._dpr) : 0
+        width: _active ? _w : 0
+        height: _active ? _h : 0
+    }
+
+    Item {
+        id: _modalLeftConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _modalLeftConnectorBlurAnchor.width > 0 && _modalLeftConnectorBlurAnchor.height > 0
+        readonly property string _arcCorner: win._connectorArcCorner(win._modalState.barSide, "left")
+        readonly property real _radius: win._modalConnectorRadius("left")
+
+        x: _active ? win._connectorCutoutX(_modalLeftConnectorBlurAnchor.x, _modalLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_modalLeftConnectorBlurAnchor.y, _modalLeftConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
+        id: _modalRightConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _modalRightConnectorBlurAnchor.width > 0 && _modalRightConnectorBlurAnchor.height > 0
+        readonly property string _arcCorner: win._connectorArcCorner(win._modalState.barSide, "right")
+        readonly property real _radius: win._modalConnectorRadius("right")
+
+        x: _active ? win._connectorCutoutX(_modalRightConnectorBlurAnchor.x, _modalRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_modalRightConnectorBlurAnchor.y, _modalRightConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
+        id: _modalFarStartConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._effectiveModalFarStartCcr
+        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farConnectorX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.y, _modalBodyBlurAnchor.width, _modalBodyBlurAnchor.height, win._modalState.barSide, "left", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farConnectorY(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.y, _modalBodyBlurAnchor.width, _modalBodyBlurAnchor.height, win._modalState.barSide, "left", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _modalFarStartBodyBlurCap
+        opacity: 0
+
+        readonly property real _radius: win._effectiveModalFarStartCcr
+        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farBodyCapX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, win._modalState.barSide, "left", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farBodyCapY(_modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, win._modalState.barSide, "left", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _modalFarEndBodyBlurCap
+        opacity: 0
+
+        readonly property real _radius: win._effectiveModalFarEndCcr
+        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farBodyCapX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.width, win._modalState.barSide, "right", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farBodyCapY(_modalBodyBlurAnchor.y, _modalBodyBlurAnchor.height, win._modalState.barSide, "right", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _modalFarEndConnectorBlurAnchor
+        opacity: 0
+
+        readonly property real _radius: win._effectiveModalFarEndCcr
+        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+
+        x: _active ? Theme.snap(win._farConnectorX(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.y, _modalBodyBlurAnchor.width, _modalBodyBlurAnchor.height, win._modalState.barSide, "right", _radius), win._dpr) : 0
+        y: _active ? Theme.snap(win._farConnectorY(_modalBodyBlurAnchor.x, _modalBodyBlurAnchor.y, _modalBodyBlurAnchor.width, _modalBodyBlurAnchor.height, win._modalState.barSide, "right", _radius), win._dpr) : 0
+        width: _active ? _radius : 0
+        height: _active ? _radius : 0
+    }
+
+    Item {
+        id: _modalFarStartConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _modalFarStartConnectorBlurAnchor.width > 0 && _modalFarStartConnectorBlurAnchor.height > 0
+        readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "left")
+        readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "left")
+        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property real _radius: win._effectiveModalFarStartCcr
+
+        x: _active ? win._connectorCutoutX(_modalFarStartConnectorBlurAnchor.x, _modalFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_modalFarStartConnectorBlurAnchor.y, _modalFarStartConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
+        id: _modalFarEndConnectorCutout
+        opacity: 0
+
+        readonly property bool _active: _modalFarEndConnectorBlurAnchor.width > 0 && _modalFarEndConnectorBlurAnchor.height > 0
+        readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "right")
+        readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "right")
+        readonly property string _arcCorner: win._connectorArcCorner(_barSide, _placement)
+        readonly property real _radius: win._effectiveModalFarEndCcr
+
+        x: _active ? win._connectorCutoutX(_modalFarEndConnectorBlurAnchor.x, _modalFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
+        y: _active ? win._connectorCutoutY(_modalFarEndConnectorBlurAnchor.y, _modalFarEndConnectorBlurAnchor.height, _arcCorner, _radius) : 0
+        width: _active ? _radius * 2 : 0
+        height: _active ? _radius * 2 : 0
+    }
+
+    Item {
         id: _notifBodySceneBlurAnchor
         visible: false
 
@@ -704,6 +895,53 @@ PanelWindow {
                 radius: win._effectiveNotifFarEndCcr
             }
         }
+
+        // ── Connected modal blur regions ──
+        Region {
+            item: _modalBodyBlurAnchor
+            radius: win._surfaceRadius
+        }
+        Region {
+            item: _modalBodyBlurCap
+        }
+        Region {
+            item: _modalLeftConnectorBlurAnchor
+            Region {
+                item: _modalLeftConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._modalConnectorRadius("left")
+            }
+        }
+        Region {
+            item: _modalRightConnectorBlurAnchor
+            Region {
+                item: _modalRightConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._modalConnectorRadius("right")
+            }
+        }
+        Region {
+            item: _modalFarStartBodyBlurCap
+        }
+        Region {
+            item: _modalFarEndBodyBlurCap
+        }
+        Region {
+            item: _modalFarStartConnectorBlurAnchor
+            Region {
+                item: _modalFarStartConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._effectiveModalFarStartCcr
+            }
+        }
+        Region {
+            item: _modalFarEndConnectorBlurAnchor
+            Region {
+                item: _modalFarEndConnectorCutout
+                intersection: Intersection.Subtract
+                radius: win._effectiveModalFarEndCcr
+            }
+        }
     }
 
     // ─── Connector position helpers ────────────────────────────────────────
@@ -892,6 +1130,52 @@ PanelWindow {
 
     function _dockFillOverlapY() {
         return (win._dockState.barSide === "left" || win._dockState.barSide === "right") ? win._seamOverlap : 0;
+    }
+
+    function _modalArcExtent() {
+        return (win._modalState.barSide === "top" || win._modalState.barSide === "bottom") ? _modalBodyBlurAnchor.height : _modalBodyBlurAnchor.width;
+    }
+
+    function _modalBlurCapThickness() {
+        const extent = win._modalArcExtent();
+        return Math.max(0, Math.min(win._effectiveModalCcr, extent - win._surfaceRadius));
+    }
+
+    function _modalConnectorRadius(placement) {
+        return placement === "right" ? win._effectiveModalEndCcr : win._effectiveModalStartCcr;
+    }
+
+    function _modalConnectorWidth(spacing, placement) {
+        const isVert = win._modalState.barSide === "left" || win._modalState.barSide === "right";
+        const radius = win._modalConnectorRadius(placement);
+        return isVert ? (spacing + radius) : radius;
+    }
+
+    function _modalConnectorHeight(spacing, placement) {
+        const isVert = win._modalState.barSide === "left" || win._modalState.barSide === "right";
+        const radius = win._modalConnectorRadius(placement);
+        return isVert ? radius : (spacing + radius);
+    }
+
+    function _modalConnectorX(baseX, bodyWidth, placement, spacing) {
+        const barSide = win._modalState.barSide;
+        const isVert = barSide === "left" || barSide === "right";
+        const seamX = !isVert ? (placement === "left" ? baseX : baseX + bodyWidth) : (barSide === "left" ? baseX : baseX + bodyWidth);
+        const w = _modalConnectorWidth(spacing, placement);
+        if (!isVert)
+            return placement === "left" ? seamX - w : seamX;
+        return barSide === "left" ? seamX : seamX - w;
+    }
+
+    function _modalConnectorY(baseY, bodyHeight, placement, spacing) {
+        const barSide = win._modalState.barSide;
+        const seamY = barSide === "top" ? baseY : barSide === "bottom" ? baseY + bodyHeight : (placement === "left" ? baseY : baseY + bodyHeight);
+        const h = _modalConnectorHeight(spacing, placement);
+        if (barSide === "top")
+            return seamY;
+        if (barSide === "bottom")
+            return seamY - h;
+        return placement === "left" ? seamY - h : seamY;
     }
 
     function _popoutArcExtent() {
@@ -1341,6 +1625,62 @@ PanelWindow {
                 fillColor: win._opaqueSurfaceColor
                 x: 0
                 y: 0
+            }
+        }
+
+        // Bar-side-bounded clip so modal chrome retracts behind the bar on exit
+        // instead of sliding over bar widgets (mirrors the popout `_popoutClip`).
+        Item {
+            id: _modalClip
+            visible: _modalBodyBlurAnchor._active
+            z: 1
+
+            readonly property string _modalSide: win._modalState.barSide
+            readonly property real _inset: _modalBodyBlurAnchor._active && win.screen ? SettingsData.frameEdgeInsetForSide(win.screen, _modalSide) : 0
+            readonly property real _topBound: _modalSide === "top" ? _inset : 0
+            readonly property real _bottomBound: _modalSide === "bottom" ? (win.height - _inset) : win.height
+            readonly property real _leftBound: _modalSide === "left" ? _inset : 0
+            readonly property real _rightBound: _modalSide === "right" ? (win.width - _inset) : win.width
+
+            x: _leftBound
+            y: _topBound
+            width: Math.max(0, _rightBound - _leftBound)
+            height: Math.max(0, _bottomBound - _topBound)
+            clip: true
+
+            Item {
+                id: _modalChrome
+
+                readonly property string _modalSide: win._modalState.barSide
+                readonly property bool _isHoriz: _modalSide === "top" || _modalSide === "bottom"
+                readonly property real _startCcr: win._effectiveModalStartCcr
+                readonly property real _endCcr: win._effectiveModalEndCcr
+                readonly property real _farExtent: win._effectiveModalFarExtent
+                readonly property real _bodyOffsetX: _isHoriz ? _startCcr : (_modalSide === "right" ? _farExtent : 0)
+                readonly property real _bodyOffsetY: _isHoriz ? (_modalSide === "bottom" ? _farExtent : 0) : _startCcr
+                readonly property real _bodyW: Theme.snap(_modalBodyBlurAnchor.width, win._dpr)
+                readonly property real _bodyH: Theme.snap(_modalBodyBlurAnchor.height, win._dpr)
+
+                x: Theme.snap(_modalBodyBlurAnchor.x - _bodyOffsetX - _modalClip.x, win._dpr)
+                y: Theme.snap(_modalBodyBlurAnchor.y - _bodyOffsetY - _modalClip.y, win._dpr)
+                width: _isHoriz ? Theme.snap(_bodyW + _startCcr + _endCcr, win._dpr) : Theme.snap(_bodyW + _farExtent, win._dpr)
+                height: _isHoriz ? Theme.snap(_bodyH + _farExtent, win._dpr) : Theme.snap(_bodyH + _startCcr + _endCcr, win._dpr)
+
+                ConnectedShape {
+                    visible: _modalBodyBlurAnchor._active && _modalChrome._bodyW > 0 && _modalChrome._bodyH > 0
+                    barSide: _modalChrome._modalSide
+                    bodyWidth: _modalChrome._bodyW
+                    bodyHeight: _modalChrome._bodyH
+                    connectorRadius: win._effectiveModalCcr
+                    startConnectorRadius: _modalChrome._startCcr
+                    endConnectorRadius: _modalChrome._endCcr
+                    farStartConnectorRadius: win._effectiveModalFarStartCcr
+                    farEndConnectorRadius: win._effectiveModalFarEndCcr
+                    surfaceRadius: win._surfaceRadius
+                    fillColor: win._opaqueSurfaceColor
+                    x: 0
+                    y: 0
+                }
             }
         }
     }

@@ -242,6 +242,9 @@ Singleton {
     onFrameBlurEnabledChanged: saveSettings()
     property bool frameCloseGaps: false
     onFrameCloseGapsChanged: saveSettings()
+    property string frameLauncherEmergeSide: "bottom"
+    onFrameLauncherEmergeSideChanged: saveSettings()
+    readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property int previousDirectionalMode: 1
     onPreviousDirectionalModeChanged: saveSettings()
     property var connectedFrameBarStyleBackups: ({})
@@ -2219,6 +2222,12 @@ Singleton {
             }
         }
         return edges;
+    }
+
+    function frameEdgeInsetForSide(screen, side) {
+        if (!frameEnabled || !screen) return 0;
+        const edges = getActiveBarEdgesForScreen(screen);
+        return edges.includes(side) ? frameBarSize : frameThickness;
     }
 
     function getActiveBarThicknessForScreen(screen) {
