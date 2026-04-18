@@ -1322,7 +1322,6 @@ Singleton {
 
     function loadCustomThemeFromFile(filePath) {
         customThemeFileView.path = Paths.expandTilde(filePath);
-        Qt.callLater(function() { customThemeFileView.reload(); });
     }
 
     function reloadCustomThemeVariant() {
