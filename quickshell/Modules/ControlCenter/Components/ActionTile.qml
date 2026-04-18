@@ -12,7 +12,6 @@ Rectangle {
     property string text: ""
     property string secondaryText: ""
     property bool isActive: false
-    property bool enabled: true
     property int widgetIndex: 0
     property var widgetData: null
     property bool editMode: false

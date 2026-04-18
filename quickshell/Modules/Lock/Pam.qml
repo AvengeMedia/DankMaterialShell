@@ -182,6 +182,8 @@ Scope {
                 abort();
                 return;
             }
+            if (active)
+                return;
 
             tries = 0;
             errorTries = 0;
@@ -195,22 +197,23 @@ Scope {
             if (!available)
                 return;
 
-            if (res === PamResult.Success) {
+            switch (res) {
+            case PamResult.Success:
                 if (!root.unlockInProgress) {
                     passwd.abort();
                     root.proceedAfterPrimaryAuth();
                 }
                 return;
-            }
-
-            if (res === PamResult.Error) {
-                root.fprintState = "error";
+            case PamResult.Error:
                 errorTries++;
-                if (errorTries < 5) {
+                if (errorTries < 200) {
                     abort();
                     errorRetry.restart();
+                    return;
                 }
-            } else if (res === PamResult.MaxTries) {
+                abort();
+                return;
+            case PamResult.MaxTries:
                 tries++;
                 if (tries < SettingsData.maxFprintTries) {
                     root.fprintState = "fail";
@@ -219,6 +222,9 @@ Scope {
                     root.fprintState = "max";
                     abort();
                 }
+                break;
+            default:
+                return;
             }
 
             root.flashMsg();
@@ -297,7 +303,7 @@ Scope {
     Timer {
         id: errorRetry
 
-        interval: 800
+        interval: 1500
         onTriggered: fprint.start()
     }
 
@@ -349,26 +355,22 @@ Scope {
         id: fprintStateReset
 
         interval: 4000
-        onTriggered: {
-            root.fprintState = "";
-            fprint.errorTries = 0;
-        }
+        onTriggered: root.fprintState = ""
     }
 
     onLockSecuredChanged: {
-        if (lockSecured) {
-            SettingsData.refreshAuthAvailability();
-            root.state = "";
-            root.fprintState = "";
-            root.u2fState = "";
-            root.u2fPending = false;
-            root.lockMessage = "";
+        if (!lockSecured) {
             root.resetAuthFlows();
-            fprint.checkAvail();
-            u2f.checkAvail();
-        } else {
-            root.resetAuthFlows();
+            return;
         }
+        root.state = "";
+        root.fprintState = "";
+        root.u2fState = "";
+        root.u2fPending = false;
+        root.lockMessage = "";
+        root.resetAuthFlows();
+        fprint.checkAvail();
+        u2f.checkAvail();
     }
 
     Connections {

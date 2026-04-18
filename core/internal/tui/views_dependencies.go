@@ -180,16 +180,7 @@ func (m Model) updateDependencyReviewState(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 			}
-			// Check if fingerprint is enabled
-			if checkFingerprintEnabled() {
-				m.state = StateAuthMethodChoice
-				m.selectedConfig = 0 // Default to fingerprint
-				return m, nil
-			} else {
-				m.state = StatePasswordPrompt
-				m.passwordInput.Focus()
-				return m, nil
-			}
+			return m.enterAuthPhase()
 		case "esc":
 			m.state = StateSelectWindowManager
 			return m, nil

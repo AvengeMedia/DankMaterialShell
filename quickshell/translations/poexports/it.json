@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "Adattatori"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "Aggiungi"
   },
@@ -1363,6 +1366,9 @@
   },
   "Connecting to Device": {
     "Connecting to Device": "Connessione al Dispositivo"
+  },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
   },
   "Connecting...": {
     "Connecting...": "Connessione in corso..."
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Colore dello Schermo Inattivo"
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "Includi Transizioni"
   },
@@ -3461,6 +3473,9 @@
   "Logging in...": {
     "Logging in...": "Accesso in corso..."
   },
+  "Login": {
+    "Login": ""
+  },
   "Login Authentication": {
     "Login Authentication": "Autenticazione di Accesso"
   },
@@ -3685,6 +3700,12 @@
   },
   "Memory usage indicator": {
     "Memory usage indicator": "Indicatore utilizzo memoria"
+  },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
   },
   "Message": {
     "Message": "Messaggio"
@@ -4404,10 +4425,10 @@
     "Output": "Output"
   },
   "Output Area Almost Full": {
-    "Output Area Almost Full": "Area Uscita Quasi Piena"
+    "Output Area Almost Full": "Vassoio di Uscita Quasi Pieno"
   },
   "Output Area Full": {
-    "Output Area Full": "Area Uscita Piena"
+    "Output Area Full": "Vassoio di Uscita Pieno"
   },
   "Output Device": {
     "Output Device": "Dispositivo di Uscita"
@@ -4624,6 +4645,9 @@
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Riproduci un video quando lo schermo si blocca."
+  },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Riproduci suono quando arriva una nuova notifica"
@@ -5328,7 +5352,7 @@
     "Security-key availability could not be confirmed.": "La disponibilità della chiave di sicurezza non ha potuto essere confermata."
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
-    "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Il supporto per chiavi di sicurezza è stato rilevato, ma nessuna chiave trovata. Puoi abilitarlo ora e registrarne una in seguito."
+    "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Il supporto per chiavi di sicurezza è stato rilevato, ma nessuna chiave registrata è ancora stata trovata. Puoi abilitarlo ora e registrarne una in seguito."
   },
   "Select": {
     "Select": "Seleziona"
@@ -5824,6 +5848,9 @@
   },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Mostra quando microfono, videocamera, o condivisione schermo sono attivi"
+  },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
   },
   "Shutdown": {
     "Shutdown": "Spegni"
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Usa unità Imperiali (°F, mph, inHg) invece di quelle Metriche (°C, km/h, hPa)"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Usa Font a Larghezza Fissa"

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 const (
@@ -80,16 +81,18 @@ type lockscreenPamResolver struct {
 
 func defaultSyncDeps() syncDeps {
 	return syncDeps{
-		pamDir:                             "/etc/pam.d",
-		greetdPath:                         GreetdPamPath,
-		dankshellPath:                      DankshellPamPath,
-		dankshellU2fPath:                   DankshellU2FPamPath,
-		isNixOS:                            IsNixOS,
-		readFile:                           os.ReadFile,
-		stat:                               os.Stat,
-		createTemp:                         os.CreateTemp,
-		removeFile:                         os.Remove,
-		runSudoCmd:                         runSudoCmd,
+		pamDir:           "/etc/pam.d",
+		greetdPath:       GreetdPamPath,
+		dankshellPath:    DankshellPamPath,
+		dankshellU2fPath: DankshellU2FPamPath,
+		isNixOS:          IsNixOS,
+		readFile:         os.ReadFile,
+		stat:             os.Stat,
+		createTemp:       os.CreateTemp,
+		removeFile:       os.Remove,
+		runSudoCmd: func(password, command string, args ...string) error {
+			return privesc.Run(context.Background(), password, append([]string{command}, args...)...)
+		},
 		pamModuleExists:                    pamModuleExists,
 		fingerprintAvailableForCurrentUser: FingerprintAuthAvailableForCurrentUser,
 	}
@@ -868,25 +871,4 @@ func fingerprintAuthAvailableForUser(username string) bool {
 		return false
 	}
 	return hasEnrolledFingerprintOutput(string(out))
-}
-
-func runSudoCmd(sudoPassword string, command string, args ...string) error {
-	var cmd *exec.Cmd
-
-	if sudoPassword != "" {
-		fullArgs := append([]string{command}, args...)
-		quotedArgs := make([]string, len(fullArgs))
-		for i, arg := range fullArgs {
-			quotedArgs[i] = "'" + strings.ReplaceAll(arg, "'", "'\\''") + "'"
-		}
-		cmdStr := strings.Join(quotedArgs, " ")
-
-		cmd = distros.ExecSudoCommand(context.Background(), sudoPassword, cmdStr)
-	} else {
-		cmd = exec.Command("sudo", append([]string{command}, args...)...)
-	}
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
 }

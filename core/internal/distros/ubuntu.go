@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 func init() {
@@ -177,7 +178,7 @@ func (u *UbuntuDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 		LogOutput:  "Updating APT package lists",
 	}
 
-	updateCmd := ExecSudoCommand(ctx, sudoPassword, "apt-get update")
+	updateCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get update")
 	if err := u.runWithProgress(updateCmd, progressChan, PhasePrerequisites, 0.06, 0.07); err != nil {
 		return fmt.Errorf("failed to update package lists: %w", err)
 	}
@@ -195,7 +196,7 @@ func (u *UbuntuDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 	checkCmd := exec.CommandContext(ctx, "dpkg", "-l", "build-essential")
 	if err := checkCmd.Run(); err != nil {
 		// Not installed, install it
-		cmd := ExecSudoCommand(ctx, sudoPassword, "apt-get install -y build-essential")
+		cmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get install -y build-essential")
 		if err := u.runWithProgress(cmd, progressChan, PhasePrerequisites, 0.08, 0.09); err != nil {
 			return fmt.Errorf("failed to install build-essential: %w", err)
 		}
@@ -211,7 +212,7 @@ func (u *UbuntuDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 		LogOutput:   "Installing additional development tools",
 	}
 
-	devToolsCmd := ExecSudoCommand(ctx, sudoPassword,
+	devToolsCmd := privesc.ExecCommand(ctx, sudoPassword,
 		"apt-get install -y curl wget git cmake ninja-build pkg-config libglib2.0-dev libpolkit-agent-1-dev")
 	if err := u.runWithProgress(devToolsCmd, progressChan, PhasePrerequisites, 0.10, 0.12); err != nil {
 		return fmt.Errorf("failed to install development tools: %w", err)
@@ -398,7 +399,7 @@ func (u *UbuntuDistribution) extractPackageNames(packages []PackageMapping) []st
 func (u *UbuntuDistribution) enablePPARepos(ctx context.Context, ppaPkgs []PackageMapping, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	enabledRepos := make(map[string]bool)
 
-	installPPACmd := ExecSudoCommand(ctx, sudoPassword,
+	installPPACmd := privesc.ExecCommand(ctx, sudoPassword,
 		"apt-get install -y software-properties-common")
 	if err := u.runWithProgress(installPPACmd, progressChan, PhaseSystemPackages, 0.15, 0.17); err != nil {
 		return fmt.Errorf("failed to install software-properties-common: %w", err)
@@ -416,7 +417,7 @@ func (u *UbuntuDistribution) enablePPARepos(ctx context.Context, ppaPkgs []Packa
 				CommandInfo: fmt.Sprintf("sudo add-apt-repository -y %s", pkg.RepoURL),
 			}
 
-			cmd := ExecSudoCommand(ctx, sudoPassword,
+			cmd := privesc.ExecCommand(ctx, sudoPassword,
 				fmt.Sprintf("add-apt-repository -y %s", pkg.RepoURL))
 			if err := u.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.20, 0.22); err != nil {
 				u.logError(fmt.Sprintf("failed to enable PPA repo %s", pkg.RepoURL), err)
@@ -437,7 +438,7 @@ func (u *UbuntuDistribution) enablePPARepos(ctx context.Context, ppaPkgs []Packa
 			CommandInfo: "sudo apt-get update",
 		}
 
-		updateCmd := ExecSudoCommand(ctx, sudoPassword, "apt-get update")
+		updateCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get update")
 		if err := u.runWithProgress(updateCmd, progressChan, PhaseSystemPackages, 0.25, 0.27); err != nil {
 			return fmt.Errorf("failed to update package lists after adding PPAs: %w", err)
 		}
@@ -504,7 +505,7 @@ func (u *UbuntuDistribution) installAPTGroups(ctx context.Context, packages []st
 			CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
 		}
 
-		cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+		cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 		return u.runWithProgress(cmd, progressChan, phase, groupStart, groupEnd)
 	}
 
@@ -591,7 +592,7 @@ func (u *UbuntuDistribution) installBuildDependencies(ctx context.Context, manua
 	args := []string{"apt-get", "install", "-y"}
 	args = append(args, depList...)
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
+	cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 	return u.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.80, 0.82)
 }
 
@@ -609,7 +610,7 @@ func (u *UbuntuDistribution) installRust(ctx context.Context, sudoPassword strin
 		CommandInfo: "sudo apt-get install rustup",
 	}
 
-	rustupInstallCmd := ExecSudoCommand(ctx, sudoPassword, "apt-get install -y rustup")
+	rustupInstallCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get install -y rustup")
 	if err := u.runWithProgress(rustupInstallCmd, progressChan, PhaseSystemPackages, 0.82, 0.83); err != nil {
 		return fmt.Errorf("failed to install rustup: %w", err)
 	}
@@ -649,7 +650,7 @@ func (u *UbuntuDistribution) installGo(ctx context.Context, sudoPassword string,
 		CommandInfo: "sudo add-apt-repository ppa:longsleep/golang-backports",
 	}
 
-	addPPACmd := ExecSudoCommand(ctx, sudoPassword,
+	addPPACmd := privesc.ExecCommand(ctx, sudoPassword,
 		"add-apt-repository -y ppa:longsleep/golang-backports")
 	if err := u.runWithProgress(addPPACmd, progressChan, PhaseSystemPackages, 0.87, 0.88); err != nil {
 		return fmt.Errorf("failed to add Go PPA: %w", err)
@@ -664,7 +665,7 @@ func (u *UbuntuDistribution) installGo(ctx context.Context, sudoPassword string,
 		CommandInfo: "sudo apt-get update",
 	}
 
-	updateCmd := ExecSudoCommand(ctx, sudoPassword, "apt-get update")
+	updateCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get update")
 	if err := u.runWithProgress(updateCmd, progressChan, PhaseSystemPackages, 0.88, 0.89); err != nil {
 		return fmt.Errorf("failed to update package lists after adding Go PPA: %w", err)
 	}
@@ -678,7 +679,7 @@ func (u *UbuntuDistribution) installGo(ctx context.Context, sudoPassword string,
 		CommandInfo: "sudo apt-get install golang-go",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword, "apt-get install -y golang-go")
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get install -y golang-go")
 	return u.runWithProgress(installCmd, progressChan, PhaseSystemPackages, 0.89, 0.90)
 }
 

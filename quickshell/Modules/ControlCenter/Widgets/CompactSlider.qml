@@ -14,7 +14,6 @@ Rectangle {
     property real value: 0.0
     property real maximumValue: 1.0
     property real minimumValue: 0.0
-    property bool enabled: true
 
     signal sliderValueChanged(real value)
 

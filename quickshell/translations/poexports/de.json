@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": "Adapter"
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "Hinzufügen"
   },
@@ -507,7 +510,7 @@
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Warmes Farbschema für weniger Augenbelastung. Automatisierungseinstellungen unten zur Aktivierung."
   },
   "Applying authentication changes…": {
-    "Applying authentication changes…": ""
+    "Applying authentication changes…": "Authentifizierungsänderungen werden angewendet…"
   },
   "Apps": {
     "Apps": "Apps"
@@ -594,16 +597,16 @@
     "Authentication Required": "Authentifzierung erforderlich"
   },
   "Authentication changes applied.": {
-    "Authentication changes applied.": ""
+    "Authentication changes applied.": "Authentifizierungsänderungen angewendet."
   },
   "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": ""
+    "Authentication changes apply automatically.": "Authentifizierungsänderungen werden automatisch angewendet."
   },
   "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
-    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": "Authentifizierungsänderungen werden automatisch angewendet. Eine Anmeldung nur per Fingerabdruck entsperrt den Schlüsselbund möglicherweise nicht."
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
-    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Authentifizierungsänderungen erfordern Sudo-Rechte. Ein Terminal wird geöffnet, damit Sie das Passwort oder Ihren Fingerabdruck verwenden können."
   },
   "Authentication error - try again": {
     "Authentication error - try again": "Authentifizierungsfehler - erneut versuchen"
@@ -666,7 +669,7 @@
     "Autoconnect enabled": "Automatische Verbindung aktiviert"
   },
   "Autofill last remembered query when opened": {
-    "Autofill last remembered query when opened": ""
+    "Autofill last remembered query when opened": "Zuletzt gemerkte Suchanfrage beim Öffnen automatisch ausfüllen"
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "Automatischer Farbmodus"
@@ -735,13 +738,13 @@
     "Background": "Hintergrund"
   },
   "Background Blur": {
-    "Background Blur": ""
+    "Background Blur": "Hintergrundunschärfe"
   },
   "Background Opacity": {
     "Background Opacity": "Hintergrunddeckkraft"
   },
   "Background authentication sync failed. Trying terminal mode.": {
-    "Background authentication sync failed. Trying terminal mode.": ""
+    "Background authentication sync failed. Trying terminal mode.": "Hintergrund-Authentifizierungssynchronisierung fehlgeschlagen. Terminal-Modus wird versucht."
   },
   "Background image": {
     "Background image": "Hintergrundbild"
@@ -828,10 +831,10 @@
     "Bluetooth not available": "Bluetooth nicht verfügbar"
   },
   "Blur Border Color": {
-    "Blur Border Color": ""
+    "Blur Border Color": "Rahmenfarbe der Unschärfe"
   },
   "Blur Border Opacity": {
-    "Blur Border Opacity": ""
+    "Blur Border Opacity": "Rahmendeckkraft der Unschärfe"
   },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Hintergrundbild-Ebene weichzeichnen"
@@ -840,7 +843,7 @@
     "Blur on Overview": "Unschärfe auf Übersicht"
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
-    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "Den Hintergrund hinter Leisten, Pop-outs, Modalen und Benachrichtigungen weichzeichnen. Erfordert Compositor-Unterstützung und Konfiguration."
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Hintergrundbild weichzeichnen, wenn Niri-Übersicht geöffnet ist"
@@ -864,7 +867,7 @@
     "Border Thickness": "Rahmenstärke"
   },
   "Border color around blurred surfaces": {
-    "Border color around blurred surfaces": ""
+    "Border color around blurred surfaces": "Rahmenfarbe um weichgezeichnete Oberflächen"
   },
   "Border with BG": {
     "Border with BG": "Rahmen mit Hintergrund"
@@ -1017,7 +1020,7 @@
     "Check for system updates": "Auf Systemupdates prüfen"
   },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
-    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "Synchronisierungsstatus bei Bedarf prüfen. Die Synchronisierung kopiert Ihr Design, Ihre Einstellungen und Ihre Hintergrundbildkonfiguration auf den Anmeldebildschirm. Authentifizierungsänderungen werden automatisch angewendet."
   },
   "Checking for updates...": {
     "Checking for updates...": "Suche nach Updates..."
@@ -1364,6 +1367,9 @@
   "Connecting to Device": {
     "Connecting to Device": "Verbinde Gerät"
   },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
+  },
   "Connecting...": {
     "Connecting...": "Verbinden..."
   },
@@ -1629,7 +1635,7 @@
     "DMS Shortcuts": "DMS-Kurzbefehle"
   },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
-    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": "DMS-Greeter benötigt: greetd, dms-greeter. Fingerabdruck: fprintd, pam_fprintd. Sicherheitsschlüssel: pam_u2f. Fügen Sie Ihren Benutzer der Gruppe „greeter“ hinzu. Authentifizierungsänderungen werden automatisch angewendet und können ein Terminal öffnen, wenn eine Sudo-Authentifizierung erforderlich ist."
   },
   "DMS out of date": {
     "DMS out of date": "DMS ist veraltet"
@@ -2088,7 +2094,7 @@
     "Enable fingerprint authentication": "Aktiviere Fingerabdruck Authentifizierung"
   },
   "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": "Fingerabdruck oder Sicherheitsschlüssel für DMS-Greeter aktivieren. Authentifizierungsänderungen werden automatisch angewendet."
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Loginctl‑Sperrintegration aktivieren"
@@ -2109,13 +2115,13 @@
     "Enabled, but no fingerprint reader was detected.": "Aktiviert, aber es wurde kein Fingerabdruckleser erkannt."
   },
   "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
-    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": "Aktiviert, aber es sind noch keine Abdrücke registriert. Authentifizierungsänderungen werden automatisch angewendet, sobald Sie Fingerabdrücke registrieren."
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": "Aktiviert, aber es sind noch keine Abdrücke registriert. Fingerabdrücke registrieren und Sync ausführen."
   },
   "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
-    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": "Aktiviert, aber es wurde noch kein registrierter Sicherheitsschlüssel gefunden. Authentifizierungsänderungen werden automatisch angewendet, sobald Ihr Schlüssel registriert oder Ihre U2F-Konfiguration aktualisiert wurde."
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": "Aktiviert, aber es wurde noch kein registrierter Sicherheitsschlüssel gefunden. Einen Schlüssel registrieren und Sync ausführen."
@@ -2526,13 +2532,13 @@
     "Fingerprint availability could not be confirmed.": "Verfügbarkeit des Fingerabdrucks konnte nicht bestätigt werden."
   },
   "Fingerprint error": {
-    "Fingerprint error": ""
+    "Fingerprint error": "Fingerabdruckfehler"
   },
   "Fingerprint error: %1": {
-    "Fingerprint error: %1": ""
+    "Fingerprint error: %1": "Fingerabdruckfehler: %1"
   },
   "Fingerprint not recognized (%1/%2). Please try again or use password.": {
-    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": "Fingerabdruck nicht erkannt (%1/%2). Bitte versuchen Sie es erneut oder verwenden Sie das Passwort."
   },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "Fingerabdruckleser erkannt, aber es sind noch keine Abdrücke registriert. Sie können dies jetzt aktivieren und später registrieren."
@@ -2607,7 +2613,7 @@
     "Folders": "Ordner"
   },
   "Follow DMS background color": {
-    "Follow DMS background color": ""
+    "Follow DMS background color": "DMS-Hintergrundfarbe folgen"
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Monitorfokus folgen"
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Farbe für inaktive Monitore"
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "Einschließlich Übergänge"
   },
@@ -3105,7 +3117,7 @@
     "Incorrect password - next failures may trigger account lockout": "Falsches Passwort - nächste Fehler können zur Kontosperrung führen"
   },
   "Incorrect password - try again": {
-    "Incorrect password - try again": ""
+    "Incorrect password - try again": "Falsches Passwort – bitte erneut versuchen"
   },
   "Indicator Style": {
     "Indicator Style": "Indikatorstil"
@@ -3135,7 +3147,7 @@
     "Input Volume Slider": "Eingangslautstärkeregler"
   },
   "Insert your security key...": {
-    "Insert your security key...": ""
+    "Insert your security key...": "Setzen Sie Ihren Sicherheitsschlüssel ein..."
   },
   "Install": {
     "Install": "Installieren"
@@ -3450,7 +3462,7 @@
     "Lock fade grace period": "Schonfrist für Sperrausblendung"
   },
   "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
-    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": "Authentifizierungsänderungen für den Sperrbildschirm werden automatisch angewendet und können ein Terminal öffnen, wenn eine Sudo-Authentifizierung erforderlich ist."
   },
   "Locked": {
     "Locked": "Gesperrt"
@@ -3460,6 +3472,9 @@
   },
   "Logging in...": {
     "Logging in...": "Anmeldung..."
+  },
+  "Login": {
+    "Login": ""
   },
   "Login Authentication": {
     "Login Authentication": "Anmelde-Authentifizierung"
@@ -3618,7 +3633,7 @@
     "Maximum Pinned Entries": "Maximale Anzahl angehefteter Einträge"
   },
   "Maximum fingerprint attempts reached. Please use password.": {
-    "Maximum fingerprint attempts reached. Please use password.": ""
+    "Maximum fingerprint attempts reached. Please use password.": "Maximale Anzahl an Fingerabdruckversuchen erreicht. Bitte verwenden Sie das Passwort."
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "Maximale Anzahl der Einträge in der Zwischenablage"
@@ -3685,6 +3700,12 @@
   },
   "Memory usage indicator": {
     "Memory usage indicator": "Speicherauslastungsanzeige"
+  },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
   },
   "Message": {
     "Message": "Nachricht"
@@ -4625,6 +4646,9 @@
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Ein Video abspielen, wenn der Bildschirm gesperrt wird."
   },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
+  },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Tonausgabe bei neuer Benachrichtigung"
   },
@@ -4977,7 +5001,7 @@
     "Remaining / Total": "Verbleibend / Gesamt"
   },
   "Remember Last Query": {
-    "Remember Last Query": ""
+    "Remember Last Query": "Letzte Suchanfrage merken"
   },
   "Remember last session": {
     "Remember last session": "Letzte Sitzung merken"
@@ -5034,7 +5058,7 @@
     "Requires DWL compositor": "Erfordert DWL-Compositor"
   },
   "Requires a newer version of Quickshell": {
-    "Requires a newer version of Quickshell": ""
+    "Requires a newer version of Quickshell": "Erfordert eine neuere Version von Quickshell"
   },
   "Requires night mode support": {
     "Requires night mode support": "Erfordert Nachtmodus-Unterstützung"
@@ -5825,6 +5849,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Zeigt wenn Mikrofon, Kamera oder Bildschirmteilung aktiv ist"
   },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+  },
   "Shutdown": {
     "Shutdown": "Ausschalten"
   },
@@ -6081,13 +6108,13 @@
     "Terminal custom additional parameters": "Zusätzliche benutzerdefinierte Terminal-Parameter"
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Terminal-Fallback fehlgeschlagen. Installieren Sie einen unterstützten Terminal-Emulator oder führen Sie „dms auth sync“ manuell aus."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Terminal-Fallback fehlgeschlagen. Installieren Sie einen der unterstützten Terminal-Emulatoren oder führen Sie 'dms greeter sync' manuell aus."
   },
   "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
-    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": "Terminal-Fallback geöffnet. Schließen Sie dort die Authentifizierungseinrichtung ab; es wird nach Abschluss automatisch geschlossen."
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": "Terminal-Fallback geöffnet. Schließen Sie den Sync dort ab; das Fenster wird nach Abschluss automatisch geschlossen."
@@ -6096,7 +6123,7 @@
     "Terminal multiplexer backend to use": "Zu verwendendes Terminal-Multiplexer-Backend"
   },
   "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
-    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": "Terminal geöffnet. Schließen Sie dort die Authentifizierungseinrichtung ab; es wird nach Abschluss automatisch geschlossen."
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": "Terminal geöffnet. Schließen Sie die Sync-Authentifizierung dort ab; das Fenster wird nach Abschluss automatisch geschlossen."
@@ -6276,7 +6303,7 @@
     "Toner Low": "Toner fast leer"
   },
   "Too many attempts - locked out": {
-    "Too many attempts - locked out": ""
+    "Too many attempts - locked out": "Zu viele Versuche – gesperrt"
   },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": "Zu viele fehlgeschlagene Versuche - Konto könnte gesperrt sein"
@@ -6315,7 +6342,7 @@
     "Total Jobs": "Alle Druckaufträge"
   },
   "Touch your security key...": {
-    "Touch your security key...": ""
+    "Touch your security key...": "Berühren Sie Ihren Sicherheitsschlüssel..."
   },
   "Transform": {
     "Transform": "Transformiere"
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Britische Maßeinheiten verwenden (°F, mph, inHg) anstatt von metrischen Einheiten (°C, km/h, hPa)"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Monospace-Schriftart verwenden"

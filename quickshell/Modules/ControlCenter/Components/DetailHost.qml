@@ -188,6 +188,9 @@ Item {
         case "battery":
             coreDetailLoader.sourceComponent = batteryDetailComponent;
             break;
+        case "doNotDisturb":
+            coreDetailLoader.sourceComponent = doNotDisturbDetailComponent;
+            break;
         default:
             return;
         }
@@ -228,6 +231,11 @@ Item {
     Component {
         id: batteryDetailComponent
         BatteryDetail {}
+    }
+
+    Component {
+        id: doNotDisturbDetailComponent
+        DoNotDisturbDetail {}
     }
 
     Component {

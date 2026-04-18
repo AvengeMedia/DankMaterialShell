@@ -10,7 +10,6 @@ Item {
 
     // API
     property bool checked: false
-    property bool enabled: true
     property bool toggling: false
     property string text: ""
     property string description: ""

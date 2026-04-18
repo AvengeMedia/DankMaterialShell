@@ -3,8 +3,73 @@ package providers
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
+
+func TestNiriParse_NoSpaceBeforeBrace(t *testing.T) {
+	config := `recent-windows {
+    binds {
+        Alt+Tab         { next-window scope="output"; }
+        Alt+Shift+Tab   { previous-window scope="output"; }
+        Alt+grave       { next-window filter="app-id"; }
+        Alt+Shift+grave { previous-window filter="app-id"; }
+        Alt+Escape      { next-window scope="all"; }
+        Alt+Shift+Escape{ previous-window scope="all"; }
+    }
+}
+`
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "config.kdl"), []byte(config), 0o644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed on valid niri config: %v", err)
+	}
+
+	var found *NiriKeyBinding
+	for i := range result.Section.Keybinds {
+		kb := &result.Section.Keybinds[i]
+		if kb.Key == "Escape" && slices.Contains(kb.Mods, "Alt") && slices.Contains(kb.Mods, "Shift") {
+			found = kb
+			break
+		}
+	}
+	if found == nil {
+		t.Fatal("Alt+Shift+Escape bind missing — '{' without preceding space was not handled")
+	}
+	if found.Action != "previous-window" {
+		t.Errorf("Action = %q, want %q", found.Action, "previous-window")
+	}
+}
+
+func TestNormalizeKDLBraces(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		out  string
+	}{
+		{"already spaced", "node { child }\n", "node { child }\n"},
+		{"missing space", "node{ child }\n", "node { child }\n"},
+		{"niri keybind", "Alt+Shift+Escape{ previous-window; }", "Alt+Shift+Escape { previous-window; }"},
+		{"brace inside string", `node "a{b" { child }`, `node "a{b" { child }`},
+		{"brace in line comment", "// foo{bar\nnode { }", "// foo{bar\nnode { }"},
+		{"brace in block comment", "/* foo{bar */ node{ }", "/* foo{bar */ node { }"},
+		{"escaped quote in string", `node "a\"b{c" { }`, `node "a\"b{c" { }`},
+		{"leading brace", "{ child }", "{ child }"},
+		{"nested missing space", "a{b{ c }}", "a {b { c }}"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := normalizeKDLBraces(tc.in)
+			if got != tc.out {
+				t.Errorf("normalizeKDLBraces(%q) = %q, want %q", tc.in, got, tc.out)
+			}
+		})
+	}
+}
 
 func TestNiriParseKeyCombo(t *testing.T) {
 	tests := []struct {

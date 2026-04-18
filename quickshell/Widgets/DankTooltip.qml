@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
+import qs.Services
 
 PanelWindow {
     id: root
@@ -71,10 +72,10 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+        color: BlurService.enabled ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         radius: Theme.cornerRadius
-        border.width: 1
-        border.color: Theme.outlineMedium
+        border.width: BlurService.enabled ? BlurService.borderWidth : 1
+        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
 
         Text {
             id: textContent

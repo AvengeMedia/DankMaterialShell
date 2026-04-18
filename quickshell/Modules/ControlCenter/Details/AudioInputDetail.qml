@@ -351,8 +351,8 @@ Rectangle {
                             deviceRipple.trigger(mapped.x, mapped.y);
                         }
                         onClicked: {
-                            if (modelData) {
-                                Pipewire.preferredDefaultAudioSource = modelData;
+                            if (modelData && modelData.name) {
+                                AudioService.setDefaultSourceByName(modelData.name);
                             }
                         }
                     }

@@ -62,12 +62,31 @@ func (cd *ConfigDeployer) DeployConfigurationsSelectiveWithReinstalls(ctx contex
 func (cd *ConfigDeployer) deployConfigurationsInternal(ctx context.Context, wm deps.WindowManager, terminal deps.Terminal, installedDeps []deps.Dependency, replaceConfigs map[string]bool, reinstallItems map[string]bool, useSystemd bool) ([]DeploymentResult, error) {
 	var results []DeploymentResult
 
+	// Primary config file paths used to detect fresh installs.
+	configPrimaryPaths := map[string]string{
+		"Niri":      filepath.Join(os.Getenv("HOME"), ".config", "niri", "config.kdl"),
+		"Hyprland":  filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.conf"),
+		"Ghostty":   filepath.Join(os.Getenv("HOME"), ".config", "ghostty", "config"),
+		"Kitty":     filepath.Join(os.Getenv("HOME"), ".config", "kitty", "kitty.conf"),
+		"Alacritty": filepath.Join(os.Getenv("HOME"), ".config", "alacritty", "alacritty.toml"),
+	}
+
 	shouldReplaceConfig := func(configType string) bool {
 		if replaceConfigs == nil {
 			return true
 		}
 		replace, exists := replaceConfigs[configType]
-		return !exists || replace
+		if !exists || replace {
+			return true
+		}
+		// Config is explicitly set to "don't replace" — but still deploy
+		// if the config file doesn't exist yet (fresh install scenario).
+		if primaryPath, ok := configPrimaryPaths[configType]; ok {
+			if _, err := os.Stat(primaryPath); os.IsNotExist(err) {
+				return true
+			}
+		}
+		return false
 	}
 
 	switch wm {

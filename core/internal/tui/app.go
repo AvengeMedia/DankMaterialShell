@@ -3,6 +3,7 @@ package tui
 import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -42,6 +43,9 @@ type Model struct {
 	sudoPassword       string
 	existingConfigs    []ExistingConfigInfo
 	fingerprintFailed  bool
+
+	availablePrivesc []privesc.Tool
+	selectedPrivesc  int
 }
 
 func NewModel(version string, logFilePath string) Model {
@@ -147,6 +151,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateGentooUseFlagsState(msg)
 	case StateGentooGCCCheck:
 		return m.updateGentooGCCCheckState(msg)
+	case StateSelectPrivesc:
+		return m.updateSelectPrivescState(msg)
 	case StateAuthMethodChoice:
 		return m.updateAuthMethodChoiceState(msg)
 	case StateFingerprintAuth:
@@ -189,6 +195,8 @@ func (m Model) View() string {
 		return m.viewGentooUseFlags()
 	case StateGentooGCCCheck:
 		return m.viewGentooGCCCheck()
+	case StateSelectPrivesc:
+		return m.viewSelectPrivesc()
 	case StateAuthMethodChoice:
 		return m.viewAuthMethodChoice()
 	case StateFingerprintAuth:

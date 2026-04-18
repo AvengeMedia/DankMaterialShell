@@ -350,6 +350,9 @@
   "Adapters": {
     "Adapters": ""
   },
+  "Adaptive Media Width": {
+    "Adaptive Media Width": ""
+  },
   "Add": {
     "Add": "追加"
   },
@@ -1363,6 +1366,9 @@
   },
   "Connecting to Device": {
     "Connecting to Device": "デバイスに接続中"
+  },
+  "Connecting to clipboard service…": {
+    "Connecting to clipboard service…": ""
   },
   "Connecting...": {
     "Connecting...": ""
@@ -3086,6 +3092,12 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": ""
   },
+  "Include Files in All Tab": {
+    "Include Files in All Tab": ""
+  },
+  "Include Folders in All Tab": {
+    "Include Folders in All Tab": ""
+  },
   "Include Transitions": {
     "Include Transitions": "トランジションを含める"
   },
@@ -3461,6 +3473,9 @@
   "Logging in...": {
     "Logging in...": ""
   },
+  "Login": {
+    "Login": ""
+  },
   "Login Authentication": {
     "Login Authentication": ""
   },
@@ -3685,6 +3700,12 @@
   },
   "Memory usage indicator": {
     "Memory usage indicator": "メモリ使用率インジケーター"
+  },
+  "Merge indexed file results into the All tab (requires dsearch).": {
+    "Merge indexed file results into the All tab (requires dsearch).": ""
+  },
+  "Merge indexed folder results into the All tab (requires dsearch).": {
+    "Merge indexed folder results into the All tab (requires dsearch).": ""
   },
   "Message": {
     "Message": ""
@@ -4624,6 +4645,9 @@
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
+  },
+  "Play sound after logging in": {
+    "Play sound after logging in": ""
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "新しい通知が届いたときにサウンドを再生"
@@ -5825,6 +5849,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "マイク、カメラ、または画面共有がアクティブなときに表示"
   },
+  "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+  },
   "Shutdown": {
     "Shutdown": "シャットダウン"
   },
@@ -6514,6 +6541,9 @@
   },
   "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "メートル法(°C、km / h、hPa)の代わりにインペリアル単位(°F、mph、inHg)を使用"
+  },
+  "Use Inline Expansion": {
+    "Use Inline Expansion": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "等幅フォントを使用"

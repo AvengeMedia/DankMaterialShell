@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Modules.Notifications.Center
 import qs.Modules.Plugins
 import qs.Widgets
 
@@ -34,7 +35,49 @@ BasePill {
         }
     }
 
-    onRightClicked: {
-        SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
+    onRightClicked: (rx, ry) => {
+        const screen = root.parentScreen || Screen;
+        if (!screen)
+            return;
+        const globalPos = root.visualContent.mapToItem(null, 0, 0);
+        const isVertical = root.axis?.isVertical ?? false;
+        const edge = root.axis?.edge ?? "top";
+        const gap = Math.max(Theme.spacingXS, root.barSpacing ?? Theme.spacingXS);
+        const barOffset = root.barThickness + root.barSpacing + gap;
+
+        let anchorX;
+        let anchorY;
+        let anchorEdge;
+        if (isVertical) {
+            anchorY = globalPos.y - (screen.y || 0) + root.visualContent.height / 2;
+            if (edge === "left") {
+                anchorX = barOffset;
+                anchorEdge = "top";
+            } else {
+                anchorX = screen.width - barOffset;
+                anchorEdge = "top";
+            }
+        } else {
+            anchorX = globalPos.x - (screen.x || 0) + root.visualContent.width / 2;
+            if (edge === "bottom") {
+                anchorY = screen.height - barOffset;
+                anchorEdge = "bottom";
+            } else {
+                anchorY = barOffset;
+                anchorEdge = "top";
+            }
+        }
+
+        dndPopupLoader.active = true;
+        const popup = dndPopupLoader.item;
+        if (!popup)
+            return;
+        popup.showAt(anchorX, anchorY, screen, anchorEdge);
+    }
+
+    Loader {
+        id: dndPopupLoader
+        active: false
+        sourceComponent: DndDurationPopup {}
     }
 }

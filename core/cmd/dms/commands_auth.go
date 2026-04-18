@@ -16,9 +16,10 @@ var authCmd = &cobra.Command{
 }
 
 var authSyncCmd = &cobra.Command{
-	Use:   "sync",
-	Short: "Sync DMS authentication configuration",
-	Long:  "Apply shared PAM/authentication changes for the lock screen and greeter based on current DMS settings",
+	Use:     "sync",
+	Short:   "Sync DMS authentication configuration",
+	Long:    "Apply shared PAM/authentication changes for the lock screen and greeter based on current DMS settings",
+	PreRunE: preRunPrivileged,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		term, _ := cmd.Flags().GetBool("terminal")

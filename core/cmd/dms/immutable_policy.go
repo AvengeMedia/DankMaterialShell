@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/spf13/cobra"
 )
 
@@ -268,4 +269,17 @@ func requireMutableSystemCommand(cmd *cobra.Command, _ []string) error {
 	}
 
 	return fmt.Errorf("%s%s\nCommand: dms %s\nPolicy files:\n  %s\n  %s", reason, policy.Message, commandPath, cliPolicyPackagedPath, cliPolicyAdminPath)
+}
+
+// preRunPrivileged combines the immutable-system check with a privesc tool
+// selection prompt (shown only when multiple tools are available and the
+// $DMS_PRIVESC env var isn't set).
+func preRunPrivileged(cmd *cobra.Command, args []string) error {
+	if err := requireMutableSystemCommand(cmd, args); err != nil {
+		return err
+	}
+	if _, err := privesc.PromptCLI(os.Stdout, os.Stdin); err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -622,5 +623,170 @@ func TestAlacrittyConfigDeployment(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotContains(t, string(newContent), "# Old alacritty config")
 		assert.Contains(t, string(newContent), "decorations = \"None\"")
+	})
+}
+
+func TestShouldReplaceConfigDeployIfMissing(t *testing.T) {
+	allFalse := map[string]bool{
+		"Niri":      false,
+		"Hyprland":  false,
+		"Ghostty":   false,
+		"Kitty":     false,
+		"Alacritty": false,
+	}
+
+	t.Run("replaceConfigs nil deploys config", func(t *testing.T) {
+		tempDir, err := os.MkdirTemp("", "dankinstall-replace-nil-test")
+		require.NoError(t, err)
+		defer os.RemoveAll(tempDir)
+
+		originalHome := os.Getenv("HOME")
+		os.Setenv("HOME", tempDir)
+		defer os.Setenv("HOME", originalHome)
+
+		logChan := make(chan string, 100)
+		cd := NewConfigDeployer(logChan)
+
+		results, err := cd.DeployConfigurationsSelectiveWithReinstalls(
+			context.Background(),
+			deps.WindowManagerNiri,
+			deps.TerminalGhostty,
+			nil, // installedDeps
+			nil, // replaceConfigs
+			nil, // reinstallItems
+		)
+		require.NoError(t, err)
+
+		// With replaceConfigs=nil, all configs should be deployed
+		hasDeployed := false
+		for _, r := range results {
+			if r.Deployed {
+				hasDeployed = true
+				break
+			}
+		}
+		assert.True(t, hasDeployed, "expected at least one config to be deployed when replaceConfigs is nil")
+	})
+
+	t.Run("replaceConfigs all false and config missing deploys config", func(t *testing.T) {
+		tempDir, err := os.MkdirTemp("", "dankinstall-replace-missing-test")
+		require.NoError(t, err)
+		defer os.RemoveAll(tempDir)
+
+		originalHome := os.Getenv("HOME")
+		os.Setenv("HOME", tempDir)
+		defer os.Setenv("HOME", originalHome)
+
+		logChan := make(chan string, 100)
+		cd := NewConfigDeployer(logChan)
+
+		results, err := cd.DeployConfigurationsSelectiveWithReinstalls(
+			context.Background(),
+			deps.WindowManagerNiri,
+			deps.TerminalGhostty,
+			nil,      // installedDeps
+			allFalse, // replaceConfigs — all false
+			nil,      // reinstallItems
+		)
+		require.NoError(t, err)
+
+		// Config files don't exist on disk, so they should still be deployed
+		hasDeployed := false
+		for _, r := range results {
+			if r.Deployed {
+				hasDeployed = true
+				break
+			}
+		}
+		assert.True(t, hasDeployed, "expected configs to be deployed when files are missing, even with replaceConfigs all false")
+	})
+
+	t.Run("replaceConfigs false and config exists skips config", func(t *testing.T) {
+		tempDir, err := os.MkdirTemp("", "dankinstall-replace-exists-test")
+		require.NoError(t, err)
+		defer os.RemoveAll(tempDir)
+
+		originalHome := os.Getenv("HOME")
+		os.Setenv("HOME", tempDir)
+		defer os.Setenv("HOME", originalHome)
+
+		// Create the Ghostty primary config file so shouldReplaceConfig returns false
+		ghosttyPath := filepath.Join(tempDir, ".config", "ghostty", "config")
+		err = os.MkdirAll(filepath.Dir(ghosttyPath), 0o755)
+		require.NoError(t, err)
+		err = os.WriteFile(ghosttyPath, []byte("# existing ghostty config\n"), 0o644)
+		require.NoError(t, err)
+
+		// Also create the Niri primary config file
+		niriPath := filepath.Join(tempDir, ".config", "niri", "config.kdl")
+		err = os.MkdirAll(filepath.Dir(niriPath), 0o755)
+		require.NoError(t, err)
+		err = os.WriteFile(niriPath, []byte("// existing niri config\n"), 0o644)
+		require.NoError(t, err)
+
+		logChan := make(chan string, 100)
+		cd := NewConfigDeployer(logChan)
+
+		results, err := cd.DeployConfigurationsSelectiveWithReinstalls(
+			context.Background(),
+			deps.WindowManagerNiri,
+			deps.TerminalGhostty,
+			nil,      // installedDeps
+			allFalse, // replaceConfigs — all false
+			nil,      // reinstallItems
+		)
+		require.NoError(t, err)
+
+		// Both Niri and Ghostty config files exist, so with all false they should be skipped
+		for _, r := range results {
+			assert.Fail(t, "expected no configs to be deployed", "got deployed config: %s", r.ConfigType)
+		}
+	})
+
+	t.Run("replaceConfigs true and config exists deploys config", func(t *testing.T) {
+		tempDir, err := os.MkdirTemp("", "dankinstall-replace-true-test")
+		require.NoError(t, err)
+		defer os.RemoveAll(tempDir)
+
+		originalHome := os.Getenv("HOME")
+		os.Setenv("HOME", tempDir)
+		defer os.Setenv("HOME", originalHome)
+
+		// Create the Ghostty primary config file
+		ghosttyPath := filepath.Join(tempDir, ".config", "ghostty", "config")
+		err = os.MkdirAll(filepath.Dir(ghosttyPath), 0o755)
+		require.NoError(t, err)
+		err = os.WriteFile(ghosttyPath, []byte("# existing ghostty config\n"), 0o644)
+		require.NoError(t, err)
+
+		logChan := make(chan string, 100)
+		cd := NewConfigDeployer(logChan)
+
+		replaceConfigs := map[string]bool{
+			"Niri":      false,
+			"Hyprland":  false,
+			"Ghostty":   true, // explicitly true
+			"Kitty":     false,
+			"Alacritty": false,
+		}
+
+		results, err := cd.DeployConfigurationsSelectiveWithReinstalls(
+			context.Background(),
+			deps.WindowManagerNiri,
+			deps.TerminalGhostty,
+			nil,            // installedDeps
+			replaceConfigs, // Ghostty=true, rest=false
+			nil,            // reinstallItems
+		)
+		require.NoError(t, err)
+
+		// Ghostty should be deployed because replaceConfigs["Ghostty"]=true
+		foundGhostty := false
+		for _, r := range results {
+			if r.ConfigType == "Ghostty" && r.Deployed {
+				foundGhostty = true
+			}
+		}
+		assert.True(t, foundGhostty, "expected Ghostty config to be deployed when replaceConfigs is true")
 	})
 }

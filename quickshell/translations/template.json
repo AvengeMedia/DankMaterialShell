@@ -819,6 +819,13 @@
     "comment": ""
   },
   {
+    "term": "Adaptive Media Width",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Add",
     "translation": "",
     "context": "",
@@ -2723,13 +2730,6 @@
     "comment": ""
   },
   {
-    "term": "Clipboard service not available",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Clipboard works but nothing saved to disk",
     "translation": "",
     "context": "",
@@ -3179,6 +3179,13 @@
   },
   {
     "term": "Connecting to Device",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Connecting to clipboard service…",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7203,6 +7210,20 @@
     "comment": ""
   },
   {
+    "term": "Include Files in All Tab",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Include Folders in All Tab",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Include Transitions",
     "translation": "",
     "context": "",
@@ -8078,6 +8099,13 @@
     "comment": ""
   },
   {
+    "term": "Login",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Login Authentication",
     "translation": "",
     "context": "",
@@ -8597,6 +8625,20 @@
   },
   {
     "term": "Memory usage indicator",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Merge indexed file results into the All tab (requires dsearch).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Merge indexed folder results into the All tab (requires dsearch).",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10788,6 +10830,13 @@
   },
   {
     "term": "Play a video when the screen locks.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Play sound after logging in",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13594,6 +13643,13 @@
     "comment": ""
   },
   {
+    "term": "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Shutdown",
     "translation": "",
     "context": "",
@@ -15198,6 +15254,13 @@
   },
   {
     "term": "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use Inline Expansion",
     "translation": "",
     "context": "",
     "reference": "",

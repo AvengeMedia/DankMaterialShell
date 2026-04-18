@@ -163,6 +163,8 @@ Column {
                                 return widgetWidth <= 25 ? smallDiskUsageComponent : diskUsagePillComponent;
                             } else if (id === "colorPicker") {
                                 return colorPickerPillComponent;
+                            } else if (id === "doNotDisturb") {
+                                return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
                             } else {
                                 return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
                             }
@@ -260,7 +262,7 @@ Column {
                     }
                 case "audioOutput":
                     {
-                        if (!AudioService.sink)
+                        if (!AudioService.sink?.audio)
                             return "volume_off";
                         let volume = AudioService.sink.audio.volume;
                         let muted = AudioService.sink.audio.muted;
@@ -276,7 +278,7 @@ Column {
                     }
                 case "audioInput":
                     {
-                        if (!AudioService.source)
+                        if (!AudioService.source?.audio)
                             return "mic_off";
                         let muted = AudioService.source.audio.muted;
                         return muted ? "mic_off" : "mic";
@@ -369,7 +371,7 @@ Column {
                     }
                 case "audioOutput":
                     {
-                        if (!AudioService.sink)
+                        if (!AudioService.sink?.audio)
                             return I18n.tr("Select device", "audio status");
                         if (AudioService.sink.audio.muted)
                             return I18n.tr("Muted", "audio status");
@@ -380,7 +382,7 @@ Column {
                     }
                 case "audioInput":
                     {
-                        if (!AudioService.source)
+                        if (!AudioService.source?.audio)
                             return I18n.tr("Select device", "audio status");
                         if (AudioService.source.audio.muted)
                             return I18n.tr("Muted", "audio status");
@@ -412,9 +414,9 @@ Column {
                 case "bluetooth":
                     return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled);
                 case "audioOutput":
-                    return !!(AudioService.sink && !AudioService.sink.audio.muted);
+                    return !!(AudioService.sink?.audio && !AudioService.sink.audio.muted);
                 case "audioInput":
-                    return !!(AudioService.source && !AudioService.source.audio.muted);
+                    return !!(AudioService.source?.audio && !AudioService.source.audio.muted);
                 default:
                     return false;
                 }
@@ -574,6 +576,22 @@ Column {
     }
 
     Component {
+        id: dndPillComponent
+        DndPill {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            width: parent.width
+            height: 60
+
+            onExpandClicked: {
+                if (!root.editMode) {
+                    root.expandClicked(widgetData, widgetIndex);
+                }
+            }
+        }
+    }
+
+    Component {
         id: smallBatteryComponent
         SmallBatteryButton {
             property var widgetData: parent.widgetData || {}
@@ -603,8 +621,6 @@ Column {
                     return DisplayService.nightModeEnabled ? "nightlight" : "dark_mode";
                 case "darkMode":
                     return "contrast";
-                case "doNotDisturb":
-                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off";
                 case "idleInhibitor":
                     return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
                 default:
@@ -618,8 +634,6 @@ Column {
                     return I18n.tr("Night Mode");
                 case "darkMode":
                     return I18n.tr("Dark Mode");
-                case "doNotDisturb":
-                    return I18n.tr("Do Not Disturb");
                 case "idleInhibitor":
                     return SessionService.idleInhibited ? I18n.tr("Keeping Awake") : I18n.tr("Keep Awake");
                 default:
@@ -642,8 +656,6 @@ Column {
                     return DisplayService.nightModeEnabled || false;
                 case "darkMode":
                     return !SessionData.isLightMode;
-                case "doNotDisturb":
-                    return SessionData.doNotDisturb || false;
                 case "idleInhibitor":
                     return SessionService.idleInhibited || false;
                 default:
@@ -668,11 +680,6 @@ Column {
                         const newMode = !SessionData.isLightMode;
                         Theme.screenTransition();
                         Theme.setLightMode(newMode);
-                        break;
-                    }
-                case "doNotDisturb":
-                    {
-                        SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
                         break;
                     }
                 case "idleInhibitor":

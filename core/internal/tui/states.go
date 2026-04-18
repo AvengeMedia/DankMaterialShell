@@ -10,6 +10,7 @@ const (
 	StateDependencyReview
 	StateGentooUseFlags
 	StateGentooGCCCheck
+	StateSelectPrivesc
 	StateAuthMethodChoice
 	StateFingerprintAuth
 	StatePasswordPrompt
