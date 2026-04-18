@@ -79,6 +79,7 @@ var SPEC = {
     selectedGpuIndex: { def: 0 },
     enabledGpuPciIds: { def: [] },
     showSystemTray: { def: true },
+    systemTrayMonochromeIcons: { def: false },
     showClock: { def: true },
     showNotificationButton: { def: true },
     showBattery: { def: true },
