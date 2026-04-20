@@ -1100,7 +1100,7 @@ Singleton {
     }
 
     function loadCustomThemeFromFile(filePath) {
-        customThemeFileView.path = filePath;
+        customThemeFileView.path = Paths.expandTilde(filePath);
     }
 
     function reloadCustomThemeVariant() {
@@ -1749,6 +1749,7 @@ Singleton {
 
     FileView {
         id: customThemeFileView
+        blockLoading: false
         watchChanges: currentTheme === "custom"
 
         function parseAndLoadTheme() {
