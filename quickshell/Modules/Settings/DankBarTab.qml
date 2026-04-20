@@ -715,6 +715,15 @@ Item {
             }
 
             SettingsToggleCard {
+                iconName: "filter_b_and_w"
+                title: I18n.tr("Monochrome System Tray Icons")
+                description: I18n.tr("Desaturate all system tray icons for a uniform monochrome look")
+                visible: selectedBarConfig?.enabled
+                checked: SettingsData.systemTrayMonochromeIcons
+                onToggled: checked => SettingsData.set("systemTrayMonochromeIcons", checked)
+            }
+
+            SettingsToggleCard {
                 iconName: "mouse"
                 title: I18n.tr("Scroll Wheel")
                 description: I18n.tr("Control workspaces and columns by scrolling on the bar")
