@@ -192,7 +192,7 @@ Singleton {
 
     function attachToSession(name) {
         if (SettingsData.muxUseCustomCommand && SettingsData.muxCustomCommand) {
-            Quickshell.execDetached([SettingsData.muxCustomCommand, name])
+            Quickshell.execDetached([Paths.expandTilde(SettingsData.muxCustomCommand), name])
         } else if (root.muxType === "zellij") {
             Quickshell.execDetached(_terminalPrefix().concat(["zellij", "attach", name]))
         } else {
@@ -202,7 +202,7 @@ Singleton {
 
     function createSession(name) {
         if (SettingsData.muxUseCustomCommand && SettingsData.muxCustomCommand) {
-            Quickshell.execDetached([SettingsData.muxCustomCommand, name])
+            Quickshell.execDetached([Paths.expandTilde(SettingsData.muxCustomCommand), name])
         } else if (root.muxType === "zellij") {
             Quickshell.execDetached(_terminalPrefix().concat(["zellij", "-s", name]))
         } else {
