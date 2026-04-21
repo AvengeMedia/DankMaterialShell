@@ -27,6 +27,7 @@ function transformApp(app, override, defaultActions, primaryActionLabel) {
         data: app,
         keywords: app.keywords || [],
         actions: actions,
+        source: Utils.classifyAppSource(app),
         primaryAction: {
             name: primaryActionLabel,
             icon: "open_in_new",

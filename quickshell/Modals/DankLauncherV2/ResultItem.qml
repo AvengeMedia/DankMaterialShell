@@ -191,6 +191,12 @@ Rectangle {
                     color: Theme.surfaceVariantText
                 }
             }
+
+            SourceBadge {
+                anchors.verticalCenter: parent.verticalCenter
+                source: root.item?.type === "app" ? (root.item.source || "") : ""
+                glyphSize: 14
+            }
         }
     }
 }

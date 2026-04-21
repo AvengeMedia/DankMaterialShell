@@ -168,6 +168,15 @@ Rectangle {
                     mipmap: true
                 }
             }
+
+            SourceBadge {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: Theme.spacingXS
+                source: root.item?.type === "app" ? (root.item.source || "") : ""
+                glyphSize: 16
+                visible: !root.isSelected && !!source
+            }
         }
     }
 
