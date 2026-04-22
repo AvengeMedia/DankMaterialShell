@@ -7,7 +7,6 @@ Rectangle {
 
     property string iconName: ""
     property bool isActive: false
-    property bool enabled: true
     property real iconRotation: 0
 
     signal clicked

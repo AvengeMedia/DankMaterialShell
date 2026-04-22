@@ -11,7 +11,6 @@ Item {
     property int step: 1
     property string leftIcon: ""
     property string rightIcon: ""
-    property bool enabled: true
     property string unit: "%"
     property bool showValue: true
     property bool isDragging: false

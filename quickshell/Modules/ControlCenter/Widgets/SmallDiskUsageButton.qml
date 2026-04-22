@@ -25,7 +25,7 @@ Rectangle {
         return parseFloat(selectedMount.percent.replace("%", "")) || 0;
     }
 
-    property bool enabled: DgopService.dgopAvailable
+    enabled: DgopService.dgopAvailable
 
     signal clicked
 

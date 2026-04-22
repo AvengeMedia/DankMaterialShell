@@ -8,7 +8,6 @@ Rectangle {
     property string text: ""
     property string iconName: ""
     property int iconSize: Theme.iconSizeSmall
-    property bool enabled: true
     property bool hovered: mouseArea.containsMouse
     property bool pressed: mouseArea.pressed
     property color backgroundColor: Theme.buttonBg

@@ -58,7 +58,7 @@ Item {
         }
     }
 
-    property bool enabled: isInstance ? (instanceData?.enabled ?? true) : SettingsData.desktopClockEnabled
+    enabled: isInstance ? (instanceData?.enabled ?? true) : SettingsData.desktopClockEnabled
     property real transparency: isInstance ? (cfg.transparency ?? 0.8) : SettingsData.desktopClockTransparency
     property string colorMode: isInstance ? (cfg.colorMode ?? "primary") : SettingsData.desktopClockColorMode
     property color customColor: isInstance ? (cfg.customColor ?? "#ffffff") : SettingsData.desktopClockCustomColor

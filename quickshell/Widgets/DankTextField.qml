@@ -25,7 +25,6 @@ StyledRect {
     property string placeholderText: ""
     property alias font: textInput.font
     property alias textColor: textInput.color
-    property alias enabled: textInput.enabled
     property alias echoMode: textInput.echoMode
     property alias validator: textInput.validator
     property alias maximumLength: textInput.maximumLength
