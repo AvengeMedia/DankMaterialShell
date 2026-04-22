@@ -749,8 +749,13 @@ Singleton {
             runResumeRecoveryPass();
             resumeRecoveryAttempt++;
 
-            if (resumeRecoveryAttempt < 3) {
-                interval = resumeRecoveryAttempt === 1 ? 1400 : 2600;
+            switch (resumeRecoveryAttempt) {
+            case 1:
+                interval = 1400;
+                restart();
+                return;
+            case 2:
+                interval = 2600;
                 restart();
                 return;
             }

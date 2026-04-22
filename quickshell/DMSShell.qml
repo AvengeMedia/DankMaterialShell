@@ -247,16 +247,16 @@ Item {
         repeat: false
         onTriggered: {
             root.recreateOsdSurfaces();
+            root.pendingOsdResumeReloads--;
 
-            if (root.pendingOsdResumeReloads > 1) {
-                root.pendingOsdResumeReloads--;
-                interval = 1400;
-                restart();
+            if (root.pendingOsdResumeReloads <= 0) {
+                root.pendingOsdResumeReloads = 0;
+                interval = 400;
                 return;
             }
 
-            root.pendingOsdResumeReloads = 0;
-            interval = 400;
+            interval = 1400;
+            restart();
         }
     }
 

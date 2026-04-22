@@ -45,7 +45,6 @@ Singleton {
     signal networkStateUpdate(var data)
     signal cupsStateUpdate(var data)
     signal loginctlStateUpdate(var data)
-    signal loginctlEvent(var event)
     signal capabilitiesReceived
     signal credentialsRequest(var data)
     signal bluetoothPairingRequest(var data)
@@ -348,11 +347,7 @@ Singleton {
         } else if (service === "network.credentials") {
             credentialsRequest(data);
         } else if (service === "loginctl") {
-            if (data.event) {
-                loginctlEvent(data);
-            } else {
-                loginctlStateUpdate(data);
-            }
+            loginctlStateUpdate(data);
         } else if (service === "bluetooth.pairing") {
             bluetoothPairingRequest(data);
         } else if (service === "cups") {

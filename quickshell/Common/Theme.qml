@@ -341,18 +341,6 @@ Singleton {
 
     Connections {
         target: DMSService
-        enabled: typeof DMSService !== "undefined" && typeof SessionData !== "undefined"
-
-        function onLoginctlEvent(event) {
-            if (!SessionData.themeModeAutoEnabled)
-                return;
-            if (typeof SettingsData !== "undefined" && SettingsData.loginctlLockIntegration)
-                return;
-            const eventType = String(event?.type || event?.event || "").toLowerCase();
-            if (eventType === "unlock") {
-                root.triggerThemeAutomationRefresh();
-            }
-        }
 
         function onThemeAutoStateUpdate(data) {
             if (!SessionData.themeModeAutoEnabled) {
@@ -415,7 +403,7 @@ Singleton {
 
     Connections {
         target: SessionService
-        enabled: typeof SessionService !== "undefined" && typeof SessionData !== "undefined" && SessionData.themeModeAutoEnabled
+        enabled: SessionData.themeModeAutoEnabled
 
         function onSessionUnlocked() {
             root.triggerThemeAutomationRefresh();

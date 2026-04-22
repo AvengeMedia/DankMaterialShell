@@ -472,7 +472,6 @@ Singleton {
         }
 
         function onCapabilitiesReceived() {
-            checkDMSCapabilities();
             syncSleepInhibitor();
         }
     }
@@ -525,10 +524,6 @@ Singleton {
 
         function onLoginctlStateUpdate(data) {
             updateLoginctlState(data);
-        }
-
-        function onLoginctlEvent(event) {
-            handleLoginctlEvent(event);
         }
     }
 
@@ -676,17 +671,5 @@ Singleton {
         }
 
         loginctlStateChanged();
-    }
-
-    function handleLoginctlEvent(event) {
-        if (event.event === "Lock") {
-            locked = true;
-            lockedHint = true;
-            sessionLocked();
-        } else if (event.event === "Unlock") {
-            locked = false;
-            lockedHint = false;
-            sessionUnlocked();
-        }
     }
 }
