@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Services
