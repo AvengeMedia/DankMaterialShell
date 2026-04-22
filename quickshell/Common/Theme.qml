@@ -346,12 +346,11 @@ Singleton {
         function onLoginctlEvent(event) {
             if (!SessionData.themeModeAutoEnabled)
                 return;
-            if (event.event === "unlock" || event.event === "resume") {
-                if (!themeAutoBackendAvailable()) {
-                    root.evaluateThemeMode();
-                    return;
-                }
-                DMSService.sendRequest("theme.auto.trigger", {});
+            if (typeof SettingsData !== "undefined" && SettingsData.loginctlLockIntegration)
+                return;
+            const eventType = String(event?.type || event?.event || "").toLowerCase();
+            if (eventType === "unlock") {
+                root.triggerThemeAutomationRefresh();
             }
         }
 
@@ -412,6 +411,27 @@ Singleton {
                 }
             }
         }
+    }
+
+    Connections {
+        target: SessionService
+        enabled: typeof SessionService !== "undefined" && typeof SessionData !== "undefined" && SessionData.themeModeAutoEnabled
+
+        function onSessionUnlocked() {
+            root.triggerThemeAutomationRefresh();
+        }
+
+        function onSessionResumed() {
+            root.triggerThemeAutomationRefresh();
+        }
+    }
+
+    function triggerThemeAutomationRefresh() {
+        if (!themeAutoBackendAvailable()) {
+            root.evaluateThemeMode();
+            return;
+        }
+        DMSService.sendRequest("theme.auto.trigger", {});
     }
 
     function applyGreeterTheme(themeName) {
