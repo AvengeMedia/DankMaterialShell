@@ -313,6 +313,8 @@ PanelWindow {
             }
         }
 
+        readonly property real cardInset: Theme.snap(4, win.dpr)
+
         property real swipeOffset: 0
         readonly property real dismissThreshold: isCenterPosition ? height * 0.4 : width * 0.35
         readonly property real swipeFadeStartRatio: 0.75
