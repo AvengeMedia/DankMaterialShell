@@ -53,8 +53,11 @@ BasePill {
 
         if (!parentScreen || CompositorService.filterCurrentDisplay([active], parentScreen?.name)?.length > 0) {
             activeWindow = active;
+        } else if (activeWindow) {
+            const alive = ToplevelManager.toplevels?.values;
+            if (alive && !Array.from(alive).some(t => t === activeWindow))
+                activeWindow = null;
         }
-        // else: active window is on a different screen so keep the previous value
     }
 
     Component.onCompleted: {
@@ -72,6 +75,13 @@ BasePill {
     Connections {
         target: CompositorService
         function onToplevelsChanged() {
+            root.updateActiveWindow();
+        }
+    }
+
+    Connections {
+        target: CompositorService.isNiri ? NiriService : null
+        function onCurrentOutputChanged() {
             root.updateActiveWindow();
         }
     }
@@ -107,21 +117,7 @@ BasePill {
     }
     readonly property bool hasWindowsOnCurrentWorkspace: {
         if (CompositorService.isNiri) {
-            let currentWorkspaceId = null;
-            for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-                const ws = NiriService.allWorkspaces[i];
-                if (ws.is_focused) {
-                    currentWorkspaceId = ws.id;
-                    break;
-                }
-            }
-
-            if (!currentWorkspaceId) {
-                return false;
-            }
-
-            const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId);
-            return workspaceWindows.length > 0 && activeWindow && (activeWindow.title || activeWindow.appId);
+            return !!activeWindow && !!(activeWindow.title || activeWindow.appId);
         }
 
         if (CompositorService.isHyprland) {
