@@ -42,11 +42,15 @@ BasePill {
         const active = ToplevelManager.activeToplevel;
 
         if (!active) {
-            // Only clear if our tracked window is no longer alive
             if (activeWindow) {
-                const alive = ToplevelManager.toplevels?.values;
-                if (alive && !Array.from(alive).some(t => t === activeWindow))
-                    activeWindow = null;
+                if (CompositorService.isNiri) {
+                    if (NiriService.currentOutput === (parentScreen?.name ?? ""))
+                        activeWindow = null;
+                } else {
+                    const alive = ToplevelManager.toplevels?.values;
+                    if (alive && !Array.from(alive).some(t => t === activeWindow))
+                        activeWindow = null;
+                }
             }
             return;
         }
@@ -68,7 +72,8 @@ BasePill {
     Connections {
         target: ToplevelManager
         function onActiveToplevelChanged() {
-            root.updateActiveWindow();
+            if (!CompositorService.isNiri)
+                root.updateActiveWindow();
         }
     }
 
@@ -81,6 +86,9 @@ BasePill {
 
     Connections {
         target: CompositorService.isNiri ? NiriService : null
+        function onWindowsChanged() {
+            root.updateActiveWindow();
+        }
         function onCurrentOutputChanged() {
             root.updateActiveWindow();
         }
@@ -117,7 +125,17 @@ BasePill {
     }
     readonly property bool hasWindowsOnCurrentWorkspace: {
         if (CompositorService.isNiri) {
-            return !!activeWindow && !!(activeWindow.title || activeWindow.appId);
+            if (!activeWindow || !(activeWindow.title || activeWindow.appId))
+                return false;
+            if (NiriService.currentOutput !== (parentScreen?.name ?? ""))
+                return true;
+            const focusedWin = NiriService.windows.find(w => w.is_focused);
+            if (!focusedWin)
+                return false;
+            const screenWsIds = new Set(
+                NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id)
+            );
+            return screenWsIds.has(focusedWin.workspace_id);
         }
 
         if (CompositorService.isHyprland) {
