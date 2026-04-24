@@ -12,6 +12,7 @@ Item {
     property alias contentLoader: contentLoader
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
+    readonly property alias backgroundWindow: backgroundWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -550,7 +551,7 @@ Item {
                 fallbackOffset: root.shadowFallbackOffset
                 targetRadius: Theme.cornerRadius
                 targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !BlurService.enabled
             }
 
             Item {

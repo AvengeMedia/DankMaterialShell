@@ -28,7 +28,7 @@ Rectangle {
     }
 
     readonly property color _tileBgActive: Theme.ccTileActiveBg
-    readonly property color _tileBgInactive: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _tileBgInactive: Theme.nestedSurface
     readonly property color _tileRingActive: Theme.ccTileRing
     readonly property color _tileIconActive: Theme.ccTileActiveText
     readonly property color _tileIconInactive: Theme.ccTileInactiveIcon

@@ -29,7 +29,7 @@ Rectangle {
         return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor);
     }
 
-    readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _containerBg: Theme.nestedSurface
 
     color: {
         const baseColor = bodyMouse.containsMouse ? Theme.primaryPressed : _containerBg;

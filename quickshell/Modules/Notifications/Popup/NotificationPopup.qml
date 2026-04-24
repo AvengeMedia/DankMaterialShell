@@ -360,7 +360,7 @@ PanelWindow {
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
-        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled
+        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !BlurService.enabled
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
         readonly property real cardInset: Theme.snap(4, win.dpr)
         readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)) + 8), win.dpr) : 0
@@ -537,12 +537,10 @@ PanelWindow {
                             return "";
                         const appIcon = notificationData.appIcon;
                         if (!appIcon)
-                            return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                            return "";
                         if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                             return appIcon;
-                        if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                            return "";
-                        return Paths.resolveIconPath(appIcon);
+                        return "";
                     }
 
                     hasImage: hasNotificationImage

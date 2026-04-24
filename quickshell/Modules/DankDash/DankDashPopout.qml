@@ -82,6 +82,7 @@ DankPopout {
             isRightEdge: root.__dropdownRightEdge
             activePlayer: root.__dropdownPlayer
             allPlayers: root.__dropdownPlayers
+            targetWindow: root.backgroundWindow
             onCloseRequested: root.__hideDropdowns()
             onPanelEntered: root.__stopCloseTimer()
             onPanelExited: root.__startCloseTimer()
