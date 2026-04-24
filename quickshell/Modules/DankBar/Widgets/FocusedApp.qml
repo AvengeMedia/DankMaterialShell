@@ -42,19 +42,26 @@ BasePill {
         const active = ToplevelManager.activeToplevel;
 
         if (!active) {
-            // Only clear if our tracked window is no longer alive
             if (activeWindow) {
-                const alive = ToplevelManager.toplevels?.values;
-                if (alive && !Array.from(alive).some(t => t === activeWindow))
-                    activeWindow = null;
+                if (CompositorService.isNiri) {
+                    if (NiriService.currentOutput === (parentScreen?.name ?? ""))
+                        activeWindow = null;
+                } else {
+                    const alive = ToplevelManager.toplevels?.values;
+                    if (alive && !Array.from(alive).some(t => t === activeWindow))
+                        activeWindow = null;
+                }
             }
             return;
         }
 
         if (!parentScreen || CompositorService.filterCurrentDisplay([active], parentScreen?.name)?.length > 0) {
             activeWindow = active;
+        } else if (activeWindow) {
+            const alive = ToplevelManager.toplevels?.values;
+            if (alive && !Array.from(alive).some(t => t === activeWindow))
+                activeWindow = null;
         }
-        // else: active window is on a different screen so keep the previous value
     }
 
     Component.onCompleted: {
@@ -65,13 +72,24 @@ BasePill {
     Connections {
         target: ToplevelManager
         function onActiveToplevelChanged() {
-            root.updateActiveWindow();
+            if (!CompositorService.isNiri)
+                root.updateActiveWindow();
         }
     }
 
     Connections {
         target: CompositorService
         function onToplevelsChanged() {
+            root.updateActiveWindow();
+        }
+    }
+
+    Connections {
+        target: CompositorService.isNiri ? NiriService : null
+        function onWindowsChanged() {
+            root.updateActiveWindow();
+        }
+        function onCurrentOutputChanged() {
             root.updateActiveWindow();
         }
     }
@@ -107,21 +125,17 @@ BasePill {
     }
     readonly property bool hasWindowsOnCurrentWorkspace: {
         if (CompositorService.isNiri) {
-            let currentWorkspaceId = null;
-            for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-                const ws = NiriService.allWorkspaces[i];
-                if (ws.is_focused) {
-                    currentWorkspaceId = ws.id;
-                    break;
-                }
-            }
-
-            if (!currentWorkspaceId) {
+            if (!activeWindow || !(activeWindow.title || activeWindow.appId))
                 return false;
-            }
-
-            const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId);
-            return workspaceWindows.length > 0 && activeWindow && (activeWindow.title || activeWindow.appId);
+            if (NiriService.currentOutput !== (parentScreen?.name ?? ""))
+                return true;
+            const focusedWin = NiriService.windows.find(w => w.is_focused);
+            if (!focusedWin)
+                return false;
+            const screenWsIds = new Set(
+                NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id)
+            );
+            return screenWsIds.has(focusedWin.workspace_id);
         }
 
         if (CompositorService.isHyprland) {
