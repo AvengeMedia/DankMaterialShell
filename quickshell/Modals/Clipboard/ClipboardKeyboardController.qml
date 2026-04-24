@@ -65,6 +65,12 @@ QtObject {
             return;
         case Qt.Key_Down:
         case Qt.Key_Tab:
+            if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ControlModifier)) {
+                modal.activeTab = modal.activeTab === "saved" ? "recents" : "saved";
+                ClipboardService.selectedIndex = 0;
+                event.accepted = true;
+                return;
+            }
             if (!ClipboardService.keyboardNavigationActive) {
                 ClipboardService.keyboardNavigationActive = true;
                 ClipboardService.selectedIndex = 0;
@@ -75,6 +81,12 @@ QtObject {
             return;
         case Qt.Key_Up:
         case Qt.Key_Backtab:
+            if (event.key === Qt.Key_Backtab && (event.modifiers & Qt.ControlModifier)) {
+                modal.activeTab = modal.activeTab === "saved" ? "recents" : "saved";
+                ClipboardService.selectedIndex = 0;
+                event.accepted = true;
+                return;
+            }
             if (!ClipboardService.keyboardNavigationActive) {
                 ClipboardService.keyboardNavigationActive = true;
                 ClipboardService.selectedIndex = 0;
