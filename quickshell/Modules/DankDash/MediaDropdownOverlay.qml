@@ -89,8 +89,8 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-        border.color: BlurService.enabled ? "transparent" : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 1
 
         opacity: dropdownType === 1 ? 1 : 0
@@ -229,8 +229,8 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-        border.color: BlurService.enabled ? "transparent" : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 2
 
         opacity: dropdownType === 2 ? 1 : 0
@@ -301,7 +301,7 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                            color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
                             border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                             border.width: modelData === AudioService.sink ? 2 : 1
 
@@ -383,8 +383,8 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-        border.color: BlurService.enabled ? "transparent" : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 2
 
         opacity: dropdownType === 3 ? 1 : 0
@@ -455,7 +455,7 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                            color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
                             border.color: modelData === activePlayer ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                             border.width: modelData === activePlayer ? 2 : 1
 

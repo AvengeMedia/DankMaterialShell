@@ -1843,6 +1843,33 @@ Item {
                     onToggled: checked => SettingsData.set("blurEnabled", checked)
                 }
 
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["blur", "foreground", "layers", "contrast", "glass", "frosted"]
+                    settingKey: "blurForegroundLayers"
+                    text: I18n.tr("Foreground Layers")
+                    description: I18n.tr("Show foreground surfaces on blurred panels for stronger contrast")
+                    checked: SettingsData.blurForegroundLayers ?? true
+                    visible: BlurService.available && (SettingsData.blurEnabled ?? false)
+                    enabled: BlurService.available
+                    onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["blur", "foreground", "layers", "outline", "border", "cards", "widgets", "notifications", "control center"]
+                    settingKey: "blurLayerOutlineOpacity"
+                    text: I18n.tr("Layer Outline Opacity")
+                    description: I18n.tr("Controls outlines around blurred foreground cards, pills, and notification cards")
+                    visible: BlurService.available && (SettingsData.blurEnabled ?? false)
+                    value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
+                    minimum: 0
+                    maximum: 40
+                    unit: "%"
+                    defaultValue: 12
+                    onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
+                }
+
                 SettingsDropdownRow {
                     tab: "theme"
                     tags: ["blur", "border", "outline", "edge"]
@@ -1886,12 +1913,13 @@ Item {
                     tags: ["blur", "border", "opacity"]
                     settingKey: "blurBorderOpacity"
                     text: I18n.tr("Blur Border Opacity")
+                    description: I18n.tr("Controls the outer edge of protocol-blurred windows")
                     visible: SettingsData.blurEnabled
-                    value: Math.round((SettingsData.blurBorderOpacity ?? 1.0) * 100)
+                    value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
                     minimum: 0
                     maximum: 100
                     unit: "%"
-                    defaultValue: 100
+                    defaultValue: 35
                     onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
                 }
             }

@@ -41,7 +41,7 @@ DankPopout {
         }
     }
 
-    readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _containerBg: Theme.nestedSurface
 
     function openWithSection(section) {
         StateUtils.openWithSection(root, section);
@@ -210,7 +210,11 @@ DankPopout {
                 EditControls {
                     width: parent.width
                     visible: editMode
-                    popoutContent: controlContent
+                    popupScreen: root.screen
+                    popoutX: root.alignedX
+                    popoutY: root.alignedY
+                    popoutWidth: root.alignedWidth
+                    popoutHeight: root.alignedHeight
                     availableWidgets: {
                         if (!editMode)
                             return [];

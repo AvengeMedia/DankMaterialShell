@@ -16,9 +16,9 @@ Rectangle {
 
     implicitHeight: diskContent.height + Theme.spacingM
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    color: Theme.nestedSurface
     border.color: Theme.outlineMedium
-    border.width: 0
+    border.width: Theme.layerOutlineWidth
 
     Component.onCompleted: {
         DgopService.addRef(["diskmounts"]);

@@ -185,7 +185,7 @@ Popup {
     }
 
     contentItem: Rectangle {
-        color: BlurService.enabled ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+        color: Theme.floatingSurface
         radius: Theme.cornerRadius
         border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: BlurService.enabled ? BlurService.borderWidth : 1

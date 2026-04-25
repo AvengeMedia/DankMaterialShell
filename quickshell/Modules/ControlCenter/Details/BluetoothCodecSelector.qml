@@ -153,9 +153,9 @@ Item {
         width: 320
         height: contentColumn.implicitHeight + Theme.spacingL * 2
         radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+        color: Theme.floatingSurface
         border.color: Theme.outlineMedium
-        border.width: 0
+        border.width: Theme.layerOutlineWidth
         opacity: modalVisible ? 1 : 0
         scale: modalVisible ? 1 : 0.9
 

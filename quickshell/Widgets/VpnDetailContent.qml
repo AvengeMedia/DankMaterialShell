@@ -19,7 +19,9 @@ Rectangle {
 
     implicitHeight: 32 + 1 + listHeight + Theme.spacingS * 4 + Theme.spacingM * 2
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     FileBrowserSurfaceModal {
         id: fileBrowser

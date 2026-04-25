@@ -134,7 +134,7 @@ PanelWindow {
 
             Rectangle {
                 anchors.fill: parent
-                color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, contentRect.effectiveTransparency)
+                color: Theme.transparentBlurLayers ? "transparent" : Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, contentRect.effectiveTransparency)
                 radius: Theme.cornerRadius
                 border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
                 border.width: BlurService.borderWidth

@@ -21,9 +21,9 @@ Rectangle {
 
     implicitHeight: 70
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    color: Theme.nestedSurface
     border.color: Theme.outlineMedium
-    border.width: 0
+    border.width: Theme.layerOutlineWidth
 
     Row {
         anchors.left: parent.left

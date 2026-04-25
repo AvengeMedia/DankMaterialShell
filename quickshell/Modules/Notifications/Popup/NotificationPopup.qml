@@ -409,9 +409,9 @@ PanelWindow {
             sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
             sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
             sourceRect.radius: Theme.cornerRadius
-            sourceRect.color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
-            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
+            sourceRect.color: Theme.readableSurface
+            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.outlineMedium
+            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 1
 
             Rectangle {
                 x: bgShadowLayer.sourceRect.x
@@ -448,9 +448,10 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: content.cardInset
             radius: Theme.cornerRadius
+            antialiasing: true
             color: "transparent"
-            border.color: BlurService.borderColor
-            border.width: BlurService.borderWidth
+            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+            border.width: BlurService.enabled ? BlurService.borderWidth : 1
             z: 100
         }
 

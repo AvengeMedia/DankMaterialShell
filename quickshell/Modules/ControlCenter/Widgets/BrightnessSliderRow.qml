@@ -13,6 +13,8 @@ Row {
     property string instanceId: ""
     property string screenName: ""
     property var parentScreen: null
+    property color sliderTrackColor: "transparent"
+    property real sliderTrackOpacity: Theme.ccSliderTrackOpacity
 
     signal iconClicked
 
@@ -184,7 +186,8 @@ Row {
             }
         }
         thumbOutlineColor: Theme.surfaceContainer
-        trackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+        trackColor: root.sliderTrackColor.a > 0 ? root.sliderTrackColor : Theme.ccSliderTrackColor
+        trackOpacity: root.sliderTrackOpacity
 
         Binding on value {
             value: root.targetBrightness

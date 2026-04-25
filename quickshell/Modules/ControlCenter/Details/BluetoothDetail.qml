@@ -20,9 +20,9 @@ Rectangle {
         return headerRow.height + bluetoothContent.height + Theme.spacingM;
     }
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    color: Theme.nestedSurface
     border.color: Theme.outlineMedium
-    border.width: 0
+    border.width: Theme.layerOutlineWidth
 
     property var bluetoothCodecModalRef: null
     property var devicesBeingPaired: new Set()
