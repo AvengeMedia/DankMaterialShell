@@ -136,6 +136,17 @@ func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*Netwo
 }
 
 func (b *NetworkManagerBackend) Initialize() error {
+	// Initialize D-Bus connection for ModemManager queries
+	if b.dbusConn == nil {
+		conn, err := dbus.ConnectSystemBus()
+		if err != nil {
+			log.Error("Failed to connect to D-Bus system bus for ModemManager: %v", err)
+		} else {
+			b.dbusConn = conn
+			log.Debug("D-Bus system bus connection established for ModemManager")
+		}
+	}
+
 	nm := b.nmConn.(gonetworkmanager.NetworkManager)
 
 	if s, err := gonetworkmanager.NewSettings(); err == nil {
@@ -243,6 +254,17 @@ func (b *NetworkManagerBackend) Initialize() error {
 		log.Warnf("Failed to get initial active VPNs: %v", err)
 	}
 
+	b.updateCellularState()
+	if _, err := b.listCellularConnections(); err != nil {
+		log.Warnf("Failed to get initial cellular connections: %v", err)
+	}
+	if _, err := b.ListCellularProfiles(); err != nil {
+		log.Warnf("Failed to get initial cellular profiles: %v", err)
+	}
+	if _, err := b.ListActiveCellular(); err != nil {
+		log.Warnf("Failed to get initial active cellular: %v", err)
+	}
+
 	return nil
 }
 
@@ -266,6 +288,10 @@ func (b *NetworkManagerBackend) GetCurrentState() (*BackendState, error) {
 	state.EthernetDevices = append([]EthernetDevice(nil), b.state.EthernetDevices...)
 	state.VPNProfiles = append([]VPNProfile(nil), b.state.VPNProfiles...)
 	state.VPNActive = append([]VPNActive(nil), b.state.VPNActive...)
+	state.CellularDevices = append([]CellularDevice(nil), b.state.CellularDevices...)
+	state.CellularConnections = append([]CellularConnection(nil), b.state.CellularConnections...)
+	state.CellularProfiles = append([]CellularProfile(nil), b.state.CellularProfiles...)
+	state.CellularActive = append([]CellularActive(nil), b.state.CellularActive...)
 
 	return &state, nil
 }

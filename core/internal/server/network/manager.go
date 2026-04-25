@@ -128,6 +128,17 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.ConnectingSSID = backendState.ConnectingSSID
 	m.state.ConnectingDevice = backendState.ConnectingDevice
 	m.state.LastError = backendState.LastError
+	m.state.CellularIP = backendState.CellularIP
+	m.state.CellularDevice = backendState.CellularDevice
+	m.state.CellularConnected = backendState.CellularConnected
+	m.state.CellularEnabled = backendState.CellularEnabled
+	m.state.CellularOperator = backendState.CellularOperator
+	m.state.CellularTechnology = backendState.CellularTechnology
+	m.state.CellularSignal = backendState.CellularSignal
+	m.state.CellularDevices = backendState.CellularDevices
+	m.state.CellularProfiles = backendState.CellularProfiles
+	m.state.CellularActive = backendState.CellularActive
+	m.state.CellularConnections = backendState.CellularConnections
 	m.stateMutex.Unlock()
 
 	return nil
@@ -161,6 +172,10 @@ func (m *Manager) snapshotState() NetworkState {
 	s.EthernetDevices = append([]EthernetDevice(nil), m.state.EthernetDevices...)
 	s.VPNProfiles = append([]VPNProfile(nil), m.state.VPNProfiles...)
 	s.VPNActive = append([]VPNActive(nil), m.state.VPNActive...)
+	s.CellularDevices = append([]CellularDevice(nil), m.state.CellularDevices...)
+	s.CellularConnections = append([]CellularConnection(nil), m.state.CellularConnections...)
+	s.CellularProfiles = append([]CellularProfile(nil), m.state.CellularProfiles...)
+	s.CellularActive = append([]CellularActive(nil), m.state.CellularActive...)
 	return s
 }
 
@@ -623,4 +638,68 @@ func (m *Manager) ScanWiFiDevice(device string) error {
 
 func (m *Manager) DisconnectWiFiDevice(device string) error {
 	return m.backend.DisconnectWiFiDevice(device)
+}
+
+func (m *Manager) GetCellularEnabled() (bool, error) {
+	return m.backend.GetCellularEnabled()
+}
+
+func (m *Manager) SetCellularEnabled(enabled bool) error {
+	return m.backend.SetCellularEnabled(enabled)
+}
+
+func (m *Manager) GetCellularDevices() []CellularDevice {
+	m.stateMutex.RLock()
+	defer m.stateMutex.RUnlock()
+	devices := make([]CellularDevice, len(m.state.CellularDevices))
+	copy(devices, m.state.CellularDevices)
+	return devices
+}
+
+func (m *Manager) GetCellularConnections() ([]CellularConnection, error) {
+	return m.backend.GetCellularConnections()
+}
+
+func (m *Manager) GetCellularNetworkInfoDetailed(uuid string) (*CellularNetworkInfoResponse, error) {
+	return m.backend.GetCellularNetworkDetails(uuid)
+}
+
+func (m *Manager) ConnectCellular(uuid string) error {
+	return m.backend.ConnectCellular(uuid)
+}
+
+func (m *Manager) DisconnectCellular() error {
+	return m.backend.DisconnectCellular()
+}
+
+func (m *Manager) DisconnectCellularDevice(device string) error {
+	return m.backend.DisconnectCellularDevice(device)
+}
+
+func (m *Manager) ListCellularProfiles() ([]CellularProfile, error) {
+	return m.backend.ListCellularProfiles()
+}
+
+func (m *Manager) ListActiveCellular() ([]CellularActive, error) {
+	return m.backend.ListActiveCellular()
+}
+
+func (m *Manager) GetCellularProfile(uuidOrName string) (*CellularProfile, error) {
+	return m.backend.GetCellularProfile(uuidOrName)
+}
+
+func (m *Manager) UpdateCellularProfile(uuid string, updates map[string]any) error {
+	return m.backend.UpdateCellularProfile(uuid, updates)
+}
+
+func (m *Manager) GetSIMStatus(device string) (*CellularDevice, error) {
+	return m.backend.GetSIMStatus(device)
+}
+
+func (m *Manager) SubmitSIMPin(device string, pin string) error {
+	return m.backend.SubmitSIMPin(device, pin)
+}
+
+func (m *Manager) GetSIMPinTriesLeft(device string) (int, error) {
+	return m.backend.GetSIMPinTriesLeft(device)
 }
