@@ -553,6 +553,13 @@ Item {
                     }
                 }
 
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.cornerRadius
+                    visible: !BlurService.enabled
+                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                }
+
                 Loader {
                     id: contentLoader
                     anchors.fill: parent
