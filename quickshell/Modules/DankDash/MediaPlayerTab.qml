@@ -637,7 +637,7 @@ Item {
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
         y: 185
         color: playerSelectorArea.containsMouse || playersExpanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
-        border.color: BlurService.enabled ? "transparent" : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+        border.color: Theme.outlineStrong
         border.width: 1
         z: 100
         visible: (allPlayers?.length || 0) >= 1
@@ -680,7 +680,7 @@ Item {
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
         y: 130
         color: volumeButtonArea.containsMouse && volumeAvailable || volumeExpanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
-        border.color: BlurService.enabled ? "transparent" : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, volumeAvailable ? 0.3 : 0.15)
+        border.color: volumeAvailable ? Theme.outlineStrong : Theme.outlineMedium
         border.width: 1
         z: 101
         enabled: volumeAvailable
@@ -757,7 +757,7 @@ Item {
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
         y: 240
         color: audioDevicesArea.containsMouse || devicesExpanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
-        border.color: BlurService.enabled ? "transparent" : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+        border.color: Theme.outlineStrong
         border.width: 1
         z: 100
 

@@ -18,7 +18,7 @@ Singleton {
     readonly property color borderColor: {
         if (!enabled)
             return "transparent";
-        const opacity = SettingsData.blurBorderOpacity ?? 0.5;
+        const opacity = SettingsData.blurBorderOpacity ?? 0.35;
         switch (SettingsData.blurBorderColor ?? "outline") {
         case "primary":
             return Theme.withAlpha(Theme.primary, opacity);

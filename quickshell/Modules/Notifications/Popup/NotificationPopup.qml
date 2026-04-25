@@ -412,9 +412,10 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: content.cardInset
             radius: Theme.cornerRadius
+            antialiasing: true
             color: "transparent"
-            border.color: BlurService.borderColor
-            border.width: BlurService.borderWidth
+            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+            border.width: BlurService.enabled ? BlurService.borderWidth : 1
             z: 100
         }
 

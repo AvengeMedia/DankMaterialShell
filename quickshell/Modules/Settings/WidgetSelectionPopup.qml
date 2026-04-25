@@ -14,6 +14,10 @@ FloatingWindow {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property var parentModal: null
+    readonly property bool blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
+    readonly property real surfaceAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.36 : 0.78) : 1.0
+    readonly property real fieldAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.18 : 0.62) : 1.0
+    readonly property real rowAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.12 : 0.52) : 0.30
 
     signal widgetSelected(string widgetId, string targetSection)
 
@@ -94,7 +98,7 @@ FloatingWindow {
     minimumSize: Qt.size(400, 350)
     implicitWidth: 500
     implicitHeight: 550
-    color: Theme.surfaceContainer
+    color: blurActive ? "transparent" : Theme.surfaceContainer
     visible: false
 
     onVisibleChanged: {
@@ -117,6 +121,24 @@ FloatingWindow {
             if (parentModal && parentModal.modalFocusScope)
                 parentModal.modalFocusScope.forceActiveFocus();
         });
+    }
+
+    WindowBlur {
+        targetWindow: root
+        blurX: 0
+        blurY: 0
+        blurWidth: root.visible ? root.width : 0
+        blurHeight: root.visible ? root.height : 0
+        blurRadius: Theme.cornerRadius
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: Theme.cornerRadius
+        color: Theme.withAlpha(Theme.surfaceContainer, root.surfaceAlpha)
+        border.color: root.blurActive ? Theme.outlineMedium : "transparent"
+        border.width: root.blurActive ? Theme.layerOutlineWidth : 0
+        antialiasing: true
     }
 
     FocusScope {
@@ -184,8 +206,7 @@ FloatingWindow {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: Theme.surfaceContainer
-                    opacity: 0.5
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, root.blurActive ? 0.20 : 0.50)
                 }
 
                 Row {
@@ -258,7 +279,7 @@ FloatingWindow {
                         width: parent.width
                         height: 48
                         cornerRadius: Theme.cornerRadius
-                        backgroundColor: Theme.surfaceContainerHigh
+                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, root.fieldAlpha)
                         normalBorderColor: Theme.outlineMedium
                         focusedBorderColor: Theme.primary
                         leftIconName: "search"
@@ -302,9 +323,10 @@ FloatingWindow {
                             height: 60
                             radius: Theme.cornerRadius
                             property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
-                            color: isSelected ? Theme.primarySelected : widgetArea.containsMouse ? Theme.primaryHover : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-                            border.color: isSelected ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
-                            border.width: isSelected ? 2 : 1
+                            color: isSelected ? Theme.withAlpha(Theme.primary, root.blurActive ? 0.22 : 0.16) : widgetArea.containsMouse ? Theme.withAlpha(Theme.primary, root.blurActive ? 0.14 : 0.08) : Theme.withAlpha(Theme.surfaceVariant, root.rowAlpha)
+                            border.color: isSelected ? Theme.primary : Theme.outlineMedium
+                            border.width: isSelected ? 2 : Theme.layerOutlineWidth
+                            antialiasing: true
 
                             Row {
                                 anchors.fill: parent

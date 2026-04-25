@@ -577,9 +577,10 @@ Item {
                 scale: contentWrapper.scale
                 visible: contentWrapper.visible
                 radius: Theme.cornerRadius
+                antialiasing: true
                 color: "transparent"
                 border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-                border.width: BlurService.borderWidth
+                border.width: BlurService.enabled ? BlurService.borderWidth : 1
                 z: 100
             }
         }

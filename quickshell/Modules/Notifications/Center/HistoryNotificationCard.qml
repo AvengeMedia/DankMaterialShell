@@ -35,14 +35,14 @@ Rectangle {
     color: {
         if (isSelected && keyboardNavigationActive)
             return Theme.primaryPressed;
-        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
+        return Theme.floatingSurfaceHigh;
     }
     border.color: {
         if (isSelected && keyboardNavigationActive)
             return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5);
         if (historyItem.urgency === 2)
             return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
-        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05);
+        return Theme.outlineMedium;
     }
     border.width: {
         if (isSelected && keyboardNavigationActive)

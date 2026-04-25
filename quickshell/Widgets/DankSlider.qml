@@ -22,6 +22,7 @@ Item {
 
     property color thumbOutlineColor: Theme.surfaceContainer
     property color trackColor: enabled ? Theme.outline : Theme.outline
+    property real trackOpacity: Theme.popupTransparency
 
     signal sliderValueChanged(int newValue)
     signal sliderDragFinished(int finalValue)
@@ -63,7 +64,7 @@ Item {
             width: parent.width - (leftIconWidth + rightIconWidth + (slider.leftIcon.length > 0 ? Theme.spacingM : 0) + (slider.rightIcon.length > 0 ? Theme.spacingM : 0))
             height: 12
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(slider.trackColor, Theme.popupTransparency)
+            color: Theme.withAlpha(slider.trackColor, slider.trackOpacity)
             anchors.verticalCenter: parent.verticalCenter
             clip: false
 

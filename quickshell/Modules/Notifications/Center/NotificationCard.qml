@@ -71,7 +71,7 @@ Rectangle {
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
             return Theme.primaryHoverLight;
         }
-        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
+        return Theme.floatingSurfaceHigh;
     }
     border.color: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -83,7 +83,7 @@ Rectangle {
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
             return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
         }
-        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05);
+        return Theme.outlineMedium;
     }
     border.width: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -452,8 +452,8 @@ Rectangle {
                             return expandedBaseHeight;
                         }
                         radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primaryPressed : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                        border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05)
+                        color: isSelected ? Theme.primaryPressed : Theme.nestedSurface
+                        border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.outlineMedium
                         border.width: 1
 
                         Behavior on border.color {

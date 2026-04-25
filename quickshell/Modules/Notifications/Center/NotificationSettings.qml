@@ -14,8 +14,8 @@ Rectangle {
     visible: expanded
     clip: true
     radius: Theme.cornerRadius
-    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
     border.width: 1
 
     Behavior on height {

@@ -18,9 +18,9 @@ Rectangle {
 
     implicitHeight: headerRow.height + (!hasVolumeSliderInCC ? volumeSlider.height : 0) + audioContent.height + Theme.spacingM
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-    border.width: 0
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Row {
         id: headerRow
@@ -132,6 +132,8 @@ Rectangle {
             unit: "%"
             valueOverride: actualVolumePercent
             thumbOutlineColor: Theme.surfaceVariant
+            trackColor: Theme.ccSliderTrackColor
+            trackOpacity: Theme.ccSliderTrackOpacity
 
             onSliderValueChanged: function (newValue) {
                 if (AudioService.sink && AudioService.sink.audio) {
@@ -448,6 +450,7 @@ Rectangle {
                         Item {
                             id: appVolumeRow
                             property color sliderTrackColor: "transparent"
+                            property real sliderTrackOpacity: Theme.ccSliderTrackOpacity
                             anchors.centerIn: parent
 
                             height: 40
@@ -519,7 +522,8 @@ Rectangle {
                                 unit: "%"
                                 valueOverride: actualVolumePercent
                                 thumbOutlineColor: Theme.surfaceContainer
-                                trackColor: appVolumeRow.sliderTrackColor.a > 0 ? appVolumeRow.sliderTrackColor : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                                trackColor: appVolumeRow.sliderTrackColor.a > 0 ? appVolumeRow.sliderTrackColor : Theme.ccSliderTrackColor
+                                trackOpacity: appVolumeRow.sliderTrackOpacity
 
                                 onSliderValueChanged: function (newValue) {
                                     if (modelData) {

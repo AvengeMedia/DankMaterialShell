@@ -277,7 +277,7 @@ PanelWindow {
             id: background
             anchors.fill: parent
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
+            color: Theme.transparentBlurLayers ? "transparent" : Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
             border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
             border.width: BlurService.enabled ? BlurService.borderWidth : 1
             z: -1

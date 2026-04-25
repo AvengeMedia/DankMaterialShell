@@ -372,7 +372,7 @@ Popup {
             anchors.fill: parent
             implicitWidth: Math.max(180, menuColumn.implicitWidth + Theme.spacingS * 2)
             implicitHeight: menuColumn.implicitHeight + Theme.spacingS * 2
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            color: Theme.floatingSurface
             radius: Theme.cornerRadius
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: 1

@@ -1,5 +1,6 @@
 import QtQuick
-import QtQuick.Controls
+import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Widgets
 
@@ -10,7 +11,11 @@ Row {
     LayoutMirroring.childrenInherit: true
 
     property var availableWidgets: []
-    property Item popoutContent: null
+    property var popupScreen: null
+    property real popoutX: 0
+    property real popoutY: 0
+    property real popoutWidth: 0
+    property real popoutHeight: 0
 
     signal addWidget(string widgetId)
     signal resetToDefault
@@ -19,121 +24,190 @@ Row {
     height: 48
     spacing: Theme.spacingS
 
-    onAddWidget: addWidgetPopup.close()
+    function openWidgetLibrary() {
+        if (popupScreen)
+            addWidgetWindow.screen = popupScreen;
+        addWidgetWindow.visible = true;
+    }
 
-    Popup {
-        id: addWidgetPopup
-        parent: popoutContent
-        x: parent ? Math.round((parent.width - width) / 2) : 0
-        y: parent ? Math.round((parent.height - height) / 2) : 0
-        width: 400
-        height: 300
-        modal: false
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+    function closeWidgetLibrary() {
+        addWidgetWindow.visible = false;
+    }
 
-        background: Rectangle {
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            border.color: Theme.primarySelected
-            border.width: 0
-            radius: Theme.cornerRadius
+    onAddWidget: closeWidgetLibrary()
+    onVisibleChanged: {
+        if (!visible)
+            closeWidgetLibrary();
+    }
+
+    PanelWindow {
+        id: addWidgetWindow
+
+        screen: root.popupScreen
+        visible: false
+        color: "transparent"
+
+        WlrLayershell.namespace: "dms:control-center-widget-library"
+        WlrLayershell.layer: WlrLayershell.Overlay
+        WlrLayershell.exclusiveZone: -1
+        WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
+        anchors {
+            top: true
+            left: true
+            right: true
+            bottom: true
         }
 
-        contentItem: Item {
+        readonly property bool blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
+        readonly property real surfaceAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.24 : 0.72) : Theme.popupTransparency
+        readonly property real rowAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.10 : 0.52) : Theme.popupTransparency
+        readonly property int panelWidth: 400
+        readonly property int panelHeight: 300
+
+        WindowBlur {
+            targetWindow: addWidgetWindow
+            blurX: widgetLibraryPanel.x
+            blurY: widgetLibraryPanel.y
+            blurWidth: addWidgetWindow.visible ? widgetLibraryPanel.width : 0
+            blurHeight: addWidgetWindow.visible ? widgetLibraryPanel.height : 0
+            blurRadius: Theme.cornerRadius
+        }
+
+        MouseArea {
             anchors.fill: parent
-            anchors.margins: Theme.spacingL
+            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+            onClicked: root.closeWidgetLibrary()
+        }
 
-            Row {
-                id: headerRow
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                spacing: Theme.spacingM
+        FocusScope {
+            anchors.fill: parent
+            focus: addWidgetWindow.visible
 
-                DankIcon {
-                    name: "add_circle"
-                    size: Theme.iconSize
-                    color: Theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+            Keys.onEscapePressed: event => {
+                root.closeWidgetLibrary();
+                event.accepted = true;
+            }
+        }
 
-                Typography {
-                    text: I18n.tr("Add Widget")
-                    style: Typography.Style.Subtitle
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+        Rectangle {
+            id: widgetLibraryPanel
+
+            width: addWidgetWindow.panelWidth
+            height: addWidgetWindow.panelHeight
+            x: Math.round((root.popoutWidth > 0 ? root.popoutX + (root.popoutWidth - width) / 2 : (addWidgetWindow.width - width) / 2))
+            y: Math.round((root.popoutHeight > 0 ? root.popoutY + (root.popoutHeight - height) / 2 : (addWidgetWindow.height - height) / 2))
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainer, addWidgetWindow.surfaceAlpha)
+            border.color: addWidgetWindow.blurActive ? Theme.outlineMedium : Theme.primarySelected
+            border.width: addWidgetWindow.blurActive ? Theme.layerOutlineWidth : 0
+            antialiasing: true
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: mouse => mouse.accepted = true
             }
 
-            DankListView {
-                anchors.top: headerRow.bottom
-                anchors.topMargin: Theme.spacingM
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                spacing: Theme.spacingS
-                clip: true
-                model: root.availableWidgets
+            Item {
+                anchors.fill: parent
+                anchors.margins: Theme.spacingL
 
-                delegate: Rectangle {
-                    width: 400 - Theme.spacingL * 2
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: widgetMouseArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
-                    border.width: 0
+                Row {
+                    id: headerRow
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing: Theme.spacingM
 
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: Theme.spacingM
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: modelData.icon
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
-                            width: 400 - Theme.spacingL * 2 - Theme.iconSize - Theme.spacingM * 3 - Theme.iconSize
-
-                            Typography {
-                                text: modelData.text
-                                style: Typography.Style.Body
-                                color: Theme.surfaceText
-                                elide: Text.ElideRight
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            Typography {
-                                text: modelData.description
-                                style: Typography.Style.Caption
-                                color: Theme.outline
-                                elide: Text.ElideRight
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-                        }
-
-                        DankIcon {
-                            name: "add"
-                            size: Theme.iconSize - 4
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+                    DankIcon {
+                        name: "add_circle"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    MouseArea {
-                        id: widgetMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.addWidget(modelData.id);
+                    Typography {
+                        text: I18n.tr("Add Widget")
+                        style: Typography.Style.Subtitle
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                DankListView {
+                    id: widgetList
+
+                    anchors.top: headerRow.bottom
+                    anchors.topMargin: Theme.spacingM
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    spacing: Theme.spacingS
+                    clip: true
+                    model: root.availableWidgets
+
+                    delegate: Rectangle {
+                        width: widgetList.width
+                        height: 50
+                        radius: Theme.cornerRadius
+                        color: widgetMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, addWidgetWindow.blurActive ? 0.12 : 0.08) : Theme.withAlpha(Theme.surfaceContainerHigh, addWidgetWindow.rowAlpha)
+                        border.color: Theme.outlineMedium
+                        border.width: Theme.layerOutlineWidth
+                        antialiasing: true
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            spacing: Theme.spacingM
+
+                            DankIcon {
+                                name: modelData.icon
+                                size: Theme.iconSize
+                                color: Theme.primary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Column {
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
+                                width: parent.width - Theme.iconSize * 2 - Theme.spacingM * 3
+
+                                Typography {
+                                    text: modelData.text
+                                    style: Typography.Style.Body
+                                    color: Theme.surfaceText
+                                    elide: Text.ElideRight
+                                    width: parent.width
+                                    horizontalAlignment: Text.AlignLeft
+                                }
+
+                                Typography {
+                                    text: modelData.description
+                                    style: Typography.Style.Caption
+                                    color: Theme.outline
+                                    elide: Text.ElideRight
+                                    width: parent.width
+                                    horizontalAlignment: Text.AlignLeft
+                                }
+                            }
+
+                            DankIcon {
+                                name: "add"
+                                size: Theme.iconSize - 4
+                                color: Theme.primary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: widgetMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.addWidget(modelData.id);
+                            }
                         }
                     }
                 }
@@ -171,7 +245,7 @@ Row {
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            onClicked: addWidgetPopup.open()
+            onClicked: root.openWidgetLibrary()
         }
     }
 
