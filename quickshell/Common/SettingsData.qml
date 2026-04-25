@@ -215,7 +215,9 @@ Singleton {
     property int selectedGpuIndex: 0
     property var enabledGpuPciIds: []
     property bool showSystemTray: true
-    property bool systemTrayMonochromeIcons: false
+    property string systemTrayIconTintMode: "none"
+    property int systemTrayIconTintSaturation: 50
+    property int systemTrayIconTintStrength: 135
     property bool showClock: true
     property bool showNotificationButton: true
     property bool showBattery: true
