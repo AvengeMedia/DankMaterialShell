@@ -181,6 +181,8 @@ func Run(opts Options) error {
 		syncColorScheme(opts.Mode)
 	}
 
+	applyKDEColorScheme(opts.Mode)
+
 	log.Info("Done")
 	return nil
 }
@@ -872,6 +874,25 @@ func syncColorScheme(mode ColorMode) {
 
 	if err := utils.GsettingsSet("org.gnome.desktop.interface", "color-scheme", scheme); err != nil {
 		log.Warnf("Failed to sync color-scheme: %v", err)
+	}
+}
+
+func applyKDEColorScheme(mode ColorMode) {
+	if !utils.CommandExists("plasma-apply-colorscheme") {
+		return
+	}
+
+	var scheme string
+	if mode == ColorModeLight {
+		scheme = "DankMatugenLight"
+	} else {
+		scheme = "DankMatugenDark"
+	}
+
+	log.Infof("Applying KDE color scheme: %s", scheme)
+	cmd := exec.Command("plasma-apply-colorscheme", scheme)
+	if err := cmd.Run(); err != nil {
+		log.Warnf("Failed to apply KDE color scheme: %v", err)
 	}
 }
 
