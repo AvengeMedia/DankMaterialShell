@@ -976,7 +976,7 @@ BasePill {
             Item {
                 id: bgShadowLayer
                 anchors.fill: parent
-                layer.enabled: true
+                layer.enabled: !BlurService.enabled
                 layer.smooth: true
                 layer.textureSize: Qt.size(Math.round(width * overflowMenu.dpr * 2), Math.round(height * overflowMenu.dpr * 2))
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
@@ -1466,7 +1466,7 @@ BasePill {
                     Item {
                         id: menuBgShadowLayer
                         anchors.fill: parent
-                        layer.enabled: true
+                        layer.enabled: !BlurService.enabled
                         layer.smooth: true
                         layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically

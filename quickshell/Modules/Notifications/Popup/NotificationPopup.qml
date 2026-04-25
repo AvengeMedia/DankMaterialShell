@@ -325,8 +325,9 @@ PanelWindow {
         property bool swipeDismissing: false
 
         readonly property real radiusForShadow: Theme.cornerRadius
-        property real shadowBlurPx: SettingsData.notificationPopupShadowEnabled ? ((2 + radiusForShadow * 0.2) * (cardHoverHandler.hovered ? 1.2 : 1)) : 0
-        property real shadowSpreadPx: SettingsData.notificationPopupShadowEnabled ? (radiusForShadow * (cardHoverHandler.hovered ? 0.06 : 0)) : 0
+        readonly property bool shadowsAllowed: SettingsData.notificationPopupShadowEnabled && !BlurService.enabled
+        property real shadowBlurPx: shadowsAllowed ? ((2 + radiusForShadow * 0.2) * (cardHoverHandler.hovered ? 1.2 : 1)) : 0
+        property real shadowSpreadPx: shadowsAllowed ? (radiusForShadow * (cardHoverHandler.hovered ? 0.06 : 0)) : 0
         property real shadowBaseAlpha: 0.35
         readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
         readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
@@ -500,12 +501,10 @@ PanelWindow {
                             return "";
                         const appIcon = notificationData.appIcon;
                         if (!appIcon)
-                            return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                            return "";
                         if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                             return appIcon;
-                        if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                            return "";
-                        return Paths.resolveIconPath(appIcon);
+                        return "";
                     }
 
                     hasImage: hasNotificationImage

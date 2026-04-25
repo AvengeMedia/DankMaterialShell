@@ -13,6 +13,7 @@ Item {
     property alias contentLoader: contentLoader
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
+    readonly property alias backgroundWindow: backgroundWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -511,7 +512,7 @@ Item {
                 readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
                 readonly property int blurMax: 64
 
-                layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                layer.enabled: !BlurService.enabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
                 layer.smooth: false
 
                 layer.effect: MultiEffect {

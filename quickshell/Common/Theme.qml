@@ -561,8 +561,8 @@ Singleton {
     property color success: currentThemeData.success || "#4CAF50"
 
     property color primaryHover: Qt.rgba(primary.r, primary.g, primary.b, 0.12)
-    property color primaryHoverLight: Qt.rgba(primary.r, primary.g, primary.b, 0.08)
-    property color primaryPressed: Qt.rgba(primary.r, primary.g, primary.b, 0.16)
+    property color primaryHoverLight: Qt.rgba(primary.r, primary.g, primary.b, BlurService.enabled ? 0.12 : 0.08)
+    property color primaryPressed: Qt.rgba(primary.r, primary.g, primary.b, BlurService.enabled ? 0.24 : 0.16)
     property color primarySelected: Qt.rgba(primary.r, primary.g, primary.b, 0.3)
     property color primaryBackground: Qt.rgba(primary.r, primary.g, primary.b, 0.04)
 
@@ -571,8 +571,10 @@ Singleton {
     property color surfaceHover: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.08)
     property color surfacePressed: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.12)
     property color surfaceSelected: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.15)
-    property color surfaceLight: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.1)
+    property color surfaceLight: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, BlurService.enabled ? 0.3 : 0.1)
     property color surfaceVariantAlpha: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.2)
+
+    readonly property color nestedSurface: BlurService.enabled ? "transparent" : withAlpha(surfaceContainerHigh, popupTransparency)
     property color surfaceTextHover: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.08)
     property color surfaceTextAlpha: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.3)
     property color surfaceTextLight: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.06)
@@ -580,8 +582,8 @@ Singleton {
 
     property color outlineButton: Qt.rgba(outline.r, outline.g, outline.b, 0.5)
     property color outlineLight: Qt.rgba(outline.r, outline.g, outline.b, 0.05)
-    property color outlineMedium: Qt.rgba(outline.r, outline.g, outline.b, 0.08)
-    property color outlineStrong: Qt.rgba(outline.r, outline.g, outline.b, 0.12)
+    property color outlineMedium: Qt.rgba(outline.r, outline.g, outline.b, BlurService.enabled ? 0 : 0.08)
+    property color outlineStrong: Qt.rgba(outline.r, outline.g, outline.b, BlurService.enabled ? 0 : 0.12)
 
     property color errorHover: Qt.rgba(error.r, error.g, error.b, 0.12)
     property color errorPressed: Qt.rgba(error.r, error.g, error.b, 0.16)
@@ -626,6 +628,8 @@ Singleton {
     }
 
     readonly property color ccTileRing: {
+        if (BlurService.enabled)
+            return "transparent";
         switch (SettingsData.controlCenterTileColorMode) {
         case "primaryContainer":
             return Qt.rgba(primary.r, primary.g, primary.b, 0.22);

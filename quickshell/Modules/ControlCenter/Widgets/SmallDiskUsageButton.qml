@@ -38,7 +38,7 @@ Rectangle {
         return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor);
     }
 
-    readonly property color _tileBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _tileBg: Theme.nestedSurface
 
     color: mouseArea.containsMouse ? Theme.primaryPressed : _tileBg
     border.color: "transparent"

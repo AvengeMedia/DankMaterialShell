@@ -54,7 +54,7 @@ Item {
     }
 
     readonly property real shadowIntensity: barConfig?.shadowIntensity ?? 0
-    readonly property bool shadowEnabled: shadowIntensity > 0
+    readonly property bool shadowEnabled: !BlurService.enabled && shadowIntensity > 0
     readonly property int blurMax: 64
     readonly property real shadowBlurPx: shadowIntensity * 0.2
     readonly property real shadowBlur: Math.max(0, Math.min(1, shadowBlurPx / blurMax))

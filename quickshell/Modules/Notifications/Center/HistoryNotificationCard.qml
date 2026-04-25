@@ -122,12 +122,10 @@ Rectangle {
                     return "";
                 const appIcon = historyItem.appIcon;
                 if (!appIcon)
-                    return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                    return "";
                 if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                     return appIcon;
-                if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                    return "";
-                return Paths.resolveIconPath(appIcon);
+                return "";
             }
 
             hasImage: hasNotificationImage
