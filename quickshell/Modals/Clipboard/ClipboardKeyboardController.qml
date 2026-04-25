@@ -53,6 +53,19 @@ QtObject {
         }
     }
 
+    function togglePinSelected() {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0 || ClipboardService.selectedIndex < 0 || ClipboardService.selectedIndex >= entries.length) {
+            return;
+        }
+        const selectedEntry = entries[ClipboardService.selectedIndex];
+        if (modal.activeTab === "saved") {
+            modal.unpinEntry(selectedEntry);
+        } else {
+            modal.pinEntry(selectedEntry);
+        }
+    }
+
     function handleKey(event) {
         switch (event.key) {
         case Qt.Key_Escape:
@@ -130,6 +143,12 @@ QtObject {
             case Qt.Key_C:
                 if (ClipboardService.keyboardNavigationActive) {
                     copySelected();
+                    event.accepted = true;
+                }
+                return;
+            case Qt.Key_S:
+                if (ClipboardService.keyboardNavigationActive) {
+                    togglePinSelected();
                     event.accepted = true;
                 }
                 return;
