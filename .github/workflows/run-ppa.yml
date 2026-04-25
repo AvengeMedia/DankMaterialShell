@@ -235,18 +235,19 @@ jobs:
                 ;;
             esac
 
-            echo ""
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "Uploading $PKG to PPA $PPA_NAME..."
-            if [[ -n "$REBUILD_RELEASE" ]]; then
-              echo "🔄 Using rebuild release number: ppa$REBUILD_RELEASE"
-            fi
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            # ppa-upload.sh uploads to questing + resolute when series is omitted
-            if ! bash distro/scripts/ppa-upload.sh "$PKG" "$PPA_NAME" ${REBUILD_RELEASE:+"$REBUILD_RELEASE"}; then
-              echo "::error::Upload failed for $PKG"
-              exit 1
-            fi
+            for SERIES in questing resolute; do
+              echo ""
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "Uploading $PKG to PPA $PPA_NAME for series $SERIES..."
+              if [[ -n "$REBUILD_RELEASE" ]]; then
+                echo "🔄 Using rebuild release number: ppa$REBUILD_RELEASE"
+              fi
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              if ! bash distro/scripts/ppa-upload.sh "$PKG" "$PPA_NAME" "$SERIES" ${REBUILD_RELEASE:+"$REBUILD_RELEASE"}; then
+                echo "::error::Upload failed for $PKG on $SERIES"
+                exit 1
+              fi
+            done
           done
 
       - name: Summary
