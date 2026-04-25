@@ -915,6 +915,31 @@
     "icon": "visibility_off"
   },
   {
+    "section": "trayIconTint",
+    "label": "System Tray Icon Tint",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "icon",
+      "icons",
+      "monochrome",
+      "panel",
+      "primary",
+      "secondary",
+      "saturation",
+      "status",
+      "statusbar",
+      "strength",
+      "taskbar",
+      "tint",
+      "tray"
+    ],
+    "icon": "filter_b_and_w",
+    "description": "Choose monochrome or a theme color tint for system tray icons"
+  },
+  {
     "section": "workspaceDragReorder",
     "label": "Drag to Reorder",
     "tabIndex": 4,
