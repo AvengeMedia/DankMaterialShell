@@ -194,6 +194,7 @@ Singleton {
     property int selectedGpuIndex: 0
     property var enabledGpuPciIds: []
     property bool showSystemTray: true
+    property bool systemTrayMonochromeIcons: false
     property bool showClock: true
     property bool showNotificationButton: true
     property bool showBattery: true
@@ -1296,9 +1297,7 @@ Singleton {
             return true;
 
         const msg = String(error || "").toLowerCase();
-        return msg.indexOf("file does not exist") !== -1
-                || msg.indexOf("no such file") !== -1
-                || msg.indexOf("enoent") !== -1;
+        return msg.indexOf("file does not exist") !== -1 || msg.indexOf("no such file") !== -1 || msg.indexOf("enoent") !== -1;
     }
 
     function loadPluginSettings() {

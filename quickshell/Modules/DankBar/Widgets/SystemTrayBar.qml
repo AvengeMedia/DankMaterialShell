@@ -79,6 +79,7 @@ BasePill {
                 item: item
             }))
     readonly property var hiddenBarItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property bool trayIconsMonochrome: SettingsData.systemTrayMonochromeIcons ?? false
 
     function moveTrayItemInFullOrder(visibleFromIndex, visibleToIndex) {
         if (visibleFromIndex === visibleToIndex || visibleFromIndex < 0 || visibleToIndex < 0)
@@ -290,6 +291,10 @@ BasePill {
                             smooth: true
                             mipmap: true
                             visible: status === Image.Ready
+                            layer.enabled: root.trayIconsMonochrome && visible
+                            layer.effect: MultiEffect {
+                                saturation: -1
+                            }
                         }
 
                         Text {
@@ -550,6 +555,10 @@ BasePill {
                             smooth: true
                             mipmap: true
                             visible: status === Image.Ready
+                            layer.enabled: root.trayIconsMonochrome && visible
+                            layer.effect: MultiEffect {
+                                saturation: -1
+                            }
                         }
 
                         Text {
@@ -1067,6 +1076,10 @@ BasePill {
                             smooth: true
                             mipmap: true
                             visible: status === Image.Ready
+                            layer.enabled: root.trayIconsMonochrome && visible
+                            layer.effect: MultiEffect {
+                                saturation: -1
+                            }
                         }
 
                         Text {

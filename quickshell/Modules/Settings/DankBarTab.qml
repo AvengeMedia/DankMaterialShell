@@ -52,9 +52,11 @@ Item {
     }
 
     function _isBarActive(c) {
-        if (!c.enabled) return false;
+        if (!c.enabled)
+            return false;
         const prefs = c.screenPreferences || ["all"];
-        if (prefs.length > 0) return true;
+        if (prefs.length > 0)
+            return true;
         return (c.showOnLastDisplay ?? true) && Quickshell.screens.length === 1;
     }
 
@@ -64,7 +66,8 @@ Item {
             return;
 
         const hasHorizontal = configs.some(c => {
-            if (!_isBarActive(c)) return false;
+            if (!_isBarActive(c))
+                return false;
             const p = c.position ?? SettingsData.Position.Top;
             return p === SettingsData.Position.Top || p === SettingsData.Position.Bottom;
         });
@@ -72,7 +75,8 @@ Item {
             return;
 
         const hasVertical = configs.some(c => {
-            if (!_isBarActive(c)) return false;
+            if (!_isBarActive(c))
+                return false;
             const p = c.position ?? SettingsData.Position.Top;
             return p === SettingsData.Position.Left || p === SettingsData.Position.Right;
         });
@@ -305,9 +309,7 @@ Item {
                                                 const prefs = cfg?.screenPreferences || ["all"];
                                                 if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all"))
                                                     return I18n.tr("All displays");
-                                                return prefs.length === 1
-                                                    ? I18n.tr("%1 display").arg(prefs.length)
-                                                    : I18n.tr("%1 displays").arg(prefs.length);
+                                                return prefs.length === 1 ? I18n.tr("%1 display").arg(prefs.length) : I18n.tr("%1 displays").arg(prefs.length);
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText
@@ -419,7 +421,7 @@ Item {
                 iconName: "vertical_align_center"
                 title: I18n.tr("Position")
                 settingKey: "barPosition"
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
 
                 Item {
                     width: parent.width
@@ -479,7 +481,7 @@ Item {
                 settingKey: "barDisplay"
                 collapsible: true
                 expanded: false
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
 
                 StyledText {
                     width: parent.width
@@ -586,7 +588,7 @@ Item {
                 settingKey: "barVisibility"
                 collapsible: true
                 expanded: false
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
 
                 SettingsToggleRow {
                     text: I18n.tr("Auto-hide")
@@ -705,7 +707,7 @@ Item {
                 iconName: "space_bar"
                 title: I18n.tr("Spacing")
                 settingKey: "barSpacing"
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
@@ -852,7 +854,7 @@ Item {
                 iconName: "opacity"
                 title: I18n.tr("Transparency")
                 settingKey: "barTransparency"
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
 
                 SettingsSliderRow {
                     id: barTransparencySlider
@@ -904,7 +906,7 @@ Item {
                 iconName: "text_fields"
                 title: I18n.tr("Font Scale")
                 description: I18n.tr("Scale DankBar font sizes independently")
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
                 minimum: 50
                 maximum: 200
                 value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
@@ -929,7 +931,7 @@ Item {
                 iconName: "interests"
                 title: I18n.tr("Icon Scale")
                 description: I18n.tr("Scale DankBar icon sizes independently")
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
                 minimum: 50
                 maximum: 200
                 value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
@@ -955,7 +957,7 @@ Item {
                 settingKey: "barCorners"
                 collapsible: true
                 expanded: false
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
 
                 SettingsToggleRow {
                     text: I18n.tr("Square Corners")
@@ -1055,7 +1057,7 @@ Item {
                 iconName: "fit_screen"
                 title: I18n.tr("Maximize Detection")
                 description: I18n.tr("Remove gaps and border when windows are maximized")
-                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland)
+                visible: (selectedBarConfig?.enabled ?? false) && (CompositorService.isNiri || CompositorService.isHyprland)
                 checked: selectedBarConfig?.maximizeDetection ?? true
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         maximizeDetection: checked
@@ -1066,15 +1068,15 @@ Item {
                 iconName: "filter_b_and_w"
                 title: I18n.tr("Monochrome System Tray Icons")
                 description: I18n.tr("Desaturate all system tray icons for a uniform monochrome look")
-                visible: selectedBarConfig?.enabled
-                checked: SettingsData.systemTrayMonochromeIcons
+                visible: selectedBarConfig?.enabled ?? false
+                checked: SettingsData.systemTrayMonochromeIcons ?? false
                 onToggled: checked => SettingsData.set("systemTrayMonochromeIcons", checked)
             }
 
             SettingsToggleCard {
                 iconName: "border_style"
                 title: I18n.tr("Border")
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
                 checked: selectedBarConfig?.borderEnabled ?? false
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         borderEnabled: checked
@@ -1164,7 +1166,7 @@ Item {
             SettingsToggleCard {
                 iconName: "highlight"
                 title: I18n.tr("Widget Outline")
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
                 checked: selectedBarConfig?.widgetOutlineEnabled ?? false
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         widgetOutlineEnabled: checked
@@ -1258,7 +1260,7 @@ Item {
                 settingKey: "barShadow"
                 collapsible: true
                 expanded: false
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "text") === "custom"
@@ -1383,7 +1385,7 @@ Item {
                 iconName: "mouse"
                 title: I18n.tr("Scroll Wheel")
                 description: I18n.tr("Control workspaces and columns by scrolling on the bar")
-                visible: selectedBarConfig?.enabled
+                visible: selectedBarConfig?.enabled ?? false
                 checked: selectedBarConfig?.scrollEnabled ?? true
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         scrollEnabled: checked
