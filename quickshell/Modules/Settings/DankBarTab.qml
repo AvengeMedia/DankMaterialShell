@@ -1064,13 +1064,103 @@ Item {
                     })
             }
 
-            SettingsToggleCard {
+            SettingsCard {
                 iconName: "filter_b_and_w"
-                title: I18n.tr("Monochrome System Tray Icons")
-                description: I18n.tr("Desaturate all system tray icons for a uniform monochrome look")
+                title: I18n.tr("System Tray Icon Tint")
+                settingKey: "trayIconTint"
                 visible: selectedBarConfig?.enabled ?? false
-                checked: SettingsData.systemTrayMonochromeIcons ?? false
-                onToggled: checked => SettingsData.set("systemTrayMonochromeIcons", checked)
+
+                StyledText {
+                    text: I18n.tr("Choose monochrome or a theme color tint for system tray icons")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                    width: parent.width
+                    horizontalAlignment: Text.AlignLeft
+                }
+
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Mode")
+                    model: [I18n.tr("None"), I18n.tr("Monochrome"), I18n.tr("Primary"), I18n.tr("Secondary")]
+                    currentIndex: {
+                        let mode = SettingsData.systemTrayIconTintMode || "none";
+                        switch (mode) {
+                        case "monochrome":
+                            return 1;
+                        case "primary":
+                            return 2;
+                        case "secondary":
+                            return 3;
+                        default:
+                            return 0;
+                        }
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+
+                        let mode = "none";
+                        switch (index) {
+                        case 1:
+                            mode = "monochrome";
+                            break;
+                        case 2:
+                            mode = "primary";
+                            break;
+                        case 3:
+                            mode = "secondary";
+                            break;
+                        }
+
+                        SettingsData.set("systemTrayIconTintMode", mode);
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: trayTintSaturationSlider
+                    text: I18n.tr("Tint Saturation")
+                    description: I18n.tr("Controls how much original icon color is removed before applying tint")
+                    visible: {
+                        const mode = SettingsData.systemTrayIconTintMode || "none";
+                        return mode === "primary" || mode === "secondary";
+                    }
+                    value: SettingsData.systemTrayIconTintSaturation ?? 50
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 50
+                    onSliderDragFinished: finalValue => SettingsData.set("systemTrayIconTintSaturation", finalValue)
+
+                    Binding {
+                        target: trayTintSaturationSlider
+                        property: "value"
+                        value: SettingsData.systemTrayIconTintSaturation ?? 50
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: trayTintStrengthSlider
+                    text: I18n.tr("Tint Strength")
+                    description: I18n.tr("Controls how strongly the selected tint color is applied")
+                    visible: {
+                        const mode = SettingsData.systemTrayIconTintMode || "none";
+                        return mode === "primary" || mode === "secondary";
+                    }
+                    value: SettingsData.systemTrayIconTintStrength ?? 135
+                    minimum: 0
+                    maximum: 200
+                    unit: "%"
+                    defaultValue: 135
+                    onSliderDragFinished: finalValue => SettingsData.set("systemTrayIconTintStrength", finalValue)
+
+                    Binding {
+                        target: trayTintStrengthSlider
+                        property: "value"
+                        value: SettingsData.systemTrayIconTintStrength ?? 135
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
             }
 
             SettingsToggleCard {

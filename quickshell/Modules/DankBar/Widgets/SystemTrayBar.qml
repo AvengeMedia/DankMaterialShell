@@ -79,7 +79,66 @@ BasePill {
                 item: item
             }))
     readonly property var hiddenBarItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
-    readonly property bool trayIconsMonochrome: SettingsData.systemTrayMonochromeIcons ?? false
+    readonly property string trayIconTintMode: {
+        const configuredMode = SettingsData.systemTrayIconTintMode || "none";
+        switch (configuredMode) {
+        case "monochrome":
+        case "primary":
+        case "secondary":
+            return configuredMode;
+        default:
+            return "none";
+        }
+    }
+    readonly property bool trayIconTintEnabled: trayIconTintMode !== "none"
+    readonly property real trayIconTintSaturationAmount: {
+        const raw = SettingsData.systemTrayIconTintSaturation;
+        const value = (raw === undefined || raw === null) ? 50 : raw;
+        return Math.max(0, Math.min(100, value)) / 100;
+    }
+    readonly property real trayIconTintStrengthAmount: {
+        const raw = SettingsData.systemTrayIconTintStrength;
+        const value = (raw === undefined || raw === null) ? 135 : raw;
+        return Math.max(0, Math.min(200, value)) / 100;
+    }
+    readonly property real trayIconSaturation: {
+        switch (trayIconTintMode) {
+        case "monochrome":
+            return -1;
+        case "primary":
+        case "secondary":
+            return -root.trayIconTintSaturationAmount;
+        default:
+            return 0;
+        }
+    }
+    readonly property real trayIconColorization: {
+        switch (trayIconTintMode) {
+        case "primary":
+        case "secondary":
+            return root.trayIconTintStrengthAmount;
+        default:
+            return 0;
+        }
+    }
+    readonly property color trayIconTintColor: {
+        switch (trayIconTintMode) {
+        case "primary":
+            return Theme.primary;
+        case "secondary":
+            return Theme.secondary;
+        default:
+            return Theme.surfaceText;
+        }
+    }
+
+    readonly property bool reverseInlineHorizontal: !useOverflowPopup && !isVerticalOrientation && section === "right"
+    readonly property bool reverseInlineVertical: !useOverflowPopup && isVerticalOrientation && section === "right"
+    readonly property var displayedMainBarItems: reverseInlineHorizontal ? [...mainBarItems].reverse() : mainBarItems
+    readonly property var displayedInlineExpandedItems: (reverseInlineHorizontal ? [...hiddenBarItems].reverse() : hiddenBarItems).map(item => ({
+                key: getTrayItemKey(item),
+                item: item
+            }))
 
     function moveTrayItemInFullOrder(visibleFromIndex, visibleToIndex) {
         if (visibleFromIndex === visibleToIndex || visibleFromIndex < 0 || visibleToIndex < 0)
@@ -291,9 +350,11 @@ BasePill {
                             smooth: true
                             mipmap: true
                             visible: status === Image.Ready
-                            layer.enabled: root.trayIconsMonochrome && visible
+                            layer.enabled: root.trayIconTintEnabled
                             layer.effect: MultiEffect {
-                                saturation: -1
+                                saturation: root.trayIconSaturation
+                                colorization: root.trayIconColorization
+                                colorizationColor: root.trayIconTintColor
                             }
                         }
 
@@ -438,6 +499,313 @@ BasePill {
                         }
                         onClicked: root.menuOpen = !root.menuOpen
                     }
+                }
+            }
+
+            Repeater {
+                model: ScriptModel {
+                    values: root.displayedInlineExpandedItems
+                    objectProp: "key"
+                }
+
+                delegate: inlineExpandedTrayItemDelegate
+            }
+        }
+    }
+
+    Component {
+        id: inlineExpandedTrayItemDelegate
+
+        Item {
+            property var trayItem: modelData.item
+            property string itemKey: modelData.key
+            property string iconSource: root.trayIconSourceFor(trayItem)
+
+            width: root.isVerticalOrientation ? root.barThickness : (root.inlineExpanded ? root.trayItemSize : 0)
+            height: root.isVerticalOrientation ? (root.inlineExpanded ? root.trayItemSize : 0) : root.barThickness
+            visible: width > 0 || height > 0
+
+            Behavior on width {
+                enabled: !root.isVerticalOrientation
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            Behavior on height {
+                enabled: root.isVerticalOrientation
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            Rectangle {
+                id: inlineVisualContent
+                width: root.trayItemSize
+                height: root.trayItemSize
+                x: root.isVerticalOrientation ? Math.round((parent.width - width) / 2) : (root.reverseInlineHorizontal ? parent.width - width : 0)
+                y: root.isVerticalOrientation ? (root.reverseInlineVertical ? parent.height - height : 0) : Math.round((parent.height - height) / 2)
+                radius: Theme.cornerRadius
+                color: inlineTrayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                opacity: root.inlineExpanded ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+
+                IconImage {
+                    id: inlineIconImg
+                    anchors.centerIn: parent
+                    width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    source: iconSource
+                    asynchronous: true
+                    smooth: true
+                    mipmap: true
+                    visible: status === Image.Ready
+                    layer.enabled: root.trayIconTintEnabled
+                    layer.effect: MultiEffect {
+                        saturation: root.trayIconSaturation
+                        colorization: root.trayIconColorization
+                        colorizationColor: root.trayIconTintColor
+                    }
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: !inlineIconImg.visible
+                    text: {
+                        const itemId = trayItem?.id || "";
+                        if (!itemId)
+                            return "?";
+                        return itemId.charAt(0).toUpperCase();
+                    }
+                    font.pixelSize: 10
+                    color: Theme.widgetTextColor
+                }
+
+                DankRipple {
+                    id: inlineItemRipple
+                    cornerRadius: Theme.cornerRadius
+                }
+            }
+
+            MouseArea {
+                id: inlineTrayItemArea
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                cursorShape: Qt.PointingHandCursor
+                enabled: root.inlineExpanded
+
+                onPressed: mouse => {
+                    const pos = mapToItem(inlineVisualContent, mouse.x, mouse.y);
+                    inlineItemRipple.trigger(pos.x, pos.y);
+                }
+
+                onClicked: mouse => {
+                    if (mouse.button === Qt.LeftButton) {
+                        root.activateInlineTrayItem(trayItem, inlineVisualContent);
+                        return;
+                    }
+                    if (mouse.button !== Qt.RightButton)
+                        return;
+                    root.openInlineTrayContextMenu(trayItem, inlineTrayItemArea, mouse, inlineVisualContent);
+                }
+            }
+        }
+    }
+
+    Component {
+        id: verticalMainTrayItemDelegate
+
+        Item {
+            property var trayItem: modelData.item
+            property string itemKey: modelData.key
+            property string iconSource: root.trayIconSourceFor(trayItem)
+
+            width: root.barThickness
+            height: root.trayItemSize
+            z: dragHandler.dragging ? 100 : 0
+
+            property real shiftOffset: {
+                if (root.draggedIndex < 0)
+                    return 0;
+                if (index === root.draggedIndex)
+                    return 0;
+                const dragIdx = root.draggedIndex;
+                const dropIdx = root.dropTargetIndex;
+                const shiftAmount = root.trayItemSize;
+                if (dropIdx < 0)
+                    return 0;
+                if (dragIdx < dropIdx && index > dragIdx && index <= dropIdx)
+                    return -shiftAmount;
+                if (dragIdx > dropIdx && index >= dropIdx && index < dragIdx)
+                    return shiftAmount;
+                return 0;
+            }
+
+            transform: Translate {
+                y: shiftOffset
+                Behavior on y {
+                    enabled: !root.suppressShiftAnimation
+                    NumberAnimation {
+                        duration: 150
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
+            Item {
+                id: dragHandler
+                anchors.fill: parent
+                property bool dragging: false
+                property point dragStartPos: Qt.point(0, 0)
+                property real dragAxisOffset: 0
+                property bool longPressing: false
+
+                Timer {
+                    id: longPressTimer
+                    interval: 400
+                    repeat: false
+                    onTriggered: dragHandler.longPressing = true
+                }
+            }
+
+            Rectangle {
+                id: visualContent
+                width: root.trayItemSize
+                height: root.trayItemSize
+                anchors.centerIn: parent
+                radius: Theme.cornerRadius
+                color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                border.width: dragHandler.dragging ? 2 : 0
+                border.color: Theme.primary
+                opacity: dragHandler.dragging ? 0.8 : 1.0
+
+                transform: Translate {
+                    y: dragHandler.dragging ? dragHandler.dragAxisOffset : 0
+                }
+
+                IconImage {
+                    id: iconImg
+                    anchors.centerIn: parent
+                    width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    source: iconSource
+                    asynchronous: true
+                    smooth: true
+                    mipmap: true
+                    visible: status === Image.Ready
+                    layer.enabled: root.trayIconTintEnabled
+                    layer.effect: MultiEffect {
+                        saturation: root.trayIconSaturation
+                        colorization: root.trayIconColorization
+                        colorizationColor: root.trayIconTintColor
+                    }
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: !iconImg.visible
+                    text: {
+                        const itemId = trayItem?.id || "";
+                        if (!itemId)
+                            return "?";
+                        return itemId.charAt(0).toUpperCase();
+                    }
+                    font.pixelSize: 10
+                    color: Theme.widgetTextColor
+                }
+
+                DankRipple {
+                    id: itemRipple
+                    cornerRadius: Theme.cornerRadius
+                }
+            }
+
+            MouseArea {
+                id: trayItemArea
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                cursorShape: dragHandler.longPressing ? Qt.DragMoveCursor : Qt.PointingHandCursor
+
+                onPressed: mouse => {
+                    const pos = mapToItem(visualContent, mouse.x, mouse.y);
+                    itemRipple.trigger(pos.x, pos.y);
+                    if (mouse.button === Qt.LeftButton) {
+                        dragHandler.dragStartPos = Qt.point(mouse.x, mouse.y);
+                        longPressTimer.start();
+                    }
+                }
+
+                onReleased: mouse => {
+                    longPressTimer.stop();
+                    const wasDragging = dragHandler.dragging;
+                    const didReorder = wasDragging && root.dropTargetIndex >= 0 && root.dropTargetIndex !== root.draggedIndex;
+
+                    if (didReorder) {
+                        root.suppressShiftAnimation = true;
+                        root.moveTrayItemInFullOrder(root.draggedIndex, root.dropTargetIndex);
+                        Qt.callLater(() => root.suppressShiftAnimation = false);
+                    }
+
+                    dragHandler.longPressing = false;
+                    dragHandler.dragging = false;
+                    dragHandler.dragAxisOffset = 0;
+                    root.draggedIndex = -1;
+                    root.dropTargetIndex = -1;
+
+                    if (wasDragging || mouse.button !== Qt.LeftButton)
+                        return;
+
+                    if (!trayItem)
+                        return;
+                    if (!trayItem.onlyMenu) {
+                        trayItem.activate();
+                        return;
+                    }
+                    if (!trayItem.hasMenu)
+                        return;
+                    if (root.useOverflowPopup)
+                        root.menuOpen = false;
+                    root.showForTrayItem(trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+                }
+
+                onPositionChanged: mouse => {
+                    if (dragHandler.longPressing && !dragHandler.dragging) {
+                        const distance = Math.abs(mouse.y - dragHandler.dragStartPos.y);
+                        if (distance > 5) {
+                            dragHandler.dragging = true;
+                            root.draggedIndex = index;
+                            root.dropTargetIndex = root.draggedIndex;
+                        }
+                    }
+                    if (!dragHandler.dragging)
+                        return;
+
+                    const axisOffset = mouse.y - dragHandler.dragStartPos.y;
+                    dragHandler.dragAxisOffset = axisOffset;
+                    const itemSize = root.trayItemSize;
+                    const slotOffset = Math.round(axisOffset / itemSize);
+                    const newTargetIndex = Math.max(0, Math.min(root.mainBarItems.length - 1, index + slotOffset));
+                    if (newTargetIndex !== root.dropTargetIndex) {
+                        root.dropTargetIndex = newTargetIndex;
+                    }
+                }
+
+                onClicked: mouse => {
+                    if (dragHandler.dragging)
+                        return;
+                    if (mouse.button !== Qt.RightButton)
+                        return;
+                    root.openInlineTrayContextMenu(trayItem, trayItemArea, mouse, visualContent);
                 }
             }
         }
@@ -1076,9 +1444,11 @@ BasePill {
                             smooth: true
                             mipmap: true
                             visible: status === Image.Ready
-                            layer.enabled: root.trayIconsMonochrome && visible
+                            layer.enabled: root.trayIconTintEnabled
                             layer.effect: MultiEffect {
-                                saturation: -1
+                                saturation: root.trayIconSaturation
+                                colorization: root.trayIconColorization
+                                colorizationColor: root.trayIconTintColor
                             }
                         }
 
