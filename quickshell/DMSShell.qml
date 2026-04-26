@@ -5,7 +5,6 @@ import qs.Modals
 import qs.Modals.Changelog
 import qs.Modals.Clipboard
 import qs.Modals.Common
-import qs.Modals.FileBrowser
 import qs.Modals.Greeter
 import qs.Modals.Settings
 import qs.Modals.DankLauncherV2
@@ -365,36 +364,12 @@ Item {
         }
     }
 
-    LazyLoader {
-        id: trashBrowserLoader
-
-        active: false
-
-        FileBrowserModal {
-            id: trashBrowser
-            browserTitle: I18n.tr("Trash")
-            browserIcon: "delete"
-            browserType: "trash"
-        }
-    }
-
     ConfirmModal {
         id: emptyTrashConfirm
     }
 
     Connections {
         target: TrashService
-        function onOpenBuiltinTrashRequested() {
-            trashBrowserLoader.active = true;
-            Qt.callLater(() => {
-                const m = trashBrowserLoader.item;
-                if (!m)
-                    return;
-                if (m.content)
-                    m.content.currentPath = TrashService.trashFilesDir;
-                m.open();
-            });
-        }
         function onEmptyTrashConfirmRequested(itemCount) {
             emptyTrashConfirm.showWithOptions({
                 title: I18n.tr("Empty Trash?"),

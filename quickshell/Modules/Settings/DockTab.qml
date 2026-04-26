@@ -526,14 +526,10 @@ Item {
                     settingKey: "dockTrashFileManager"
                     tags: ["dock", "trash", "file", "manager", "nautilus", "thunar", "dolphin"]
                     text: I18n.tr("Open Trash With")
-                    description: I18n.tr("File manager used to open the trash. Falls back to the built-in browser if unavailable.")
+                    description: I18n.tr("File manager used to open the trash. Click is a no-op if none is installed.")
                     visible: SettingsData.dockShowTrash
                     currentValue: SettingsData.dockTrashFileManager
-                    options: {
-                        const all = ["nautilus", "thunar", "dolphin", "builtin"];
-                        const detected = TrashService.availableFileManagers || [];
-                        return all.filter(fm => fm === "builtin" || detected.indexOf(fm) >= 0);
-                    }
+                    options: TrashService.availableFileManagers || []
                     onValueChanged: value => SettingsData.set("dockTrashFileManager", value)
                 }
             }
