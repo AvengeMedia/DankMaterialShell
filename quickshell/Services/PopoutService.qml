@@ -93,12 +93,7 @@ Singleton {
     }
 
     function closeNotificationCenter() {
-        if (notificationCenterPopout) {
-            if (notificationCenterPopout.notificationHistoryVisible !== undefined)
-                notificationCenterPopout.notificationHistoryVisible = false;
-            else
-                notificationCenterPopout.close();
-        }
+        notificationCenterPopout?.close();
     }
 
     function unloadNotificationCenter() {
