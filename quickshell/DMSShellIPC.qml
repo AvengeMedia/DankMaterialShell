@@ -1643,7 +1643,7 @@ Item {
                 if (id === matchedId)
                     flags.push("matched");
                 const flagStr = flags.length > 0 ? " [" + flags.join(",") + "]" : "";
-                lines.push(p.name + flagStr + " -> " + JSON.stringify(p.outputSet));
+                lines.push(p.name + flagStr + " -> " + JSON.stringify(Object.keys(p.outputs)));
             }
 
             if (lines.length === 0)
@@ -1675,13 +1675,16 @@ Item {
             return `PROFILE_SET_SUCCESS: ${profileName}`;
         }
 
-        // ! TODO - auto profile switching is buggy on niri and other compositors
         function toggleAuto(): string {
-            return "ERROR: Auto profile selection is temporarily disabled due to compositor bugs";
+            SettingsData.displayProfileAutoSelect = !SettingsData.displayProfileAutoSelect;
+            SettingsData.saveSettings();
+            if (SettingsData.displayProfileAutoSelect)
+                DisplayConfigState.autoSelectProfile();
+            return `Auto profile selection: ${SettingsData.displayProfileAutoSelect ? "enabled" : "disabled"}`;
         }
 
         function status(): string {
-            const auto = "off"; // disabled for now
+            const auto = SettingsData.displayProfileAutoSelect ? "on" : "off";
             const activeId = SettingsData.getActiveDisplayProfile(CompositorService.compositor);
             const matchedId = DisplayConfigState.matchedProfile;
             const profiles = DisplayConfigState.validatedProfiles;

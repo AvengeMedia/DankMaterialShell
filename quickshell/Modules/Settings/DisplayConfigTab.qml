@@ -15,15 +15,13 @@ Item {
     property bool showNewProfileDialog: false
     property bool showDeleteConfirmDialog: false
     property bool showRenameDialog: false
+    property bool showEditMonitorsDialog: false
     property string newProfileName: ""
     property string renameProfileName: ""
+    property var editMonitorSelection: ({})
 
     function getProfileOptions() {
-        const profiles = DisplayConfigState.validatedProfiles;
-        const options = [];
-        for (const id in profiles)
-            options.push(profiles[id].name);
-        return options;
+        return Object.values(DisplayConfigState.validatedProfiles).filter(p => p.name !== "").map(p => p.name);
     }
 
     function getProfileIds() {
@@ -42,6 +40,13 @@ Item {
     function getProfileNameById(id) {
         const profiles = DisplayConfigState.validatedProfiles;
         return profiles[id]?.name || "";
+    }
+
+    function openEditMonitorsDialog() {
+        if (!root.selectedProfileId)
+            return;
+        editMonitorSelection = DisplayConfigState.getProfileMonitorInclusion(root.selectedProfileId);
+        showEditMonitorsDialog = true;
     }
 
     Connections {
@@ -139,10 +144,9 @@ Item {
                             }
                         }
 
-                        // ! TODO - auto profile switching is buggy on niri and other compositors
                         Column {
                             id: autoSelectColumn
-                            visible: false // disabled for now
+                            visible: true
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -156,12 +160,12 @@ Item {
 
                             DankToggle {
                                 id: autoSelectToggle
-                                checked: false // disabled for now
-                                enabled: false
+                                checked: SettingsData.displayProfileAutoSelect
                                 onToggled: checked => {
-                                // disabled for now
-                                // SettingsData.displayProfileAutoSelect = checked;
-                                // SettingsData.saveSettings();
+                                    SettingsData.displayProfileAutoSelect = checked;
+                                    SettingsData.saveSettings();
+                                    if (checked)
+                                        DisplayConfigState.applyAutoConfig();
                                 }
                             }
                         }
@@ -170,21 +174,28 @@ Item {
                     Row {
                         width: parent.width
                         spacing: Theme.spacingS
-                        visible: !root.showNewProfileDialog && !root.showDeleteConfirmDialog && !root.showRenameDialog
+                        visible: !root.showNewProfileDialog && !root.showDeleteConfirmDialog && !root.showRenameDialog && !root.showEditMonitorsDialog
+                        opacity: SettingsData.displayProfileAutoSelect ? 0.4 : 1.0
 
                         DankDropdown {
                             id: profileDropdown
-                            width: parent.width - newButton.width - deleteButton.width - Theme.spacingS * 2
+                            width: parent.width - newButton.width - editMonitorsButton.width - deleteButton.width - Theme.spacingS * 3
                             compactMode: true
                             dropdownWidth: width
                             options: root.getProfileOptions()
-                            currentValue: root.getProfileNameById(root.selectedProfileId)
                             emptyText: I18n.tr("No profiles")
+                            enabled: !SettingsData.displayProfileAutoSelect
                             onValueChanged: value => {
                                 const profileId = root.getProfileIdByName(value);
                                 if (profileId && profileId !== root.selectedProfileId)
                                     DisplayConfigState.activateProfile(profileId);
                             }
+                        }
+
+                        Binding {
+                            target: profileDropdown
+                            property: "currentValue"
+                            value: SettingsData.displayProfileAutoSelect ? I18n.tr("Auto") : root.getProfileNameById(root.selectedProfileId)
                         }
 
                         DankButton {
@@ -195,10 +206,23 @@ Item {
                             horizontalPadding: Theme.spacingM
                             backgroundColor: Theme.surfaceContainer
                             textColor: Theme.surfaceText
+                            enabled: !SettingsData.displayProfileAutoSelect
                             onClicked: {
                                 root.newProfileName = "";
                                 root.showNewProfileDialog = true;
                             }
+                        }
+
+                        DankButton {
+                            id: editMonitorsButton
+                            iconName: "edit"
+                            text: ""
+                            buttonHeight: 40
+                            horizontalPadding: Theme.spacingM
+                            backgroundColor: Theme.surfaceContainer
+                            textColor: Theme.surfaceText
+                            enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
+                            onClicked: root.openEditMonitorsDialog()
                         }
 
                         DankButton {
@@ -209,7 +233,7 @@ Item {
                             horizontalPadding: Theme.spacingM
                             backgroundColor: Theme.surfaceContainer
                             textColor: Theme.error
-                            enabled: root.selectedProfileId !== ""
+                            enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                             onClicked: root.showDeleteConfirmDialog = true
                         }
                     }
@@ -307,23 +331,89 @@ Item {
                         }
                     }
 
-                    Row {
+                    Rectangle {
                         width: parent.width
-                        spacing: Theme.spacingS
-                        visible: DisplayConfigState.matchedProfile !== ""
+                        height: editMonitorsColumn.height + Theme.spacingM * 2
+                        radius: Theme.cornerRadius
+                        color: Theme.surfaceContainer
+                        visible: root.showEditMonitorsDialog
 
-                        DankIcon {
-                            name: "check_circle"
-                            size: 16
-                            color: Theme.success
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+                        Column {
+                            id: editMonitorsColumn
+                            anchors.centerIn: parent
+                            width: parent.width - Theme.spacingM * 2
+                            spacing: Theme.spacingS
 
-                        StyledText {
-                            text: I18n.tr("Matches profile: %1").arg(root.getProfileNameById(DisplayConfigState.matchedProfile))
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.success
-                            anchors.verticalCenter: parent.verticalCenter
+                            StyledText {
+                                text: I18n.tr("Monitors in \"%1\":").arg(root.getProfileNameById(root.selectedProfileId))
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceText
+                                width: parent.width
+                            }
+
+                            Repeater {
+                                model: Object.keys(DisplayConfigState.allOutputs || {})
+                                delegate: Row {
+                                    required property string modelData
+                                    width: parent.width
+                                    spacing: Theme.spacingM
+
+                                    DankToggle {
+                                        id: monitorToggle
+                                        checked: root.editMonitorSelection[modelData] ?? false
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        onToggled: checked => {
+                                            const sel = Object.assign({}, root.editMonitorSelection);
+                                            sel[modelData] = checked;
+                                            root.editMonitorSelection = sel;
+                                        }
+                                    }
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+
+                                        StyledText {
+                                            text: {
+                                                const od = DisplayConfigState.allOutputs[modelData];
+                                                return DisplayConfigState.getOutputDisplayName(od, modelData);
+                                            }
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            color: Theme.surfaceText
+                                        }
+
+                                        StyledText {
+                                            text: DisplayConfigState.allOutputs[modelData]?.connected
+                                                ? I18n.tr("Connected") : I18n.tr("Disconnected")
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: DisplayConfigState.allOutputs[modelData]?.connected
+                                                ? Theme.success : Theme.surfaceVariantText
+                                        }
+                                    }
+                                }
+                            }
+
+                            Row {
+                                spacing: Theme.spacingS
+                                anchors.right: parent.right
+
+                                DankButton {
+                                    text: I18n.tr("Save")
+                                    enabled: Object.values(root.editMonitorSelection).some(v => v)
+                                    onClicked: {
+                                        const enabled = Object.keys(root.editMonitorSelection).filter(k => root.editMonitorSelection[k]);
+                                        DisplayConfigState.updateProfileMonitors(root.selectedProfileId, enabled);
+                                        root.showEditMonitorsDialog = false;
+                                    }
+                                }
+
+                                DankButton {
+                                    text: I18n.tr("Cancel")
+                                    backgroundColor: "transparent"
+                                    textColor: Theme.surfaceText
+                                    onClicked: root.showEditMonitorsDialog = false
+                                }
+                            }
                         }
                     }
                 }
