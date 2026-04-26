@@ -121,7 +121,7 @@ Variants {
             return Math.round(v * _dpr) / _dpr;
         }
 
-        property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData)
+        property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData) || (dockVariants.trashContextMenu && dockVariants.trashContextMenu.visible && dockVariants.trashContextMenu.screen === modelData)
         property bool revealSticky: false
 
         readonly property bool shouldHideForWindows: {
