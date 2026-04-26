@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Io
 import qs.Common
 
 Item {
@@ -68,17 +69,33 @@ Item {
         smooth: true
 
         onStatusChanged: {
-            if (source == root.cachePath && status === Image.Error) {
+            if (source === root.cachePath && status === Image.Error) {
                 source = root.encodedImagePath;
                 return;
             }
-            if (root.isRemoteUrl || source != root.encodedImagePath || status !== Image.Ready || !root.cachePath)
+            if (root.isRemoteUrl || source !== root.encodedImagePath || status !== Image.Ready || !root.cachePath)
                 return;
             Paths.mkdir(Paths.imagecache);
             const grabPath = root.cachePath;
             if (visible && width > 0 && height > 0 && Window.window?.visible) {
                 grabToImage(res => res.saveToFile(grabPath));
             }
+        }
+    }
+
+    Process {
+        id: cacheProbe
+
+        property string cachePath: ""
+        property string fallbackSource: ""
+
+        running: false
+        command: ["test", "-f", cachePath]
+
+        onExited: exitCode => {
+            if (cacheProbe.cachePath !== root.cachePath)
+                return;
+            staticImg.source = exitCode === 0 ? cacheProbe.cachePath : cacheProbe.fallbackSource;
         }
     }
 
@@ -97,6 +114,13 @@ Item {
         const hash = djb2Hash(normalizedPath);
         const cPath = hash ? `${Paths.stringify(Paths.imagecache)}/${hash}@${maxCacheSize}x${maxCacheSize}.png` : "";
         const encoded = "file://" + normalizedPath.split('/').map(s => encodeURIComponent(s)).join('/');
-        staticImg.source = cPath || encoded;
+        if (!cPath) {
+            staticImg.source = encoded;
+            return;
+        }
+        cacheProbe.running = false;
+        cacheProbe.cachePath = cPath;
+        cacheProbe.fallbackSource = encoded;
+        cacheProbe.running = true;
     }
 }

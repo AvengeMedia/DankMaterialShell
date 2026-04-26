@@ -161,10 +161,16 @@ const NIRI_ACTIONS = {
         { id: "focus-monitor-right", label: "Focus Monitor Right" },
         { id: "focus-monitor-down", label: "Focus Monitor Down" },
         { id: "focus-monitor-up", label: "Focus Monitor Up" },
-        { id: "move-column-to-monitor-left", label: "Move to Monitor Left" },
-        { id: "move-column-to-monitor-right", label: "Move to Monitor Right" },
-        { id: "move-column-to-monitor-down", label: "Move to Monitor Down" },
-        { id: "move-column-to-monitor-up", label: "Move to Monitor Up" }
+        { id: "move-column-to-monitor-left", label: "Move Column to Monitor Left" },
+        { id: "move-column-to-monitor-right", label: "Move Column to Monitor Right" },
+        { id: "move-column-to-monitor-down", label: "Move Column to Monitor Down" },
+        { id: "move-column-to-monitor-up", label: "Move Column to Monitor Up" },
+        { id: "move-workspace-to-monitor-left", label: "Move Workspace to Monitor Left" },
+        { id: "move-workspace-to-monitor-right", label: "Move Workspace to Monitor Right" },
+        { id: "move-workspace-to-monitor-down", label: "Move Workspace to Monitor Down" },
+        { id: "move-workspace-to-monitor-up", label: "Move Workspace to Monitor Up" },
+        { id: "move-workspace-to-monitor-next", label: "Move Workspace to Next Monitor" },
+        { id: "move-workspace-to-monitor-previous", label: "Move Workspace to Previous Monitor" }
     ],
     "Screenshot": [
         { id: "screenshot", label: "Screenshot (Interactive)" },

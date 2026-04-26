@@ -75,7 +75,7 @@ DankPopout {
         }
     }
 
-    readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _containerBg: Theme.nestedSurface
 
     function openWithSection(section) {
         StateUtils.openWithSection(root, section);
@@ -286,7 +286,11 @@ DankPopout {
                         id: editControls
                         width: parent.width
                         visible: editMode
-                        popoutContent: controlContent
+                        popupScreen: root.screen
+                        popoutX: root.alignedX
+                        popoutY: root.alignedY
+                        popoutWidth: root.alignedWidth
+                        popoutHeight: root.alignedHeight
                         availableWidgets: {
                             if (!editMode)
                                 return [];
@@ -294,9 +298,6 @@ DankPopout {
                             const allWidgets = widgetModel.baseWidgetDefinitions.concat(widgetModel.getPluginWidgets());
                             return allWidgets.filter(w => w.allowMultiple || !existingIds.includes(w.id));
                         }
-                        onAddWidget: widgetId => widgetModel.addWidget(widgetId)
-                        onResetToDefault: () => widgetModel.resetToDefault()
-                        onClearAll: () => widgetModel.clearAll()
                     }
                 }
             }

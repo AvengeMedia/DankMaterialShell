@@ -50,7 +50,7 @@ Item {
             id: listComponent
 
             Column {
-                spacing: 2
+                spacing: 4
                 width: contentLoader.width
 
                 Repeater {

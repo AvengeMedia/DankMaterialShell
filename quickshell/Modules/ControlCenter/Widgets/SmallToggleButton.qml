@@ -26,7 +26,7 @@ Rectangle {
     }
 
     readonly property color _tileBgActive: Theme.ccTileActiveBg
-    readonly property color _tileBgInactive: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _tileBgInactive: Theme.ccPillInactiveBg
     readonly property color _tileRingActive: Theme.ccTileRing
     readonly property color _tileIconActive: Theme.ccTileActiveText
     readonly property color _tileIconInactive: Theme.ccTileInactiveIcon
@@ -34,11 +34,11 @@ Rectangle {
     color: {
         if (isActive)
             return _tileBgActive;
-        const baseColor = mouseArea.containsMouse ? Theme.primaryPressed : _tileBgInactive;
+        const baseColor = mouseArea.containsMouse ? Theme.ccPillInactiveHoverBg : _tileBgInactive;
         return baseColor;
     }
-    border.color: isActive ? _tileRingActive : "transparent"
-    border.width: isActive ? 1 : 0
+    border.color: isActive ? _tileRingActive : Theme.outlineMedium
+    border.width: isActive ? 1 : Theme.layerOutlineWidth
     antialiasing: true
     opacity: enabled ? 1.0 : 0.6
 

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import qs.Common
 import qs.Services
@@ -32,7 +31,7 @@ Rectangle {
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
     clip: false
-    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !BlurService.enabled
 
     ElevationShadow {
         id: shadowLayer
@@ -50,21 +49,21 @@ Rectangle {
     color: {
         if (isSelected && keyboardNavigationActive)
             return Theme.primaryPressed;
-        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
+        return Theme.floatingSurfaceHigh;
     }
     border.color: {
         if (isSelected && keyboardNavigationActive)
             return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5);
         if (historyItem.urgency === 2)
             return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
-        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05);
+        return Theme.outlineMedium;
     }
     border.width: {
         if (isSelected && keyboardNavigationActive)
             return 1.5;
         if (historyItem.urgency === 2)
             return 2;
-        return 0;
+        return Theme.layerOutlineWidth;
     }
 
     Behavior on border.color {
@@ -137,12 +136,10 @@ Rectangle {
                     return "";
                 const appIcon = historyItem.appIcon;
                 if (!appIcon)
-                    return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                    return "";
                 if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                     return appIcon;
-                if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                    return "";
-                return Paths.resolveIconPath(appIcon);
+                return "";
             }
 
             hasImage: hasNotificationImage

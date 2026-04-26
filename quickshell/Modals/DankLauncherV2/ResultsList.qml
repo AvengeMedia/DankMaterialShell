@@ -58,9 +58,9 @@ Item {
                         item: items[i],
                         flatIndex: flatIdx,
                         sectionId: sectionId,
-                        height: 52
+                        height: 56
                     });
-                    cumY += 52;
+                    cumY += 56;
                 }
             } else {
                 var cols = root.controller?.getGridColumns(sectionId) ?? root.gridColumns;
@@ -190,124 +190,135 @@ Item {
         }
     }
 
-    DankListView {
-        id: mainListView
+    Item {
+        id: listClip
         anchors.fill: parent
+        anchors.topMargin: BlurService.enabled && stickyHeader.visible ? 32 : 0
         clip: true
-        scrollBarTopMargin: (root.controller?.sections?.length > 0) ? 32 : 0
 
-        model: ScriptModel {
-            values: root._visualRows
-            objectProp: "_rowId"
-        }
+        DankListView {
+            id: mainListView
+            y: -listClip.anchors.topMargin
+            width: parent.width
+            height: parent.height + listClip.anchors.topMargin
+            clip: true
+            scrollBarTopMargin: (root.controller?.sections?.length > 0) ? 32 : 0
 
-        add: null
-        remove: null
-        displaced: null
-        move: null
-
-        delegate: Item {
-            id: delegateRoot
-            required property var modelData
-            required property int index
-
-            width: mainListView.width
-            height: modelData?.height ?? 52
-
-            SectionHeader {
-                anchors.fill: parent
-                visible: delegateRoot.modelData?.type === "header"
-                section: delegateRoot.modelData?.section ?? null
-                controller: root.controller
-                viewMode: {
-                    var vt = root.controller?.viewModeVersion ?? 0;
-                    void (vt);
-                    return root.controller?.getSectionViewMode(delegateRoot.modelData?.sectionId ?? "") ?? "list";
-                }
-                canChangeViewMode: {
-                    var vt = root.controller?.viewModeVersion ?? 0;
-                    void (vt);
-                    return root.controller?.canChangeSectionViewMode(delegateRoot.modelData?.sectionId ?? "") ?? false;
-                }
-                canCollapse: root.controller?.canCollapseSection(delegateRoot.modelData?.sectionId ?? "") ?? false
+            model: ScriptModel {
+                values: root._visualRows
+                objectProp: "_rowId"
             }
 
-            ResultItem {
-                anchors.fill: parent
-                visible: delegateRoot.modelData?.type === "list_item"
-                item: delegateRoot.modelData?.type === "list_item" ? (delegateRoot.modelData?.item ?? null) : null
-                isSelected: delegateRoot.modelData?.type === "list_item" && (delegateRoot.modelData?.flatIndex ?? -1) === root.controller?.selectedFlatIndex
-                controller: root.controller
-                flatIndex: delegateRoot.modelData?.type === "list_item" ? (delegateRoot.modelData?.flatIndex ?? -1) : -1
+            add: null
+            remove: null
+            displaced: null
+            move: null
 
-                onClicked: {
-                    if (root.controller && delegateRoot.modelData?.item) {
-                        root.controller.executeItem(delegateRoot.modelData.item);
+            delegate: Item {
+                id: delegateRoot
+                required property var modelData
+                required property int index
+
+                width: mainListView.width
+                height: modelData?.height ?? 52
+
+                SectionHeader {
+                    anchors.fill: parent
+                    visible: delegateRoot.modelData?.type === "header"
+                    section: delegateRoot.modelData?.section ?? null
+                    controller: root.controller
+                    viewMode: {
+                        var vt = root.controller?.viewModeVersion ?? 0;
+                        void (vt);
+                        return root.controller?.getSectionViewMode(delegateRoot.modelData?.sectionId ?? "") ?? "list";
+                    }
+                    canChangeViewMode: {
+                        var vt = root.controller?.viewModeVersion ?? 0;
+                        void (vt);
+                        return root.controller?.canChangeSectionViewMode(delegateRoot.modelData?.sectionId ?? "") ?? false;
+                    }
+                    canCollapse: root.controller?.canCollapseSection(delegateRoot.modelData?.sectionId ?? "") ?? false
+                }
+
+                ResultItem {
+                    anchors.fill: parent
+                    anchors.topMargin: 2
+                    anchors.bottomMargin: 2
+                    visible: delegateRoot.modelData?.type === "list_item"
+                    item: delegateRoot.modelData?.type === "list_item" ? (delegateRoot.modelData?.item ?? null) : null
+                    isSelected: delegateRoot.modelData?.type === "list_item" && (delegateRoot.modelData?.flatIndex ?? -1) === root.controller?.selectedFlatIndex
+                    controller: root.controller
+                    flatIndex: delegateRoot.modelData?.type === "list_item" ? (delegateRoot.modelData?.flatIndex ?? -1) : -1
+
+                    onClicked: {
+                        if (root.controller && delegateRoot.modelData?.item) {
+                            root.controller.executeItem(delegateRoot.modelData.item);
+                        }
+                    }
+
+                    onRightClicked: (mouseX, mouseY) => {
+                        root.itemRightClicked(delegateRoot.modelData?.flatIndex ?? -1, delegateRoot.modelData?.item ?? null, mouseX, mouseY);
                     }
                 }
 
-                onRightClicked: (mouseX, mouseY) => {
-                    root.itemRightClicked(delegateRoot.modelData?.flatIndex ?? -1, delegateRoot.modelData?.item ?? null, mouseX, mouseY);
-                }
-            }
+                Row {
+                    id: gridRowContent
+                    anchors.fill: parent
+                    visible: delegateRoot.modelData?.type === "grid_row"
 
-            Row {
-                id: gridRowContent
-                anchors.fill: parent
-                visible: delegateRoot.modelData?.type === "grid_row"
+                    Repeater {
+                        model: delegateRoot.modelData?.type === "grid_row" ? (delegateRoot.modelData?.items ?? []) : []
 
-                Repeater {
-                    model: delegateRoot.modelData?.type === "grid_row" ? (delegateRoot.modelData?.items ?? []) : []
+                        Item {
+                            id: gridCellDelegate
+                            required property var modelData
+                            required property int index
 
-                    Item {
-                        id: gridCellDelegate
-                        required property var modelData
-                        required property int index
+                            readonly property real cellWidth: delegateRoot.modelData?.viewMode === "tile" ? Math.floor(delegateRoot.width / 3) : Math.floor(delegateRoot.width / (delegateRoot.modelData?.cols ?? root.gridColumns))
 
-                        readonly property real cellWidth: delegateRoot.modelData?.viewMode === "tile" ? Math.floor(delegateRoot.width / 3) : Math.floor(delegateRoot.width / (delegateRoot.modelData?.cols ?? root.gridColumns))
+                            width: cellWidth
+                            height: delegateRoot.height
 
-                        width: cellWidth
-                        height: delegateRoot.height
+                            GridItem {
+                                width: parent.width - 4
+                                height: parent.height - 4
+                                anchors.centerIn: parent
+                                visible: delegateRoot.modelData?.viewMode === "grid"
+                                item: gridCellDelegate.modelData?.item ?? null
+                                isSelected: (gridCellDelegate.modelData?.flatIndex ?? -1) === root.controller?.selectedFlatIndex
+                                controller: root.controller
+                                flatIndex: gridCellDelegate.modelData?.flatIndex ?? -1
 
-                        GridItem {
-                            width: parent.width - 4
-                            height: parent.height - 4
-                            anchors.centerIn: parent
-                            visible: delegateRoot.modelData?.viewMode === "grid"
-                            item: gridCellDelegate.modelData?.item ?? null
-                            isSelected: (gridCellDelegate.modelData?.flatIndex ?? -1) === root.controller?.selectedFlatIndex
-                            controller: root.controller
-                            flatIndex: gridCellDelegate.modelData?.flatIndex ?? -1
+                                onClicked: {
+                                    if (root.controller && gridCellDelegate.modelData?.item) {
+                                        root.controller.executeItem(gridCellDelegate.modelData.item);
+                                    }
+                                }
 
-                            onClicked: {
-                                if (root.controller && gridCellDelegate.modelData?.item) {
-                                    root.controller.executeItem(gridCellDelegate.modelData.item);
+                                onRightClicked: (mouseX, mouseY) => {
+                                    root.itemRightClicked(gridCellDelegate.modelData?.flatIndex ?? -1, gridCellDelegate.modelData?.item ?? null, mouseX, mouseY);
                                 }
                             }
 
-                            onRightClicked: (mouseX, mouseY) => {
-                                root.itemRightClicked(gridCellDelegate.modelData?.flatIndex ?? -1, gridCellDelegate.modelData?.item ?? null, mouseX, mouseY);
-                            }
-                        }
+                            TileItem {
+                                width: parent.width - 4
+                                height: parent.height - 4
+                                anchors.centerIn: parent
+                                visible: delegateRoot.modelData?.viewMode === "tile"
+                                item: gridCellDelegate.modelData?.item ?? null
+                                isSelected: (gridCellDelegate.modelData?.flatIndex ?? -1) === root.controller?.selectedFlatIndex
+                                controller: root.controller
+                                flatIndex: gridCellDelegate.modelData?.flatIndex ?? -1
 
-                        TileItem {
-                            width: parent.width - 4
-                            height: parent.height - 4
-                            anchors.centerIn: parent
-                            visible: delegateRoot.modelData?.viewMode === "tile"
-                            item: gridCellDelegate.modelData?.item ?? null
-                            isSelected: (gridCellDelegate.modelData?.flatIndex ?? -1) === root.controller?.selectedFlatIndex
-                            controller: root.controller
-                            flatIndex: gridCellDelegate.modelData?.flatIndex ?? -1
-
-                            onClicked: {
-                                if (root.controller && gridCellDelegate.modelData?.item) {
-                                    root.controller.executeItem(gridCellDelegate.modelData.item);
+                                onClicked: {
+                                    if (root.controller && gridCellDelegate.modelData?.item) {
+                                        root.controller.executeItem(gridCellDelegate.modelData.item);
+                                    }
                                 }
-                            }
 
-                            onRightClicked: (mouseX, mouseY) => {
-                                root.itemRightClicked(gridCellDelegate.modelData?.flatIndex ?? -1, gridCellDelegate.modelData?.item ?? null, mouseX, mouseY);
+                                onRightClicked: (mouseX, mouseY) => {
+                                    root.itemRightClicked(gridCellDelegate.modelData?.flatIndex ?? -1, gridCellDelegate.modelData?.item ?? null, mouseX, mouseY);
+                                }
                             }
                         }
                     }
@@ -365,7 +376,7 @@ Item {
         anchors.top: parent.top
         height: 32
         z: 101
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+        color: Theme.floatingSurface
         visible: stickyHeaderSection !== null
 
         readonly property int versionTrigger: root.controller?.viewModeVersion ?? 0

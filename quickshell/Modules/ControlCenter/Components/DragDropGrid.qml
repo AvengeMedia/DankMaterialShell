@@ -575,7 +575,8 @@ Column {
                 anchors.centerIn: parent
                 width: parent.width
                 height: 14
-                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                sliderTrackColor: Theme.ccSliderTrackColor
+                sliderTrackOpacity: Theme.ccSliderTrackOpacity
             }
         }
     }
@@ -597,7 +598,8 @@ Column {
                 instanceId: widgetData.instanceId || ""
                 screenName: root.screenName
                 parentScreen: root.parentScreen
-                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                sliderTrackColor: Theme.ccSliderTrackColor
+                sliderTrackOpacity: Theme.ccSliderTrackOpacity
 
                 onIconClicked: {
                     if (!root.editMode && DisplayService.devices && DisplayService.devices.length > 1) {
@@ -620,7 +622,8 @@ Column {
                 anchors.centerIn: parent
                 width: parent.width
                 height: 14
-                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                sliderTrackColor: Theme.ccSliderTrackColor
+                sliderTrackOpacity: Theme.ccSliderTrackOpacity
             }
         }
     }

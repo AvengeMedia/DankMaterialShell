@@ -357,7 +357,7 @@ DankPopout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                    color: Theme.nestedSurface
                     clip: true
 
                     ProcessesView {

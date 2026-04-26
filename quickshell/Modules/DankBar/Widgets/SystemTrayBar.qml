@@ -152,6 +152,59 @@ BasePill {
                 item: item
             }))
     readonly property var hiddenBarItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property string trayIconTintMode: {
+        const configuredMode = SettingsData.systemTrayIconTintMode || "none";
+        switch (configuredMode) {
+        case "monochrome":
+        case "primary":
+        case "secondary":
+            return configuredMode;
+        default:
+            return "none";
+        }
+    }
+    readonly property bool trayIconTintEnabled: trayIconTintMode !== "none"
+    readonly property real trayIconTintSaturationAmount: {
+        const raw = SettingsData.systemTrayIconTintSaturation;
+        const value = (raw === undefined || raw === null) ? 50 : raw;
+        return Math.max(0, Math.min(100, value)) / 100;
+    }
+    readonly property real trayIconTintStrengthAmount: {
+        const raw = SettingsData.systemTrayIconTintStrength;
+        const value = (raw === undefined || raw === null) ? 135 : raw;
+        return Math.max(0, Math.min(200, value)) / 100;
+    }
+    readonly property real trayIconSaturation: {
+        switch (trayIconTintMode) {
+        case "monochrome":
+            return -1;
+        case "primary":
+        case "secondary":
+            return -root.trayIconTintSaturationAmount;
+        default:
+            return 0;
+        }
+    }
+    readonly property real trayIconColorization: {
+        switch (trayIconTintMode) {
+        case "primary":
+        case "secondary":
+            return root.trayIconTintStrengthAmount;
+        default:
+            return 0;
+        }
+    }
+    readonly property color trayIconTintColor: {
+        switch (trayIconTintMode) {
+        case "primary":
+            return Theme.primary;
+        case "secondary":
+            return Theme.secondary;
+        default:
+            return Theme.surfaceText;
+        }
+    }
+
     readonly property bool reverseInlineHorizontal: !useOverflowPopup && !isVerticalOrientation && section === "right"
     readonly property bool reverseInlineVertical: !useOverflowPopup && isVerticalOrientation && section === "right"
     readonly property var displayedMainBarItems: reverseInlineHorizontal ? [...mainBarItems].reverse() : mainBarItems
@@ -367,9 +420,11 @@ BasePill {
                             smooth: true
                             mipmap: true
                             visible: status === Image.Ready
-                            layer.enabled: SettingsData.systemTrayMonochromeIcons
+                            layer.enabled: root.trayIconTintEnabled
                             layer.effect: MultiEffect {
-                                saturation: -1
+                                saturation: root.trayIconSaturation
+                                colorization: root.trayIconColorization
+                                colorizationColor: root.trayIconTintColor
                             }
                         }
 
@@ -586,9 +641,11 @@ BasePill {
                     smooth: true
                     mipmap: true
                     visible: status === Image.Ready
-                    layer.enabled: SettingsData.systemTrayMonochromeIcons
+                    layer.enabled: root.trayIconTintEnabled
                     layer.effect: MultiEffect {
-                        saturation: -1
+                        saturation: root.trayIconSaturation
+                        colorization: root.trayIconColorization
+                        colorizationColor: root.trayIconTintColor
                     }
                 }
 
@@ -718,9 +775,11 @@ BasePill {
                     smooth: true
                     mipmap: true
                     visible: status === Image.Ready
-                    layer.enabled: SettingsData.systemTrayMonochromeIcons
+                    layer.enabled: root.trayIconTintEnabled
                     layer.effect: MultiEffect {
-                        saturation: -1
+                        saturation: root.trayIconSaturation
+                        colorization: root.trayIconColorization
+                        colorizationColor: root.trayIconTintColor
                     }
                 }
 
@@ -1178,7 +1237,7 @@ BasePill {
                 targetRadius: Theme.cornerRadius
                 sourceRect.antialiasing: true
                 sourceRect.smooth: true
-                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
+                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && !BlurService.enabled
                 layer.smooth: true
                 layer.textureSize: Qt.size(Math.round(width * overflowMenu.dpr * 2), Math.round(height * overflowMenu.dpr * 2))
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
@@ -1223,9 +1282,11 @@ BasePill {
                             smooth: true
                             mipmap: true
                             visible: status === Image.Ready
-                            layer.enabled: SettingsData.systemTrayMonochromeIcons
+                            layer.enabled: root.trayIconTintEnabled
                             layer.effect: MultiEffect {
-                                saturation: -1
+                                saturation: root.trayIconSaturation
+                                colorization: root.trayIconColorization
+                                colorizationColor: root.trayIconTintColor
                             }
                         }
 
@@ -1627,7 +1688,7 @@ BasePill {
                         targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                         targetRadius: Theme.cornerRadius
                         sourceRect.antialiasing: true
-                        shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
+                        shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && !BlurService.enabled
                         layer.smooth: true
                         layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically
