@@ -41,6 +41,7 @@ Singleton {
     property bool profilesLoading: false
     property var validatedProfiles: ({})
     property bool manualActivation: false
+    property var monitorsCache: null
 
     signal changesApplied(var changeDescriptions)
     signal changesConfirmed
@@ -70,33 +71,433 @@ Singleton {
         return outputName;
     }
 
-    function validateProfiles() {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profilesDir = getProfilesDir();
-        const ext = getProfileExtension();
+    // Translate any stored output ID (connector name or model ID) to the current
+    // displayNameMode format. Enables cross-format matching when displayNameMode
+    // changed since a config was saved, or when an output lacks make/model info.
+    function normalizeOutputId(storedId) {
+        for (const rawName in outputs) {
+            if (rawName === storedId || getOutputIdentifier(outputs[rawName], rawName) === storedId)
+                return getOutputIdentifier(outputs[rawName], rawName);
+        }
+        return storedId;
+    }
 
-        if (!profilesDir) {
-            validatedProfiles = {};
+    function readMonitorsJson(callback) {
+        if (monitorsCache !== null) {
+            callback(monitorsCache);
             return;
         }
+        Proc.runCommand("read-monitors-json", ["cat", Paths.strip(Paths.config) + "/monitors.json"], (content, exitCode) => {
+            if (exitCode !== 0 || !content.trim()) {
+                monitorsCache = {"version": 1, "configurations": []};
+                callback(monitorsCache);
+                return;
+            }
+            try {
+                monitorsCache = JSON.parse(content);
+                if (!Array.isArray(monitorsCache.configurations))
+                    monitorsCache.configurations = [];
+            } catch (e) {
+                console.warn("Failed to parse monitors.json, using empty config", e);
+                monitorsCache = {"version": 1, "configurations": []};
+            }
+            callback(monitorsCache);
+        });
+    }
 
-        const profileIds = Object.keys(profiles);
-        if (profileIds.length === 0) {
-            validatedProfiles = {};
+    function writeMonitorsJson(data, callback) {
+        const path = Paths.strip(Paths.config) + "/monitors.json";
+        const dir = path.substring(0, path.lastIndexOf("/"));
+        const jsonContent = JSON.stringify(data, null, 2);
+        monitorsCache = data;
+        Proc.runCommand("write-monitors-json-dir", ["mkdir", "-p", dir], (output, exitCode) => {
+            if (exitCode !== 0) {
+                callback && callback(false);
+                return;
+            }
+            // Use python3 to write the file safely (avoids heredoc quoting issues)
+            Proc.runCommand("write-monitors-json", ["python3", "-c",
+                `import sys; open(sys.argv[1],'w').write(sys.argv[2])`, path, jsonContent],
+                (output2, exitCode2) => {
+                    callback && callback(exitCode2 === 0);
+                });
+        });
+    }
+
+    // Find entry in data.configurations array whose output keys match the given output identifiers.
+    // Normalizes both sides to the current displayNameMode to handle cross-format configs
+    // (e.g. entries saved in connector mode while current mode is model, or vice versa).
+    function findConfigEntry(data, outputIdentifiers) {
+        const targetKey = outputIdentifiers.map(id => normalizeOutputId(id)).sort().join("+");
+        const configs = data.configurations || [];
+        for (let i = 0; i < configs.length; i++) {
+            const entryKey = Object.keys(configs[i].outputs || {}).map(id => normalizeOutputId(id)).sort().join("+");
+            if (entryKey === targetKey)
+                return {entry: configs[i], index: i};
+        }
+        return null;
+    }
+
+    // Find entry by exact virtualId (sorted output identifier keys joined by "+")
+    function findConfigEntryByKey(data, virtualId) {
+        const configs = data.configurations || [];
+        for (let i = 0; i < configs.length; i++) {
+            const entryKey = Object.keys(configs[i].outputs || {}).sort().join("+");
+            if (entryKey === virtualId)
+                return {entry: configs[i], index: i};
+        }
+        return null;
+    }
+
+    // Find the config entry whose outputs are the largest subset of outputIdentifiers.
+    // All outputs in the entry must be present in outputIdentifiers (no extra outputs).
+    function findPartialConfigEntry(data, outputIdentifiers) {
+        const currentSet = new Set(outputIdentifiers.map(id => normalizeOutputId(id)));
+        const configs = data.configurations || [];
+        let bestEntry = null;
+        let bestCount = 0;
+        for (let i = 0; i < configs.length; i++) {
+            const cfgKeys = Object.keys(configs[i].outputs || {}).map(id => normalizeOutputId(id));
+            if (cfgKeys.length === 0)
+                continue;
+            // All config outputs must be present in the current output set
+            if (!cfgKeys.every(k => currentSet.has(k)))
+                continue;
+            if (cfgKeys.length > bestCount) {
+                bestCount = cfgKeys.length;
+                bestEntry = {entry: configs[i], index: i};
+            }
+        }
+        return bestEntry;
+    }
+
+    // Returns {rawName: bool} for all known monitors — true if included in profileId
+    function getProfileMonitorInclusion(profileId) {
+        const profile = validatedProfiles[profileId];
+        const profileOutputIds = new Set(Object.keys(profile?.outputs || {}).map(id => normalizeOutputId(id)));
+        const result = {};
+        for (const rawName in allOutputs) {
+            const od = allOutputs[rawName];
+            const id = od ? getOutputIdentifier(od, rawName) : rawName;
+            result[rawName] = profileOutputIds.has(id);
+        }
+        return result;
+    }
+
+    // Update which monitors are part of a named profile
+    function updateProfileMonitors(profileId, enabledRawNames) {
+        readMonitorsJson(data => {
+            const match = findConfigEntryByKey(data, profileId);
+            if (!match) {
+                profileError(I18n.tr("Profile not found"));
+                return;
+            }
+            const profileName = match.entry.name;
+            const existingOutputs = match.entry.outputs || {};
+            const mergedAll = buildOutputsWithPendingChanges();
+            const niriSettings = buildMergedNiriSettings();
+            const hyprlandSettings = buildMergedHyprlandSettings();
+            const newOutputConfigs = {};
+            for (const rawName of enabledRawNames) {
+                const od = mergedAll[rawName] || allOutputs[rawName];
+                if (!od)
+                    continue;
+                const outputId = getOutputIdentifier(od, rawName);
+                newOutputConfigs[outputId] = existingOutputs[outputId]
+                    || extractOutputNeutralConfig(rawName, od, niriSettings, hyprlandSettings);
+            }
+            const newVirtualId = Object.keys(newOutputConfigs).sort().join("+");
+            data.configurations[match.index] = {"name": profileName, "outputs": newOutputConfigs};
+            writeMonitorsJson(data, success => {
+                if (!success) return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                delete updated[profileId];
+                if (newVirtualId)
+                    updated[newVirtualId] = {name: profileName, outputs: newOutputConfigs};
+                validatedProfiles = updated;
+                if (matchedProfile === profileId)
+                    matchedProfile = newVirtualId;
+                profileSaved(newVirtualId, profileName);
+            });
+        });
+    }
+
+    // Extract neutral per-output config from current live state
+    function extractOutputNeutralConfig(outputName, outputData, niriSettings, hyprlandSettings) {
+        const modeData = (outputData.modes && outputData.current_mode !== undefined)
+            ? outputData.modes[outputData.current_mode] : null;
+        const modeStr = modeData
+            ? modeData.width + "x" + modeData.height + "@" + (modeData.refresh_rate / 1000).toFixed(3)
+            : null;
+        const cfg = {
+            "mode": modeStr,
+            "position": {"x": outputData.logical?.x ?? 0, "y": outputData.logical?.y ?? 0},
+            "scale": outputData.logical?.scale || 1.0,
+            "transform": outputData.logical?.transform ?? "Normal",
+            "vrr": outputData.vrr_enabled ?? false,
+            "disabled": false
+        };
+        if (CompositorService.isNiri) {
+            cfg.niri = Object.assign({}, niriSettings?.[getNiriOutputIdentifier(outputData, outputName)] || {});
+            if (cfg.niri.disabled)
+                cfg.disabled = true;
+        }
+        if (CompositorService.isHyprland) {
+            cfg.hyprland = Object.assign({}, hyprlandSettings?.[getHyprlandOutputIdentifier(outputData, outputName)] || {});
+            if (outputData.mirror)
+                cfg.hyprland.mirror = outputData.mirror;
+            if (cfg.hyprland.disabled)
+                cfg.disabled = true;
+        }
+        return cfg;
+    }
+
+    // Convert monitors.json config entry → internal outputsData map
+    function generateOutputsDataFromConfig(configEntry) {
+        const result = {};
+        const cfgOutputs = configEntry.outputs || {};
+        for (const outputId in cfgOutputs) {
+            const cfg = cfgOutputs[outputId];
+            // Find matching live output to get modes list
+            let liveOutput = null;
+            for (const name in outputs) {
+                if (getOutputIdentifier(outputs[name], name) === outputId || name === outputId) {
+                    liveOutput = outputs[name];
+                    break;
+                }
+            }
+            const liveModes = liveOutput?.modes || [];
+            let currentMode = liveModes.findIndex(m => {
+                const s = m.width + "x" + m.height + "@" + (m.refresh_rate / 1000).toFixed(3);
+                return s === cfg.mode;
+            });
+            if (currentMode < 0 && liveModes.length > 0)
+                currentMode = 0;
+            const entry = {
+                "name": outputId,
+                "make": liveOutput?.make || "",
+                "model": liveOutput?.model || "",
+                "serial": liveOutput?.serial || "",
+                "modes": liveModes,
+                "current_mode": currentMode,
+                "vrr_supported": liveOutput?.vrr_supported ?? false,
+                "vrr_enabled": cfg.vrr ?? false,
+                "logical": {
+                    "x": cfg.position?.x ?? 0,
+                    "y": cfg.position?.y ?? 0,
+                    "scale": cfg.scale ?? 1.0,
+                    "transform": cfg.transform ?? "Normal"
+                }
+            };
+            if (cfg.hyprland?.mirror)
+                entry.mirror = cfg.hyprland.mirror;
+            result[outputId] = entry;
+        }
+        return result;
+    }
+
+    // Extract niri settings map from neutral config entry for generateNiriOutputsKdl
+    function getNiriSettingsFromConfig(configEntry) {
+        const result = {};
+        for (const outputId in (configEntry.outputs || {})) {
+            const cfg = configEntry.outputs[outputId];
+            const settings = Object.assign({}, cfg.niri || {});
+            if (cfg.disabled)
+                settings.disabled = true;
+            else
+                delete settings.disabled;
+            if (Object.keys(settings).length > 0)
+                result[outputId] = settings;
+        }
+        return result;
+    }
+
+    // Extract hyprland settings map from neutral config entry
+    function getHyprlandSettingsFromConfig(configEntry) {
+        const result = {};
+        for (const outputId in (configEntry.outputs || {})) {
+            const cfg = configEntry.outputs[outputId];
+            const settings = Object.assign({}, cfg.hyprland || {});
+            if (cfg.disabled)
+                settings.disabled = true;
+            else
+                delete settings.disabled;
+            if (Object.keys(settings).length > 0)
+                result[outputId] = settings;
+        }
+        return result;
+    }
+
+    // Generate hyprland conf content from internal outputsData + settings
+    function generateHyprConfContent(outputsData, hyprlandSettings) {
+        const settings = hyprlandSettings || {};
+        const lines = ["# Auto-generated by DMS - do not edit manually", ""];
+        const monitorv2Blocks = [];
+        for (const outputName in outputsData) {
+            const output = outputsData[outputName];
+            if (!output)
+                continue;
+            const identifier = getHyprlandOutputIdentifier(output, outputName);
+            const outputSettings = settings[identifier] || {};
+            if (outputSettings.disabled) {
+                lines.push("monitor = " + identifier + ", disable");
+                continue;
+            }
+            let resolution = "preferred";
+            if (output.modes && output.current_mode !== undefined) {
+                const mode = output.modes[output.current_mode];
+                if (mode)
+                    resolution = mode.width + "x" + mode.height + "@" + (mode.refresh_rate / 1000).toFixed(3);
+            }
+            const x = output.logical?.x ?? 0;
+            const y = output.logical?.y ?? 0;
+            const scale = output.logical?.scale ?? 1.0;
+            let line = "monitor = " + identifier + ", " + resolution + ", " + x + "x" + y + ", " + scale;
+            const transform = mapTransformToWlr(output.logical?.transform ?? "Normal");
+            if (transform !== 0)
+                line += ", transform, " + transform;
+            if (output.vrr_supported) {
+                const vrrMode = outputSettings.vrrFullscreenOnly ? 2 : (output.vrr_enabled ? 1 : 0);
+                line += ", vrr, " + vrrMode;
+            }
+            if (output.mirror && output.mirror.length > 0)
+                line += ", mirror, " + output.mirror;
+            if (outputSettings.bitdepth && outputSettings.bitdepth !== 8)
+                line += ", bitdepth, " + outputSettings.bitdepth;
+            if (outputSettings.colorManagement && outputSettings.colorManagement !== "auto")
+                line += ", cm, " + outputSettings.colorManagement;
+            if (outputSettings.sdrBrightness !== undefined && outputSettings.sdrBrightness !== 1.0)
+                line += ", sdrbrightness, " + outputSettings.sdrBrightness;
+            if (outputSettings.sdrSaturation !== undefined && outputSettings.sdrSaturation !== 1.0)
+                line += ", sdrsaturation, " + outputSettings.sdrSaturation;
+            lines.push(line);
+            if (outputSettings.supportsHdr || outputSettings.supportsWideColor) {
+                let block = "monitorv2 {\n";
+                block += "    output = " + identifier + "\n";
+                if (outputSettings.supportsWideColor)
+                    block += "    supports_wide_color = true\n";
+                if (outputSettings.supportsHdr)
+                    block += "    supports_hdr = true\n";
+                block += "}";
+                monitorv2Blocks.push(block);
+            }
+        }
+        if (monitorv2Blocks.length > 0) {
+            lines.push("");
+            for (const block of monitorv2Blocks)
+                lines.push(block);
+        }
+        lines.push("");
+        return lines.join("\n");
+    }
+
+    // Generate dwl/mango conf content from internal outputsData
+    function generateDwlConfContent(outputsData) {
+        const lines = ["# Auto-generated by DMS - do not edit manually", ""];
+        for (const outputName in outputsData) {
+            const output = outputsData[outputName];
+            if (!output)
+                continue;
+            let width = 1920, height = 1080, refreshRate = 60;
+            if (output.modes && output.current_mode !== undefined) {
+                const mode = output.modes[output.current_mode];
+                if (mode) {
+                    width = mode.width || 1920;
+                    height = mode.height || 1080;
+                    refreshRate = Math.round((mode.refresh_rate || 60000) / 1000);
+                }
+            }
+            const x = output.logical?.x ?? 0;
+            const y = output.logical?.y ?? 0;
+            const scale = output.logical?.scale ?? 1.0;
+            const transform = mapTransformToWlr(output.logical?.transform ?? "Normal");
+            const vrr = output.vrr_enabled ? 1 : 0;
+            lines.push("monitorrule=" + ["name:" + outputName, "width:" + width,
+                "height:" + height, "refresh:" + refreshRate, "x:" + x, "y:" + y,
+                "scale:" + scale, "rr:" + transform, "vrr:" + vrr].join(","));
+        }
+        lines.push("");
+        return lines.join("\n");
+    }
+
+    // Write compositor config from a neutral config entry and optionally reload
+    function applyConfigEntry(configEntry, configId, profileName, isManual) {
+        // If every output is disabled, force-enable the first so the compositor
+        // always has at least one active output.
+        const outputKeys = Object.keys(configEntry.outputs || {});
+        const hasEnabledOutput = outputKeys.some(k => !configEntry.outputs[k].disabled);
+        if (!hasEnabledOutput && outputKeys.length > 0) {
+            configEntry = JSON.parse(JSON.stringify(configEntry));
+            const firstKey = outputKeys[0];
+            delete configEntry.outputs[firstKey].disabled;
+            saveConfig();
+        }
+        const outputsData = generateOutputsDataFromConfig(configEntry);
+        const paths = getConfigPaths();
+        if (!paths) {
+            if (isManual) {
+                profilesLoading = false;
+                manualActivation = false;
+            }
             return;
         }
-
-        const fileChecks = profileIds.map(id => profilesDir + "/" + id + ext).join(" ");
-        Proc.runCommand("validate-profiles", ["sh", "-c", `for f in ${fileChecks}; do [ -f "$f" ] && echo "$f"; done`], (output, exitCode) => {
-            const existingFiles = new Set(output.trim().split("\n").filter(f => f));
-            const validated = {};
-            for (const profileId of profileIds) {
-                const profileFile = profilesDir + "/" + profileId + ext;
-                if (existingFiles.has(profileFile))
-                    validated[profileId] = profiles[profileId];
+        let configContent = "";
+        let reloadCmd = [];
+        if (CompositorService.isNiri) {
+            configContent = generateNiriOutputsKdl(outputsData, getNiriSettingsFromConfig(configEntry));
+        } else if (CompositorService.isHyprland) {
+            configContent = generateHyprConfContent(outputsData, getHyprlandSettingsFromConfig(configEntry));
+            reloadCmd = ["hyprctl", "reload"];
+        } else {
+            configContent = generateDwlConfContent(outputsData);
+            reloadCmd = ["mmsg", "-d", "reload_config"];
+        }
+        Proc.runCommand("apply-config-write", ["python3", "-c",
+            `import sys,os; os.makedirs(os.path.dirname(sys.argv[1]),exist_ok=True); open(sys.argv[1],'w').write(sys.argv[2])`,
+            paths.outputsFile, configContent],
+            (output, exitCode) => {
+                if (exitCode !== 0) {
+                    if (isManual) {
+                        profilesLoading = false;
+                        manualActivation = false;
+                        profileError(I18n.tr("Failed to apply profile"));
+                    }
+                    return;
+                }
+                SettingsData.setActiveDisplayProfile(CompositorService.compositor, configId);
+                const finish = () => {
+                    if (isManual) {
+                        WlrOutputService.requestState();
+                        profilesLoading = false;
+                        profileActivated(configId, profileName);
+                        manualActivationTimer.restart();
+                    }
+                };
+                if (reloadCmd.length > 0)
+                    Proc.runCommand("apply-config-reload", reloadCmd, () => finish());
                 else
-                    SettingsData.removeDisplayProfile(compositor, profileId);
+                    finish();
+            });
+    }
+
+    // ── Profile management ─────────────────────────────────────────────────
+
+    function validateProfiles() {
+        readMonitorsJson(data => {
+            const validated = {};
+            for (const entry of (data.configurations || [])) {
+                const virtualId = Object.keys(entry.outputs || {}).sort().join("+");
+                if (!virtualId)
+                    continue;
+                // If every output is disabled, enable the first one so the profile is always usable 
+                const hasEnabledOutput = Object.values(entry.outputs || {}).some(cfg => !cfg.disabled);
+                let outputs = entry.outputs;
+                if (!hasEnabledOutput) {
+                    const firstKey = Object.keys(outputs)[0];
+                    outputs = JSON.parse(JSON.stringify(outputs));
+                    delete outputs[firstKey].disabled;
+                }
+                validated[virtualId] = {name: entry?.name ? entry.name : "", outputs: outputs};
             }
             validatedProfiles = validated;
             matchedProfile = findMatchingProfile();
@@ -104,190 +505,108 @@ Singleton {
     }
 
     function findMatchingProfile() {
-        const profiles = validatedProfiles;
-
-        console.log("[Profile Match] Current outputs:", JSON.stringify(currentOutputSet));
-
-        let bestMatch = "";
-        let bestScore = -1;
-        let bestUpdatedAt = 0;
-
-        for (const profileId in profiles) {
-            const profile = profiles[profileId];
-            const profileSet = new Set(profile.outputSet);
-
-            console.log("[Profile Match] Checking", profile.name, "outputSet:", JSON.stringify(profile.outputSet));
-
-            let allCurrentPresent = true;
-            for (const output of currentOutputSet) {
-                if (!profileSet.has(output)) {
-                    console.log("[Profile Match]  - Missing output:", output);
-                    allCurrentPresent = false;
-                    break;
-                }
-            }
-            if (!allCurrentPresent) {
-                console.log("[Profile Match]  - SKIP: not all current outputs present");
-                continue;
-            }
-
-            const disconnectedCount = profile.outputSet.length - currentOutputSet.length;
-            const score = currentOutputSet.length * 100 - disconnectedCount;
-            const updatedAt = profile.updatedAt || profile.createdAt || 0;
-            console.log("[Profile Match]  - MATCH score:", score, "(disconnected:", disconnectedCount, "updatedAt:", updatedAt + ")");
-
-            if (score > bestScore || (score === bestScore && updatedAt > bestUpdatedAt)) {
-                bestScore = score;
-                bestMatch = profileId;
-                bestUpdatedAt = updatedAt;
-            }
+        const currentKey = currentOutputSet.join("+");
+        if (validatedProfiles[currentKey])
+            return currentKey;
+        // Cross-format fallback: stored config may have been saved with a different displayNameMode
+        for (const storedKey in validatedProfiles) {
+            const normalizedKey = storedKey.split("+").map(id => normalizeOutputId(id)).sort().join("+");
+            if (normalizedKey === currentKey)
+                return storedKey;
         }
-        console.log("[Profile Match] Best match:", bestMatch, "score:", bestScore);
-        return bestMatch;
+        return "";
     }
 
-    function getProfilesDir() {
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        switch (CompositorService.compositor) {
-        case "niri":
-            return configDir + "/niri/dms/profiles";
-        case "hyprland":
-            return configDir + "/hypr/dms/profiles";
-        case "dwl":
-            return configDir + "/mango/dms/profiles";
-        default:
-            return "";
-        }
-    }
-
-    function getProfileExtension() {
-        return CompositorService.compositor === "niri" ? ".kdl" : ".conf";
-    }
-
-    function createProfile(name) {
-        const compositor = CompositorService.compositor;
-        const profileId = "profile_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
-        const outputSet = buildCurrentOutputSet();
-        const now = Date.now();
-
-        const profileData = {
-            "id": profileId,
-            "name": name,
-            "outputSet": outputSet,
-            "createdAt": now,
-            "updatedAt": now
-        };
-
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
-        const paths = getConfigPaths();
-        if (!paths) {
-            profileError(I18n.tr("Compositor not supported"));
-            return;
-        }
+    function createProfile(profileName) {
+        const outputConfigs = buildCurrentOutputConfigs();
+        const virtualId = Object.keys(outputConfigs).sort().join("+");
 
         profilesLoading = true;
-        Proc.runCommand("create-profile-dir", ["mkdir", "-p", profilesDir], (output, exitCode) => {
-            if (exitCode !== 0) {
+        readMonitorsJson(data => {
+            const match = findConfigEntry(data, currentOutputSet);
+            const newEntry = {"name": profileName, "outputs": outputConfigs};
+
+            if (match)
+                data.configurations[match.index] = newEntry;
+            else
+                data.configurations.push(newEntry);
+
+            writeMonitorsJson(data, success => {
                 profilesLoading = false;
-                profileError(I18n.tr("Failed to create profiles directory"));
-                return;
-            }
-            Proc.runCommand("copy-profile", ["cp", "-L", paths.outputsFile, profileFile], (output2, exitCode2) => {
-                if (exitCode2 !== 0) {
-                    profilesLoading = false;
-                    profileError(I18n.tr("Failed to save profile file"));
+                if (!success) {
+                    profileError(I18n.tr("Failed to save profile"));
                     return;
                 }
-                SettingsData.setDisplayProfile(compositor, profileId, profileData);
-                SettingsData.setActiveDisplayProfile(compositor, profileId);
+                matchedProfile = virtualId;
                 const updated = JSON.parse(JSON.stringify(validatedProfiles));
-                updated[profileId] = profileData;
+                updated[virtualId] = {name: profileName, outputs: outputConfigs};
                 validatedProfiles = updated;
-                Proc.runCommand("link-new-profile", ["ln", "-sf", profileFile, paths.outputsFile], () => {
-                    profilesLoading = false;
-                    currentOutputSet = outputSet;
-                    matchedProfile = profileId;
-                    profileSaved(profileId, name);
-                });
+                currentOutputSet = buildCurrentOutputSet();
+                SettingsData.setActiveDisplayProfile(CompositorService.compositor, virtualId);
+                profileSaved(virtualId, profileName);
             });
         });
     }
 
     function renameProfile(profileId, newName) {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profile = profiles[profileId];
-        if (!profile) {
-            profileError(I18n.tr("Profile not found"));
-            return;
-        }
-        profile.name = newName;
-        profile.updatedAt = Date.now();
-        SettingsData.setDisplayProfile(compositor, profileId, profile);
+        const outputSet = profileId.split("+");
+        readMonitorsJson(data => {
+            const match = findConfigEntry(data, outputSet);
+            if (!match) {
+                profileError(I18n.tr("Profile not found"));
+                return;
+            }
+            match.entry.name = newName;
+            data.configurations[match.index] = match.entry;
+            writeMonitorsJson(data, success => {
+                if (!success) return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                if (updated[profileId])
+                    updated[profileId].name = newName;
+                validatedProfiles = updated;
+            });
+        });
     }
 
     function deleteProfile(profileId) {
         const compositor = CompositorService.compositor;
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
         const isActive = SettingsData.getActiveDisplayProfile(compositor) === profileId;
+        const outputSet = profileId.split("+");
 
         profilesLoading = true;
-        Proc.runCommand("delete-profile", ["rm", "-f", profileFile], (output, exitCode) => {
-            profilesLoading = false;
-            SettingsData.removeDisplayProfile(compositor, profileId);
-            if (isActive) {
-                SettingsData.setActiveDisplayProfile(compositor, "");
-                backendWriteOutputsConfig(allOutputs);
-            }
-            const updated = JSON.parse(JSON.stringify(validatedProfiles));
-            delete updated[profileId];
-            validatedProfiles = updated;
-            matchedProfile = findMatchingProfile();
-            profileDeleted(profileId);
+        readMonitorsJson(data => {
+            const match = findConfigEntry(data, outputSet);
+            if (match)
+                data.configurations.splice(match.index, 1);
+            writeMonitorsJson(data, success => {
+                profilesLoading = false;
+                SettingsData.removeDisplayProfile(compositor, profileId);
+                if (isActive) {
+                    SettingsData.setActiveDisplayProfile(compositor, "");
+                    backendWriteOutputsConfig(allOutputs);
+                }
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                delete updated[profileId];
+                validatedProfiles = updated;
+                matchedProfile = findMatchingProfile();
+                profileDeleted(profileId);
+            });
         });
     }
 
     function activateProfile(profileId) {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profile = profiles[profileId];
-        if (!profile) {
-            profileError(I18n.tr("Profile not found"));
-            return;
-        }
-
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
-        const paths = getConfigPaths();
-        if (!paths)
-            return;
-
         manualActivation = true;
         profilesLoading = true;
-        Proc.runCommand("activate-profile", ["ln", "-sf", profileFile, paths.outputsFile], (output, exitCode) => {
-            if (exitCode !== 0) {
+        const outputSet = profileId.split("+");
+        readMonitorsJson(data => {
+            const match = findConfigEntry(data, outputSet);
+            if (!match) {
                 profilesLoading = false;
                 manualActivation = false;
-                profileError(I18n.tr("Failed to activate profile - file not found"));
+                profileError(I18n.tr("Profile not found in monitors.json"));
                 return;
             }
-            SettingsData.setActiveDisplayProfile(compositor, profileId);
-
-            const reloadCmd = CompositorService.isNiri ? ["niri", "msg", "action", "reload-config-or-panic"] : CompositorService.isHyprland ? ["hyprctl", "reload"] : [];
-            if (reloadCmd.length > 0) {
-                Proc.runCommand("reload-compositor", reloadCmd, (output2, exitCode2) => {
-                    profilesLoading = false;
-                    WlrOutputService.requestState();
-                    profileActivated(profileId, profile.name);
-                    manualActivationTimer.restart();
-                });
-            } else {
-                profilesLoading = false;
-                profileActivated(profileId, profile.name);
-                manualActivationTimer.restart();
-            }
+            applyConfigEntry(match.entry, profileId, match.entry.name || profileId, true);
         });
     }
 
@@ -298,26 +617,85 @@ Singleton {
     }
 
     Timer {
-        id: autoSelectDebounceTimer
-        interval: 800
-        onTriggered: root.doAutoSelectProfile()
+        id: autoConfigDebounceTimer
+        interval: 1000 
+        onTriggered: root.applyAutoConfig()
     }
 
-    // ! TODO - auto profile switching is buggy on niri and other compositors, might need a longer debounce before updating output configuration idk
-    function autoSelectProfile() {
-        return; // disabled
-        autoSelectDebounceTimer.restart();
-    }
-
-    function doAutoSelectProfile() {
-        return; // disabled
-        if (!SettingsData.displayProfileAutoSelect || manualActivation)
+    function applyAutoConfig() {
+        if (!SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
             return;
-        currentOutputSet = buildCurrentOutputSet();
-        const matched = findMatchingProfile();
-        matchedProfile = matched;
-        if (matched && matched !== SettingsData.getActiveDisplayProfile(CompositorService.compositor))
-            activateProfile(matched);
+        
+        readMonitorsJson(data => {
+            // 1. Exact match
+            const match = findConfigEntry(data, currentOutputSet);
+            if (match) {
+                const virtualId = Object.keys(match.entry.outputs || {}).sort().join("+");
+                if (virtualId === SettingsData.getActiveDisplayProfile(CompositorService.compositor))
+                    return;
+                applyConfigEntry(match.entry, virtualId, "", false);
+                return;
+            }
+
+            // 2. Partial match — largest saved subset of current outputs
+            // 3. No match — use all current outputs with defaults
+            const partial = findPartialConfigEntry(data, currentOutputSet);
+            const niriSettings = buildMergedNiriSettings();
+            const hyprlandSettings = buildMergedHyprlandSettings();
+            const mergedOutputs = buildOutputsWithPendingChanges();
+
+            // Start from the partial config outputs (if any)
+            const outputConfigs = partial ? JSON.parse(JSON.stringify(partial.entry.outputs || {})) : {};
+
+            // Fill in any current outputs not covered by the partial config
+            for (const name in outputs) {
+                const outputId = getOutputIdentifier(outputs[name], name);
+                const normalizedId = normalizeOutputId(outputId);
+                const alreadyCovered = Object.keys(outputConfigs).some(k => normalizeOutputId(k) === normalizedId);
+                if (!alreadyCovered) {
+                    const od = mergedOutputs[name];
+                    if (od)
+                        outputConfigs[outputId] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
+                }
+            }
+
+            if (Object.keys(outputConfigs).length === 0)
+                return;
+
+            const syntheticEntry = {name: "", outputs: outputConfigs};
+            const syntheticId = Object.keys(outputConfigs).sort().join("+");
+            applyConfigEntry(syntheticEntry, syntheticId, "", false);
+            saveConfig();
+        });
+    }
+
+    function buildCurrentOutputConfigs() {
+        const mergedAll = buildOutputsWithPendingChanges();
+        const niriSettings = buildMergedNiriSettings();
+        const hyprlandSettings = buildMergedHyprlandSettings();
+        const outputConfigs = {};
+        for (const name in outputs) {
+            const od = mergedAll[name];
+            if (od)
+                outputConfigs[getOutputIdentifier(od, name)] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
+        }
+        return outputConfigs;
+    }
+
+    function saveConfig() {
+        const outputConfigs = buildCurrentOutputConfigs();
+
+        readMonitorsJson(data => {
+            const match = findConfigEntry(data, currentOutputSet);
+            // Preserve existing name if this entry already has one
+            const existingName = match?.entry?.name;
+            const newEntry = {"name": existingName ?? "", "outputs": outputConfigs}; 
+            if (match)
+                data.configurations[match.index] = newEntry;
+            else
+                data.configurations.push(newEntry);
+            writeMonitorsJson(data, null);
+        });
     }
 
     function deleteDisconnectedOutput(outputName) {
@@ -354,11 +732,11 @@ Singleton {
 
     onOutputsChanged: {
         allOutputs = buildAllOutputsMap();
-        currentOutputSet = buildCurrentOutputSet();
-        matchedProfile = findMatchingProfile();
-        // ! TODO - auto profile switching disabled for now
-        // if (SettingsData.displayProfileAutoSelect)
-        //     Qt.callLater(autoSelectProfile);
+        const newOutputSet = buildCurrentOutputSet();
+        if (JSON.stringify(newOutputSet) === JSON.stringify(currentOutputSet))
+            return;
+        currentOutputSet = newOutputSet;
+        autoConfigDebounceTimer.restart();
     }
     onSavedOutputsChanged: allOutputs = buildAllOutputsMap()
 
@@ -370,11 +748,16 @@ Singleton {
         }
     }
 
+    Connections {
+        target: CompositorService
+        function onCompositorChanged() {
+            root.checkIncludeStatus();
+        }
+    }
+
     Component.onCompleted: {
         outputs = buildOutputsMap();
         reloadSavedOutputs();
-        checkIncludeStatus();
-        currentOutputSet = buildCurrentOutputSet();
         validateProfiles();
     }
 
@@ -840,7 +1223,7 @@ Singleton {
                     "y": output.y ?? 0,
                     "width": output.currentMode?.width ?? 1920,
                     "height": output.currentMode?.height ?? 1080,
-                    "scale": output.scale ?? 1.0,
+                    "scale": output.scale || 1.0,
                     "transform": mapWlrTransform(output.transform)
                 }
             };
@@ -1019,14 +1402,7 @@ Singleton {
     }
 
     function getOutputDisplayName(output, outputName) {
-        if (SettingsData.displayNameMode === "model" && output?.make && output?.model) {
-            if (CompositorService.isNiri) {
-                const serial = output.serial || "Unknown";
-                return output.make + " " + output.model + " " + serial;
-            }
-            return output.make + " " + output.model;
-        }
-        return outputName;
+        return getOutputIdentifier(output, outputName); 
     }
 
     function getNiriOutputIdentifier(output, outputName) {
@@ -1181,6 +1557,26 @@ Singleton {
     function getEffectiveValue(outputName, key, originalValue) {
         const pending = getPendingValue(outputName, key);
         return pending !== undefined ? pending : originalValue;
+    }
+
+    // Returns true if the given output can currently be disabled.
+    // Prevents disabling all outputs and prevents disabling the only output
+    // in a single-display configuration.
+    function canDisableOutput(output, outputName) {
+        const totalOutputs = Object.keys(outputs).length;
+        if (totalOutputs <= 1)
+            return false;
+        let enabledCount = 0;
+        for (const name in outputs) {
+            let disabled = false;
+            if (CompositorService.isNiri)
+                disabled = getNiriSetting(outputs[name], name, "disabled", false);
+            else if (CompositorService.isHyprland)
+                disabled = getHyprlandSetting(outputs[name], name, "disabled", false);
+            if (!disabled)
+                enabledCount++;
+        }
+        return enabledCount >= 2;
     }
 
     function clearPendingChanges() {
@@ -1463,6 +1859,8 @@ Singleton {
     }
 
     function confirmChanges() {
+        // saveConfig must be called before clearPendingChanges so pending changes are still available
+        saveConfig();
         clearPendingChanges();
         changesConfirmed();
     }
