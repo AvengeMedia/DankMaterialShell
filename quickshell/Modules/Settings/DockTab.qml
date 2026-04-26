@@ -526,7 +526,7 @@ Item {
                     settingKey: "dockTrashFileManager"
                     tags: ["dock", "trash", "file", "manager", "nautilus", "thunar", "dolphin", "custom"]
                     text: I18n.tr("Open Trash With")
-                    description: I18n.tr("File manager used to open the trash. Pick \"custom\" to enter your own command. Click is a no-op if none is detected.")
+                    description: I18n.tr("File manager used to open the trash. Pick \"custom\" to enter your own command.")
                     visible: SettingsData.dockShowTrash
                     currentValue: SettingsData.dockTrashFileManager
                     options: TrashService.availableFileManagers || []
