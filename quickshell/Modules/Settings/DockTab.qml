@@ -508,6 +508,38 @@ Item {
 
             SettingsCard {
                 width: parent.width
+                iconName: "delete"
+                title: I18n.tr("Trash")
+                settingKey: "dockTrash"
+
+                SettingsToggleRow {
+                    settingKey: "dockShowTrash"
+                    tags: ["dock", "trash", "bin", "recycle"]
+                    text: I18n.tr("Show Trash in Dock")
+                    description: I18n.tr("Place a trash bin at the end of the dock")
+                    checked: SettingsData.dockShowTrash
+                    onToggled: checked => SettingsData.set("dockShowTrash", checked)
+                }
+
+                SettingsDropdownRow {
+                    id: trashFmDropdown
+                    settingKey: "dockTrashFileManager"
+                    tags: ["dock", "trash", "file", "manager", "nautilus", "thunar", "dolphin"]
+                    text: I18n.tr("Open Trash With")
+                    description: I18n.tr("File manager used to open the trash. Falls back to the built-in browser if unavailable.")
+                    visible: SettingsData.dockShowTrash
+                    currentValue: SettingsData.dockTrashFileManager
+                    options: {
+                        const all = ["nautilus", "thunar", "dolphin", "builtin"];
+                        const detected = TrashService.availableFileManagers || [];
+                        return all.filter(fm => fm === "builtin" || detected.indexOf(fm) >= 0);
+                    }
+                    onValueChanged: value => SettingsData.set("dockTrashFileManager", value)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 iconName: "photo_size_select_large"
                 title: I18n.tr("Sizing")
                 settingKey: "dockSizing"
