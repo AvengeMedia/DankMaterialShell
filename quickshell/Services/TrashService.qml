@@ -37,7 +37,9 @@ Singleton {
         command: ["sh", "-c", "for fm in nautilus thunar dolphin; do command -v $fm >/dev/null 2>&1 && echo $fm; done"]
         stdout: StdioCollector {
             onStreamFinished: {
-                root.availableFileManagers = (text || "").split("\n").map(s => s.trim()).filter(s => s.length > 0);
+                const detected = (text || "").split("\n").map(s => s.trim()).filter(s => s.length > 0);
+                detected.push("custom");
+                root.availableFileManagers = detected;
             }
         }
     }
@@ -48,6 +50,15 @@ Singleton {
 
     function openTrash() {
         const choice = SettingsData.dockTrashFileManager || "nautilus";
+        if (choice === "custom") {
+            const cmd = (SettingsData.dockTrashCustomCommand || "").trim();
+            if (!cmd) {
+                console.warn("TrashService: custom command is empty; ignoring click.");
+                return;
+            }
+            Quickshell.execDetached(["sh", "-c", cmd]);
+            return;
+        }
         if (availableFileManagers.indexOf(choice) < 0) {
             console.warn("TrashService: configured file manager '" + choice + "' is not installed; ignoring click.");
             return;

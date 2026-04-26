@@ -352,6 +352,7 @@ var SPEC = {
     dockShowOverflowBadge: { def: true },
     dockShowTrash: { def: false },
     dockTrashFileManager: { def: "nautilus" },
+    dockTrashCustomCommand: { def: "" },
 
     notificationOverlayEnabled: { def: false },
     notificationPopupShadowEnabled: { def: true },

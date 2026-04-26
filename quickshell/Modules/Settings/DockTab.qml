@@ -524,13 +524,58 @@ Item {
                 SettingsDropdownRow {
                     id: trashFmDropdown
                     settingKey: "dockTrashFileManager"
-                    tags: ["dock", "trash", "file", "manager", "nautilus", "thunar", "dolphin"]
+                    tags: ["dock", "trash", "file", "manager", "nautilus", "thunar", "dolphin", "custom"]
                     text: I18n.tr("Open Trash With")
-                    description: I18n.tr("File manager used to open the trash. Click is a no-op if none is installed.")
+                    description: I18n.tr("File manager used to open the trash. Pick \"custom\" to enter your own command. Click is a no-op if none is detected.")
                     visible: SettingsData.dockShowTrash
                     currentValue: SettingsData.dockTrashFileManager
                     options: TrashService.availableFileManagers || []
                     onValueChanged: value => SettingsData.set("dockTrashFileManager", value)
+                }
+
+                FocusScope {
+                    width: parent.width - Theme.spacingM * 2
+                    height: visible ? trashCustomCommandColumn.implicitHeight : 0
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingM
+                    visible: SettingsData.dockShowTrash && SettingsData.dockTrashFileManager === "custom"
+
+                    Column {
+                        id: trashCustomCommandColumn
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Custom open-trash command")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: trashCustomCommandField
+                            width: parent.width
+                            placeholderText: "pcmanfm trash:///"
+                            backgroundColor: Theme.surfaceContainerHighest
+                            normalBorderColor: Theme.outlineMedium
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.dockTrashCustomCommand) {
+                                    text = SettingsData.dockTrashCustomCommand;
+                                }
+                            }
+
+                            onTextEdited: SettingsData.set("dockTrashCustomCommand", text.trim())
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onPressed: mouse => {
+                                    trashCustomCommandField.forceActiveFocus();
+                                    mouse.accepted = false;
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
