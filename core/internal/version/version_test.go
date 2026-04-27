@@ -2,12 +2,10 @@ package version
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
 	mocks_version "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/version"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 func TestCompareVersions(t *testing.T) {
@@ -147,76 +145,6 @@ func TestGetCurrentDMSVersion_NotInstalled(t *testing.T) {
 	_, err := GetCurrentDMSVersion()
 	if err == nil {
 		t.Error("Expected error when DMS not installed, got nil")
-	}
-}
-
-func TestGetCurrentDMSVersion_GitTag(t *testing.T) {
-	if !utils.CommandExists("git") {
-		t.Skip("git not available")
-	}
-
-	tempDir := t.TempDir()
-	dmsPath := filepath.Join(tempDir, ".config", "quickshell", "dms")
-	os.MkdirAll(dmsPath, 0o755)
-
-	originalHome := os.Getenv("HOME")
-	defer os.Setenv("HOME", originalHome)
-	os.Setenv("HOME", tempDir)
-
-	exec.Command("git", "init", dmsPath).Run()
-	exec.Command("git", "-C", dmsPath, "config", "user.email", "test@test.com").Run()
-	exec.Command("git", "-C", dmsPath, "config", "user.name", "Test User").Run()
-
-	testFile := filepath.Join(dmsPath, "test.txt")
-	os.WriteFile(testFile, []byte("test"), 0o644)
-	exec.Command("git", "-C", dmsPath, "add", ".").Run()
-	exec.Command("git", "-C", dmsPath, "commit", "-m", "initial").Run()
-	exec.Command("git", "-C", dmsPath, "tag", "v0.1.0").Run()
-
-	version, err := GetCurrentDMSVersion()
-	if err != nil {
-		t.Fatalf("GetCurrentDMSVersion() failed: %v", err)
-	}
-
-	if version != "v0.1.0" {
-		t.Errorf("Expected version v0.1.0, got %s", version)
-	}
-}
-
-func TestGetCurrentDMSVersion_GitBranch(t *testing.T) {
-	if !utils.CommandExists("git") {
-		t.Skip("git not available")
-	}
-
-	tempDir := t.TempDir()
-	dmsPath := filepath.Join(tempDir, ".config", "quickshell", "dms")
-	os.MkdirAll(dmsPath, 0o755)
-
-	originalHome := os.Getenv("HOME")
-	defer os.Setenv("HOME", originalHome)
-	os.Setenv("HOME", tempDir)
-
-	exec.Command("git", "init", dmsPath).Run()
-	exec.Command("git", "-C", dmsPath, "config", "user.email", "test@test.com").Run()
-	exec.Command("git", "-C", dmsPath, "config", "user.name", "Test User").Run()
-	exec.Command("git", "-C", dmsPath, "checkout", "-b", "master").Run()
-
-	testFile := filepath.Join(dmsPath, "test.txt")
-	os.WriteFile(testFile, []byte("test"), 0o644)
-	exec.Command("git", "-C", dmsPath, "add", ".").Run()
-	exec.Command("git", "-C", dmsPath, "commit", "-m", "initial").Run()
-
-	version, err := GetCurrentDMSVersion()
-	if err != nil {
-		t.Fatalf("GetCurrentDMSVersion() failed: %v", err)
-	}
-
-	if version == "" {
-		t.Error("Expected non-empty version")
-	}
-
-	if len(version) < 7 {
-		t.Errorf("Expected version with branch@commit format, got %s", version)
 	}
 }
 

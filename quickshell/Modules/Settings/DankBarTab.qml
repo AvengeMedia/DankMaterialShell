@@ -311,9 +311,7 @@ Item {
                                                 const prefs = cfg?.screenPreferences || ["all"];
                                                 if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all"))
                                                     return I18n.tr("All displays");
-                                                return prefs.length === 1
-                                                    ? I18n.tr("%1 display").arg(prefs.length)
-                                                    : I18n.tr("%1 displays").arg(prefs.length);
+                                                return prefs.length === 1 ? I18n.tr("%1 display").arg(prefs.length) : I18n.tr("%1 displays").arg(prefs.length);
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText
@@ -422,9 +420,69 @@ Item {
             }
 
             SettingsCard {
+                iconName: "vertical_align_center"
+                title: I18n.tr("Position")
+                settingKey: "barPosition"
+                visible: selectedBarConfig?.enabled
+
+                Item {
+                    width: parent.width
+                    height: positionButtonGroup.height
+
+                    DankButtonGroup {
+                        id: positionButtonGroup
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        model: [I18n.tr("Top"), I18n.tr("Bottom"), I18n.tr("Left"), I18n.tr("Right")]
+                        currentIndex: {
+                            selectedBarId;
+                            const config = SettingsData.getBarConfig(selectedBarId);
+                            const pos = config?.position ?? 0;
+                            switch (pos) {
+                            case SettingsData.Position.Top:
+                                return 0;
+                            case SettingsData.Position.Bottom:
+                                return 1;
+                            case SettingsData.Position.Left:
+                                return 2;
+                            case SettingsData.Position.Right:
+                                return 3;
+                            default:
+                                return 0;
+                            }
+                        }
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            let newPos = 0;
+                            switch (index) {
+                            case 0:
+                                newPos = SettingsData.Position.Top;
+                                break;
+                            case 1:
+                                newPos = SettingsData.Position.Bottom;
+                                break;
+                            case 2:
+                                newPos = SettingsData.Position.Left;
+                                break;
+                            case 3:
+                                newPos = SettingsData.Position.Right;
+                                break;
+                            }
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                position: newPos
+                            });
+                            notifyHorizontalBarChange();
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
                 iconName: "display_settings"
                 title: I18n.tr("Display Assignment")
                 settingKey: "barDisplay"
+                collapsible: true
+                expanded: false
                 visible: selectedBarConfig?.enabled
 
                 StyledText {
@@ -527,67 +585,11 @@ Item {
             }
 
             SettingsCard {
-                iconName: "vertical_align_center"
-                title: I18n.tr("Position")
-                settingKey: "barPosition"
-                visible: selectedBarConfig?.enabled
-
-                Item {
-                    width: parent.width
-                    height: positionButtonGroup.height
-
-                    DankButtonGroup {
-                        id: positionButtonGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        model: [I18n.tr("Top"), I18n.tr("Bottom"), I18n.tr("Left"), I18n.tr("Right")]
-                        currentIndex: {
-                            selectedBarId;
-                            const config = SettingsData.getBarConfig(selectedBarId);
-                            const pos = config?.position ?? 0;
-                            switch (pos) {
-                            case SettingsData.Position.Top:
-                                return 0;
-                            case SettingsData.Position.Bottom:
-                                return 1;
-                            case SettingsData.Position.Left:
-                                return 2;
-                            case SettingsData.Position.Right:
-                                return 3;
-                            default:
-                                return 0;
-                            }
-                        }
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            let newPos = 0;
-                            switch (index) {
-                            case 0:
-                                newPos = SettingsData.Position.Top;
-                                break;
-                            case 1:
-                                newPos = SettingsData.Position.Bottom;
-                                break;
-                            case 2:
-                                newPos = SettingsData.Position.Left;
-                                break;
-                            case 3:
-                                newPos = SettingsData.Position.Right;
-                                break;
-                            }
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                position: newPos
-                            });
-                            notifyHorizontalBarChange();
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
                 iconName: "visibility_off"
                 title: I18n.tr("Visibility")
                 settingKey: "barVisibility"
+                collapsible: true
+                expanded: false
                 visible: selectedBarConfig?.enabled
 
                 SettingsToggleRow {
@@ -698,101 +700,6 @@ Item {
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
                             openOnOverview: toggled
-                        });
-                    }
-                }
-            }
-
-            SettingsToggleCard {
-                iconName: "fit_screen"
-                title: I18n.tr("Maximize Detection")
-                description: I18n.tr("Remove gaps and border when windows are maximized")
-                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland)
-                checked: selectedBarConfig?.maximizeDetection ?? true
-                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                        maximizeDetection: checked
-                    })
-            }
-
-            SettingsToggleCard {
-                iconName: "mouse"
-                title: I18n.tr("Scroll Wheel")
-                description: I18n.tr("Control workspaces and columns by scrolling on the bar")
-                visible: selectedBarConfig?.enabled
-                checked: selectedBarConfig?.scrollEnabled ?? true
-                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                        scrollEnabled: checked
-                    })
-
-                SettingsButtonGroupRow {
-                    text: I18n.tr("Y Axis")
-                    model: CompositorService.isNiri ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")] : [I18n.tr("None"), I18n.tr("Workspace")]
-                    currentIndex: {
-                        switch (selectedBarConfig?.scrollYBehavior || "workspace") {
-                        case "none":
-                            return 0;
-                        case "workspace":
-                            return 1;
-                        case "column":
-                            return 2;
-                        default:
-                            return 1;
-                        }
-                    }
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        let behavior = "workspace";
-                        switch (index) {
-                        case 0:
-                            behavior = "none";
-                            break;
-                        case 1:
-                            behavior = "workspace";
-                            break;
-                        case 2:
-                            behavior = "column";
-                            break;
-                        }
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            scrollYBehavior: behavior
-                        });
-                    }
-                }
-
-                SettingsButtonGroupRow {
-                    text: I18n.tr("X Axis")
-                    visible: CompositorService.isNiri
-                    model: [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")]
-                    currentIndex: {
-                        switch (selectedBarConfig?.scrollXBehavior || "column") {
-                        case "none":
-                            return 0;
-                        case "workspace":
-                            return 1;
-                        case "column":
-                            return 2;
-                        default:
-                            return 2;
-                        }
-                    }
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        let behavior = "column";
-                        switch (index) {
-                        case 0:
-                            behavior = "none";
-                            break;
-                        case 1:
-                            behavior = "workspace";
-                            break;
-                        case 2:
-                            behavior = "column";
-                            break;
-                        }
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            scrollXBehavior: behavior
                         });
                     }
                 }
@@ -945,56 +852,6 @@ Item {
                 }
             }
 
-            SettingsSliderCard {
-                id: fontScaleSliderCard
-                iconName: "text_fields"
-                title: I18n.tr("Font Scale")
-                description: I18n.tr("Scale DankBar font sizes independently")
-                visible: selectedBarConfig?.enabled
-                minimum: 50
-                maximum: 200
-                value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
-                unit: "%"
-                defaultValue: 100
-                onSliderValueChanged: newValue => {
-                    SettingsData.updateBarConfig(selectedBarId, {
-                        fontScale: newValue / 100
-                    });
-                }
-
-                Binding {
-                    target: fontScaleSliderCard
-                    property: "value"
-                    value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
-                    restoreMode: Binding.RestoreBinding
-                }
-            }
-
-            SettingsSliderCard {
-                id: iconScaleSliderCard
-                iconName: "interests"
-                title: I18n.tr("Icon Scale")
-                description: I18n.tr("Scale DankBar icon sizes independently")
-                visible: selectedBarConfig?.enabled
-                minimum: 50
-                maximum: 200
-                value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
-                unit: "%"
-                defaultValue: 100
-                onSliderValueChanged: newValue => {
-                    SettingsData.updateBarConfig(selectedBarId, {
-                        iconScale: newValue / 100
-                    });
-                }
-
-                Binding {
-                    target: iconScaleSliderCard
-                    property: "value"
-                    value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
-                    restoreMode: Binding.RestoreBinding
-                }
-            }
-
             SettingsCard {
                 iconName: "opacity"
                 title: I18n.tr("Transparency")
@@ -1046,13 +903,455 @@ Item {
                 }
             }
 
+            SettingsSliderCard {
+                id: fontScaleSliderCard
+                iconName: "text_fields"
+                title: I18n.tr("Font Scale")
+                description: I18n.tr("Scale DankBar font sizes independently")
+                visible: selectedBarConfig?.enabled
+                minimum: 50
+                maximum: 200
+                value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
+                unit: "%"
+                defaultValue: 100
+                onSliderValueChanged: newValue => {
+                    SettingsData.updateBarConfig(selectedBarId, {
+                        fontScale: newValue / 100
+                    });
+                }
+
+                Binding {
+                    target: fontScaleSliderCard
+                    property: "value"
+                    value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
+                    restoreMode: Binding.RestoreBinding
+                }
+            }
+
+            SettingsSliderCard {
+                id: iconScaleSliderCard
+                iconName: "interests"
+                title: I18n.tr("Icon Scale")
+                description: I18n.tr("Scale DankBar icon sizes independently")
+                visible: selectedBarConfig?.enabled
+                minimum: 50
+                maximum: 200
+                value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
+                unit: "%"
+                defaultValue: 100
+                onSliderValueChanged: newValue => {
+                    SettingsData.updateBarConfig(selectedBarId, {
+                        iconScale: newValue / 100
+                    });
+                }
+
+                Binding {
+                    target: iconScaleSliderCard
+                    property: "value"
+                    value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
+                    restoreMode: Binding.RestoreBinding
+                }
+            }
+
+            SettingsCard {
+                iconName: "rounded_corner"
+                title: I18n.tr("Corners & Background")
+                settingKey: "barCorners"
+                collapsible: true
+                expanded: false
+                visible: selectedBarConfig?.enabled
+
+                SettingsToggleRow {
+                    text: I18n.tr("Square Corners")
+                    checked: selectedBarConfig?.squareCorners ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            squareCorners: checked
+                        })
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("No Background")
+                    checked: selectedBarConfig?.noBackground ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            noBackground: checked
+                        })
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Maximize Widget Icons")
+                    checked: selectedBarConfig?.maximizeWidgetIcons ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            maximizeWidgetIcons: checked
+                        })
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Maximize Widget Text")
+                    checked: selectedBarConfig?.maximizeWidgetText ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            maximizeWidgetText: checked
+                        })
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Remove Widget Padding")
+                    checked: selectedBarConfig?.removeWidgetPadding ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            removeWidgetPadding: checked
+                        })
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Goth Corners")
+                    checked: selectedBarConfig?.gothCornersEnabled ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            gothCornersEnabled: checked
+                        })
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Corner Radius Override")
+                    checked: selectedBarConfig?.gothCornerRadiusOverride ?? false
+                    visible: selectedBarConfig?.gothCornersEnabled ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            gothCornerRadiusOverride: checked
+                        })
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: (selectedBarConfig?.gothCornersEnabled ?? false) && (selectedBarConfig?.gothCornerRadiusOverride ?? false)
+                    leftPadding: Theme.spacingM
+
+                    SettingsSliderRow {
+                        id: gothCornerRadiusSlider
+                        width: parent.width - parent.leftPadding
+                        text: I18n.tr("Goth Corner Radius")
+                        value: selectedBarConfig?.gothCornerRadiusValue ?? 12
+                        minimum: 0
+                        maximum: 64
+                        defaultValue: 12
+                        onSliderDragFinished: finalValue => {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                gothCornerRadiusValue: finalValue
+                            });
+                        }
+
+                        Binding {
+                            target: gothCornerRadiusSlider
+                            property: "value"
+                            value: selectedBarConfig?.gothCornerRadiusValue ?? 12
+                            restoreMode: Binding.RestoreBinding
+                        }
+                    }
+                }
+            }
+
+            SettingsToggleCard {
+                iconName: "fit_screen"
+                title: I18n.tr("Maximize Detection")
+                description: I18n.tr("Remove gaps and border when windows are maximized")
+                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland)
+                checked: selectedBarConfig?.maximizeDetection ?? true
+                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                        maximizeDetection: checked
+                    })
+            }
+
+            SettingsCard {
+                iconName: "filter_b_and_w"
+                title: I18n.tr("System Tray Icon Tint")
+                settingKey: "trayIconTint"
+                visible: selectedBarConfig?.enabled
+
+                StyledText {
+                    text: I18n.tr("Choose monochrome or a theme color tint for system tray icons")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                    width: parent.width
+                    horizontalAlignment: Text.AlignLeft
+                }
+
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Mode")
+                    model: [I18n.tr("None"), I18n.tr("Monochrome"), I18n.tr("Primary"), I18n.tr("Secondary")]
+                    currentIndex: {
+                        let mode = SettingsData.systemTrayIconTintMode || "none";
+                        switch (mode) {
+                        case "monochrome":
+                            return 1;
+                        case "primary":
+                            return 2;
+                        case "secondary":
+                            return 3;
+                        default:
+                            return 0;
+                        }
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+
+                        let mode = "none";
+                        switch (index) {
+                        case 1:
+                            mode = "monochrome";
+                            break;
+                        case 2:
+                            mode = "primary";
+                            break;
+                        case 3:
+                            mode = "secondary";
+                            break;
+                        }
+
+                        SettingsData.set("systemTrayIconTintMode", mode);
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: trayTintSaturationSlider
+                    text: I18n.tr("Tint Saturation")
+                    description: I18n.tr("Controls how much original icon color is removed before applying tint")
+                    visible: {
+                        const mode = SettingsData.systemTrayIconTintMode || "none";
+                        return mode === "primary" || mode === "secondary";
+                    }
+                    value: SettingsData.systemTrayIconTintSaturation ?? 50
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 50
+                    onSliderDragFinished: finalValue => SettingsData.set("systemTrayIconTintSaturation", finalValue)
+
+                    Binding {
+                        target: trayTintSaturationSlider
+                        property: "value"
+                        value: SettingsData.systemTrayIconTintSaturation ?? 50
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: trayTintStrengthSlider
+                    text: I18n.tr("Tint Strength")
+                    description: I18n.tr("Controls how strongly the selected tint color is applied")
+                    visible: {
+                        const mode = SettingsData.systemTrayIconTintMode || "none";
+                        return mode === "primary" || mode === "secondary";
+                    }
+                    value: SettingsData.systemTrayIconTintStrength ?? 135
+                    minimum: 0
+                    maximum: 200
+                    unit: "%"
+                    defaultValue: 135
+                    onSliderDragFinished: finalValue => SettingsData.set("systemTrayIconTintStrength", finalValue)
+
+                    Binding {
+                        target: trayTintStrengthSlider
+                        property: "value"
+                        value: SettingsData.systemTrayIconTintStrength ?? 135
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+            }
+
+            SettingsToggleCard {
+                iconName: "border_style"
+                title: I18n.tr("Border")
+                visible: selectedBarConfig?.enabled
+                checked: selectedBarConfig?.borderEnabled ?? false
+                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                        borderEnabled: checked
+                    })
+
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Color")
+                    model: ["Surface", "Secondary", "Primary"]
+                    currentIndex: {
+                        switch (selectedBarConfig?.borderColor || "surfaceText") {
+                        case "surfaceText":
+                            return 0;
+                        case "secondary":
+                            return 1;
+                        case "primary":
+                            return 2;
+                        default:
+                            return 0;
+                        }
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        let newColor = "surfaceText";
+                        switch (index) {
+                        case 0:
+                            newColor = "surfaceText";
+                            break;
+                        case 1:
+                            newColor = "secondary";
+                            break;
+                        case 2:
+                            newColor = "primary";
+                            break;
+                        }
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            borderColor: newColor
+                        });
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: borderOpacitySlider
+                    text: I18n.tr("Opacity")
+                    value: (selectedBarConfig?.borderOpacity ?? 1.0) * 100
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            borderOpacity: finalValue / 100
+                        });
+                    }
+
+                    Binding {
+                        target: borderOpacitySlider
+                        property: "value"
+                        value: (selectedBarConfig?.borderOpacity ?? 1.0) * 100
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: borderThicknessSlider
+                    text: I18n.tr("Thickness")
+                    value: selectedBarConfig?.borderThickness ?? 1
+                    minimum: 1
+                    maximum: 10
+                    unit: "px"
+                    defaultValue: 1
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            borderThickness: finalValue
+                        });
+                    }
+
+                    Binding {
+                        target: borderThicknessSlider
+                        property: "value"
+                        value: selectedBarConfig?.borderThickness ?? 1
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+            }
+
+            SettingsToggleCard {
+                iconName: "highlight"
+                title: I18n.tr("Widget Outline")
+                visible: selectedBarConfig?.enabled
+                checked: selectedBarConfig?.widgetOutlineEnabled ?? false
+                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                        widgetOutlineEnabled: checked
+                    })
+
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Color")
+                    model: ["Surface", "Secondary", "Primary"]
+                    currentIndex: {
+                        switch (selectedBarConfig?.widgetOutlineColor || "primary") {
+                        case "surfaceText":
+                            return 0;
+                        case "secondary":
+                            return 1;
+                        case "primary":
+                            return 2;
+                        default:
+                            return 2;
+                        }
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        let newColor = "primary";
+                        switch (index) {
+                        case 0:
+                            newColor = "surfaceText";
+                            break;
+                        case 1:
+                            newColor = "secondary";
+                            break;
+                        case 2:
+                            newColor = "primary";
+                            break;
+                        }
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            widgetOutlineColor: newColor
+                        });
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: widgetOutlineOpacitySlider
+                    text: I18n.tr("Opacity")
+                    value: (selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            widgetOutlineOpacity: finalValue / 100
+                        });
+                    }
+
+                    Binding {
+                        target: widgetOutlineOpacitySlider
+                        property: "value"
+                        value: (selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: widgetOutlineThicknessSlider
+                    text: I18n.tr("Thickness")
+                    value: selectedBarConfig?.widgetOutlineThickness ?? 1
+                    minimum: 1
+                    maximum: 10
+                    unit: "px"
+                    defaultValue: 1
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            widgetOutlineThickness: finalValue
+                        });
+                    }
+
+                    Binding {
+                        target: widgetOutlineThicknessSlider
+                        property: "value"
+                        value: selectedBarConfig?.widgetOutlineThickness ?? 1
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+            }
+
             SettingsCard {
                 id: shadowCard
                 iconName: "layers"
                 title: I18n.tr("Shadow Override", "bar shadow settings card")
                 settingKey: "barShadow"
                 collapsible: true
-                expanded: true
+                expanded: false
                 visible: selectedBarConfig?.enabled
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
@@ -1277,217 +1576,63 @@ Item {
                 }
             }
 
-            SettingsCard {
-                iconName: "rounded_corner"
-                title: I18n.tr("Corners & Background")
-                settingKey: "barCorners"
-                collapsible: true
-                expanded: false
-                visible: selectedBarConfig?.enabled
-
-                SettingsToggleRow {
-                    text: I18n.tr("Square Corners")
-                    checked: selectedBarConfig?.squareCorners ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            squareCorners: checked
-                        })
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("No Background")
-                    checked: selectedBarConfig?.noBackground ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            noBackground: checked
-                        })
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("Maximize Widget Icons")
-                    checked: selectedBarConfig?.maximizeWidgetIcons ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            maximizeWidgetIcons: checked
-                        })
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("Maximize Widget Text")
-                    checked: selectedBarConfig?.maximizeWidgetText ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            maximizeWidgetText: checked
-                        })
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("Remove Widget Padding")
-                    checked: selectedBarConfig?.removeWidgetPadding ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            removeWidgetPadding: checked
-                        })
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("Goth Corners")
-                    checked: selectedBarConfig?.gothCornersEnabled ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            gothCornersEnabled: checked
-                        })
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("Corner Radius Override")
-                    checked: selectedBarConfig?.gothCornerRadiusOverride ?? false
-                    visible: selectedBarConfig?.gothCornersEnabled ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            gothCornerRadiusOverride: checked
-                        })
-                }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
-                    visible: (selectedBarConfig?.gothCornersEnabled ?? false) && (selectedBarConfig?.gothCornerRadiusOverride ?? false)
-                    leftPadding: Theme.spacingM
-
-                    SettingsSliderRow {
-                        id: gothCornerRadiusSlider
-                        width: parent.width - parent.leftPadding
-                        text: I18n.tr("Goth Corner Radius")
-                        value: selectedBarConfig?.gothCornerRadiusValue ?? 12
-                        minimum: 0
-                        maximum: 64
-                        defaultValue: 12
-                        onSliderDragFinished: finalValue => {
-                            SettingsData.updateBarConfig(selectedBarId, {
-                                gothCornerRadiusValue: finalValue
-                            });
-                        }
-
-                        Binding {
-                            target: gothCornerRadiusSlider
-                            property: "value"
-                            value: selectedBarConfig?.gothCornerRadiusValue ?? 12
-                            restoreMode: Binding.RestoreBinding
-                        }
-                    }
-                }
-            }
-
             SettingsToggleCard {
-                iconName: "border_style"
-                title: I18n.tr("Border")
+                iconName: "mouse"
+                title: I18n.tr("Scroll Wheel")
+                description: I18n.tr("Control workspaces and columns by scrolling on the bar")
                 visible: selectedBarConfig?.enabled
-                checked: selectedBarConfig?.borderEnabled ?? false
+                checked: selectedBarConfig?.scrollEnabled ?? true
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                        borderEnabled: checked
+                        scrollEnabled: checked
                     })
 
                 SettingsButtonGroupRow {
-                    text: I18n.tr("Color")
-                    model: ["Surface", "Secondary", "Primary"]
+                    text: I18n.tr("Y Axis")
+                    model: CompositorService.isNiri ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")] : [I18n.tr("None"), I18n.tr("Workspace")]
                     currentIndex: {
-                        switch (selectedBarConfig?.borderColor || "surfaceText") {
-                        case "surfaceText":
+                        switch (selectedBarConfig?.scrollYBehavior || "workspace") {
+                        case "none":
                             return 0;
-                        case "secondary":
+                        case "workspace":
                             return 1;
-                        case "primary":
+                        case "column":
                             return 2;
                         default:
-                            return 0;
+                            return 1;
                         }
                     }
                     onSelectionChanged: (index, selected) => {
                         if (!selected)
                             return;
-                        let newColor = "surfaceText";
+                        let behavior = "workspace";
                         switch (index) {
                         case 0:
-                            newColor = "surfaceText";
+                            behavior = "none";
                             break;
                         case 1:
-                            newColor = "secondary";
+                            behavior = "workspace";
                             break;
                         case 2:
-                            newColor = "primary";
+                            behavior = "column";
                             break;
                         }
                         SettingsData.updateBarConfig(selectedBarId, {
-                            borderColor: newColor
+                            scrollYBehavior: behavior
                         });
                     }
                 }
-
-                SettingsSliderRow {
-                    id: borderOpacitySlider
-                    text: I18n.tr("Opacity")
-                    value: (selectedBarConfig?.borderOpacity ?? 1.0) * 100
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            borderOpacity: finalValue / 100
-                        });
-                    }
-
-                    Binding {
-                        target: borderOpacitySlider
-                        property: "value"
-                        value: (selectedBarConfig?.borderOpacity ?? 1.0) * 100
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsSliderRow {
-                    id: borderThicknessSlider
-                    text: I18n.tr("Thickness")
-                    value: selectedBarConfig?.borderThickness ?? 1
-                    minimum: 1
-                    maximum: 10
-                    unit: "px"
-                    defaultValue: 1
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            borderThickness: finalValue
-                        });
-                    }
-
-                    Binding {
-                        target: borderThicknessSlider
-                        property: "value"
-                        value: selectedBarConfig?.borderThickness ?? 1
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-            }
-
-            SettingsToggleCard {
-                iconName: "highlight"
-                title: I18n.tr("Widget Outline")
-                visible: selectedBarConfig?.enabled
-                checked: selectedBarConfig?.widgetOutlineEnabled ?? false
-                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                        widgetOutlineEnabled: checked
-                    })
 
                 SettingsButtonGroupRow {
-                    text: I18n.tr("Color")
-                    model: ["Surface", "Secondary", "Primary"]
+                    text: I18n.tr("X Axis")
+                    visible: CompositorService.isNiri
+                    model: [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")]
                     currentIndex: {
-                        switch (selectedBarConfig?.widgetOutlineColor || "primary") {
-                        case "surfaceText":
+                        switch (selectedBarConfig?.scrollXBehavior || "column") {
+                        case "none":
                             return 0;
-                        case "secondary":
+                        case "workspace":
                             return 1;
-                        case "primary":
+                        case "column":
                             return 2;
                         default:
                             return 2;
@@ -1496,65 +1641,21 @@ Item {
                     onSelectionChanged: (index, selected) => {
                         if (!selected)
                             return;
-                        let newColor = "primary";
+                        let behavior = "column";
                         switch (index) {
                         case 0:
-                            newColor = "surfaceText";
+                            behavior = "none";
                             break;
                         case 1:
-                            newColor = "secondary";
+                            behavior = "workspace";
                             break;
                         case 2:
-                            newColor = "primary";
+                            behavior = "column";
                             break;
                         }
                         SettingsData.updateBarConfig(selectedBarId, {
-                            widgetOutlineColor: newColor
+                            scrollXBehavior: behavior
                         });
-                    }
-                }
-
-                SettingsSliderRow {
-                    id: widgetOutlineOpacitySlider
-                    text: I18n.tr("Opacity")
-                    value: (selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            widgetOutlineOpacity: finalValue / 100
-                        });
-                    }
-
-                    Binding {
-                        target: widgetOutlineOpacitySlider
-                        property: "value"
-                        value: (selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsSliderRow {
-                    id: widgetOutlineThicknessSlider
-                    text: I18n.tr("Thickness")
-                    value: selectedBarConfig?.widgetOutlineThickness ?? 1
-                    minimum: 1
-                    maximum: 10
-                    unit: "px"
-                    defaultValue: 1
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            widgetOutlineThickness: finalValue
-                        });
-                    }
-
-                    Binding {
-                        target: widgetOutlineThicknessSlider
-                        property: "value"
-                        value: selectedBarConfig?.widgetOutlineThickness ?? 1
-                        restoreMode: Binding.RestoreBinding
                     }
                 }
             }

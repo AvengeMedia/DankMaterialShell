@@ -40,6 +40,7 @@ Singleton {
     property bool nightModeEnabled: false
     property bool automationAvailable: false
     property bool gammaControlAvailable: false
+    property int resumeRecoveryAttempt: 0
 
     property var gammaState: ({})
     property int gammaCurrentTemp: gammaState?.currentTemp ?? 0
@@ -672,6 +673,15 @@ Singleton {
         }
     }
 
+    function runResumeRecoveryPass() {
+        checkGammaControlAvailability();
+        rescanDevices();
+
+        if (nightModeEnabled) {
+            evaluateNightMode();
+        }
+    }
+
     function checkGammaControlAvailability() {
         if (!DMSService.isConnected) {
             return;
@@ -727,6 +737,31 @@ Singleton {
                 applyNightModeDirectly();
             }
             nextAction = "";
+        }
+    }
+
+    Timer {
+        id: resumeRecoveryTimer
+        interval: 400
+        repeat: false
+
+        onTriggered: {
+            runResumeRecoveryPass();
+            resumeRecoveryAttempt++;
+
+            switch (resumeRecoveryAttempt) {
+            case 1:
+                interval = 1400;
+                restart();
+                return;
+            case 2:
+                interval = 2600;
+                restart();
+                return;
+            }
+
+            resumeRecoveryAttempt = 0;
+            interval = 400;
         }
     }
 
@@ -815,16 +850,20 @@ Singleton {
             updateSingleDevice(device);
         }
 
-        function onLoginctlEvent(event) {
-            if (event.event === "unlock" || event.event === "resume") {
-                suppressOsd = true;
-                osdSuppressTimer.restart();
-                evaluateNightMode();
-            }
-        }
-
         function onGammaStateUpdate(data) {
             root.gammaState = data;
+        }
+    }
+
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            suppressOsd = true;
+            osdSuppressTimer.restart();
+            resumeRecoveryAttempt = 0;
+            resumeRecoveryTimer.interval = 400;
+            resumeRecoveryTimer.restart();
         }
     }
 

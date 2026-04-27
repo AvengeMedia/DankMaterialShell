@@ -29,23 +29,21 @@ Rectangle {
         return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor);
     }
 
-    readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _containerBg: Theme.ccPillInactiveBg
 
     color: {
-        const baseColor = bodyMouse.containsMouse ? Theme.primaryPressed : _containerBg;
+        const baseColor = bodyMouse.containsMouse ? Theme.ccPillInactiveHoverBg : _containerBg;
         return baseColor;
     }
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.10)
-    border.width: 0
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
     antialiasing: true
 
     readonly property color _labelPrimary: Theme.surfaceText
     readonly property color _labelSecondary: Theme.surfaceVariantText
     readonly property color _tileBgActive: Theme.ccTileActiveBg
     readonly property color _tileBgInactive: {
-        const transparency = Theme.popupTransparency;
-        const surface = Theme.surfaceContainer || Qt.rgba(0.1, 0.1, 0.1, 1);
-        return Qt.rgba(surface.r, surface.g, surface.b, transparency);
+        return Theme.ccTileInactiveBg;
     }
     readonly property color _tileRingActive: Theme.ccTileRing
     readonly property color _tileRingInactive: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.18)
@@ -92,8 +90,8 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             radius: _tileRadius
             color: isActive ? _tileBgActive : _tileBgInactive
-            border.color: isActive ? _tileRingActive : "transparent"
-            border.width: isActive ? 1 : 0
+            border.color: isActive ? _tileRingActive : Theme.outlineMedium
+            border.width: isActive ? 1 : Theme.layerOutlineWidth
             antialiasing: true
 
             Rectangle {

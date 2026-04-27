@@ -526,5 +526,6 @@ func getCommonCommands() []*cobra.Command {
 		dlCmd,
 		randrCmd,
 		blurCmd,
+		trashCmd,
 	}
 }

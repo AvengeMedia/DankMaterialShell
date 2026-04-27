@@ -915,6 +915,31 @@
     "icon": "visibility_off"
   },
   {
+    "section": "trayIconTint",
+    "label": "System Tray Icon Tint",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "icon",
+      "icons",
+      "monochrome",
+      "panel",
+      "primary",
+      "secondary",
+      "saturation",
+      "status",
+      "statusbar",
+      "strength",
+      "taskbar",
+      "tint",
+      "tray"
+    ],
+    "icon": "filter_b_and_w",
+    "description": "Choose monochrome or a theme color tint for system tray icons"
+  },
+  {
     "section": "workspaceDragReorder",
     "label": "Drag to Reorder",
     "tabIndex": 4,
@@ -2871,6 +2896,60 @@
     ]
   },
   {
+    "section": "blurForegroundLayers",
+    "label": "Foreground Layers",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "blur",
+      "blurred",
+      "colors",
+      "contrast",
+      "foreground",
+      "frosted",
+      "glass",
+      "layers",
+      "look",
+      "panels",
+      "scheme",
+      "show",
+      "stronger",
+      "style",
+      "surfaces",
+      "theme"
+    ],
+    "description": "Show foreground surfaces on blurred panels for stronger contrast"
+  },
+  {
+    "section": "blurLayerOutlineOpacity",
+    "label": "Layer Outline Opacity",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "blur",
+      "border",
+      "cards",
+      "colors",
+      "contrast",
+      "control",
+      "foreground",
+      "frosted",
+      "glass",
+      "intensity",
+      "layers",
+      "notifications",
+      "opacity",
+      "outline",
+      "pills",
+      "surfaces",
+      "theme",
+      "widgets"
+    ],
+    "description": "Controls outlines around blurred foreground cards, pills, and notification cards"
+  },
+  {
     "section": "matugenTemplateGtk",
     "label": "GTK",
     "tabIndex": 10,
@@ -4532,6 +4611,27 @@
       "startup"
     ],
     "description": "Automatically lock the screen when DMS starts"
+  },
+  {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "automatic",
+      "automatically",
+      "before",
+      "lock",
+      "login",
+      "password",
+      "prepares",
+      "screen",
+      "security",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "lockScreenNotificationMode",
@@ -6556,27 +6656,6 @@
     "description": "Gradually fade the screen before locking with a configurable grace period"
   },
   {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "automatically",
-      "before",
-      "energy",
-      "lock",
-      "power",
-      "prepares",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
-  },
-  {
     "section": "fadeToLockGracePeriod",
     "label": "Lock fade grace period",
     "tabIndex": 21,
@@ -6737,6 +6816,29 @@
       "monitor",
       "monitors",
       "off",
+      "power",
+      "screen",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "timeout",
+      "turn"
+    ]
+  },
+  {
+    "section": "postLockMonitorTimeout",
+    "label": "Turn off monitors after lock",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "after",
+      "display",
+      "energy",
+      "lock",
+      "monitor",
+      "monitors",
+      "off",
+      "post",
       "power",
       "screen",
       "shutdown",

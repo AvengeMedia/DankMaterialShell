@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Notifications
 import qs.Common
@@ -40,7 +39,7 @@ Rectangle {
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: Theme.cornerRadius
     scale: (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
-    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !BlurService.enabled
     readonly property var shadowElevation: Theme.elevationLevel1
     readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
     readonly property real hoverShadowBlurBoost: cardHoverHandler.hovered ? Math.min(2, baseShadowBlurPx * 0.25) : 0
@@ -100,7 +99,7 @@ Rectangle {
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
             return Theme.primaryHoverLight;
         }
-        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
+        return Theme.floatingSurfaceHigh;
     }
     border.color: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -112,7 +111,7 @@ Rectangle {
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
             return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
         }
-        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05);
+        return Theme.outlineMedium;
     }
     border.width: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -124,7 +123,7 @@ Rectangle {
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
             return 2;
         }
-        return 0;
+        return Theme.layerOutlineWidth;
     }
     clip: false
 
@@ -215,12 +214,10 @@ Rectangle {
                     return "";
                 const appIcon = notificationGroup?.latestNotification?.appIcon;
                 if (!appIcon)
-                    return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                    return "";
                 if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                     return appIcon;
-                if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                    return "";
-                return Paths.resolveIconPath(appIcon);
+                return "";
             }
 
             hasImage: hasNotificationImage
@@ -503,8 +500,8 @@ Rectangle {
                             return expandedBaseHeight;
                         }
                         radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primaryPressed : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                        border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05)
+                        color: isSelected ? Theme.primaryPressed : Theme.nestedSurface
+                        border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.outlineMedium
                         border.width: 1
 
                         Behavior on border.color {
@@ -552,12 +549,10 @@ Rectangle {
                                         return "";
                                     const appIcon = modelData?.appIcon;
                                     if (!appIcon)
-                                        return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                                        return "";
                                     if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                                         return appIcon;
-                                    if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                                        return "";
-                                    return Paths.resolveIconPath(appIcon);
+                                    return "";
                                 }
 
                                 fallbackIcon: {
@@ -732,8 +727,10 @@ Rectangle {
                                                     onEntered: parent.isHovered = true
                                                     onExited: parent.isHovered = false
                                                     onClicked: {
-                                                        if (modelData && modelData.invoke)
+                                                        if (modelData && modelData.invoke) {
                                                             modelData.invoke();
+                                                            PopoutService.closeNotificationCenter();
+                                                        }
                                                     }
                                                 }
                                             }
@@ -871,6 +868,7 @@ Rectangle {
                     onClicked: {
                         if (modelData && modelData.invoke) {
                             modelData.invoke();
+                            PopoutService.closeNotificationCenter();
                         }
                     }
                 }

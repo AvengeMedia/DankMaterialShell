@@ -213,8 +213,8 @@ Item {
             width: parent.width
             height: heroContent.height + Theme.spacingL * 2
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-            border.color: Theme.withAlpha(Theme.outline, 0.08)
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
             border.width: 1
 
             Column {

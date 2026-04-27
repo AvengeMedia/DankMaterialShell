@@ -371,8 +371,21 @@ Singleton {
     function filterCurrentDisplay(toplevels, screenName) {
         if (!toplevels || toplevels.length === 0 || !screenName)
             return toplevels;
-        if (useNiriSorting)
+        if (useNiriSorting) {
+            const active = ToplevelManager.activeToplevel;
+            if (active && toplevels.length === 1 && toplevels[0] === active) {
+                if (NiriService.currentOutput !== screenName)
+                    return [];
+                const focusedWin = NiriService.windows.find(nw => nw.is_focused);
+                if (!focusedWin)
+                    return [];
+                const screenWsIds = new Set(
+                    NiriService.allWorkspaces.filter(ws => ws.output === screenName).map(ws => ws.id)
+                );
+                return screenWsIds.has(focusedWin.workspace_id) ? toplevels : [];
+            }
             return NiriService.filterCurrentDisplay(toplevels, screenName);
+        }
         if (isHyprland)
             return filterHyprlandCurrentDisplaySafe(toplevels, screenName);
         return toplevels;

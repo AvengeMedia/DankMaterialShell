@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Modals.DankLauncherV2
 import qs.Services
+import qs.Widgets
 
 Scope {
     id: niriOverviewScope
@@ -122,6 +123,17 @@ Scope {
 
                 mask: Region {
                     item: overlayVisible && spotlightContainer.visible ? spotlightContainer : null
+                }
+
+                WindowBlur {
+                    targetWindow: overlayWindow
+                    readonly property real s: Math.min(1, spotlightContainer.scale)
+                    readonly property bool active: spotlightContainer.visible && spotlightContainer.opacity > 0
+                    blurX: spotlightContainer.x + spotlightContainer.width * (1 - s) * 0.5
+                    blurY: spotlightContainer.y + spotlightContainer.height * (1 - s) * 0.5
+                    blurWidth: active ? spotlightContainer.width * s : 0
+                    blurHeight: active ? spotlightContainer.height * s : 0
+                    blurRadius: Theme.cornerRadius
                 }
 
                 onShouldShowSpotlightChanged: {

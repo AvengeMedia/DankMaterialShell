@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     quickshell = {
-      url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=41828c4180fb921df7992a5405f5ff05d2ac2fff";
+      url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=783c953987dc56ff0601abe6845ed96f1d00495a";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-compat = {
@@ -45,6 +45,12 @@
         nixpkgs.lib.genAttrs [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ] (
           system: fn system nixpkgs.legacyPackages.${system}
         );
+      forEachLinuxSystem =
+        fn:
+        nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ] (
+          system: fn system nixpkgs.legacyPackages.${system}
+        );
+
       mkModuleWithDmsPkgs =
         modulePath:
         args@{ pkgs, ... }:
@@ -53,6 +59,7 @@
             (import modulePath (args // { dmsPkgs = buildDmsPkgs pkgs; }))
           ];
         };
+
       mkQmlImportPath =
         pkgs: qmlPkgs:
         pkgs.lib.concatStringsSep ":" (map (o: "${o}/${pkgs.qt6.qtbase.qtQmlPrefix}") qmlPkgs);
@@ -242,6 +249,17 @@
             QML2_IMPORT_PATH = mkQmlImportPath pkgs devQmlPkgs;
             QT_PLUGIN_PATH = mkQtPluginPath pkgs devQmlPkgs;
           };
+        }
+      );
+
+      nixosTests = forEachLinuxSystem (
+        system: pkgs:
+        import ./distro/nix/tests {
+          inherit
+            self
+            pkgs
+            ;
+          lib = pkgs.lib;
         }
       );
     };

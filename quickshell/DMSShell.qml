@@ -4,6 +4,7 @@ import qs.Common
 import qs.Modals
 import qs.Modals.Changelog
 import qs.Modals.Clipboard
+import qs.Modals.Common
 import qs.Modals.Greeter
 import qs.Modals.Settings
 import qs.Modals.DankLauncherV2
@@ -26,6 +27,15 @@ import qs.Services
 
 Item {
     id: root
+
+    property bool osdSurfacesLoaded: true
+    property int pendingOsdResumeReloads: 0
+
+    function recreateOsdSurfaces() {
+        OSDManager.currentOSDsByScreen = ({});
+        osdSurfacesLoaded = false;
+        osdSurfaceReloadTimer.restart();
+    }
 
     Instantiator {
         id: daemonPluginInstantiator
@@ -232,6 +242,32 @@ Item {
         }
     }
 
+    Timer {
+        id: osdResumeRecreateTimer
+        interval: 400
+        repeat: false
+        onTriggered: {
+            root.recreateOsdSurfaces();
+            root.pendingOsdResumeReloads--;
+
+            if (root.pendingOsdResumeReloads <= 0) {
+                root.pendingOsdResumeReloads = 0;
+                interval = 400;
+                return;
+            }
+
+            interval = 1400;
+            restart();
+        }
+    }
+
+    Timer {
+        id: osdSurfaceReloadTimer
+        interval: 120
+        repeat: false
+        onTriggered: root.osdSurfacesLoaded = true
+    }
+
     Component.onCompleted: {
         dockRecreateDebounce.start();
         // Force PolkitService singleton to initialize
@@ -249,11 +285,15 @@ Item {
 
         sourceComponent: Dock {
             contextMenu: dockContextMenuLoader.item ? dockContextMenuLoader.item : null
+            trashContextMenu: dockTrashContextMenuLoader.item ? dockTrashContextMenuLoader.item : null
         }
 
         onLoaded: {
             if (item) {
                 dockContextMenuLoader.active = true;
+                if (SettingsData.dockShowTrash) {
+                    dockTrashContextMenuLoader.active = true;
+                }
             }
         }
 
@@ -302,6 +342,43 @@ Item {
 
         DockContextMenu {
             id: dockContextMenu
+        }
+    }
+
+    LazyLoader {
+        id: dockTrashContextMenuLoader
+
+        active: false
+
+        DockTrashContextMenu {
+            id: dockTrashContextMenu
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onDockShowTrashChanged() {
+            if (SettingsData.dockShowTrash) {
+                dockTrashContextMenuLoader.active = true;
+            }
+        }
+    }
+
+    ConfirmModal {
+        id: emptyTrashConfirm
+    }
+
+    Connections {
+        target: TrashService
+        function onEmptyTrashConfirmRequested(itemCount) {
+            emptyTrashConfirm.showWithOptions({
+                title: I18n.tr("Empty Trash?"),
+                message: I18n.tr("Permanently delete %1 item(s)? This cannot be undone.").arg(itemCount),
+                confirmText: I18n.tr("Empty"),
+                cancelText: I18n.tr("Cancel"),
+                confirmColor: Theme.error,
+                onConfirm: () => TrashService.emptyTrash()
+            });
         }
     }
 
@@ -749,6 +826,16 @@ Item {
         }
     }
 
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            root.pendingOsdResumeReloads = 2;
+            osdResumeRecreateTimer.interval = 400;
+            osdResumeRecreateTimer.restart();
+        }
+    }
+
     DankColorPickerModal {
         id: colorPickerModal
 
@@ -923,51 +1010,85 @@ Item {
         }
     }
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+    Loader {
+        id: osdSurfacesLoader
+        active: root.osdSurfacesLoaded
+        asynchronous: false
 
-        delegate: VolumeOSD {
-            modelData: item
-        }
-    }
+        sourceComponent: Component {
+            Item {
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+                    delegate: VolumeOSD {
+                        modelData: item
+                    }
+                }
 
-        delegate: MediaVolumeOSD {
-            modelData: item
-        }
-    }
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+                    delegate: MediaVolumeOSD {
+                        modelData: item
+                    }
+                }
 
-        delegate: MediaPlaybackOSD {
-            modelData: item
-        }
-    }
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+                    delegate: MediaPlaybackOSD {
+                        modelData: item
+                    }
+                }
 
-        delegate: MicMuteOSD {
-            modelData: item
-        }
-    }
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+                    delegate: MicMuteOSD {
+                        modelData: item
+                    }
+                }
 
-        delegate: BrightnessOSD {
-            modelData: item
-        }
-    }
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+                    delegate: BrightnessOSD {
+                        modelData: item
+                    }
+                }
 
-        delegate: IdleInhibitorOSD {
-            modelData: item
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: IdleInhibitorOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.osdPowerProfileEnabled ? SettingsData.getFilteredScreens("osd") : []
+
+                    delegate: PowerProfileOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: CapsLockOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: AudioOutputOSD {
+                        modelData: item
+                    }
+                }
+            }
         }
     }
 
@@ -975,30 +1096,6 @@ Item {
         id: powerProfileWatcherLoader
         active: SettingsData.osdPowerProfileEnabled
         source: "Services/PowerProfileWatcher.qml"
-    }
-
-    Variants {
-        model: SettingsData.osdPowerProfileEnabled ? SettingsData.getFilteredScreens("osd") : []
-
-        delegate: PowerProfileOSD {
-            modelData: item
-        }
-    }
-
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: CapsLockOSD {
-            modelData: item
-        }
-    }
-
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: AudioOutputOSD {
-            modelData: item
-        }
     }
 
     LazyLoader {

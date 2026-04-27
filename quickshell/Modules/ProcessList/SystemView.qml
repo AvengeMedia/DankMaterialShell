@@ -23,7 +23,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: systemInfoColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            color: Theme.nestedSurface
 
             ColumnLayout {
                 id: systemInfoColumn
@@ -96,7 +96,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            color: Theme.nestedSurface
 
             ColumnLayout {
                 anchors.fill: parent

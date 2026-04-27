@@ -508,6 +508,66 @@ Item {
 
             SettingsCard {
                 width: parent.width
+                iconName: "delete"
+                title: I18n.tr("Trash")
+                settingKey: "dockTrash"
+
+                SettingsToggleRow {
+                    settingKey: "dockShowTrash"
+                    tags: ["dock", "trash", "bin", "recycle"]
+                    text: I18n.tr("Show Trash in Dock")
+                    description: I18n.tr("Place a trash bin at the end of the dock")
+                    checked: SettingsData.dockShowTrash
+                    onToggled: checked => SettingsData.set("dockShowTrash", checked)
+                }
+
+                SettingsDropdownRow {
+                    id: trashFmDropdown
+                    settingKey: "dockTrashFileManager"
+                    tags: ["dock", "trash", "file", "manager", "nautilus", "thunar", "dolphin", "custom"]
+                    text: I18n.tr("Open Trash With")
+                    description: I18n.tr("File manager used to open the trash. Pick \"custom\" to enter your own command.")
+                    visible: SettingsData.dockShowTrash
+                    currentValue: SettingsData.dockTrashFileManager
+                    options: TrashService.availableFileManagers || []
+                    onValueChanged: value => SettingsData.set("dockTrashFileManager", value)
+                }
+
+                FocusScope {
+                    width: parent.width - Theme.spacingM * 2
+                    height: visible ? trashCustomCommandColumn.implicitHeight : 0
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingM
+                    visible: SettingsData.dockShowTrash && SettingsData.dockTrashFileManager === "custom"
+
+                    Column {
+                        id: trashCustomCommandColumn
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Custom open-trash command")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: trashCustomCommandField
+                            width: parent.width
+                            placeholderText: "pcmanfm trash:///"
+                            backgroundColor: Theme.surfaceContainerHighest
+                            normalBorderColor: Theme.outlineMedium
+                            focusedBorderColor: Theme.primary
+                            text: SettingsData.dockTrashCustomCommand
+
+                            onTextEdited: SettingsData.set("dockTrashCustomCommand", text.trim())
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 iconName: "photo_size_select_large"
                 title: I18n.tr("Sizing")
                 settingKey: "dockSizing"

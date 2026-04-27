@@ -38,11 +38,11 @@ Rectangle {
         return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor);
     }
 
-    readonly property color _tileBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    readonly property color _tileBg: Theme.ccPillInactiveBg
 
-    color: mouseArea.containsMouse ? Theme.primaryPressed : _tileBg
-    border.color: "transparent"
-    border.width: 0
+    color: mouseArea.containsMouse ? Theme.ccPillInactiveHoverBg : _tileBg
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
     antialiasing: true
     opacity: enabled ? 1.0 : 0.6
 

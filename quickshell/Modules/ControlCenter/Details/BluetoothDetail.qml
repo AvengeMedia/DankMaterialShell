@@ -20,9 +20,9 @@ Rectangle {
         return headerRow.height + bluetoothContent.height + Theme.spacingM;
     }
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-    border.width: 0
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     property var bluetoothCodecModalRef: null
     property var devicesBeingPaired: new Set()
@@ -115,7 +115,7 @@ Rectangle {
             height: 36
             radius: 18
             color: scanMouseArea.containsMouse && adapterEnabled ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
-            border.color: adapterEnabled ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: adapterEnabled ? Theme.primary : Theme.outlineStrong
             border.width: 0
             visible: adapterEnabled
 
@@ -434,7 +434,7 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                color: Theme.outlineStrong
                 visible: pairedRepeater.count > 0 && availableRepeater.count > 0
             }
 
@@ -609,7 +609,7 @@ Rectangle {
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: Theme.outlineStrong
         }
 
         MenuItem {

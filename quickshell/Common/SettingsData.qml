@@ -188,11 +188,15 @@ Singleton {
     onBarElevationEnabledChanged: saveSettings()
     property bool blurEnabled: false
     onBlurEnabledChanged: saveSettings()
+    property bool blurForegroundLayers: true
+    onBlurForegroundLayersChanged: saveSettings()
+    property real blurLayerOutlineOpacity: 0.12
+    onBlurLayerOutlineOpacityChanged: saveSettings()
     property string blurBorderColor: "outline"
     onBlurBorderColorChanged: saveSettings()
     property string blurBorderCustomColor: "#ffffff"
     onBlurBorderCustomColorChanged: saveSettings()
-    property real blurBorderOpacity: 1.0
+    property real blurBorderOpacity: 0.35
     onBlurBorderOpacityChanged: saveSettings()
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
@@ -211,6 +215,9 @@ Singleton {
     property int selectedGpuIndex: 0
     property var enabledGpuPciIds: []
     property bool showSystemTray: true
+    property string systemTrayIconTintMode: "none"
+    property int systemTrayIconTintSaturation: 50
+    property int systemTrayIconTintStrength: 135
     property bool showClock: true
     property bool showNotificationButton: true
     property bool showBattery: true
@@ -538,6 +545,9 @@ Singleton {
     property int dockMaxVisibleApps: 0
     property int dockMaxVisibleRunningApps: 0
     property bool dockShowOverflowBadge: true
+    property bool dockShowTrash: false
+    property string dockTrashFileManager: "default"
+    property string dockTrashCustomCommand: ""
 
     property bool notificationOverlayEnabled: false
     property bool notificationPopupShadowEnabled: true

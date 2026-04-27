@@ -22,6 +22,7 @@ Item {
 
     property color thumbOutlineColor: Theme.surfaceContainer
     property color trackColor: enabled ? Theme.outline : Theme.outline
+    property real trackOpacity: Theme.popupTransparency
 
     signal sliderValueChanged(int newValue)
     signal sliderDragFinished(int finalValue)
@@ -63,7 +64,7 @@ Item {
             width: parent.width - (leftIconWidth + rightIconWidth + (slider.leftIcon.length > 0 ? Theme.spacingM : 0) + (slider.rightIcon.length > 0 ? Theme.spacingM : 0))
             height: 12
             radius: Theme.cornerRadius
-            color: slider.trackColor
+            color: Theme.withAlpha(slider.trackColor, slider.trackOpacity)
             anchors.verticalCenter: parent.verticalCenter
             clip: false
 
@@ -71,13 +72,16 @@ Item {
                 id: sliderFill
                 height: parent.height
                 radius: Theme.cornerRadius
+                topRightRadius: 0
+                bottomRightRadius: 0
                 width: {
                     const range = slider.maximum - slider.minimum;
                     const rawRatio = range === 0 ? 0 : (slider.value - slider.minimum) / range;
                     const ratio = slider.centerMinimum ? (0.5 + rawRatio * 0.5) : rawRatio;
                     const travel = sliderTrack.width - sliderHandle.width;
-                    const center = (travel * ratio) + sliderHandle.width / 2;
-                    return Math.max(0, Math.min(sliderTrack.width, center));
+                    const handleLeft = travel * ratio;
+                    const endPoint = handleLeft - 3;
+                    return Math.max(0, Math.min(sliderTrack.width, endPoint));
                 }
                 color: slider.enabled ? Theme.primary : Theme.withAlpha(Theme.onSurface, 0.12)
             }
@@ -87,8 +91,8 @@ Item {
 
                 property bool active: sliderMouseArea.containsMouse || sliderMouseArea.pressed || slider.isDragging
 
-                width: 8
-                height: 24
+                width: 4
+                height: 20
                 radius: Theme.cornerRadius
                 x: {
                     const range = slider.maximum - slider.minimum;
@@ -99,7 +103,7 @@ Item {
                 }
                 anchors.verticalCenter: parent.verticalCenter
                 color: slider.enabled ? Theme.primary : Theme.withAlpha(Theme.onSurface, 0.12)
-                border.width: 3
+                border.width: 0
                 border.color: slider.thumbOutlineColor
 
                 StyledRect {

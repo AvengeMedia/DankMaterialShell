@@ -48,6 +48,9 @@ Singleton {
     signal loginctlStateChanged
 
     property bool stateInitialized: false
+    property string prepareForSleepSubscriptionId: ""
+    property bool prepareForSleepSubscriptionPending: false
+    property double lastResumeSignalTimestamp: 0
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -320,6 +323,11 @@ Singleton {
                 return;
             }
 
+            if (CompositorService.isLabwc) {
+                LabwcService.quit();
+                return;
+            }
+
             if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                 try {
                     I3.dispatch("exit");
@@ -458,6 +466,8 @@ Singleton {
         function onConnectionStateChanged() {
             if (DMSService.isConnected) {
                 checkDMSCapabilities();
+            } else {
+                clearPrepareForSleepSubscriptionState();
             }
         }
 
@@ -472,6 +482,13 @@ Singleton {
 
         function onCapabilitiesChanged() {
             checkDMSCapabilities();
+        }
+
+        function onDbusSignalReceived(subscriptionId, data) {
+            if (subscriptionId !== prepareForSleepSubscriptionId) {
+                return;
+            }
+            handlePrepareForSleepSignal(data);
         }
     }
 
@@ -508,10 +525,6 @@ Singleton {
         function onLoginctlStateUpdate(data) {
             updateLoginctlState(data);
         }
-
-        function onLoginctlEvent(event) {
-            handleLoginctlEvent(event);
-        }
     }
 
     function checkDMSCapabilities() {
@@ -533,6 +546,61 @@ Singleton {
         } else {
             loginctlAvailable = false;
             console.log("SessionService: loginctl capability not available in DMS");
+        }
+
+        if (DMSService.capabilities.includes("dbus")) {
+            ensurePrepareForSleepSubscription();
+        } else {
+            clearPrepareForSleepSubscriptionState();
+        }
+    }
+
+    function clearPrepareForSleepSubscriptionState() {
+        prepareForSleepSubscriptionId = "";
+        prepareForSleepSubscriptionPending = false;
+    }
+
+    function ensurePrepareForSleepSubscription() {
+        if (!DMSService.isConnected || !DMSService.capabilities.includes("dbus")) {
+            return;
+        }
+
+        if (prepareForSleepSubscriptionId || prepareForSleepSubscriptionPending) {
+            return;
+        }
+
+        prepareForSleepSubscriptionPending = true;
+        DMSService.dbusSubscribe("system", "org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "PrepareForSleep", response => {
+            prepareForSleepSubscriptionPending = false;
+
+            if (response.error) {
+                console.warn("SessionService: Failed to subscribe to PrepareForSleep:", response.error);
+                return;
+            }
+
+            prepareForSleepSubscriptionId = response.result?.subscriptionId || "";
+        });
+    }
+
+    function emitSessionResumedOnce() {
+        const now = Date.now();
+        if ((now - lastResumeSignalTimestamp) < 1000) {
+            return;
+        }
+        lastResumeSignalTimestamp = now;
+        sessionResumed();
+    }
+
+    function handlePrepareForSleepSignal(data) {
+        if (!data?.body || data.body.length === 0) {
+            return;
+        }
+
+        const wasSleeping = preparingForSleep;
+        preparingForSleep = data.body[0] === true;
+
+        if (wasSleeping && !preparingForSleep) {
+            emitSessionResumedOnce();
         }
     }
 
@@ -599,21 +667,9 @@ Singleton {
         }
 
         if (wasSleeping && !preparingForSleep) {
-            sessionResumed();
+            emitSessionResumedOnce();
         }
 
         loginctlStateChanged();
-    }
-
-    function handleLoginctlEvent(event) {
-        if (event.event === "Lock") {
-            locked = true;
-            lockedHint = true;
-            sessionLocked();
-        } else if (event.event === "Unlock") {
-            locked = false;
-            lockedHint = false;
-            sessionUnlocked();
-        }
     }
 }

@@ -89,9 +89,9 @@ PanelWindow {
             case ToastService.levelWarn:
                 return Theme.warning;
             case ToastService.levelInfo:
-                return Theme.surfaceContainer;
+                return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
             default:
-                return Theme.surfaceContainer;
+                return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
             }
         }
         radius: Theme.cornerRadius

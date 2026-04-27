@@ -55,7 +55,7 @@ Item {
     // M3 elevation shadow — Level 2 baseline (navigation bar), with per-bar override support
     readonly property bool hasPerBarOverride: (barConfig?.shadowIntensity ?? 0) > 0
     readonly property var elevLevel: Theme.elevationLevel2
-    readonly property bool shadowEnabled: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || hasPerBarOverride
+    readonly property bool shadowEnabled: !BlurService.enabled && ((Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || hasPerBarOverride)
     readonly property string autoBarShadowDirection: isTop ? "top" : (isBottom ? "bottom" : (isLeft ? "left" : (isRight ? "right" : "top")))
     readonly property string globalShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
     readonly property string perBarShadowDirectionMode: barConfig?.shadowDirectionMode ?? "inherit"

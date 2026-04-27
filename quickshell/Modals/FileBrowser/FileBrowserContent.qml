@@ -158,6 +158,13 @@ FocusScope {
         selectedFileIsDir = isDir;
     }
 
+    function openItemContextMenu(sender, localX, localY, path, name, isDir) {
+        if (!sender)
+            return;
+        const pos = sender.mapToItem(root, localX, localY);
+        itemContextMenu.showAt(root, pos.x, pos.y, path, name, isDir);
+    }
+
     function navigateUp() {
         const path = currentPath;
         if (path === homeDir)
@@ -759,6 +766,9 @@ FocusScope {
                                 onItemSelected: (index, path, name, isDir) => {
                                     setSelectedFileData(path, name, isDir);
                                 }
+                                onItemContextMenuRequested: (sender, localX, localY, path, name, isDir) => {
+                                    root.openItemContextMenu(sender, localX, localY, path, name, isDir);
+                                }
 
                                 Connections {
                                     function onKeyboardSelectionRequestedChanged() {
@@ -816,6 +826,9 @@ FocusScope {
                                 }
                                 onItemSelected: (index, path, name, isDir) => {
                                     setSelectedFileData(path, name, isDir);
+                                }
+                                onItemContextMenuRequested: (sender, localX, localY, path, name, isDir) => {
+                                    root.openItemContextMenu(sender, localX, localY, path, name, isDir);
                                 }
 
                                 Connections {
@@ -916,5 +929,10 @@ FocusScope {
                 pendingFilePath = "";
             }
         }
+    }
+
+    FileBrowserItemContextMenu {
+        id: itemContextMenu
+        parentFocusItem: root
     }
 }

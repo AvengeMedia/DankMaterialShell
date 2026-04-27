@@ -19,6 +19,7 @@ StyledRect {
 
     signal itemClicked(int index, string path, string name, bool isDir)
     signal itemSelected(int index, string path, string name, bool isDir)
+    signal itemContextMenuRequested(var sender, real localX, real localY, string path, string name, bool isDir)
 
     function getFileExtension(fileName) {
         const parts = fileName.split('.');
@@ -107,11 +108,11 @@ StyledRect {
         const size = _thumbnailPx;
         const fp = delegateRoot.filePath;
         Paths.mkdir(thumbDir);
-        Proc.runCommand(null, ["test", "-f", thumbPath], function(output, exitCode) {
+        Proc.runCommand(null, ["test", "-f", thumbPath], function (output, exitCode) {
             if (exitCode === 0) {
                 _videoThumb = thumbPath;
             } else {
-                Proc.runCommand(null, ["ffmpegthumbnailer", "-i", fp, "-o", thumbPath, "-s", String(size), "-f"], function(output, exitCode) {
+                Proc.runCommand(null, ["ffmpegthumbnailer", "-i", fp, "-o", thumbPath, "-s", String(size), "-f"], function (output, exitCode) {
                     if (exitCode === 0)
                         _videoThumb = thumbPath;
                 });
@@ -246,8 +247,16 @@ StyledRect {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: {
-            itemClicked(delegateRoot.index, delegateRoot.filePath, delegateRoot.fileName, delegateRoot.fileIsDir);
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            switch (mouse.button) {
+            case Qt.LeftButton:
+                itemClicked(delegateRoot.index, delegateRoot.filePath, delegateRoot.fileName, delegateRoot.fileIsDir);
+                break;
+            case Qt.RightButton:
+                itemContextMenuRequested(delegateRoot, mouse.x, mouse.y, delegateRoot.filePath, delegateRoot.fileName, delegateRoot.fileIsDir);
+                break;
+            }
         }
     }
 }

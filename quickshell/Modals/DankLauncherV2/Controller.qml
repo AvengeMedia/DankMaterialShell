@@ -1442,7 +1442,8 @@ Item {
                     section: it.section || "",
                     isCore: it.isCore || false,
                     isBuiltInLauncher: it.isBuiltInLauncher || false,
-                    pluginId: it.pluginId || ""
+                    pluginId: it.pluginId || "",
+                    source: it.source || ""
                 });
             }
             serializable.push({
@@ -1497,6 +1498,7 @@ Item {
                     isCore: it.isCore || false,
                     isBuiltInLauncher: it.isBuiltInLauncher || false,
                     pluginId: it.pluginId || "",
+                    source: it.source || "",
                     data: {
                         id: it.id
                     },

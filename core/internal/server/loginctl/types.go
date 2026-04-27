@@ -35,12 +35,7 @@ type SessionState struct {
 type EventType string
 
 const (
-	EventStateChanged      EventType = "state_changed"
-	EventLock              EventType = "lock"
-	EventUnlock            EventType = "unlock"
-	EventPrepareForSleep   EventType = "prepare_for_sleep"
-	EventIdleHintChanged   EventType = "idle_hint_changed"
-	EventLockedHintChanged EventType = "locked_hint_changed"
+	EventStateChanged EventType = "state_changed"
 )
 
 type SessionEvent struct {

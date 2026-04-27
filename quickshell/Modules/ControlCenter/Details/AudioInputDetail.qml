@@ -18,9 +18,9 @@ Rectangle {
 
     implicitHeight: headerRow.height + (hasInputVolumeSliderInCC ? 0 : volumeSlider.height) + audioContent.height + Theme.spacingM
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-    border.width: 0
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Row {
         id: headerRow
@@ -123,6 +123,8 @@ Rectangle {
             unit: "%"
             valueOverride: actualVolumePercent
             thumbOutlineColor: Theme.surfaceVariant
+            trackColor: Theme.ccSliderTrackColor
+            trackOpacity: Theme.ccSliderTrackOpacity
 
             onSliderValueChanged: function (newValue) {
                 if (AudioService.source && AudioService.source.audio) {

@@ -360,7 +360,7 @@ PanelWindow {
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
-        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled
+        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !BlurService.enabled
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
         readonly property real cardInset: Theme.snap(4, win.dpr)
         readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)) + 8), win.dpr) : 0
@@ -409,9 +409,9 @@ PanelWindow {
             sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
             sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
             sourceRect.radius: Theme.cornerRadius
-            sourceRect.color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
-            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
+            sourceRect.color: Theme.readableSurface
+            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.outlineMedium
+            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 1
 
             Rectangle {
                 x: bgShadowLayer.sourceRect.x
@@ -448,9 +448,10 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: content.cardInset
             radius: Theme.cornerRadius
+            antialiasing: true
             color: "transparent"
-            border.color: BlurService.borderColor
-            border.width: BlurService.borderWidth
+            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+            border.width: BlurService.enabled ? BlurService.borderWidth : 1
             z: 100
         }
 
@@ -537,12 +538,10 @@ PanelWindow {
                             return "";
                         const appIcon = notificationData.appIcon;
                         if (!appIcon)
-                            return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                            return "";
                         if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                             return appIcon;
-                        if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                            return "";
-                        return Paths.resolveIconPath(appIcon);
+                        return "";
                     }
 
                     hasImage: hasNotificationImage

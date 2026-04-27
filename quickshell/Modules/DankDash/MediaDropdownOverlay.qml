@@ -15,6 +15,7 @@ Item {
     property var allPlayers: []
     property point anchorPos: Qt.point(0, 0)
     property bool isRightEdge: false
+    property var targetWindow: null
 
     property bool __isChromeBrowser: {
         if (!activePlayer?.identity)
@@ -56,6 +57,30 @@ Item {
         });
     }
 
+    readonly property Item __activePanel: {
+        switch (dropdownType) {
+        case 1:
+            return volumePanel;
+        case 2:
+            return audioDevicesPanel;
+        case 3:
+            return playersPanel;
+        default:
+            return null;
+        }
+    }
+
+    WindowBlur {
+        targetWindow: root.targetWindow
+        readonly property bool active: root.__activePanel !== null && root.__activePanel.visible && root.__activePanel.opacity > 0
+        readonly property real s: root.__activePanel ? Math.min(1, root.__activePanel.scale) : 1
+        blurX: root.__activePanel ? root.__activePanel.x + root.__activePanel.width * (1 - s) * 0.5 : 0
+        blurY: root.__activePanel ? root.__activePanel.y + root.__activePanel.height * (1 - s) * 0.5 : 0
+        blurWidth: active ? root.__activePanel.width * s : 0
+        blurHeight: active ? root.__activePanel.height * s : 0
+        blurRadius: Theme.cornerRadius * 2
+    }
+
     Rectangle {
         id: volumePanel
         visible: dropdownType === 1 && volumeAvailable
@@ -64,8 +89,8 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 1
 
         opacity: dropdownType === 1 ? 1 : 0
@@ -99,7 +124,7 @@ Item {
             borderColor: volumePanel.border.color
             borderWidth: volumePanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled
+            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
         }
 
         MouseArea {
@@ -126,23 +151,26 @@ Item {
                     width: parent.width
                     height: parent.height
                     anchors.centerIn: parent
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                    color: Theme.withAlpha(Theme.outline, Theme.popupTransparency)
                     radius: Theme.cornerRadius
                 }
 
                 Rectangle {
+                    readonly property real ratio: volumeAvailable ? Math.min(1.0, currentVolume) : 0
+                    readonly property real thumbHeight: 4
                     width: parent.width
-                    height: volumeAvailable ? (Math.min(1.0, currentVolume) * parent.height) : 0
+                    height: Math.max(0, ratio * (parent.height - thumbHeight) - 3)
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: Theme.primary
-                    bottomLeftRadius: Theme.cornerRadius
-                    bottomRightRadius: Theme.cornerRadius
+                    radius: Theme.cornerRadius
+                    topLeftRadius: 0
+                    topRightRadius: 0
                 }
 
                 Rectangle {
                     width: parent.width + 8
-                    height: 8
+                    height: 4
                     radius: Theme.cornerRadius
                     y: {
                         const ratio = volumeAvailable ? Math.min(1.0, currentVolume) : 0;
@@ -151,8 +179,7 @@ Item {
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: Theme.primary
-                    border.width: 3
-                    border.color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1.0)
+                    border.width: 0
                 }
 
                 MouseArea {
@@ -202,8 +229,8 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 2
 
         opacity: dropdownType === 2 ? 1 : 0
@@ -237,7 +264,7 @@ Item {
             borderColor: audioDevicesPanel.border.color
             borderWidth: audioDevicesPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled
+            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
         }
 
         Column {
@@ -274,7 +301,7 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                            color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
                             border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                             border.width: modelData === AudioService.sink ? 2 : 1
 
@@ -356,8 +383,8 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 2
 
         opacity: dropdownType === 3 ? 1 : 0
@@ -391,7 +418,7 @@ Item {
             borderColor: playersPanel.border.color
             borderWidth: playersPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled
+            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
         }
 
         Column {
@@ -428,7 +455,7 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                            color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
                             border.color: modelData === activePlayer ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                             border.width: modelData === activePlayer ? 2 : 1
 

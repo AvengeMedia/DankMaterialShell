@@ -10,9 +10,9 @@ Rectangle {
 
     implicitHeight: contentColumn.implicitHeight + Theme.spacingL * 2
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-    border.width: 0
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     property real nowMs: Date.now()
 
@@ -149,8 +149,8 @@ Rectangle {
                     width: (contentColumn.width - Theme.spacingS * 2) / 3
                     height: 36
                     radius: Theme.cornerRadius
-                    color: presetArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                    color: presetArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Theme.floatingSurface
+                    border.color: Theme.outlineStrong
                     border.width: 1
 
                     StyledText {
@@ -183,8 +183,8 @@ Rectangle {
                 width: (contentColumn.width - Theme.spacingS) / 2
                 height: 36
                 radius: Theme.cornerRadius
-                color: foreverArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                color: foreverArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Theme.floatingSurface
+                border.color: Theme.outlineStrong
                 border.width: 1
 
                 Row {
@@ -221,8 +221,8 @@ Rectangle {
                 height: 36
                 radius: Theme.cornerRadius
                 visible: SessionData.doNotDisturb
-                color: offArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.18) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                color: offArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.18) : Theme.floatingSurface
+                border.color: Theme.outlineStrong
                 border.width: 1
 
                 Row {

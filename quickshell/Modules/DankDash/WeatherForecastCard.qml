@@ -103,7 +103,7 @@ Rectangle {
         }
     ]
 
-    color: isCurrent ? Theme.withAlpha(Theme.primary, 0.1) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    color: isCurrent ? Theme.withAlpha(Theme.primary, 0.1) : Theme.nestedSurface
     border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
     border.width: isCurrent ? 1 : 0
 
