@@ -479,14 +479,33 @@ Item {
                 delegate: Item {
                     id: delegateItem
 
-                    property var dockButton: itemData.type === "launcher" ? launcherButton : (itemData.type === "trash" ? trashButton : button)
+                    property var dockButton: {
+                        switch (itemData.type) {
+                        case "launcher":
+                            return launcherButton;
+                        case "trash":
+                            return trashButton;
+                        default:
+                            return button;
+                        }
+                    }
                     property var itemData: modelData
                     readonly property bool isOverflowToggle: itemData.type === "overflow-toggle"
                     readonly property bool isTrash: itemData.type === "trash"
                     readonly property bool isInOverflow: itemData.isInOverflow === true
+                    readonly property bool isDragging: {
+                        switch (itemData.type) {
+                        case "launcher":
+                            return launcherButton.dragging;
+                        case "trash":
+                            return false;
+                        default:
+                            return button.dragging;
+                        }
+                    }
 
                     clip: false
-                    z: (itemData.type === "launcher" ? launcherButton.dragging : (itemData.type === "trash" ? false : button.dragging)) ? 100 : 0
+                    z: isDragging ? 100 : 0
                     visible: !isInOverflow || root.overflowExpanded
                     opacity: (isInOverflow && !root.overflowExpanded) ? 0 : 1
                     scale: (isInOverflow && !root.overflowExpanded) ? 0.8 : 1

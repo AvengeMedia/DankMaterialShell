@@ -558,22 +558,9 @@ Item {
                             backgroundColor: Theme.surfaceContainerHighest
                             normalBorderColor: Theme.outlineMedium
                             focusedBorderColor: Theme.primary
-
-                            Component.onCompleted: {
-                                if (SettingsData.dockTrashCustomCommand) {
-                                    text = SettingsData.dockTrashCustomCommand;
-                                }
-                            }
+                            text: SettingsData.dockTrashCustomCommand
 
                             onTextEdited: SettingsData.set("dockTrashCustomCommand", text.trim())
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onPressed: mouse => {
-                                    trashCustomCommandField.forceActiveFocus();
-                                    mouse.accepted = false;
-                                }
-                            }
                         }
                     }
                 }

@@ -546,7 +546,7 @@ Singleton {
     property int dockMaxVisibleRunningApps: 0
     property bool dockShowOverflowBadge: true
     property bool dockShowTrash: false
-    property string dockTrashFileManager: "nautilus"
+    property string dockTrashFileManager: "default"
     property string dockTrashCustomCommand: ""
 
     property bool notificationOverlayEnabled: false

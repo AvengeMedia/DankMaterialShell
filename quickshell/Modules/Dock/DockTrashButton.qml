@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
@@ -16,40 +15,39 @@ Item {
     property real actualIconSize: 40
     property real hoverAnimOffset: 0
 
-    property bool isHovered: mouseArea.containsMouse
-    property bool showTooltip: mouseArea.containsMouse
+    readonly property bool isHovered: mouseArea.containsMouse
+    readonly property bool showTooltip: mouseArea.containsMouse
     readonly property string tooltipText: TrashService.isEmpty ? I18n.tr("Trash") : (I18n.tr("Trash") + " (" + TrashService.count + ")")
 
     readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
     readonly property real animationDistance: actualIconSize
     readonly property real animationDirection: {
-        if (SettingsData.dockPosition === SettingsData.Position.Bottom)
-            return -1;
-        if (SettingsData.dockPosition === SettingsData.Position.Top)
+        switch (SettingsData.dockPosition) {
+        case SettingsData.Position.Top:
+        case SettingsData.Position.Left:
             return 1;
-        if (SettingsData.dockPosition === SettingsData.Position.Right)
+        case SettingsData.Position.Bottom:
+        case SettingsData.Position.Right:
+        default:
             return -1;
-        if (SettingsData.dockPosition === SettingsData.Position.Left)
-            return 1;
-        return -1;
+        }
     }
 
     onIsHoveredChanged: {
         if (mouseArea.pressed)
             return;
-        if (isHovered) {
-            exitAnimation.stop();
-            if (!bounceAnimation.running)
-                bounceAnimation.restart();
-        } else {
+        if (!isHovered) {
             bounceAnimation.stop();
             exitAnimation.restart();
+            return;
         }
+        exitAnimation.stop();
+        if (!bounceAnimation.running)
+            bounceAnimation.restart();
     }
 
     SequentialAnimation {
         id: bounceAnimation
-
         running: false
 
         NumberAnimation {
@@ -73,7 +71,6 @@ Item {
 
     NumberAnimation {
         id: exitAnimation
-
         running: false
         target: root
         property: "hoverAnimOffset"
@@ -85,52 +82,56 @@ Item {
 
     MouseArea {
         id: mouseArea
-
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onClicked: mouse => {
-            if (mouse.button === Qt.LeftButton) {
+            switch (mouse.button) {
+            case Qt.LeftButton:
                 TrashService.openTrash();
-            } else if (mouse.button === Qt.RightButton) {
-                if (contextMenu) {
+                break;
+            case Qt.RightButton:
+                if (contextMenu)
                     contextMenu.showForButton(root, root.height, parentDockScreen, dockApps);
-                }
+                break;
             }
         }
     }
 
     Item {
-        id: visualContent
         anchors.fill: parent
 
         transform: Translate {
-            x: !isVertical ? 0 : hoverAnimOffset
-            y: !isVertical ? hoverAnimOffset : 0
+            x: isVertical ? hoverAnimOffset : 0
+            y: isVertical ? 0 : hoverAnimOffset
         }
 
         Item {
             anchors.centerIn: parent
-            width: actualIconSize
-            height: actualIconSize
+            width: actualIconSize - 4
+            height: actualIconSize - 4
+
+            readonly property string iconPath: Paths.resolveIconPath(TrashService.isEmpty ? "user-trash" : "user-trash-full")
 
             IconImage {
                 id: trashIcon
-                anchors.centerIn: parent
-                width: actualIconSize - 4
-                height: actualIconSize - 4
+                anchors.fill: parent
+                source: parent.iconPath
+                backer.sourceSize: Qt.size(parent.width * 2, parent.height * 2)
                 smooth: true
+                mipmap: true
                 asynchronous: true
-                source: Quickshell.iconPath(TrashService.isEmpty ? "user-trash" : "user-trash-full", "user-trash")
+                visible: status === Image.Ready
+            }
 
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Easing.OutCubic
-                    }
-                }
+            DankIcon {
+                anchors.centerIn: parent
+                visible: parent.iconPath === "" || trashIcon.status !== Image.Ready
+                name: "delete"
+                size: actualIconSize - 8
+                color: TrashService.isEmpty ? Theme.surfaceText : Theme.primary
             }
         }
     }
