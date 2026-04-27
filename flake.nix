@@ -45,6 +45,11 @@
         nixpkgs.lib.genAttrs [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ] (
           system: fn system nixpkgs.legacyPackages.${system}
         );
+      forEachLinuxSystem =
+        fn:
+        nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ] (
+          system: fn system nixpkgs.legacyPackages.${system}
+        );
       buildDmsPkgs = pkgs: {
         dms-shell = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
         quickshell = quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -238,6 +243,17 @@
             QML2_IMPORT_PATH = mkQmlImportPath pkgs devQmlPkgs;
             QT_PLUGIN_PATH = mkQtPluginPath pkgs devQmlPkgs;
           };
+        }
+      );
+
+      nixosTests = forEachLinuxSystem (
+        system: pkgs:
+        import ./distro/nix/tests {
+          inherit
+            self
+            pkgs
+            ;
+          lib = pkgs.lib;
         }
       );
     };
