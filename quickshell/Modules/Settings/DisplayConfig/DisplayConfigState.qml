@@ -41,7 +41,12 @@ Singleton {
     property bool profilesLoading: false
     property var validatedProfiles: ({})
     property bool manualActivation: false
+    property bool profilesReady: false
     property var monitorsCache: null
+    // Last config entry that was applied (set by applyConfigEntry / confirmChanges).
+    // Used to recover position, scale, and transform for disabled outputs that wlr
+    // no longer reports a logical viewport for.
+    property var lastAppliedEntry: null
 
     signal changesApplied(var changeDescriptions)
     signal changesConfirmed
@@ -69,17 +74,6 @@ Singleton {
             return output.make + " " + output.model;
         }
         return outputName;
-    }
-
-    // Translate any stored output ID (connector name or model ID) to the current
-    // displayNameMode format. Enables cross-format matching when displayNameMode
-    // changed since a config was saved, or when an output lacks make/model info.
-    function normalizeOutputId(storedId) {
-        for (const rawName in outputs) {
-            if (rawName === storedId || getOutputIdentifier(outputs[rawName], rawName) === storedId)
-                return getOutputIdentifier(outputs[rawName], rawName);
-        }
-        return storedId;
     }
 
     function readMonitorsJson(callback) {
@@ -128,10 +122,10 @@ Singleton {
     // Normalizes both sides to the current displayNameMode to handle cross-format configs
     // (e.g. entries saved in connector mode while current mode is model, or vice versa).
     function findConfigEntry(data, outputIdentifiers) {
-        const targetKey = outputIdentifiers.map(id => normalizeOutputId(id)).sort().join("+");
+        const targetKey = outputIdentifiers.sort().join("+");
         const configs = data.configurations || [];
         for (let i = 0; i < configs.length; i++) {
-            const entryKey = Object.keys(configs[i].outputs || {}).map(id => normalizeOutputId(id)).sort().join("+");
+            const entryKey = Object.keys(configs[i].outputs || {}).sort().join("+");
             if (entryKey === targetKey)
                 return {entry: configs[i], index: i};
         }
@@ -152,12 +146,12 @@ Singleton {
     // Find the config entry whose outputs are the largest subset of outputIdentifiers.
     // All outputs in the entry must be present in outputIdentifiers (no extra outputs).
     function findPartialConfigEntry(data, outputIdentifiers) {
-        const currentSet = new Set(outputIdentifiers.map(id => normalizeOutputId(id)));
+        const currentSet = new Set(outputIdentifiers);
         const configs = data.configurations || [];
         let bestEntry = null;
         let bestCount = 0;
         for (let i = 0; i < configs.length; i++) {
-            const cfgKeys = Object.keys(configs[i].outputs || {}).map(id => normalizeOutputId(id));
+            const cfgKeys = Object.keys(configs[i].outputs || {});
             if (cfgKeys.length === 0)
                 continue;
             // All config outputs must be present in the current output set
@@ -174,7 +168,7 @@ Singleton {
     // Returns {rawName: bool} for all known monitors — true if included in profileId
     function getProfileMonitorInclusion(profileId) {
         const profile = validatedProfiles[profileId];
-        const profileOutputIds = new Set(Object.keys(profile?.outputs || {}).map(id => normalizeOutputId(id)));
+        const profileOutputIds = new Set(Object.keys(profile?.outputs || {}));
         const result = {};
         for (const rawName in allOutputs) {
             const od = allOutputs[rawName];
@@ -239,15 +233,19 @@ Singleton {
         };
         if (CompositorService.isNiri) {
             cfg.niri = Object.assign({}, niriSettings?.[getNiriOutputIdentifier(outputData, outputName)] || {});
-            if (cfg.niri.disabled)
+            if (cfg.niri.disabled) {
+                delete cfg.niri.disabled;
                 cfg.disabled = true;
+            }
         }
         if (CompositorService.isHyprland) {
             cfg.hyprland = Object.assign({}, hyprlandSettings?.[getHyprlandOutputIdentifier(outputData, outputName)] || {});
             if (outputData.mirror)
                 cfg.hyprland.mirror = outputData.mirror;
-            if (cfg.hyprland.disabled)
+            if (cfg.hyprland.disabled) {
+                delete cfg.hyprland.disabled;
                 cfg.disabled = true;
+            }
         }
         return cfg;
     }
@@ -304,8 +302,6 @@ Singleton {
             const settings = Object.assign({}, cfg.niri || {});
             if (cfg.disabled)
                 settings.disabled = true;
-            else
-                delete settings.disabled;
             if (Object.keys(settings).length > 0)
                 result[outputId] = settings;
         }
@@ -320,8 +316,6 @@ Singleton {
             const settings = Object.assign({}, cfg.hyprland || {});
             if (cfg.disabled)
                 settings.disabled = true;
-            else
-                delete settings.disabled;
             if (Object.keys(settings).length > 0)
                 result[outputId] = settings;
         }
@@ -420,18 +414,24 @@ Singleton {
         return lines.join("\n");
     }
 
+    // Mutates configEntry in place. Returns true if a fix was applied.
+    function ensureEnabledOutput(configEntry) {
+        const outputKeys = Object.keys(configEntry.outputs || {});
+        if (outputKeys.length === 0)
+            return false;
+        const hasEnabled = outputKeys.some(k => !configEntry.outputs[k].disabled);
+        if (hasEnabled)
+            return false;
+        delete configEntry.outputs[outputKeys[0]].disabled;
+        return true;
+    }
+
     // Write compositor config from a neutral config entry and optionally reload
     function applyConfigEntry(configEntry, configId, profileName, isManual) {
-        // If every output is disabled, force-enable the first so the compositor
-        // always has at least one active output.
-        const outputKeys = Object.keys(configEntry.outputs || {});
-        const hasEnabledOutput = outputKeys.some(k => !configEntry.outputs[k].disabled);
-        if (!hasEnabledOutput && outputKeys.length > 0) {
-            configEntry = JSON.parse(JSON.stringify(configEntry));
-            const firstKey = outputKeys[0];
-            delete configEntry.outputs[firstKey].disabled;
-            saveConfig();
-        }
+        ensureEnabledOutput(configEntry);
+        // Capture the entry being applied so disabled-output settings fields can read
+        // scale/position/transform back even when wlr reports no logical viewport.
+        root.lastAppliedEntry = JSON.parse(JSON.stringify(configEntry));
         const outputsData = generateOutputsDataFromConfig(configEntry);
         const paths = getConfigPaths();
         if (!paths) {
@@ -471,6 +471,8 @@ Singleton {
                         profilesLoading = false;
                         profileActivated(configId, profileName);
                         manualActivationTimer.restart();
+                    } else {
+                        saveConfigEntry(configEntry);
                     }
                 };
                 if (reloadCmd.length > 0)
@@ -483,24 +485,26 @@ Singleton {
     // ── Profile management ─────────────────────────────────────────────────
 
     function validateProfiles() {
+        console.warn("Validating profiles against current outputs...");
         readMonitorsJson(data => {
             const validated = {};
+            let dirty = false;
             for (const entry of (data.configurations || [])) {
                 const virtualId = Object.keys(entry.outputs || {}).sort().join("+");
                 if (!virtualId)
                     continue;
-                // If every output is disabled, enable the first one so the profile is always usable 
-                const hasEnabledOutput = Object.values(entry.outputs || {}).some(cfg => !cfg.disabled);
-                let outputs = entry.outputs;
-                if (!hasEnabledOutput) {
-                    const firstKey = Object.keys(outputs)[0];
-                    outputs = JSON.parse(JSON.stringify(outputs));
-                    delete outputs[firstKey].disabled;
-                }
-                validated[virtualId] = {name: entry?.name ? entry.name : "", outputs: outputs};
+                if (ensureEnabledOutput(entry))
+                    dirty = true;
+                validated[virtualId] = {name: entry?.name ? entry.name : "", outputs: entry.outputs};
             }
+            if (dirty)
+                writeMonitorsJson(data, null);
             validatedProfiles = validated;
             matchedProfile = findMatchingProfile();
+            if (!profilesReady) {
+                profilesReady = true;
+                applyAutoConfig();
+            }
         });
     }
 
@@ -508,12 +512,6 @@ Singleton {
         const currentKey = currentOutputSet.join("+");
         if (validatedProfiles[currentKey])
             return currentKey;
-        // Cross-format fallback: stored config may have been saved with a different displayNameMode
-        for (const storedKey in validatedProfiles) {
-            const normalizedKey = storedKey.split("+").map(id => normalizeOutputId(id)).sort().join("+");
-            if (normalizedKey === currentKey)
-                return storedKey;
-        }
         return "";
     }
 
@@ -616,14 +614,8 @@ Singleton {
         onTriggered: root.manualActivation = false
     }
 
-    Timer {
-        id: autoConfigDebounceTimer
-        interval: 1000 
-        onTriggered: root.applyAutoConfig()
-    }
-
     function applyAutoConfig() {
-        if (!SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
+        if (!profilesReady || !SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
             return;
         
         readMonitorsJson(data => {
@@ -631,8 +623,6 @@ Singleton {
             const match = findConfigEntry(data, currentOutputSet);
             if (match) {
                 const virtualId = Object.keys(match.entry.outputs || {}).sort().join("+");
-                if (virtualId === SettingsData.getActiveDisplayProfile(CompositorService.compositor))
-                    return;
                 applyConfigEntry(match.entry, virtualId, "", false);
                 return;
             }
@@ -650,8 +640,7 @@ Singleton {
             // Fill in any current outputs not covered by the partial config
             for (const name in outputs) {
                 const outputId = getOutputIdentifier(outputs[name], name);
-                const normalizedId = normalizeOutputId(outputId);
-                const alreadyCovered = Object.keys(outputConfigs).some(k => normalizeOutputId(k) === normalizedId);
+                const alreadyCovered = Object.keys(outputConfigs).some(k => k === outputId);
                 if (!alreadyCovered) {
                     const od = mergedOutputs[name];
                     if (od)
@@ -665,7 +654,6 @@ Singleton {
             const syntheticEntry = {name: "", outputs: outputConfigs};
             const syntheticId = Object.keys(outputConfigs).sort().join("+");
             applyConfigEntry(syntheticEntry, syntheticId, "", false);
-            saveConfig();
         });
     }
 
@@ -682,14 +670,12 @@ Singleton {
         return outputConfigs;
     }
 
-    function saveConfig() {
-        const outputConfigs = buildCurrentOutputConfigs();
-
+    function saveConfigEntry(configEntry) {
+        const outputIds = Object.keys(configEntry.outputs || {});
         readMonitorsJson(data => {
-            const match = findConfigEntry(data, currentOutputSet);
-            // Preserve existing name if this entry already has one
-            const existingName = match?.entry?.name;
-            const newEntry = {"name": existingName ?? "", "outputs": outputConfigs}; 
+            const match = findConfigEntry(data, outputIds);
+            const existingName = match?.entry?.name ?? configEntry.name ?? "";
+            const newEntry = {"name": existingName, "outputs": configEntry.outputs};
             if (match)
                 data.configurations[match.index] = newEntry;
             else
@@ -723,11 +709,37 @@ Singleton {
             });
         }
         for (const name in outputs) {
-            result[name] = Object.assign({}, outputs[name], {
-                "connected": true
-            });
+            const entry = JSON.parse(JSON.stringify(outputs[name]));
+            entry.connected = true;
+            // For disabled outputs wlr reports scale=0 (no logical viewport).
+            // Overlay scale/position/transform from the last applied profile so
+            // the settings UI can display meaningful values.
+            if (!(entry.logical?.scale > 0)) {
+                const profileCfg = getProfileOutputConfig(name);
+                if (profileCfg) {
+                    if (!entry.logical)
+                        entry.logical = {};
+                    entry.logical.scale = profileCfg.scale ?? 1.0;
+                    entry.logical.x = profileCfg.position?.x ?? entry.logical.x ?? 0;
+                    entry.logical.y = profileCfg.position?.y ?? entry.logical.y ?? 0;
+                    if (profileCfg.transform)
+                        entry.logical.transform = profileCfg.transform;
+                } else if (entry.logical) {
+                    entry.logical.scale = entry.logical.scale || 1.0;
+                }
+            }
+            result[name] = entry;
         }
         return result;
+    }
+
+    function getProfileOutputConfig(outputName) {
+        const sourceEntry = lastAppliedEntry || (matchedProfile ? validatedProfiles[matchedProfile] : null);
+        if (!sourceEntry)
+            return null;
+        const cfgOutputs = sourceEntry.outputs || {};
+        const outputId = getOutputIdentifier(outputs[outputName] || {}, outputName);
+        return Object.entries(cfgOutputs).find(([key]) => key === outputId)?.[1] ?? null;
     }
 
     onOutputsChanged: {
@@ -736,9 +748,10 @@ Singleton {
         if (JSON.stringify(newOutputSet) === JSON.stringify(currentOutputSet))
             return;
         currentOutputSet = newOutputSet;
-        autoConfigDebounceTimer.restart();
+        applyAutoConfig();
     }
     onSavedOutputsChanged: allOutputs = buildAllOutputsMap()
+    onLastAppliedEntryChanged: allOutputs = buildAllOutputsMap()
 
     Connections {
         target: WlrOutputService
@@ -1562,7 +1575,9 @@ Singleton {
     // Returns true if the given output can currently be disabled.
     // Prevents disabling all outputs and prevents disabling the only output
     // in a single-display configuration.
-    function canDisableOutput(output, outputName) {
+    function canDisableOutput() {
+        if (!CompositorService.isNiri && !CompositorService.isHyprland)
+            return false;
         const totalOutputs = Object.keys(outputs).length;
         if (totalOutputs <= 1)
             return false;
@@ -1717,6 +1732,11 @@ Singleton {
                 merged[outputId][key] = pendingNiriChanges[outputId][key];
             }
         }
+        // Never disable the only connected output — clear any stale flag
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in merged)
+                delete merged[id].disabled;
+        }
         return merged;
     }
 
@@ -1724,6 +1744,13 @@ Singleton {
         for (const outputId in pendingNiriChanges) {
             for (const key in pendingNiriChanges[outputId]) {
                 SettingsData.setNiriOutputSetting(outputId, key, pendingNiriChanges[outputId][key]);
+            }
+        }
+        // Clear stale disabled from SettingsData so NiriService reads clean state
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in SettingsData.niriOutputSettings) {
+                if (SettingsData.niriOutputSettings[id]?.disabled)
+                    SettingsData.setNiriOutputSetting(id, "disabled", null);
             }
         }
     }
@@ -1741,6 +1768,11 @@ Singleton {
                     merged[outputId][key] = val;
             }
         }
+        // Never disable the only connected output — clear any stale flag
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in merged)
+                delete merged[id].disabled;
+        }
         return merged;
     }
 
@@ -1752,6 +1784,13 @@ Singleton {
                     SettingsData.removeHyprlandOutputSetting(outputId, key);
                 else
                     SettingsData.setHyprlandOutputSetting(outputId, key, val);
+            }
+        }
+        // Clear stale disabled from SettingsData so HyprlandService reads clean state
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in SettingsData.hyprlandOutputSettings) {
+                if (SettingsData.hyprlandOutputSettings[id]?.disabled)
+                    SettingsData.removeHyprlandOutputSetting(id, "disabled");
             }
         }
     }
@@ -1859,8 +1898,10 @@ Singleton {
     }
 
     function confirmChanges() {
-        // saveConfig must be called before clearPendingChanges so pending changes are still available
-        saveConfig();
+        const outputConfigs = buildCurrentOutputConfigs();
+        const entry = {name: "", outputs: outputConfigs};
+        lastAppliedEntry = JSON.parse(JSON.stringify(entry));
+        saveConfigEntry(entry);
         clearPendingChanges();
         changesConfirmed();
     }
