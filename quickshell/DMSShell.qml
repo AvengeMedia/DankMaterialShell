@@ -4,6 +4,7 @@ import qs.Common
 import qs.Modals
 import qs.Modals.Changelog
 import qs.Modals.Clipboard
+import qs.Modals.Common
 import qs.Modals.Greeter
 import qs.Modals.Settings
 import qs.Modals.DankLauncherV2
@@ -284,11 +285,15 @@ Item {
 
         sourceComponent: Dock {
             contextMenu: dockContextMenuLoader.item ? dockContextMenuLoader.item : null
+            trashContextMenu: dockTrashContextMenuLoader.item ? dockTrashContextMenuLoader.item : null
         }
 
         onLoaded: {
             if (item) {
                 dockContextMenuLoader.active = true;
+                if (SettingsData.dockShowTrash) {
+                    dockTrashContextMenuLoader.active = true;
+                }
             }
         }
 
@@ -337,6 +342,43 @@ Item {
 
         DockContextMenu {
             id: dockContextMenu
+        }
+    }
+
+    LazyLoader {
+        id: dockTrashContextMenuLoader
+
+        active: false
+
+        DockTrashContextMenu {
+            id: dockTrashContextMenu
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onDockShowTrashChanged() {
+            if (SettingsData.dockShowTrash) {
+                dockTrashContextMenuLoader.active = true;
+            }
+        }
+    }
+
+    ConfirmModal {
+        id: emptyTrashConfirm
+    }
+
+    Connections {
+        target: TrashService
+        function onEmptyTrashConfirmRequested(itemCount) {
+            emptyTrashConfirm.showWithOptions({
+                title: I18n.tr("Empty Trash?"),
+                message: I18n.tr("Permanently delete %1 item(s)? This cannot be undone.").arg(itemCount),
+                confirmText: I18n.tr("Empty"),
+                cancelText: I18n.tr("Cancel"),
+                confirmColor: Theme.error,
+                onConfirm: () => TrashService.emptyTrash()
+            });
         }
     }
 

@@ -8,6 +8,7 @@ Item {
     id: root
 
     property var contextMenu: null
+    property var trashContextMenu: null
     property bool requestDockShow: false
     property int pinnedAppCount: 0
     property bool groupByApp: false
@@ -460,19 +461,32 @@ Item {
 
                 function updateModel() {
                     const baseResult = buildBaseItems();
-                    dockItems = applyOverflow(baseResult);
+                    let finalItems = applyOverflow(baseResult);
+                    if (SettingsData.dockShowTrash) {
+                        finalItems.push({
+                            uniqueKey: "trash_button",
+                            type: "trash",
+                            appId: "__TRASH__",
+                            toplevel: null,
+                            isPinned: false,
+                            isRunning: false,
+                            isInOverflow: false
+                        });
+                    }
+                    dockItems = finalItems;
                 }
 
                 delegate: Item {
                     id: delegateItem
 
-                    property var dockButton: itemData.type === "launcher" ? launcherButton : button
+                    property var dockButton: itemData.type === "launcher" ? launcherButton : (itemData.type === "trash" ? trashButton : button)
                     property var itemData: modelData
                     readonly property bool isOverflowToggle: itemData.type === "overflow-toggle"
+                    readonly property bool isTrash: itemData.type === "trash"
                     readonly property bool isInOverflow: itemData.isInOverflow === true
 
                     clip: false
-                    z: (itemData.type === "launcher" ? launcherButton.dragging : button.dragging) ? 100 : 0
+                    z: (itemData.type === "launcher" ? launcherButton.dragging : (itemData.type === "trash" ? false : button.dragging)) ? 100 : 0
                     visible: !isInOverflow || root.overflowExpanded
                     opacity: (isInOverflow && !root.overflowExpanded) ? 0 : 1
                     scale: (isInOverflow && !root.overflowExpanded) ? 0.8 : 1
@@ -568,9 +582,21 @@ Item {
                         index: model.index
                     }
 
+                    DockTrashButton {
+                        id: trashButton
+                        visible: itemData.type === "trash"
+                        anchors.centerIn: parent
+                        width: delegateItem.width
+                        height: delegateItem.height
+                        actualIconSize: root.iconSize
+                        dockApps: root
+                        contextMenu: root.trashContextMenu
+                        parentDockScreen: root.dockScreen
+                    }
+
                     DockAppButton {
                         id: button
-                        visible: !isOverflowToggle && itemData.type !== "separator" && itemData.type !== "launcher"
+                        visible: !isOverflowToggle && itemData.type !== "separator" && itemData.type !== "launcher" && itemData.type !== "trash"
                         anchors.centerIn: parent
                         width: delegateItem.width
                         height: delegateItem.height
@@ -638,6 +664,9 @@ Item {
             repeater.updateModel();
         }
         function onDockMaxVisibleRunningAppsChanged() {
+            repeater.updateModel();
+        }
+        function onDockShowTrashChanged() {
             repeater.updateModel();
         }
     }

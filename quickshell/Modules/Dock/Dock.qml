@@ -13,6 +13,7 @@ Variants {
     model: SettingsData.getFilteredScreens("dock")
 
     property var contextMenu
+    property var trashContextMenu
 
     delegate: PanelWindow {
         id: dock
@@ -120,7 +121,7 @@ Variants {
             return Math.round(v * _dpr) / _dpr;
         }
 
-        property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData)
+        property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData) || (dockVariants.trashContextMenu && dockVariants.trashContextMenu.visible && dockVariants.trashContextMenu.screen === modelData)
         property bool revealSticky: false
 
         readonly property bool shouldHideForWindows: {
@@ -659,6 +660,7 @@ Variants {
                         anchors.rightMargin: dock.isVertical ? SettingsData.dockSpacing : 0
 
                         contextMenu: dockVariants.contextMenu
+                        trashContextMenu: dockVariants.trashContextMenu
                         groupByApp: dock.groupByApp
                         isVertical: dock.isVertical
                         dockScreen: dock.screen

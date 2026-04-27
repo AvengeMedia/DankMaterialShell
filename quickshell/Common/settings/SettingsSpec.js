@@ -350,6 +350,9 @@ var SPEC = {
     dockMaxVisibleApps: { def: 0 },
     dockMaxVisibleRunningApps: { def: 0 },
     dockShowOverflowBadge: { def: true },
+    dockShowTrash: { def: false },
+    dockTrashFileManager: { def: "nautilus" },
+    dockTrashCustomCommand: { def: "" },
 
     notificationOverlayEnabled: { def: false },
     notificationPopupShadowEnabled: { def: true },
