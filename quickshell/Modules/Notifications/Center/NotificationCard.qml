@@ -674,8 +674,10 @@ Rectangle {
                                                     onEntered: parent.isHovered = true
                                                     onExited: parent.isHovered = false
                                                     onClicked: {
-                                                        if (modelData && modelData.invoke)
+                                                        if (modelData && modelData.invoke) {
                                                             modelData.invoke();
+                                                            PopoutService.closeNotificationCenter();
+                                                        }
                                                     }
                                                 }
                                             }
@@ -813,6 +815,7 @@ Rectangle {
                     onClicked: {
                         if (modelData && modelData.invoke) {
                             modelData.invoke();
+                            PopoutService.closeNotificationCenter();
                         }
                     }
                 }

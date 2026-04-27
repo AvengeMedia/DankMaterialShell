@@ -97,6 +97,8 @@ DankPopout {
     onDprChanged: updateStablePopupHeight()
 
     onShouldBeVisibleChanged: {
+        notificationHistoryVisible = shouldBeVisible;
+
         if (shouldBeVisible) {
             NotificationService.onOverlayOpen();
             updateStablePopupHeight();
