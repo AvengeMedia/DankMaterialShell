@@ -23,6 +23,7 @@ Item {
 
     property string passwordBuffer: ""
     property bool demoMode: false
+    property var pam: demoPam
     property string screenName: ""
     property bool unlocking: false
     property string pamState: ""
@@ -52,20 +53,18 @@ Item {
             return I18n.tr("Touch your security key...");
         if (pam.lockMessage && pam.lockMessage.length > 0)
             return pam.lockMessage;
-        if (pam.fprintState === "error") {
-            const detail = (pam.fprint.message || "").trim();
-            return detail.length > 0 ? I18n.tr("Fingerprint error: %1").arg(detail) : I18n.tr("Fingerprint error");
-        }
-        if (pam.fprintState === "max")
-            return I18n.tr("Maximum fingerprint attempts reached. Please use password.");
-        if (pam.fprintState === "fail")
-            return I18n.tr("Fingerprint not recognized (%1/%2). Please try again or use password.").arg(pam.fprint.tries).arg(SettingsData.maxFprintTries);
         if (root.pamState === "error")
             return I18n.tr("Authentication error - try again");
         if (root.pamState === "max")
             return I18n.tr("Too many attempts - locked out");
         if (root.pamState === "fail")
             return I18n.tr("Incorrect password - try again");
+        if (pam.fprintState === "error")
+            return I18n.tr("Fingerprint error");
+        if (pam.fprintState === "max")
+            return I18n.tr("Maximum fingerprint attempts reached. Please use password.");
+        if (pam.fprintState === "fail")
+            return I18n.tr("Fingerprint not recognized (%1/%2). Please try again or use password.").arg(pam.fprint.tries).arg(SettingsData.maxFprintTries);
         return "";
     }
 
@@ -742,13 +741,6 @@ Item {
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: Theme.mediumDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
                                     easing.type: Theme.standardEasing
                                 }
                             }
@@ -1639,47 +1631,44 @@ Item {
     }
 
     Pam {
-        id: pam
-        lockSecured: !demoMode
-        onUnlockRequested: {
+        id: demoPam
+        lockSecured: false
+    }
+
+    Connections {
+        target: root.pam
+
+        function onUnlockRequested() {
             root.unlocking = true;
             lockerReadyArmed = false;
             passwordField.text = "";
             root.passwordBuffer = "";
             root.unlockRequested();
         }
-        onStateChanged: {
-            root.pamState = state;
-            if (state !== "") {
-                root.unlocking = false;
-                placeholderDelay.restart();
-                passwordField.text = "";
-                root.passwordBuffer = "";
-            }
-        }
-        onU2fPendingChanged: {
-            if (u2fPending) {
-                passwordField.text = "";
-                root.passwordBuffer = "";
-                if (keyboardController.isKeyboardActive)
-                    keyboardController.hide();
-            }
-        }
-    }
 
-    Connections {
-        target: pam
+        function onStateChanged() {
+            root.pamState = root.pam.state;
+            if (root.pam.state === "")
+                return;
+            root.unlocking = false;
+            placeholderDelay.restart();
+            passwordField.text = "";
+            root.passwordBuffer = "";
+        }
+
+        function onU2fPendingChanged() {
+            if (!root.pam.u2fPending)
+                return;
+            passwordField.text = "";
+            root.passwordBuffer = "";
+            if (keyboardController.isKeyboardActive)
+                keyboardController.hide();
+        }
 
         function onUnlockInProgressChanged() {
-            if (!pam.unlockInProgress && root.unlocking)
+            if (!root.pam.unlockInProgress && root.unlocking)
                 root.unlocking = false;
         }
-    }
-
-    Binding {
-        target: pam
-        property: "buffer"
-        value: root.passwordBuffer
     }
 
     Timer {

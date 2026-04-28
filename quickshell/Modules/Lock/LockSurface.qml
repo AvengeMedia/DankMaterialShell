@@ -7,6 +7,7 @@ Rectangle {
     id: root
 
     required property WlSessionLock lock
+    required property var pam
     required property string sharedPasswordBuffer
     required property string screenName
     required property bool isLocked
@@ -21,6 +22,7 @@ Rectangle {
 
         anchors.fill: parent
         demoMode: false
+        pam: root.pam
         passwordBuffer: root.sharedPasswordBuffer
         screenName: root.screenName
         onUnlockRequested: root.unlockRequested()
