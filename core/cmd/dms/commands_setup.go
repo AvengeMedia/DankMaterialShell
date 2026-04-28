@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -267,6 +269,8 @@ func runSetupDmsConfig(name string) error {
 func runSetup() error {
 	fmt.Println("=== DMS Configuration Setup ===")
 
+	ensureInputGroup()
+
 	wm, wmSelected := promptCompositor()
 	terminal, terminalSelected := promptTerminal()
 	useSystemd := promptSystemd()
@@ -338,6 +342,37 @@ func runSetup() error {
 	}
 
 	return nil
+}
+
+// Add user to the input group for the evdev manager for inut state tracking.
+// Caps Lock OSD and the Caps Lock bar indicator.
+func ensureInputGroup() {
+	if !utils.HasGroup("input") {
+		return
+	}
+	currentUser := os.Getenv("USER")
+	if currentUser == "" {
+		currentUser = os.Getenv("LOGNAME")
+	}
+	if currentUser == "" {
+		return
+	}
+	out, err := execGroups(currentUser)
+	if err == nil && strings.Contains(out, "input") {
+		fmt.Printf("✓ %s is already in the input group (Caps Lock OSD enabled)\n", currentUser)
+		return
+	}
+	fmt.Println("Adding user to input group for Caps Lock OSD support...")
+	if err := privesc.Run(context.Background(), "", "usermod", "-aG", "input", currentUser); err != nil {
+		fmt.Printf("⚠ Could not add %s to input group (Caps Lock OSD will be unavailable): %v\n", currentUser, err)
+	} else {
+		fmt.Printf("✓ Added %s to input group (logout/login required to take effect)\n", currentUser)
+	}
+}
+
+func execGroups(user string) (string, error) {
+	out, err := exec.Command("groups", user).Output()
+	return string(out), err
 }
 
 func promptCompositor() (deps.WindowManager, bool) {
