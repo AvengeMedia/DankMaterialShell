@@ -1092,12 +1092,6 @@ Item {
         }
     }
 
-    Loader {
-        id: powerProfileWatcherLoader
-        active: SettingsData.osdPowerProfileEnabled
-        source: "Services/PowerProfileWatcher.qml"
-    }
-
     LazyLoader {
         id: hyprlandOverviewLoader
         active: CompositorService.isHyprland
