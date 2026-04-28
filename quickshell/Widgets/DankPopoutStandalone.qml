@@ -13,6 +13,7 @@ Item {
     property alias contentLoader: contentLoader
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
+    readonly property alias backgroundWindow: backgroundWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -181,15 +182,13 @@ Item {
             _surfaceMarginLeft = alignedX - shadowBuffer;
             _surfaceW = alignedWidth + shadowBuffer * 2;
         }
-        Qt.callLater(() => {
-            if (shouldBeVisible && screen) {
-                if (useBackgroundWindow)
-                    backgroundWindow.visible = true;
-                contentWindow.visible = true;
-                PopoutManager.showPopout(popoutHandle);
-                opened();
-            }
-        });
+        if (shouldBeVisible && screen) {
+            if (useBackgroundWindow)
+                backgroundWindow.visible = true;
+            contentWindow.visible = true;
+            PopoutManager.showPopout(popoutHandle);
+            opened();
+        }
     }
 
     function close() {

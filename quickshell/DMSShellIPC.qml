@@ -162,37 +162,36 @@ Item {
     }
 
     IpcHandler {
+        function resolveTabIndex(tab: string): int {
+            switch ((tab || "").toLowerCase()) {
+            case "media":
+                return 1;
+            case "wallpaper":
+                return 2;
+            case "weather":
+                return SettingsData.weatherEnabled ? 3 : 0;
+            default:
+                return 0;
+            }
+        }
+
         function open(tab: string): string {
             const bar = root.getPreferredBar("clockButtonRef");
             if (!bar)
                 return "DASH_OPEN_FAILED";
 
+            const tabIndex = resolveTabIndex(tab);
             const dash = root.dankDashPopoutLoader.item;
-            const onSameScreen = dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name;
-
-            if (!onSameScreen) {
-                bar.triggerWallpaperBrowser();
+            if (dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name) {
+                dash.currentTabIndex = tabIndex;
+                if (dash.updateSurfacePosition)
+                    dash.updateSurfacePosition();
+                return "DASH_OPEN_SUCCESS";
             }
 
-            if (!root.dankDashPopoutLoader.item)
+            if (!bar.triggerDashTab(tabIndex))
                 return "DASH_OPEN_FAILED";
 
-            switch (tab.toLowerCase()) {
-            case "media":
-                root.dankDashPopoutLoader.item.currentTabIndex = 1;
-                break;
-            case "wallpaper":
-                root.dankDashPopoutLoader.item.currentTabIndex = 2;
-                break;
-            case "weather":
-                root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 3 : 0;
-                break;
-            default:
-                root.dankDashPopoutLoader.item.currentTabIndex = 0;
-                break;
-            }
-
-            root.dankDashPopoutLoader.item.dashVisible = true;
             return "DASH_OPEN_SUCCESS";
         }
 
@@ -212,23 +211,8 @@ Item {
 
             const bar = root.getPreferredBar("clockButtonRef");
             if (bar) {
-                bar.triggerWallpaperBrowser();
-                if (root.dankDashPopoutLoader.item) {
-                    switch (tab.toLowerCase()) {
-                    case "media":
-                        root.dankDashPopoutLoader.item.currentTabIndex = 1;
-                        break;
-                    case "wallpaper":
-                        root.dankDashPopoutLoader.item.currentTabIndex = 2;
-                        break;
-                    case "weather":
-                        root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 3 : 0;
-                        break;
-                    default:
-                        root.dankDashPopoutLoader.item.currentTabIndex = 0;
-                        break;
-                    }
-                }
+                if (!bar.triggerDashTab(resolveTabIndex(tab)))
+                    return "DASH_TOGGLE_FAILED";
                 return "DASH_TOGGLE_SUCCESS";
             }
             return "DASH_TOGGLE_FAILED";

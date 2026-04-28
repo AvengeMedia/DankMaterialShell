@@ -14,6 +14,7 @@ Item {
     property alias contentLoader: contentLoader
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
+    readonly property alias backgroundWindow: contentWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -222,8 +223,6 @@ Item {
     readonly property real contentAnimX: contentContainer.animX
     readonly property real contentAnimY: contentContainer.animY
 
-    property bool _fullSyncPending: false
-
     // ─── ConnectedModeState sync ────────────────────────────────────────────
     function _syncPopoutChromeState() {
         if (!root.frameOwnsConnectedChrome) {
@@ -262,20 +261,8 @@ Item {
         ConnectedModeState.setPopoutBody(_chromeClaimId, root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
     }
 
-    function _flushFullSync() {
-        _fullSyncPending = false;
-        if (root && typeof root._syncPopoutChromeState === "function")
-            root._syncPopoutChromeState();
-    }
-
     function _queueFullSync() {
-        if (_fullSyncPending)
-            return;
-        _fullSyncPending = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushFullSync === "function")
-                root._flushFullSync();
-        });
+        _syncPopoutChromeState();
     }
 
     onAlignedXChanged: _queueFullSync()
@@ -349,15 +336,13 @@ Item {
 
         contentWindow.visible = true;
 
-        Qt.callLater(() => {
-            animationsEnabled = true;
-            shouldBeVisible = true;
-            if (shouldBeVisible && screen) {
-                contentWindow.visible = true;
-                PopoutManager.showPopout(popoutHandle);
-                opened();
-            }
-        });
+        animationsEnabled = true;
+        shouldBeVisible = true;
+        if (shouldBeVisible && screen) {
+            contentWindow.visible = true;
+            PopoutManager.showPopout(popoutHandle);
+            opened();
+        }
     }
 
     function close() {

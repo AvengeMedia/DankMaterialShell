@@ -43,10 +43,10 @@ PanelWindow {
         }
     }
 
-    function triggerWallpaperBrowser() {
+    function triggerDashTab(tabIndex) {
         dankDashPopoutLoader.active = true;
         if (!dankDashPopoutLoader.item) {
-            return;
+            return false;
         }
 
         let section = "center";
@@ -82,7 +82,12 @@ PanelWindow {
             dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
         }
 
-        PopoutManager.requestPopout(dankDashPopoutLoader.item, 2, (barConfig?.id ?? "default") + "-" + section + "-2");
+        PopoutManager.requestPopout(dankDashPopoutLoader.item, tabIndex, (barConfig?.id ?? "default") + "-" + section + "-" + tabIndex);
+        return true;
+    }
+
+    function triggerWallpaperBrowser() {
+        triggerDashTab(2);
     }
 
     readonly property var dBarLayer: {

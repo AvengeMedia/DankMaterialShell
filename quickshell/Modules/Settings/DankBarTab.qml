@@ -1412,6 +1412,10 @@ Item {
                         property: "value"
                         value: selectedBarConfig?.widgetOutlineThickness ?? 1
                         restoreMode: Binding.RestoreBinding
+                    }
+                }
+            }
+
             Item {
                 visible: dankBarTab.connectedFrameModeActive
                 width: parent.width
