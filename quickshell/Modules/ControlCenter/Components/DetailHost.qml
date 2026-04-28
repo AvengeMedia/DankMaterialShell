@@ -22,6 +22,7 @@ Item {
         case section === "wifi":
         case section === "bluetooth":
         case section === "builtin_vpn":
+        case section === "builtin_tailscale":
             return Math.min(350, maxAvailableHeight);
         case section.startsWith("brightnessSlider_"):
             return Math.min(400, maxAvailableHeight);
@@ -127,6 +128,12 @@ Item {
                     widgetModel.cupsLoader.active = true;
                 }
                 builtinInstance = widgetModel.cupsBuiltinInstance;
+            }
+            if (builtinId === "builtin_tailscale") {
+                if (widgetModel?.tailscaleLoader) {
+                    widgetModel.tailscaleLoader.active = true;
+                }
+                builtinInstance = widgetModel.tailscaleBuiltinInstance;
             }
 
             if (!builtinInstance || !builtinInstance.ccDetailContent) {
