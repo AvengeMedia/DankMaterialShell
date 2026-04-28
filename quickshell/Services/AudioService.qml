@@ -71,6 +71,36 @@ Singleton {
         return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
     }
 
+    // Resolve a PwNode by name from the live typed list and assign it as the
+    // default sink. Going through Pipewire.nodes.values directly (no .filter
+    // / spread / .sort / property var) avoids QML type erasure to QObject*,
+    // which newer quickshell rejects when assigning to preferredDefaultAudioSink.
+    function setDefaultSinkByName(name) {
+        if (!name)
+            return false;
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            const node = Pipewire.nodes.values[i];
+            if (node && node.name === name && node.audio && node.isSink && !node.isStream) {
+                Pipewire.preferredDefaultAudioSink = node;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function setDefaultSourceByName(name) {
+        if (!name)
+            return false;
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            const node = Pipewire.nodes.values[i];
+            if (node && node.name === name && node.audio && !node.isSink && !node.isStream) {
+                Pipewire.preferredDefaultAudioSource = node;
+                return true;
+            }
+        }
+        return false;
+    }
+
     function cycleAudioOutput() {
         const sinks = getAvailableSinks();
         if (sinks.length < 2)
@@ -80,7 +110,8 @@ Singleton {
         const currentIndex = sinks.findIndex(s => s.name === currentName);
         const nextIndex = (currentIndex + 1) % sinks.length;
         const nextSink = sinks[nextIndex];
-        Pipewire.preferredDefaultAudioSink = nextSink;
+        if (!setDefaultSinkByName(nextSink.name))
+            Pipewire.preferredDefaultAudioSink = nextSink;
         const name = displayName(nextSink);
         audioOutputCycled(name, sinkIcon(nextSink));
         return name;
