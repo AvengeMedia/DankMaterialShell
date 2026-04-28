@@ -115,4 +115,8 @@ Singleton {
             return translations[context][term];
         return term;
     }
+
+    function locale() {
+        return Qt.locale();
+    }
 }

@@ -17,8 +17,11 @@ BasePill {
     enableCursor: false
 
     property var parentWindow: null
+    property var widgetData: null
+    property string section: "right"
     property bool isAtBottom: false
     property bool isAutoHideBar: false
+    property bool useOverflowPopup: !widgetData?.trayUseInlineExpansion
     readonly property var hiddenTrayIds: {
         const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
         return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
@@ -39,6 +42,54 @@ BasePill {
             return id;
         }
         return `${id}::${tooltipTitle}`;
+    }
+
+    function trayIconSourceFor(trayItem) {
+        let icon = trayItem && trayItem.icon;
+        if (typeof icon === 'string' || icon instanceof String) {
+            if (icon === "")
+                return "";
+            if (icon.includes("?path=")) {
+                const split = icon.split("?path=");
+                if (split.length !== 2)
+                    return icon;
+                const name = split[0];
+                const path = split[1];
+                let fileName = name.substring(name.lastIndexOf("/") + 1);
+                if (fileName.startsWith("dropboxstatus")) {
+                    fileName = `hicolor/16x16/status/${fileName}`;
+                }
+                return `file://${path}/${fileName}`;
+            }
+            if (icon.startsWith("/") && !icon.startsWith("file://"))
+                return `file://${icon}`;
+            return icon;
+        }
+        return "";
+    }
+
+    function activateInlineTrayItem(trayItem, anchorItem) {
+        if (!trayItem)
+            return;
+        if (!trayItem.onlyMenu) {
+            trayItem.activate();
+            return;
+        }
+        if (!trayItem.hasMenu)
+            return;
+        root.showForTrayItem(trayItem, anchorItem, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+    }
+
+    function openInlineTrayContextMenu(trayItem, areaItem, mouse, anchorItem) {
+        if (!trayItem) {
+            return;
+        }
+        if (!trayItem.hasMenu) {
+            const gp = areaItem.mapToGlobal(mouse.x, mouse.y);
+            root.callContextMenuFallback(trayItem.id, Math.round(gp.x), Math.round(gp.y));
+            return;
+        }
+        root.showForTrayItem(trayItem, anchorItem, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
     }
 
     // ! TODO - replace with either native dbus client (like plugins use) or just a DMS cli or something
@@ -164,6 +215,7 @@ BasePill {
     property int dropTargetIndex: -1
     property bool suppressShiftAnimation: false
     readonly property bool hasHiddenItems: allTrayItems.length > mainBarItems.length
+    readonly property bool inlineExpanded: hasHiddenItems && !useOverflowPopup && menuOpen
     visible: allTrayItems.length > 0
     opacity: allTrayItems.length > 0 ? 1 : 0
 
