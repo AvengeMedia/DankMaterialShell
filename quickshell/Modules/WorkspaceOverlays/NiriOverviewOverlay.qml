@@ -68,6 +68,20 @@ Scope {
             hideSpotlight();
     }
 
+    onIsClosingChanged: {
+        if (!isClosing) {
+            closeTimer.stop();
+            return;
+        }
+        closeTimer.restart();
+    }
+
+    Timer {
+        id: closeTimer
+        interval: Theme.expressiveDurations.fast
+        onTriggered: niriOverviewScope.resetState()
+    }
+
     Loader {
         id: niriOverlayLoader
         active: overlayActive || isClosing
@@ -128,7 +142,7 @@ Scope {
                 WindowBlur {
                     targetWindow: overlayWindow
                     readonly property real s: Math.min(1, spotlightContainer.scale)
-                    readonly property bool active: spotlightContainer.visible && spotlightContainer.opacity > 0
+                    readonly property bool active: overlayWindow.shouldShowSpotlight && spotlightContainer.opacity > 0
                     blurX: spotlightContainer.x + spotlightContainer.width * (1 - s) * 0.5
                     blurY: spotlightContainer.y + spotlightContainer.height * (1 - s) * 0.5
                     blurWidth: active ? spotlightContainer.width * s : 0
@@ -256,16 +270,10 @@ Scope {
                     layer.textureSize: layer.enabled ? Qt.size(Math.round(width * overlayWindow.dpr), Math.round(height * overlayWindow.dpr)) : Qt.size(0, 0)
 
                     Behavior on scale {
-                        id: scaleAnimation
                         NumberAnimation {
                             duration: Theme.expressiveDurations.fast
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveFastSpatial : Theme.expressiveCurves.standardAccel
-                            onRunningChanged: {
-                                if (running || !spotlightContainer.animatingOut)
-                                    return;
-                                niriOverviewScope.resetState();
-                            }
                         }
                     }
 
