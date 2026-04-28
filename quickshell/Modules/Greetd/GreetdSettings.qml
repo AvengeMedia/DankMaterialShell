@@ -29,12 +29,6 @@ Singleton {
     property bool use24HourClock: true
     property bool showSeconds: false
     property bool padHours12Hour: false
-    property bool greeterUse24HourClock: true
-    property bool greeterShowSeconds: false
-    property bool greeterPadHours12Hour: false
-    property string greeterLockDateFormat: ""
-    property string greeterFontFamily: ""
-    property string greeterWallpaperFillMode: ""
     property bool useFahrenheit: false
     property bool nightModeEnabled: false
     property string weatherLocation: "New York, NY"
@@ -87,12 +81,6 @@ Singleton {
             use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true;
             showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : false;
             padHours12Hour = settings.padHours12Hour !== undefined ? settings.padHours12Hour : false;
-            greeterUse24HourClock = settings.greeterUse24HourClock !== undefined ? settings.greeterUse24HourClock : use24HourClock;
-            greeterShowSeconds = settings.greeterShowSeconds !== undefined ? settings.greeterShowSeconds : showSeconds;
-            greeterPadHours12Hour = settings.greeterPadHours12Hour !== undefined ? settings.greeterPadHours12Hour : padHours12Hour;
-            greeterLockDateFormat = settings.greeterLockDateFormat !== undefined ? settings.greeterLockDateFormat : "";
-            greeterFontFamily = settings.greeterFontFamily !== undefined ? settings.greeterFontFamily : "";
-            greeterWallpaperFillMode = settings.greeterWallpaperFillMode !== undefined ? settings.greeterWallpaperFillMode : "";
             useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false;
             nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false;
             weatherLocation = settings.weatherLocation !== undefined ? settings.weatherLocation : "New York, NY";
@@ -149,27 +137,23 @@ Singleton {
     }
 
     function getEffectiveTimeFormat() {
-        const use24 = greeterUse24HourClock;
-        const secs = greeterShowSeconds;
-        const pad = greeterPadHours12Hour;
-        if (use24)
-            return secs ? "hh:mm:ss" : "hh:mm";
-        if (pad)
-            return secs ? "hh:mm:ss AP" : "hh:mm AP";
-        return secs ? "h:mm:ss AP" : "h:mm AP";
+        if (use24HourClock)
+            return showSeconds ? "hh:mm:ss" : "hh:mm";
+        if (padHours12Hour)
+            return showSeconds ? "hh:mm:ss AP" : "hh:mm AP";
+        return showSeconds ? "h:mm:ss AP" : "h:mm AP";
     }
 
     function getEffectiveLockDateFormat() {
-        const fmt = (greeterLockDateFormat !== undefined && greeterLockDateFormat !== "") ? greeterLockDateFormat : lockDateFormat;
-        return fmt && fmt.length > 0 ? fmt : Locale.LongFormat;
+        return lockDateFormat && lockDateFormat.length > 0 ? lockDateFormat : Locale.LongFormat;
     }
 
     function getEffectiveWallpaperFillMode() {
-        return (greeterWallpaperFillMode && greeterWallpaperFillMode !== "") ? greeterWallpaperFillMode : wallpaperFillMode;
+        return wallpaperFillMode;
     }
 
     function getEffectiveFontFamily() {
-        return (greeterFontFamily && greeterFontFamily !== "") ? greeterFontFamily : fontFamily;
+        return fontFamily;
     }
 
     function getFilteredScreens(componentId) {

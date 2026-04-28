@@ -168,12 +168,6 @@ var SPEC = {
     greeterEnableFprint: { def: false },
     greeterEnableU2f: { def: false },
     greeterWallpaperPath: { def: "" },
-    greeterUse24HourClock: { def: true },
-    greeterShowSeconds: { def: false },
-    greeterPadHours12Hour: { def: false },
-    greeterLockDateFormat: { def: "" },
-    greeterFontFamily: { def: "" },
-    greeterWallpaperFillMode: { def: "" },
     mediaSize: { def: 1 },
 
     appLauncherViewMode: { def: "list" },
