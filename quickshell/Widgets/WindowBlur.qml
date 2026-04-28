@@ -55,7 +55,7 @@ Item {
     }
 
     Connections {
-        target: root.targetWindow
+        target: root.targetWindow ?? null
         function onVisibleChanged() {
             if (root.targetWindow && root.targetWindow.visible) {
                 root._region = null;

@@ -47,6 +47,7 @@ Item {
 
     readonly property var contentLoader: impl.item ? impl.item.contentLoader : _fallbackContentLoader
     readonly property var overlayLoader: impl.item ? impl.item.overlayLoader : _fallbackOverlayLoader
+    readonly property var backgroundWindow: impl.item ? impl.item.backgroundWindow : null
 
     Loader {
         id: _fallbackContentLoader

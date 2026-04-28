@@ -286,7 +286,11 @@ DankPopout {
                         id: editControls
                         width: parent.width
                         visible: editMode
-                        popoutContent: controlContent
+                        popupScreen: root.screen
+                        popoutX: root.alignedX
+                        popoutY: root.alignedY
+                        popoutWidth: root.alignedWidth
+                        popoutHeight: root.alignedHeight
                         availableWidgets: {
                             if (!editMode)
                                 return [];
