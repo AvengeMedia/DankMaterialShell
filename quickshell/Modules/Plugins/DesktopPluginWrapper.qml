@@ -407,6 +407,8 @@ Item {
                     item.widgetWidth = Qt.binding(() => contentLoader.width);
                 if (item.widgetHeight !== undefined)
                     item.widgetHeight = Qt.binding(() => contentLoader.height);
+                if (item.screen !== undefined)
+                    item.screen = Qt.binding(() => root.screen);
             }
         }
 
