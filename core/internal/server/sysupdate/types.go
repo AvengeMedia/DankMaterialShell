@@ -41,11 +41,10 @@ type Package struct {
 }
 
 type BackendInfo struct {
-	ID             string   `json:"id"`
-	DisplayName    string   `json:"displayName"`
-	Repo           RepoKind `json:"repo"`
-	NeedsAuth      bool     `json:"needsAuth"`
-	RunsInTerminal bool     `json:"runsInTerminal"`
+	ID          string   `json:"id"`
+	DisplayName string   `json:"displayName"`
+	Repo        RepoKind `json:"repo"`
+	NeedsAuth   bool     `json:"needsAuth"`
 }
 
 type ErrorInfo struct {
@@ -67,7 +66,6 @@ type State struct {
 	NextCheckUnix    int64         `json:"nextCheckUnix,omitempty"`
 	OperationID      string        `json:"operationId,omitempty"`
 	OperationStarted int64         `json:"operationStartedUnix,omitempty"`
-	RecentLog        []string      `json:"recentLog,omitempty"`
 	Error            *ErrorInfo    `json:"error,omitempty"`
 }
 

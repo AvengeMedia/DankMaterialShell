@@ -7,6 +7,8 @@ This file is more of a quick reference so I know what to account for before next
 - Terminal mux
 - Locale overrides
 - new neovim theming
+- system upder overhaul
+- New Log system, remember to update all plugins after release as it breaks compat
 
 # 1.4.0
 

@@ -9,7 +9,6 @@ Rectangle {
     property string iconName: ""
     property string text: ""
     property bool isDestructive: false
-    property bool enabled: true
 
     signal triggered
 

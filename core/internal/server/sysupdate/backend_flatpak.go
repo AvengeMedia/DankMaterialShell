@@ -16,7 +16,6 @@ func (flatpakBackend) ID() string                         { return "flatpak" }
 func (flatpakBackend) DisplayName() string                { return "Flatpak" }
 func (flatpakBackend) Repo() RepoKind                     { return RepoFlatpak }
 func (flatpakBackend) NeedsAuth() bool                    { return false }
-func (flatpakBackend) RunsInTerminal() bool               { return false }
 func (flatpakBackend) IsAvailable(_ context.Context) bool { return commandExists("flatpak") }
 
 func (flatpakBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
@@ -69,12 +68,11 @@ type flatpakInstalledEntry struct {
 	commit  string
 }
 
-func (flatpakBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
-	argv := []string{"flatpak", "update", "-y", "--noninteractive"}
+func (flatpakBackend) UpgradeCommand(opts UpgradeOptions) (string, error) {
 	if opts.DryRun {
-		argv = []string{"flatpak", "update", "--no-deploy", "-y"}
+		return "flatpak update --no-deploy -y", nil
 	}
-	return Run(ctx, argv, RunOptions{OnLine: onLine})
+	return "flatpak update -y --noninteractive", nil
 }
 
 func parseFlatpakUpdates(text string, installed map[string]flatpakInstalledEntry) []Package {

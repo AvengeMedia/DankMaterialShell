@@ -18,7 +18,6 @@ import (
 const (
 	defaultIntervalSeconds = 30 * 60
 	minIntervalSeconds     = 5 * 60
-	recentLogCapacity      = 200
 	checkTimeout           = 5 * time.Minute
 	upgradeTimeout         = 30 * time.Minute
 )
@@ -240,7 +239,6 @@ func (m *Manager) runRefresh(parent context.Context) {
 	}
 	m.state.Phase = PhaseRefreshing
 	m.state.Error = nil
-	m.state.RecentLog = nil
 	m.mu.Unlock()
 	m.markDirty()
 
@@ -298,57 +296,13 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		m.opMu.Unlock()
 	}()
 
-	if opts.CustomCommand != "" {
-		m.runCustomUpgrade(ctx, opts.CustomCommand, opts.Terminal)
+	combined, err := buildBundledCommand(m.selection, opts)
+	if err != nil {
+		m.setError(ErrCodeNoBackend, err.Error())
 		return
 	}
 
-	backends := upgradeBackends(m.selection, opts)
-	if len(backends) == 0 {
-		m.setError(ErrCodeNoBackend, "no backend selected for upgrade")
-		return
-	}
-
-	opID := fmt.Sprintf("op-%d", time.Now().UnixNano())
-	m.mu.Lock()
-	m.state.Phase = PhaseUpgrading
-	m.state.OperationID = opID
-	m.state.OperationStarted = time.Now().Unix()
-	m.state.RecentLog = m.state.RecentLog[:0]
-	m.state.Error = nil
-	m.mu.Unlock()
-	m.markDirty()
-
-	onLine := func(line string) { m.appendLog(line) }
-	for _, b := range backends {
-		m.appendLog(fmt.Sprintf("== %s ==", b.DisplayName()))
-		if err := b.Upgrade(ctx, opts, onLine); err != nil {
-			code := ErrCodeBackendFailed
-			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				code = ErrCodeTimeout
-			} else if errors.Is(ctx.Err(), context.Canceled) {
-				code = ErrCodeCancelled
-			}
-			m.mu.Lock()
-			m.state.Phase = PhaseError
-			m.state.Error = &ErrorInfo{Code: code, Message: fmt.Sprintf("%s: %v", b.ID(), err)}
-			m.mu.Unlock()
-			m.markDirty()
-			return
-		}
-	}
-
-	m.mu.Lock()
-	m.state.Phase = PhaseIdle
-	m.state.OperationID = ""
-	m.state.OperationStarted = 0
-	m.mu.Unlock()
-	m.markDirty()
-	go m.runRefresh(context.Background())
-}
-
-func (m *Manager) runCustomUpgrade(ctx context.Context, command, terminalOverride string) {
-	term := findTerminal(terminalOverride)
+	term := findTerminal(opts.Terminal)
 	if term == "" {
 		m.setError(ErrCodeBackendFailed, "no terminal found (pick one in DMS settings, set $TERMINAL, or install kitty/ghostty/foot/alacritty)")
 		return
@@ -359,14 +313,12 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, command, terminalOverrid
 	m.state.Phase = PhaseUpgrading
 	m.state.OperationID = opID
 	m.state.OperationStarted = time.Now().Unix()
-	m.state.RecentLog = m.state.RecentLog[:0]
 	m.state.Error = nil
 	m.mu.Unlock()
 	m.markDirty()
 
-	onLine := func(line string) { m.appendLog(line) }
-	argv := wrapInTerminal(term, "DMS — System Update (custom)", command)
-	if err := Run(ctx, argv, RunOptions{OnLine: onLine}); err != nil {
+	argv := wrapInTerminal(term, "DMS — System Update", combined)
+	if err := Run(ctx, argv); err != nil {
 		code := ErrCodeBackendFailed
 		switch {
 		case errors.Is(ctx.Err(), context.DeadlineExceeded):
@@ -391,6 +343,31 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, command, terminalOverrid
 	go m.runRefresh(context.Background())
 }
 
+func buildBundledCommand(sel Selection, opts UpgradeOptions) (string, error) {
+	if opts.CustomCommand != "" {
+		return opts.CustomCommand, nil
+	}
+	backends := upgradeBackends(sel, opts)
+	if len(backends) == 0 {
+		return "", errors.New("no backend selected for upgrade")
+	}
+	parts := make([]string, 0, len(backends))
+	for _, b := range backends {
+		cmd, err := b.UpgradeCommand(opts)
+		if err != nil {
+			return "", fmt.Errorf("%s: %w", b.ID(), err)
+		}
+		if cmd == "" {
+			continue
+		}
+		parts = append(parts, cmd)
+	}
+	if len(parts) == 0 {
+		return "", errors.New("no backend produced an upgrade command")
+	}
+	return strings.Join(parts, " && "), nil
+}
+
 func upgradeBackends(sel Selection, opts UpgradeOptions) []Backend {
 	var out []Backend
 	if sel.System != nil {
@@ -404,20 +381,6 @@ func upgradeBackends(sel Selection, opts UpgradeOptions) []Backend {
 		out = append(out, b)
 	}
 	return out
-}
-
-func (m *Manager) appendLog(line string) {
-	m.mu.Lock()
-	if cap(m.state.RecentLog) == 0 {
-		m.state.RecentLog = make([]string, 0, recentLogCapacity)
-	}
-	if len(m.state.RecentLog) >= recentLogCapacity {
-		copy(m.state.RecentLog, m.state.RecentLog[1:])
-		m.state.RecentLog = m.state.RecentLog[:recentLogCapacity-1]
-	}
-	m.state.RecentLog = append(m.state.RecentLog, line)
-	m.mu.Unlock()
-	m.markDirty()
 }
 
 func (m *Manager) setError(code ErrorCode, msg string) {
@@ -458,7 +421,6 @@ func cloneState(s State) State {
 	out := s
 	out.Backends = append([]BackendInfo(nil), s.Backends...)
 	out.Packages = append([]Package(nil), s.Packages...)
-	out.RecentLog = append([]string(nil), s.RecentLog...)
 	if s.Error != nil {
 		errCopy := *s.Error
 		out.Error = &errCopy

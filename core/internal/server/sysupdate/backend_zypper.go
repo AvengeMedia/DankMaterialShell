@@ -17,7 +17,6 @@ func (zypperBackend) ID() string                         { return "zypper" }
 func (zypperBackend) DisplayName() string                { return "Zypper" }
 func (zypperBackend) Repo() RepoKind                     { return RepoSystem }
 func (zypperBackend) NeedsAuth() bool                    { return true }
-func (zypperBackend) RunsInTerminal() bool               { return false }
 func (zypperBackend) IsAvailable(_ context.Context) bool { return commandExists("zypper") }
 
 type zypperUpdateList struct {
@@ -70,9 +69,9 @@ func parseZypperXML(out []byte) ([]Package, error) {
 	return pkgs, nil
 }
 
-func (zypperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
+func (zypperBackend) UpgradeCommand(opts UpgradeOptions) (string, error) {
 	if opts.DryRun {
-		return Run(ctx, []string{"zypper", "--non-interactive", "--dry-run", "update"}, RunOptions{OnLine: onLine})
+		return "zypper --non-interactive --dry-run update", nil
 	}
-	return Run(ctx, []string{"pkexec", "zypper", "--non-interactive", "update"}, RunOptions{OnLine: onLine})
+	return "sudo zypper --non-interactive update", nil
 }
