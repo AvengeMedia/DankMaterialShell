@@ -57,6 +57,8 @@ DankPopout {
             color: "transparent"
             focus: true
 
+            readonly property bool hasTerminalBackend: (SystemUpdateService.backends || []).some(b => b.runsInTerminal === true)
+
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape) {
                     systemUpdatePopout.close();
@@ -206,9 +208,13 @@ DankPopout {
                                 includeAUR: SettingsData.updaterAllowAUR,
                                 terminal: SessionData.terminalOverride
                             };
-                            systemUpdatePopout._reopenAfterUpgrade = true;
+                            if (updaterPanel.hasTerminalBackend) {
+                                systemUpdatePopout._reopenAfterUpgrade = true;
+                                SystemUpdateService.runUpdates(opts);
+                                systemUpdatePopout.close();
+                                return;
+                            }
                             SystemUpdateService.runUpdates(opts);
-                            systemUpdatePopout.close();
                         }
                     }
 
@@ -377,7 +383,7 @@ DankPopout {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
                     spacing: Theme.spacingS
-                    visible: SystemUpdateService.isUpgrading
+                    visible: SystemUpdateService.isUpgrading && updaterPanel.hasTerminalBackend
 
                     DankIcon {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -397,11 +403,36 @@ DankPopout {
 
                     StyledText {
                         width: parent.width
-                        text: I18n.tr("See the terminal window for prompts. This popout will return when the upgrade exits.")
+                        text: I18n.tr("AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+
+                DankFlickable {
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingM
+                    visible: SystemUpdateService.isUpgrading && !updaterPanel.hasTerminalBackend
+                    contentWidth: width
+                    contentHeight: logText.implicitHeight
+                    clip: true
+
+                    onContentHeightChanged: {
+                        if (contentHeight > height) {
+                            contentY = contentHeight - height;
+                        }
+                    }
+
+                    StyledText {
+                        id: logText
+                        width: parent.width
+                        text: (SystemUpdateService.recentLog || []).join("\n")
+                        font.family: Theme.monoFontFamily || "monospace"
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        wrapMode: Text.NoWrap
                     }
                 }
             }

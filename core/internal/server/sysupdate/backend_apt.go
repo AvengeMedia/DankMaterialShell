@@ -15,10 +15,11 @@ var aptUpgradableLine = regexp.MustCompile(`^([^/]+)/\S+\s+(\S+)\s+\S+\s+\[upgra
 
 type aptBackend struct{}
 
-func (aptBackend) ID() string          { return "apt" }
-func (aptBackend) DisplayName() string { return "APT" }
-func (aptBackend) Repo() RepoKind      { return RepoSystem }
-func (aptBackend) NeedsAuth() bool     { return true }
+func (aptBackend) ID() string           { return "apt" }
+func (aptBackend) DisplayName() string  { return "APT" }
+func (aptBackend) Repo() RepoKind       { return RepoSystem }
+func (aptBackend) NeedsAuth() bool      { return true }
+func (aptBackend) RunsInTerminal() bool { return false }
 func (aptBackend) IsAvailable(_ context.Context) bool {
 	return commandExists("apt") || commandExists("apt-get")
 }
@@ -33,16 +34,19 @@ func (aptBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
 	return parseAptUpgradable(string(out)), nil
 }
 
-func (aptBackend) UpgradeCommand(opts UpgradeOptions) (string, error) {
+func (aptBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
 	bin := "apt-get"
 	if !commandExists(bin) {
 		bin = "apt"
 	}
-	env := "DEBIAN_FRONTEND=noninteractive LC_ALL=C "
 	if opts.DryRun {
-		return env + bin + " upgrade --dry-run", nil
+		return Run(ctx, []string{bin, "upgrade", "--dry-run"}, RunOptions{
+			Env:    []string{"DEBIAN_FRONTEND=noninteractive", "LC_ALL=C"},
+			OnLine: onLine,
+		})
 	}
-	return "sudo " + env + bin + " upgrade -y", nil
+	argv := []string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", bin, "upgrade", "-y"}
+	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }
 
 func parseAptUpgradable(text string) []Package {

@@ -15,10 +15,11 @@ func init() {
 
 type rpmOstreeBackend struct{}
 
-func (rpmOstreeBackend) ID() string          { return "rpm-ostree" }
-func (rpmOstreeBackend) DisplayName() string { return "rpm-ostree" }
-func (rpmOstreeBackend) Repo() RepoKind      { return RepoOSTree }
-func (rpmOstreeBackend) NeedsAuth() bool     { return true }
+func (rpmOstreeBackend) ID() string           { return "rpm-ostree" }
+func (rpmOstreeBackend) DisplayName() string  { return "rpm-ostree" }
+func (rpmOstreeBackend) Repo() RepoKind       { return RepoOSTree }
+func (rpmOstreeBackend) NeedsAuth() bool      { return true }
+func (rpmOstreeBackend) RunsInTerminal() bool { return false }
 
 func (b rpmOstreeBackend) IsAvailable(ctx context.Context) bool {
 	if !commandExists("rpm-ostree") {
@@ -115,9 +116,10 @@ func bootedDeployment(deps []ostreeDeployment) *ostreeDeployment {
 	return nil
 }
 
-func (rpmOstreeBackend) UpgradeCommand(opts UpgradeOptions) (string, error) {
+func (rpmOstreeBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
+	argv := []string{"rpm-ostree", "upgrade"}
 	if opts.DryRun {
-		return "rpm-ostree upgrade --check", nil
+		argv = append(argv, "--check")
 	}
-	return "rpm-ostree upgrade", nil
+	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }

@@ -28,6 +28,7 @@ func (pacmanBackend) ID() string                         { return "pacman" }
 func (pacmanBackend) DisplayName() string                { return "Pacman" }
 func (pacmanBackend) Repo() RepoKind                     { return RepoSystem }
 func (pacmanBackend) NeedsAuth() bool                    { return true }
+func (pacmanBackend) RunsInTerminal() bool               { return false }
 func (pacmanBackend) IsAvailable(_ context.Context) bool { return commandExists("pacman") }
 
 func (b pacmanBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
@@ -38,11 +39,11 @@ func (b pacmanBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
 	return parseArchUpdates(out, b.ID(), RepoSystem), nil
 }
 
-func (pacmanBackend) UpgradeCommand(opts UpgradeOptions) (string, error) {
+func (b pacmanBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
 	if opts.DryRun {
-		return "pacman -Sup", nil
+		return Run(ctx, []string{"pacman", "-Sup"}, RunOptions{OnLine: onLine})
 	}
-	return "sudo pacman -Syu --noconfirm", nil
+	return Run(ctx, []string{"pkexec", "pacman", "-Syu", "--noconfirm"}, RunOptions{OnLine: onLine})
 }
 
 type archHelperBackend struct {
@@ -52,6 +53,7 @@ type archHelperBackend struct {
 func (b archHelperBackend) ID() string                         { return b.id }
 func (b archHelperBackend) Repo() RepoKind                     { return RepoSystem }
 func (b archHelperBackend) NeedsAuth() bool                    { return true }
+func (b archHelperBackend) RunsInTerminal() bool               { return true }
 func (b archHelperBackend) IsAvailable(_ context.Context) bool { return commandExists(b.id) }
 
 func (b archHelperBackend) DisplayName() string {
@@ -80,15 +82,20 @@ func (b archHelperBackend) CheckUpdates(ctx context.Context) ([]Package, error) 
 	return pkgs, nil
 }
 
-func (b archHelperBackend) UpgradeCommand(opts UpgradeOptions) (string, error) {
+func (b archHelperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
 	if opts.DryRun {
-		return fmt.Sprintf("%s -Sup", b.id), nil
+		return Run(ctx, []string{b.id, "-Sup"}, RunOptions{OnLine: onLine})
 	}
-	cmd := fmt.Sprintf("%s -Syu --noconfirm", b.id)
+	term := findTerminal(opts.Terminal)
+	if term == "" {
+		return fmt.Errorf("no terminal found (pick one in DMS settings, set $TERMINAL, or install kitty/ghostty/foot/alacritty)")
+	}
+	cmd := fmt.Sprintf("%s -Syu", b.id)
 	if !opts.IncludeAUR {
 		cmd += " --repo"
 	}
-	return cmd, nil
+	title := fmt.Sprintf("DMS — System Update (%s)", b.id)
+	return Run(ctx, wrapInTerminal(term, title, cmd), RunOptions{OnLine: onLine})
 }
 
 func pacmanRepoUpdates(ctx context.Context) (string, error) {

@@ -12,8 +12,9 @@ type Backend interface {
 	Repo() RepoKind
 	IsAvailable(ctx context.Context) bool
 	NeedsAuth() bool
+	RunsInTerminal() bool
 	CheckUpdates(ctx context.Context) ([]Package, error)
-	UpgradeCommand(opts UpgradeOptions) (string, error)
+	Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error
 }
 
 type Selection struct {
@@ -36,10 +37,11 @@ func (s Selection) Info() []BackendInfo {
 	out := make([]BackendInfo, 0, len(all))
 	for _, b := range all {
 		out = append(out, BackendInfo{
-			ID:          b.ID(),
-			DisplayName: b.DisplayName(),
-			Repo:        b.Repo(),
-			NeedsAuth:   b.NeedsAuth(),
+			ID:             b.ID(),
+			DisplayName:    b.DisplayName(),
+			Repo:           b.Repo(),
+			NeedsAuth:      b.NeedsAuth(),
+			RunsInTerminal: b.RunsInTerminal(),
 		})
 	}
 	return out

@@ -3,7 +3,6 @@ package sysupdate
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -17,10 +16,11 @@ type dnfBackend struct {
 	bin string
 }
 
-func (b dnfBackend) ID() string          { return b.bin }
-func (b dnfBackend) DisplayName() string { return strings.ToUpper(b.bin) }
-func (b dnfBackend) Repo() RepoKind      { return RepoSystem }
-func (b dnfBackend) NeedsAuth() bool     { return true }
+func (b dnfBackend) ID() string           { return b.bin }
+func (b dnfBackend) DisplayName() string  { return strings.ToUpper(b.bin) }
+func (b dnfBackend) Repo() RepoKind       { return RepoSystem }
+func (b dnfBackend) NeedsAuth() bool      { return true }
+func (b dnfBackend) RunsInTerminal() bool { return false }
 
 func (b dnfBackend) IsAvailable(ctx context.Context) bool {
 	if !commandExists(b.bin) {
@@ -41,11 +41,11 @@ func (b dnfBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
 	return parseDnfList(out, b.bin, installed), nil
 }
 
-func (b dnfBackend) UpgradeCommand(opts UpgradeOptions) (string, error) {
+func (b dnfBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
 	if opts.DryRun {
-		return fmt.Sprintf("%s upgrade --assumeno", b.bin), nil
+		return Run(ctx, []string{b.bin, "upgrade", "--assumeno"}, RunOptions{OnLine: onLine})
 	}
-	return fmt.Sprintf("sudo %s upgrade -y", b.bin), nil
+	return Run(ctx, []string{"pkexec", b.bin, "upgrade", "-y"}, RunOptions{OnLine: onLine})
 }
 
 func dnfListUpgrades(ctx context.Context, bin string) (string, error) {

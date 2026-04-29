@@ -24,6 +24,7 @@ Singleton {
     property string distributionPretty: ""
     property string pkgManager: ""
     property bool distributionSupported: false
+    property var recentLog: []
     property int intervalSeconds: 1800
     property int lastCheckUnix: 0
     property int nextCheckUnix: 0
@@ -88,6 +89,7 @@ Singleton {
         distribution = data.distro || "";
         distributionPretty = data.distroPretty || "";
         distributionSupported = (backends.length > 0);
+        recentLog = data.recentLog || [];
         intervalSeconds = data.intervalSeconds || 1800;
         lastCheckUnix = data.lastCheckUnix || 0;
         nextCheckUnix = data.nextCheckUnix || 0;

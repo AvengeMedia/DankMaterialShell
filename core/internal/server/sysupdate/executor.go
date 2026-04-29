@@ -1,18 +1,63 @@
 package sysupdate
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"sync"
 )
 
-func Run(ctx context.Context, argv []string) error {
+type RunOptions struct {
+	Env    []string
+	OnLine func(string)
+}
+
+func Run(ctx context.Context, argv []string, opts RunOptions) error {
 	if len(argv) == 0 {
 		return fmt.Errorf("sysupdate.Run: empty argv")
 	}
+
 	cmd := exec.CommandContext(ctx, argv[0], argv[1:]...)
-	return cmd.Run()
+	if len(opts.Env) > 0 {
+		cmd.Env = append(cmd.Environ(), opts.Env...)
+	}
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return err
+	}
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go pump(stdout, opts.OnLine, &wg)
+	go pump(stderr, opts.OnLine, &wg)
+	wg.Wait()
+
+	return cmd.Wait()
+}
+
+func pump(r io.Reader, onLine func(string), wg *sync.WaitGroup) {
+	defer wg.Done()
+	if onLine == nil {
+		_, _ = io.Copy(io.Discard, r)
+		return
+	}
+	scanner := bufio.NewScanner(r)
+	scanner.Buffer(make([]byte, 64*1024), 1024*1024)
+	for scanner.Scan() {
+		onLine(scanner.Text())
+	}
 }
 
 func Capture(ctx context.Context, argv []string) (string, error) {

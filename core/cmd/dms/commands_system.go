@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -184,20 +183,10 @@ func runSystemUpdateApply() {
 		DryRun:         sysUpdateDry,
 	}
 
+	onLine := func(line string) { fmt.Println(line) }
 	for _, b := range backends {
-		cmd, err := b.UpgradeCommand(opts)
-		if err != nil {
-			log.Fatalf("%s: %v", b.ID(), err)
-		}
-		if cmd == "" {
-			continue
-		}
-		fmt.Printf("\n== %s ==\n$ %s\n\n", b.DisplayName(), cmd)
-		shell := exec.CommandContext(ctx, "sh", "-c", cmd)
-		shell.Stdin = os.Stdin
-		shell.Stdout = os.Stdout
-		shell.Stderr = os.Stderr
-		if err := shell.Run(); err != nil {
+		fmt.Printf("\n== %s ==\n", b.DisplayName())
+		if err := b.Upgrade(ctx, opts, onLine); err != nil {
 			log.Fatalf("%s upgrade failed: %v", b.ID(), err)
 		}
 	}
