@@ -79,7 +79,46 @@ Singleton {
     property string pendingVpnUuid: ""
     property var vpnBusyStartTime: 0
 
-    property alias profiles: root.vpnProfiles
+    property var profiles: {
+        const mergedProfiles = vpnProfiles ? vpnProfiles.slice() : [];
+        const seen = new Set();
+
+        for (const profile of mergedProfiles) {
+            if (profile?.uuid)
+                seen.add("uuid:" + profile.uuid);
+            if (profile?.name)
+                seen.add("name:" + profile.name);
+        }
+
+        for (const active of vpnActive || []) {
+            const entryUuid = active?.uuid || active?.name || "";
+            const uuidKey = active?.uuid ? "uuid:" + active.uuid : "";
+            const nameKey = active?.name ? "name:" + active.name : "";
+
+            if ((uuidKey && seen.has(uuidKey)) || (!uuidKey && nameKey && seen.has(nameKey)))
+                continue;
+
+            mergedProfiles.unshift({
+                uuid: entryUuid,
+                name: active?.name || I18n.tr("Active VPN"),
+                serviceType: active?.serviceType || "",
+                type: active?.type || "",
+                typeLabel: active?.typeLabel || active?.vpnType || "",
+                state: active?.state || "",
+                device: active?.device || "",
+                transient: true,
+                canDelete: false,
+                canExpand: false
+            });
+
+            if (uuidKey)
+                seen.add(uuidKey);
+            if (nameKey)
+                seen.add(nameKey);
+        }
+
+        return mergedProfiles;
+    }
     property alias activeConnections: root.vpnActive
     property var activeUuids: vpnActive.map(v => v.uuid).filter(u => !!u)
     property var activeNames: vpnActive.map(v => v.name).filter(n => !!n)
