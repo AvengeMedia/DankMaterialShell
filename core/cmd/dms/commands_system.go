@@ -1,0 +1,277 @@
+package main
+
+import (
+	"bufio"
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
+	"github.com/spf13/cobra"
+)
+
+var systemCmd = &cobra.Command{
+	Use:   "system",
+	Short: "System operations",
+	Long:  "System-level operations (updates, etc.). Runs against installed package managers directly; does not require the DMS server.",
+}
+
+var systemUpdateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Apply or list system updates",
+	Long: `Apply or list system updates across detected package managers.
+
+Default behavior is to apply available updates after prompting for confirmation.
+Use --check to list updates without applying.
+
+Examples:
+  dms system update --check                  # list available updates
+  dms system update                          # apply updates (interactive prompt)
+  dms system update --noconfirm              # apply updates without prompting
+  dms system update --dry                    # simulate without changing anything
+  dms system update --no-flatpak --noconfirm # apply system updates only
+  dms system update --interval 3600          # set the server poll interval to 1h`,
+	Run: runSystemUpdate,
+}
+
+var (
+	sysUpdateCheck      bool
+	sysUpdateNoConfirm  bool
+	sysUpdateDry        bool
+	sysUpdateJSON       bool
+	sysUpdateNoFlatpak  bool
+	sysUpdateNoAUR      bool
+	sysUpdateIntervalS  int
+	sysUpdateListPmTime = 5 * time.Minute
+)
+
+func init() {
+	systemUpdateCmd.Flags().BoolVar(&sysUpdateCheck, "check", false, "List available updates without applying")
+	systemUpdateCmd.Flags().BoolVarP(&sysUpdateNoConfirm, "noconfirm", "y", false, "Apply updates without prompting")
+	systemUpdateCmd.Flags().BoolVar(&sysUpdateDry, "dry", false, "Simulate the upgrade without applying changes")
+	systemUpdateCmd.Flags().BoolVar(&sysUpdateJSON, "json", false, "Output as JSON (with --check)")
+	systemUpdateCmd.Flags().BoolVar(&sysUpdateNoFlatpak, "no-flatpak", false, "Skip the Flatpak overlay")
+	systemUpdateCmd.Flags().BoolVar(&sysUpdateNoAUR, "no-aur", false, "Skip the AUR (paru/yay only)")
+	systemUpdateCmd.Flags().IntVar(&sysUpdateIntervalS, "interval", -1, "Set the DMS server poll interval in seconds and exit (requires running server)")
+
+	systemCmd.AddCommand(systemUpdateCmd)
+}
+
+func runSystemUpdate(cmd *cobra.Command, args []string) {
+	switch {
+	case sysUpdateIntervalS >= 0:
+		runSystemUpdateSetInterval(sysUpdateIntervalS)
+	case sysUpdateCheck:
+		runSystemUpdateCheck()
+	default:
+		runSystemUpdateApply()
+	}
+}
+
+func selectBackends(ctx context.Context) []sysupdate.Backend {
+	sel := sysupdate.Select(ctx)
+	backends := sel.All()
+	if !sysUpdateNoFlatpak {
+		return backends
+	}
+	out := backends[:0]
+	for _, b := range backends {
+		if b.Repo() == sysupdate.RepoFlatpak {
+			continue
+		}
+		out = append(out, b)
+	}
+	return out
+}
+
+func runSystemUpdateCheck() {
+	ctx, cancel := context.WithTimeout(context.Background(), sysUpdateListPmTime)
+	defer cancel()
+
+	backends := selectBackends(ctx)
+	if len(backends) == 0 {
+		log.Fatal("No supported package manager found")
+	}
+
+	type backendResult struct {
+		ID       string              `json:"id"`
+		Display  string              `json:"displayName"`
+		Packages []sysupdate.Package `json:"packages"`
+	}
+	var results []backendResult
+	var allPkgs []sysupdate.Package
+	var firstErr error
+
+	for _, b := range backends {
+		pkgs, err := b.CheckUpdates(ctx)
+		if err != nil && firstErr == nil {
+			firstErr = fmt.Errorf("%s: %w", b.ID(), err)
+		}
+		results = append(results, backendResult{ID: b.ID(), Display: b.DisplayName(), Packages: pkgs})
+		allPkgs = append(allPkgs, pkgs...)
+	}
+
+	if sysUpdateJSON {
+		out, _ := json.MarshalIndent(map[string]any{
+			"backends": results,
+			"packages": allPkgs,
+			"error":    errOrEmpty(firstErr),
+			"count":    len(allPkgs),
+		}, "", "  ")
+		fmt.Println(string(out))
+		return
+	}
+
+	printBackends(backends)
+	fmt.Printf("Updates: %d\n", len(allPkgs))
+	if firstErr != nil {
+		fmt.Printf("Error:   %v\n", firstErr)
+	}
+	if len(allPkgs) == 0 {
+		return
+	}
+	fmt.Println()
+	for _, p := range allPkgs {
+		fmt.Printf("  [%s] %s  %s -> %s\n", p.Repo, p.Name, defaultIfEmpty(p.FromVersion, "?"), defaultIfEmpty(p.ToVersion, "?"))
+	}
+}
+
+func runSystemUpdateApply() {
+	checkCtx, checkCancel := context.WithTimeout(context.Background(), sysUpdateListPmTime)
+	defer checkCancel()
+
+	backends := selectBackends(checkCtx)
+	if len(backends) == 0 {
+		log.Fatal("No supported package manager found")
+	}
+
+	pkgs, firstErr := collectUpdates(checkCtx, backends)
+	if firstErr != nil {
+		fmt.Printf("Warning: %v\n\n", firstErr)
+	}
+
+	printBackends(backends)
+	fmt.Printf("Updates: %d\n", len(pkgs))
+	if len(pkgs) == 0 {
+		fmt.Println("Nothing to upgrade.")
+		return
+	}
+	fmt.Println()
+	for _, p := range pkgs {
+		fmt.Printf("  [%s] %s  %s -> %s\n", p.Repo, p.Name, defaultIfEmpty(p.FromVersion, "?"), defaultIfEmpty(p.ToVersion, "?"))
+	}
+	fmt.Println()
+
+	if !sysUpdateNoConfirm && !sysUpdateDry {
+		if !promptYesNo("Proceed with upgrade? [y/N]: ") {
+			fmt.Println("Aborted.")
+			return
+		}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
+
+	opts := sysupdate.UpgradeOptions{
+		IncludeFlatpak: !sysUpdateNoFlatpak,
+		IncludeAUR:     !sysUpdateNoAUR,
+		DryRun:         sysUpdateDry,
+	}
+
+	onLine := func(line string) { fmt.Println(line) }
+	for _, b := range backends {
+		fmt.Printf("\n== %s ==\n", b.DisplayName())
+		if err := b.Upgrade(ctx, opts, onLine); err != nil {
+			log.Fatalf("%s upgrade failed: %v", b.ID(), err)
+		}
+	}
+	if sysUpdateDry {
+		fmt.Println("\nDry run complete (no changes applied).")
+		return
+	}
+	fmt.Println("\nUpgrade complete.")
+}
+
+func collectUpdates(ctx context.Context, backends []sysupdate.Backend) ([]sysupdate.Package, error) {
+	var all []sysupdate.Package
+	var firstErr error
+	for _, b := range backends {
+		pkgs, err := b.CheckUpdates(ctx)
+		if err != nil && firstErr == nil {
+			firstErr = fmt.Errorf("%s: %w", b.ID(), err)
+		}
+		all = append(all, pkgs...)
+	}
+	return all, firstErr
+}
+
+func runSystemUpdateSetInterval(seconds int) {
+	resp, err := sendServerRequest(models.Request{
+		ID:     1,
+		Method: "sysupdate.setInterval",
+		Params: map[string]any{"seconds": float64(seconds)},
+	})
+	if err != nil {
+		log.Fatalf("Failed: %v (is dms server running?)", err)
+	}
+	if resp.Error != "" {
+		log.Fatalf("Error: %s", resp.Error)
+	}
+	fmt.Printf("Interval set to %d seconds.\n", seconds)
+}
+
+func promptYesNo(prompt string) bool {
+	if !stdinIsTTY() {
+		log.Fatal("Refusing to apply updates non-interactively. Re-run with --noconfirm or --check.")
+	}
+	fmt.Print(prompt)
+	reader := bufio.NewReader(os.Stdin)
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		return false
+	}
+	switch strings.ToLower(strings.TrimSpace(line)) {
+	case "y", "yes":
+		return true
+	default:
+		return false
+	}
+}
+
+func printBackends(backends []sysupdate.Backend) {
+	if len(backends) == 0 {
+		return
+	}
+	names := make([]string, 0, len(backends))
+	for _, b := range backends {
+		names = append(names, b.DisplayName())
+	}
+	fmt.Printf("Backends: %s\n", strings.Join(names, ", "))
+}
+
+func stdinIsTTY() bool {
+	fi, err := os.Stdin.Stat()
+	if err != nil {
+		return false
+	}
+	return (fi.Mode() & os.ModeCharDevice) != 0
+}
+
+func errOrEmpty(err error) string {
+	if err == nil {
+		return ""
+	}
+	return err.Error()
+}
+
+func defaultIfEmpty(s, def string) string {
+	if s == "" {
+		return def
+	}
+	return s
+}

@@ -895,7 +895,12 @@ Item {
 
         SystemUpdatePopout {
             id: systemUpdatePopout
-            onPopoutClosed: PopoutService.unloadSystemUpdate()
+            onPopoutClosed: {
+                if (systemUpdatePopout._reopenAfterUpgrade) {
+                    return;
+                }
+                PopoutService.unloadSystemUpdate();
+            }
 
             Component.onCompleted: {
                 PopoutService.systemUpdatePopout = systemUpdatePopout;

@@ -61,12 +61,13 @@ Singleton {
     signal screensaverStateUpdate(var data)
     signal clipboardStateUpdate(var data)
     signal locationStateUpdate(var data)
+    signal sysupdateStateUpdate(var data)
 
     property bool capsLockState: false
     property bool screensaverInhibited: false
     property var screensaverInhibitors: []
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location"]
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location", "sysupdate"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -393,6 +394,8 @@ Singleton {
             clipboardStateUpdate(data);
         } else if (service === "location") {
             locationStateUpdate(data);
+        } else if (service === "sysupdate") {
+            sysupdateStateUpdate(data);
         }
     }
 
@@ -748,5 +751,38 @@ Singleton {
         sendRequest("extworkspace.renameWorkspace", {
             "name": name
         }, callback);
+    }
+
+    function sysupdateGetState(callback) {
+        sendRequest("sysupdate.getState", null, callback);
+    }
+
+    function sysupdateRefresh(force, callback) {
+        sendRequest("sysupdate.refresh", {
+            "force": force === true
+        }, callback);
+    }
+
+    function sysupdateUpgrade(opts, callback) {
+        const params = opts || {};
+        sendRequest("sysupdate.upgrade", params, callback);
+    }
+
+    function sysupdateCancel(callback) {
+        sendRequest("sysupdate.cancel", null, callback);
+    }
+
+    function sysupdateSetInterval(seconds, callback) {
+        sendRequest("sysupdate.setInterval", {
+            "seconds": seconds
+        }, callback);
+    }
+
+    function sysupdateAcquire(callback) {
+        sendRequest("sysupdate.acquire", null, callback);
+    }
+
+    function sysupdateRelease(callback) {
+        sendRequest("sysupdate.release", null, callback);
     }
 }

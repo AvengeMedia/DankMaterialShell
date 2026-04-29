@@ -37,7 +37,7 @@ Singleton {
         return terminalFlags[terminal] ?? ["-e"]
     }
 
-    readonly property string terminal: Quickshell.env("TERMINAL") || "ghostty"
+    readonly property string terminal: SessionData.resolveTerminal() || "ghostty"
 
     function _terminalPrefix() {
         return [terminal].concat(getTerminalFlag(terminal))

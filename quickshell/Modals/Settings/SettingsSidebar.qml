@@ -164,7 +164,8 @@ Rectangle {
                     "id": "updater",
                     "text": I18n.tr("System Updater"),
                     "icon": "refresh",
-                    "tabIndex": 20
+                    "tabIndex": 20,
+                    "updaterOnly": true
                 },
                 {
                     "id": "desktop_widgets",
@@ -339,6 +340,8 @@ Rectangle {
         if (item.niriOnly && !CompositorService.isNiri)
             return false;
         if (item.clipboardOnly && (!DMSService.isConnected || DMSService.apiVersion < 23))
+            return false;
+        if (item.updaterOnly && !SystemUpdateService.sysupdateAvailable)
             return false;
         return true;
     }

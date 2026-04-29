@@ -325,6 +325,8 @@ Item {
                     placeholderText: I18n.tr("Enter launch prefix (e.g., 'uwsm-app')")
                     onTextEdited: SettingsData.set("launchPrefix", text)
                 }
+
+                TerminalPickerRow {}
             }
 
             SettingsCard {

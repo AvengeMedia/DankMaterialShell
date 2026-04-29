@@ -237,7 +237,7 @@ Singleton {
         const finalEnv = Object.assign({}, cursorEnv, overrideEnv);
 
         if (desktopEntry.runInTerminal) {
-            const terminal = Quickshell.env("TERMINAL") || "xterm";
+            const terminal = SessionData.resolveTerminal() || "xterm";
             const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ");
             const shellCmd = prefix.length > 0 ? `${prefix} ${escapedCmd}` : escapedCmd;
             Quickshell.execDetached({

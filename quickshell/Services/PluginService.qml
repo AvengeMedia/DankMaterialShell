@@ -860,7 +860,7 @@ Singleton {
     function checkPluginCompatibility(requiresDms) {
         if (!requiresDms)
             return true;
-        return SystemUpdateService.checkVersionRequirement(requiresDms, SystemUpdateService.getParsedShellVersion());
+        return ShellVersionService.checkVersionRequirement(requiresDms, ShellVersionService.getParsedShellVersion());
     }
 
     function getIncompatiblePlugins() {

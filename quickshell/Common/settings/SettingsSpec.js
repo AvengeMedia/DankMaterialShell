@@ -428,6 +428,9 @@ var SPEC = {
     updaterUseCustomCommand: { def: false },
     updaterCustomCommand: { def: "" },
     updaterTerminalAdditionalParams: { def: "" },
+    updaterIntervalSeconds: { def: 1800 },
+    updaterIncludeFlatpak: { def: true },
+    updaterAllowAUR: { def: true },
 
     displayNameMode: { def: "system" },
     screenPreferences: { def: {} },

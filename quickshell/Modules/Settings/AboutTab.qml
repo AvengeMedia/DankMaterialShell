@@ -189,10 +189,10 @@ Item {
 
                     StyledText {
                         text: {
-                            if (!SystemUpdateService.shellVersion && !DMSService.cliVersion)
+                            if (!ShellVersionService.shellVersion && !DMSService.cliVersion)
                                 return "dms";
 
-                            let version = SystemUpdateService.shellVersion || "";
+                            let version = ShellVersionService.shellVersion || "";
                             let cliVersion = DMSService.cliVersion || "";
 
                             // Debian/Ubuntu/OpenSUSE git format: 1.0.3+git2264.c5c5ce84
@@ -218,7 +218,7 @@ Item {
 
                                 let baseVersion = extractBaseVersion(cliVersion);
                                 if (!baseVersion)
-                                    baseVersion = extractBaseVersion(SystemUpdateService.semverVersion);
+                                    baseVersion = extractBaseVersion(ShellVersionService.semverVersion);
                                 if (baseVersion) {
                                     return `dms (git) v${baseVersion}-${match[1]}`;
                                 }
@@ -253,8 +253,8 @@ Item {
                     }
 
                     StyledText {
-                        visible: SystemUpdateService.shellCodename.length > 0
-                        text: `"${SystemUpdateService.shellCodename}"`
+                        visible: ShellVersionService.shellCodename.length > 0
+                        text: `"${ShellVersionService.shellCodename}"`
                         font.pixelSize: Theme.fontSizeMedium
                         font.italic: true
                         color: Theme.surfaceVariantText

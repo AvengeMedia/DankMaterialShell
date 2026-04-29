@@ -30,8 +30,35 @@ Singleton {
     property bool isLightMode: false
     property bool doNotDisturb: false
     property real doNotDisturbUntil: 0
+    property string terminalOverride: ""
     property bool isSwitchingMode: false
     property bool suppressOSD: true
+
+    readonly property var terminalOptions: ["ghostty", "kitty", "foot", "alacritty", "wezterm", "konsole", "gnome-terminal", "xterm"]
+    property var installedTerminals: []
+
+    function resolveTerminal() {
+        if (terminalOverride && terminalOverride.length > 0) {
+            return terminalOverride;
+        }
+        const env = Quickshell.env("TERMINAL");
+        if (env && env.length > 0) {
+            return env;
+        }
+        return "";
+    }
+
+    Process {
+        id: terminalProbe
+        running: true
+        command: ["sh", "-c", "for t in ghostty kitty foot alacritty wezterm konsole gnome-terminal xterm; do command -v \"$t\" >/dev/null 2>&1 && echo \"$t\"; done"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const found = text.trim().split("\n").filter(line => line.length > 0);
+                root.installedTerminals = found;
+            }
+        }
+    }
 
     Timer {
         id: dndExpireTimer

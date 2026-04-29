@@ -1881,7 +1881,7 @@ Item {
     function openTerminal(path) {
         if (!path)
             return;
-        var terminal = Quickshell.env("TERMINAL") || "xterm";
+        var terminal = SessionData.resolveTerminal() || "xterm";
         Quickshell.execDetached({
             command: [terminal],
             workingDirectory: path
