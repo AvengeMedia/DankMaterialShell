@@ -56,12 +56,15 @@ bash.x86_64       5.2.40-1.fc41       updates`,
 			want:      nil,
 		},
 		{
-			name:      "package without arch suffix",
-			input:     "noarchpkg 1.2.3 updates",
+			name: "skips dnf5 banner / column header lines",
+			input: `Updates available
+Last metadata expiration check: 0:01:23 ago on Tue Apr 29 14:00:00 2026.
+Package    Version    Repository    Size
+bash.x86_64       5.2.40-1.fc41       updates`,
 			backendID: "dnf",
-			installed: map[string]string{"noarchpkg": "1.2.0"},
+			installed: nil,
 			want: []Package{
-				{Name: "noarchpkg", Repo: RepoSystem, Backend: "dnf", FromVersion: "1.2.0", ToVersion: "1.2.3"},
+				{Name: "bash.x86_64", Repo: RepoSystem, Backend: "dnf", FromVersion: "", ToVersion: "5.2.40-1.fc41"},
 			},
 		},
 	}

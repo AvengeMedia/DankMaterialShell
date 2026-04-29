@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -16,6 +17,21 @@ DankPopout {
     }
 
     property bool _reopenAfterUpgrade: false
+
+    readonly property bool polkitModalOpen: PopoutService.polkitAuthModal?.visible ?? false
+    readonly property bool anyModalOpen: polkitModalOpen
+
+    backgroundInteractive: !anyModalOpen
+
+    customKeyboardFocus: {
+        if (!shouldBeVisible)
+            return WlrKeyboardFocus.None;
+        if (anyModalOpen)
+            return WlrKeyboardFocus.None;
+        if (CompositorService.useHyprlandFocusGrab)
+            return WlrKeyboardFocus.OnDemand;
+        return WlrKeyboardFocus.Exclusive;
+    }
 
     Connections {
         target: SystemUpdateService
@@ -38,7 +54,11 @@ DankPopout {
     screen: triggerScreen
     shouldBeVisible: false
 
-    onBackgroundClicked: close()
+    onBackgroundClicked: {
+        if (anyModalOpen)
+            return;
+        close();
+    }
 
     onShouldBeVisibleChanged: {
         if (!shouldBeVisible) {
@@ -290,7 +310,7 @@ DankPopout {
                         }
                     }
                     font.pixelSize: Theme.fontSizeMedium
-                    color: SystemUpdateService.hasError ? Theme.errorText : Theme.surfaceText
+                    color: SystemUpdateService.hasError ? Theme.error : Theme.surfaceText
                     wrapMode: Text.WordWrap
                 }
 

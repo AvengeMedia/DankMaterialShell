@@ -38,6 +38,7 @@ type Package struct {
 	ToVersion    string   `json:"toVersion,omitempty"`
 	SizeBytes    int64    `json:"sizeBytes,omitempty"`
 	ChangelogURL string   `json:"changelogUrl,omitempty"`
+	Ref          string   `json:"-"`
 }
 
 type BackendInfo struct {
@@ -77,6 +78,7 @@ type UpgradeOptions struct {
 	DryRun         bool
 	CustomCommand  string
 	Terminal       string
+	Targets        []Package
 }
 
 type RefreshOptions struct {

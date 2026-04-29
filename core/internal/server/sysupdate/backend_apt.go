@@ -45,7 +45,11 @@ func (aptBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(
 			OnLine: onLine,
 		})
 	}
-	argv := []string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", bin, "upgrade", "-y"}
+	names := pickTargetNames(opts.Targets, "apt", true)
+	if len(names) == 0 {
+		return nil
+	}
+	argv := append([]string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", bin, "install", "-y", "--only-upgrade"}, names...)
 	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }
 

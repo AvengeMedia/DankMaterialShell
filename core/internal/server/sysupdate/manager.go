@@ -309,6 +309,12 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		return
 	}
 
+	if len(opts.Targets) == 0 {
+		m.mu.RLock()
+		opts.Targets = append([]Package(nil), m.state.Packages...)
+		m.mu.RUnlock()
+	}
+
 	opID := fmt.Sprintf("op-%d", time.Now().UnixNano())
 	m.mu.Lock()
 	m.state.Phase = PhaseUpgrading

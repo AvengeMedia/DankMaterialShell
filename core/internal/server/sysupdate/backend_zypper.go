@@ -74,5 +74,10 @@ func (zypperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine fu
 	if opts.DryRun {
 		return Run(ctx, []string{"zypper", "--non-interactive", "--dry-run", "update"}, RunOptions{OnLine: onLine})
 	}
-	return Run(ctx, []string{"pkexec", "zypper", "--non-interactive", "update"}, RunOptions{OnLine: onLine})
+	names := pickTargetNames(opts.Targets, "zypper", true)
+	if len(names) == 0 {
+		return nil
+	}
+	argv := append([]string{"pkexec", "zypper", "--non-interactive", "update"}, names...)
+	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }

@@ -70,11 +70,30 @@ type flatpakInstalledEntry struct {
 }
 
 func (flatpakBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
-	argv := []string{"flatpak", "update", "-y", "--noninteractive"}
 	if opts.DryRun {
-		argv = []string{"flatpak", "update", "--no-deploy", "-y"}
+		return Run(ctx, []string{"flatpak", "update", "--no-deploy", "-y"}, RunOptions{OnLine: onLine})
 	}
+	refs := flatpakTargetRefs(opts.Targets)
+	if len(refs) == 0 {
+		return nil
+	}
+	argv := append([]string{"flatpak", "update", "-y", "--noninteractive"}, refs...)
 	return Run(ctx, argv, RunOptions{OnLine: onLine})
+}
+
+func flatpakTargetRefs(targets []Package) []string {
+	out := make([]string, 0, len(targets))
+	for _, p := range targets {
+		if p.Backend != "flatpak" {
+			continue
+		}
+		ref := p.Ref
+		if ref == "" {
+			ref = p.Name
+		}
+		out = append(out, ref)
+	}
+	return out
 }
 
 func parseFlatpakUpdates(text string, installed map[string]flatpakInstalledEntry) []Package {
@@ -111,7 +130,17 @@ func parseFlatpakUpdates(text string, installed map[string]flatpakInstalledEntry
 			key = appID + "//" + branch
 		}
 		inst := installed[key]
+
+		if inst.commit != "" && commit != "" && strings.HasPrefix(commit, inst.commit) {
+			continue
+		}
+
 		from, to := flatpakVersionPair(inst.version, inst.commit, version, commit)
+
+		ref := appID
+		if branch != "" {
+			ref = appID + "//" + branch
+		}
 
 		pkgs = append(pkgs, Package{
 			Name:        display,
@@ -119,6 +148,7 @@ func parseFlatpakUpdates(text string, installed map[string]flatpakInstalledEntry
 			Backend:     "flatpak",
 			FromVersion: from,
 			ToVersion:   to,
+			Ref:         ref,
 		})
 	}
 	return pkgs

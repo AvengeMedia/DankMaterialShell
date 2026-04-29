@@ -43,17 +43,24 @@ func (b pacmanBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 	if opts.DryRun {
 		return Run(ctx, []string{"pacman", "-Sup"}, RunOptions{OnLine: onLine})
 	}
-	return Run(ctx, []string{"pkexec", "pacman", "-Syu", "--noconfirm"}, RunOptions{OnLine: onLine})
+	names := pickTargetNames(opts.Targets, b.ID(), opts.IncludeAUR)
+	if len(names) == 0 {
+		return nil
+	}
+	argv := append([]string{"pkexec", "pacman", "-Sy", "--noconfirm", "--needed"}, names...)
+	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }
 
 type archHelperBackend struct {
 	id string
 }
 
-func (b archHelperBackend) ID() string                         { return b.id }
-func (b archHelperBackend) Repo() RepoKind                     { return RepoSystem }
-func (b archHelperBackend) NeedsAuth() bool                    { return true }
-func (b archHelperBackend) RunsInTerminal() bool               { return true }
+func (b archHelperBackend) ID() string      { return b.id }
+func (b archHelperBackend) Repo() RepoKind  { return RepoSystem }
+func (b archHelperBackend) NeedsAuth() bool { return true }
+func (b archHelperBackend) RunsInTerminal() bool {
+	return os.Getenv("DMS_FORCE_PKEXEC") != "1"
+}
 func (b archHelperBackend) IsAvailable(_ context.Context) bool { return commandExists(b.id) }
 
 func (b archHelperBackend) DisplayName() string {
@@ -86,16 +93,35 @@ func (b archHelperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onL
 	if opts.DryRun {
 		return Run(ctx, []string{b.id, "-Sup"}, RunOptions{OnLine: onLine})
 	}
+	names := pickTargetNames(opts.Targets, b.id, opts.IncludeAUR)
+	if len(names) == 0 {
+		return nil
+	}
+	if os.Getenv("DMS_FORCE_PKEXEC") == "1" {
+		argv := append([]string{"pkexec", b.id, "-Sy", "--noconfirm", "--needed"}, names...)
+		return Run(ctx, argv, RunOptions{OnLine: onLine})
+	}
 	term := findTerminal(opts.Terminal)
 	if term == "" {
 		return fmt.Errorf("no terminal found (pick one in DMS settings, set $TERMINAL, or install kitty/ghostty/foot/alacritty)")
 	}
-	cmd := fmt.Sprintf("%s -Syu", b.id)
-	if !opts.IncludeAUR {
-		cmd += " --repo"
-	}
+	cmd := fmt.Sprintf("%s -Sy --noconfirm --needed %s", b.id, strings.Join(names, " "))
 	title := fmt.Sprintf("DMS — System Update (%s)", b.id)
 	return Run(ctx, wrapInTerminal(term, title, cmd), RunOptions{OnLine: onLine})
+}
+
+func pickTargetNames(targets []Package, backendID string, includeAUR bool) []string {
+	out := make([]string, 0, len(targets))
+	for _, p := range targets {
+		if p.Backend != backendID {
+			continue
+		}
+		if !includeAUR && p.Repo == RepoAUR {
+			continue
+		}
+		out = append(out, p.Name)
+	}
+	return out
 }
 
 func pacmanRepoUpdates(ctx context.Context) (string, error) {

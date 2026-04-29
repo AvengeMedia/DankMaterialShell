@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"sync"
+	"syscall"
 )
 
 type RunOptions struct {
@@ -23,6 +24,13 @@ func Run(ctx context.Context, argv []string, opts RunOptions) error {
 	cmd := exec.CommandContext(ctx, argv[0], argv[1:]...)
 	if len(opts.Env) > 0 {
 		cmd.Env = append(cmd.Environ(), opts.Env...)
+	}
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.Cancel = func() error {
+		if cmd.Process == nil {
+			return nil
+		}
+		return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	}
 
 	stdout, err := cmd.StdoutPipe()

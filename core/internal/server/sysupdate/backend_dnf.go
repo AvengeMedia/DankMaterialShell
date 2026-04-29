@@ -45,7 +45,12 @@ func (b dnfBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine fun
 	if opts.DryRun {
 		return Run(ctx, []string{b.bin, "upgrade", "--assumeno"}, RunOptions{OnLine: onLine})
 	}
-	return Run(ctx, []string{"pkexec", b.bin, "upgrade", "-y"}, RunOptions{OnLine: onLine})
+	names := pickTargetNames(opts.Targets, b.bin, true)
+	if len(names) == 0 {
+		return nil
+	}
+	argv := append([]string{"pkexec", b.bin, "upgrade", "-y"}, names...)
+	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }
 
 func dnfListUpgrades(ctx context.Context, bin string) (string, error) {
@@ -88,14 +93,14 @@ func parseDnfList(text, backendID string, installed map[string]string) []Package
 		}
 		nameArch := fields[0]
 		version := fields[1]
-		switch nameArch {
-		case "Available", "Upgrades":
+		dot := strings.LastIndex(nameArch, ".")
+		if dot <= 0 {
 			continue
 		}
-		name := nameArch
-		if dot := strings.LastIndex(nameArch, "."); dot > 0 {
-			name = nameArch[:dot]
+		if !looksLikeRpmVersion(version) {
+			continue
 		}
+		name := nameArch[:dot]
 		pkgs = append(pkgs, Package{
 			Name:        nameArch,
 			Repo:        RepoSystem,
@@ -105,4 +110,16 @@ func parseDnfList(text, backendID string, installed map[string]string) []Package
 		})
 	}
 	return pkgs
+}
+
+func looksLikeRpmVersion(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if r >= '0' && r <= '9' {
+			return true
+		}
+	}
+	return false
 }
