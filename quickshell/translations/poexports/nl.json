@@ -50,6 +50,12 @@
   "%1 filtered": {
     "%1 filtered": "%1 gefilterd"
   },
+  "%1 h %2 m left": {
+    "%1 h %2 m left": ""
+  },
+  "%1 h left": {
+    "%1 h left": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 is nu opgenomen in config"
   },
@@ -58,6 +64,9 @@
   },
   "%1 issues found": {
     "%1 issues found": "%1 problemen gevonden"
+  },
+  "%1 min left": {
+    "%1 min left": ""
   },
   "%1 notifications": {
     "%1 notifications": "%1 meldingen"
@@ -146,6 +155,9 @@
   "14 days": {
     "14 days": "14 dagen"
   },
+  "15 min": {
+    "15 min": ""
+  },
   "15 minutes": {
     "15 minutes": "15 minuten"
   },
@@ -202,6 +214,9 @@
   },
   "30 days": {
     "30 days": "30 dagen"
+  },
+  "30 min": {
+    "30 min": ""
   },
   "30 minutes": {
     "30 minutes": "30 minuten"
@@ -278,6 +293,9 @@
   "API": {
     "API": "API"
   },
+  "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": ""
+  },
   "Aborted": {
     "Aborted": "Afgebroken"
   },
@@ -351,7 +369,7 @@
     "Adapters": "Adapters"
   },
   "Adaptive Media Width": {
-    "Adaptive Media Width": ""
+    "Adaptive Media Width": "Adaptieve mediabreedte"
   },
   "Add": {
     "Add": "Toevoegen"
@@ -499,6 +517,9 @@
   },
   "Apply Changes": {
     "Apply Changes": "Wijzigingen toepassen"
+  },
+  "Apply Flatpak updates alongside system updates when running 'Update All'.": {
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": ""
   },
   "Apply GTK Colors": {
     "Apply GTK Colors": "GTK-kleuren toepassen"
@@ -734,6 +755,9 @@
   "Backend": {
     "Backend": "Backend"
   },
+  "Backends: %1": {
+    "Backends: %1": ""
+  },
   "Background": {
     "Background": "Achtergrond"
   },
@@ -965,6 +989,12 @@
   "Canceled": {
     "Canceled": "Geannuleerd"
   },
+  "Cannot open trash: '%1' is not installed": {
+    "Cannot open trash: '%1' is not installed": ""
+  },
+  "Cannot open trash: no custom command set": {
+    "Cannot open trash: no custom command set": ""
+  },
   "Cannot pair": {
     "Cannot pair": "Kan niet koppelen"
   },
@@ -1019,8 +1049,14 @@
   "Check for system updates": {
     "Check for system updates": "Controleren op systeemupdates"
   },
+  "Check interval": {
+    "Check interval": ""
+  },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "Synchronisatiestatus op aanvraag controleren. Synchronisatie kopieert uw thema, instellingen en achtergrondconfiguratie naar het aanmeldscherm. Verificatiewijzigingen worden automatisch toegepast."
+  },
+  "Check your custom command in Settings → Dock → Trash.": {
+    "Check your custom command in Settings → Dock → Trash.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": "Zoeken naar updates..."
@@ -1066,6 +1102,9 @@
   },
   "Choose icon": {
     "Choose icon": "Kies pictogram"
+  },
+  "Choose monochrome or a theme color tint for system tray icons": {
+    "Choose monochrome or a theme color tint for system tray icons": ""
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "Kies de achtergrondkleur voor widgets"
@@ -1322,6 +1361,9 @@
   "Configure match criteria and actions": {
     "Configure match criteria and actions": "Criteria en acties configureren"
   },
+  "Configure one in Settings → Dock → Trash.": {
+    "Configure one in Settings → Dock → Trash.": ""
+  },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "Configureren op welke schermen \"%1\" wordt getoond"
   },
@@ -1368,7 +1410,7 @@
     "Connecting to Device": "Verbinden met apparaat"
   },
   "Connecting to clipboard service…": {
-    "Connecting to clipboard service…": ""
+    "Connecting to clipboard service…": "Verbinden met klembord-service…"
   },
   "Connecting...": {
     "Connecting...": "Verbinden..."
@@ -1409,14 +1451,26 @@
   "Control workspaces and columns by scrolling on the bar": {
     "Control workspaces and columns by scrolling on the bar": "Werkbladen en kolommen bedienen door te scrollen op de balk"
   },
+  "Controls how much original icon color is removed before applying tint": {
+    "Controls how much original icon color is removed before applying tint": ""
+  },
+  "Controls how strongly the selected tint color is applied": {
+    "Controls how strongly the selected tint color is applied": ""
+  },
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "Regelt dekking van alle pop-outs, modale vensters en hun inhoudslagen"
+  },
+  "Controls outlines around blurred foreground cards, pills, and notification cards": {
+    "Controls outlines around blurred foreground cards, pills, and notification cards": ""
   },
   "Controls shadow cast direction for elevation layers": {
     "Controls shadow cast direction for elevation layers": "Bepaalt de richting van de schaduw voor hoogtelagen"
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": "Bepaalt de basisvervagingsstraal en verschuiving van schaduwen"
+  },
+  "Controls the outer edge of protocol-blurred windows": {
+    "Controls the outer edge of protocol-blurred windows": ""
   },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "Bepaalt de transparantie van de schaduw"
@@ -1459,6 +1513,9 @@
   },
   "Copy PID": {
     "Copy PID": "PID kopiëren"
+  },
+  "Copy Path": {
+    "Copy Path": ""
   },
   "Copy Text": {
     "Copy Text": "Tekst kopiëren"
@@ -1507,6 +1564,15 @@
   },
   "Critical Priority": {
     "Critical Priority": "Kritieke prioriteit"
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": ""
   },
   "Current": {
     "Current": "Huidig"
@@ -1604,11 +1670,20 @@
   "Custom Transparency": {
     "Custom Transparency": "Aangepaste transparantie"
   },
+  "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
+  },
+  "Custom open-trash command": {
+    "Custom open-trash command": ""
+  },
   "Custom power profile": {
     "Custom power profile": "Aangepast energieprofiel"
   },
   "Custom theme loaded from JSON file": {
     "Custom theme loaded from JSON file": "Aangepast thema geladen uit JSON-bestand"
+  },
+  "Custom update command": {
+    "Custom update command": ""
   },
   "Custom...": {
     "Custom...": "Aangepast..."
@@ -1795,6 +1870,9 @@
   },
   "Details for \"%1": {
     "Details for \"%1\"": "Details voor \"%1\""
+  },
+  "Detected backends: %1": {
+    "Detected backends: %1": ""
   },
   "Development": {
     "Development": "Ontwikkeling"
@@ -2048,6 +2126,15 @@
   "Empty": {
     "Empty": "Leeg"
   },
+  "Empty Trash": {
+    "Empty Trash": ""
+  },
+  "Empty Trash (%1)": {
+    "Empty Trash (%1)": ""
+  },
+  "Empty Trash?": {
+    "Empty Trash?": ""
+  },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Schakel 10-bits kleurdiepte in voor een breder kleurengamma en HDR-ondersteuning"
   },
@@ -2225,6 +2312,18 @@
   "Ethernet": {
     "Ethernet": "Ethernet"
   },
+  "Every 15 minutes": {
+    "Every 15 minutes": ""
+  },
+  "Every 30 minutes": {
+    "Every 30 minutes": ""
+  },
+  "Every 4 hours": {
+    "Every 4 hours": ""
+  },
+  "Every hour": {
+    "Every hour": ""
+  },
   "Exact": {
     "Exact": "Exact"
   },
@@ -2336,6 +2435,9 @@
   "Failed to disconnect WiFi": {
     "Failed to disconnect WiFi": "Verbreken van wifi-verbinding mislukt"
   },
+  "Failed to empty trash": {
+    "Failed to empty trash": ""
+  },
   "Failed to enable IP location": {
     "Failed to enable IP location": "Inschakelen van IP-locatie mislukt"
   },
@@ -2365,6 +2467,9 @@
   },
   "Failed to move job": {
     "Failed to move job": "Verplaatsen van taak mislukt"
+  },
+  "Failed to move to trash": {
+    "Failed to move to trash": ""
   },
   "Failed to parse plugin_settings.json": {
     "Failed to parse plugin_settings.json": "Ontleden van plugin_settings.json mislukt"
@@ -2480,6 +2585,9 @@
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "Schrijven van tijdelijk bestand voor validatie mislukt"
   },
+  "Failed: %1": {
+    "Failed: %1": ""
+  },
   "Features": {
     "Features": "Functies"
   },
@@ -2506,6 +2614,9 @@
   },
   "File Information": {
     "File Information": "Bestandsinformatie"
+  },
+  "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
+    "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
   },
   "File received from": {
     "File received from": "Bestand ontvangen van"
@@ -2639,6 +2750,21 @@
   "Font used on the login screen": {
     "Font used on the login screen": "Lettertype dat op het aanmeldscherm wordt gebruikt"
   },
+  "For 1 hour": {
+    "For 1 hour": ""
+  },
+  "For 15 minutes": {
+    "For 15 minutes": ""
+  },
+  "For 3 hours": {
+    "For 3 hours": ""
+  },
+  "For 30 minutes": {
+    "For 30 minutes": ""
+  },
+  "For 8 hours": {
+    "For 8 hours": ""
+  },
   "Force HDR": {
     "Force HDR": "HDR forceren"
   },
@@ -2659,6 +2785,9 @@
   },
   "Forecast Not Available": {
     "Forecast Not Available": "Voorspelling niet beschikbaar"
+  },
+  "Foreground Layers": {
+    "Foreground Layers": ""
   },
   "Forever": {
     "Forever": "Voor altijd"
@@ -3008,6 +3137,9 @@
   "Hourly Forecast Count": {
     "Hourly Forecast Count": "Aantal uren voorspelling"
   },
+  "How often the server polls for new updates.": {
+    "How often the server polls for new updates.": ""
+  },
   "How often to change wallpaper": {
     "How often to change wallpaper": "Hoe vaak de achtergrond moet wisselen"
   },
@@ -3092,11 +3224,17 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Kleur inactief beeldscherm"
   },
+  "Include AUR updates": {
+    "Include AUR updates": ""
+  },
   "Include Files in All Tab": {
-    "Include Files in All Tab": ""
+    "Include Files in All Tab": "Bestanden opnemen in het tabblad 'Alles'"
+  },
+  "Include Flatpak updates": {
+    "Include Flatpak updates": ""
   },
   "Include Folders in All Tab": {
-    "Include Folders in All Tab": ""
+    "Include Folders in All Tab": "Mappen opnemen in het tabblad 'Alles'"
   },
   "Include Transitions": {
     "Include Transitions": "Overgangen opnemen"
@@ -3347,6 +3485,9 @@
   "Launcher Button Logo": {
     "Launcher Button Logo": "Logo startknop"
   },
+  "Layer Outline Opacity": {
+    "Layer Outline Opacity": ""
+  },
   "Layout": {
     "Layout": "Indeling"
   },
@@ -3474,7 +3615,7 @@
     "Logging in...": "Inloggen..."
   },
   "Login": {
-    "Login": ""
+    "Login": "Inloggen"
   },
   "Login Authentication": {
     "Login Authentication": "Aanmeld-authenticatie"
@@ -3702,10 +3843,10 @@
     "Memory usage indicator": "Indicator geheugengebruik"
   },
   "Merge indexed file results into the All tab (requires dsearch).": {
-    "Merge indexed file results into the All tab (requires dsearch).": ""
+    "Merge indexed file results into the All tab (requires dsearch).": "Geïndexeerde bestandsresultaten samenvoegen in het tabblad 'Alles' (vereist dsearch)."
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
-    "Merge indexed folder results into the All tab (requires dsearch).": ""
+    "Merge indexed folder results into the All tab (requires dsearch).": "Geïndexeerde mapresultaten samenvoegen in het tabblad 'Alles' (vereist dsearch)."
   },
   "Message": {
     "Message": "Bericht"
@@ -3814,6 +3955,9 @@
   },
   "Move Widget": {
     "Move Widget": "Widget verplaatsen"
+  },
+  "Move to Trash": {
+    "Move to Trash": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Overschakelen naar gepauzeerd"
@@ -4169,6 +4313,12 @@
   "No status output.": {
     "No status output.": "Geen statusuitvoer."
   },
+  "No supported package manager found.": {
+    "No supported package manager found.": ""
+  },
+  "No terminal configured": {
+    "No terminal configured": ""
+  },
   "No themes found": {
     "No themes found": "Geen thema's gevonden"
   },
@@ -4328,6 +4478,9 @@
   "On": {
     "On": "Aan"
   },
+  "On indefinitely": {
+    "On indefinitely": ""
+  },
   "On-Demand": {
     "On-Demand": "Op aanvraag"
   },
@@ -4336,6 +4489,9 @@
   },
   "On-screen Displays": {
     "On-screen Displays": "On-screen displays"
+  },
+  "Once a day": {
+    "Once a day": ""
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Gamma alleen aanpassen op basis van tijd- of locatieregels."
@@ -4367,8 +4523,17 @@
   "Open Notepad File": {
     "Open Notepad File": "Kladblok-bestand openen"
   },
+  "Open Trash": {
+    "Open Trash": ""
+  },
+  "Open Trash With": {
+    "Open Trash With": ""
+  },
   "Open a new note": {
     "Open a new note": "Een nieuwe notitie openen"
+  },
+  "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
   },
   "Open folder": {
     "Open folder": "Map openen"
@@ -4592,6 +4757,9 @@
   "Performance": {
     "Performance": "Prestaties"
   },
+  "Permanently delete %1 item(s)? This cannot be undone.": {
+    "Permanently delete %1 item(s)? This cannot be undone.": ""
+  },
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "Toegang geweigerd om profielafbeelding in te stellen."
   },
@@ -4607,8 +4775,17 @@
   "Phone number": {
     "Phone number": "Telefoonnummer"
   },
+  "Pick a different file manager in Settings → Dock → Trash.": {
+    "Pick a different file manager in Settings → Dock → Trash.": ""
+  },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Kies telkens een willekeurige andere video uit dezelfde map"
+  },
+  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
+    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": ""
+  },
+  "Pick how long to pause notifications": {
+    "Pick how long to pause notifications": ""
   },
   "Pictures": {
     "Pictures": "Afbeeldingen"
@@ -4637,6 +4814,9 @@
   "Pixelate": {
     "Pixelate": "Pixelvorming"
   },
+  "Place a trash bin at the end of the dock": {
+    "Place a trash bin at the end of the dock": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Plaats plug-inmappen hier. Elke plug-in moet een plugin.json manifestbestand hebben."
   },
@@ -4647,7 +4827,7 @@
     "Play a video when the screen locks.": "Speel een video af wanneer het scherm vergrendelt."
   },
   "Play sound after logging in": {
-    "Play sound after logging in": ""
+    "Play sound after logging in": "Geluid afspelen na het inloggen"
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Geluid afspelen bij nieuwe melding"
@@ -5054,6 +5234,9 @@
   "Requires DMS %1": {
     "Requires DMS %1": "Vereist DMS %1"
   },
+  "Requires DMS server with sysupdate capability": {
+    "Requires DMS server with sysupdate capability": ""
+  },
   "Requires DWL compositor": {
     "Requires DWL compositor": "Vereist DWL-compositor"
   },
@@ -5174,6 +5357,9 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "Een shell-opdracht uitvoeren (bijv. notify-send)"
   },
+  "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
+    "Run paru/yay with AUR enabled when 'Update All' is clicked.": ""
+  },
   "Running Apps": {
     "Running Apps": "Actieve apps"
   },
@@ -5182,6 +5368,9 @@
   },
   "Running greeter sync…": {
     "Running greeter sync…": "Greeter-synchronisatie uitvoeren…"
+  },
+  "Running in terminal": {
+    "Running in terminal": ""
   },
   "SDR Brightness": {
     "SDR Brightness": "SDR-helderheid"
@@ -5723,6 +5912,9 @@
   "Show Top Processes": {
     "Show Top Processes": "Topprocessen tonen"
   },
+  "Show Trash in Dock": {
+    "Show Trash in Dock": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "Toon weersomstandigheid"
   },
@@ -5758,6 +5950,9 @@
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Toon slagschaduw op meldingspop-ups. Vereist dat M3 Elevation is ingeschakeld in Thema & kleuren."
+  },
+  "Show foreground surfaces on blurred panels for stronger contrast": {
+    "Show foreground surfaces on blurred panels for stronger contrast": ""
   },
   "Show in GB": {
     "Show in GB": "Toon in GB"
@@ -5850,7 +6045,7 @@
     "Shows when microphone, camera, or screen sharing is active": "Toont wanneer microfoon, camera of schermdelen actief is"
   },
   "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
-    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "De media-widget verkleinen voor kortere songtitels, met inachtneming van de geconfigureerde maximale grootte"
   },
   "Shutdown": {
     "Shutdown": "Afsluiten"
@@ -5860,6 +6055,12 @@
   },
   "Signal:": {
     "Signal:": "Signaal:"
+  },
+  "Silence for a while": {
+    "Silence for a while": ""
+  },
+  "Silence notifications": {
+    "Silence notifications": ""
   },
   "Size": {
     "Size": "Grootte"
@@ -6071,6 +6272,9 @@
   "System Tray": {
     "System Tray": "Systeemvak"
   },
+  "System Tray Icon Tint": {
+    "System Tray Icon Tint": ""
+  },
   "System Update": {
     "System Update": "Systeemupdate"
   },
@@ -6103,6 +6307,9 @@
   },
   "Terminal": {
     "Terminal": "Terminal"
+  },
+  "Terminal additional parameters": {
+    "Terminal additional parameters": ""
   },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Aangepaste extra parameters terminal"
@@ -6263,6 +6470,12 @@
   "Timeout for normal priority notifications": {
     "Timeout for normal priority notifications": "Time-out voor meldingen met normale prioriteit"
   },
+  "Tint Saturation": {
+    "Tint Saturation": ""
+  },
+  "Tint Strength": {
+    "Tint Strength": ""
+  },
   "Title": {
     "Title": "Titel"
   },
@@ -6353,6 +6566,12 @@
   "Transparency": {
     "Transparency": "Transparantie"
   },
+  "Trash": {
+    "Trash": ""
+  },
+  "Trash command failed (exit %1)": {
+    "Trash command failed (exit %1)": ""
+  },
   "Trending GIFs": {
     "Trending GIFs": "Populaire GIF's"
   },
@@ -6374,11 +6593,23 @@
   "Try a different search": {
     "Try a different search": "Probeer een andere zoekopdracht"
   },
+  "Turn off": {
+    "Turn off": ""
+  },
+  "Turn off Do Not Disturb": {
+    "Turn off Do Not Disturb": ""
+  },
   "Turn off all displays immediately when the lock screen activates": {
     "Turn off all displays immediately when the lock screen activates": "Schakel alle beeldschermen onmiddellijk uit wanneer het vergrendelscherm activeert"
   },
   "Turn off monitors after": {
     "Turn off monitors after": "Beeldschermen uitschakelen na"
+  },
+  "Turn off monitors after lock": {
+    "Turn off monitors after lock": ""
+  },
+  "Turn off now": {
+    "Turn off now": ""
   },
   "Type": {
     "Type": "Type"
@@ -6494,6 +6725,18 @@
   "Unsaved note...": {
     "Unsaved note...": "Niet-opgeslagen notitie..."
   },
+  "Until %1": {
+    "Until %1": ""
+  },
+  "Until 8 AM": {
+    "Until 8 AM": ""
+  },
+  "Until I turn it off": {
+    "Until I turn it off": ""
+  },
+  "Until tomorrow, 8:00 AM": {
+    "Until tomorrow, 8:00 AM": ""
+  },
   "Untitled": {
     "Untitled": "Naamloos"
   },
@@ -6511,6 +6754,9 @@
   },
   "Update Plugin": {
     "Update Plugin": "Plug-in bijwerken"
+  },
+  "Upgrading...": {
+    "Upgrading...": ""
   },
   "Uptime": {
     "Uptime": "Uptime"
@@ -6543,7 +6789,7 @@
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Imperiale eenheden (°F, mph, inHg) gebruiken in plaats van Metrisch (°C, km/h, hPa)"
   },
   "Use Inline Expansion": {
-    "Use Inline Expansion": ""
+    "Use Inline Expansion": "Inline-uitbreiding gebruiken"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Monospace-lettertype gebruiken"
@@ -6571,6 +6817,9 @@
   },
   "Use custom border/focus-ring width": {
     "Use custom border/focus-ring width": "Aangepaste rand-/focusringbreedte gebruiken"
+  },
+  "Use custom command": {
+    "Use custom command": ""
   },
   "Use custom command for update your system": {
     "Use custom command for update your system": "Gebruik aangepaste opdracht om uw systeem bij te werken"
@@ -7111,6 +7360,9 @@
   },
   "this app": {
     "this app": "deze app"
+  },
+  "until %1": {
+    "until %1": ""
   },
   "up": {
     "up": "actief"

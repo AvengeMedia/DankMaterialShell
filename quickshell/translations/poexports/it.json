@@ -50,6 +50,12 @@
   "%1 filtered": {
     "%1 filtered": "%1 filtrato(i)"
   },
+  "%1 h %2 m left": {
+    "%1 h %2 m left": ""
+  },
+  "%1 h left": {
+    "%1 h left": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 è ora incluso nella configurazione"
   },
@@ -58,6 +64,9 @@
   },
   "%1 issues found": {
     "%1 issues found": "%1 problemi trovati"
+  },
+  "%1 min left": {
+    "%1 min left": ""
   },
   "%1 notifications": {
     "%1 notifications": "%1 notifiche"
@@ -146,6 +155,9 @@
   "14 days": {
     "14 days": "14 giorni"
   },
+  "15 min": {
+    "15 min": ""
+  },
   "15 minutes": {
     "15 minutes": "15 minuti"
   },
@@ -202,6 +214,9 @@
   },
   "30 days": {
     "30 days": "30 giorni"
+  },
+  "30 min": {
+    "30 min": ""
   },
   "30 minutes": {
     "30 minutes": "30 minuti"
@@ -278,6 +293,9 @@
   "API": {
     "API": "API"
   },
+  "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": ""
+  },
   "Aborted": {
     "Aborted": "Interrotto"
   },
@@ -351,7 +369,7 @@
     "Adapters": "Adattatori"
   },
   "Adaptive Media Width": {
-    "Adaptive Media Width": ""
+    "Adaptive Media Width": "Larghezza Adattiva del Widget Media"
   },
   "Add": {
     "Add": "Aggiungi"
@@ -499,6 +517,9 @@
   },
   "Apply Changes": {
     "Apply Changes": "Applica Modifiche"
+  },
+  "Apply Flatpak updates alongside system updates when running 'Update All'.": {
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": ""
   },
   "Apply GTK Colors": {
     "Apply GTK Colors": "Applica Colori GTK"
@@ -734,6 +755,9 @@
   "Backend": {
     "Backend": "Backend"
   },
+  "Backends: %1": {
+    "Backends: %1": ""
+  },
   "Background": {
     "Background": "Sfondo"
   },
@@ -965,6 +989,12 @@
   "Canceled": {
     "Canceled": "Annullato"
   },
+  "Cannot open trash: '%1' is not installed": {
+    "Cannot open trash: '%1' is not installed": ""
+  },
+  "Cannot open trash: no custom command set": {
+    "Cannot open trash: no custom command set": ""
+  },
   "Cannot pair": {
     "Cannot pair": "Impossibile associare"
   },
@@ -1019,8 +1049,14 @@
   "Check for system updates": {
     "Check for system updates": "Controlla aggiornamenti di sistema"
   },
+  "Check interval": {
+    "Check interval": ""
+  },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "Controlla lo stato della sincronizzazione su richiesta. Sincronizza copia il tema, le impostazioni e la configurazione dello sfondo nella schermata di accesso. Le modifiche di autenticazione vengono applicate automaticamente."
+  },
+  "Check your custom command in Settings → Dock → Trash.": {
+    "Check your custom command in Settings → Dock → Trash.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": "Controllo aggiornamenti..."
@@ -1066,6 +1102,9 @@
   },
   "Choose icon": {
     "Choose icon": "Scegli icona"
+  },
+  "Choose monochrome or a theme color tint for system tray icons": {
+    "Choose monochrome or a theme color tint for system tray icons": ""
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "Scegli il colore di sfondo per i widget"
@@ -1322,6 +1361,9 @@
   "Configure match criteria and actions": {
     "Configure match criteria and actions": "Configura criteri di corrispondenza e azioni"
   },
+  "Configure one in Settings → Dock → Trash.": {
+    "Configure one in Settings → Dock → Trash.": ""
+  },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "Configura quali schermi mostrano \"%1\""
   },
@@ -1368,7 +1410,7 @@
     "Connecting to Device": "Connessione al Dispositivo"
   },
   "Connecting to clipboard service…": {
-    "Connecting to clipboard service…": ""
+    "Connecting to clipboard service…": "Connessione al servizio degli appunti…"
   },
   "Connecting...": {
     "Connecting...": "Connessione in corso..."
@@ -1409,14 +1451,26 @@
   "Control workspaces and columns by scrolling on the bar": {
     "Control workspaces and columns by scrolling on the bar": "Controlla spazi di lavoro e colonne scorrendo sulla barra"
   },
+  "Controls how much original icon color is removed before applying tint": {
+    "Controls how much original icon color is removed before applying tint": ""
+  },
+  "Controls how strongly the selected tint color is applied": {
+    "Controls how strongly the selected tint color is applied": ""
+  },
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "Controlla l'opacità di tutti i popup, le finestre modali e i loro livelli di contenuto"
+  },
+  "Controls outlines around blurred foreground cards, pills, and notification cards": {
+    "Controls outlines around blurred foreground cards, pills, and notification cards": ""
   },
   "Controls shadow cast direction for elevation layers": {
     "Controls shadow cast direction for elevation layers": "Controlla la direzione della proiezione dell'ombra per i livelli in rilievo"
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": "Controlla il raggio di sfocatura base e l'offset delle ombre"
+  },
+  "Controls the outer edge of protocol-blurred windows": {
+    "Controls the outer edge of protocol-blurred windows": ""
   },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "Controlla la trasparenza dell'ombra"
@@ -1459,6 +1513,9 @@
   },
   "Copy PID": {
     "Copy PID": "Copia PID"
+  },
+  "Copy Path": {
+    "Copy Path": ""
   },
   "Copy Text": {
     "Copy Text": "Copia Testo"
@@ -1507,6 +1564,15 @@
   },
   "Critical Priority": {
     "Critical Priority": "Priorità Critica"
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": ""
   },
   "Current": {
     "Current": "Attuali"
@@ -1604,11 +1670,20 @@
   "Custom Transparency": {
     "Custom Transparency": "Trasparenza Personalizzata"
   },
+  "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
+  },
+  "Custom open-trash command": {
+    "Custom open-trash command": ""
+  },
   "Custom power profile": {
     "Custom power profile": "Profilo energetico personalizzato"
   },
   "Custom theme loaded from JSON file": {
     "Custom theme loaded from JSON file": "Tema personalizzato caricato da file JSON"
+  },
+  "Custom update command": {
+    "Custom update command": ""
   },
   "Custom...": {
     "Custom...": "Personalizzato..."
@@ -1795,6 +1870,9 @@
   },
   "Details for \"%1": {
     "Details for \"%1\"": "Dettagli per \"%1\""
+  },
+  "Detected backends: %1": {
+    "Detected backends: %1": ""
   },
   "Development": {
     "Development": "Sviluppo"
@@ -2048,6 +2126,15 @@
   "Empty": {
     "Empty": "Vuoto"
   },
+  "Empty Trash": {
+    "Empty Trash": ""
+  },
+  "Empty Trash (%1)": {
+    "Empty Trash (%1)": ""
+  },
+  "Empty Trash?": {
+    "Empty Trash?": ""
+  },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Abilita profondità colore a 10 bit per una gamma cromatica più ampia e supporto HDR"
   },
@@ -2225,6 +2312,18 @@
   "Ethernet": {
     "Ethernet": "Ethernet"
   },
+  "Every 15 minutes": {
+    "Every 15 minutes": ""
+  },
+  "Every 30 minutes": {
+    "Every 30 minutes": ""
+  },
+  "Every 4 hours": {
+    "Every 4 hours": ""
+  },
+  "Every hour": {
+    "Every hour": ""
+  },
   "Exact": {
     "Exact": "Esatto"
   },
@@ -2336,6 +2435,9 @@
   "Failed to disconnect WiFi": {
     "Failed to disconnect WiFi": "Impossibile disconnettersi dal Wi-Fi"
   },
+  "Failed to empty trash": {
+    "Failed to empty trash": ""
+  },
   "Failed to enable IP location": {
     "Failed to enable IP location": "Impossibile attivare la posizione tramite IP"
   },
@@ -2365,6 +2467,9 @@
   },
   "Failed to move job": {
     "Failed to move job": "Impossibile spostare la stampa"
+  },
+  "Failed to move to trash": {
+    "Failed to move to trash": ""
   },
   "Failed to parse plugin_settings.json": {
     "Failed to parse plugin_settings.json": "Impossibile analizzare plugin_settings.json"
@@ -2480,6 +2585,9 @@
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "Impossibile scrivere il file temporaneo per la validazione"
   },
+  "Failed: %1": {
+    "Failed: %1": ""
+  },
   "Features": {
     "Features": "Funzionalità"
   },
@@ -2506,6 +2614,9 @@
   },
   "File Information": {
     "File Information": "Informazioni File"
+  },
+  "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
+    "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
   },
   "File received from": {
     "File received from": "File ricevuto da"
@@ -2639,6 +2750,21 @@
   "Font used on the login screen": {
     "Font used on the login screen": "Carattere utilizzato nella schermata di accesso"
   },
+  "For 1 hour": {
+    "For 1 hour": ""
+  },
+  "For 15 minutes": {
+    "For 15 minutes": ""
+  },
+  "For 3 hours": {
+    "For 3 hours": ""
+  },
+  "For 30 minutes": {
+    "For 30 minutes": ""
+  },
+  "For 8 hours": {
+    "For 8 hours": ""
+  },
   "Force HDR": {
     "Force HDR": "Forza HDR"
   },
@@ -2659,6 +2785,9 @@
   },
   "Forecast Not Available": {
     "Forecast Not Available": "Previsioni Non Disponibili"
+  },
+  "Foreground Layers": {
+    "Foreground Layers": ""
   },
   "Forever": {
     "Forever": "Per Sempre"
@@ -2706,7 +2835,7 @@
     "Full Content": "Contenuto Completo"
   },
   "Full Day & Month": {
-    "Full Day & Month": "Data e Mese Est."
+    "Full Day & Month": "Data e Mese Estesi"
   },
   "Full with Year": {
     "Full with Year": "Completo con Anno"
@@ -3008,6 +3137,9 @@
   "Hourly Forecast Count": {
     "Hourly Forecast Count": "Numero di Previsioni Orarie"
   },
+  "How often the server polls for new updates.": {
+    "How often the server polls for new updates.": ""
+  },
   "How often to change wallpaper": {
     "How often to change wallpaper": "Quanto spesso cambiare lo sfondo"
   },
@@ -3092,11 +3224,17 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Colore dello Schermo Inattivo"
   },
+  "Include AUR updates": {
+    "Include AUR updates": ""
+  },
   "Include Files in All Tab": {
-    "Include Files in All Tab": ""
+    "Include Files in All Tab": "Includi File nella Scheda Tutti"
+  },
+  "Include Flatpak updates": {
+    "Include Flatpak updates": ""
   },
   "Include Folders in All Tab": {
-    "Include Folders in All Tab": ""
+    "Include Folders in All Tab": "Includi Cartelle nella Scheda Tutti"
   },
   "Include Transitions": {
     "Include Transitions": "Includi Transizioni"
@@ -3347,6 +3485,9 @@
   "Launcher Button Logo": {
     "Launcher Button Logo": "Logo Pulsante Launcher"
   },
+  "Layer Outline Opacity": {
+    "Layer Outline Opacity": ""
+  },
   "Layout": {
     "Layout": "Layout"
   },
@@ -3474,7 +3615,7 @@
     "Logging in...": "Accesso in corso..."
   },
   "Login": {
-    "Login": ""
+    "Login": "Accesso"
   },
   "Login Authentication": {
     "Login Authentication": "Autenticazione di Accesso"
@@ -3702,10 +3843,10 @@
     "Memory usage indicator": "Indicatore utilizzo memoria"
   },
   "Merge indexed file results into the All tab (requires dsearch).": {
-    "Merge indexed file results into the All tab (requires dsearch).": ""
+    "Merge indexed file results into the All tab (requires dsearch).": "Unisci i risultati dei file indicizzati nella scheda Tutti (richiede dsearch)."
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
-    "Merge indexed folder results into the All tab (requires dsearch).": ""
+    "Merge indexed folder results into the All tab (requires dsearch).": "Unisci i risultati delle cartelle indicizzate nella scheda Tutti (richiede dsearch)."
   },
   "Message": {
     "Message": "Messaggio"
@@ -3814,6 +3955,9 @@
   },
   "Move Widget": {
     "Move Widget": "Sposta Widget"
+  },
+  "Move to Trash": {
+    "Move to Trash": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Messa in Pausa"
@@ -4169,6 +4313,12 @@
   "No status output.": {
     "No status output.": "Nessun output di stato."
   },
+  "No supported package manager found.": {
+    "No supported package manager found.": ""
+  },
+  "No terminal configured": {
+    "No terminal configured": ""
+  },
   "No themes found": {
     "No themes found": "Nessun tema trovato"
   },
@@ -4328,6 +4478,9 @@
   "On": {
     "On": "Attivo"
   },
+  "On indefinitely": {
+    "On indefinitely": ""
+  },
   "On-Demand": {
     "On-Demand": "Su Richiesta"
   },
@@ -4336,6 +4489,9 @@
   },
   "On-screen Displays": {
     "On-screen Displays": "Indicatori a Schermo"
+  },
+  "Once a day": {
+    "Once a day": ""
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Regola la gamma solo in base alle regole di tempo o di posizione."
@@ -4367,8 +4523,17 @@
   "Open Notepad File": {
     "Open Notepad File": "Apri File Blocco Note"
   },
+  "Open Trash": {
+    "Open Trash": ""
+  },
+  "Open Trash With": {
+    "Open Trash With": ""
+  },
   "Open a new note": {
     "Open a new note": "Apri una nuova nota"
+  },
+  "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
   },
   "Open folder": {
     "Open folder": "Apri cartella"
@@ -4592,6 +4757,9 @@
   "Performance": {
     "Performance": "Prestazioni"
   },
+  "Permanently delete %1 item(s)? This cannot be undone.": {
+    "Permanently delete %1 item(s)? This cannot be undone.": ""
+  },
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "Permesso negato per impostare l'immagine del profilo."
   },
@@ -4607,8 +4775,17 @@
   "Phone number": {
     "Phone number": "Numero di telefono"
   },
+  "Pick a different file manager in Settings → Dock → Trash.": {
+    "Pick a different file manager in Settings → Dock → Trash.": ""
+  },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Scegli un video casuale diverso ogni volta dalla stessa cartella"
+  },
+  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
+    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": ""
+  },
+  "Pick how long to pause notifications": {
+    "Pick how long to pause notifications": ""
   },
   "Pictures": {
     "Pictures": "Immagini"
@@ -4637,6 +4814,9 @@
   "Pixelate": {
     "Pixelate": "Mosaico"
   },
+  "Place a trash bin at the end of the dock": {
+    "Place a trash bin at the end of the dock": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Posiziona la cartella dei plugin qui. Ogni plugin dovrebbe avere un file manifesto plugin.json."
   },
@@ -4647,7 +4827,7 @@
     "Play a video when the screen locks.": "Riproduci un video quando lo schermo si blocca."
   },
   "Play sound after logging in": {
-    "Play sound after logging in": ""
+    "Play sound after logging in": "Riproduci un suono dopo l'accesso"
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "Riproduci suono quando arriva una nuova notifica"
@@ -5054,6 +5234,9 @@
   "Requires DMS %1": {
     "Requires DMS %1": "Richiede DMS %1"
   },
+  "Requires DMS server with sysupdate capability": {
+    "Requires DMS server with sysupdate capability": ""
+  },
   "Requires DWL compositor": {
     "Requires DWL compositor": "Richiede compositor DWL"
   },
@@ -5174,6 +5357,9 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "Esegui un comando shell (es. notify-send)"
   },
+  "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
+    "Run paru/yay with AUR enabled when 'Update All' is clicked.": ""
+  },
   "Running Apps": {
     "Running Apps": "App in Esecuzione"
   },
@@ -5182,6 +5368,9 @@
   },
   "Running greeter sync…": {
     "Running greeter sync…": "Sincronizzazione del greeter in corso…"
+  },
+  "Running in terminal": {
+    "Running in terminal": ""
   },
   "SDR Brightness": {
     "SDR Brightness": "Luminosità SDR"
@@ -5723,6 +5912,9 @@
   "Show Top Processes": {
     "Show Top Processes": "Mostra Processi Principali"
   },
+  "Show Trash in Dock": {
+    "Show Trash in Dock": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "Mostra Condizioni Meteo"
   },
@@ -5758,6 +5950,9 @@
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Mostra ombra esterna sui popup di notifica. Richiede che M3 Elevation sia attivato in Tema e Colori."
+  },
+  "Show foreground surfaces on blurred panels for stronger contrast": {
+    "Show foreground surfaces on blurred panels for stronger contrast": ""
   },
   "Show in GB": {
     "Show in GB": "Mostra in GB"
@@ -5850,7 +6045,7 @@
     "Shows when microphone, camera, or screen sharing is active": "Mostra quando microfono, videocamera, o condivisione schermo sono attivi"
   },
   "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
-    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "Riduci il widget media per adattarsi ai titoli più corti, rispettando comunque la dimensione massima configurata"
   },
   "Shutdown": {
     "Shutdown": "Spegni"
@@ -5860,6 +6055,12 @@
   },
   "Signal:": {
     "Signal:": "Segnale:"
+  },
+  "Silence for a while": {
+    "Silence for a while": ""
+  },
+  "Silence notifications": {
+    "Silence notifications": ""
   },
   "Size": {
     "Size": "Dimensione"
@@ -6071,11 +6272,14 @@
   "System Tray": {
     "System Tray": "Area di Notifica"
   },
+  "System Tray Icon Tint": {
+    "System Tray Icon Tint": ""
+  },
   "System Update": {
     "System Update": "Aggiornamento di Sistema"
   },
   "System Updater": {
-    "System Updater": "Gestore Aggiornamenti di Sistema"
+    "System Updater": "Aggiornamenti di Sistema"
   },
   "System Updates": {
     "System Updates": "Aggiornamenti di Sistema"
@@ -6103,6 +6307,9 @@
   },
   "Terminal": {
     "Terminal": "Terminale"
+  },
+  "Terminal additional parameters": {
+    "Terminal additional parameters": ""
   },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Parametri aggiuntivi personalizzati terminale"
@@ -6263,6 +6470,12 @@
   "Timeout for normal priority notifications": {
     "Timeout for normal priority notifications": "Timeout per le notifiche di priorità normale"
   },
+  "Tint Saturation": {
+    "Tint Saturation": ""
+  },
+  "Tint Strength": {
+    "Tint Strength": ""
+  },
   "Title": {
     "Title": "Titolo"
   },
@@ -6353,6 +6566,12 @@
   "Transparency": {
     "Transparency": "Trasparenza"
   },
+  "Trash": {
+    "Trash": ""
+  },
+  "Trash command failed (exit %1)": {
+    "Trash command failed (exit %1)": ""
+  },
   "Trending GIFs": {
     "Trending GIFs": "GIF di Tendenza"
   },
@@ -6374,11 +6593,23 @@
   "Try a different search": {
     "Try a different search": "Prova una ricerca diversa"
   },
+  "Turn off": {
+    "Turn off": ""
+  },
+  "Turn off Do Not Disturb": {
+    "Turn off Do Not Disturb": ""
+  },
   "Turn off all displays immediately when the lock screen activates": {
     "Turn off all displays immediately when the lock screen activates": "Spegni immediatamente tutti gli schermi quando si attiva la schermata di blocco"
   },
   "Turn off monitors after": {
     "Turn off monitors after": "Spegni schermi dopo"
+  },
+  "Turn off monitors after lock": {
+    "Turn off monitors after lock": ""
+  },
+  "Turn off now": {
+    "Turn off now": ""
   },
   "Type": {
     "Type": "Tipo"
@@ -6494,6 +6725,18 @@
   "Unsaved note...": {
     "Unsaved note...": "Nota non salvata..."
   },
+  "Until %1": {
+    "Until %1": ""
+  },
+  "Until 8 AM": {
+    "Until 8 AM": ""
+  },
+  "Until I turn it off": {
+    "Until I turn it off": ""
+  },
+  "Until tomorrow, 8:00 AM": {
+    "Until tomorrow, 8:00 AM": ""
+  },
   "Untitled": {
     "Untitled": "Senza Titolo"
   },
@@ -6511,6 +6754,9 @@
   },
   "Update Plugin": {
     "Update Plugin": "Aggiorna Plugin"
+  },
+  "Upgrading...": {
+    "Upgrading...": ""
   },
   "Uptime": {
     "Uptime": "Tempo di Attività"
@@ -6543,7 +6789,7 @@
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Usa unità Imperiali (°F, mph, inHg) invece di quelle Metriche (°C, km/h, hPa)"
   },
   "Use Inline Expansion": {
-    "Use Inline Expansion": ""
+    "Use Inline Expansion": "Usa Espansione Inline"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Usa Font a Larghezza Fissa"
@@ -6571,6 +6817,9 @@
   },
   "Use custom border/focus-ring width": {
     "Use custom border/focus-ring width": "Usa larghezza bordo/cornice di focus personalizzata"
+  },
+  "Use custom command": {
+    "Use custom command": ""
   },
   "Use custom command for update your system": {
     "Use custom command for update your system": "Usa comando personalizzato per aggiornare il sistema"
@@ -7111,6 +7360,9 @@
   },
   "this app": {
     "this app": "questa app"
+  },
+  "until %1": {
+    "until %1": ""
   },
   "up": {
     "up": "attivo da"
