@@ -7,6 +7,7 @@ import "../utils/layout.js" as LayoutUtils
 
 Column {
     id: root
+    readonly property var log: Log.scoped("DragDropGrid")
 
     property bool editMode: false
     property string expandedSection: ""
@@ -988,7 +989,7 @@ Column {
                         return true;
                     }
                 } catch (e) {
-                    console.warn("DragDropGrid: stale plugin component for", pluginId, "- reloading");
+                    log.warn("stale plugin component for", pluginId, "- reloading");
                     PluginService.reloadPlugin(pluginId);
                 }
                 return false;

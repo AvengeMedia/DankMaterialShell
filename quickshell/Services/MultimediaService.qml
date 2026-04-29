@@ -6,6 +6,7 @@ import Quickshell
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("MultimediaService")
 
     property bool available: false
 
@@ -14,6 +15,7 @@ Singleton {
             const testObj = Qt.createQmlObject(`
                 import QtQuick
                 import QtMultimedia
+import qs.Services
                 Item {}
             `, root, "MultimediaService.TestComponent");
             if (testObj) {
@@ -29,7 +31,7 @@ Singleton {
 
     Component.onCompleted: {
         if (!detectAvailability()) {
-            console.warn("MultimediaService: QtMultimedia not available");
+            log.warn("QtMultimedia not available");
         }
     }
 }

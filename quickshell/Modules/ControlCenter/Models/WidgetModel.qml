@@ -6,6 +6,7 @@ import "../utils/widgets.js" as WidgetUtils
 
 QtObject {
     id: root
+    readonly property var log: Log.scoped("WidgetModel")
 
     property var vpnBuiltinInstance: null
     property var cupsBuiltinInstance: null
@@ -26,7 +27,7 @@ QtObject {
                 const widgets = SettingsData.controlCenterWidgets || [];
                 const hasVpnWidget = widgets.some(w => w.id === "builtin_vpn");
                 if (!hasVpnWidget && vpnLoader.active) {
-                    console.log("VpnWidget: No VPN widget in control center, deactivating loader");
+                    log.debug("VpnWidget: No VPN widget in control center, deactivating loader");
                     vpnLoader.active = false;
                 }
             }
@@ -55,7 +56,7 @@ QtObject {
                 const widgets = SettingsData.controlCenterWidgets || [];
                 const hasCupsWidget = widgets.some(w => w.id === "builtin_cups");
                 if (!hasCupsWidget && cupsLoader.active) {
-                    console.log("CupsWidget: No CUPS widget in control center, deactivating loader");
+                    log.debug("CupsWidget: No CUPS widget in control center, deactivating loader");
                     cupsLoader.active = false;
                 }
             }

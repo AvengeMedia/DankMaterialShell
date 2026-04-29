@@ -5,9 +5,11 @@ import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("CacheData")
 
     readonly property int cacheConfigVersion: 1
 
@@ -131,7 +133,7 @@ Singleton {
                 }
             }
         } catch (e) {
-            console.warn("CacheData: Failed to parse cache:", e.message);
+            log.warn("Failed to parse cache:", e.message);
         } finally {
             _loading = false;
         }
@@ -149,7 +151,7 @@ Singleton {
     }
 
     function migrateFromUndefinedToV1(cache) {
-        console.info("CacheData: Migrating configuration from undefined to version 1");
+        log.info("Migrating configuration from undefined to version 1");
     }
 
     function cleanupUnusedKeys() {
@@ -164,7 +166,7 @@ Singleton {
 
             for (const key in cache) {
                 if (!validKeys.includes(key)) {
-                    console.log("CacheData: Removing unused key:", key);
+                    log.debug("Removing unused key:", key);
                     delete cache[key];
                     needsSave = true;
                 }
@@ -174,7 +176,7 @@ Singleton {
                 cacheFile.setText(JSON.stringify(cache, null, 2));
             }
         } catch (e) {
-            console.warn("CacheData: Failed to cleanup unused keys:", e.message);
+            log.warn("Failed to cleanup unused keys:", e.message);
         }
     }
 
@@ -184,7 +186,7 @@ Singleton {
             if (content && content.trim())
                 return JSON.parse(content);
         } catch (e) {
-            console.warn("CacheData: Failed to parse launcher cache:", e.message);
+            log.warn("Failed to parse launcher cache:", e.message);
         }
         return null;
     }
@@ -220,7 +222,7 @@ Singleton {
         }
         onLoadFailed: error => {
             if (!isGreeterMode) {
-                console.info("CacheData: No cache file found, starting fresh");
+                log.info("No cache file found, starting fresh");
             }
         }
     }

@@ -7,6 +7,7 @@ import qs.Services
 
 PanelWindow {
     id: barWindow
+    readonly property var log: Log.scoped("DankBarWindow")
 
     required property var rootWindow
     required property var barConfig
@@ -164,7 +165,7 @@ PanelWindow {
                 barWindow.BackgroundEffect.blurRegion = region;
                 barWindow.blurRegion = region;
             } catch (e) {
-                console.warn("BarBlur: Failed to create blur region:", e);
+                log.warn("BarBlur: Failed to create blur region:", e);
             }
         }
 
@@ -534,11 +535,11 @@ PanelWindow {
     Connections {
         target: PluginService
         function onPluginLoaded(pluginId) {
-            console.info("DankBar: Plugin loaded:", pluginId);
+            log.info("DankBar: Plugin loaded:", pluginId);
             SettingsData.widgetDataChanged();
         }
         function onPluginUnloaded(pluginId) {
-            console.info("DankBar: Plugin unloaded:", pluginId);
+            log.info("DankBar: Plugin unloaded:", pluginId);
             SettingsData.widgetDataChanged();
         }
     }

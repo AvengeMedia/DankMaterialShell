@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("SettingsSearchService")
 
     property string query: ""
     property var results: []
@@ -41,12 +43,12 @@ Singleton {
                 root.indexLoaded = true;
                 root._rebuildTranslationCache();
             } catch (e) {
-                console.warn("SettingsSearchService: Failed to parse index:", e);
+                log.warn("Failed to parse index:", e);
                 root.settingsIndex = [];
                 root._translatedCache = [];
             }
         }
-        onLoadFailed: error => console.warn("SettingsSearchService: Failed to load index:", error)
+        onLoadFailed: error => log.warn("Failed to load index:", error)
     }
 
     function registerCard(settingKey, item, flickable) {

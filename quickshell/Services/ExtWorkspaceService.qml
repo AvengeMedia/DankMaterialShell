@@ -3,9 +3,11 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("ExtWorkspaceService")
 
     property bool extWorkspaceAvailable: false
     property var groups: []
@@ -49,13 +51,13 @@ Singleton {
             if (typeof CompositorService !== "undefined") {
                 const useExtWorkspace = DMSService.forceExtWorkspace || (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isDwl && !CompositorService.isSway && !CompositorService.isScroll && !CompositorService.isMiracle);
                 if (!useExtWorkspace) {
-                    console.info("ExtWorkspaceService: ext-workspace available but compositor has native support");
+                    log.info("ext-workspace available but compositor has native support");
                     extWorkspaceAvailable = false;
                     return;
                 }
             }
             extWorkspaceAvailable = true;
-            console.info("ExtWorkspaceService: ext-workspace capability detected");
+            log.info("ext-workspace capability detected");
             DMSService.addSubscription("extworkspace");
             requestState();
         } else if (!hasExtWorkspace) {
@@ -78,9 +80,9 @@ Singleton {
     function handleStateUpdate(state) {
         groups = state.groups || [];
         if (groups.length === 0) {
-            console.warn("ExtWorkspaceService: Received empty workspace groups from backend");
+            log.warn("Received empty workspace groups from backend");
         } else {
-            console.log("ExtWorkspaceService: Updated with", groups.length, "workspace groups");
+            log.debug("Updated with", groups.length, "workspace groups");
         }
         stateChanged();
     }
@@ -95,7 +97,7 @@ Singleton {
             "groupID": groupID
         }, response => {
             if (response.error) {
-                console.warn("ExtWorkspaceService: activateWorkspace error:", response.error);
+                log.warn("activateWorkspace error:", response.error);
             }
         });
     }
@@ -110,7 +112,7 @@ Singleton {
             "groupID": groupID
         }, response => {
             if (response.error) {
-                console.warn("ExtWorkspaceService: deactivateWorkspace error:", response.error);
+                log.warn("deactivateWorkspace error:", response.error);
             }
         });
     }
@@ -125,7 +127,7 @@ Singleton {
             "groupID": groupID
         }, response => {
             if (response.error) {
-                console.warn("ExtWorkspaceService: removeWorkspace error:", response.error);
+                log.warn("removeWorkspace error:", response.error);
             }
         });
     }
@@ -140,7 +142,7 @@ Singleton {
             "name": name
         }, response => {
             if (response.error) {
-                console.warn("ExtWorkspaceService: createWorkspace error:", response.error);
+                log.warn("createWorkspace error:", response.error);
             }
         });
     }
@@ -272,6 +274,6 @@ Singleton {
                 return;
             }
         }
-        console.warn("ExtWorkspaceService: workspace not found:", workspaceName);
+        log.warn("workspace not found:", workspaceName);
     }
 }

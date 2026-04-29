@@ -6,6 +6,7 @@ import qs.Services
 
 PanelWindow {
     id: root
+    readonly property var log: Log.scoped("DankOSD")
 
     property string blurNamespace: "dms:osd"
     WlrLayershell.namespace: blurNamespace
@@ -94,10 +95,10 @@ PanelWindow {
     WlrLayershell.layer: {
         switch (Quickshell.env("DMS_OSD_LAYER")) {
         case "bottom":
-            console.warn("DankOSD: 'bottom' layer is not valid for OSDs. Defaulting to 'overlay' layer.");
+            log.warn("'bottom' layer is not valid for OSDs. Defaulting to 'overlay' layer.");
             return WlrLayershell.Overlay;
         case "background":
-            console.warn("DankOSD: 'background' layer is not valid for OSDs. Defaulting to 'overlay' layer.");
+            log.warn("'background' layer is not valid for OSDs. Defaulting to 'overlay' layer.");
             return WlrLayershell.Overlay;
         case "top":
             return WlrLayershell.Top;

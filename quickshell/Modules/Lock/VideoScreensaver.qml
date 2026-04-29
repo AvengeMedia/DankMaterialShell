@@ -7,6 +7,7 @@ import qs.Services
 
 Item {
     id: root
+    readonly property var log: Log.scoped("VideoScreensaver")
 
     required property string screenName
     property bool active: false
@@ -53,7 +54,7 @@ Item {
 
         onExited: exitCode => {
             if (exitCode !== 0 || !videoPicker.result) {
-                console.warn("VideoScreensaver: no video found in folder");
+                log.warn("no video found in folder");
                 ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("No video found in folder"));
                 root.dismiss();
             }
@@ -98,14 +99,14 @@ Item {
             `, background, "VideoScreensaver.VideoPlayer");
 
             videoPlayer.errorOccurred.connect((error, errorString) => {
-                console.warn("VideoScreensaver: playback error:", errorString);
+                log.warn("playback error:", errorString);
                 ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("Playback error: ") + errorString);
                 root.dismiss();
             });
 
             return true;
         } catch (e) {
-            console.warn("VideoScreensaver: Failed to create video player:", e);
+            log.warn("Failed to create video player:", e);
             return false;
         }
     }

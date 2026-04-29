@@ -12,6 +12,7 @@ import "settings/SessionStore.js" as Store
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("SessionData")
 
     readonly property int sessionConfigVersion: 3
 
@@ -257,7 +258,7 @@ Singleton {
         } catch (e) {
             _parseError = true;
             const msg = e.message;
-            console.error("SessionData: Failed to parse session.json - file will not be overwritten.");
+            log.error("Failed to parse session.json - file will not be overwritten.");
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse session.json"), msg));
         }
     }
@@ -337,7 +338,7 @@ Singleton {
         } catch (e) {
             _parseError = true;
             const msg = e.message;
-            console.error("SessionData: Failed to parse session.json - file will not be overwritten.");
+            log.error("Failed to parse session.json - file will not be overwritten.");
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse session.json"), msg));
         }
     }
@@ -552,7 +553,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -649,7 +650,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -680,7 +681,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -711,7 +712,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -742,7 +743,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 

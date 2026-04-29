@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Modals.Common
 import qs.Widgets
@@ -7,6 +6,7 @@ import qs.Services
 
 DankModal {
     id: root
+    readonly property var log: Log.scoped("AppPickerModal")
 
     property string title: I18n.tr("Select Application")
     property string targetData: ""
@@ -30,52 +30,52 @@ DankModal {
     onBackgroundClicked: close()
 
     onDialogClosed: {
-        searchQuery = ""
-        selectedIndex = 0
-        keyboardNavigationActive = false
+        searchQuery = "";
+        selectedIndex = 0;
+        keyboardNavigationActive = false;
     }
 
     onOpened: {
-        searchQuery = ""
-        updateApplicationList()
-        selectedIndex = 0
+        searchQuery = "";
+        updateApplicationList();
+        selectedIndex = 0;
         Qt.callLater(() => {
             if (contentLoader.item && contentLoader.item.searchField) {
-                contentLoader.item.searchField.text = ""
-                contentLoader.item.searchField.forceActiveFocus()
+                contentLoader.item.searchField.text = "";
+                contentLoader.item.searchField.forceActiveFocus();
             }
-        })
+        });
     }
 
     function updateApplicationList() {
-        applicationsModel.clear()
-        const apps = AppSearchService.applications
-        const usageHistory = usageHistoryKey && SettingsData[usageHistoryKey] ? SettingsData[usageHistoryKey] : {}
-        let filteredApps = []
+        applicationsModel.clear();
+        const apps = AppSearchService.applications;
+        const usageHistory = usageHistoryKey && SettingsData[usageHistoryKey] ? SettingsData[usageHistoryKey] : {};
+        let filteredApps = [];
 
         for (const app of apps) {
-            if (!app || !app.categories) continue
-
-            let matchesCategory = categoryFilter.length === 0
+            if (!app || !app.categories)
+                continue;
+            let matchesCategory = categoryFilter.length === 0;
 
             if (categoryFilter.length > 0) {
                 try {
                     for (const cat of app.categories) {
                         if (categoryFilter.includes(cat)) {
-                            matchesCategory = true
-                            break
+                            matchesCategory = true;
+                            break;
                         }
                     }
                 } catch (e) {
-                    console.warn("AppPicker: Error iterating categories for", app.name, ":", e)
-                    continue
+                    log.warn("AppPicker: Error iterating categories for", app.name, ":", e);
+                    continue;
                 }
             }
 
             if (matchesCategory) {
-                const name = app.name || ""
-                const lowerName = name.toLowerCase()
-                const lowerQuery = searchQuery.toLowerCase()
+                const name = app.name || "";
+                const lowerName = name.toLowerCase();
+                const lowerQuery = searchQuery.toLowerCase();
 
                 if (searchQuery === "" || lowerName.includes(lowerQuery)) {
                     filteredApps.push({
@@ -84,21 +84,21 @@ DankModal {
                         exec: app.exec || app.execString || "",
                         startupClass: app.startupWMClass || "",
                         appData: app
-                    })
+                    });
                 }
             }
         }
 
         filteredApps.sort((a, b) => {
-            const aId = a.appData.id || a.appData.execString || a.appData.exec || ""
-            const bId = b.appData.id || b.appData.execString || b.appData.exec || ""
-            const aUsage = usageHistory[aId] ? usageHistory[aId].count : 0
-            const bUsage = usageHistory[bId] ? usageHistory[bId].count : 0
+            const aId = a.appData.id || a.appData.execString || a.appData.exec || "";
+            const bId = b.appData.id || b.appData.execString || b.appData.exec || "";
+            const aUsage = usageHistory[aId] ? usageHistory[aId].count : 0;
+            const bUsage = usageHistory[bId] ? usageHistory[bId].count : 0;
             if (aUsage !== bUsage) {
-                return bUsage - aUsage
+                return bUsage - aUsage;
             }
-            return (a.name || "").localeCompare(b.name || "")
-        })
+            return (a.name || "").localeCompare(b.name || "");
+        });
 
         filteredApps.forEach(app => {
             applicationsModel.append({
@@ -107,10 +107,10 @@ DankModal {
                 exec: app.exec,
                 startupClass: app.startupClass,
                 appId: app.appData.id || app.appData.execString || app.appData.exec || ""
-            })
-        })
+            });
+        });
 
-        console.log("AppPicker: Found " + filteredApps.length + " applications")
+        log.debug("AppPicker: Found " + filteredApps.length + " applications");
     }
 
     onSearchQueryChanged: updateApplicationList()
@@ -129,56 +129,57 @@ DankModal {
             focus: true
 
             Keys.onEscapePressed: event => {
-                root.close()
-                event.accepted = true
+                root.close();
+                event.accepted = true;
             }
 
             Keys.onPressed: event => {
-                if (applicationsModel.count === 0) return
+                if (applicationsModel.count === 0)
+                    return;
 
                 // Toggle view mode with Tab key
                 if (event.key === Qt.Key_Tab) {
-                    root.viewMode = root.viewMode === "grid" ? "list" : "grid"
-                    event.accepted = true
-                    return
+                    root.viewMode = root.viewMode === "grid" ? "list" : "grid";
+                    event.accepted = true;
+                    return;
                 }
 
                 if (root.viewMode === "grid") {
                     if (event.key === Qt.Key_Left) {
-                        root.keyboardNavigationActive = true
-                        root.selectedIndex = Math.max(0, root.selectedIndex - 1)
-                        event.accepted = true
+                        root.keyboardNavigationActive = true;
+                        root.selectedIndex = Math.max(0, root.selectedIndex - 1);
+                        event.accepted = true;
                     } else if (event.key === Qt.Key_Right) {
-                        root.keyboardNavigationActive = true
-                        root.selectedIndex = Math.min(applicationsModel.count - 1, root.selectedIndex + 1)
-                        event.accepted = true
+                        root.keyboardNavigationActive = true;
+                        root.selectedIndex = Math.min(applicationsModel.count - 1, root.selectedIndex + 1);
+                        event.accepted = true;
                     } else if (event.key === Qt.Key_Up) {
-                        root.keyboardNavigationActive = true
-                        root.selectedIndex = Math.max(0, root.selectedIndex - root.gridColumns)
-                        event.accepted = true
+                        root.keyboardNavigationActive = true;
+                        root.selectedIndex = Math.max(0, root.selectedIndex - root.gridColumns);
+                        event.accepted = true;
                     } else if (event.key === Qt.Key_Down) {
-                        root.keyboardNavigationActive = true
-                        root.selectedIndex = Math.min(applicationsModel.count - 1, root.selectedIndex + root.gridColumns)
-                        event.accepted = true
+                        root.keyboardNavigationActive = true;
+                        root.selectedIndex = Math.min(applicationsModel.count - 1, root.selectedIndex + root.gridColumns);
+                        event.accepted = true;
                     }
                 } else {
                     if (event.key === Qt.Key_Up) {
-                        root.keyboardNavigationActive = true
-                        root.selectedIndex = Math.max(0, root.selectedIndex - 1)
-                        event.accepted = true
+                        root.keyboardNavigationActive = true;
+                        root.selectedIndex = Math.max(0, root.selectedIndex - 1);
+                        event.accepted = true;
                     } else if (event.key === Qt.Key_Down) {
-                        root.keyboardNavigationActive = true
-                        root.selectedIndex = Math.min(applicationsModel.count - 1, root.selectedIndex + 1)
-                        event.accepted = true
+                        root.keyboardNavigationActive = true;
+                        root.selectedIndex = Math.min(applicationsModel.count - 1, root.selectedIndex + 1);
+                        event.accepted = true;
                     }
                 }
 
                 if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                     if (root.selectedIndex >= 0 && root.selectedIndex < applicationsModel.count) {
-                        const app = applicationsModel.get(root.selectedIndex)
-                        launchApplication(app)
+                        const app = applicationsModel.get(root.selectedIndex);
+                        launchApplication(app);
                     }
-                    event.accepted = true
+                    event.accepted = true;
                 }
             }
 
@@ -217,7 +218,7 @@ DankModal {
                             iconColor: root.viewMode === "list" ? Theme.primary : Theme.surfaceText
                             backgroundColor: root.viewMode === "list" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
                             onClicked: {
-                                root.viewMode = "list"
+                                root.viewMode = "list";
                             }
                         }
 
@@ -229,7 +230,7 @@ DankModal {
                             iconColor: root.viewMode === "grid" ? Theme.primary : Theme.surfaceText
                             backgroundColor: root.viewMode === "grid" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
                             onClicked: {
-                                root.viewMode = "grid"
+                                root.viewMode = "grid";
                             }
                         }
                     }
@@ -257,42 +258,42 @@ DankModal {
                     keyForwardTargets: [appContent]
 
                     onTextEdited: {
-                        root.searchQuery = text
+                        root.searchQuery = text;
                     }
 
                     Keys.onPressed: function (event) {
                         if (event.key === Qt.Key_Escape) {
-                            root.close()
-                            event.accepted = true
-                            return
+                            root.close();
+                            event.accepted = true;
+                            return;
                         }
 
-                        const isEnterKey = [Qt.Key_Return, Qt.Key_Enter].includes(event.key)
-                        const hasText = text.length > 0
+                        const isEnterKey = [Qt.Key_Return, Qt.Key_Enter].includes(event.key);
+                        const hasText = text.length > 0;
 
                         if (isEnterKey && hasText) {
                             if (root.keyboardNavigationActive && applicationsModel.count > 0) {
-                                const app = applicationsModel.get(root.selectedIndex)
-                                launchApplication(app)
+                                const app = applicationsModel.get(root.selectedIndex);
+                                launchApplication(app);
                             } else if (applicationsModel.count > 0) {
-                                const app = applicationsModel.get(0)
-                                launchApplication(app)
+                                const app = applicationsModel.get(0);
+                                launchApplication(app);
                             }
-                            event.accepted = true
-                            return
+                            event.accepted = true;
+                            return;
                         }
 
-                        const navigationKeys = [Qt.Key_Down, Qt.Key_Up, Qt.Key_Left, Qt.Key_Right, Qt.Key_Tab, Qt.Key_Backtab]
-                        const isNavigationKey = navigationKeys.includes(event.key)
-                        const isEmptyEnter = isEnterKey && !hasText
+                        const navigationKeys = [Qt.Key_Down, Qt.Key_Up, Qt.Key_Left, Qt.Key_Right, Qt.Key_Tab, Qt.Key_Backtab];
+                        const isNavigationKey = navigationKeys.includes(event.key);
+                        const isEmptyEnter = isEnterKey && !hasText;
 
-                        event.accepted = !(isNavigationKey || isEmptyEnter)
+                        event.accepted = !(isNavigationKey || isEmptyEnter);
                     }
 
                     Connections {
                         function onShouldBeVisibleChanged() {
                             if (!root.shouldBeVisible) {
-                                searchField.focus = false
+                                searchField.focus = false;
                             }
                         }
 
@@ -303,12 +304,12 @@ DankModal {
                 Rectangle {
                     width: parent.width
                     height: {
-                        let usedHeight = 40 + Theme.spacingS
-                        usedHeight += 52 + Theme.spacingS
+                        let usedHeight = 40 + Theme.spacingS;
+                        usedHeight += 52 + Theme.spacingS;
                         if (root.showTargetData) {
-                            usedHeight += 36 + Theme.spacingS
+                            usedHeight += 36 + Theme.spacingS;
                         }
-                        return parent.height - usedHeight
+                        return parent.height - usedHeight;
                     }
                     radius: Theme.cornerRadius
                     color: "transparent"
@@ -320,14 +321,14 @@ DankModal {
                         property int itemSpacing: Theme.spacingS
 
                         function ensureVisible(index) {
-                            if (index < 0 || index >= count) return
-
-                            const itemY = index * (itemHeight + itemSpacing)
-                            const itemBottom = itemY + itemHeight
+                            if (index < 0 || index >= count)
+                                return;
+                            const itemY = index * (itemHeight + itemSpacing);
+                            const itemBottom = itemY + itemHeight;
                             if (itemY < contentY) {
-                                contentY = itemY
+                                contentY = itemY;
                             } else if (itemBottom > contentY + height) {
-                                contentY = itemBottom - height
+                                contentY = itemBottom - height;
                             }
                         }
 
@@ -343,9 +344,9 @@ DankModal {
                         spacing: itemSpacing
 
                         onCurrentIndexChanged: {
-                            root.selectedIndex = currentIndex
+                            root.selectedIndex = currentIndex;
                             if (root.keyboardNavigationActive) {
-                                ensureVisible(currentIndex)
+                                ensureVisible(currentIndex);
                             }
                         }
 
@@ -360,11 +361,11 @@ DankModal {
                             hoverUpdatesSelection: true
 
                             onItemClicked: (idx, modelData) => {
-                                launchApplication(modelData)
+                                launchApplication(modelData);
                             }
 
                             onKeyboardNavigationReset: {
-                                root.keyboardNavigationActive = false
+                                root.keyboardNavigationActive = false;
                             }
                         }
                     }
@@ -373,14 +374,14 @@ DankModal {
                         id: appGrid
 
                         function ensureVisible(index) {
-                            if (index < 0 || index >= count) return
-
-                            const itemY = Math.floor(index / root.gridColumns) * cellHeight
-                            const itemBottom = itemY + cellHeight
+                            if (index < 0 || index >= count)
+                                return;
+                            const itemY = Math.floor(index / root.gridColumns) * cellHeight;
+                            const itemBottom = itemY + cellHeight;
                             if (itemY < contentY) {
-                                contentY = itemY
+                                contentY = itemY;
                             } else if (itemBottom > contentY + height) {
-                                contentY = itemBottom - height
+                                contentY = itemBottom - height;
                             }
                         }
 
@@ -397,9 +398,9 @@ DankModal {
                         currentIndex: root.selectedIndex
 
                         onCurrentIndexChanged: {
-                            root.selectedIndex = currentIndex
+                            root.selectedIndex = currentIndex;
                             if (root.keyboardNavigationActive) {
-                                ensureVisible(currentIndex)
+                                ensureVisible(currentIndex);
                             }
                         }
 
@@ -413,11 +414,11 @@ DankModal {
                             hoverUpdatesSelection: true
 
                             onItemClicked: (idx, modelData) => {
-                                launchApplication(modelData)
+                                launchApplication(modelData);
                             }
 
                             onKeyboardNavigationReset: {
-                                root.keyboardNavigationActive = false
+                                root.keyboardNavigationActive = false;
                             }
                         }
                     }
@@ -449,22 +450,22 @@ DankModal {
             }
 
             function launchApplication(app) {
-                if (!app) return
-
-                root.applicationSelected(app, root.targetData)
+                if (!app)
+                    return;
+                root.applicationSelected(app, root.targetData);
 
                 if (usageHistoryKey && app.appId) {
-                    const usageHistory = SettingsData[usageHistoryKey] || {}
-                    const currentCount = usageHistory[app.appId] ? usageHistory[app.appId].count : 0
+                    const usageHistory = SettingsData[usageHistoryKey] || {};
+                    const currentCount = usageHistory[app.appId] ? usageHistory[app.appId].count : 0;
                     usageHistory[app.appId] = {
                         count: currentCount + 1,
                         lastUsed: Date.now(),
                         name: app.name
-                    }
-                    SettingsData.set(usageHistoryKey, usageHistory)
+                    };
+                    SettingsData.set(usageHistoryKey, usageHistory);
                 }
 
-                root.close()
+                root.close();
             }
         }
     }

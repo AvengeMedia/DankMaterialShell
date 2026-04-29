@@ -9,6 +9,7 @@ import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DisplayConfigState")
 
     readonly property bool hasOutputBackend: WlrOutputService.wlrOutputAvailable
     readonly property var wlrOutputs: WlrOutputService.outputs
@@ -106,7 +107,7 @@ Singleton {
     function findMatchingProfile() {
         const profiles = validatedProfiles;
 
-        console.log("[Profile Match] Current outputs:", JSON.stringify(currentOutputSet));
+        log.debug("[Profile Match] Current outputs:", JSON.stringify(currentOutputSet));
 
         let bestMatch = "";
         let bestScore = -1;
@@ -116,25 +117,25 @@ Singleton {
             const profile = profiles[profileId];
             const profileSet = new Set(profile.outputSet);
 
-            console.log("[Profile Match] Checking", profile.name, "outputSet:", JSON.stringify(profile.outputSet));
+            log.debug("[Profile Match] Checking", profile.name, "outputSet:", JSON.stringify(profile.outputSet));
 
             let allCurrentPresent = true;
             for (const output of currentOutputSet) {
                 if (!profileSet.has(output)) {
-                    console.log("[Profile Match]  - Missing output:", output);
+                    log.debug("[Profile Match]  - Missing output:", output);
                     allCurrentPresent = false;
                     break;
                 }
             }
             if (!allCurrentPresent) {
-                console.log("[Profile Match]  - SKIP: not all current outputs present");
+                log.debug("[Profile Match]  - SKIP: not all current outputs present");
                 continue;
             }
 
             const disconnectedCount = profile.outputSet.length - currentOutputSet.length;
             const score = currentOutputSet.length * 100 - disconnectedCount;
             const updatedAt = profile.updatedAt || profile.createdAt || 0;
-            console.log("[Profile Match]  - MATCH score:", score, "(disconnected:", disconnectedCount, "updatedAt:", updatedAt + ")");
+            log.debug("[Profile Match]  - MATCH score:", score, "(disconnected:", disconnectedCount, "updatedAt:", updatedAt + ")");
 
             if (score > bestScore || (score === bestScore && updatedAt > bestUpdatedAt)) {
                 bestScore = score;
@@ -142,7 +143,7 @@ Singleton {
                 bestUpdatedAt = updatedAt;
             }
         }
-        console.log("[Profile Match] Best match:", bestMatch, "score:", bestScore);
+        log.debug("[Profile Match] Best match:", bestMatch, "score:", bestScore);
         return bestMatch;
     }
 

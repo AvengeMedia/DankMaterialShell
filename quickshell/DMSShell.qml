@@ -27,6 +27,7 @@ import qs.Services
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DMSShell")
 
     property bool osdSurfacesLoaded: true
     property int pendingOsdResumeReloads: 0
@@ -54,7 +55,7 @@ Item {
                         item.popoutService = PopoutService;
                     }
                     item.pluginId = pluginId;
-                    console.info("Daemon plugin loaded:", pluginId);
+                    log.info("Daemon plugin loaded:", pluginId);
                 }
             }
         }
@@ -93,7 +94,7 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    console.log("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
+                    log.debug("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
                 }
             }
 
@@ -133,7 +134,7 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    console.log("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
+                    log.debug("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
                 }
             }
 
@@ -773,7 +774,7 @@ Item {
                 cmd += " " + escapedPath;
             }
 
-            console.log("FilePicker: Launching", cmd);
+            log.debug("FilePicker: Launching", cmd);
 
             Quickshell.execDetached({
                 command: ["sh", "-c", cmd]
@@ -805,10 +806,10 @@ Item {
         }
 
         function onAppPickerRequested(data) {
-            console.log("DMSShell: App picker requested with data:", JSON.stringify(data));
+            log.debug("App picker requested with data:", JSON.stringify(data));
 
             if (!data || !data.target) {
-                console.warn("DMSShell: Invalid app picker request data");
+                log.warn("Invalid app picker request data");
                 return;
             }
 

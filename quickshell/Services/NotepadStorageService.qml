@@ -6,9 +6,11 @@ import QtCore
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("NotepadStorageService")
 
     property int refCount: 0
 
@@ -39,7 +41,7 @@ Singleton {
                 root.metadataLoaded = true
                 root.validateTabs()
             } catch(e) {
-                console.warn("Failed to parse notepad metadata:", e)
+                log.warn("Failed to parse notepad metadata:", e)
                 root.createDefaultTab()
             }
         }
@@ -148,7 +150,7 @@ Singleton {
                         callback: callback
                     })
                 } else {
-                    console.warn("Tab file does not exist:", fullPath)
+                    log.warn("Tab file does not exist:", fullPath)
                     callback("")
                 }
             }
@@ -389,7 +391,7 @@ Singleton {
             }
 
             onSaveFailed: {
-                console.error("Failed to save tab content")
+                log.error("Failed to save tab content")
                 if (creationCallback) {
                     creationCallback()
                 }

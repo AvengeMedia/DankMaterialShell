@@ -8,14 +8,16 @@ import Quickshell.Io
 import Quickshell.Wayland
 // ! Even though qmlls says this is unused, it is wrong
 import qs.Common
+import qs.Services
 import "../Common/KeybindActions.js" as Actions
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("KeybindsService")
 
     Component.onCompleted: {
         if (!shortcutInhibitorAvailable) {
-            console.warn("[KeybindsService] ShortcutInhibitor is not available in this environment, keybinds editor disabled.");
+            log.warn("ShortcutInhibitor is not available in this environment, keybinds editor disabled.");
         }
     }
 
@@ -150,7 +152,7 @@ Singleton {
                 try {
                     root.cheatsheet = JSON.parse(text);
                 } catch (e) {
-                    console.error("[KeybindsService] Failed to parse cheatsheet:", e);
+                    log.error("Failed to parse cheatsheet:", e);
                     root.cheatsheet = {};
                 }
                 root.cheatsheetLoading = false;
@@ -161,7 +163,7 @@ Singleton {
         onExited: exitCode => {
             if (exitCode === 0)
                 return;
-            console.warn("[KeybindsService] Cheatsheet load failed with code:", exitCode);
+            log.warn("Cheatsheet load failed with code:", exitCode);
             root.cheatsheetLoading = false;
         }
     }
@@ -176,7 +178,7 @@ Singleton {
                     root._rawData = JSON.parse(text);
                     root._processData();
                 } catch (e) {
-                    console.error("[KeybindsService] Failed to parse binds:", e);
+                    log.error("Failed to parse binds:", e);
                 }
                 root.loading = false;
             }
@@ -184,7 +186,7 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("[KeybindsService] Load process failed with code:", exitCode);
+                log.warn("Load process failed with code:", exitCode);
                 root.loading = false;
             }
         }
@@ -206,7 +208,7 @@ Singleton {
         onExited: exitCode => {
             root.saving = false;
             if (exitCode !== 0) {
-                console.error("[KeybindsService] Save failed with code:", exitCode);
+                log.error("Save failed with code:", exitCode);
                 root.bindSaveCompleted(false);
                 return;
             }
@@ -231,7 +233,7 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.error("[KeybindsService] Remove failed with code:", exitCode);
+                log.error("Remove failed with code:", exitCode);
                 return;
             }
             root.lastError = "";
@@ -255,7 +257,7 @@ Singleton {
         onExited: exitCode => {
             root.fixing = false;
             if (exitCode !== 0) {
-                console.error("[KeybindsService] Fix failed with code:", exitCode);
+                log.error("Fix failed with code:", exitCode);
                 return;
             }
             root.lastError = "";

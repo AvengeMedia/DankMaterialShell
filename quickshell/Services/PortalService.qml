@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("PortalService")
 
     property bool accountsServiceAvailable: false
     property string systemProfileImage: ""
@@ -127,7 +129,7 @@ Singleton {
             "iconTheme": themeName
         }, response => {
             if (response.error) {
-                console.warn("PortalService: Failed to set icon theme:", response.error);
+                log.warn("Failed to set icon theme:", response.error);
             }
         });
     }
@@ -139,7 +141,7 @@ Singleton {
             "path": imagePath || ""
         }, response => {
             if (response.error) {
-                console.warn("PortalService: Failed to set icon file:", response.error);
+                log.warn("Failed to set icon file:", response.error);
 
                 const errorMsg = response.error.toString();
                 let userMessage = I18n.tr("Failed to set profile image");
@@ -169,7 +171,7 @@ Singleton {
         if (socketPath && socketPath.length > 0) {
             checkDMSCapabilities();
         } else {
-            console.info("PortalService: DMS_SOCKET not set");
+            log.info("DMS_SOCKET not set");
         }
         colorSchemeDetector.running = true;
     }
@@ -207,7 +209,7 @@ Singleton {
             checkAccountsService();
             checkSettingsPortal();
         } else {
-            console.info("PortalService: freedesktop capability not available in DMS");
+            log.info("freedesktop capability not available in DMS");
         }
     }
 

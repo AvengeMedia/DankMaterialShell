@@ -6,6 +6,7 @@ import qs.Services
 
 Column {
     id: root
+    readonly property var log: Log.scoped("WidgetsTabSection")
 
     property var items: []
     property var allWidgets: []
@@ -1726,11 +1727,11 @@ Column {
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         onOpened: {
-            console.log("Privacy context menu opened");
+            log.debug("Privacy context menu opened");
         }
 
         onClosed: {
-            console.log("Privacy Center context menu closed");
+            log.debug("Privacy Center context menu closed");
         }
 
         background: Rectangle {

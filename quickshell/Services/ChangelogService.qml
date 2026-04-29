@@ -6,9 +6,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("ChangelogService")
 
     readonly property string currentVersion: "1.4"
     readonly property bool changelogEnabled: false
@@ -101,7 +103,7 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("ChangelogService: Failed to create changelog marker");
+                log.warn("Failed to create changelog marker");
             }
         }
     }

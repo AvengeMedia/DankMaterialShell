@@ -4,9 +4,11 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("AppSearchService")
 
     property var applications: []
     property var _cachedCategories: null
@@ -811,7 +813,7 @@ Singleton {
                 });
                 isPersistent = false;
             } catch (e) {
-                console.warn("AppSearchService: Error creating temporary plugin instance", pluginId, ":", e);
+                log.warn("Error creating temporary plugin instance", pluginId, ":", e);
                 return [];
             }
         }
@@ -831,7 +833,7 @@ Singleton {
                 instance.destroy();
             }
         } catch (e) {
-            console.warn("AppSearchService: Error getting items from plugin", pluginId, ":", e);
+            log.warn("Error getting items from plugin", pluginId, ":", e);
             if (!isPersistent)
                 instance.destroy();
         }
@@ -857,7 +859,7 @@ Singleton {
                 });
                 isPersistent = false;
             } catch (e) {
-                console.warn("AppSearchService: Error creating temporary plugin instance for execution", pluginId, ":", e);
+                log.warn("Error creating temporary plugin instance for execution", pluginId, ":", e);
                 return false;
             }
         }
@@ -877,7 +879,7 @@ Singleton {
                 instance.destroy();
             }
         } catch (e) {
-            console.warn("AppSearchService: Error executing item from plugin", pluginId, ":", e);
+            log.warn("Error executing item from plugin", pluginId, ":", e);
             if (!isPersistent)
                 instance.destroy();
         }
@@ -949,7 +951,7 @@ Singleton {
         try {
             return instance.getCategories() || [];
         } catch (e) {
-            console.warn("AppSearchService: Error getting categories from plugin", pluginId, ":", e);
+            log.warn("Error getting categories from plugin", pluginId, ":", e);
             return [];
         }
     }
@@ -968,7 +970,7 @@ Singleton {
         try {
             instance.setCategory(categoryId);
         } catch (e) {
-            console.warn("AppSearchService: Error setting category on plugin", pluginId, ":", e);
+            log.warn("Error setting category on plugin", pluginId, ":", e);
         }
     }
 

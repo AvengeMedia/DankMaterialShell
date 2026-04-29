@@ -1,10 +1,12 @@
 import QtQuick
 import Quickshell.Io
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("GreeterDoctorPage")
 
     property bool isRunning: false
     property bool hasRun: false
@@ -228,9 +230,7 @@ Item {
                         text: {
                             if (root.errorCount === 0)
                                 return I18n.tr("All checks passed", "greeter doctor page success");
-                            return root.errorCount === 1
-                                ? I18n.tr("%1 issue found", "greeter doctor page error count").arg(root.errorCount)
-                                : I18n.tr("%1 issues found", "greeter doctor page error count").arg(root.errorCount);
+                            return root.errorCount === 1 ? I18n.tr("%1 issue found", "greeter doctor page error count").arg(root.errorCount) : I18n.tr("%1 issues found", "greeter doctor page error count").arg(root.errorCount);
                         }
                         font.pixelSize: Theme.fontSizeMedium
                         color: root.errorCount > 0 ? Theme.error : Theme.surfaceVariantText
@@ -412,7 +412,7 @@ Item {
                     else
                         root.selectedFilter = "ok";
                 } catch (e) {
-                    console.error("GreeterDoctorPage: Failed to parse doctor output:", e);
+                    log.error("Failed to parse doctor output:", e);
                 }
             }
         }

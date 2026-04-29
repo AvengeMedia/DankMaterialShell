@@ -80,6 +80,16 @@ func getRuntimeDir() string {
 	return os.TempDir()
 }
 
+func appendLogEnv(env []string) []string {
+	if v := os.Getenv("DMS_LOG_LEVEL"); v != "" {
+		env = append(env, "DMS_LOG_LEVEL="+v)
+	}
+	if v := os.Getenv("DMS_LOG_FILE"); v != "" {
+		env = append(env, "DMS_LOG_FILE="+v)
+	}
+	return env
+}
+
 func hasSystemdRun() bool {
 	_, err := exec.LookPath("systemd-run")
 	return err == nil
@@ -215,6 +225,8 @@ func runShellInteractive(session bool) {
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
+
+	cmd.Env = appendLogEnv(cmd.Env)
 
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -458,6 +470,8 @@ func runShellDaemon(session bool) {
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
+
+	cmd.Env = appendLogEnv(cmd.Env)
 
 	devNull, err := os.OpenFile("/dev/null", os.O_RDWR, 0)
 	if err != nil {

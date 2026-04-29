@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DisplayService")
 
     property bool brightnessAvailable: devices.length > 0
     property var devices: []
@@ -247,7 +249,7 @@ Singleton {
     function setBrightness(percentage, device, suppressOsd) {
         const actualDevice = device === "" ? getDefaultDevice() : (device || currentDevice || getDefaultDevice());
         if (!actualDevice) {
-            console.warn("DisplayService: No device selected for brightness change");
+            log.warn("No device selected for brightness change");
             return;
         }
 
@@ -273,14 +275,14 @@ Singleton {
         }
 
         if (maxValue <= 0) {
-            console.warn("DisplayService: Invalid max value for device", actualDevice, "- skipping brightness change");
+            log.warn("Invalid max value for device", actualDevice, "- skipping brightness change");
             return;
         }
 
         const clampedValue = Math.max(minValue, Math.min(maxValue, percentage));
 
         if (!DMSService.isConnected) {
-            console.warn("DisplayService: Not connected to DMS");
+            log.warn("Not connected to DMS");
             return;
         }
 
@@ -319,7 +321,7 @@ Singleton {
 
         DMSService.sendRequest("brightness.setBrightness", params, response => {
             if (response.error) {
-                console.error("DisplayService: Failed to set brightness:", response.error);
+                log.error("Failed to set brightness:", response.error);
                 ToastService.showError(I18n.tr("Failed to set brightness"), response.error, "", "brightness");
             } else {
                 ToastService.dismissCategory("brightness");
@@ -453,7 +455,7 @@ Singleton {
             "enabled": true
         }, response => {
             if (response.error) {
-                console.error("DisplayService: Failed to enable gamma control:", response.error);
+                log.error("Failed to enable gamma control:", response.error);
                 ToastService.showError(I18n.tr("Failed to enable night mode"), response.error, "", "night-mode");
                 nightModeEnabled = false;
                 SessionData.setNightModeEnabled(false);
@@ -481,7 +483,7 @@ Singleton {
             "enabled": false
         }, response => {
             if (response.error) {
-                console.error("DisplayService: Failed to disable gamma control:", response.error);
+                log.error("Failed to disable gamma control:", response.error);
                 ToastService.showError(I18n.tr("Failed to disable night mode"), response.error, "", "night-mode");
             } else {
                 ToastService.dismissCategory("night-mode");
@@ -505,7 +507,7 @@ Singleton {
             "sunset": null
         }, response => {
             if (response.error) {
-                console.error("DisplayService: Failed to clear manual times:", response.error);
+                log.error("Failed to clear manual times:", response.error);
                 return;
             }
 
@@ -513,7 +515,7 @@ Singleton {
                 "use": false
             }, response => {
                 if (response.error) {
-                    console.error("DisplayService: Failed to disable IP location:", response.error);
+                    log.error("Failed to disable IP location:", response.error);
                     return;
                 }
 
@@ -522,7 +524,7 @@ Singleton {
                     "high": temperature
                 }, response => {
                     if (response.error) {
-                        console.error("DisplayService: Failed to set temperature:", response.error);
+                        log.error("Failed to set temperature:", response.error);
                         ToastService.showError(I18n.tr("Failed to set night mode temperature"), response.error, "", "night-mode");
                     } else {
                         ToastService.dismissCategory("night-mode");
@@ -564,7 +566,7 @@ Singleton {
             "use": false
         }, response => {
             if (response.error) {
-                console.error("DisplayService: Failed to disable IP location:", response.error);
+                log.error("Failed to disable IP location:", response.error);
                 return;
             }
 
@@ -573,7 +575,7 @@ Singleton {
                 "high": highTemp
             }, response => {
                 if (response.error) {
-                    console.error("DisplayService: Failed to set temperature:", response.error);
+                    log.error("Failed to set temperature:", response.error);
                     ToastService.showError(I18n.tr("Failed to set night mode temperature"), response.error, "", "night-mode");
                     return;
                 }
@@ -583,7 +585,7 @@ Singleton {
                     "sunset": sunset
                 }, response => {
                     if (response.error) {
-                        console.error("DisplayService: Failed to set manual times:", response.error);
+                        log.error("Failed to set manual times:", response.error);
                         ToastService.showError(I18n.tr("Failed to set night mode schedule"), response.error, "", "night-mode");
                     } else {
                         ToastService.dismissCategory("night-mode");
@@ -602,7 +604,7 @@ Singleton {
             "sunset": null
         }, response => {
             if (response.error) {
-                console.error("DisplayService: Failed to clear manual times:", response.error);
+                log.error("Failed to clear manual times:", response.error);
                 return;
             }
 
@@ -611,7 +613,7 @@ Singleton {
                 "high": highTemp
             }, response => {
                 if (response.error) {
-                    console.error("DisplayService: Failed to set temperature:", response.error);
+                    log.error("Failed to set temperature:", response.error);
                     ToastService.showError(I18n.tr("Failed to set night mode temperature"), response.error, "", "night-mode");
                     return;
                 }
@@ -621,7 +623,7 @@ Singleton {
                         "use": true
                     }, response => {
                         if (response.error) {
-                            console.error("DisplayService: Failed to enable IP location:", response.error);
+                            log.error("Failed to enable IP location:", response.error);
                             ToastService.showError(I18n.tr("Failed to enable IP location"), response.error, "", "night-mode");
                         } else {
                             ToastService.dismissCategory("night-mode");
@@ -632,7 +634,7 @@ Singleton {
                         "use": false
                     }, response => {
                         if (response.error) {
-                            console.error("DisplayService: Failed to disable IP location:", response.error);
+                            log.error("Failed to disable IP location:", response.error);
                             return;
                         }
 
@@ -641,7 +643,7 @@ Singleton {
                             "longitude": SessionData.longitude
                         }, response => {
                             if (response.error) {
-                                console.error("DisplayService: Failed to set location:", response.error);
+                                log.error("Failed to set location:", response.error);
                                 ToastService.showError(I18n.tr("Failed to set night mode location"), response.error, "", "night-mode");
                             } else {
                                 ToastService.dismissCategory("night-mode");
@@ -649,7 +651,7 @@ Singleton {
                         });
                     });
                 } else {
-                    console.warn("DisplayService: Location mode selected but no coordinates set and IP location disabled");
+                    log.warn("Location mode selected but no coordinates set and IP location disabled");
                 }
             });
         });
@@ -703,7 +705,7 @@ Singleton {
             if (response.error) {
                 gammaControlAvailable = false;
                 automationAvailable = false;
-                console.error("DisplayService: Gamma control not available:", response.error);
+                log.error("Gamma control not available:", response.error);
             } else {
                 gammaControlAvailable = true;
                 automationAvailable = true;
@@ -713,7 +715,7 @@ Singleton {
                         "enabled": true
                     }, enableResponse => {
                         if (enableResponse.error) {
-                            console.error("DisplayService: Failed to enable gamma control on startup:", enableResponse.error);
+                            log.error("Failed to enable gamma control on startup:", enableResponse.error);
                             return;
                         }
 
@@ -772,7 +774,7 @@ Singleton {
 
         DMSService.sendRequest("brightness.rescan", null, response => {
             if (response.error) {
-                console.error("DisplayService: Failed to rescan brightness devices:", response.error);
+                log.error("Failed to rescan brightness devices:", response.error);
             }
         });
     }

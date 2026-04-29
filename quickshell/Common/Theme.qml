@@ -12,6 +12,7 @@ import "StockThemes.js" as StockThemes
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("Theme")
 
     readonly property string stateDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation).toString()) + "/DankMaterialShell"
     readonly property bool envDisableMatugen: Quickshell.env("DMS_DISABLE_MATUGEN") === "1" || Quickshell.env("DMS_DISABLE_MATUGEN") === "true"
@@ -148,7 +149,7 @@ Singleton {
             }
 
             if (colorsFileLoadFailed && currentTheme === dynamic && rawWallpaperPath) {
-                console.info("Theme: Matugen now available, regenerating colors for dynamic theme");
+                log.info("Matugen now available, regenerating colors for dynamic theme");
                 const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
                 const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
                 const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
@@ -376,7 +377,7 @@ Singleton {
                         "use": true
                     }, response => {
                         if (!response.error) {
-                            console.info("Theme automation: IP location enabled after connection");
+                            log.info("Theme automation: IP location enabled after connection");
                         }
                     });
                 } else if (SessionData.latitude !== 0.0 && SessionData.longitude !== 0.0) {
@@ -389,13 +390,13 @@ Singleton {
                                 "longitude": SessionData.longitude
                             }, locationResponse => {
                                 if (locationResponse?.error) {
-                                    console.warn("Theme automation: Failed to set location", locationResponse.error);
+                                    log.warn("Theme automation: Failed to set location", locationResponse.error);
                                 }
                             });
                         }
                     });
                 } else {
-                    console.warn("Theme automation: No location configured");
+                    log.warn("Theme automation: No location configured");
                 }
             }
         }
@@ -1525,12 +1526,12 @@ Singleton {
 
     function setDesiredTheme(kind, value, isLight, iconTheme, matugenType, stockColors) {
         if (!matugenAvailable) {
-            console.warn("Theme: matugen not available or disabled - cannot set system theme");
+            log.warn("matugen not available or disabled - cannot set system theme");
             return;
         }
 
         if (workerRunning) {
-            console.info("Theme: Worker already running, queueing request");
+            log.info("Worker already running, queueing request");
             pendingThemeRequest = {
                 kind,
                 value,
@@ -1542,7 +1543,7 @@ Singleton {
             return;
         }
 
-        console.info("Theme: Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", stockColors ? "(stock colors)" : "(dynamic)");
+        log.info("Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", stockColors ? "(stock colors)" : "(dynamic)");
 
         if (typeof NiriService !== "undefined" && CompositorService.isNiri) {
             NiriService.suppressNextToast();
@@ -1557,7 +1558,7 @@ Singleton {
             "runUserTemplates": (typeof SettingsData !== "undefined") ? SettingsData.runUserMatugenTemplates : true
         };
 
-        console.log("Theme: Starting matugen worker");
+        log.debug("Starting matugen worker");
         workerRunning = true;
 
         const args = ["dms", "matugen", "queue", "--state-dir", stateDir, "--shell-dir", shellDir, "--config-dir", configDir, "--kind", desired.kind, "--value", desired.value, "--mode", desired.mode, "--icon-theme", desired.iconTheme, "--matugen-type", desired.matugenType,];
@@ -1715,7 +1716,7 @@ Singleton {
         }
 
         if (!darkTheme || !darkTheme.primary) {
-            console.warn("Theme data not available for:", currentTheme);
+            log.warn("Theme data not available for:", currentTheme);
             return;
         }
 
@@ -1953,10 +1954,10 @@ Singleton {
         id: systemThemeGenerator
         running: false
         stdout: SplitParser {
-            onRead: data => console.info("Theme worker:", data)
+            onRead: data => log.info("Theme worker:", data)
         }
         stderr: SplitParser {
-            onRead: data => console.warn("Theme worker:", data)
+            onRead: data => log.warn("Theme worker:", data)
         }
 
         onExited: exitCode => {
@@ -1965,18 +1966,18 @@ Singleton {
 
             switch (exitCode) {
             case 0:
-                console.info("Theme: Matugen worker completed successfully");
+                log.info("Matugen worker completed successfully");
                 root.matugenCompleted(currentMode, "success");
                 break;
             case 2:
-                console.log("Theme: Matugen worker completed with code 2 (no changes needed)");
+                log.debug("Matugen worker completed with code 2 (no changes needed)");
                 root.matugenCompleted(currentMode, "no-changes");
                 break;
             default:
                 if (typeof ToastService !== "undefined") {
                     ToastService.showError("Theme worker failed (" + exitCode + ")");
                 }
-                console.warn("Theme: Matugen worker failed with exit code:", exitCode);
+                log.warn("Matugen worker failed with exit code:", exitCode);
                 root.matugenCompleted(currentMode, "error");
             }
 
@@ -1985,7 +1986,7 @@ Singleton {
 
             const req = pendingThemeRequest;
             pendingThemeRequest = null;
-            console.info("Theme: Processing queued theme request");
+            log.info("Processing queued theme request");
             setDesiredTheme(req.kind, req.value, req.isLight, req.iconTheme, req.matugenType, req.stockColors);
         }
     }
@@ -2039,7 +2040,7 @@ Singleton {
                     }
                 }
             } catch (e) {
-                console.error("Theme: Failed to parse dynamic colors:", e);
+                log.error("Failed to parse dynamic colors:", e);
                 if (typeof ToastService !== "undefined") {
                     ToastService.wallpaperErrorStatus = "error";
                     ToastService.showError("Dynamic colors parse error: " + e.message);
@@ -2059,11 +2060,11 @@ Singleton {
 
         onLoadFailed: function (error) {
             if (currentTheme === dynamic) {
-                console.warn("Theme: Dynamic colors file load failed, marking for regeneration");
+                log.warn("Dynamic colors file load failed, marking for regeneration");
                 colorsFileLoadFailed = true;
                 const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
                 if (!isGreeterMode && matugenAvailable && rawWallpaperPath) {
-                    console.log("Theme: Matugen available, triggering immediate regeneration");
+                    log.debug("Matugen available, triggering immediate regeneration");
                     generateSystemThemesFromCurrentTheme();
                 }
             }
@@ -2187,7 +2188,7 @@ Singleton {
             "endMinute": endMinute
         }, response => {
             if (response && response.error) {
-                console.error("Theme automation: Failed to sync time schedule:", response.error);
+                log.error("Theme automation: Failed to sync time schedule:", response.error);
             }
         });
 
@@ -2280,9 +2281,9 @@ Singleton {
 
         if (root.themeModeAutomationActive) {
             if (SessionData.nightModeUseIPLocation) {
-                console.warn("Theme automation: Waiting for IP location from backend");
+                log.warn("Theme automation: Waiting for IP location from backend");
             } else {
-                console.warn("Theme automation: Location mode requires coordinates");
+                log.warn("Theme automation: Location mode requires coordinates");
             }
         }
     }
@@ -2364,7 +2365,7 @@ Singleton {
                 "use": true
             }, response => {
                 if (response?.error) {
-                    console.warn("Theme automation: Failed to enable IP location", response.error);
+                    log.warn("Theme automation: Failed to enable IP location", response.error);
                 }
             });
             return true;
@@ -2378,7 +2379,7 @@ Singleton {
                         "longitude": SessionData.longitude
                     }, locResp => {
                         if (locResp?.error) {
-                            console.warn("Theme automation: Failed to set location", locResp.error);
+                            log.warn("Theme automation: Failed to set location", locResp.error);
                         }
                     });
                 }

@@ -8,6 +8,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("OverviewWidget")
     required property var panelWindow
     required property bool overviewOpen
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(panelWindow.screen)
@@ -276,7 +277,7 @@ Item {
                             }
                             return result;
                         } catch (e) {
-                            console.error("OverviewWidget filter error:", e);
+                            log.error("OverviewWidget filter error:", e);
                             return [];
                         }
                     }

@@ -6,6 +6,7 @@ import qs.Services
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DankPopout")
 
     property string layerNamespace: "dms:popout"
     property alias content: contentLoader.sourceComponent
@@ -414,10 +415,10 @@ Item {
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_POPOUT_LAYER")) {
             case "bottom":
-                console.warn("DankPopout: 'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
+                log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "background":
-                console.warn("DankPopout: 'background' layer is not valid for popouts. Defaulting to 'top' layer.");
+                log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;

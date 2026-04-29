@@ -6,6 +6,7 @@ import qs.Widgets
 
 Item {
     id: thumbnail
+    readonly property var log: Log.scoped("ClipboardThumbnail")
 
     required property var entry
     required property string entryType
@@ -52,7 +53,7 @@ Item {
                     modal.activeImageLoads--;
                 }
                 if (response.error) {
-                    console.warn("ClipboardThumbnail: Failed to load image:", entry.id);
+                    log.warn("Failed to load image:", entry.id);
                     return;
                 }
                 const data = response.result?.data;

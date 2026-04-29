@@ -7,6 +7,7 @@ import qs.Widgets
 import qs.Services
 
 Variants {
+    readonly property var log: Log.scoped("WallpaperBackground")
     model: {
         if (SessionData.isGreeterMode) {
             return Quickshell.screens;
@@ -103,7 +104,7 @@ Variants {
             function _recheckScreenScale() {
                 const newScale = CompositorService.getScreenScale(modelData);
                 if (newScale !== root.screenScale) {
-                    console.info("WallpaperBackground: screen scale corrected for", modelData.name + ":", root.screenScale, "->", newScale);
+                    log.info("screen scale corrected for", modelData.name + ":", root.screenScale, "->", newScale);
                     root.screenScale = newScale;
                 }
             }

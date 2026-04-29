@@ -13,6 +13,7 @@ import "settings/SettingsStore.js" as Store
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("SettingsData")
 
     readonly property int settingsConfigVersion: 5
 
@@ -1294,7 +1295,7 @@ Singleton {
         } catch (e) {
             _parseError = true;
             const msg = e.message;
-            console.error("SettingsData: Failed to parse settings.json - file will not be overwritten. Error:", msg);
+            log.error("Failed to parse settings.json - file will not be overwritten. Error:", msg);
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse settings.json"), msg));
             applyStoredTheme();
         } finally {
@@ -1315,12 +1316,12 @@ Singleton {
         if (_isReadOnly) {
             _hasUnsavedChanges = _checkForUnsavedChanges();
             if (!wasReadOnly)
-                console.info("SettingsData: settings.json is now read-only");
+                log.info("settings.json is now read-only");
         } else {
             _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
             _hasUnsavedChanges = false;
             if (wasReadOnly)
-                console.info("SettingsData: settings.json is now writable");
+                log.info("settings.json is now writable");
             if (_pendingMigration)
                 settingsFile.setText(JSON.stringify(_pendingMigration, null, 2));
         }
@@ -1374,7 +1375,7 @@ Singleton {
         } catch (e) {
             const msg = e.message || String(e);
             if (!_isMissingPluginSettingsError(e))
-                console.warn("SettingsData: Failed to load plugin_settings.json. Error:", msg);
+                log.warn("Failed to load plugin_settings.json. Error:", msg);
             _resetPluginSettings();
         }
     }
@@ -1391,7 +1392,7 @@ Singleton {
         } catch (e) {
             _pluginParseError = true;
             const msg = e.message;
-            console.error("SettingsData: Failed to parse plugin_settings.json - file will not be overwritten. Error:", msg);
+            log.error("Failed to parse plugin_settings.json - file will not be overwritten. Error:", msg);
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse plugin_settings.json"), msg));
             pluginSettings = {};
         } finally {
@@ -2794,7 +2795,7 @@ Singleton {
             } catch (e) {
                 _parseError = true;
                 const msg = e.message;
-                console.error("SettingsData: Failed to reload settings.json - file will not be overwritten. Error:", msg);
+                log.error("Failed to reload settings.json - file will not be overwritten. Error:", msg);
                 Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse settings.json"), msg));
             } finally {
                 _loading = false;
@@ -2829,7 +2830,7 @@ Singleton {
             if (!isGreeterMode) {
                 const msg = String(error || "");
                 if (!_isMissingPluginSettingsError(error))
-                    console.warn("SettingsData: Failed to load plugin_settings.json. Error:", msg);
+                    log.warn("Failed to load plugin_settings.json. Error:", msg);
                 _resetPluginSettings();
             }
         }

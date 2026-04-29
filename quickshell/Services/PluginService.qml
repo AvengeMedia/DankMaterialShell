@@ -10,6 +10,7 @@ import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("PluginService")
 
     property var availablePlugins: ({})
     property var loadedPlugins: ({})
@@ -167,13 +168,13 @@ Singleton {
                         const manifest = JSON.parse(raw)
                         root._onManifestParsed(absPath, manifest, "${sourceTag}", ${mtimeEpochMs})
                     } catch (e) {
-                        console.error("PluginService: bad manifest", absPath, e.message)
+                        log.error("bad manifest", absPath, e.message)
                         knownManifests[absPath] = { mtime: ${mtimeEpochMs}, source: "${sourceTag}", bad: true }
                     }
                     fv.destroy()
                 }
                 onLoadFailed: (err) => {
-                    console.warn("PluginService: manifest load failed", absPath, err)
+                    log.warn("manifest load failed", absPath, err)
                     fv.destroy()
                 }
             }
@@ -186,7 +187,7 @@ Singleton {
 
     function _onManifestParsed(absPath, manifest, sourceTag, mtimeEpochMs) {
         if (!manifest || !manifest.id || !manifest.name || !manifest.component) {
-            console.error("PluginService: invalid manifest fields:", absPath);
+            log.error("invalid manifest fields:", absPath);
             knownManifests[absPath] = {
                 mtime: mtimeEpochMs,
                 source: sourceTag,
@@ -269,7 +270,7 @@ Singleton {
     function loadPlugin(pluginId, bustCache) {
         const plugin = availablePlugins[pluginId];
         if (!plugin) {
-            console.error("PluginService: Plugin not found:", pluginId);
+            log.error("Plugin not found:", pluginId);
             pluginLoadFailed(pluginId, "Plugin not found");
             return false;
         }
@@ -296,7 +297,7 @@ Singleton {
                 url += "?t=" + Date.now();
             const comp = Qt.createComponent(url, Component.PreferSynchronous);
             if (comp.status === Component.Error) {
-                console.error("PluginService: component error", pluginId, comp.errorString());
+                log.error("component error", pluginId, comp.errorString());
                 pluginLoadFailed(pluginId, comp.errorString());
                 return false;
             }
@@ -310,7 +311,7 @@ Singleton {
                     "pluginService": root
                 });
                 if (!instance) {
-                    console.error("PluginService: failed to instantiate plugin:", pluginId, comp.errorString());
+                    log.error("failed to instantiate plugin:", pluginId, comp.errorString());
                     pluginLoadFailed(pluginId, comp.errorString());
                     return false;
                 }
@@ -339,7 +340,7 @@ Singleton {
             pluginLoaded(pluginId);
             return true;
         } catch (e) {
-            console.error("PluginService: Error loading plugin:", pluginId, e.message);
+            log.error("Error loading plugin:", pluginId, e.message);
             pluginLoadFailed(pluginId, e.message);
             return false;
         }
@@ -348,7 +349,7 @@ Singleton {
     function unloadPlugin(pluginId) {
         const plugin = loadedPlugins[pluginId];
         if (!plugin) {
-            console.warn("PluginService: Plugin not loaded:", pluginId);
+            log.warn("Plugin not loaded:", pluginId);
             return false;
         }
 
@@ -392,7 +393,7 @@ Singleton {
             pluginUnloaded(pluginId);
             return true;
         } catch (error) {
-            console.error("PluginService: Error unloading plugin:", pluginId, "Error:", error.message);
+            log.error("Error unloading plugin:", pluginId, "Error:", error.message);
             return false;
         }
     }
@@ -705,7 +706,7 @@ Singleton {
                 fv.setText(content);
             });
         } catch (e) {
-            console.warn("PluginService: Failed to write state for", pluginId, e.message);
+            log.warn("Failed to write state for", pluginId, e.message);
         }
     }
 
@@ -753,14 +754,14 @@ Singleton {
             process.command = ["mkdir", "-p", pluginDirectory];
             process.exited.connect(function (exitCode) {
                 if (exitCode !== 0) {
-                    console.error("PluginService: Failed to create plugin directory, exit code:", exitCode);
+                    log.error("Failed to create plugin directory, exit code:", exitCode);
                 }
                 process.destroy();
             });
             process.running = true;
             return true;
         } else {
-            console.error("PluginService: Failed to create mkdir process");
+            log.error("Failed to create mkdir process");
             return false;
         }
     }
