@@ -746,7 +746,7 @@ Item {
 
             Item {
                 id: directionalClipMask
-                readonly property bool shouldClip: Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0
+                readonly property bool shouldClip: Theme.isDirectionalEffect
                 readonly property real clipOversize: 2000
 
                 clip: shouldClip

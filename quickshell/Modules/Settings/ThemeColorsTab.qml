@@ -11,6 +11,7 @@ import qs.Modules.Settings.Widgets
 Item {
     id: themeColorsTab
 
+    property var parentModal: null
     readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
     property var cachedIconThemes: SettingsData.availableIconThemes
     property var cachedCursorThemes: SettingsData.availableCursorThemes
@@ -1614,16 +1615,20 @@ Item {
                     }
                 }
 
+                SettingsControlledByFrame {
+                    visible: themeColorsTab.connectedFrameModeActive
+                    parentModal: themeColorsTab.parentModal
+                    settingLabel: I18n.tr("Surface Opacity")
+                    reason: I18n.tr("Managed by Frame in Connected Mode")
+                }
+
                 SettingsSliderRow {
                     tab: "theme"
                     tags: ["surface", "popup", "transparency", "opacity", "modal"]
                     settingKey: "popupTransparency"
                     text: I18n.tr("Surface Opacity")
-                    description: themeColorsTab.connectedFrameModeActive
-                        ? I18n.tr("Connected Frame mode follows Surface Opacity from the Frame tab for connected popouts, docks, and modal surfaces")
-                        : I18n.tr("Controls opacity of all popouts, modals, and their content layers")
-                    enabled: !themeColorsTab.connectedFrameModeActive
-                    opacity: themeColorsTab.connectedFrameModeActive ? 0.5 : 1.0
+                    description: I18n.tr("Controls opacity of all popouts, modals, and their content layers")
+                    visible: !themeColorsTab.connectedFrameModeActive
                     value: Math.round(SettingsData.popupTransparency * 100)
                     minimum: 0
                     maximum: 100
@@ -1637,9 +1642,7 @@ Item {
                     tags: ["corner", "radius", "rounded", "square"]
                     settingKey: "cornerRadius"
                     text: I18n.tr("Corner Radius")
-                    description: themeColorsTab.connectedFrameModeActive
-                        ? I18n.tr("Controls general UI rounding. Connected frame popouts, docks, and modal surfaces follow Border Radius in the Frame tab while Connected Frame mode is active")
-                        : I18n.tr("0 = square corners")
+                    description: I18n.tr("0 = square corners")
                     value: SettingsData.cornerRadius
                     minimum: 0
                     maximum: 32
@@ -1844,11 +1847,7 @@ Item {
                     tags: ["blur", "background", "transparency", "glass", "frosted"]
                     settingKey: "blurEnabled"
                     text: I18n.tr("Background Blur")
-                    description: !BlurService.available
-                        ? I18n.tr("Requires a newer version of Quickshell")
-                        : (themeColorsTab.connectedFrameModeActive
-                            ? I18n.tr("Connected Frame mode follows Frame Blur for connected surfaces while this remains the master blur availability toggle")
-                            : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration."))
+                    description: !BlurService.available ? I18n.tr("Requires a newer version of Quickshell") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.")
                     checked: SettingsData.blurEnabled ?? false
                     enabled: BlurService.available
                     onToggled: checked => SettingsData.set("blurEnabled", checked)

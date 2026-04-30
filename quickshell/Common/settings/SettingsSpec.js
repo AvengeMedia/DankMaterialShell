@@ -51,8 +51,6 @@ var SPEC = {
     enableRippleEffects: { def: true },
     animationVariant: { def: 0 },
     motionEffect: { def: 0 },
-    directionalAnimationMode: { def: 1 },
-    previousDirectionalMode: { def: 1 },
     m3ElevationEnabled: { def: true },
     m3ElevationIntensity: { def: 12 },
     m3ElevationOpacity: { def: 30 },
@@ -566,7 +564,8 @@ var SPEC = {
     frameShowOnOverview: { def: false },
     frameBlurEnabled: { def: true },
     frameCloseGaps: { def: false },
-    frameLauncherEmergeSide: { def: "bottom" }
+    frameLauncherEmergeSide: { def: "bottom" },
+    frameMode: { def: "separate" }
 };
 
 function getValidKeys() {

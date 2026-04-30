@@ -708,42 +708,18 @@ Item {
                 }
             }
 
-            Item {
+            SettingsControlledByFrame {
                 visible: SettingsData.frameEnabled
-                width: parent.width
-                implicitHeight: frameNote.implicitHeight + Theme.spacingS * 2
-
-                Row {
-                    id: frameNote
-                    x: Theme.spacingM
-                    width: parent.width - Theme.spacingM * 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingS
-
-                    DankIcon {
-                        name: "frame_source"
-                        size: Theme.fontSizeMedium
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    StyledText {
-                        text: I18n.tr("Spacing and size are managed by Frame mode")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width - Theme.fontSizeMedium - Theme.spacingS
-                    }
-                }
+                parentModal: dankBarTab.parentModal
+                settingLabel: I18n.tr("Bar spacing and size")
+                reason: I18n.tr("Managed by Frame")
             }
 
             SettingsCard {
                 iconName: "space_bar"
                 title: I18n.tr("Spacing")
                 settingKey: "barSpacing"
-                visible: selectedBarConfig?.enabled
-                enabled: !SettingsData.frameEnabled
-                opacity: SettingsData.frameEnabled ? 0.5 : 1.0
+                visible: (selectedBarConfig?.enabled ?? false) && !SettingsData.frameEnabled
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
@@ -894,8 +870,7 @@ Item {
 
                 SettingsSliderRow {
                     id: barTransparencySlider
-                    enabled: !SettingsData.frameEnabled
-                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
+                    visible: !SettingsData.frameEnabled
                     text: I18n.tr("Bar Transparency")
                     value: (selectedBarConfig?.transparency ?? 1.0) * 100
                     minimum: 0
@@ -938,33 +913,11 @@ Item {
                     }
                 }
 
-                Item {
+                SettingsControlledByFrame {
                     visible: SettingsData.frameEnabled
-                    width: parent.width
-                    implicitHeight: transparencyFrameNote.implicitHeight + Theme.spacingS * 2
-
-                    Row {
-                        id: transparencyFrameNote
-                        x: Theme.spacingM
-                        width: parent.width - Theme.spacingM * 2
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: "frame_source"
-                            size: Theme.fontSizeMedium
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Opacity is controlled by Frame Border Opacity in Frame settings")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.WordWrap
-                            width: parent.width - Theme.fontSizeMedium - Theme.spacingS
-                        }
-                    }
+                    parentModal: dankBarTab.parentModal
+                    settingLabel: I18n.tr("Bar transparency")
+                    reason: I18n.tr("Managed by Frame")
                 }
             }
 
@@ -1026,10 +979,16 @@ Item {
                 expanded: false
                 visible: selectedBarConfig?.enabled
 
+                SettingsControlledByFrame {
+                    visible: SettingsData.frameEnabled
+                    parentModal: dankBarTab.parentModal
+                    settingLabel: I18n.tr("Bar corners and background")
+                    reason: I18n.tr("Managed by Frame")
+                }
+
                 SettingsToggleRow {
                     text: I18n.tr("Square Corners")
-                    enabled: !SettingsData.frameEnabled
-                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
+                    visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.squareCorners ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             squareCorners: checked
@@ -1038,8 +997,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("No Background")
-                    enabled: !SettingsData.frameEnabled
-                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
+                    visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.noBackground ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             noBackground: checked
@@ -1079,8 +1037,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Goth Corners")
-                    enabled: !SettingsData.frameEnabled
-                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
+                    visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             gothCornersEnabled: checked
@@ -1416,33 +1373,11 @@ Item {
                 }
             }
 
-            Item {
+            SettingsControlledByFrame {
                 visible: dankBarTab.connectedFrameModeActive
-                width: parent.width
-                implicitHeight: connectedFrameStyleNote.implicitHeight + Theme.spacingS * 2
-
-                Row {
-                    id: connectedFrameStyleNote
-                    x: Theme.spacingM
-                    width: parent.width - Theme.spacingM * 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingS
-
-                    DankIcon {
-                        name: "frame_source"
-                        size: Theme.fontSizeMedium
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    StyledText {
-                        text: I18n.tr("Connected Frame mode keeps bar shadow override, border, and corner overrides off while active")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width - Theme.fontSizeMedium - Theme.spacingS
-                    }
-                }
+                parentModal: dankBarTab.parentModal
+                settingLabel: I18n.tr("Bar shadow, border, and corners")
+                reason: I18n.tr("Managed by Frame in Connected Mode")
             }
 
             SettingsCard {
@@ -1452,9 +1387,7 @@ Item {
                 settingKey: "barShadow"
                 collapsible: true
                 expanded: false
-                visible: selectedBarConfig?.enabled
-                enabled: !dankBarTab.connectedFrameModeActive
-                opacity: dankBarTab.connectedFrameModeActive ? 0.5 : 1.0
+                visible: (selectedBarConfig?.enabled ?? false) && !dankBarTab.connectedFrameModeActive
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"

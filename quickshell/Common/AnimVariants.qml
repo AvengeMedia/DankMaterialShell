@@ -55,7 +55,7 @@ Singleton {
 
     readonly property bool isDirectionalEffect: isConnectedEffect || _effect === 1
     readonly property bool isDepthEffect: _effect === 2
-    readonly property bool isConnectedEffect: (typeof SettingsData !== "undefined") && SettingsData.frameEnabled && _effect === 1 && SettingsData.directionalAnimationMode === 3
+    readonly property bool isConnectedEffect: (typeof SettingsData !== "undefined") && SettingsData.connectedFrameModeActive
 
     readonly property real effectScaleCollapsed: _effectScaleCollapsed[_effect] !== undefined ? _effectScaleCollapsed[_effect] : 0.96
     readonly property real effectAnimOffset: _effectAnimOffsets[_effect] !== undefined ? _effectAnimOffsets[_effect] : 16

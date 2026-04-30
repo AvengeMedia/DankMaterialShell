@@ -191,46 +191,6 @@ Item {
                         }
                     }
                 }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                    visible: SettingsData.motionEffect === 1
-                }
-
-                SettingsDropdownRow {
-                    visible: SettingsData.motionEffect === 1
-                    tab: "typography"
-                    tags: ["animation", "directional", "behavior", "fluid", "connected"]
-                    settingKey: "directionalAnimationMode"
-                    text: I18n.tr("Directional Behavior")
-                    description: {
-                        if (SettingsData.connectedFrameModeActive)
-                            return I18n.tr("Popouts emerge flush from the bar edge as a single continuous piece, with corner connectors bridging the junction");
-                        return I18n.tr("How the popout emerges from the DankBar");
-                    }
-                    options: SettingsData.frameEnabled ? [I18n.tr("Fluid"), I18n.tr("Connected")] : [I18n.tr("Fluid")]
-                    currentValue: {
-                        switch (SettingsData.directionalAnimationMode) {
-                        case 3:
-                            return SettingsData.frameEnabled ? I18n.tr("Connected") : I18n.tr("Fluid");
-                        default:
-                            return I18n.tr("Fluid");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Fluid"))
-                            SettingsData.set("directionalAnimationMode", 1);
-                        else if (value === I18n.tr("Connected") && SettingsData.frameEnabled) {
-                            if (SettingsData.directionalAnimationMode !== 3)
-                                SettingsData.set("previousDirectionalMode", 1);
-                            SettingsData.set("directionalAnimationMode", 3);
-                        } else
-                            SettingsData.set("directionalAnimationMode", 1);
-                    }
-                }
             }
 
             SettingsCard {
