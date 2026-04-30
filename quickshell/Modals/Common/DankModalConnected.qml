@@ -311,8 +311,8 @@ Item {
     readonly property real shadowMotionPadding: {
         if (Theme.isConnectedEffect)
             return 0;
-        if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0 && Theme.isDirectionalEffect)
-            return 0; // Wayland native overlap mask
+        if (Theme.isDirectionalEffect)
+            return 0;
         if (animationType === "slide")
             return 30;
         if (Theme.isDirectionalEffect)

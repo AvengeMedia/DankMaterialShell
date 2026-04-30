@@ -185,15 +185,6 @@ Singleton {
     onAnimationVariantChanged: saveSettings()
     property int motionEffect: SettingsData.AnimationEffect.Standard
     onMotionEffectChanged: saveSettings()
-    property int directionalAnimationMode: 1
-    onDirectionalAnimationModeChanged: {
-        const normalized = directionalAnimationMode === 3 ? 3 : 1;
-        if (directionalAnimationMode !== normalized) {
-            directionalAnimationMode = normalized;
-            return;
-        }
-        saveSettings();
-    }
     property bool m3ElevationEnabled: true
     onM3ElevationEnabledChanged: saveSettings()
     property int m3ElevationIntensity: 12
@@ -252,17 +243,11 @@ Singleton {
     property string frameLauncherEmergeSide: "bottom"
     onFrameLauncherEmergeSideChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
-    property int previousDirectionalMode: 1
-    onPreviousDirectionalModeChanged: {
-        if (previousDirectionalMode !== 1) {
-            previousDirectionalMode = 1;
-            return;
-        }
-        saveSettings();
-    }
+    property string frameMode: "separate"
+    onFrameModeChanged: saveSettings()
     property var connectedFrameBarStyleBackups: ({})
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
-    readonly property bool connectedFrameModeActive: frameEnabled && motionEffect === SettingsData.AnimationEffect.Directional && directionalAnimationMode === 3
+    readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
     onConnectedFrameModeActiveChanged: {
         if (_loading)
             return;
@@ -1352,6 +1337,9 @@ Singleton {
             }
 
             Store.parse(root, obj);
+
+            if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
+                frameMode = "connected";
 
             if (obj?.weatherLocation !== undefined)
                 _legacyWeatherLocation = obj.weatherLocation;

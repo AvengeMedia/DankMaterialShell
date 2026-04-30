@@ -500,11 +500,8 @@ Item {
     readonly property real shadowMotionPadding: {
         if (Theme.isConnectedEffect)
             return Math.max(storedBarSpacing + Theme.connectedCornerRadius + 4, 40);
-        if (Theme.isDirectionalEffect) {
-            if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0)
-                return 16; // Fluid uses strict Wayland clipping instead of extra motion padding.
-            return Math.max(0, animationOffset) + 16;
-        }
+        if (Theme.isDirectionalEffect)
+            return 16;
         if (Theme.isDepthEffect)
             return Math.max(0, animationOffset) + 8;
         return Math.max(0, animationOffset);
@@ -901,7 +898,7 @@ Item {
             Item {
                 id: directionalClipMask
 
-                readonly property bool shouldClip: (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0) || Theme.isConnectedEffect
+                readonly property bool shouldClip: Theme.isDirectionalEffect || Theme.isConnectedEffect
                 readonly property real clipOversize: 1000
                 readonly property real connectedClipAllowance: {
                     if (!Theme.isConnectedEffect)

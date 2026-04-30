@@ -25,7 +25,6 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
-            // ── Enable Frame ──────────────────────────────────────────────────
             SettingsCard {
                 width: parent.width
                 iconName: "frame_source"
@@ -42,7 +41,35 @@ Item {
                 }
             }
 
-            // ── Border ────────────────────────────────────────────────────────
+            SettingsCard {
+                width: parent.width
+                iconName: "tune"
+                title: I18n.tr("Mode")
+                settingKey: "frameMode"
+                visible: SettingsData.frameEnabled
+
+                SettingsButtonGroupRow {
+                    settingKey: "frameModeSelector"
+                    tags: ["frame", "mode", "connected", "separate", "popout"]
+                    text: I18n.tr("Surface Behavior")
+                    description: SettingsData.frameMode === "connected" ? I18n.tr("Surfaces emerge flush from the bar") : I18n.tr("Surfaces float independently of the frame")
+                    model: [I18n.tr("Separate"), I18n.tr("Connected")]
+                    currentIndex: SettingsData.frameMode === "connected" ? 1 : 0
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        switch (index) {
+                        case 1:
+                            SettingsData.set("frameMode", "connected");
+                            break;
+                        default:
+                            SettingsData.set("frameMode", "separate");
+                            break;
+                        }
+                    }
+                }
+            }
+
             SettingsCard {
                 width: parent.width
                 iconName: "border_outer"
@@ -56,9 +83,6 @@ Item {
                     settingKey: "frameRounding"
                     tags: ["frame", "border", "rounding", "radius", "corner"]
                     text: I18n.tr("Border Radius")
-                    description: SettingsData.connectedFrameModeActive
-                        ? I18n.tr("Controls the radius of the frame and all connected popout, dock, and modal surfaces while Connected Mode is active")
-                        : I18n.tr("Controls the frame border radius. This also becomes the connected surface radius whenever Connected Mode is active")
                     unit: "px"
                     minimum: 0
                     maximum: 100
@@ -99,7 +123,7 @@ Item {
                     settingKey: "frameBarSize"
                     tags: ["frame", "bar", "thickness", "size", "height", "width"]
                     text: I18n.tr("Size")
-                    description: I18n.tr("Height of horizontal bars / width of vertical bars in frame mode")
+                    description: I18n.tr("Horizontal and vertical bar thickness")
                     unit: "px"
                     minimum: 24
                     maximum: 100
@@ -120,7 +144,6 @@ Item {
                     settingKey: "frameOpacity"
                     tags: ["frame", "border", "surface", "popup", "opacity", "transparency"]
                     text: I18n.tr("Surface Opacity")
-                    description: I18n.tr("Frame border opacity. Controls all surface opacity globally when Connected Mode is active")
                     unit: "%"
                     minimum: 0
                     maximum: 100
@@ -140,9 +163,7 @@ Item {
                     settingKey: "frameBlurEnabled"
                     tags: ["frame", "blur", "background", "glass", "transparency", "frosted"]
                     text: I18n.tr("Frame Blur")
-                    description: !BlurService.available
-                        ? I18n.tr("Requires a newer version of Quickshell")
-                        : I18n.tr("Apply compositor blur behind the frame border")
+                    description: !BlurService.available ? I18n.tr("Requires a newer version of Quickshell") : I18n.tr("Apply compositor blur behind the frame border")
                     checked: SettingsData.frameBlurEnabled
                     onToggled: checked => SettingsData.set("frameBlurEnabled", checked)
                     enabled: BlurService.available && SettingsData.blurEnabled
@@ -170,7 +191,7 @@ Item {
                         }
 
                         StyledText {
-                            text: I18n.tr("Frame Blur is controlled by Background Blur in Theme & Colors")
+                            text: I18n.tr("Frame Blur follows Background Blur in Theme & Colors")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
@@ -179,35 +200,47 @@ Item {
                     }
                 }
 
-                // Color mode buttons
                 SettingsButtonGroupRow {
                     settingKey: "frameColor"
                     tags: ["frame", "border", "color", "theme", "primary", "surface", "default"]
-                    text: I18n.tr("Border color")
+                    text: I18n.tr("Border Color")
                     model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
                     currentIndex: {
                         const fc = SettingsData.frameColor;
-                        if (!fc || fc === "default") return 0;
-                        if (fc === "primary") return 1;
-                        if (fc === "surface") return 2;
-                        return 3;
+                        if (!fc || fc === "default")
+                            return 0;
+                        switch (fc) {
+                        case "primary":
+                            return 1;
+                        case "surface":
+                            return 2;
+                        default:
+                            return 3;
+                        }
                     }
                     onSelectionChanged: (index, selected) => {
-                        if (!selected) return;
+                        if (!selected)
+                            return;
                         switch (index) {
-                        case 0: SettingsData.set("frameColor", ""); break;
-                        case 1: SettingsData.set("frameColor", "primary"); break;
-                        case 2: SettingsData.set("frameColor", "surface"); break;
+                        case 0:
+                            SettingsData.set("frameColor", "");
+                            break;
+                        case 1:
+                            SettingsData.set("frameColor", "primary");
+                            break;
+                        case 2:
+                            SettingsData.set("frameColor", "surface");
+                            break;
                         case 3:
                             const cur = SettingsData.frameColor;
                             const isPreset = !cur || cur === "primary" || cur === "surface";
-                            if (isPreset) SettingsData.set("frameColor", "#2a2a2a");
+                            if (isPreset)
+                                SettingsData.set("frameColor", "#2a2a2a");
                             break;
                         }
                     }
                 }
 
-                // Custom color swatch — only visible when a hex color is stored (Custom mode)
                 Item {
                     visible: {
                         const fc = SettingsData.frameColor;
@@ -225,14 +258,13 @@ Item {
 
                         StyledText {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Custom color")
+                            text: I18n.tr("Custom Color")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                         }
 
                         Rectangle {
-                            id: colorSwatch
                             anchors.verticalCenter: parent.verticalCenter
                             width: 32
                             height: 32
@@ -258,7 +290,39 @@ Item {
                 }
             }
 
-            // ── Bar Integration ───────────────────────────────────────────────
+            SettingsCard {
+                width: parent.width
+                iconName: "blur_linear"
+                title: I18n.tr("Connected Options")
+                settingKey: "frameConnectedOptions"
+                collapsible: true
+                expanded: true
+                visible: SettingsData.frameEnabled && SettingsData.frameMode === "connected"
+
+                SettingsToggleRow {
+                    settingKey: "frameCloseGaps"
+                    tags: ["frame", "connected", "gap", "edge", "flush", "popout", "notification"]
+                    text: I18n.tr("Close the Gaps")
+                    description: I18n.tr("Connected popouts sit flush with the frame")
+                    checked: SettingsData.frameCloseGaps
+                    onToggled: checked => SettingsData.set("frameCloseGaps", checked)
+                }
+
+                SettingsButtonGroupRow {
+                    settingKey: "frameLauncherEmergeSide"
+                    tags: ["frame", "connected", "launcher", "modal", "emerge", "direction", "bottom", "top"]
+                    text: I18n.tr("Launcher Emerge Side")
+                    description: I18n.tr("Edge the launcher slides from")
+                    model: [I18n.tr("Bottom"), I18n.tr("Top")]
+                    currentIndex: SettingsData.frameLauncherEmergeSide === "top" ? 1 : 0
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("frameLauncherEmergeSide", index === 1 ? "top" : "bottom");
+                    }
+                }
+            }
+
             SettingsCard {
                 width: parent.width
                 iconName: "toolbar"
@@ -266,73 +330,18 @@ Item {
                 settingKey: "frameBarIntegration"
                 collapsible: true
                 expanded: true
-                visible: SettingsData.frameEnabled
+                visible: SettingsData.frameEnabled && CompositorService.isNiri
 
                 SettingsToggleRow {
-                    visible: CompositorService.isNiri
                     settingKey: "frameShowOnOverview"
                     tags: ["frame", "overview", "show", "hide", "niri"]
                     text: I18n.tr("Show on Overview")
-                    description: I18n.tr("Show the bar and frame during Niri overview mode")
+                    description: I18n.tr("Show during Niri overview")
                     checked: SettingsData.frameShowOnOverview
                     onToggled: checked => SettingsData.set("frameShowOnOverview", checked)
                 }
-
-                SettingsToggleRow {
-                    visible: SettingsData.frameEnabled
-                    settingKey: "directionalAnimationMode"
-                    tags: ["frame", "connected", "popout", "corner", "animation"]
-                    text: I18n.tr("Connected Mode")
-                    description: I18n.tr("Popouts emerge flush from the bar edge as one continuous piece")
-                    checked: SettingsData.connectedFrameModeActive
-                    onToggled: checked => {
-                        if (checked) {
-                            if (SettingsData.directionalAnimationMode !== 3)
-                                SettingsData.set("previousDirectionalMode", SettingsData.directionalAnimationMode);
-                            SettingsData.set("motionEffect", 1);
-                            SettingsData.set("directionalAnimationMode", 3);
-                        } else {
-                            SettingsData.set("directionalAnimationMode", SettingsData.previousDirectionalMode);
-                        }
-                    }
-
-                    Connections {
-                        target: SettingsData
-                        function onDirectionalAnimationModeChanged() {}
-                        function onMotionEffectChanged() {}
-                    }
-                }
-
-                SettingsToggleRow {
-                    visible: SettingsData.frameEnabled
-                    settingKey: "frameCloseGaps"
-                    tags: ["frame", "connected", "gap", "edge", "flush", "popout", "notification"]
-                    text: I18n.tr("Close the Gaps")
-                    description: I18n.tr("Connected popouts and notification corners sit flush against the frame edge")
-                    checked: SettingsData.frameCloseGaps
-                    enabled: SettingsData.connectedFrameModeActive
-                    opacity: enabled ? 1.0 : 0.5
-                    onToggled: checked => SettingsData.set("frameCloseGaps", checked)
-                }
-
-                SettingsButtonGroupRow {
-                    visible: SettingsData.frameEnabled
-                    settingKey: "frameLauncherEmergeSide"
-                    tags: ["frame", "connected", "launcher", "modal", "emerge", "direction", "bottom", "top"]
-                    text: I18n.tr("Launcher Emerge Side")
-                    description: I18n.tr("Which frame edge the Launcher slides in from. Other modals emerge from the opposite side.")
-                    model: [I18n.tr("Bottom"), I18n.tr("Top")]
-                    currentIndex: SettingsData.frameLauncherEmergeSide === "top" ? 1 : 0
-                    enabled: SettingsData.connectedFrameModeActive
-                    opacity: enabled ? 1.0 : 0.5
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected) return;
-                        SettingsData.set("frameLauncherEmergeSide", index === 1 ? "top" : "bottom");
-                    }
-                }
             }
 
-            // ── Display Assignment ────────────────────────────────────────────
             SettingsCard {
                 width: parent.width
                 iconName: "monitor"

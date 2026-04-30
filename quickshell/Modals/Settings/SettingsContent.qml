@@ -112,7 +112,9 @@ FocusScope {
             focus: active
 
             sourceComponent: Component {
-                DockTab {}
+                DockTab {
+                    parentModal: root.parentModal
+                }
             }
 
             onActiveChanged: {
@@ -218,7 +220,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: ThemeColorsTab {}
+            sourceComponent: ThemeColorsTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)
