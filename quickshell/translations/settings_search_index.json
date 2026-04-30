@@ -4456,6 +4456,24 @@
     ]
   },
   {
+    "section": "matugenTemplateVencord",
+    "label": "vencord",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "discord",
+      "vencord",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme"
+    ]
+  },
+  {
     "section": "matugenTemplateZenBrowser",
     "label": "zenbrowser",
     "tabIndex": 10,

@@ -1,0 +1,3 @@
+[templates.dmsvencord]
+input_path = 'SHELL_DIR/matugen/templates/vesktop.css'
+output_path = 'CONFIG_DIR/Vencord/themes/dank-discord.css'

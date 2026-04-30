@@ -494,6 +494,7 @@ Singleton {
     property bool matugenTemplatePywalfox: true
     property bool matugenTemplateZenBrowser: true
     property bool matugenTemplateVesktop: true
+    property bool matugenTemplateVencord: true
     property bool matugenTemplateEquibop: true
     property bool matugenTemplateGhostty: true
     property bool matugenTemplateKitty: true
