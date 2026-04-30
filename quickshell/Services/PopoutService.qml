@@ -202,10 +202,9 @@ Singleton {
     }
 
     function unloadDankDash() {
-        if (!dankDashPopoutLoader)
-            return;
-        dankDashPopout = null;
-        dankDashPopoutLoader.active = false;
+        // DankDash is intentionally kept alive after first use. Destroying this
+        // lazy popout during its close signal can invalidate connected overlay
+        // bindings while Qt is still unwinding the signal stack.
     }
 
     function toggleDankDash(tabIndex, x, y, width, section, screen) {

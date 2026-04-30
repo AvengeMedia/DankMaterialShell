@@ -86,14 +86,7 @@ DankPopout {
     }
 
     popupWidth: 550
-    popupHeight: {
-        if (SettingsData.connectedFrameModeActive)
-            return targetPopupHeight;
-        const screenHeight = (triggerScreen?.height ?? 1080);
-        const maxHeight = screenHeight - 100;
-        const contentHeight = contentLoader.item && contentLoader.item.implicitHeight > 0 ? contentLoader.item.implicitHeight + 20 : 400;
-        return Math.min(maxHeight, contentHeight);
-    }
+    popupHeight: targetPopupHeight
     triggerWidth: 80
     positioning: ""
     screen: triggerScreen

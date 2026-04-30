@@ -39,6 +39,7 @@ Item {
     property int _connectedChromeSerial: 0
     property real _chromeAnimTravelX: 1
     property real _chromeAnimTravelY: 1
+    property bool _fullSyncQueued: false
 
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
@@ -262,7 +263,14 @@ Item {
     }
 
     function _queueFullSync() {
-        _syncPopoutChromeState();
+        if (_fullSyncQueued)
+            return;
+        _fullSyncQueued = true;
+        Qt.callLater(() => {
+            root._fullSyncQueued = false;
+            if (typeof root._syncPopoutChromeState === "function")
+                root._syncPopoutChromeState();
+        });
     }
 
     onAlignedXChanged: _queueFullSync()
@@ -272,8 +280,8 @@ Item {
     onContentAnimYChanged: _syncPopoutAnim("y")
     onRenderedAlignedYChanged: _syncPopoutBody()
     onRenderedAlignedHeightChanged: _syncPopoutBody()
-    onScreenChanged: _syncPopoutChromeState()
-    onEffectiveBarPositionChanged: _syncPopoutChromeState()
+    onScreenChanged: _queueFullSync()
+    onEffectiveBarPositionChanged: _queueFullSync()
 
     Connections {
         target: contentWindow
@@ -493,8 +501,8 @@ Item {
         if (Theme.isConnectedEffect)
             return Math.max(storedBarSpacing + Theme.connectedCornerRadius + 4, 40);
         if (Theme.isDirectionalEffect) {
-            if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode !== 0)
-                return 16; // Slide Behind and Roll Out do not add animationOffset, enabling strict Wayland clipping.
+            if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode > 0)
+                return 16; // Fluid uses strict Wayland clipping instead of extra motion padding.
             return Math.max(0, animationOffset) + 16;
         }
         if (Theme.isDepthEffect)
@@ -662,7 +670,7 @@ Item {
             blurEnabled: root.effectiveSurfaceBlurEnabled && !root.frameOwnsConnectedChrome
 
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: Theme.isConnectedEffect || (typeof SettingsData !== "undefined" && Theme.isDirectionalEffect && SettingsData.directionalAnimationMode !== 2)
+            readonly property bool trackBlurFromBarEdge: Theme.isConnectedEffect || Theme.isDirectionalEffect
 
             // Directional popouts clip to the bar edge, so the blur needs to grow from
             // that same edge instead of translating through the bar before settling.
@@ -790,8 +798,6 @@ Item {
 
             readonly property real offsetX: {
                 if (directionalEffect) {
-                    if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2)
-                        return 0;
                     if (barLeft)
                         return -directionalTravelX;
                     if (barRight)
@@ -813,8 +819,6 @@ Item {
             }
             readonly property real offsetY: {
                 if (directionalEffect) {
-                    if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2)
-                        return 0;
                     if (barBottom)
                         return directionalTravelY;
                     if (barTop)
@@ -838,7 +842,7 @@ Item {
             property real animX: 0
             property real animY: 0
 
-            readonly property real computedScaleCollapsed: (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect) ? 0.0 : root.animationScaleCollapsed
+            readonly property real computedScaleCollapsed: root.animationScaleCollapsed
             property real scaleValue: computedScaleCollapsed
 
             Component.onCompleted: {
@@ -932,19 +936,17 @@ Item {
                     return parent.height + clipOversize * 2;
                 }
 
-                // Roll-out clips a wrapper while content and shadow keep full-size geometry.
                 Item {
                     id: rollOutAdjuster
                     readonly property real baseWidth: contentContainer.width
                     readonly property real baseHeight: contentContainer.height
-                    readonly property bool isRollOut: typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect
 
                     x: directionalClipMask.x !== 0 ? -directionalClipMask.x : 0
                     y: directionalClipMask.y !== 0 ? -directionalClipMask.y : 0
-                    width: isRollOut && (contentContainer.barLeft || contentContainer.barRight) ? Math.max(0, baseWidth * contentContainer.scaleValue) : baseWidth
-                    height: isRollOut && (contentContainer.barTop || contentContainer.barBottom) ? Math.max(0, baseHeight * contentContainer.scaleValue) : baseHeight
+                    width: baseWidth
+                    height: baseHeight
 
-                    clip: isRollOut
+                    clip: false
 
                     ElevationShadow {
                         id: shadowSource
@@ -1028,7 +1030,7 @@ Item {
                         opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
                         visible: opacity > 0
 
-                        scale: rollOutAdjuster.isRollOut ? 1.0 : contentContainer.scaleValue
+                        scale: contentContainer.scaleValue
                         x: Theme.snap(contentContainer.animX + (rollOutAdjuster.baseWidth - width) * (1 - scale) * 0.5, root.dpr)
                         y: Theme.snap(contentContainer.animY + (rollOutAdjuster.baseHeight - height) * (1 - scale) * 0.5, root.dpr)
 

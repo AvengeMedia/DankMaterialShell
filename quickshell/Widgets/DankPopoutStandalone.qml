@@ -22,13 +22,14 @@ Item {
     property string triggerSection: ""
     property string positioning: "center"
     property int animationDuration: Theme.popoutAnimationDuration
-    property real animationScaleCollapsed: 0.96
-    property real animationOffset: Theme.spacingL
-    property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
-    property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
+    property real animationScaleCollapsed: Theme.effectScaleCollapsed
+    property real animationOffset: Theme.effectAnimOffset
+    property list<real> animationEnterCurve: Theme.variantPopoutEnterCurve
+    property list<real> animationExitCurve: Theme.variantPopoutExitCurve
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
     property bool isClosing: false
+    property bool animationsEnabled: true
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
@@ -36,7 +37,13 @@ Item {
     property bool _primeContent: false
     property bool _resizeActive: false
     property real _surfaceMarginLeft: 0
+    property real _surfaceMarginTop: 0
     property real _surfaceW: 0
+    property real _surfaceH: 0
+    property real _surfaceBodyX: 0
+    property real _surfaceBodyY: 0
+    property real _surfaceBodyW: 0
+    property real _surfaceBodyH: 0
 
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
@@ -48,6 +55,26 @@ Item {
             "rightBar": 0
         })
     property var screen: null
+    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+    readonly property bool fluidStandaloneActive: Theme.isDirectionalEffect
+    readonly property bool backgroundDismissWindowRequired: backgroundInteractive
+    readonly property bool backgroundWindowRequired: backgroundDismissWindowRequired || root.overlayContent !== null
+
+    function _frameEdgeInset(side) {
+        if (!screen)
+            return 0;
+        return SettingsData.frameEdgeInsetForSide(screen, side);
+    }
+
+    function _frameGapMargin(side) {
+        return _frameEdgeInset(side) + Theme.popupDistance;
+    }
+
+    function _edgeClearance(side, popupGap, adjacentInset) {
+        if (frameOnlyNoConnected)
+            return Math.max(adjacentInset, _frameGapMargin(side));
+        return adjacentInset > 0 ? adjacentInset : popupGap;
+    }
 
     readonly property real effectiveBarThickness: {
         const padding = storedBarConfig ? (storedBarConfig.innerPadding !== undefined ? storedBarConfig.innerPadding : 4) : 4;
@@ -150,13 +177,60 @@ Item {
         setBarContext(pos, bottomGap);
     }
 
-    readonly property bool useBackgroundWindow: !CompositorService.isHyprland || CompositorService.useHyprlandFocusGrab
+    function _setSurfaceGeometry(bodyX, bodyY, bodyW, bodyH) {
+        _surfaceBodyX = Theme.snap(bodyX, dpr);
+        _surfaceBodyY = Theme.snap(bodyY, dpr);
+        _surfaceBodyW = Theme.snap(bodyW, dpr);
+        _surfaceBodyH = Theme.snap(bodyH, dpr);
+        _surfaceMarginLeft = _surfaceBodyX - shadowBuffer;
+        _surfaceMarginTop = _surfaceBodyY - shadowBuffer;
+        _surfaceW = _surfaceBodyW + shadowBuffer * 2;
+        _surfaceH = _surfaceBodyH + shadowBuffer * 2;
+    }
+
+    function _setSettledSurfaceGeometry() {
+        if (shouldBeVisible) {
+            _setSurfaceGeometry(alignedX, alignedY, alignedWidth, alignedHeight);
+        }
+    }
+
+    function _setAnimatedSurfaceEnvelope() {
+        if (!shouldBeVisible)
+            return;
+        if (!fluidStandaloneActive) {
+            _setSettledSurfaceGeometry();
+            return;
+        }
+
+        const currentY = renderedAlignedY;
+        const currentBottom = renderedAlignedY + renderedAlignedHeight;
+        const targetY = alignedY;
+        const targetBottom = alignedY + alignedHeight;
+        const existingY = _surfaceBodyH > 0 ? _surfaceBodyY : currentY;
+        const existingBottom = _surfaceBodyH > 0 ? _surfaceBodyY + _surfaceBodyH : currentBottom;
+        const envelopeY = Math.min(currentY, targetY, existingY);
+        const envelopeBottom = Math.max(currentBottom, targetBottom, existingBottom);
+        _setSurfaceGeometry(alignedX, envelopeY, alignedWidth, Math.max(0, envelopeBottom - envelopeY));
+        surfaceSettleTimer.restart();
+    }
 
     function updateSurfacePosition() {
-        if (useBackgroundWindow && shouldBeVisible) {
-            _surfaceMarginLeft = alignedX - shadowBuffer;
-            _surfaceW = alignedWidth + shadowBuffer * 2;
-        }
+        _setSettledSurfaceGeometry();
+    }
+
+    onAlignedXChanged: {
+        if (shouldBeVisible)
+            _setAnimatedSurfaceEnvelope();
+    }
+
+    onAlignedYChanged: {
+        if (shouldBeVisible)
+            _setAnimatedSurfaceEnvelope();
+    }
+
+    onAlignedWidthChanged: {
+        if (shouldBeVisible)
+            _setAnimatedSurfaceEnvelope();
     }
 
     function open() {
@@ -164,6 +238,8 @@ Item {
             return;
         closeTimer.stop();
         isClosing = false;
+        animationsEnabled = false;
+        _primeContent = true;
 
         _frozenMaskX = maskX;
         _frozenMaskY = maskY;
@@ -172,20 +248,24 @@ Item {
 
         if (_lastOpenedScreen !== null && _lastOpenedScreen !== screen) {
             contentWindow.visible = false;
-            if (useBackgroundWindow)
-                backgroundWindow.visible = false;
+            backgroundWindow.visible = false;
         }
         _lastOpenedScreen = screen;
 
-        shouldBeVisible = true;
-        if (useBackgroundWindow) {
-            _surfaceMarginLeft = alignedX - shadowBuffer;
-            _surfaceW = alignedWidth + shadowBuffer * 2;
+        if (contentContainer) {
+            contentContainer.animX = Theme.snap(contentContainer.offsetX, root.dpr);
+            contentContainer.animY = Theme.snap(contentContainer.offsetY, root.dpr);
+            contentContainer.scaleValue = contentContainer.computedScaleCollapsed;
         }
-        if (shouldBeVisible && screen) {
-            if (useBackgroundWindow)
-                backgroundWindow.visible = true;
-            contentWindow.visible = true;
+
+        _setSurfaceGeometry(alignedX, alignedY, alignedWidth, alignedHeight);
+        if (backgroundWindowRequired)
+            backgroundWindow.visible = true;
+        contentWindow.visible = true;
+
+        animationsEnabled = true;
+        shouldBeVisible = true;
+        if (screen) {
             PopoutManager.showPopout(popoutHandle);
             opened();
         }
@@ -224,13 +304,12 @@ Item {
 
     Timer {
         id: closeTimer
-        interval: animationDuration
+        interval: Theme.variantCloseInterval(animationDuration)
         onTriggered: {
             if (!shouldBeVisible) {
                 isClosing = false;
                 contentWindow.visible = false;
-                if (useBackgroundWindow)
-                    backgroundWindow.visible = false;
+                backgroundWindow.visible = false;
                 PopoutManager.hidePopout(popoutHandle);
                 popoutClosed();
             }
@@ -244,12 +323,35 @@ Item {
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.popoutElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, effectiveShadowDirection, shadowFallbackOffset, 8, 16) : 0
-    readonly property real shadowMotionPadding: Math.max(0, animationOffset)
+    readonly property real shadowMotionPadding: fluidStandaloneActive ? 0 : Math.max(0, animationOffset)
     readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
+    property real renderedAlignedY: alignedY
+    property real renderedAlignedHeight: alignedHeight
+    readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
+
+    Behavior on renderedAlignedY {
+        enabled: root.animationsEnabled && fluidStandaloneActive && contentWindow.visible && root.shouldBeVisible
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
+
+    Behavior on renderedAlignedHeight {
+        enabled: root.animationsEnabled && fluidStandaloneActive && contentWindow.visible && root.shouldBeVisible
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
 
     onAlignedHeightChanged: {
+        if (shouldBeVisible)
+            _setAnimatedSurfaceEnvelope();
         if (!suspendShadowWhileResizing || !shouldBeVisible)
             return;
         _resizeActive = true;
@@ -261,6 +363,10 @@ Item {
             resizeSettleTimer.stop();
         }
     }
+    onBackgroundWindowRequiredChanged: {
+        if (shouldBeVisible)
+            backgroundWindow.visible = backgroundWindowRequired;
+    }
 
     Timer {
         id: resizeSettleTimer
@@ -269,20 +375,29 @@ Item {
         onTriggered: root._resizeActive = false
     }
 
+    Timer {
+        id: surfaceSettleTimer
+        interval: Math.max(0, Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing) + 32)
+        repeat: false
+        onTriggered: root._setSettledSurfaceGeometry()
+    }
+
     readonly property real alignedX: Theme.snap((() => {
             const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
             const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
             const popupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
+            const leftGap = _edgeClearance("left", popupGap, adjacentBarInfo.leftBar > 0 ? adjacentBarInfo.leftBar : 0);
+            const rightGap = _edgeClearance("right", popupGap, adjacentBarInfo.rightBar > 0 ? adjacentBarInfo.rightBar : 0);
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Left:
-                return Math.max(popupGap, Math.min(screenWidth - popupWidth - popupGap, triggerX));
+                return Math.max(leftGap, Math.min(screenWidth - popupWidth - rightGap, triggerX));
             case SettingsData.Position.Right:
-                return Math.max(popupGap, Math.min(screenWidth - popupWidth - popupGap, triggerX - popupWidth));
+                return Math.max(leftGap, Math.min(screenWidth - popupWidth - rightGap, triggerX - popupWidth));
             default:
                 const rawX = triggerX + (triggerWidth / 2) - (popupWidth / 2);
-                const minX = adjacentBarInfo.leftBar > 0 ? adjacentBarInfo.leftBar : popupGap;
-                const maxX = screenWidth - popupWidth - (adjacentBarInfo.rightBar > 0 ? adjacentBarInfo.rightBar : popupGap);
+                const minX = leftGap;
+                const maxX = screenWidth - popupWidth - rightGap;
                 return Math.max(minX, Math.min(maxX, rawX));
             }
         })(), dpr)
@@ -291,16 +406,18 @@ Item {
             const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
             const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
             const popupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
+            const topGap = _edgeClearance("top", popupGap, adjacentBarInfo.topBar > 0 ? adjacentBarInfo.topBar : 0);
+            const bottomGap = _edgeClearance("bottom", popupGap, adjacentBarInfo.bottomBar > 0 ? adjacentBarInfo.bottomBar : 0);
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Bottom:
-                return Math.max(popupGap, Math.min(screenHeight - popupHeight - popupGap, triggerY - popupHeight));
+                return Math.max(topGap, Math.min(screenHeight - popupHeight - bottomGap, triggerY - popupHeight));
             case SettingsData.Position.Top:
-                return Math.max(popupGap, Math.min(screenHeight - popupHeight - popupGap, triggerY));
+                return Math.max(topGap, Math.min(screenHeight - popupHeight - bottomGap, triggerY));
             default:
                 const rawY = triggerY - (popupHeight / 2);
-                const minY = adjacentBarInfo.topBar > 0 ? adjacentBarInfo.topBar : popupGap;
-                const maxY = screenHeight - popupHeight - (adjacentBarInfo.bottomBar > 0 ? adjacentBarInfo.bottomBar : popupGap);
+                const minY = topGap;
+                const maxY = screenHeight - popupHeight - bottomGap;
                 return Math.max(minY, Math.min(maxY, rawY));
             }
         })(), dpr)
@@ -355,35 +472,38 @@ Item {
 
         mask: Region {
             item: maskRect
+            Region {
+                item: contentHoleRect
+                intersection: Intersection.Subtract
+            }
         }
 
         Rectangle {
             id: maskRect
             visible: false
             color: "transparent"
-            x: root._frozenMaskX
-            y: root._frozenMaskY
-            width: (shouldBeVisible && backgroundInteractive) ? root._frozenMaskWidth : 0
-            height: (shouldBeVisible && backgroundInteractive) ? root._frozenMaskHeight : 0
+            x: root.backgroundDismissWindowRequired ? root._frozenMaskX : 0
+            y: root.backgroundDismissWindowRequired ? root._frozenMaskY : 0
+            width: (root.backgroundDismissWindowRequired && shouldBeVisible && backgroundInteractive) ? root._frozenMaskWidth : 0
+            height: (root.backgroundDismissWindowRequired && shouldBeVisible && backgroundInteractive) ? root._frozenMaskHeight : 0
+        }
+
+        Rectangle {
+            id: contentHoleRect
+            visible: false
+            color: "transparent"
+            x: root.backgroundDismissWindowRequired ? root._surfaceBodyX : 0
+            y: root.backgroundDismissWindowRequired ? root._surfaceBodyY : 0
+            width: (root.backgroundDismissWindowRequired && shouldBeVisible) ? root._surfaceBodyW : 0
+            height: (root.backgroundDismissWindowRequired && shouldBeVisible) ? root._surfaceBodyH : 0
         }
 
         MouseArea {
-            x: root._frozenMaskX
-            y: root._frozenMaskY
-            width: root._frozenMaskWidth
-            height: root._frozenMaskHeight
+            anchors.fill: parent
             hoverEnabled: false
-            enabled: shouldBeVisible && backgroundInteractive
+            enabled: root.backgroundDismissWindowRequired && shouldBeVisible && backgroundInteractive
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-            onClicked: mouse => {
-                const clickX = mouse.x + root._frozenMaskX;
-                const clickY = mouse.y + root._frozenMaskY;
-                const outsideContent = clickX < root.alignedX || clickX > root.alignedX + root.alignedWidth || clickY < root.alignedY || clickY > root.alignedY + root.alignedHeight;
-
-                if (!outsideContent)
-                    return;
-                backgroundClicked();
-            }
+            onClicked: backgroundClicked()
         }
 
         Loader {
@@ -399,15 +519,18 @@ Item {
         screen: root.screen
         visible: false
         color: "transparent"
+        readonly property bool closeVisualActive: root.shouldBeVisible || root.isClosing
 
         WindowBlur {
             id: popoutBlur
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            blurX: contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
-            blurY: contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.width * s : 0
-            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? contentContainer.height * s : 0
+            readonly property bool trackBlurFromBarEdge: root.fluidStandaloneActive
+
+            blurX: trackBlurFromBarEdge ? contentContainer.x + contentContainer.revealX : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
+            blurY: trackBlurFromBarEdge ? contentContainer.y + contentContainer.revealY : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+            blurWidth: (contentWindow.closeVisualActive && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? contentContainer.revealWidth : contentContainer.width * s) : 0
+            blurHeight: (contentWindow.closeVisualActive && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? contentContainer.revealHeight : contentContainer.height * s) : 0
             blurRadius: Theme.cornerRadius
         }
 
@@ -437,24 +560,20 @@ Item {
             return WlrKeyboardFocus.Exclusive;
         }
 
-        readonly property bool _fullHeight: useBackgroundWindow && root.fullHeightSurface
-
         anchors {
             left: true
             top: true
-            right: !useBackgroundWindow
-            bottom: _fullHeight || !useBackgroundWindow
         }
 
         WlrLayershell.margins {
-            left: useBackgroundWindow ? root._surfaceMarginLeft : 0
-            top: (useBackgroundWindow && !_fullHeight) ? (root.alignedY - shadowBuffer) : 0
+            left: root._surfaceMarginLeft
+            top: root._surfaceMarginTop
         }
 
-        implicitWidth: useBackgroundWindow ? root._surfaceW : 0
-        implicitHeight: (useBackgroundWindow && !_fullHeight) ? (root.alignedHeight + shadowBuffer * 2) : 0
+        implicitWidth: root._surfaceW
+        implicitHeight: root._surfaceH
 
-        mask: useBackgroundWindow ? contentInputMask : null
+        mask: contentInputMask
 
         Region {
             id: contentInputMask
@@ -466,140 +585,234 @@ Item {
             visible: false
             x: contentContainer.x
             y: contentContainer.y
-            width: shouldBeVisible ? root.alignedWidth : 0
-            height: shouldBeVisible ? root.alignedHeight : 0
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: !useBackgroundWindow && shouldBeVisible && backgroundInteractive
-            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-            z: -1
-            onClicked: mouse => {
-                const clickX = mouse.x;
-                const clickY = mouse.y;
-                const outsideContent = clickX < root.alignedX || clickX > root.alignedX + root.alignedWidth || clickY < root.alignedY || clickY > root.alignedY + root.alignedHeight;
-                if (!outsideContent)
-                    return;
-                backgroundClicked();
-            }
+            width: contentWindow.closeVisualActive ? root.alignedWidth : 0
+            height: contentWindow.closeVisualActive ? (root.fluidStandaloneActive ? root.renderedAlignedHeight : root.alignedHeight) : 0
         }
 
         Item {
             id: contentContainer
-            x: useBackgroundWindow ? shadowBuffer : root.alignedX
-            y: (useBackgroundWindow && !contentWindow._fullHeight) ? shadowBuffer : root.alignedY
+            x: shadowBuffer + root.alignedX - root._surfaceBodyX
+            y: shadowBuffer + (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) - root._surfaceBodyY
             width: root.alignedWidth
-            height: root.alignedHeight
+            height: root.fluidStandaloneActive ? root.renderedAlignedHeight : root.alignedHeight
 
             readonly property bool barTop: effectiveBarPosition === SettingsData.Position.Top
             readonly property bool barBottom: effectiveBarPosition === SettingsData.Position.Bottom
             readonly property bool barLeft: effectiveBarPosition === SettingsData.Position.Left
             readonly property bool barRight: effectiveBarPosition === SettingsData.Position.Right
             readonly property string connectedBarSide: barTop ? "top" : (barBottom ? "bottom" : (barLeft ? "left" : "right"))
-            readonly property real offsetX: barLeft ? root.animationOffset : (barRight ? -root.animationOffset : 0)
-            readonly property real offsetY: barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0)
+            readonly property bool directionalEffect: Theme.isDirectionalEffect
+            readonly property bool depthEffect: Theme.isDepthEffect
+            readonly property real directionalTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
+            readonly property real directionalTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
+            readonly property real depthTravel: Math.max(root.animationOffset * 0.7, 28)
+            readonly property real sectionTilt: (triggerSection === "left" ? -1 : (triggerSection === "right" ? 1 : 0))
+            readonly property real offsetX: {
+                if (directionalEffect) {
+                    if (barLeft)
+                        return -directionalTravelX;
+                    if (barRight)
+                        return directionalTravelX;
+                    if (barTop || barBottom)
+                        return 0;
+                    return sectionTilt * directionalTravelX * 0.2;
+                }
+                if (depthEffect) {
+                    if (barLeft)
+                        return -depthTravel;
+                    if (barRight)
+                        return depthTravel;
+                    if (barTop || barBottom)
+                        return 0;
+                    return sectionTilt * depthTravel * 0.2;
+                }
+                return barLeft ? root.animationOffset : (barRight ? -root.animationOffset : 0);
+            }
+            readonly property real offsetY: {
+                if (directionalEffect) {
+                    if (barBottom)
+                        return directionalTravelY;
+                    if (barTop)
+                        return -directionalTravelY;
+                    if (barLeft || barRight)
+                        return 0;
+                    return directionalTravelY;
+                }
+                if (depthEffect) {
+                    if (barBottom)
+                        return depthTravel;
+                    if (barTop)
+                        return -depthTravel;
+                    if (barLeft || barRight)
+                        return 0;
+                    return depthTravel;
+                }
+                return barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0);
+            }
 
             property real animX: 0
             property real animY: 0
-            property real scaleValue: root.animationScaleCollapsed
+            readonly property real computedScaleCollapsed: root.animationScaleCollapsed
+            property real scaleValue: computedScaleCollapsed
+            readonly property real clampedAnimX: Math.max(-width, Math.min(animX, width))
+            readonly property real clampedAnimY: Math.max(-height, Math.min(animY, height))
+            readonly property real revealWidth: {
+                if (!root.fluidStandaloneActive)
+                    return width;
+                if (barLeft)
+                    return Theme.snap(Math.max(0, width + clampedAnimX), root.dpr);
+                if (barRight)
+                    return Theme.snap(Math.max(0, width - clampedAnimX), root.dpr);
+                return width;
+            }
+            readonly property real revealHeight: {
+                if (!root.fluidStandaloneActive)
+                    return height;
+                if (barTop)
+                    return Theme.snap(Math.max(0, height + clampedAnimY), root.dpr);
+                if (barBottom)
+                    return Theme.snap(Math.max(0, height - clampedAnimY), root.dpr);
+                return height;
+            }
+            readonly property real revealX: root.fluidStandaloneActive && barRight ? Theme.snap(width - revealWidth, root.dpr) : 0
+            readonly property real revealY: root.fluidStandaloneActive && barBottom ? Theme.snap(height - revealHeight, root.dpr) : 0
 
-            onOffsetXChanged: animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr)
-            onOffsetYChanged: animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr)
+            Component.onCompleted: {
+                animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr);
+                animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr);
+                scaleValue = root.shouldBeVisible ? 1.0 : computedScaleCollapsed;
+            }
+
+            onOffsetXChanged: {
+                if (!root.shouldBeVisible)
+                    animX = Theme.snap(offsetX, root.dpr);
+            }
+            onOffsetYChanged: {
+                if (!root.shouldBeVisible)
+                    animY = Theme.snap(offsetY, root.dpr);
+            }
 
             Connections {
                 target: root
                 function onShouldBeVisibleChanged() {
                     contentContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetX, root.dpr);
                     contentContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetY, root.dpr);
-                    contentContainer.scaleValue = root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed;
+                    contentContainer.scaleValue = root.shouldBeVisible ? 1.0 : contentContainer.computedScaleCollapsed;
                 }
             }
 
             Behavior on animX {
+                enabled: root.animationsEnabled
                 NumberAnimation {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
 
             Behavior on animY {
+                enabled: root.animationsEnabled
                 NumberAnimation {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
 
             Behavior on scaleValue {
+                enabled: root.animationsEnabled
                 NumberAnimation {
-                    duration: root.animationDuration
+                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                     easing.type: Easing.BezierSpline
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                 }
             }
 
-            ElevationShadow {
-                id: shadowSource
-                width: parent.width
-                height: parent.height
-                opacity: contentWrapper.opacity
-                scale: contentWrapper.scale
-                x: contentWrapper.x
-                y: contentWrapper.y
-                level: root.shadowLevel
-                direction: root.effectiveShadowDirection
-                fallbackOffset: root.shadowFallbackOffset
-                targetRadius: Theme.cornerRadius
-                targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
-            }
-
             Item {
-                id: contentWrapper
-                anchors.centerIn: parent
-                width: parent.width
-                height: parent.height
-                opacity: shouldBeVisible ? 1 : 0
-                visible: opacity > 0
-                scale: contentContainer.scaleValue
-                x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
-                y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+                id: directionalClipMask
 
-                layer.enabled: contentWrapper.opacity < 1
-                layer.smooth: false
-                layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
+                readonly property bool shouldClip: root.fluidStandaloneActive
 
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: animationDuration
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                clip: shouldClip
+                x: shouldClip ? contentContainer.revealX : 0
+                y: shouldClip ? contentContainer.revealY : 0
+                width: shouldClip ? contentContainer.revealWidth : parent.width
+                height: shouldClip ? contentContainer.revealHeight : parent.height
+
+                Item {
+                    id: rollOutAdjuster
+                    readonly property real baseWidth: contentContainer.width
+                    readonly property real baseHeight: contentContainer.height
+
+                    x: directionalClipMask.x !== 0 ? -directionalClipMask.x : 0
+                    y: directionalClipMask.y !== 0 ? -directionalClipMask.y : 0
+                    width: baseWidth
+                    height: baseHeight
+                    clip: false
+
+                    ElevationShadow {
+                        id: shadowSource
+                        width: rollOutAdjuster.baseWidth
+                        height: rollOutAdjuster.baseHeight
+                        opacity: contentWrapper.opacity
+                        scale: root.fluidStandaloneActive ? 1 : contentWrapper.scale
+                        x: root.fluidStandaloneActive ? 0 : contentWrapper.x
+                        y: root.fluidStandaloneActive ? 0 : contentWrapper.y
+                        level: root.shadowLevel
+                        direction: root.effectiveShadowDirection
+                        fallbackOffset: root.shadowFallbackOffset
+                        targetRadius: Theme.cornerRadius
+                        targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                        shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                    }
+
+                    Item {
+                        id: contentWrapper
+                        width: rollOutAdjuster.baseWidth
+                        height: rollOutAdjuster.baseHeight
+                        opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
+                        visible: opacity > 0
+                        scale: contentContainer.scaleValue
+                        transformOrigin: Item.Center
+                        x: Theme.snap(contentContainer.animX + (rollOutAdjuster.baseWidth - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+                        y: Theme.snap(contentContainer.animY + (rollOutAdjuster.baseHeight - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+
+                        layer.enabled: contentWrapper.opacity < 1
+                        layer.smooth: false
+                        layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
+
+                        Behavior on opacity {
+                            enabled: !Theme.isDirectionalEffect
+                            NumberAnimation {
+                                duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                            }
+                        }
+
+                        Loader {
+                            id: contentLoader
+                            anchors.fill: parent
+                            active: root._primeContent || shouldBeVisible || contentWindow.visible
+                            asynchronous: false
+                        }
+                    }
+
+                    Rectangle {
+                        width: rollOutAdjuster.baseWidth
+                        height: rollOutAdjuster.baseHeight
+                        x: root.fluidStandaloneActive ? 0 : contentWrapper.x
+                        y: root.fluidStandaloneActive ? 0 : contentWrapper.y
+                        opacity: contentWrapper.opacity
+                        scale: root.fluidStandaloneActive ? 1 : contentWrapper.scale
+                        visible: contentWrapper.visible
+                        radius: Theme.cornerRadius
+                        color: "transparent"
+                        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+                        border.width: BlurService.borderWidth
+                        z: 100
                     }
                 }
-
-                Loader {
-                    id: contentLoader
-                    anchors.fill: parent
-                    active: root._primeContent || shouldBeVisible || contentWindow.visible
-                    asynchronous: false
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: parent.height
-                x: contentWrapper.x
-                y: contentWrapper.y
-                opacity: contentWrapper.opacity
-                scale: contentWrapper.scale
-                visible: contentWrapper.visible
-                radius: Theme.cornerRadius
-                color: "transparent"
-                border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-                border.width: BlurService.borderWidth
-                z: 100
             }
         }
 

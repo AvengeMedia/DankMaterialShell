@@ -61,6 +61,20 @@ Item {
     readonly property int modalHeight: Math.min(baseHeight, screenHeight - 100)
     readonly property real modalX: (screenWidth - modalWidth) / 2
     readonly property real modalY: (screenHeight - modalHeight) / 2
+    readonly property var shadowLevel: Theme.elevationLevel3
+    readonly property real shadowFallbackOffset: 6
+    readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
+    readonly property real shadowPad: Theme.snap(shadowRenderPadding, dpr)
+    readonly property real alignedWidth: Theme.px(modalWidth, dpr)
+    readonly property real alignedHeight: Theme.px(modalHeight, dpr)
+    readonly property real alignedX: Theme.snap(modalX, dpr)
+    readonly property real alignedY: Theme.snap(modalY, dpr)
+    readonly property real windowX: Math.max(0, Theme.snap(alignedX - shadowPad, dpr))
+    readonly property real windowY: Math.max(0, Theme.snap(alignedY - shadowPad, dpr))
+    readonly property real contentX: Theme.snap(alignedX - windowX, dpr)
+    readonly property real contentY: Theme.snap(alignedY - windowY, dpr)
+    readonly property real windowWidth: alignedWidth + contentX + shadowPad
+    readonly property real windowHeight: alignedHeight + contentY + shadowPad
 
     readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     readonly property real cornerRadius: Theme.cornerRadius
@@ -278,6 +292,57 @@ Item {
     }
 
     PanelWindow {
+        id: clickCatcher
+        screen: launcherWindow.screen
+        visible: spotlightOpen
+        color: "transparent"
+        updatesEnabled: false
+
+        WlrLayershell.namespace: "dms:spotlight:clickcatcher"
+        WlrLayershell.layer: WlrLayershell.Top
+        WlrLayershell.exclusiveZone: -1
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+        anchors {
+            top: true
+            bottom: true
+            left: true
+            right: true
+        }
+
+        mask: Region {
+            item: outsideClickMask
+
+            Region {
+                item: outsideClickHole
+                intersection: Intersection.Subtract
+            }
+        }
+
+        Item {
+            id: outsideClickMask
+            visible: false
+            anchors.fill: parent
+        }
+
+        Rectangle {
+            id: outsideClickHole
+            visible: false
+            color: "transparent"
+            x: root.alignedX
+            y: root.alignedY
+            width: root.alignedWidth
+            height: root.alignedHeight
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: spotlightOpen
+            onClicked: root.hide()
+        }
+    }
+
+    PanelWindow {
         id: launcherWindow
         visible: spotlightOpen || isClosing
         color: "transparent"
@@ -286,10 +351,10 @@ Item {
         WindowBlur {
             targetWindow: launcherWindow
             readonly property real s: Math.min(1, modalContainer.scale)
-            blurX: root.modalX + root.modalWidth * (1 - s) * 0.5
-            blurY: root.modalY + root.modalHeight * (1 - s) * 0.5
-            blurWidth: (contentVisible && modalContainer.opacity > 0) ? root.modalWidth * s : 0
-            blurHeight: (contentVisible && modalContainer.opacity > 0) ? root.modalHeight * s : 0
+            blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5
+            blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5
+            blurWidth: (contentVisible && modalContainer.opacity > 0) ? modalContainer.width * s : 0
+            blurHeight: (contentVisible && modalContainer.opacity > 0) ? modalContainer.height * s : 0
             blurRadius: root.cornerRadius
         }
 
@@ -308,60 +373,44 @@ Item {
                 return WlrLayershell.Top;
             }
         }
+        WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
 
         anchors {
             top: true
-            bottom: true
             left: true
-            right: true
         }
+
+        WlrLayershell.margins {
+            left: root.windowX
+            top: root.windowY
+            right: 0
+            bottom: 0
+        }
+
+        implicitWidth: root.windowWidth
+        implicitHeight: root.windowHeight
 
         mask: Region {
-            item: spotlightOpen ? fullScreenMask : null
-        }
-
-        Item {
-            id: fullScreenMask
-            anchors.fill: parent
+            item: launcherInputMask
         }
 
         Rectangle {
-            id: backgroundDarken
-            anchors.fill: parent
-            color: "black"
-            opacity: contentVisible && SettingsData.modalDarkenBackground ? 0.5 : 0
-            visible: contentVisible || opacity > 0
-
-            Behavior on opacity {
-                DankAnim {
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
-                }
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: spotlightOpen
-            onClicked: mouse => {
-                var contentX = modalContainer.x;
-                var contentY = modalContainer.y;
-                var contentW = modalContainer.width;
-                var contentH = modalContainer.height;
-
-                if (mouse.x < contentX || mouse.x > contentX + contentW || mouse.y < contentY || mouse.y > contentY + contentH) {
-                    root.hide();
-                }
-            }
+            id: launcherInputMask
+            visible: false
+            color: "transparent"
+            x: modalContainer.x
+            y: modalContainer.y
+            width: modalContainer.width
+            height: modalContainer.height
         }
 
         Item {
             id: modalContainer
-            x: root.modalX
-            y: root.modalY
-            width: root.modalWidth
-            height: root.modalHeight
+            x: root.contentX
+            y: root.contentY
+            width: root.alignedWidth
+            height: root.alignedHeight
             visible: contentVisible || opacity > 0
 
             opacity: contentVisible ? 1 : 0
@@ -385,8 +434,8 @@ Item {
             ElevationShadow {
                 id: launcherShadowLayer
                 anchors.fill: parent
-                level: Theme.elevationLevel3
-                fallbackOffset: 6
+                level: root.shadowLevel
+                fallbackOffset: root.shadowFallbackOffset
                 targetColor: root.backgroundColor
                 borderColor: root.borderColor
                 borderWidth: root.borderWidth

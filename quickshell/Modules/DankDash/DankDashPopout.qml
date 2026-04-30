@@ -53,7 +53,8 @@ DankPopout {
     function __hideDropdowns() {
         __volumeCloseTimer.stop();
         __dropdownType = 0;
-        __mediaTabRef?.resetDropdownStates();
+        if (__mediaTabRef && typeof __mediaTabRef.resetDropdownStates === "function")
+            __mediaTabRef.resetDropdownStates();
     }
 
     function __startCloseTimer() {
@@ -74,7 +75,11 @@ DankPopout {
         }
     }
 
-    overlayContent: Component {
+    overlayContent: shouldBeVisible ? mediaDropdownOverlayComponent : null
+
+    Component {
+        id: mediaDropdownOverlayComponent
+
         MediaDropdownOverlay {
             dropdownType: root.__dropdownType
             anchorPos: root.__dropdownAnchor
@@ -182,11 +187,8 @@ DankPopout {
             Connections {
                 target: root
                 function onShouldBeVisibleChanged() {
-                    if (root.shouldBeVisible) {
-                        Qt.callLater(function () {
-                            mainContainer.forceActiveFocus();
-                        });
-                    }
+                    if (root.shouldBeVisible)
+                        mainContainer.forceActiveFocus();
                 }
             }
 
@@ -378,6 +380,10 @@ DankPopout {
                                 section: root.triggerSection
                                 barPosition: root.effectiveBarPosition
                                 Component.onCompleted: root.__mediaTabRef = this
+                                Component.onDestruction: {
+                                    if (root.__mediaTabRef === this)
+                                        root.__mediaTabRef = null;
+                                }
                                 onShowVolumeDropdown: (pos, screen, rightEdge, player, players) => {
                                     root.__showVolumeDropdown(pos, rightEdge, player, players);
                                 }

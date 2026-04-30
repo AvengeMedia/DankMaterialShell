@@ -50,11 +50,9 @@ Item {
     }
 
     function volumeAreaExited() {
-        __volumeHoverCount--;
-        Qt.callLater(() => {
-            if (__volumeHoverCount <= 0)
-                panelExited();
-        });
+        __volumeHoverCount = Math.max(0, __volumeHoverCount - 1);
+        if (__volumeHoverCount === 0)
+            panelExited();
     }
 
     readonly property Item __activePanel: {
