@@ -38,6 +38,8 @@ type Manager struct {
 	acquireCount int32
 	wakeSched    chan struct{}
 
+	refreshSerial sync.Mutex
+
 	opMu     sync.Mutex
 	opCtx    context.Context
 	opCancel context.CancelFunc
@@ -143,9 +145,11 @@ func (m *Manager) Refresh(opts RefreshOptions) {
 	case phase == PhaseUpgrading:
 		return
 	case phase == PhaseRefreshing && !opts.Force:
+		m.refreshSerial.Lock()
+		m.refreshSerial.Unlock()
 		return
 	}
-	go m.runRefresh(context.Background())
+	m.runRefresh(context.Background())
 }
 
 func (m *Manager) Upgrade(opts UpgradeOptions) error {
@@ -226,6 +230,9 @@ func (m *Manager) scheduler() {
 }
 
 func (m *Manager) runRefresh(parent context.Context) {
+	m.refreshSerial.Lock()
+	defer m.refreshSerial.Unlock()
+
 	if len(m.selection.All()) == 0 {
 		return
 	}
