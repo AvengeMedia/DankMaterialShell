@@ -216,6 +216,8 @@ Singleton {
     function getVpnTypeFromProfile(profile) {
         if (!profile)
             return "VPN";
+        if (profile.typeLabel)
+            return profile.typeLabel;
         if (profile.type === "wireguard")
             return "WireGuard";
         return getPluginName(profile.serviceType);
