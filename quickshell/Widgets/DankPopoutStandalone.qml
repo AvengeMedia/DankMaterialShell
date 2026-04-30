@@ -59,6 +59,7 @@ Item {
     readonly property bool fluidStandaloneActive: Theme.isDirectionalEffect
     readonly property bool backgroundDismissWindowRequired: backgroundInteractive
     readonly property bool backgroundWindowRequired: backgroundDismissWindowRequired || root.overlayContent !== null
+    readonly property bool _fullHeight: fullHeightSurface
 
     function _frameEdgeInset(side) {
         if (!screen)
@@ -197,7 +198,7 @@ Item {
     function _setAnimatedSurfaceEnvelope() {
         if (!shouldBeVisible)
             return;
-        if (!fluidStandaloneActive) {
+        if (_fullHeight || !fluidStandaloneActive) {
             _setSettledSurfaceGeometry();
             return;
         }
@@ -526,11 +527,12 @@ Item {
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             readonly property bool trackBlurFromBarEdge: root.fluidStandaloneActive
+            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : (root.shouldBeVisible && contentWrapper.opacity > 0)
 
             blurX: trackBlurFromBarEdge ? contentContainer.x + contentContainer.revealX : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
             blurY: trackBlurFromBarEdge ? contentContainer.y + contentContainer.revealY : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: (contentWindow.closeVisualActive && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? contentContainer.revealWidth : contentContainer.width * s) : 0
-            blurHeight: (contentWindow.closeVisualActive && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? contentContainer.revealHeight : contentContainer.height * s) : 0
+            blurWidth: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealWidth : contentContainer.width * s) : 0
+            blurHeight: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealHeight : contentContainer.height * s) : 0
             blurRadius: Theme.cornerRadius
         }
 
@@ -563,15 +565,16 @@ Item {
         anchors {
             left: true
             top: true
+            bottom: root._fullHeight
         }
 
         WlrLayershell.margins {
             left: root._surfaceMarginLeft
-            top: root._surfaceMarginTop
+            top: root._fullHeight ? 0 : root._surfaceMarginTop
         }
 
         implicitWidth: root._surfaceW
-        implicitHeight: root._surfaceH
+        implicitHeight: root._fullHeight ? 0 : root._surfaceH
 
         mask: contentInputMask
 
@@ -592,7 +595,9 @@ Item {
         Item {
             id: contentContainer
             x: shadowBuffer + root.alignedX - root._surfaceBodyX
-            y: shadowBuffer + (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) - root._surfaceBodyY
+            y: root._fullHeight
+                ? (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY)
+                : shadowBuffer + (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) - root._surfaceBodyY
             width: root.alignedWidth
             height: root.fluidStandaloneActive ? root.renderedAlignedHeight : root.alignedHeight
 
