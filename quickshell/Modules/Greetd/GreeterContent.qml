@@ -1,4 +1,3 @@
-import QtCore
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
@@ -119,15 +118,7 @@ Item {
     function greeterPamStackHasModule(moduleName) {
         if (pamModuleEnabled(greetdPamText, moduleName))
             return true;
-        const includedPamStacks = [
-            ["system-auth", systemAuthPamText],
-            ["common-auth", commonAuthPamText],
-            ["password-auth", passwordAuthPamText],
-            ["system-login", systemLoginPamText],
-            ["system-local-login", systemLocalLoginPamText],
-            ["common-auth-pc", commonAuthPcPamText],
-            ["login", loginPamText]
-        ];
+        const includedPamStacks = [["system-auth", systemAuthPamText], ["common-auth", commonAuthPamText], ["password-auth", passwordAuthPamText], ["system-login", systemLoginPamText], ["system-local-login", systemLocalLoginPamText], ["common-auth-pc", commonAuthPcPamText], ["login", loginPamText]];
         for (let i = 0; i < includedPamStacks.length; i++) {
             const stack = includedPamStacks[i];
             if (pamTextIncludesFile(greetdPamText, stack[0]) && pamModuleEnabled(stack[1], moduleName))
@@ -609,13 +600,7 @@ Item {
         running: false
         // sh wrapper: emits PROBE_UNAVAILABLE if gdbus is absent or fprintd unreachable,
         // keeping the PAM-only fallback active in those cases.
-        command: ["sh", "-c",
-                  "command -v gdbus >/dev/null 2>&1 || { echo PROBE_UNAVAILABLE; exit 0; }; " +
-                  "gdbus call --system " +
-                  "--dest net.reactivated.Fprint " +
-                  "--object-path /net/reactivated/Fprint/Manager " +
-                  "--method net.reactivated.Fprint.Manager.GetDevices 2>/dev/null " +
-                  "|| echo PROBE_UNAVAILABLE"]
+        command: ["sh", "-c", "command -v gdbus >/dev/null 2>&1 || { echo PROBE_UNAVAILABLE; exit 0; }; " + "gdbus call --system " + "--dest net.reactivated.Fprint " + "--object-path /net/reactivated/Fprint/Manager " + "--method net.reactivated.Fprint.Manager.GetDevices 2>/dev/null " + "|| echo PROBE_UNAVAILABLE"]
         stdout: StdioCollector {
             onStreamFinished: {
                 if (text.includes("PROBE_UNAVAILABLE"))
@@ -625,7 +610,7 @@ Item {
                 root.maybeAutoStartExternalAuth();
             }
         }
-        onExited: function(exitCode, exitStatus) {
+        onExited: function (exitCode, exitStatus) {
             if (!root.fprintdProbeComplete)
                 root.maybeAutoStartExternalAuth(); // PAM-only fallback stays active
         }
@@ -729,7 +714,7 @@ Item {
         }
 
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: Theme.mediumDuration
                 easing.type: Theme.standardEasing
             }
@@ -1027,7 +1012,7 @@ Item {
                             opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length === 0 : GreeterState.usernameInput.length === 0) ? 1 : 0
 
                             Behavior on opacity {
-                                NumberAnimation {
+                                OpacityAnimator {
                                     duration: Theme.mediumDuration
                                     easing.type: Theme.standardEasing
                                 }
@@ -1064,7 +1049,7 @@ Item {
                             horizontalAlignment: implicitWidth > width ? Text.AlignRight : Text.AlignLeft
 
                             Behavior on opacity {
-                                NumberAnimation {
+                                OpacityAnimator {
                                     duration: Theme.mediumDuration
                                     easing.type: Theme.standardEasing
                                 }
@@ -1136,7 +1121,7 @@ Item {
                             }
 
                             Behavior on opacity {
-                                NumberAnimation {
+                                OpacityAnimator {
                                     duration: Theme.shortDuration
                                     easing.type: Theme.standardEasing
                                 }
@@ -1166,7 +1151,7 @@ Item {
                     opacity: root.authFeedbackMessage !== "" ? 1 : 0
 
                     Behavior on opacity {
-                        NumberAnimation {
+                        OpacityAnimator {
                             duration: Theme.shortDuration
                             easing.type: Theme.standardEasing
                         }
@@ -1184,7 +1169,7 @@ Item {
                     enabled: GreeterState.showPasswordInput
 
                     Behavior on opacity {
-                        NumberAnimation {
+                        OpacityAnimator {
                             duration: Theme.mediumDuration
                             easing.type: Theme.standardEasing
                         }
@@ -1754,7 +1739,7 @@ Item {
                 authTimeout.interval = defaultAuthTimeoutMs;
                 authTimeout.stop();
                 if (resumePasswordSubmit) {
-                    Qt.callLater(function() {
+                    Qt.callLater(function () {
                         root.startAuthSession(true);
                     });
                     return;

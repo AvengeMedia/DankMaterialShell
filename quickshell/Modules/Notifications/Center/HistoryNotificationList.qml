@@ -283,7 +283,7 @@ Item {
 
                     Behavior on x {
                         enabled: !swipeDragHandler.active && delegateRoot.__delegateInitialized
-                        NumberAnimation {
+                        XAnimator {
                             duration: Theme.notificationExitDuration
                             easing.type: Theme.standardEasing
                         }
@@ -291,7 +291,7 @@ Item {
 
                     Behavior on opacity {
                         enabled: delegateRoot.__delegateInitialized
-                        NumberAnimation {
+                        OpacityAnimator {
                             duration: delegateRoot.__delegateInitialized ? Theme.notificationExitDuration : 0
                         }
                     }

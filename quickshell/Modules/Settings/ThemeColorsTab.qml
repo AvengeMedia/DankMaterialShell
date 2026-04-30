@@ -380,7 +380,7 @@ Item {
                                     }
 
                                     Behavior on scale {
-                                        NumberAnimation {
+                                        ScaleAnimator {
                                             duration: Theme.shortDuration
                                             easing.type: Theme.emphasizedEasing
                                         }
@@ -633,7 +633,7 @@ Item {
                                     scale: isActive ? 1.03 : 1
 
                                     Behavior on scale {
-                                        NumberAnimation {
+                                        ScaleAnimator {
                                             duration: Theme.shortDuration
                                             easing.type: Theme.emphasizedEasing
                                         }
@@ -989,7 +989,7 @@ Item {
                                         }
 
                                         Behavior on scale {
-                                            NumberAnimation {
+                                            ScaleAnimator {
                                                 duration: Theme.shortDuration
                                                 easing.type: Theme.emphasizedEasing
                                             }

@@ -214,7 +214,7 @@ Item {
         }
 
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: Theme.mediumDuration
                 easing.type: Theme.standardEasing
             }
@@ -740,7 +740,7 @@ Item {
                             opacity: pam.passwd.active ? 0 : 1
 
                             Behavior on opacity {
-                                NumberAnimation {
+                                OpacityAnimator {
                                     duration: Theme.mediumDuration
                                     easing.type: Theme.standardEasing
                                 }
@@ -879,7 +879,7 @@ Item {
                         opacity: (demoMode || root.passwordBuffer.length === 0) ? 1 : 0
 
                         Behavior on opacity {
-                            NumberAnimation {
+                            OpacityAnimator {
                                 duration: Theme.mediumDuration
                                 easing.type: Theme.standardEasing
                             }
@@ -916,7 +916,7 @@ Item {
                         horizontalAlignment: implicitWidth > width ? Text.AlignRight : Text.AlignLeft
 
                         Behavior on opacity {
-                            NumberAnimation {
+                            OpacityAnimator {
                                 duration: Theme.mediumDuration
                                 easing.type: Theme.standardEasing
                             }
@@ -1053,7 +1053,7 @@ Item {
                         }
 
                         Behavior on opacity {
-                            NumberAnimation {
+                            OpacityAnimator {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
@@ -1084,7 +1084,7 @@ Item {
                 opacity: text.length > 0 ? 1 : 0
 
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
@@ -1114,7 +1114,7 @@ Item {
             }
 
             Behavior on opacity {
-                NumberAnimation {
+                OpacityAnimator {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
                 }

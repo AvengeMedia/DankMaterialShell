@@ -271,7 +271,7 @@ BasePill {
     ]
 
     Behavior on opacity {
-        NumberAnimation {
+        OpacityAnimator {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
         }
@@ -625,7 +625,7 @@ BasePill {
                 opacity: root.inlineExpanded ? 1 : 0
 
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
@@ -1214,14 +1214,14 @@ BasePill {
             scale: root.menuOpen ? 1 : 0.85
 
             Behavior on opacity {
-                NumberAnimation {
+                OpacityAnimator {
                     duration: Theme.mediumDuration
                     easing.type: Theme.emphasizedEasing
                 }
             }
 
             Behavior on scale {
-                NumberAnimation {
+                ScaleAnimator {
                     duration: Theme.mediumDuration
                     easing.type: Theme.emphasizedEasing
                 }
@@ -1666,14 +1666,14 @@ BasePill {
                     scale: menuRoot.showMenu ? 1 : 0.85
 
                     Behavior on opacity {
-                        NumberAnimation {
+                        OpacityAnimator {
                             duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
                         }
                     }
 
                     Behavior on scale {
-                        NumberAnimation {
+                        ScaleAnimator {
                             duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
                         }

@@ -315,14 +315,14 @@ PanelWindow {
         }
 
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: animationDuration
                 easing.type: animationEasing
             }
         }
 
         Behavior on scale {
-            NumberAnimation {
+            ScaleAnimator {
                 duration: animationDuration
                 easing.type: animationEasing
             }

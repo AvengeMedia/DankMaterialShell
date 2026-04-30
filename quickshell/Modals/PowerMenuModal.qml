@@ -772,7 +772,7 @@ DankModal {
                 opacity: root.showHoldHint ? 1 : 0.5
 
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: 150
                     }
                 }

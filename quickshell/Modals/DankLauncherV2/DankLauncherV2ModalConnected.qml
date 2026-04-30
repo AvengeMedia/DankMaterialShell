@@ -250,6 +250,36 @@ Item {
         });
     }
 
+    property bool _animSyncQueued: false
+    function _queueAnimSync() {
+        if (_animSyncQueued)
+            return;
+        _animSyncQueued = true;
+        Qt.callLater(() => {
+            if (root && typeof root._flushAnimSync === "function")
+                root._flushAnimSync();
+        });
+    }
+    function _flushAnimSync() {
+        _animSyncQueued = false;
+        _syncModalAnim();
+    }
+
+    property bool _bodySyncQueued: false
+    function _queueBodySync() {
+        if (_bodySyncQueued)
+            return;
+        _bodySyncQueued = true;
+        Qt.callLater(() => {
+            if (root && typeof root._flushBodySync === "function")
+                root._flushBodySync();
+        });
+    }
+    function _flushBodySync() {
+        _bodySyncQueued = false;
+        _syncModalBody();
+    }
+
     function _syncModalAnim() {
         if (!frameOwnsConnectedChrome || !_chromeClaimId)
             return;
@@ -281,10 +311,10 @@ Item {
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
     onResolvedConnectedBarSideChanged: _queueFullSync()
     onSpotlightOpenChanged: _queueFullSync()
-    onAlignedXChanged: _syncModalBody()
-    onAlignedYChanged: _syncModalBody()
-    onAlignedWidthChanged: _syncModalBody()
-    onAlignedHeightChanged: _syncModalBody()
+    onAlignedXChanged: _queueBodySync()
+    onAlignedYChanged: _queueBodySync()
+    onAlignedWidthChanged: _queueBodySync()
+    onAlignedHeightChanged: _queueBodySync()
 
     Component.onDestruction: _releaseModalChrome()
 
@@ -571,7 +601,8 @@ Item {
 
             Behavior on opacity {
                 enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
-                DankAnim {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
                     duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
                     easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
                 }
@@ -597,8 +628,8 @@ Item {
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             blurX: root._ccX + root.alignedWidth * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
             blurY: root._ccY + root.alignedHeight * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: (root.spotlightOpen || root.isClosing) && contentWrapper.opacity > 0 && !root.frameOwnsConnectedChrome ? root.alignedWidth * s : 0
-            blurHeight: (root.spotlightOpen || root.isClosing) && contentWrapper.opacity > 0 && !root.frameOwnsConnectedChrome ? root.alignedHeight * s : 0
+            blurWidth: (root.spotlightOpen || root.isClosing) && contentWrapper.publishedOpacity > 0 && !root.frameOwnsConnectedChrome ? root.alignedWidth * s : 0
+            blurHeight: (root.spotlightOpen || root.isClosing) && contentWrapper.publishedOpacity > 0 && !root.frameOwnsConnectedChrome ? root.alignedHeight * s : 0
             blurRadius: root.cornerRadius
         }
 
@@ -716,9 +747,9 @@ Item {
             property real scaleValue: root._motionActive ? 1.0 : Theme.effectScaleCollapsed
 
             onAnimXChanged: if (root.frameOwnsConnectedChrome)
-                root._syncModalAnim()
+                root._queueAnimSync()
             onAnimYChanged: if (root.frameOwnsConnectedChrome)
-                root._syncModalAnim()
+                root._queueAnimSync()
 
             Behavior on animX {
                 enabled: root.animationsEnabled
@@ -769,7 +800,7 @@ Item {
                         id: launcherShadowLayer
                         width: parent.width
                         height: parent.height
-                        opacity: contentWrapper.opacity
+                        opacity: contentWrapper.publishedOpacity
                         scale: contentWrapper.scale
                         x: contentWrapper.x
                         y: contentWrapper.y
@@ -787,17 +818,41 @@ Item {
                         id: contentWrapper
                         width: parent.width
                         height: parent.height
+
+                        property bool _renderActive: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) || launcherMotionVisible
+                        property real publishedOpacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (launcherMotionVisible ? 1 : 0)
+
                         opacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (launcherMotionVisible ? 1 : 0)
-                        visible: opacity > 0
+                        visible: _renderActive
                         scale: contentContainer.scaleValue
                         x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
                         y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
 
                         Behavior on opacity {
                             enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
-                            DankAnim {
+                            OpacityAnimator {
+                                easing.type: Easing.BezierSpline
                                 duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
                                 easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
+                            }
+                        }
+
+                        Behavior on publishedOpacity {
+                            enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
+                            NumberAnimation {
+                                easing.type: Easing.BezierSpline
+                                duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                                easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
+                                onRunningChanged: if (!running && contentWrapper.publishedOpacity === 0)
+                                    contentWrapper._renderActive = false
+                            }
+                        }
+
+                        Connections {
+                            target: root
+                            function onLauncherMotionVisibleChanged() {
+                                if (root.launcherMotionVisible)
+                                    contentWrapper._renderActive = true;
                             }
                         }
 

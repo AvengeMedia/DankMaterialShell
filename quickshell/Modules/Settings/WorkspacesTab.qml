@@ -97,7 +97,7 @@ Item {
                     }
 
                     Behavior on opacity {
-                        NumberAnimation {
+                        OpacityAnimator {
                             duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
                         }

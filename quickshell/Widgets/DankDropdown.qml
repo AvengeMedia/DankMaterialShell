@@ -187,7 +187,7 @@ Item {
             anchors.rightMargin: Theme.spacingS
 
             Behavior on rotation {
-                NumberAnimation {
+                RotationAnimator {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
                 }

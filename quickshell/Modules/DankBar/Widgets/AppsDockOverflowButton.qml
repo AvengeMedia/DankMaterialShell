@@ -36,7 +36,7 @@ Item {
             rotation: isVertical ? (overflowExpanded ? 180 : 0) : (overflowExpanded ? 90 : -90)
 
             Behavior on rotation {
-                NumberAnimation {
+                RotationAnimator {
                     duration: Theme.shortDuration
                     easing.type: Easing.OutCubic
                 }

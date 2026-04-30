@@ -157,7 +157,7 @@ Item {
             opacity: (locationInput.getActiveFocus() && locationInput.text.length > 2) ? 1 : 0
 
             Behavior on opacity {
-                NumberAnimation {
+                OpacityAnimator {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
                 }

@@ -273,13 +273,44 @@ Item {
         });
     }
 
+    property bool _animSyncQueued: false
+    function _queueAnimSync() {
+        if (_animSyncQueued)
+            return;
+        _animSyncQueued = true;
+        Qt.callLater(() => {
+            if (root && typeof root._flushAnimSync === "function")
+                root._flushAnimSync();
+        });
+    }
+    function _flushAnimSync() {
+        _animSyncQueued = false;
+        _syncPopoutAnim("x");
+        _syncPopoutAnim("y");
+    }
+
+    property bool _bodySyncQueued: false
+    function _queueBodySync() {
+        if (_bodySyncQueued)
+            return;
+        _bodySyncQueued = true;
+        Qt.callLater(() => {
+            if (root && typeof root._flushBodySync === "function")
+                root._flushBodySync();
+        });
+    }
+    function _flushBodySync() {
+        _bodySyncQueued = false;
+        _syncPopoutBody();
+    }
+
     onAlignedXChanged: _queueFullSync()
     onAlignedYChanged: _queueFullSync()
     onAlignedWidthChanged: _queueFullSync()
-    onContentAnimXChanged: _syncPopoutAnim("x")
-    onContentAnimYChanged: _syncPopoutAnim("y")
-    onRenderedAlignedYChanged: _syncPopoutBody()
-    onRenderedAlignedHeightChanged: _syncPopoutBody()
+    onContentAnimXChanged: _queueAnimSync()
+    onContentAnimYChanged: _queueAnimSync()
+    onRenderedAlignedYChanged: _queueBodySync()
+    onRenderedAlignedHeightChanged: _queueBodySync()
     onScreenChanged: _queueFullSync()
     onEffectiveBarPositionChanged: _queueFullSync()
 
@@ -676,8 +707,8 @@ Item {
 
             blurX: trackBlurFromBarEdge ? contentContainer.x + (contentContainer.barRight ? _dxClamp : 0) : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr) - contentContainer.horizontalConnectorExtent * s
             blurY: trackBlurFromBarEdge ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0) : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s
-            blurWidth: (shouldBeVisible && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.width - Math.abs(_dxClamp)) : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s) : 0
-            blurHeight: (shouldBeVisible && contentWrapper.opacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) : 0
+            blurWidth: (shouldBeVisible && contentWrapper.publishedOpacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.width - Math.abs(_dxClamp)) : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s) : 0
+            blurHeight: (shouldBeVisible && contentWrapper.publishedOpacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) : 0
             blurRadius: Theme.isConnectedEffect ? Theme.connectedCornerRadius : Theme.connectedSurfaceRadius
         }
 
@@ -959,7 +990,7 @@ Item {
 
                         width: rollOutAdjuster.baseWidth + extraLeft + extraRight
                         height: rollOutAdjuster.baseHeight + extraTop + extraBottom
-                        opacity: contentWrapper.opacity
+                        opacity: contentWrapper.publishedOpacity
                         scale: contentWrapper.scale
                         x: contentWrapper.x - extraLeft
                         y: contentWrapper.y - extraTop
@@ -1024,23 +1055,48 @@ Item {
                         id: contentWrapper
                         width: rollOutAdjuster.baseWidth
                         height: rollOutAdjuster.baseHeight
+
+                        property bool _renderActive: Theme.isDirectionalEffect || shouldBeVisible
+                        property bool _animating: false
+                        property real publishedOpacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
+
                         opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
-                        visible: opacity > 0
+                        visible: _renderActive
 
                         scale: contentContainer.scaleValue
                         x: Theme.snap(contentContainer.animX + (rollOutAdjuster.baseWidth - width) * (1 - scale) * 0.5, root.dpr)
                         y: Theme.snap(contentContainer.animY + (rollOutAdjuster.baseHeight - height) * (1 - scale) * 0.5, root.dpr)
 
-                        layer.enabled: contentWrapper.opacity < 1
+                        layer.enabled: _animating || (!Theme.isDirectionalEffect && publishedOpacity < 1)
                         layer.smooth: false
                         layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
                         Behavior on opacity {
                             enabled: !Theme.isDirectionalEffect
+                            OpacityAnimator {
+                                duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                                onRunningChanged: contentWrapper._animating = running
+                            }
+                        }
+
+                        Behavior on publishedOpacity {
+                            enabled: !Theme.isDirectionalEffect
                             NumberAnimation {
                                 duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                                onRunningChanged: if (!running && contentWrapper.publishedOpacity === 0)
+                                    contentWrapper._renderActive = false
+                            }
+                        }
+
+                        Connections {
+                            target: root
+                            function onShouldBeVisibleChanged() {
+                                if (root.shouldBeVisible)
+                                    contentWrapper._renderActive = true;
                             }
                         }
 

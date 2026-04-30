@@ -180,7 +180,7 @@ Item {
         opacity: (root.hasRun && !root.isRunning) ? 1 : 0
 
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing
             }

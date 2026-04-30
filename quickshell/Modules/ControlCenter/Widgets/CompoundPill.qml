@@ -64,7 +64,7 @@ Rectangle {
         opacity: 0.08
         antialiasing: true
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: Theme.shortDuration
             }
         }
