@@ -243,8 +243,8 @@
    `(which-key-special-key-face ((t (:foreground ,dank-yellow :weight bold))))
 
    ;; Line numbers
-   `(line-number ((t (:foreground ,dank-gray :inherit fixed-pitch))))
-   `(line-number-current-line ((t (:foreground ,dank-cyan :weight bold :inherit fixed-pitch))))
+   `(line-number ((t (:foreground ,dank-gray :inherit default))))
+   `(line-number-current-line ((t (:foreground ,dank-cyan :weight bold :inherit default))))
 
    ;; Parenthesis matching
    `(sp-show-pair-match-face ((t (:background ,primary-container :foreground ,dank-cyan-bright))))
