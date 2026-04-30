@@ -1416,7 +1416,7 @@ Singleton {
     }
 
     function getOutputDisplayName(output, outputName) {
-        return getOutputIdentifier(output, outputName); 
+        return getOutputIdentifier(output, outputName);
     }
 
     function getNiriOutputIdentifier(output, outputName) {
