@@ -1697,8 +1697,11 @@ Item {
                                 required property int index
 
                                 readonly property bool isActive: DMSNetworkService.isActiveUuid(modelData.uuid)
+                                readonly property bool isTransient: !!modelData.transient
+                                readonly property bool canExpand: modelData.canExpand !== false
+                                readonly property bool canDelete: modelData.canDelete !== false
                                 readonly property bool isExpanded: networkTab.expandedVpnUuid === modelData.uuid
-                                readonly property var configData: isExpanded ? VPNService.editConfig : null
+                                readonly property var configData: (!isTransient && isExpanded) ? VPNService.editConfig : null
 
                                 width: parent.width
                                 height: isExpanded ? 56 + vpnExpandedContent.height : 56
@@ -1745,7 +1748,7 @@ Item {
                                         Column {
                                             spacing: 2
                                             anchors.verticalCenter: parent.verticalCenter
-                                            width: parent.width - 20 - 28 - 28 - Theme.spacingS * 4
+                                            width: parent.width - 20 - ((canExpand ? 28 : 0) + (canDelete ? 28 : 0)) - Theme.spacingS * 4
 
                                             StyledText {
                                                 text: modelData.name
@@ -1775,6 +1778,7 @@ Item {
                                             radius: 14
                                             color: vpnExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
                                             anchors.verticalCenter: parent.verticalCenter
+                                            visible: canExpand
 
                                             DankIcon {
                                                 anchors.centerIn: parent
@@ -1805,6 +1809,7 @@ Item {
                                             radius: 14
                                             color: vpnDeleteBtn.containsMouse ? Theme.errorHover : "transparent"
                                             anchors.verticalCenter: parent.verticalCenter
+                                            visible: canDelete
 
                                             DankIcon {
                                                 anchors.centerIn: parent
@@ -1835,7 +1840,7 @@ Item {
                                         id: vpnExpandedContent
                                         width: parent.width
                                         spacing: Theme.spacingXS
-                                        visible: isExpanded
+                                        visible: !isTransient && isExpanded
 
                                         Rectangle {
                                             width: parent.width

@@ -11,13 +11,16 @@ Rectangle {
 
     required property var profile
     property bool isExpanded: false
+    readonly property bool isTransient: !!profile?.transient
+    readonly property bool canExpand: profile?.canExpand !== false
+    readonly property bool canDelete: profile?.canDelete !== false
 
     signal toggleExpand
     signal deleteRequested
 
     readonly property bool isActive: DMSNetworkService.activeUuids?.includes(profile?.uuid) ?? false
     readonly property bool isHovered: rowArea.containsMouse || expandBtn.containsMouse || deleteBtn.containsMouse
-    readonly property var configData: isExpanded ? VPNService.editConfig : null
+    readonly property var configData: (!isTransient && isExpanded) ? VPNService.editConfig : null
     readonly property var configFields: buildConfigFields()
 
     height: isExpanded ? 46 + expandedContent.height : 46
@@ -114,7 +117,7 @@ Rectangle {
             Column {
                 spacing: 1
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - 20 - 28 - 28 - Theme.spacingS * 4
+                width: parent.width - 20 - ((canExpand ? 28 : 0) + (canDelete ? 28 : 0)) - Theme.spacingS * 4
 
                 StyledText {
                     text: profile?.name ?? ""
@@ -148,6 +151,7 @@ Rectangle {
                 radius: 14
                 color: expandBtn.containsMouse ? Theme.surfacePressed : "transparent"
                 anchors.verticalCenter: parent.verticalCenter
+                visible: canExpand
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -171,6 +175,7 @@ Rectangle {
                 radius: 14
                 color: deleteBtn.containsMouse ? Theme.errorHover : "transparent"
                 anchors.verticalCenter: parent.verticalCenter
+                visible: canDelete
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -227,7 +232,7 @@ Rectangle {
             Flow {
                 width: parent.width
                 spacing: Theme.spacingXS
-                visible: !VPNService.configLoading && configData
+                visible: !isTransient && !VPNService.configLoading && configData
 
                 Repeater {
                     model: configFields
