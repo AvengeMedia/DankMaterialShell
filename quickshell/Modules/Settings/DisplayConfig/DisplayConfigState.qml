@@ -93,7 +93,7 @@ Singleton {
                 if (!Array.isArray(monitorsCache.configurations))
                     monitorsCache.configurations = [];
             } catch (e) {
-                console.warn("Failed to parse monitors.json, using empty config", e);
+                log.warn("Failed to parse monitors.json, using empty config");
                 monitorsCache = {"version": 1, "configurations": []};
             }
             callback(monitorsCache);
@@ -486,7 +486,7 @@ Singleton {
     // ── Profile management ─────────────────────────────────────────────────
 
     function validateProfiles() {
-        console.warn("Validating profiles against current outputs...");
+        log.info("Validating profiles against current outputs...");
         readMonitorsJson(data => {
             const validated = {};
             let dirty = false;
