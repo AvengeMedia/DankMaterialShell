@@ -67,6 +67,16 @@ Singleton {
         onTriggered: root.activePlayer?.positionChanged()
     }
 
+    function isFirefoxYoutubeHoverPreview(player: MprisPlayer): bool {
+        if (!player)
+            return false;
+        const id = (player.identity || "").toLowerCase();
+        if (!id.includes("firefox"))
+            return false;
+        const url = (player.metadata?.["xesam:url"] || "").toString();
+        return /^https?:\/\/(www\.)?youtube\.com\/?($|\?|#)/i.test(url);
+    }
+
     function previousOrRewind(): void {
         if (!activePlayer)
             return;

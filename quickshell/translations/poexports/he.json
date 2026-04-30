@@ -50,6 +50,12 @@
   "%1 filtered": {
     "%1 filtered": "%1 מסוננים"
   },
+  "%1 h %2 m left": {
+    "%1 h %2 m left": ""
+  },
+  "%1 h left": {
+    "%1 h left": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 כעת כלול בconfig"
   },
@@ -58,6 +64,9 @@
   },
   "%1 issues found": {
     "%1 issues found": "נמצאו %1 בעיות"
+  },
+  "%1 min left": {
+    "%1 min left": ""
   },
   "%1 notifications": {
     "%1 notifications": "%1 התראות"
@@ -146,6 +155,9 @@
   "14 days": {
     "14 days": "14 ימים"
   },
+  "15 min": {
+    "15 min": ""
+  },
   "15 minutes": {
     "15 minutes": "15 דקות"
   },
@@ -202,6 +214,9 @@
   },
   "30 days": {
     "30 days": "30 ימים"
+  },
+  "30 min": {
+    "30 min": ""
   },
   "30 minutes": {
     "30 minutes": "30 דקות"
@@ -278,6 +293,9 @@
   "API": {
     "API": "API"
   },
+  "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": ""
+  },
   "Aborted": {
     "Aborted": "בוטל"
   },
@@ -351,7 +369,7 @@
     "Adapters": "מתאמים"
   },
   "Adaptive Media Width": {
-    "Adaptive Media Width": ""
+    "Adaptive Media Width": "רוחב מדיה אדפטיבי"
   },
   "Add": {
     "Add": "הוספה"
@@ -499,6 +517,9 @@
   },
   "Apply Changes": {
     "Apply Changes": "החל/י שינויים"
+  },
+  "Apply Flatpak updates alongside system updates when running 'Update All'.": {
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": ""
   },
   "Apply GTK Colors": {
     "Apply GTK Colors": "החלת צבעים על GTK"
@@ -734,6 +755,9 @@
   "Backend": {
     "Backend": "Backend"
   },
+  "Backends: %1": {
+    "Backends: %1": ""
+  },
   "Background": {
     "Background": "רקע"
   },
@@ -965,6 +989,12 @@
   "Canceled": {
     "Canceled": "בוטל"
   },
+  "Cannot open trash: '%1' is not installed": {
+    "Cannot open trash: '%1' is not installed": ""
+  },
+  "Cannot open trash: no custom command set": {
+    "Cannot open trash: no custom command set": ""
+  },
   "Cannot pair": {
     "Cannot pair": "לא ניתן לצמד"
   },
@@ -1019,8 +1049,14 @@
   "Check for system updates": {
     "Check for system updates": "בדוק/בדקי עדכוני מערכת"
   },
+  "Check interval": {
+    "Check interval": ""
+  },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "בדוק/בדקי את מצב הסנכרון לפי דרישה. הסנכרון מעתיק את תצורת ערכת הנושא, ההגדרות ותמונת הרקע שלך למסך ההתחברות. שינויי אימות מוחלים באופן אוטומטי."
+  },
+  "Check your custom command in Settings → Dock → Trash.": {
+    "Check your custom command in Settings → Dock → Trash.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": "בודק עדכונים..."
@@ -1066,6 +1102,9 @@
   },
   "Choose icon": {
     "Choose icon": "בחר/י סמל"
+  },
+  "Choose monochrome or a theme color tint for system tray icons": {
+    "Choose monochrome or a theme color tint for system tray icons": ""
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "בחר/י את צבע הרקע לווידג׳טים"
@@ -1322,6 +1361,9 @@
   "Configure match criteria and actions": {
     "Configure match criteria and actions": "הגדר/י קריטריוני התאמה ופעולות"
   },
+  "Configure one in Settings → Dock → Trash.": {
+    "Configure one in Settings → Dock → Trash.": ""
+  },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "הגדר/י אילו מסכים מציגים את \"%1\""
   },
@@ -1368,7 +1410,7 @@
     "Connecting to Device": "מתחבר להתקן"
   },
   "Connecting to clipboard service…": {
-    "Connecting to clipboard service…": ""
+    "Connecting to clipboard service…": "מתחבר לשירות לוח ההעתקה…"
   },
   "Connecting...": {
     "Connecting...": "מתחבר..."
@@ -1409,14 +1451,26 @@
   "Control workspaces and columns by scrolling on the bar": {
     "Control workspaces and columns by scrolling on the bar": "שלוט/י בסביבות העבודה ועמודות באמצעות גלילה על הסרגל"
   },
+  "Controls how much original icon color is removed before applying tint": {
+    "Controls how much original icon color is removed before applying tint": ""
+  },
+  "Controls how strongly the selected tint color is applied": {
+    "Controls how strongly the selected tint color is applied": ""
+  },
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "שולט בשקיפות של כל החלונות הקופצים, המודלים ושכבות התוכן שלהם"
+  },
+  "Controls outlines around blurred foreground cards, pills, and notification cards": {
+    "Controls outlines around blurred foreground cards, pills, and notification cards": ""
   },
   "Controls shadow cast direction for elevation layers": {
     "Controls shadow cast direction for elevation layers": "שולט בכיוון הטלת הצל עבור שכבות הגבהה"
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": "שולט ברדיוס הטשטוש הבסיסי ובהיסט של הצללים"
+  },
+  "Controls the outer edge of protocol-blurred windows": {
+    "Controls the outer edge of protocol-blurred windows": ""
   },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "שולט בשקיפות הצל"
@@ -1459,6 +1513,9 @@
   },
   "Copy PID": {
     "Copy PID": "העתק/י PID"
+  },
+  "Copy Path": {
+    "Copy Path": ""
   },
   "Copy Text": {
     "Copy Text": "העתק/י טקסט"
@@ -1507,6 +1564,15 @@
   },
   "Critical Priority": {
     "Critical Priority": "עדיפות קריטית"
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": ""
   },
   "Current": {
     "Current": "עכשיו"
@@ -1604,11 +1670,20 @@
   "Custom Transparency": {
     "Custom Transparency": "שקיפות מותאמת אישית"
   },
+  "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
+  },
+  "Custom open-trash command": {
+    "Custom open-trash command": ""
+  },
   "Custom power profile": {
     "Custom power profile": "פרופיל חשמל מותאם אישית"
   },
   "Custom theme loaded from JSON file": {
     "Custom theme loaded from JSON file": "ערכת נושא מותאמת אישית נטענה מקובץ JSON"
+  },
+  "Custom update command": {
+    "Custom update command": ""
   },
   "Custom...": {
     "Custom...": "מותאם אישית..."
@@ -1795,6 +1870,9 @@
   },
   "Details for \"%1": {
     "Details for \"%1\"": "פרטים עבור \"%1\""
+  },
+  "Detected backends: %1": {
+    "Detected backends: %1": ""
   },
   "Development": {
     "Development": "פיתוח"
@@ -2048,6 +2126,15 @@
   "Empty": {
     "Empty": "ריק"
   },
+  "Empty Trash": {
+    "Empty Trash": ""
+  },
+  "Empty Trash (%1)": {
+    "Empty Trash (%1)": ""
+  },
+  "Empty Trash?": {
+    "Empty Trash?": ""
+  },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "הפעל/י עומק צבע של 10 סיביות לסולם צבעים רחב יותר עם תמיכה בHDR"
   },
@@ -2225,6 +2312,18 @@
   "Ethernet": {
     "Ethernet": "Ethernet"
   },
+  "Every 15 minutes": {
+    "Every 15 minutes": ""
+  },
+  "Every 30 minutes": {
+    "Every 30 minutes": ""
+  },
+  "Every 4 hours": {
+    "Every 4 hours": ""
+  },
+  "Every hour": {
+    "Every hour": ""
+  },
   "Exact": {
     "Exact": "מדויק"
   },
@@ -2336,6 +2435,9 @@
   "Failed to disconnect WiFi": {
     "Failed to disconnect WiFi": "ניתוק הWiFi נכשל"
   },
+  "Failed to empty trash": {
+    "Failed to empty trash": ""
+  },
   "Failed to enable IP location": {
     "Failed to enable IP location": "הפעלת מיקום לפי IP נכשלה"
   },
@@ -2365,6 +2467,9 @@
   },
   "Failed to move job": {
     "Failed to move job": "העברת העבודה נכשלה"
+  },
+  "Failed to move to trash": {
+    "Failed to move to trash": ""
   },
   "Failed to parse plugin_settings.json": {
     "Failed to parse plugin_settings.json": "הקריאה של הקובץ plugin_settings.json נכשלה"
@@ -2480,6 +2585,9 @@
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "כתיבת קובץ זמני לאימות נכשלה"
   },
+  "Failed: %1": {
+    "Failed: %1": ""
+  },
   "Features": {
     "Features": "תכונות"
   },
@@ -2506,6 +2614,9 @@
   },
   "File Information": {
     "File Information": "פרטי קובץ"
+  },
+  "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
+    "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
   },
   "File received from": {
     "File received from": "התקבל קובץ מ"
@@ -2639,6 +2750,21 @@
   "Font used on the login screen": {
     "Font used on the login screen": "הגופן שנעשה בו שימוש במסך ההתחברות"
   },
+  "For 1 hour": {
+    "For 1 hour": ""
+  },
+  "For 15 minutes": {
+    "For 15 minutes": ""
+  },
+  "For 3 hours": {
+    "For 3 hours": ""
+  },
+  "For 30 minutes": {
+    "For 30 minutes": ""
+  },
+  "For 8 hours": {
+    "For 8 hours": ""
+  },
   "Force HDR": {
     "Force HDR": "אלץ/י HDR"
   },
@@ -2659,6 +2785,9 @@
   },
   "Forecast Not Available": {
     "Forecast Not Available": "תחזית לא זמינה"
+  },
+  "Foreground Layers": {
+    "Foreground Layers": ""
   },
   "Forever": {
     "Forever": "לנצח"
@@ -3008,6 +3137,9 @@
   "Hourly Forecast Count": {
     "Hourly Forecast Count": "מספר תחזיות שעתיות"
   },
+  "How often the server polls for new updates.": {
+    "How often the server polls for new updates.": ""
+  },
   "How often to change wallpaper": {
     "How often to change wallpaper": "כל כמה זמן להחליף רקע"
   },
@@ -3092,11 +3224,17 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "צבע למסך הלא פעיל"
   },
+  "Include AUR updates": {
+    "Include AUR updates": ""
+  },
   "Include Files in All Tab": {
-    "Include Files in All Tab": ""
+    "Include Files in All Tab": "הכללה של קבצים בלשונית 'הכל'"
+  },
+  "Include Flatpak updates": {
+    "Include Flatpak updates": ""
   },
   "Include Folders in All Tab": {
-    "Include Folders in All Tab": ""
+    "Include Folders in All Tab": "הכללה של תיקיות בלשונית 'הכל'"
   },
   "Include Transitions": {
     "Include Transitions": "כלול/כללי מעברים"
@@ -3240,7 +3378,7 @@
     "Keep Changes": "שמור/י שינויים"
   },
   "Keeping Awake": {
-    "Keeping Awake": "משאיר ער"
+    "Keeping Awake": "שינה נמנעת"
   },
   "Kernel": {
     "Kernel": "ליבה"
@@ -3346,6 +3484,9 @@
   },
   "Launcher Button Logo": {
     "Launcher Button Logo": "סמל כפתור המשגר"
+  },
+  "Layer Outline Opacity": {
+    "Layer Outline Opacity": ""
   },
   "Layout": {
     "Layout": "פריסה"
@@ -3474,7 +3615,7 @@
     "Logging in...": "מתחבר..."
   },
   "Login": {
-    "Login": ""
+    "Login": "התחברות"
   },
   "Login Authentication": {
     "Login Authentication": "הזדהות בכניסה"
@@ -3702,10 +3843,10 @@
     "Memory usage indicator": "מחוון שימוש בזיכרון"
   },
   "Merge indexed file results into the All tab (requires dsearch).": {
-    "Merge indexed file results into the All tab (requires dsearch).": ""
+    "Merge indexed file results into the All tab (requires dsearch).": "מזג/י תוצאות של קבצים שנשמרו באינדקס לתוך הלשונית 'הכל' (החבילה dsearch נדרשת)."
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
-    "Merge indexed folder results into the All tab (requires dsearch).": ""
+    "Merge indexed folder results into the All tab (requires dsearch).": "מזג/י תוצאות של תיקיות שנשמרו באינדקס לתוך הלשונית 'הכל' (החבילה dsearch נדרשת)."
   },
   "Message": {
     "Message": "הודעה"
@@ -3814,6 +3955,9 @@
   },
   "Move Widget": {
     "Move Widget": "הזזת הווידג׳ט"
+  },
+  "Move to Trash": {
+    "Move to Trash": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "עובר להשהיה"
@@ -4169,6 +4313,12 @@
   "No status output.": {
     "No status output.": "לא התקבל פלט לעדכון המצב."
   },
+  "No supported package manager found.": {
+    "No supported package manager found.": ""
+  },
+  "No terminal configured": {
+    "No terminal configured": ""
+  },
   "No themes found": {
     "No themes found": "לא נמצאו ערכות נושא"
   },
@@ -4328,6 +4478,9 @@
   "On": {
     "On": "פועל"
   },
+  "On indefinitely": {
+    "On indefinitely": ""
+  },
   "On-Demand": {
     "On-Demand": "לפי דרישה"
   },
@@ -4336,6 +4489,9 @@
   },
   "On-screen Displays": {
     "On-screen Displays": "תצוגות על המסך (OSD)"
+  },
+  "Once a day": {
+    "Once a day": ""
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "כוונן/י את הגאמה רק לפי כללי זמן או מיקום."
@@ -4367,8 +4523,17 @@
   "Open Notepad File": {
     "Open Notepad File": "פתח/י קובץ בפנקס"
   },
+  "Open Trash": {
+    "Open Trash": ""
+  },
+  "Open Trash With": {
+    "Open Trash With": ""
+  },
   "Open a new note": {
     "Open a new note": "פתח/י פתק חדש"
+  },
+  "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
   },
   "Open folder": {
     "Open folder": "פתח/י תיקייה"
@@ -4592,6 +4757,9 @@
   "Performance": {
     "Performance": "ביצועים"
   },
+  "Permanently delete %1 item(s)? This cannot be undone.": {
+    "Permanently delete %1 item(s)? This cannot be undone.": ""
+  },
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "ההרשאה להגדרת תמונת הפרופיל נדחתה."
   },
@@ -4607,8 +4775,17 @@
   "Phone number": {
     "Phone number": "מספר טלפון"
   },
+  "Pick a different file manager in Settings → Dock → Trash.": {
+    "Pick a different file manager in Settings → Dock → Trash.": ""
+  },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "בחר/י סרטון וידאו אקראי שונה בכל פעם מאותה תיקייה"
+  },
+  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
+    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": ""
+  },
+  "Pick how long to pause notifications": {
+    "Pick how long to pause notifications": ""
   },
   "Pictures": {
     "Pictures": "תמונות"
@@ -4637,6 +4814,9 @@
   "Pixelate": {
     "Pixelate": "פיקסול"
   },
+  "Place a trash bin at the end of the dock": {
+    "Place a trash bin at the end of the dock": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "מקם/י כאן את תיקיות התוספים. לכל תוסף צריך להיות קובץ מניפסט בשם plugin.json."
   },
@@ -4647,7 +4827,7 @@
     "Play a video when the screen locks.": "נגן/י וידאו כאשר המסך ננעל."
   },
   "Play sound after logging in": {
-    "Play sound after logging in": ""
+    "Play sound after logging in": "השמעת צליל לאחר ההתחברות"
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "ניגון צליל כשהתראה חדשה מגיעה"
@@ -5054,6 +5234,9 @@
   "Requires DMS %1": {
     "Requires DMS %1": "DMS %1 נדרש"
   },
+  "Requires DMS server with sysupdate capability": {
+    "Requires DMS server with sysupdate capability": ""
+  },
   "Requires DWL compositor": {
     "Requires DWL compositor": "קומפוזיטור DWL נדרש"
   },
@@ -5174,6 +5357,9 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "הרץ/י פקודת מעטפת (לדוגמא notify-send)"
   },
+  "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
+    "Run paru/yay with AUR enabled when 'Update All' is clicked.": ""
+  },
   "Running Apps": {
     "Running Apps": "אפליקציות פעילות"
   },
@@ -5182,6 +5368,9 @@
   },
   "Running greeter sync…": {
     "Running greeter sync…": "מריץ סנכרון במסך ההתחברות…"
+  },
+  "Running in terminal": {
+    "Running in terminal": ""
   },
   "SDR Brightness": {
     "SDR Brightness": "בהירות של SDR"
@@ -5723,6 +5912,9 @@
   "Show Top Processes": {
     "Show Top Processes": "הצג/י תהליכים עליונים"
   },
+  "Show Trash in Dock": {
+    "Show Trash in Dock": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "הצגת תנאי מזג האוויר"
   },
@@ -5758,6 +5950,9 @@
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "הצג/י צל נופל על חלונות קופצים של התראות. דורש הפעלה של M3 Elevation (הגבהה) בערכת נושא וצבעים."
+  },
+  "Show foreground surfaces on blurred panels for stronger contrast": {
+    "Show foreground surfaces on blurred panels for stronger contrast": ""
   },
   "Show in GB": {
     "Show in GB": "הצג/י בGB"
@@ -5850,7 +6045,7 @@
     "Shows when microphone, camera, or screen sharing is active": "מוצג כאשר המיקרופון, המצלמה או שיתוף המסך פעילים"
   },
   "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
-    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "כווץ/י את ווידג׳ט המדיה כך שיתאים לשמות שירים קצרים יותר, תוך שמירה על הגודל המירבי שהוגדר"
   },
   "Shutdown": {
     "Shutdown": "כיבוי"
@@ -5860,6 +6055,12 @@
   },
   "Signal:": {
     "Signal:": "אות:"
+  },
+  "Silence for a while": {
+    "Silence for a while": ""
+  },
+  "Silence notifications": {
+    "Silence notifications": ""
   },
   "Size": {
     "Size": "גודל"
@@ -6071,6 +6272,9 @@
   "System Tray": {
     "System Tray": "מגש המערכת"
   },
+  "System Tray Icon Tint": {
+    "System Tray Icon Tint": ""
+  },
   "System Update": {
     "System Update": "עדכון מערכת"
   },
@@ -6103,6 +6307,9 @@
   },
   "Terminal": {
     "Terminal": "מסוף"
+  },
+  "Terminal additional parameters": {
+    "Terminal additional parameters": ""
   },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "פרמטרים נוספים מותאמים אישית למסוף"
@@ -6263,6 +6470,12 @@
   "Timeout for normal priority notifications": {
     "Timeout for normal priority notifications": "הזמן שמוקצב להתראות בעדיפות רגילה"
   },
+  "Tint Saturation": {
+    "Tint Saturation": ""
+  },
+  "Tint Strength": {
+    "Tint Strength": ""
+  },
   "Title": {
     "Title": "כותרת"
   },
@@ -6353,6 +6566,12 @@
   "Transparency": {
     "Transparency": "שקיפות"
   },
+  "Trash": {
+    "Trash": ""
+  },
+  "Trash command failed (exit %1)": {
+    "Trash command failed (exit %1)": ""
+  },
   "Trending GIFs": {
     "Trending GIFs": "GIFים טרנדיים"
   },
@@ -6374,11 +6593,23 @@
   "Try a different search": {
     "Try a different search": "נסה/י חיפוש אחר"
   },
+  "Turn off": {
+    "Turn off": ""
+  },
+  "Turn off Do Not Disturb": {
+    "Turn off Do Not Disturb": ""
+  },
   "Turn off all displays immediately when the lock screen activates": {
     "Turn off all displays immediately when the lock screen activates": "כבה/י את כל המסכים מיד כאשר מסך הנעילה מופעל"
   },
   "Turn off monitors after": {
     "Turn off monitors after": "כבה/י את כל המסכים לאחר"
+  },
+  "Turn off monitors after lock": {
+    "Turn off monitors after lock": ""
+  },
+  "Turn off now": {
+    "Turn off now": ""
   },
   "Type": {
     "Type": "סוג"
@@ -6494,6 +6725,18 @@
   "Unsaved note...": {
     "Unsaved note...": "פתק שלא נשמר..."
   },
+  "Until %1": {
+    "Until %1": ""
+  },
+  "Until 8 AM": {
+    "Until 8 AM": ""
+  },
+  "Until I turn it off": {
+    "Until I turn it off": ""
+  },
+  "Until tomorrow, 8:00 AM": {
+    "Until tomorrow, 8:00 AM": ""
+  },
   "Untitled": {
     "Untitled": "ללא כותרת"
   },
@@ -6511,6 +6754,9 @@
   },
   "Update Plugin": {
     "Update Plugin": "עדכן/י תוסף"
+  },
+  "Upgrading...": {
+    "Upgrading...": ""
   },
   "Uptime": {
     "Uptime": "זמן פעילות"
@@ -6543,7 +6789,7 @@
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "השתמש/י ביחידות אימפריאליות (°F, mph, inHg) במקום מטריות (°C, km/h, hPa)"
   },
   "Use Inline Expansion": {
-    "Use Inline Expansion": ""
+    "Use Inline Expansion": "השתמש/י בהרחבה באותה שורה"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "השתמש/י בגופן ברוחב קבוע"
@@ -6571,6 +6817,9 @@
   },
   "Use custom border/focus-ring width": {
     "Use custom border/focus-ring width": "השתמש/י ברוחב מסגרת/טבעת מיקוד מותאם אישית"
+  },
+  "Use custom command": {
+    "Use custom command": ""
   },
   "Use custom command for update your system": {
     "Use custom command for update your system": "השתמש/י בפקודה מותאמת אישית לעדכון המערכת"
@@ -7111,6 +7360,9 @@
   },
   "this app": {
     "this app": "אפליקציה זו"
+  },
+  "until %1": {
+    "until %1": ""
   },
   "up": {
     "up": "פועל"

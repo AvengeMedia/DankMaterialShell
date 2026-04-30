@@ -9,6 +9,7 @@ import qs.Modules.Settings.DisplayConfig
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DMSShellIPC")
 
     required property var powerMenuModalLoader
     required property var processListModalLoader
@@ -861,7 +862,7 @@ Item {
 
         function set(key: string, value: string): string {
             if (!(key in SettingsData)) {
-                console.warn("Cannot set property, not found:", key);
+                log.warn("Cannot set property, not found:", key);
                 return "SETTINGS_INVALID_KEY";
             }
 
@@ -894,12 +895,12 @@ Item {
                     throw "Unsupported type";
                 }
 
-                console.warn("Setting:", key, value);
+                log.warn("Setting:", key, value);
                 SettingsData[key] = value;
                 SettingsData.saveSettings();
                 return "SETTINGS_SET_SUCCESS";
             } catch (e) {
-                console.warn("Failed to set property:", key, "error:", e);
+                log.warn("Failed to set property:", key, "error:", e);
                 return "SETTINGS_SET_FAILURE";
             }
         }

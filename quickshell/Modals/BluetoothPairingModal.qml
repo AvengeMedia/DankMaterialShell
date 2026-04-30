@@ -7,6 +7,7 @@ import qs.Widgets
 
 DankModal {
     id: root
+    readonly property var log: Log.scoped("BluetoothPairingModal")
 
     layerNamespace: "dms:bluetooth-pairing"
 
@@ -24,7 +25,7 @@ DankModal {
     property string passkeyInput: ""
 
     function show(pairingData) {
-        console.log("BluetoothPairingModal.show() called:", JSON.stringify(pairingData));
+        log.debug("BluetoothPairingModal.show() called:", JSON.stringify(pairingData));
         token = pairingData.token || "";
         deviceName = pairingData.deviceName || "";
         deviceAddress = pairingData.deviceAddr || "";
@@ -33,7 +34,7 @@ DankModal {
         pinInput = "";
         passkeyInput = "";
 
-        console.log("BluetoothPairingModal: Calling open()");
+        log.debug("Calling open()");
         open();
         Qt.callLater(() => {
             if (contentLoader.item) {

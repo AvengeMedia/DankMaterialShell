@@ -47,6 +47,9 @@ DankOSD {
     }
 
     property bool _pendingShow: false
+    property string _displayTitle: ""
+    property string _displayArtist: ""
+    property string _displayAlbum: ""
 
     Timer {
         id: iconDebounce
@@ -105,6 +108,12 @@ DankOSD {
                 return;
             if (!SettingsData.osdMediaPlaybackEnabled)
                 return;
+            if (MprisController.isFirefoxYoutubeHoverPreview(player))
+                return;
+
+            root._displayTitle = player.trackTitle || "";
+            root._displayArtist = player.trackArtist || "";
+            root._displayAlbum = player.trackAlbum || "";
 
             root.updatePlaybackIcon();
             TrackArtService.loadArtwork(player.trackArtUrl);
@@ -254,7 +263,7 @@ DankOSD {
                 StyledText {
                     id: topText
                     width: parent.width
-                    text: player ? `${player.trackTitle || I18n.tr("Unknown Title")}` : ""
+                    text: player ? (root._displayTitle || I18n.tr("Unknown Title")) : ""
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -265,7 +274,7 @@ DankOSD {
                 StyledText {
                     id: bottomText
                     width: parent.width
-                    text: player ? ((player.trackArtist || I18n.tr("Unknown Artist")) + (player.trackAlbum ? ` • ${player.trackAlbum}` : "")) : ""
+                    text: player ? ((root._displayArtist || I18n.tr("Unknown Artist")) + (root._displayAlbum ? ` • ${root._displayAlbum}` : "")) : ""
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Light
                     color: Theme.surfaceText

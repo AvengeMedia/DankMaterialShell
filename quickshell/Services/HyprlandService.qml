@@ -6,9 +6,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("HyprlandService")
 
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation))
     readonly property string hyprDmsDir: configDir + "/hypr/dms"
@@ -29,7 +31,7 @@ Singleton {
     function ensureWindowrulesConfig() {
         Proc.runCommand("hypr-ensure-windowrules", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && [ ! -f "${windowrulesPath}" ] && touch "${windowrulesPath}" || true`], (output, exitCode) => {
             if (exitCode !== 0)
-                console.warn("HyprlandService: Failed to ensure windowrules.conf:", output);
+                log.warn("Failed to ensure windowrules.conf:", output);
         });
     }
 
@@ -159,10 +161,10 @@ Singleton {
 
         Proc.runCommand("hypr-write-outputs", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && cat > "${outputsPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to write outputs config:", output);
+                log.warn("Failed to write outputs config:", output);
                 return;
             }
-            console.info("HyprlandService: Generated outputs config at", outputsPath);
+            log.info("Generated outputs config at", outputsPath);
             if (CompositorService.isHyprland)
                 reloadConfig();
         });
@@ -171,7 +173,7 @@ Singleton {
     function reloadConfig() {
         Proc.runCommand("hyprctl-reload", ["hyprctl", "reload"], (output, exitCode) => {
             if (exitCode !== 0)
-                console.warn("HyprlandService: hyprctl reload failed:", output);
+                log.warn("hyprctl reload failed:", output);
         });
     }
 
@@ -202,10 +204,10 @@ decoration {
 
         Proc.runCommand("hypr-write-layout", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && cat > "${layoutPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to write layout config:", output);
+                log.warn("Failed to write layout config:", output);
                 return;
             }
-            console.info("HyprlandService: Generated layout config at", layoutPath);
+            log.info("Generated layout config at", layoutPath);
             reloadConfig();
         });
     }
@@ -264,7 +266,7 @@ decoration {
         if (!settings) {
             Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("HyprlandService: Failed to write cursor config:", output);
+                    log.warn("Failed to write cursor config:", output);
             });
             return;
         }
@@ -282,7 +284,7 @@ decoration {
         if (!hasTheme && !hasNonDefaultSize && !hasCursorSettings) {
             Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("HyprlandService: Failed to write cursor config:", output);
+                    log.warn("Failed to write cursor config:", output);
             });
             return;
         }
@@ -313,7 +315,7 @@ decoration {
 
         Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && cat > "${cursorPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to write cursor config:", output);
+                log.warn("Failed to write cursor config:", output);
                 return;
             }
             if (hasTheme)
@@ -331,7 +333,7 @@ decoration {
         const fullName = wsId + " " + newName;
         Proc.runCommand("hyprland-rename-ws", ["hyprctl", "dispatch", "renameworkspace", String(wsId), fullName], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to rename workspace:", output);
+                log.warn("Failed to rename workspace:", output);
             }
         });
     }

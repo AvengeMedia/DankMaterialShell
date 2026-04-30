@@ -6,10 +6,12 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import qs.Common
+import qs.Services
 import "../Common/markdown2html.js" as Markdown2Html
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("NotificationService")
 
     readonly property list<NotifWrapper> notifications: []
     readonly property list<NotifWrapper> allWrappers: []
@@ -153,7 +155,7 @@ Singleton {
             historyAdapter.notifications = historyList;
             historyFileView.writeAdapter();
         } catch (e) {
-            console.warn("NotificationService: save history failed:", e);
+            log.warn("save history failed:", e);
         }
     }
 
@@ -203,7 +205,7 @@ Singleton {
             if ((maxAgeMs > 0 && loaded.length !== (historyAdapter.notifications || []).length) || needsRewrite)
                 saveHistory();
         } catch (e) {
-            console.warn("NotificationService: load history failed:", e);
+            log.warn("load history failed:", e);
             historyLoaded = true;
         }
     }
@@ -403,7 +405,7 @@ Singleton {
             try {
                 return new RegExp(pattern, "i").test(value);
             } catch (e) {
-                console.warn("NotificationService: invalid notification rule regex:", pattern);
+                log.warn("invalid notification rule regex:", pattern);
                 return false;
             }
         }

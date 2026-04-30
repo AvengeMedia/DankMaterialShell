@@ -10,6 +10,36 @@ BasePill {
 
     readonly property MprisPlayer activePlayer: MprisController.activePlayer
     readonly property bool playerAvailable: activePlayer !== null
+    readonly property bool _hoverPreview: MprisController.isFirefoxYoutubeHoverPreview(activePlayer)
+    readonly property bool _isPlaying: !!activePlayer && activePlayer.playbackState === 1 && !_hoverPreview
+
+    property string _stableTitle: ""
+    property string _stableArtist: ""
+
+    Connections {
+        target: root.activePlayer
+        function onTrackTitleChanged() {
+            root._syncMeta();
+        }
+        function onTrackArtistChanged() {
+            root._syncMeta();
+        }
+    }
+
+    onActivePlayerChanged: _syncMeta()
+
+    function _syncMeta() {
+        if (!activePlayer) {
+            _stableTitle = "";
+            _stableArtist = "";
+            return;
+        }
+        if (MprisController.isFirefoxYoutubeHoverPreview(activePlayer))
+            return;
+        _stableTitle = activePlayer.trackTitle || "";
+        _stableArtist = activePlayer.trackArtist || "";
+    }
+
     readonly property bool __isChromeBrowser: {
         if (!activePlayer?.identity)
             return false;
@@ -212,15 +242,15 @@ BasePill {
                     height: 24
                     radius: 12
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: activePlayer && activePlayer.playbackState === 1 ? Theme.primary : Theme.primaryHover
+                    color: root._isPlaying ? Theme.primary : Theme.primaryHover
                     visible: root.playerAvailable
                     opacity: activePlayer ? 1 : 0.3
 
                     DankIcon {
                         anchors.centerIn: parent
-                        name: activePlayer && activePlayer.playbackState === 1 ? "pause" : "play_arrow"
+                        name: root._isPlaying ? "pause" : "play_arrow"
                         size: 14
-                        color: activePlayer && activePlayer.playbackState === 1 ? Theme.background : Theme.primary
+                        color: root._isPlaying ? Theme.background : Theme.primary
                     }
 
                     MouseArea {
@@ -279,12 +309,10 @@ BasePill {
                         readonly property bool isWebMedia: lowerIdentity.includes("firefox") || lowerIdentity.includes("chrome") || lowerIdentity.includes("chromium") || lowerIdentity.includes("edge") || lowerIdentity.includes("safari")
 
                         property string displayText: {
-                            if (!activePlayer || !activePlayer.trackTitle) {
+                            if (!activePlayer || !root._stableTitle)
                                 return "";
-                            }
-
-                            const title = isWebMedia ? activePlayer.trackTitle : (activePlayer.trackTitle || "Unknown Track");
-                            const subtitle = isWebMedia ? (activePlayer.trackArtist || cachedIdentity) : (activePlayer.trackArtist || "");
+                            const title = isWebMedia ? root._stableTitle : (root._stableTitle || "Unknown Track");
+                            const subtitle = isWebMedia ? (root._stableArtist || cachedIdentity) : (root._stableArtist || "");
                             return subtitle.length > 0 ? title + " • " + subtitle : title;
                         }
 
@@ -444,15 +472,15 @@ BasePill {
                         height: 24
                         radius: 12
                         anchors.verticalCenter: parent.verticalCenter
-                        color: activePlayer && activePlayer.playbackState === 1 ? Theme.primary : Theme.primaryHover
+                        color: root._isPlaying ? Theme.primary : Theme.primaryHover
                         visible: root.playerAvailable
                         opacity: activePlayer ? 1 : 0.3
 
                         DankIcon {
                             anchors.centerIn: parent
-                            name: activePlayer && activePlayer.playbackState === 1 ? "pause" : "play_arrow"
+                            name: root._isPlaying ? "pause" : "play_arrow"
                             size: 14
-                            color: activePlayer && activePlayer.playbackState === 1 ? Theme.background : Theme.primary
+                            color: root._isPlaying ? Theme.background : Theme.primary
                         }
 
                         MouseArea {

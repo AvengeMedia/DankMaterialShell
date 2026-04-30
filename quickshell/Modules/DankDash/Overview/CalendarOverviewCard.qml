@@ -6,6 +6,7 @@ import qs.Widgets
 
 Rectangle {
     id: root
+    readonly property var log: Log.scoped("CalendarOverviewCard")
 
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
 
@@ -521,7 +522,7 @@ Rectangle {
                     onClicked: {
                         if (modelData.url && modelData.url !== "") {
                             if (Qt.openUrlExternally(modelData.url) === false) {
-                                console.warn("Failed to open URL: " + modelData.url);
+                                log.warn("Failed to open URL: " + modelData.url);
                             } else {
                                 root.closeDash();
                             }

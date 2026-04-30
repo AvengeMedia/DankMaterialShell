@@ -6,9 +6,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DwlService")
 
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation))
     readonly property string mangoDmsDir: configDir + "/mango/dms"
@@ -91,7 +93,7 @@ Singleton {
         const hasDwl = DMSService.capabilities.includes("dwl");
         if (hasDwl && !dwlAvailable) {
             dwlAvailable = true;
-            console.info("DwlService: DWL capability detected");
+            log.info("DWL capability detected");
             requestState();
             refreshOutputScales();
         } else if (!hasDwl) {
@@ -130,7 +132,7 @@ Singleton {
             "toggleTagset": toggleTagset
         }, response => {
             if (response.error) {
-                console.warn("DwlService: setTags error:", response.error);
+                log.warn("setTags error:", response.error);
             }
         });
     }
@@ -146,7 +148,7 @@ Singleton {
             "xorTags": xorTags
         }, response => {
             if (response.error) {
-                console.warn("DwlService: setClientTags error:", response.error);
+                log.warn("setClientTags error:", response.error);
             }
         });
     }
@@ -161,7 +163,7 @@ Singleton {
             "index": index
         }, response => {
             if (response.error) {
-                console.warn("DwlService: setLayout error:", response.error);
+                log.warn("setLayout error:", response.error);
             }
         });
     }
@@ -205,7 +207,7 @@ Singleton {
     function toggleTag(outputName, tagIndex) {
         const output = getOutputState(outputName);
         if (!output || !output.tags) {
-            console.log("toggleTag: no output or tags for", outputName);
+            log.debug("toggleTag: no output or tags for", outputName);
             return;
         }
 
@@ -219,13 +221,13 @@ Singleton {
         const clickedMask = 1 << tagIndex;
         const newMask = currentMask ^ clickedMask;
 
-        console.log("toggleTag:", outputName, "tag:", tagIndex, "currentMask:", currentMask.toString(2), "clickedMask:", clickedMask.toString(2), "newMask:", newMask.toString(2));
+        log.debug("toggleTag:", outputName, "tag:", tagIndex, "currentMask:", currentMask.toString(2), "clickedMask:", clickedMask.toString(2), "newMask:", newMask.toString(2));
 
         if (newMask === 0) {
-            console.log("toggleTag: newMask is 0, switching to tag", tagIndex);
+            log.debug("toggleTag: newMask is 0, switching to tag", tagIndex);
             setTags(outputName, 1 << tagIndex, 0);
         } else {
-            console.log("toggleTag: setting combined mask", newMask);
+            log.debug("toggleTag: setting combined mask", newMask);
             setTags(outputName, newMask, 0);
         }
     }
@@ -256,14 +258,14 @@ Singleton {
                     }
                     outputScales = newScales;
                 } catch (e) {
-                    console.warn("DwlService: Failed to parse mmsg output:", e);
+                    log.warn("Failed to parse mmsg output:", e);
                 }
             }
         }
 
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("DwlService: mmsg failed with exit code:", exitCode);
+                log.warn("mmsg failed with exit code:", exitCode);
             }
         }
     }
@@ -333,10 +335,10 @@ Singleton {
 
         Proc.runCommand("mango-write-outputs", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && cat > "${outputsPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("DwlService: Failed to write outputs config:", output);
+                log.warn("Failed to write outputs config:", output);
                 return;
             }
-            console.info("DwlService: Generated outputs config at", outputsPath);
+            log.info("Generated outputs config at", outputsPath);
             if (CompositorService.isDwl)
                 reloadConfig();
         });
@@ -345,7 +347,7 @@ Singleton {
     function reloadConfig() {
         Proc.runCommand("mango-reload", ["mmsg", "-d", "reload_config"], (output, exitCode) => {
             if (exitCode !== 0)
-                console.warn("DwlService: mmsg reload_config failed:", output);
+                log.warn("mmsg reload_config failed:", output);
         });
     }
 
@@ -372,10 +374,10 @@ borderpx=${borderSize}
 
         Proc.runCommand("mango-write-layout", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && cat > "${layoutPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("DwlService: Failed to write layout config:", output);
+                log.warn("Failed to write layout config:", output);
                 return;
             }
-            console.info("DwlService: Generated layout config at", layoutPath);
+            log.info("Generated layout config at", layoutPath);
             reloadConfig();
         });
     }
@@ -407,13 +409,13 @@ borderpx=${borderSize}
         if (!CompositorService.isDwl)
             return;
 
-        console.log("DwlService: Generating cursor config...");
+        log.debug("Generating cursor config...");
 
         const settings = typeof SettingsData !== "undefined" ? SettingsData.cursorSettings : null;
         if (!settings) {
             Proc.runCommand("mango-write-cursor", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("DwlService: Failed to write cursor config:", output);
+                    log.warn("Failed to write cursor config:", output);
             });
             return;
         }
@@ -426,7 +428,7 @@ borderpx=${borderSize}
         if (isDefaultConfig) {
             Proc.runCommand("mango-write-cursor", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("DwlService: Failed to write cursor config:", output);
+                    log.warn("Failed to write cursor config:", output);
             });
             return;
         }
@@ -444,10 +446,10 @@ cursor_size=${size}`;
 
         Proc.runCommand("mango-write-cursor", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && cat > "${cursorPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("DwlService: Failed to write cursor config:", output);
+                log.warn("Failed to write cursor config:", output);
                 return;
             }
-            console.info("DwlService: Generated cursor config at", cursorPath);
+            log.info("Generated cursor config at", cursorPath);
             reloadConfig();
         });
     }

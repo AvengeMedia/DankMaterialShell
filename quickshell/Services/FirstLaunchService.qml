@@ -6,9 +6,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("FirstLaunchService")
 
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/DankMaterialShell"
     readonly property string settingsPath: configDir + "/settings.json"
@@ -77,10 +79,10 @@ Singleton {
 
                 if (result === "first") {
                     root.isFirstLaunch = true;
-                    console.info("FirstLaunchService: First launch detected, greeter will be shown");
+                    log.info("First launch detected, greeter will be shown");
                 } else if (result === "existing_user") {
                     root.isFirstLaunch = false;
-                    console.info("FirstLaunchService: Existing user detected, silently creating marker");
+                    log.info("Existing user detected, silently creating marker");
                     touchMarkerProcess.running = true;
                 } else {
                     root.isFirstLaunch = false;
@@ -102,9 +104,9 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("FirstLaunchService: First launch marker created");
+                log.info("First launch marker created");
             } else {
-                console.warn("FirstLaunchService: Failed to create first launch marker");
+                log.warn("Failed to create first launch marker");
             }
         }
     }

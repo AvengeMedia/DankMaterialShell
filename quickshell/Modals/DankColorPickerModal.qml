@@ -9,6 +9,7 @@ import qs.Widgets
 
 DankModal {
     id: root
+    readonly property var log: Log.scoped("DankColorPickerModal")
 
     layerNamespace: "dms:color-picker"
 
@@ -50,17 +51,17 @@ DankModal {
 
     function toggle() {
         if (shouldBeVisible) {
-          hide();
+            hide();
         } else {
-          show();
+            show();
         }
     }
 
     function toggleInstant() {
         if (shouldBeVisible) {
-          hideInstant();
+            hideInstant();
         } else {
-          show();
+            show();
         }
     }
 
@@ -111,7 +112,7 @@ DankModal {
         hideInstant();
         Proc.runCommand("dms-color-pick", ["dms", "color", "pick", "--json"], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("dms color pick exited with code:", exitCode);
+                log.warn("dms color pick exited with code:", exitCode);
                 root.show();
                 return;
             }
@@ -120,11 +121,11 @@ DankModal {
                 if (result.hex) {
                     applyPickedColor(result.hex);
                 } else {
-                    console.warn("Failed to parse dms color pick output: missing hex");
+                    log.warn("Failed to parse dms color pick output: missing hex");
                     root.show();
                 }
             } catch (e) {
-                console.warn("Failed to parse dms color pick JSON:", e);
+                log.warn("Failed to parse dms color pick JSON:", e);
                 root.show();
             }
         }, 0, Proc.noTimeout);
@@ -142,39 +143,39 @@ DankModal {
     onBackgroundClicked: hide()
 
     IpcHandler {
-      function open(): string {
-        root.show();
-        return "COLOR_PICKER_MODAL_OPEN_SUCCESS";
-      }
+        function open(): string {
+            root.show();
+            return "COLOR_PICKER_MODAL_OPEN_SUCCESS";
+        }
 
-      function openColor(color: string): string {
-        root.selectedColor = Qt.color(color);
-        root.currentColor = Qt.color(color);
-        root.updateFromColor(Qt.color(color));
-        return open();
-      }
+        function openColor(color: string): string {
+            root.selectedColor = Qt.color(color);
+            root.currentColor = Qt.color(color);
+            root.updateFromColor(Qt.color(color));
+            return open();
+        }
 
-      function close(): string {
-        root.hide();
-        return "COLOR_PICKER_MODAL_CLOSE_SUCCESS";
-      }
+        function close(): string {
+            root.hide();
+            return "COLOR_PICKER_MODAL_CLOSE_SUCCESS";
+        }
 
-      function closeInstant(): string {
-        root.hideInstant();
-        return "COLOR_PICKER_MODAL_CLOSE_INSTANT_SUCCESS";
-      }
+        function closeInstant(): string {
+            root.hideInstant();
+            return "COLOR_PICKER_MODAL_CLOSE_INSTANT_SUCCESS";
+        }
 
-      function toggle(): string {
-        root.toggle();
-        return "COLOR_PICKER_MODAL_TOGGLE_SUCCESS";
-      }
+        function toggle(): string {
+            root.toggle();
+            return "COLOR_PICKER_MODAL_TOGGLE_SUCCESS";
+        }
 
-      function toggleInstant(): string {
-        root.toggleInstant();
-        return "COLOR_PICKER_MODAL_TOGGLE_INSTANT_SUCCESS";
-      }
+        function toggleInstant(): string {
+            root.toggleInstant();
+            return "COLOR_PICKER_MODAL_TOGGLE_INSTANT_SUCCESS";
+        }
 
-      target: "color-picker"
+        target: "color-picker"
     }
 
     content: Component {

@@ -6,6 +6,7 @@ import qs.Services
 
 Column {
     id: root
+    readonly property var log: Log.scoped("WidgetsTabSection")
 
     property var items: []
     property var allWidgets: []
@@ -33,6 +34,7 @@ Column {
     signal showInGbChanged(string sectionId, int widgetIndex, bool enabled)
     signal diskUsageModeChanged(string sectionId, int widgetIndex, int mode)
     signal overflowSettingChanged(string sectionId, int widgetIndex, string settingName, var value)
+    signal hideWhenIdleChanged(string sectionId, int widgetIndex, bool enabled)
 
     function cloneWidgetData(widget) {
         var result = {
@@ -329,6 +331,25 @@ Column {
                                 var currentEnabled = modelData.minimumWidth !== undefined ? modelData.minimumWidth : true;
                                 const tooltipText = currentEnabled ? "Force Padding" : "Dynamic Width";
                                 sharedTooltip.show(tooltipText, minimumWidthButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
+                        }
+
+                        DankActionButton {
+                            id: hideWhenIdleButton
+                            buttonSize: 28
+                            visible: modelData.id === "systemUpdate"
+                            iconName: "visibility_off"
+                            iconSize: 16
+                            iconColor: (modelData.hideWhenIdle === true) ? Theme.primary : Theme.outline
+                            onClicked: {
+                                root.hideWhenIdleChanged(root.sectionId, index, modelData.hideWhenIdle !== true);
+                            }
+                            onEntered: {
+                                const tooltipText = modelData.hideWhenIdle === true ? "Hide when no updates: ON" : "Hide when no updates: OFF";
+                                sharedTooltip.show(tooltipText, hideWhenIdleButton, 0, 0, "bottom");
                             }
                             onExited: {
                                 sharedTooltip.hide();
@@ -1706,11 +1727,11 @@ Column {
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         onOpened: {
-            console.log("Privacy context menu opened");
+            log.debug("Privacy context menu opened");
         }
 
         onClosed: {
-            console.log("Privacy Center context menu closed");
+            log.debug("Privacy Center context menu closed");
         }
 
         background: Rectangle {

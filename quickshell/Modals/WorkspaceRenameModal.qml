@@ -7,6 +7,7 @@ import qs.Widgets
 
 FloatingWindow {
     id: root
+    readonly property var log: Log.scoped("WorkspaceRenameModal")
 
     property bool disablePopupTransparency: true
     readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
@@ -39,7 +40,7 @@ FloatingWindow {
         } else if (CompositorService.isHyprland) {
             HyprlandService.renameWorkspace(name);
         } else {
-            console.warn("WorkspaceRenameModal: rename not supported for this compositor");
+            log.warn("rename not supported for this compositor");
         }
     }
 

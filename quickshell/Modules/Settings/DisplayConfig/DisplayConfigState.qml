@@ -9,6 +9,7 @@ import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DisplayConfigState")
 
     readonly property bool hasOutputBackend: WlrOutputService.wlrOutputAvailable
     readonly property var wlrOutputs: WlrOutputService.outputs

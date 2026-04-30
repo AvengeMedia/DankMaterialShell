@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "GreetdEnv.js" as GreetdEnv
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("GreetdMemory")
 
     readonly property string greetCfgDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
     readonly property string sessionConfigPath: greetCfgDir + "/session.json"
@@ -42,7 +44,7 @@ Singleton {
                 nightModeEnabled = config.nightModeEnabled !== undefined ? config.nightModeEnabled : false;
             }
         } catch (e) {
-            console.warn("Failed to parse greeter session config:", e);
+            log.warn("Failed to parse greeter session config:", e);
         }
     }
 
@@ -56,7 +58,7 @@ Singleton {
             if (!rememberLastSession || !rememberLastUser)
                 saveMemory();
         } catch (e) {
-            console.warn("Failed to parse greetd memory:", e);
+            log.warn("Failed to parse greetd memory:", e);
         }
     }
 
@@ -122,7 +124,7 @@ Singleton {
             parseSessionConfig(sessionConfigFileView.text());
         }
         onLoadFailed: error => {
-            console.warn("Could not load greeter session config from", root.sessionConfigPath, "error:", error);
+            log.warn("Could not load greeter session config from", root.sessionConfigPath, "error:", error);
         }
     }
 }

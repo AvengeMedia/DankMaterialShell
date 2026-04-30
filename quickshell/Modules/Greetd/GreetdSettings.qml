@@ -5,10 +5,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 import "GreetdEnv.js" as GreetdEnv
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("GreetdSettings")
 
     readonly property string configPath: {
         const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
@@ -81,8 +83,7 @@ Singleton {
 
             currentThemeName = settings.currentThemeName !== undefined ? settings.currentThemeName : "purple";
             customThemeFile = settings.customThemeFile !== undefined ? settings.customThemeFile : "";
-	    registryThemeVariants = settings.registryThemeVariants !== undefined ?
-		settings.registryThemeVariants : ({});
+            registryThemeVariants = settings.registryThemeVariants !== undefined ? settings.registryThemeVariants : ({});
             matugenScheme = settings.matugenScheme !== undefined ? settings.matugenScheme : "scheme-tonal-spot";
             use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true;
             showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : false;
@@ -142,7 +143,7 @@ Singleton {
                 Theme.applyGreeterTheme(currentThemeName);
             }
         } catch (e) {
-            console.warn("Failed to parse greetd settings:", e);
+            log.warn("Failed to parse greetd settings:", e);
         } finally {
             settingsLoaded = true;
         }
@@ -192,7 +193,7 @@ Singleton {
             parseSettings(settingsFile.text());
         }
         onLoadFailed: error => {
-            console.warn("Failed to load greetd settings:", error);
+            log.warn("Failed to load greetd settings:", error);
             root.parseSettings("");
         }
     }

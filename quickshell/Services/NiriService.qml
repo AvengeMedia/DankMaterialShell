@@ -6,9 +6,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("NiriService")
 
     readonly property string socketPath: Quickshell.env("NIRI_SOCKET")
 
@@ -118,10 +120,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated layout config at", configPath);
+                log.info("Generated layout config at", configPath);
                 return;
             }
-            console.warn("NiriService: Failed to write layout config, exit code:", exitCode);
+            log.warn("Failed to write layout config, exit code:", exitCode);
         }
     }
 
@@ -132,10 +134,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated alttab config at", alttabPath);
+                log.info("Generated alttab config at", alttabPath);
                 return;
             }
-            console.warn("NiriService: Failed to write alttab config, exit code:", exitCode);
+            log.warn("Failed to write alttab config, exit code:", exitCode);
         }
     }
 
@@ -145,10 +147,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated wpblur config at", blurrulePath);
+                log.info("Generated wpblur config at", blurrulePath);
                 return;
             }
-            console.warn("NiriService: Failed to write wpblur config, exit code:", exitCode);
+            log.warn("Failed to write wpblur config, exit code:", exitCode);
         }
     }
 
@@ -159,10 +161,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated cursor config at", cursorPath);
+                log.info("Generated cursor config at", cursorPath);
                 return;
             }
-            console.warn("NiriService: Failed to write cursor config, exit code:", exitCode);
+            log.warn("Failed to write cursor config, exit code:", exitCode);
         }
     }
 
@@ -184,7 +186,7 @@ Singleton {
                     const event = JSON.parse(line);
                     handleNiriEvent(event);
                 } catch (e) {
-                    console.warn("NiriService: Failed to parse event:", line, e);
+                    log.warn("Failed to parse event:", line, e);
                 }
             }
         }
@@ -201,19 +203,19 @@ Singleton {
             return;
         Proc.runCommand("niri-fetch-outputs", ["niri", "msg", "-j", "outputs"], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("NiriService: Failed to fetch outputs, exit code:", exitCode);
+                log.warn("Failed to fetch outputs, exit code:", exitCode);
                 return;
             }
             try {
                 const outputsData = JSON.parse(output);
                 outputs = outputsData;
-                console.info("NiriService: Loaded", Object.keys(outputsData).length, "outputs");
+                log.info("Loaded", Object.keys(outputsData).length, "outputs");
                 updateDisplayScales();
                 if (windows.length > 0) {
                     windows = sortWindowsByLayout(windows);
                 }
             } catch (e) {
-                console.warn("NiriService: Failed to parse outputs:", e);
+                log.warn("Failed to parse outputs:", e);
             }
         });
     }
@@ -1076,7 +1078,7 @@ Singleton {
     }
 
     function doGenerateNiriLayoutConfig() {
-        console.log("NiriService: Generating layout config...");
+        log.debug("Generating layout config...");
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
         const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4;
@@ -1136,7 +1138,7 @@ Singleton {
             const path = niriDmsDir + "/" + name + ".kdl";
             Proc.runCommand("niri-ensure-" + name, ["sh", "-c", `mkdir -p "${niriDmsDir}" && [ ! -f "${path}" ] && touch "${path}" || true`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("NiriService: Failed to ensure " + name + ".kdl, exit code:", exitCode);
+                    log.warn("Failed to ensure " + name + ".kdl, exit code:", exitCode);
             });
         }
 
@@ -1144,7 +1146,7 @@ Singleton {
     }
 
     function generateNiriBlurrule() {
-        console.log("NiriService: Generating wpblur config...");
+        log.debug("Generating wpblur config...");
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const niriDmsDir = configDir + "/niri/dms";
@@ -1160,7 +1162,7 @@ Singleton {
         if (!CompositorService.isNiri)
             return;
 
-        console.log("NiriService: Generating cursor config...");
+        log.debug("Generating cursor config...");
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const niriDmsDir = configDir + "/niri/dms";
@@ -1275,12 +1277,12 @@ Singleton {
         const fullCommand = commands.join(" && ");
         Proc.runCommand("niri-output-config", ["sh", "-c", fullCommand], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("NiriService: Failed to apply output config:", output);
+                log.warn("Failed to apply output config:", output);
                 if (callback)
                     callback(false, output);
                 return;
             }
-            console.info("NiriService: Applied output config for", outputName);
+            log.info("Applied output config for", outputName);
             fetchOutputs();
             if (callback)
                 callback(true, "Success");
@@ -1369,10 +1371,10 @@ Singleton {
 
         Proc.runCommand("niri-write-outputs", ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${outputsPath}" << 'EOF'\n${kdlContent}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("NiriService: Failed to write outputs config:", output);
+                log.warn("Failed to write outputs config:", output);
                 return;
             }
-            console.info("NiriService: Generated outputs config at", outputsPath);
+            log.info("Generated outputs config at", outputsPath);
         });
     }
 

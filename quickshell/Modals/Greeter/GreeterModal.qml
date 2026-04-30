@@ -7,6 +7,7 @@ import qs.Widgets
 
 FloatingWindow {
     id: root
+    readonly property var log: Log.scoped("GreeterModal")
 
     property bool disablePopupTransparency: true
     property int currentPage: 0
@@ -105,7 +106,7 @@ FloatingWindow {
                     root.cheatsheetData = JSON.parse(trimmed);
                     root.cheatsheetLoaded = true;
                 } catch (e) {
-                    console.warn("Greeter: Failed to parse cheatsheet:", e);
+                    log.warn("Greeter: Failed to parse cheatsheet:", e);
                 }
             }
         }

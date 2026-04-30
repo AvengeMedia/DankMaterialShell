@@ -4,9 +4,11 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DMSNetworkService")
 
     property bool networkAvailable: false
     property string backend: ""
@@ -79,7 +81,46 @@ Singleton {
     property string pendingVpnUuid: ""
     property var vpnBusyStartTime: 0
 
-    property alias profiles: root.vpnProfiles
+    property var profiles: {
+        const mergedProfiles = vpnProfiles ? vpnProfiles.slice() : [];
+        const seen = new Set();
+
+        for (const profile of mergedProfiles) {
+            if (profile?.uuid)
+                seen.add("uuid:" + profile.uuid);
+            if (profile?.name)
+                seen.add("name:" + profile.name);
+        }
+
+        for (const active of vpnActive || []) {
+            const entryUuid = active?.uuid || active?.name || "";
+            const uuidKey = active?.uuid ? "uuid:" + active.uuid : "";
+            const nameKey = active?.name ? "name:" + active.name : "";
+
+            if ((uuidKey && seen.has(uuidKey)) || (!uuidKey && nameKey && seen.has(nameKey)))
+                continue;
+
+            mergedProfiles.unshift({
+                uuid: entryUuid,
+                name: active?.name || I18n.tr("Active VPN"),
+                serviceType: active?.serviceType || "",
+                type: active?.type || "",
+                typeLabel: active?.typeLabel || active?.vpnType || "",
+                state: active?.state || "",
+                device: active?.device || "",
+                transient: true,
+                canDelete: false,
+                canExpand: false
+            });
+
+            if (uuidKey)
+                seen.add(uuidKey);
+            if (nameKey)
+                seen.add(nameKey);
+        }
+
+        return mergedProfiles;
+    }
     property alias activeConnections: root.vpnActive
     property var activeUuids: vpnActive.map(v => v.uuid).filter(u => !!u)
     property var activeNames: vpnActive.map(v => v.name).filter(n => !!n)
@@ -141,7 +182,7 @@ Singleton {
 
         function onNetworkStateUpdate(data) {
             const networksCount = data.wifiNetworks?.length ?? "null";
-            console.log("DMSNetworkService: Subscription update received, networks:", networksCount);
+            log.debug("Subscription update received, networks:", networksCount);
             updateState(data);
         }
     }
@@ -301,7 +342,7 @@ Singleton {
             const timeout = 30000;
 
             if (busyDuration > timeout) {
-                console.warn("DMSNetworkService: VPN operation timed out after", timeout, "ms");
+                log.warn("VPN operation timed out after", timeout, "ms");
                 vpnIsBusy = false;
                 pendingVpnUuid = "";
                 vpnBusyStartTime = 0;
@@ -331,7 +372,7 @@ Singleton {
         if (pendingConnectionSSID) {
             if (wifiConnected && currentWifiSSID === pendingConnectionSSID && wifiIP) {
                 const elapsed = Date.now() - pendingConnectionStartTime;
-                console.info("DMSNetworkService: Successfully connected to", pendingConnectionSSID, "in", elapsed, "ms");
+                log.info("Successfully connected to", pendingConnectionSSID, "in", elapsed, "ms");
                 ToastService.showInfo(`Connected to ${pendingConnectionSSID}`);
 
                 if (userPreference === "wifi" || userPreference === "auto") {
@@ -402,7 +443,7 @@ Singleton {
         DMSService.sendRequest("network.wifi.scan", params, response => {
             isScanning = false;
             if (response.error) {
-                console.warn("DMSNetworkService: WiFi scan failed:", response.error);
+                log.warn("WiFi scan failed:", response.error);
             } else {
                 Qt.callLater(() => getState());
             }
@@ -485,10 +526,10 @@ Singleton {
     }
 
     function submitCredentials(token, secrets, save) {
-        console.log("submitCredentials: networkAvailable=" + networkAvailable + " apiVersion=" + DMSService.apiVersion);
+        log.debug("submitCredentials: networkAvailable=" + networkAvailable + " apiVersion=" + DMSService.apiVersion);
 
         if (!networkAvailable || DMSService.apiVersion < 7) {
-            console.warn("submitCredentials: Aborting - networkAvailable=" + networkAvailable + " apiVersion=" + DMSService.apiVersion);
+            log.warn("submitCredentials: Aborting - networkAvailable=" + networkAvailable + " apiVersion=" + DMSService.apiVersion);
             return;
         }
 
@@ -502,7 +543,7 @@ Singleton {
 
         DMSService.sendRequest("network.credentials.submit", params, response => {
             if (response.error) {
-                console.warn("DMSNetworkService: Failed to submit credentials:", response.error);
+                log.warn("Failed to submit credentials:", response.error);
             }
         });
     }
@@ -520,7 +561,7 @@ Singleton {
 
         DMSService.sendRequest("network.credentials.cancel", params, response => {
             if (response.error) {
-                console.warn("DMSNetworkService: Failed to cancel credentials:", response.error);
+                log.warn("Failed to cancel credentials:", response.error);
             }
         });
     }
@@ -533,7 +574,7 @@ Singleton {
             ssid: ssid
         }, response => {
             if (response.error) {
-                console.warn("Failed to forget network:", response.error);
+                log.warn("Failed to forget network:", response.error);
             } else {
                 ToastService.showInfo(I18n.tr("Forgot network %1").arg(ssid));
 
@@ -565,7 +606,7 @@ Singleton {
             wifiToggling = false;
 
             if (response.error) {
-                console.warn("Failed to toggle WiFi:", response.error);
+                log.warn("Failed to toggle WiFi:", response.error);
             } else if (response.result) {
                 wifiEnabled = response.result.enabled;
                 ToastService.showInfo(wifiEnabled ? I18n.tr("WiFi enabled") : I18n.tr("WiFi disabled"));
@@ -600,7 +641,7 @@ Singleton {
             targetPreference = "";
 
             if (response.error) {
-                console.warn("Failed to set network preference:", response.error);
+                log.warn("Failed to set network preference:", response.error);
             }
         });
     }

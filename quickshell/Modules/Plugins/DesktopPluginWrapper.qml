@@ -211,6 +211,7 @@ Item {
     property real minWidth: contentLoader.item?.minWidth ?? 100
     property real minHeight: contentLoader.item?.minHeight ?? 100
     property bool forceSquare: contentLoader.item?.forceSquare ?? false
+    property bool acceptsKeyboardFocus: contentLoader.item?.acceptsKeyboardFocus ?? false
     property bool isInteracting: dragArea.pressed || resizeArea.pressed
 
     property var _gridSettingsTrigger: SettingsData.desktopWidgetGridSettings
@@ -299,11 +300,14 @@ Item {
         }
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
         WlrLayershell.keyboardFocus: {
-            if (!root.isInteracting)
-                return WlrKeyboardFocus.None;
-            if (CompositorService.useHyprlandFocusGrab)
+            if (root.isInteracting) {
+                if (CompositorService.useHyprlandFocusGrab)
+                    return WlrKeyboardFocus.OnDemand;
+                return WlrKeyboardFocus.Exclusive;
+            }
+            if (root.acceptsKeyboardFocus)
                 return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
+            return WlrKeyboardFocus.None;
         }
 
         HyprlandFocusGrab {
@@ -403,6 +407,8 @@ Item {
                     item.widgetWidth = Qt.binding(() => contentLoader.width);
                 if (item.widgetHeight !== undefined)
                     item.widgetHeight = Qt.binding(() => contentLoader.height);
+                if (item.screen !== undefined)
+                    item.screen = Qt.binding(() => root.screen);
             }
         }
 

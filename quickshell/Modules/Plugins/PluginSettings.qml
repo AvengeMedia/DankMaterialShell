@@ -1,10 +1,12 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("PluginSettings")
 
     required property string pluginId
     property var pluginService: null
@@ -131,7 +133,7 @@ Item {
             return;
         }
         if (!hasPermission) {
-            console.warn("PluginSettings: Plugin", pluginId, "does not have settings_write permission");
+            log.warn("Plugin", pluginId, "does not have settings_write permission");
             return;
         }
         if (pluginService.savePluginData) {

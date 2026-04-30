@@ -1,5 +1,4 @@
 pragma Singleton
-
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -19,206 +18,217 @@ Singleton {
     readonly property bool enhancedPairingAvailable: DMSService.dmsAvailable && DMSService.apiVersion >= 9 && DMSService.capabilities.includes("bluetooth")
     readonly property bool connected: {
         if (!adapter || !adapter.devices) {
-            return false
+            return false;
         }
 
-        let isConnected = false
-        adapter.devices.values.forEach(dev => { if (dev.connected) isConnected = true })
-        return isConnected
+        let isConnected = false;
+        adapter.devices.values.forEach(dev => {
+            if (dev.connected)
+                isConnected = true;
+        });
+        return isConnected;
     }
     readonly property var pairedDevices: {
         if (!adapter || !adapter.devices) {
-            return []
+            return [];
         }
 
         return adapter.devices.values.filter(dev => {
-                                                 return dev && (dev.paired || dev.trusted)
-                                             })
+            return dev && (dev.paired || dev.trusted);
+        });
     }
     readonly property var allDevicesWithBattery: {
         if (!adapter || !adapter.devices) {
-            return []
+            return [];
         }
 
         return adapter.devices.values.filter(dev => {
-                                                 return dev && dev.batteryAvailable && dev.battery > 0
-                                             })
+            return dev && dev.batteryAvailable && dev.battery > 0;
+        });
     }
 
     function sortDevices(devices) {
         return devices.sort((a, b) => {
-                                const aName = a.name || a.deviceName || ""
-                                const bName = b.name || b.deviceName || ""
-                                const aAddr = a.address || ""
-                                const bAddr = b.address || ""
+            const aName = a.name || a.deviceName || "";
+            const bName = b.name || b.deviceName || "";
+            const aAddr = a.address || "";
+            const bAddr = b.address || "";
 
-                                const aHasRealName = aName.includes(" ") && aName.length > 3
-                                const bHasRealName = bName.includes(" ") && bName.length > 3
+            const aHasRealName = aName.includes(" ") && aName.length > 3;
+            const bHasRealName = bName.includes(" ") && bName.length > 3;
 
-                                if (aHasRealName && !bHasRealName) return -1
-                                if (!aHasRealName && bHasRealName) return 1
+            if (aHasRealName && !bHasRealName)
+                return -1;
+            if (!aHasRealName && bHasRealName)
+                return 1;
 
-                                if (aHasRealName && bHasRealName) {
-                                    return aName.localeCompare(bName)
-                                }
+            if (aHasRealName && bHasRealName) {
+                return aName.localeCompare(bName);
+            }
 
-                                return aAddr.localeCompare(bAddr)
-                            })
+            return aAddr.localeCompare(bAddr);
+        });
     }
 
     function getDeviceIcon(device) {
         if (!device) {
-            return "bluetooth"
+            return "bluetooth";
         }
 
-        const name = (device.name || device.deviceName || "").toLowerCase()
-        const icon = (device.icon || "").toLowerCase()
+        const name = (device.name || device.deviceName || "").toLowerCase();
+        const icon = (device.icon || "").toLowerCase();
 
-        const audioKeywords = ["headset", "audio", "headphone", "airpod", "arctis"]
+        const audioKeywords = ["headset", "audio", "headphone", "airpod", "arctis"];
         if (audioKeywords.some(keyword => icon.includes(keyword) || name.includes(keyword))) {
-            return "headset"
+            return "headset";
         }
 
         if (icon.includes("mouse") || name.includes("mouse")) {
-            return "mouse"
+            return "mouse";
         }
 
         if (icon.includes("keyboard") || name.includes("keyboard")) {
-            return "keyboard"
+            return "keyboard";
         }
 
-        const phoneKeywords = ["phone", "iphone", "android", "samsung"]
+        const phoneKeywords = ["phone", "iphone", "android", "samsung"];
         if (phoneKeywords.some(keyword => icon.includes(keyword) || name.includes(keyword))) {
-            return "smartphone"
+            return "smartphone";
         }
 
         if (icon.includes("watch") || name.includes("watch")) {
-            return "watch"
+            return "watch";
         }
 
         if (icon.includes("speaker") || name.includes("speaker")) {
-            return "speaker"
+            return "speaker";
         }
 
         if (icon.includes("display") || name.includes("tv")) {
-            return "tv"
+            return "tv";
         }
 
-        return "bluetooth"
+        return "bluetooth";
     }
 
     function canConnect(device) {
         if (!device) {
-            return false
+            return false;
         }
 
-        return !device.paired && !device.pairing && !device.blocked
+        return !device.paired && !device.pairing && !device.blocked;
     }
 
     function getSignalStrength(device) {
         if (!device || device.signalStrength === undefined || device.signalStrength <= 0) {
-            return "Unknown"
+            return "Unknown";
         }
 
-        const signal = device.signalStrength
+        const signal = device.signalStrength;
         if (signal >= 80) {
-            return "Excellent"
+            return "Excellent";
         }
         if (signal >= 60) {
-            return "Good"
+            return "Good";
         }
         if (signal >= 40) {
-            return "Fair"
+            return "Fair";
         }
         if (signal >= 20) {
-            return "Poor"
+            return "Poor";
         }
 
-        return "Very Poor"
+        return "Very Poor";
     }
 
     function getSignalIcon(device) {
         if (!device || device.signalStrength === undefined || device.signalStrength <= 0) {
-            return "signal_cellular_null"
+            return "signal_cellular_null";
         }
 
-        const signal = device.signalStrength
+        const signal = device.signalStrength;
         if (signal >= 80) {
-            return "signal_cellular_4_bar"
+            return "signal_cellular_4_bar";
         }
         if (signal >= 60) {
-            return "signal_cellular_3_bar"
+            return "signal_cellular_3_bar";
         }
         if (signal >= 40) {
-            return "signal_cellular_2_bar"
+            return "signal_cellular_2_bar";
         }
         if (signal >= 20) {
-            return "signal_cellular_1_bar"
+            return "signal_cellular_1_bar";
         }
 
-        return "signal_cellular_0_bar"
+        return "signal_cellular_0_bar";
     }
 
     function isDeviceBusy(device) {
         if (!device) {
-            return false
+            return false;
         }
-        return device.pairing || device.state === BluetoothDeviceState.Disconnecting || device.state === BluetoothDeviceState.Connecting
+        return device.pairing || device.state === BluetoothDeviceState.Disconnecting || device.state === BluetoothDeviceState.Connecting;
     }
 
     function connectDeviceWithTrust(device) {
         if (!device) {
-            return
+            return;
         }
 
-        device.trusted = true
-        device.connect()
+        device.trusted = true;
+        device.connect();
     }
 
     function pairDevice(device, callback) {
         if (!device) {
-            if (callback) callback({error: "Invalid device"})
-            return
+            if (callback)
+                callback({
+                    error: "Invalid device"
+                });
+            return;
         }
 
         // The DMS backend actually implements a bluez agent, so we can pair anything
         if (enhancedPairingAvailable) {
-            const devicePath = getDevicePath(device)
-            DMSService.bluetoothPair(devicePath, callback)
-            return
+            const devicePath = getDevicePath(device);
+            DMSService.bluetoothPair(devicePath, callback);
+            return;
         }
 
         // Quickshell does not implement a bluez agent, so we can try to pair but only with devices that don't require a passcode
-        device.trusted = true
-        device.connect()
-        if (callback) callback({success: true})
+        device.trusted = true;
+        device.connect();
+        if (callback)
+            callback({
+                success: true
+            });
     }
 
     function getCardName(device) {
         if (!device) {
-            return ""
+            return "";
         }
-        return `bluez_card.${device.address.replace(/:/g, "_")}`
+        return `bluez_card.${device.address.replace(/:/g, "_")}`;
     }
 
     function getDevicePath(device) {
         if (!device || !device.address) {
-            return ""
+            return "";
         }
-        const adapterPath = adapter ? "/org/bluez/hci0" : "/org/bluez/hci0"
-        return `${adapterPath}/dev_${device.address.replace(/:/g, "_")}`
+        const adapterPath = adapter ? "/org/bluez/hci0" : "/org/bluez/hci0";
+        return `${adapterPath}/dev_${device.address.replace(/:/g, "_")}`;
     }
 
     function isAudioDevice(device) {
         if (!device) {
-            return false
+            return false;
         }
-        const icon = getDeviceIcon(device)
-        return icon === "headset" || icon === "speaker"
+        const icon = getDeviceIcon(device);
+        return icon === "headset" || icon === "speaker";
     }
 
     function getCodecInfo(codecName) {
-        const codec = codecName.replace(/-/g, "_").toUpperCase()
+        const codec = codecName.replace(/-/g, "_").toUpperCase();
 
         const codecMap = {
             "LDAC": {
@@ -261,77 +271,77 @@ Singleton {
                 "description": "Basic speech codec • Legacy compatibility",
                 "qualityColor": "#9E9E9E"
             }
-        }
+        };
 
         return codecMap[codec] || {
             "name": codecName,
             "description": "Unknown codec",
             "qualityColor": "#9E9E9E"
-        }
+        };
     }
 
     property var deviceCodecs: ({})
 
     function updateDeviceCodec(deviceAddress, codec) {
-        deviceCodecs[deviceAddress] = codec
-        deviceCodecsChanged()
+        deviceCodecs[deviceAddress] = codec;
+        deviceCodecsChanged();
     }
 
     function refreshDeviceCodec(device) {
         if (!device || !device.connected || !isAudioDevice(device)) {
-            return
+            return;
         }
 
-        const cardName = getCardName(device)
-        codecQueryProcess.cardName = cardName
-        codecQueryProcess.deviceAddress = device.address
-        codecQueryProcess.availableCodecs = []
-        codecQueryProcess.parsingTargetCard = false
-        codecQueryProcess.detectedCodec = ""
-        codecQueryProcess.running = true
+        const cardName = getCardName(device);
+        codecQueryProcess.cardName = cardName;
+        codecQueryProcess.deviceAddress = device.address;
+        codecQueryProcess.availableCodecs = [];
+        codecQueryProcess.parsingTargetCard = false;
+        codecQueryProcess.detectedCodec = "";
+        codecQueryProcess.running = true;
     }
 
     function getCurrentCodec(device, callback) {
         if (!device || !device.connected || !isAudioDevice(device)) {
-            callback("")
-            return
+            callback("");
+            return;
         }
 
-        const cardName = getCardName(device)
-        codecQueryProcess.cardName = cardName
-        codecQueryProcess.callback = callback
-        codecQueryProcess.availableCodecs = []
-        codecQueryProcess.parsingTargetCard = false
-        codecQueryProcess.detectedCodec = ""
-        codecQueryProcess.running = true
+        const cardName = getCardName(device);
+        codecQueryProcess.cardName = cardName;
+        codecQueryProcess.callback = callback;
+        codecQueryProcess.availableCodecs = [];
+        codecQueryProcess.parsingTargetCard = false;
+        codecQueryProcess.detectedCodec = "";
+        codecQueryProcess.running = true;
     }
 
     function getAvailableCodecs(device, callback) {
         if (!device || !device.connected || !isAudioDevice(device)) {
-            callback([], "")
-            return
+            callback([], "");
+            return;
         }
 
-        const cardName = getCardName(device)
-        codecFullQueryProcess.cardName = cardName
-        codecFullQueryProcess.callback = callback
-        codecFullQueryProcess.availableCodecs = []
-        codecFullQueryProcess.parsingTargetCard = false
-        codecFullQueryProcess.detectedCodec = ""
-        codecFullQueryProcess.running = true
+        const cardName = getCardName(device);
+        codecFullQueryProcess.cardName = cardName;
+        codecFullQueryProcess.callback = callback;
+        codecFullQueryProcess.availableCodecs = [];
+        codecFullQueryProcess.parsingTargetCard = false;
+        codecFullQueryProcess.detectedCodec = "";
+        codecFullQueryProcess.running = true;
     }
 
     function switchCodec(device, profileName, callback) {
         if (!device || !isAudioDevice(device)) {
-            callback(false, "Invalid device")
-            return
+            callback(false, "Invalid device");
+            return;
         }
 
-        const cardName = getCardName(device)
-        codecSwitchProcess.cardName = cardName
-        codecSwitchProcess.profile = profileName
-        codecSwitchProcess.callback = callback
-        codecSwitchProcess.running = true
+        const cardName = getCardName(device);
+        codecSwitchProcess.cardName = cardName;
+        codecSwitchProcess.profile = profileName;
+        codecSwitchProcess.callback = callback;
+        codecSwitchProcess.running = true;
     }
 
     Process {
@@ -349,67 +359,67 @@ Singleton {
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0 && detectedCodec) {
                 if (deviceAddress) {
-                    root.updateDeviceCodec(deviceAddress, detectedCodec)
+                    root.updateDeviceCodec(deviceAddress, detectedCodec);
                 }
                 if (callback) {
-                    callback(detectedCodec)
+                    callback(detectedCodec);
                 }
             } else if (callback) {
-                callback("")
+                callback("");
             }
 
-            parsingTargetCard = false
-            detectedCodec = ""
-            availableCodecs = []
-            deviceAddress = ""
-            callback = null
+            parsingTargetCard = false;
+            detectedCodec = "";
+            availableCodecs = [];
+            deviceAddress = "";
+            callback = null;
         }
 
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                let line = data.trim()
+                let line = data.trim();
 
                 if (line.includes(`Name: ${codecQueryProcess.cardName}`)) {
-                    codecQueryProcess.parsingTargetCard = true
-                    return
+                    codecQueryProcess.parsingTargetCard = true;
+                    return;
                 }
 
                 if (codecQueryProcess.parsingTargetCard && line.startsWith("Name: ") && !line.includes(codecQueryProcess.cardName)) {
-                    codecQueryProcess.parsingTargetCard = false
-                    return
+                    codecQueryProcess.parsingTargetCard = false;
+                    return;
                 }
 
                 if (codecQueryProcess.parsingTargetCard) {
                     if (line.startsWith("Active Profile:")) {
-                        let profile = line.split(": ")[1] || ""
+                        let profile = line.split(": ")[1] || "";
                         let activeCodec = codecQueryProcess.availableCodecs.find(c => {
-                                                                                     return c.profile === profile
-                                                                                 })
+                            return c.profile === profile;
+                        });
                         if (activeCodec) {
-                            codecQueryProcess.detectedCodec = activeCodec.name
+                            codecQueryProcess.detectedCodec = activeCodec.name;
                         }
-                        return
+                        return;
                     }
                     if (line.includes("codec") && line.includes("available: yes")) {
-                        let parts = line.split(": ")
+                        let parts = line.split(": ");
                         if (parts.length >= 2) {
-                            let profile = parts[0].trim()
-                            let description = parts[1]
-                            let codecMatch = description.match(/codec ([^\)\s]+)/i)
-                            let codecName = codecMatch ? codecMatch[1].toUpperCase() : "UNKNOWN"
-                            let codecInfo = root.getCodecInfo(codecName)
+                            let profile = parts[0].trim();
+                            let description = parts[1];
+                            let codecMatch = description.match(/codec ([^\)\s]+)/i);
+                            let codecName = codecMatch ? codecMatch[1].toUpperCase() : "UNKNOWN";
+                            let codecInfo = root.getCodecInfo(codecName);
                             if (codecInfo && !codecQueryProcess.availableCodecs.some(c => {
-                                                                                         return c.profile === profile
-                                                                                     })) {
-                                let newCodecs = codecQueryProcess.availableCodecs.slice()
+                                return c.profile === profile;
+                            })) {
+                                let newCodecs = codecQueryProcess.availableCodecs.slice();
                                 newCodecs.push({
-                                                   "name": codecInfo.name,
-                                                   "profile": profile,
-                                                   "description": codecInfo.description,
-                                                   "qualityColor": codecInfo.qualityColor
-                                               })
-                                codecQueryProcess.availableCodecs = newCodecs
+                                    "name": codecInfo.name,
+                                    "profile": profile,
+                                    "description": codecInfo.description,
+                                    "qualityColor": codecInfo.qualityColor
+                                });
+                                codecQueryProcess.availableCodecs = newCodecs;
                             }
                         }
                     }
@@ -431,59 +441,59 @@ Singleton {
 
         onExited: function (exitCode, exitStatus) {
             if (callback) {
-                callback(exitCode === 0 ? availableCodecs : [], exitCode === 0 ? detectedCodec : "")
+                callback(exitCode === 0 ? availableCodecs : [], exitCode === 0 ? detectedCodec : "");
             }
-            parsingTargetCard = false
-            detectedCodec = ""
-            availableCodecs = []
-            callback = null
+            parsingTargetCard = false;
+            detectedCodec = "";
+            availableCodecs = [];
+            callback = null;
         }
 
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                let line = data.trim()
+                let line = data.trim();
 
                 if (line.includes(`Name: ${codecFullQueryProcess.cardName}`)) {
-                    codecFullQueryProcess.parsingTargetCard = true
-                    return
+                    codecFullQueryProcess.parsingTargetCard = true;
+                    return;
                 }
 
                 if (codecFullQueryProcess.parsingTargetCard && line.startsWith("Name: ") && !line.includes(codecFullQueryProcess.cardName)) {
-                    codecFullQueryProcess.parsingTargetCard = false
-                    return
+                    codecFullQueryProcess.parsingTargetCard = false;
+                    return;
                 }
 
                 if (codecFullQueryProcess.parsingTargetCard) {
                     if (line.startsWith("Active Profile:")) {
-                        let profile = line.split(": ")[1] || ""
+                        let profile = line.split(": ")[1] || "";
                         let activeCodec = codecFullQueryProcess.availableCodecs.find(c => {
-                                                                                         return c.profile === profile
-                                                                                     })
+                            return c.profile === profile;
+                        });
                         if (activeCodec) {
-                            codecFullQueryProcess.detectedCodec = activeCodec.name
+                            codecFullQueryProcess.detectedCodec = activeCodec.name;
                         }
-                        return
+                        return;
                     }
                     if (line.includes("codec") && line.includes("available: yes")) {
-                        let parts = line.split(": ")
+                        let parts = line.split(": ");
                         if (parts.length >= 2) {
-                            let profile = parts[0].trim()
-                            let description = parts[1]
-                            let codecMatch = description.match(/codec ([^\)\s]+)/i)
-                            let codecName = codecMatch ? codecMatch[1].toUpperCase() : "UNKNOWN"
-                            let codecInfo = root.getCodecInfo(codecName)
+                            let profile = parts[0].trim();
+                            let description = parts[1];
+                            let codecMatch = description.match(/codec ([^\)\s]+)/i);
+                            let codecName = codecMatch ? codecMatch[1].toUpperCase() : "UNKNOWN";
+                            let codecInfo = root.getCodecInfo(codecName);
                             if (codecInfo && !codecFullQueryProcess.availableCodecs.some(c => {
-                                                                                             return c.profile === profile
-                                                                                         })) {
-                                let newCodecs = codecFullQueryProcess.availableCodecs.slice()
+                                return c.profile === profile;
+                            })) {
+                                let newCodecs = codecFullQueryProcess.availableCodecs.slice();
                                 newCodecs.push({
-                                                   "name": codecInfo.name,
-                                                   "profile": profile,
-                                                   "description": codecInfo.description,
-                                                   "qualityColor": codecInfo.qualityColor
-                                               })
-                                codecFullQueryProcess.availableCodecs = newCodecs
+                                    "name": codecInfo.name,
+                                    "profile": profile,
+                                    "description": codecInfo.description,
+                                    "qualityColor": codecInfo.qualityColor
+                                });
+                                codecFullQueryProcess.availableCodecs = newCodecs;
                             }
                         }
                     }
@@ -503,21 +513,21 @@ Singleton {
 
         onExited: function (exitCode, exitStatus) {
             if (callback) {
-                callback(exitCode === 0, exitCode === 0 ? "Codec switched successfully" : "Failed to switch codec")
+                callback(exitCode === 0, exitCode === 0 ? "Codec switched successfully" : "Failed to switch codec");
             }
 
             // If successful, refresh the codec for this device
             if (exitCode === 0) {
                 if (root.adapter && root.adapter.devices) {
                     root.adapter.devices.values.forEach(device => {
-                                                            if (device && root.getCardName(device) === cardName) {
-                                                                Qt.callLater(() => root.refreshDeviceCodec(device))
-                                                            }
-                                                        })
+                        if (device && root.getCardName(device) === cardName) {
+                            Qt.callLater(() => root.refreshDeviceCodec(device));
+                        }
+                    });
                 }
             }
 
-            callback = null
+            callback = null;
         }
     }
 }

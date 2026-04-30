@@ -8,6 +8,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DankLauncherV2Modal")
 
     visible: false
 
@@ -323,10 +324,10 @@ Item {
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_MODAL_LAYER")) {
             case "bottom":
-                console.error("DankModal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("DankModal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "background":
-                console.error("DankModal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("DankModal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;

@@ -3,9 +3,11 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("Proc")
 
     readonly property int noTimeout: -1
     property int defaultDebounceMs: 50
@@ -112,7 +114,7 @@ Singleton {
                     const safeExitCode = exitCodeValue !== null && exitCodeValue !== undefined ? exitCodeValue : -1;
                     entry.callback(safeOutput, safeExitCode);
                 } catch (e) {
-                    console.warn("runCommand callback error for command:", entry.command, "Error:", e);
+                    log.warn("runCommand callback error for command:", entry.command, "Error:", e);
                 }
             }
             try {

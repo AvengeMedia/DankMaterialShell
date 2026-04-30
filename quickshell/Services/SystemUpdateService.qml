@@ -10,288 +10,185 @@ Singleton {
     id: root
 
     property int refCount: 0
+
+    property bool sysupdateAvailable: false
+
     property var availableUpdates: []
     property bool isChecking: false
+    property bool isUpgrading: false
     property bool hasError: false
     property string errorMessage: ""
-    property string updChecker: ""
-    property string pkgManager: ""
+    property string errorCode: ""
+    property var backends: []
     property string distribution: ""
+    property string distributionPretty: ""
+    property string pkgManager: ""
     property bool distributionSupported: false
-    property string shellVersion: ""
-    property string shellCodename: ""
-    property string semverVersion: ""
+    property var recentLog: []
+    property int intervalSeconds: 1800
+    property int lastCheckUnix: 0
+    property int nextCheckUnix: 0
 
-    function getParsedShellVersion() {
-        return parseVersion(semverVersion);
-    }
-
-    readonly property var archBasedUCSettings: {
-        "listUpdatesSettings": {
-            "params": [],
-            "correctExitCodes": [0, 2]   // Exit code 0 = updates available, 2 = no updates
-        },
-        "parserSettings": {
-            "lineRegex": /^(\S+)\s+([^\s]+)\s+->\s+([^\s]+)$/,
-            "entryProducer": function (match) {
-                return {
-                    "name": match[1],
-                    "currentVersion": match[2],
-                    "newVersion": match[3],
-                    "description": `${match[1]} ${match[2]} → ${match[3]}`
-                };
-            }
-        }
-    }
-
-    readonly property var archBasedPMSettings: function(requiresSudo) {
-        return {
-            "listUpdatesSettings": {
-                "params": ["-Qu"],
-                "correctExitCodes": [0, 1]   // Exit code 0 = updates available, 1 = no updates
-            },
-            "upgradeSettings": {
-                "params": ["-Syu"],
-                "requiresSudo": requiresSudo
-            },
-            "parserSettings": {
-                "lineRegex": /^(\S+)\s+([^\s]+)\s+->\s+([^\s]+)$/,
-                "entryProducer": function (match) {
-                    return {
-                        "name": match[1],
-                        "currentVersion": match[2],
-                        "newVersion": match[3],
-                        "description": `${match[1]} ${match[2]} → ${match[3]}`
-                    };
-                }
-            }
-        }
-    }
-
-    readonly property var fedoraBasedPMSettings: {
-        "listUpdatesSettings": {
-            "params": ["list", "--upgrades", "--quiet", "--color=never"],
-            "correctExitCodes": [0, 1]   // Exit code 0 = updates available, 1 = no updates
-        },
-        "upgradeSettings": {
-            "params": ["upgrade"],
-            "requiresSudo": true
-        },
-        "parserSettings": {
-            "lineRegex": /^([^\s]+)\s+([^\s]+)\s+.*$/,
-            "entryProducer": function (match) {
-                return {
-                    "name": match[1],
-                    "currentVersion": "",
-                    "newVersion": match[2],
-                    "description": `${match[1]} → ${match[2]}`
-                };
-            }
-        }
-    }
-
-    readonly property var updateCheckerParams: {
-        "checkupdates": archBasedUCSettings
-    }
-    readonly property var packageManagerParams: {
-        "yay": archBasedPMSettings(false),
-        "paru": archBasedPMSettings(false),
-        "pacman": archBasedPMSettings(true),
-        "dnf": fedoraBasedPMSettings
-    }
-    readonly property list<string> supportedDistributions: ["arch", "artix", "cachyos", "manjaro", "endeavouros", "fedora"]
     readonly property int updateCount: availableUpdates.length
-    readonly property bool helperAvailable: pkgManager !== "" && distributionSupported
+    readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
 
-    Process {
-        id: distributionDetection
-        command: ["sh", "-c", "cat /etc/os-release | grep '^ID=' | cut -d'=' -f2 | tr -d '\"'"]
-        running: true
-
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                distribution = stdout.text.trim().toLowerCase();
-                distributionSupported = supportedDistributions.includes(distribution);
-
-                if (distributionSupported) {
-                    updateFinderDetection.running = true;
-                    pkgManagerDetection.running = true;
-                    checkForUpdates();
-                } else {
-                    console.warn("SystemUpdate: Unsupported distribution:", distribution);
-                }
+    Connections {
+        target: DMSService
+        function onCapabilitiesReceived() {
+            root.checkCapabilities();
+        }
+        function onConnectionStateChanged() {
+            if (DMSService.isConnected) {
+                root.checkCapabilities();
             } else {
-                console.warn("SystemUpdate: Failed to detect distribution");
+                root.sysupdateAvailable = false;
             }
         }
-
-        stdout: StdioCollector {}
-
-        Component.onCompleted: {
-            versionDetection.running = true;
+        function onSysupdateStateUpdate(data) {
+            root._applyState(data);
         }
     }
 
-    Process {
-        id: versionDetection
-        command: ["sh", "-c", `cd "${Quickshell.shellDir}" && if [ -d .git ]; then echo "(git) $(git rev-parse --short HEAD)"; elif [ -f VERSION ]; then cat VERSION; fi`]
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                shellVersion = text.trim();
-            }
+    Component.onCompleted: {
+        if (DMSService.dmsAvailable) {
+            checkCapabilities();
         }
     }
 
-    Process {
-        id: semverDetection
-        command: ["sh", "-c", `cd "${Quickshell.shellDir}" && if [ -f VERSION ]; then cat VERSION; fi`]
-        running: true
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                semverVersion = text.trim();
-            }
+    function checkCapabilities() {
+        if (!DMSService.capabilities || !Array.isArray(DMSService.capabilities)) {
+            sysupdateAvailable = false;
+            return;
+        }
+        const has = DMSService.capabilities.includes("sysupdate");
+        if (has && !sysupdateAvailable) {
+            sysupdateAvailable = true;
+            requestState();
+        } else if (!has) {
+            sysupdateAvailable = false;
         }
     }
 
-    Process {
-        id: codenameDetection
-        command: ["sh", "-c", `cd "${Quickshell.shellDir}" && if [ -f CODENAME ]; then cat CODENAME; fi`]
-        running: true
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                shellCodename = text.trim();
-            }
+    function requestState() {
+        if (!DMSService.isConnected || !sysupdateAvailable) {
+            return;
         }
+        DMSService.sysupdateGetState(resp => {
+            if (resp && resp.result) {
+                _applyState(resp.result);
+            }
+        });
     }
 
-    Process {
-        id: updateFinderDetection
-        command: ["sh", "-c", "which checkupdates"]
-
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                const exeFound = stdout.text.trim();
-                updChecker = exeFound.split('/').pop();
-            } else {
-                console.warn("SystemUpdate: No update checker found. Will use package manager.");
-            }
+    function _applyState(data) {
+        if (!data) {
+            return;
         }
+        availableUpdates = data.packages || [];
+        backends = data.backends || [];
+        distribution = data.distro || "";
+        distributionPretty = data.distroPretty || "";
+        distributionSupported = (backends.length > 0);
+        recentLog = data.recentLog || [];
+        intervalSeconds = data.intervalSeconds || 1800;
+        lastCheckUnix = data.lastCheckUnix || 0;
+        nextCheckUnix = data.nextCheckUnix || 0;
 
-        stdout: StdioCollector {}
-    }
-
-    Process {
-        id: pkgManagerDetection
-        command: ["sh", "-c", "which paru || which yay || which pacman || which dnf"]
-
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                const exeFound = stdout.text.trim();
-                pkgManager = exeFound.split('/').pop();
-            } else {
-                console.warn("SystemUpdate: No package manager found");
-            }
-        }
-
-        stdout: StdioCollector {}
-    }
-
-    Process {
-        id: updateChecker
-
-        onExited: exitCode => {
+        const phase = data.phase || "idle";
+        switch (phase) {
+        case "refreshing":
+            isChecking = true;
+            isUpgrading = false;
+            break;
+        case "upgrading":
             isChecking = false;
-            const correctExitCodes = updChecker.length > 0 ? [updChecker].concat(updateCheckerParams[updChecker].listUpdatesSettings.correctExitCodes) : [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesSettings.correctExitCodes);
-            if (correctExitCodes.includes(exitCode)) {
-                parseUpdates(stdout.text);
-                hasError = false;
-                errorMessage = "";
-            } else {
-                hasError = true;
-                errorMessage = "Failed to check for updates";
-                console.warn("SystemUpdate: Update check failed with code:", exitCode);
-            }
+            isUpgrading = true;
+            break;
+        default:
+            isChecking = false;
+            isUpgrading = false;
         }
 
-        stdout: StdioCollector {}
-    }
+        if (data.error) {
+            hasError = true;
+            errorMessage = data.error.message || "";
+            errorCode = data.error.code || "";
+        } else {
+            hasError = false;
+            errorMessage = "";
+            errorCode = "";
+        }
 
-    Process {
-        id: updater
-        onExited: exitCode => {
-            checkForUpdates();
+        if (backends.length > 0) {
+            const sys = backends.find(b => b.repo === "system" || b.repo === "ostree");
+            pkgManager = sys ? sys.id : backends[0].id;
+        } else {
+            pkgManager = "";
         }
     }
 
     function checkForUpdates() {
-        if (!distributionSupported || (!pkgManager && !updChecker) || isChecking)
-            return;
-        isChecking = true;
-        hasError = false;
-        if (pkgManager === "paru" || pkgManager === "yay") {
-            const repoCmd = updChecker.length > 0 ? updChecker : `${pkgManager} -Qu`;
-            updateChecker.command = ["sh", "-c", `(${repoCmd} 2>/dev/null; ${pkgManager} -Qua 2>/dev/null) || true`];
-        } else if (updChecker.length > 0) {
-            updateChecker.command = [updChecker].concat(updateCheckerParams[updChecker].listUpdatesSettings.params);
-        } else {
-            updateChecker.command = [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesSettings.params);
-        }
-        updateChecker.running = true;
+        DMSService.sysupdateRefresh(false, null);
     }
 
-    function parseUpdates(output) {
-        const lines = output.trim().split('\n').filter(line => line.trim());
-        const updates = [];
-
-        const regex = packageManagerParams[pkgManager].parserSettings.lineRegex;
-        const entryProducer = packageManagerParams[pkgManager].parserSettings.entryProducer;
-
-        for (const line of lines) {
-            const match = line.match(regex);
-            if (match) {
-                updates.push(entryProducer(match));
-            }
-        }
-
-        availableUpdates = updates;
-    }
-
-    function runUpdates() {
-        if (!distributionSupported || !pkgManager || updateCount === 0)
-            return;
-        const terminal = Quickshell.env("TERMINAL") || "xterm";
-
+    function runUpdates(opts) {
+        const params = opts || {};
         if (SettingsData.updaterUseCustomCommand && SettingsData.updaterCustomCommand.length > 0) {
-            const updateCommand = `${SettingsData.updaterCustomCommand} && echo -n "Updates complete! " ; echo "Press Enter to close..." && read`;
-            const termClass = SettingsData.updaterTerminalAdditionalParams;
-
-            var finalCommand = [terminal];
-            if (termClass.length > 0) {
-                finalCommand = finalCommand.concat(termClass.split(" "));
-            }
-            finalCommand.push("-e");
-            finalCommand.push("sh");
-            finalCommand.push("-c");
-            finalCommand.push(updateCommand);
-            updater.command = finalCommand;
-        } else {
-            const params = packageManagerParams[pkgManager].upgradeSettings.params.join(" ");
-            const sudo = packageManagerParams[pkgManager].upgradeSettings.requiresSudo ? "sudo" : "";
-            const updateCommand = `${sudo} ${pkgManager} ${params} && echo -n "Updates complete! " ; echo "Press Enter to close..." && read`;
-
-            updater.command = [terminal, "-e", "sh", "-c", updateCommand];
+            _runCustomTerminalCommand();
+            return;
         }
-        updater.running = true;
+        DMSService.sysupdateUpgrade(params, null);
     }
 
-    Timer {
-        interval: 30 * 60 * 1000
-        repeat: true
-        running: refCount > 0 && distributionSupported && (pkgManager || updChecker)
-        onTriggered: checkForUpdates()
+    function cancelUpdates() {
+        DMSService.sysupdateCancel(null);
+    }
+
+    function setInterval(seconds) {
+        DMSService.sysupdateSetInterval(seconds, null);
+    }
+
+    function _runCustomTerminalCommand() {
+        const terminal = SessionData.resolveTerminal();
+        if (!terminal || terminal.length === 0) {
+            ToastService.showError(I18n.tr("No terminal configured"), I18n.tr("Pick a terminal in Settings → Launcher (or set $TERMINAL)."));
+            return;
+        }
+        const updateCommand = `${SettingsData.updaterCustomCommand} && echo -n "Updates complete! " ; echo "Press Enter to close..." && read`;
+        const termClass = SettingsData.updaterTerminalAdditionalParams || "";
+        var argv = [terminal];
+        if (termClass.length > 0) {
+            argv = argv.concat(termClass.split(" "));
+        }
+        argv.push("-e");
+        argv.push("sh");
+        argv.push("-c");
+        argv.push(updateCommand);
+        customRunner.command = argv;
+        customRunner.running = true;
+    }
+
+    Process {
+        id: customRunner
+        onExited: root.checkForUpdates()
+    }
+
+    onRefCountChanged: _syncAcquire()
+    onSysupdateAvailableChanged: _syncAcquire()
+
+    property bool _acquired: false
+
+    function _syncAcquire() {
+        const want = refCount > 0 && sysupdateAvailable;
+        if (want === _acquired) {
+            return;
+        }
+        _acquired = want;
+        if (want) {
+            DMSService.sysupdateAcquire(null);
+            return;
+        }
+        DMSService.sysupdateRelease(null);
     }
 
     IpcHandler {
@@ -301,96 +198,11 @@ Singleton {
             if (root.isChecking) {
                 return "ERROR: already checking";
             }
-            if (!distributionSupported) {
-                return "ERROR: distribution not supported";
-            }
-            if (!pkgManager && !updChecker) {
-                return "ERROR: update checker not available";
+            if (root.backends.length === 0) {
+                return "ERROR: no package manager available";
             }
             root.checkForUpdates();
             return "SUCCESS: Now checking...";
-        }
-    }
-
-    function parseVersion(versionStr) {
-        if (!versionStr || typeof versionStr !== "string")
-            return {
-                major: 0,
-                minor: 0,
-                patch: 0
-            };
-
-        let v = versionStr.trim();
-        if (v.startsWith("v"))
-            v = v.substring(1);
-
-        const dashIdx = v.indexOf("-");
-        if (dashIdx !== -1)
-            v = v.substring(0, dashIdx);
-
-        const plusIdx = v.indexOf("+");
-        if (plusIdx !== -1)
-            v = v.substring(0, plusIdx);
-
-        const parts = v.split(".");
-        return {
-            major: parseInt(parts[0], 10) || 0,
-            minor: parseInt(parts[1], 10) || 0,
-            patch: parseInt(parts[2], 10) || 0
-        };
-    }
-
-    function compareVersions(v1, v2) {
-        if (v1.major !== v2.major)
-            return v1.major - v2.major;
-        if (v1.minor !== v2.minor)
-            return v1.minor - v2.minor;
-        return v1.patch - v2.patch;
-    }
-
-    function checkVersionRequirement(requirementStr, currentVersion) {
-        if (!requirementStr || typeof requirementStr !== "string")
-            return true;
-
-        const req = requirementStr.trim();
-        let operator = "";
-        let versionPart = req;
-
-        if (req.startsWith(">=")) {
-            operator = ">=";
-            versionPart = req.substring(2);
-        } else if (req.startsWith("<=")) {
-            operator = "<=";
-            versionPart = req.substring(2);
-        } else if (req.startsWith(">")) {
-            operator = ">";
-            versionPart = req.substring(1);
-        } else if (req.startsWith("<")) {
-            operator = "<";
-            versionPart = req.substring(1);
-        } else if (req.startsWith("=")) {
-            operator = "=";
-            versionPart = req.substring(1);
-        } else {
-            operator = ">=";
-        }
-
-        const reqVersion = parseVersion(versionPart);
-        const cmp = compareVersions(currentVersion, reqVersion);
-
-        switch (operator) {
-        case ">=":
-            return cmp >= 0;
-        case ">":
-            return cmp > 0;
-        case "<=":
-            return cmp <= 0;
-        case "<":
-            return cmp < 0;
-        case "=":
-            return cmp === 0;
-        default:
-            return cmp >= 0;
         }
     }
 }

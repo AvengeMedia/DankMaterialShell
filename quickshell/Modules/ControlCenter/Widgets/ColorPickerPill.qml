@@ -1,9 +1,11 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter.Widgets
+import qs.Services
 
 CompoundPill {
     id: root
+    readonly property var log: Log.scoped("ColorPickerPill")
 
     property var colorPickerModal: null
 
@@ -14,14 +16,14 @@ CompoundPill {
     secondaryText: I18n.tr("Choose a color")
 
     onToggled: {
-        console.log("ColorPickerPill toggled, modal:", colorPickerModal);
+        log.debug("ColorPickerPill toggled, modal:", colorPickerModal);
         if (colorPickerModal) {
             colorPickerModal.show();
         }
     }
 
     onExpandClicked: {
-        console.log("ColorPickerPill expandClicked, modal:", colorPickerModal);
+        log.debug("ColorPickerPill expandClicked, modal:", colorPickerModal);
         if (colorPickerModal) {
             colorPickerModal.show();
         }

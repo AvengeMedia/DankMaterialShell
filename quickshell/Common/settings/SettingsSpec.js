@@ -350,6 +350,9 @@ var SPEC = {
     dockMaxVisibleApps: { def: 0 },
     dockMaxVisibleRunningApps: { def: 0 },
     dockShowOverflowBadge: { def: true },
+    dockShowTrash: { def: false },
+    dockTrashFileManager: { def: "default" },
+    dockTrashCustomCommand: { def: "" },
 
     notificationOverlayEnabled: { def: false },
     notificationPopupShadowEnabled: { def: true },
@@ -425,6 +428,9 @@ var SPEC = {
     updaterUseCustomCommand: { def: false },
     updaterCustomCommand: { def: "" },
     updaterTerminalAdditionalParams: { def: "" },
+    updaterIntervalSeconds: { def: 1800 },
+    updaterIncludeFlatpak: { def: true },
+    updaterAllowAUR: { def: true },
 
     displayNameMode: { def: "system" },
     screenPreferences: { def: {} },

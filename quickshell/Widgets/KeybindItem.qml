@@ -11,6 +11,7 @@ import "../Common/KeybindActions.js" as Actions
 
 Item {
     id: root
+    readonly property var log: Log.scoped("KeybindItem")
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -716,7 +717,7 @@ Item {
 
                             const key = KeyUtils.xkbKeyFromQtKey(qtKey);
                             if (!key) {
-                                console.warn("[KeybindItem] Unknown key:", event.key, "mods:", event.modifiers);
+                                log.warn("Unknown key:", event.key, "mods:", event.modifiers);
                                 return;
                             }
 

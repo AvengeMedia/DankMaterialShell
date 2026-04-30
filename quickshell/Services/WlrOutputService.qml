@@ -3,9 +3,11 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("WlrOutputService")
 
     property bool wlrOutputAvailable: false
     property var outputs: []
@@ -53,7 +55,7 @@ Singleton {
         const hasWlrOutput = DMSService.capabilities.includes("wlroutput");
         if (hasWlrOutput && !wlrOutputAvailable) {
             wlrOutputAvailable = true;
-            console.info("WlrOutputService: wlr-output-management capability detected");
+            log.info("wlr-output-management capability detected");
             requestState();
             return;
         }
@@ -81,11 +83,11 @@ Singleton {
         serial = state.serial || 0;
 
         if (outputs.length === 0) {
-            console.warn("WlrOutputService: Received empty outputs list");
+            log.warn("Received empty outputs list");
         } else {
-            console.log("WlrOutputService: Updated with", outputs.length, "outputs, serial:", serial);
+            log.debug("Updated with", outputs.length, "outputs, serial:", serial);
             outputs.forEach((output, index) => {
-                console.log("WlrOutputService: Output", index, "-", output.name, "enabled:", output.enabled, "mode:", output.currentMode ? output.currentMode.width + "x" + output.currentMode.height + "@" + (output.currentMode.refresh / 1000) + "Hz" : "none");
+                log.debug("Output", index, "-", output.name, "enabled:", output.enabled, "mode:", output.currentMode ? output.currentMode.width + "x" + output.currentMode.height + "@" + (output.currentMode.refresh / 1000) + "Hz" : "none");
             });
         }
         stateChanged();
@@ -112,9 +114,9 @@ Singleton {
             return;
         }
 
-        console.log("WlrOutputService: Applying configuration for", heads.length, "outputs");
+        log.debug("Applying configuration for", heads.length, "outputs");
         heads.forEach((head, index) => {
-            console.log("WlrOutputService: Head", index, "- name:", head.name, "enabled:", head.enabled, "modeId:", head.modeId, "customMode:", JSON.stringify(head.customMode), "position:", JSON.stringify(head.position), "scale:", head.scale, "transform:", head.transform, "adaptiveSync:", head.adaptiveSync);
+            log.debug("Head", index, "- name:", head.name, "enabled:", head.enabled, "modeId:", head.modeId, "customMode:", JSON.stringify(head.customMode), "position:", JSON.stringify(head.position), "scale:", head.scale, "transform:", head.transform, "adaptiveSync:", head.adaptiveSync);
         });
 
         DMSService.sendRequest("wlroutput.applyConfiguration", {
@@ -124,9 +126,9 @@ Singleton {
             const message = response.error || response.result?.message || "";
 
             if (response.error) {
-                console.warn("WlrOutputService: applyConfiguration error:", response.error);
+                log.warn("applyConfiguration error:", response.error);
             } else {
-                console.log("WlrOutputService: Configuration applied successfully");
+                log.debug("Configuration applied successfully");
             }
 
             configurationApplied(success, message);
@@ -144,7 +146,7 @@ Singleton {
             return;
         }
 
-        console.log("WlrOutputService: Testing configuration for", heads.length, "outputs");
+        log.debug("Testing configuration for", heads.length, "outputs");
 
         DMSService.sendRequest("wlroutput.testConfiguration", {
             "heads": heads
@@ -153,9 +155,9 @@ Singleton {
             const message = response.error || response.result?.message || "";
 
             if (response.error) {
-                console.warn("WlrOutputService: testConfiguration error:", response.error);
+                log.warn("testConfiguration error:", response.error);
             } else {
-                console.log("WlrOutputService: Configuration test passed");
+                log.debug("Configuration test passed");
             }
 
             if (callback) {
@@ -167,7 +169,7 @@ Singleton {
     function setOutputEnabled(outputName, enabled, callback) {
         const output = getOutput(outputName);
         if (!output) {
-            console.warn("WlrOutputService: Output not found:", outputName);
+            log.warn("Output not found:", outputName);
             if (callback) {
                 callback(false, "Output not found");
             }

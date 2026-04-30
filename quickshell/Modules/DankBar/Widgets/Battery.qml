@@ -7,6 +7,7 @@ import qs.Widgets
 
 BasePill {
     id: battery
+    readonly property var log: Log.scoped("Battery")
 
     property bool batteryPopupVisible: false
     property var popoutTarget: null
@@ -130,13 +131,13 @@ BasePill {
             // Check if this is a touchpad
             if (delta !== 120 && delta !== -120) {
                 touchpadAccumulator += delta;
-                console.info("Acc: "+touchpadAccumulator);
+                log.info("Acc: " + touchpadAccumulator);
                 if (Math.abs(touchpadAccumulator) < 500)
                     return;
                 delta = touchpadAccumulator;
                 touchpadAccumulator = 0;
             }
-            console.info("Trigger! Delta: "+delta)
+            log.info("Trigger! Delta: " + delta);
 
             // This is after the other delta checks so it only shows on valid Y scroll
             if (typeof PowerProfiles === "undefined") {
@@ -149,11 +150,14 @@ BasePill {
             var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
 
             // Step once based on mouse wheel direction
-            if (delta > 0) index += 1;
-            else index -= 1;
+            if (delta > 0)
+                index += 1;
+            else
+                index -= 1;
 
             // Already at end of list, can't go further
-            if (index < 0 || index >= profiles.length) return;
+            if (index < 0 || index >= profiles.length)
+                return;
 
             // Set new profile
             PowerProfiles.profile = profiles[index];

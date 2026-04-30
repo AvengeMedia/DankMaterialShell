@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("IdleService")
 
     readonly property bool idleMonitorAvailable: {
         try {
@@ -82,7 +84,7 @@ Singleton {
 
     function createIdleMonitors() {
         if (!idleMonitorAvailable) {
-            console.info("IdleService: IdleMonitor not available, skipping creation");
+            log.info("IdleMonitor not available, skipping creation");
             return;
         }
 
@@ -157,7 +159,7 @@ Singleton {
                 }
             });
         } catch (e) {
-            console.warn("IdleService: Error creating IdleMonitors:", e);
+            log.warn("Error creating IdleMonitors:", e);
         }
     }
 
@@ -181,11 +183,11 @@ Singleton {
     onExternalInhibitActiveChanged: {
         if (externalInhibitActive) {
             const apps = DMSService.screensaverInhibitors.map(i => i.appName).join(", ");
-            console.info("IdleService: External idle inhibit active from:", apps || "unknown");
+            log.info("External idle inhibit active from:", apps || "unknown");
             SessionService.idleInhibited = true;
             SessionService.inhibitReason = "External app: " + (apps || "unknown");
         } else {
-            console.info("IdleService: External idle inhibit released");
+            log.info("External idle inhibit released");
             SessionService.idleInhibited = false;
             SessionService.inhibitReason = "Keep system awake";
         }
@@ -193,9 +195,9 @@ Singleton {
 
     Component.onCompleted: {
         if (!idleMonitorAvailable) {
-            console.warn("IdleService: IdleMonitor not available - power management disabled. This requires a newer version of Quickshell.");
+            log.warn("IdleMonitor not available - power management disabled. This requires a newer version of Quickshell.");
         } else {
-            console.info("IdleService: Initialized with idle monitoring support");
+            log.info("Initialized with idle monitoring support");
             createIdleMonitors();
         }
 

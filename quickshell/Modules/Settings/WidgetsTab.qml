@@ -246,7 +246,8 @@ Item {
                 "text": I18n.tr("System Update"),
                 "description": I18n.tr("Check for system updates"),
                 "icon": "update",
-                "enabled": SystemUpdateService.distributionSupported
+                "enabled": SystemUpdateService.sysupdateAvailable,
+                "warning": SystemUpdateService.sysupdateAvailable ? undefined : I18n.tr("Requires DMS server with sysupdate capability")
             },
             {
                 "id": "powerMenuButton",
@@ -430,7 +431,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "hideWhenIdle"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -579,6 +580,17 @@ Item {
         setWidgetsForSection(sectionId, widgets);
     }
 
+    function handleHideWhenIdleChanged(sectionId, widgetIndex, enabled) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+            return;
+        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.hideWhenIdle = enabled;
+        widgets[widgetIndex] = newWidget;
+        setWidgetsForSection(sectionId, widgets);
+    }
+
     function handleDiskUsageModeChanged(sectionId, widgetIndex, mode) {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex < 0 || widgetIndex >= widgets.length) {
@@ -714,6 +726,8 @@ Item {
                     item.barShowOverflowBadge = widget.barShowOverflowBadge;
                 if (widget.trayUseInlineExpansion !== undefined)
                     item.trayUseInlineExpansion = widget.trayUseInlineExpansion;
+                if (widget.hideWhenIdle !== undefined)
+                    item.hideWhenIdle = widget.hideWhenIdle;
             }
             widgets.push(item);
         });
@@ -1003,6 +1017,9 @@ Item {
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
                         }
+                        onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
+                            widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
+                        }
                     }
                 }
 
@@ -1070,6 +1087,9 @@ Item {
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
                         }
+                        onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
+                            widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
+                        }
                     }
                 }
 
@@ -1136,6 +1156,9 @@ Item {
                         }
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
+                        }
+                        onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
+                            widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
                     }
                 }

@@ -26,6 +26,17 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		daemon, _ := cmd.Flags().GetBool("daemon")
 		session, _ := cmd.Flags().GetBool("session")
+		if v, _ := cmd.Flags().GetString("log-level"); v != "" {
+			if err := os.Setenv("DMS_LOG_LEVEL", v); err != nil {
+				log.Fatalf("Failed to set DMS_LOG_LEVEL: %v", err)
+			}
+		}
+		if v, _ := cmd.Flags().GetString("log-file"); v != "" {
+			if err := os.Setenv("DMS_LOG_FILE", v); err != nil {
+				log.Fatalf("Failed to set DMS_LOG_FILE: %v", err)
+			}
+		}
+		log.ApplyEnvOverrides()
 		if daemon {
 			runShellDaemon(session)
 		} else {
@@ -526,5 +537,7 @@ func getCommonCommands() []*cobra.Command {
 		dlCmd,
 		randrCmd,
 		blurCmd,
+		trashCmd,
+		systemCmd,
 	}
 }

@@ -7,41 +7,33 @@ import qs.Widgets
 BasePill {
     id: root
 
+    property var widgetData: null
     property bool isActive: false
+
     readonly property bool hasUpdates: SystemUpdateService.updateCount > 0
     readonly property bool isChecking: SystemUpdateService.isChecking
-    readonly property bool shouldHide: SettingsData.updaterHideWidget && !hasUpdates && !isChecking && !SystemUpdateService.hasError
+    readonly property bool isClean: SystemUpdateService.sysupdateAvailable && !hasUpdates && !isChecking && !SystemUpdateService.hasError
+    readonly property bool hideWhenIdle: widgetData?.hideWhenIdle === true
+    readonly property bool shouldHide: hideWhenIdle && isClean
 
+    width: shouldHide ? 0 : (isVerticalOrientation ? barThickness : visualWidth)
+    height: shouldHide ? 0 : (isVerticalOrientation ? visualHeight : barThickness)
+    visible: !shouldHide
     opacity: shouldHide ? 0 : 1
 
-    states: [
-        State {
-            name: "hidden_horizontal"
-            when: root.shouldHide && !isVerticalOrientation
-            PropertyChanges {
-                target: root
-                width: 0
-            }
-        },
-        State {
-            name: "hidden_vertical"
-            when: root.shouldHide && isVerticalOrientation
-            PropertyChanges {
-                target: root
-                height: 0
-            }
+    Behavior on width {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
         }
-    ]
+    }
 
-    transitions: [
-        Transition {
-            NumberAnimation {
-                properties: "width,height"
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
+    Behavior on height {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
         }
-    ]
+    }
 
     Behavior on opacity {
         NumberAnimation {

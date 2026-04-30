@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("ClipboardService")
 
     readonly property int longTextThreshold: 200
 
@@ -78,7 +80,7 @@ Singleton {
         }
         DMSService.sendRequest("clipboard.getHistory", null, function (response) {
             if (response.error) {
-                console.warn("ClipboardService: Failed to get history:", response.error);
+                log.warn("Failed to get history:", response.error);
                 return;
             }
             internalEntries = response.result || [];
@@ -144,7 +146,7 @@ Singleton {
             "id": entry.id
         }, function (response) {
             if (response.error) {
-                console.warn("ClipboardService: Failed to delete entry:", response.error);
+                log.warn("Failed to delete entry:", response.error);
                 return;
             }
             internalEntries = internalEntries.filter(e => e.id !== entry.id);
@@ -169,7 +171,7 @@ Singleton {
                 "id": entry.id
             }, function (response) {
                 if (response.error) {
-                    console.warn("ClipboardService: Failed to delete entry:", response.error);
+                    log.warn("Failed to delete entry:", response.error);
                     return;
                 }
                 internalEntries = internalEntries.filter(e => e.id !== entry.id);
@@ -223,7 +225,7 @@ Singleton {
         const savedCount = pinnedCount;
         DMSService.sendRequest("clipboard.clearHistory", null, function (response) {
             if (response.error) {
-                console.warn("ClipboardService: Failed to clear history:", response.error);
+                log.warn("Failed to clear history:", response.error);
                 return;
             }
             refresh();

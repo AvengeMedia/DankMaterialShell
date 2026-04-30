@@ -4,6 +4,7 @@ import qs.Common
 import qs.Modals
 import qs.Modals.Changelog
 import qs.Modals.Clipboard
+import qs.Modals.Common
 import qs.Modals.Greeter
 import qs.Modals.Settings
 import qs.Modals.DankLauncherV2
@@ -27,6 +28,7 @@ import qs.Services
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DMSShell")
 
     property bool osdSurfacesLoaded: true
     property int pendingOsdResumeReloads: 0
@@ -54,7 +56,7 @@ Item {
                         item.popoutService = PopoutService;
                     }
                     item.pluginId = pluginId;
-                    console.info("Daemon plugin loaded:", pluginId);
+                    log.info("Daemon plugin loaded:", pluginId);
                 }
             }
         }
@@ -93,7 +95,7 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    console.log("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
+                    log.debug("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
                 }
             }
 
@@ -133,7 +135,7 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    console.log("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
+                    log.debug("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
                 }
             }
 
@@ -287,11 +289,15 @@ Item {
 
         sourceComponent: Dock {
             contextMenu: dockContextMenuLoader.item ? dockContextMenuLoader.item : null
+            trashContextMenu: dockTrashContextMenuLoader.item ? dockTrashContextMenuLoader.item : null
         }
 
         onLoaded: {
             if (item) {
                 dockContextMenuLoader.active = true;
+                if (SettingsData.dockShowTrash) {
+                    dockTrashContextMenuLoader.active = true;
+                }
             }
         }
 
@@ -340,6 +346,43 @@ Item {
 
         DockContextMenu {
             id: dockContextMenu
+        }
+    }
+
+    LazyLoader {
+        id: dockTrashContextMenuLoader
+
+        active: false
+
+        DockTrashContextMenu {
+            id: dockTrashContextMenu
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onDockShowTrashChanged() {
+            if (SettingsData.dockShowTrash) {
+                dockTrashContextMenuLoader.active = true;
+            }
+        }
+    }
+
+    ConfirmModal {
+        id: emptyTrashConfirm
+    }
+
+    Connections {
+        target: TrashService
+        function onEmptyTrashConfirmRequested(itemCount) {
+            emptyTrashConfirm.showWithOptions({
+                title: I18n.tr("Empty Trash?"),
+                message: I18n.tr("Permanently delete %1 item(s)? This cannot be undone.").arg(itemCount),
+                confirmText: I18n.tr("Empty"),
+                cancelText: I18n.tr("Cancel"),
+                confirmColor: Theme.error,
+                onConfirm: () => TrashService.emptyTrash()
+            });
         }
     }
 
@@ -734,7 +777,7 @@ Item {
                 cmd += " " + escapedPath;
             }
 
-            console.log("FilePicker: Launching", cmd);
+            log.debug("FilePicker: Launching", cmd);
 
             Quickshell.execDetached({
                 command: ["sh", "-c", cmd]
@@ -766,10 +809,10 @@ Item {
         }
 
         function onAppPickerRequested(data) {
-            console.log("DMSShell: App picker requested with data:", JSON.stringify(data));
+            log.debug("App picker requested with data:", JSON.stringify(data));
 
             if (!data || !data.target) {
-                console.warn("DMSShell: Invalid app picker request data");
+                log.warn("Invalid app picker request data");
                 return;
             }
 
@@ -856,7 +899,12 @@ Item {
 
         SystemUpdatePopout {
             id: systemUpdatePopout
-            onPopoutClosed: PopoutService.unloadSystemUpdate()
+            onPopoutClosed: {
+                if (systemUpdatePopout._reopenAfterUpgrade) {
+                    return;
+                }
+                PopoutService.unloadSystemUpdate();
+            }
 
             Component.onCompleted: {
                 PopoutService.systemUpdatePopout = systemUpdatePopout;
@@ -1051,12 +1099,6 @@ Item {
                 }
             }
         }
-    }
-
-    Loader {
-        id: powerProfileWatcherLoader
-        active: SettingsData.osdPowerProfileEnabled
-        source: "Services/PowerProfileWatcher.qml"
     }
 
     LazyLoader {

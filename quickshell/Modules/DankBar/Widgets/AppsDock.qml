@@ -9,6 +9,7 @@ import qs.Widgets
 
 BasePill {
     id: root
+    readonly property var log: Log.scoped("AppsDock")
 
     enableBackgroundHover: false
     enableCursor: false
@@ -550,9 +551,9 @@ BasePill {
                 showBadge: root.showOverflowBadge
                 z: 10
                 onClicked: {
-                    console.log("Overflow button clicked! Current state:", root.overflowExpanded);
+                    log.debug("Overflow button clicked! Current state:", root.overflowExpanded);
                     root.overflowExpanded = !root.overflowExpanded;
-                    console.log("New state:", root.overflowExpanded);
+                    log.debug("New state:", root.overflowExpanded);
                 }
             }
 

@@ -11,6 +11,7 @@ import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("AudioService")
 
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property PwNode source: Pipewire.defaultAudioSource
@@ -143,7 +144,7 @@ Singleton {
 
     function setDeviceAlias(nodeName, customAlias) {
         if (!nodeName) {
-            console.error("AudioService: Cannot set alias - nodeName is empty");
+            log.error("Cannot set alias - nodeName is empty");
             return false;
         }
 
@@ -189,8 +190,8 @@ EOFCONFIG
 
         Proc.runCommand("writeWireplumberConfig", ["sh", "-c", shellCmd], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.error("AudioService: Failed to write WirePlumber config. Exit code:", exitCode);
-                console.error("AudioService: Error output:", output);
+                log.error("Failed to write WirePlumber config. Exit code:", exitCode);
+                log.error("Error output:", output);
                 ToastService.showError(I18n.tr("Failed to save audio config"), output || "");
                 return;
             }
@@ -305,7 +306,7 @@ EOFCONFIG
                 ToastService.showInfo(I18n.tr("Audio system restarted"), I18n.tr("Device names updated"));
                 wireplumberReloadCompleted(true);
             } else {
-                console.error("AudioService: Failed to restart WirePlumber:", output);
+                log.error("Failed to restart WirePlumber:", output);
                 ToastService.showError(I18n.tr("Failed to restart audio system"), output);
                 wireplumberReloadCompleted(false);
             }
@@ -317,7 +318,7 @@ EOFCONFIG
 
         Proc.runCommand("readWireplumberConfig", ["cat", configPath], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.log("AudioService: No existing WirePlumber config found");
+                log.debug("No existing WirePlumber config found");
                 return;
             }
 
@@ -340,7 +341,7 @@ EOFCONFIG
 
             if (Object.keys(aliases).length > 0) {
                 deviceAliases = aliases;
-                console.log("AudioService: Loaded", Object.keys(aliases).length, "device aliases");
+                log.debug("Loaded", Object.keys(aliases).length, "device aliases");
             }
         }, 0);
     }
@@ -394,13 +395,13 @@ EOFCONFIG
         Proc.runCommand("getCurrentSoundTheme", ["sh", "-c", "gsettings get org.gnome.desktop.sound theme-name 2>/dev/null | sed \"s/'//g\""], (output, exitCode) => {
             if (exitCode === 0 && output.trim()) {
                 currentSoundTheme = output.trim();
-                console.log("AudioService: Current system sound theme:", currentSoundTheme);
+                log.debug("Current system sound theme:", currentSoundTheme);
                 if (SettingsData.useSystemSoundTheme) {
                     discoverSoundFiles(currentSoundTheme);
                 }
             } else {
                 currentSoundTheme = "";
-                console.log("AudioService: No system sound theme found");
+                log.debug("No system sound theme found");
             }
         }, 0);
     }
@@ -510,22 +511,22 @@ EOFCONFIG
         const themeLower = currentSoundTheme.toLowerCase();
         if (SettingsData.useSystemSoundTheme && specialConditions[themeLower]?.includes(soundEvent)) {
             const bundledPath = Qt.resolvedUrl(soundMap[soundEvent] || "../assets/sounds/freedesktop/message.wav");
-            console.log("AudioService: Using bundled sound (special condition) for", soundEvent, ":", bundledPath);
+            log.debug("Using bundled sound (special condition) for", soundEvent, ":", bundledPath);
             return bundledPath;
         }
 
         if (SettingsData.useSystemSoundTheme && soundFilePaths[soundEvent]) {
-            console.log("AudioService: Using system sound for", soundEvent, ":", soundFilePaths[soundEvent]);
+            log.debug("Using system sound for", soundEvent, ":", soundFilePaths[soundEvent]);
             return soundFilePaths[soundEvent];
         }
 
         const bundledPath = Qt.resolvedUrl(soundMap[soundEvent] || "../assets/sounds/freedesktop/message.wav");
-        console.log("AudioService: Using bundled sound for", soundEvent, ":", bundledPath);
+        log.debug("Using bundled sound for", soundEvent, ":", bundledPath);
         return bundledPath;
     }
 
     function reloadSounds() {
-        console.log("AudioService: Reloading sounds, useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme);
+        log.debug("Reloading sounds, useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme);
         if (SettingsData.useSystemSoundTheme && currentSoundTheme) {
             discoverSoundFiles(currentSoundTheme);
         } else {
@@ -549,7 +550,7 @@ EOFCONFIG
                 MediaDevices {
                     id: devices
                     Component.onCompleted: {
-                        console.log("AudioService: MediaDevices initialized, default output:", defaultAudioOutput?.description)
+                        log.debug("MediaDevices initialized, default output:", defaultAudioOutput?.description)
                     }
                 }
             `, root, "AudioService.MediaDevices");
@@ -560,7 +561,7 @@ EOFCONFIG
                     Connections {
                         target: root.mediaDevices
                         function onDefaultAudioOutputChanged() {
-                            console.log("AudioService: Default audio output changed, recreating sound players")
+                            log.debug("Default audio output changed, recreating sound players")
                             root.destroySoundPlayers()
                             root.createSoundPlayers()
                         }
@@ -568,7 +569,7 @@ EOFCONFIG
                 `, root, "AudioService.MediaDevicesConnections");
             }
         } catch (e) {
-            console.log("AudioService: MediaDevices not available, using default audio output");
+            log.debug("MediaDevices not available, using default audio output");
             mediaDevices = null;
         }
     }
@@ -682,7 +683,7 @@ EOFCONFIG
                 }
             `, root, "AudioService.LoginSound");
         } catch (e) {
-            console.warn("AudioService: Error creating sound players:", e);
+            log.warn("Error creating sound players:", e);
         }
     }
 

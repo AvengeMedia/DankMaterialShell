@@ -7,6 +7,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("WeatherTab")
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -45,7 +46,7 @@ Item {
                 hourlyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 1) - 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date()).getHours()));
             }
         } catch (e) {
-            console.warn("Weather Date Sync Error:", e);
+            log.warn("Weather Date Sync Error:", e);
         }
 
         syncing = false;

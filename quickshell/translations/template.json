@@ -119,6 +119,20 @@
     "comment": ""
   },
   {
+    "term": "%1 h %2 m left",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "%1 h left",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 is now included in config",
     "translation": "",
     "context": "",
@@ -136,6 +150,13 @@
     "term": "%1 issues found",
     "translation": "",
     "context": "greeter doctor page error count",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "%1 min left",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -343,6 +364,13 @@
     "comment": ""
   },
   {
+    "term": "15 min",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "15 minutes",
     "translation": "",
     "context": "wallpaper interval",
@@ -472,6 +500,13 @@
     "term": "30 days",
     "translation": "",
     "context": "notification history filter | notification history retention option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "30 min",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -645,6 +680,13 @@
   },
   {
     "term": "API",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1163,6 +1205,13 @@
   },
   {
     "term": "Apply Changes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Apply Flatpak updates alongside system updates when running 'Update All'.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1715,6 +1764,13 @@
     "comment": ""
   },
   {
+    "term": "Backends: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Background",
     "translation": "",
     "context": "",
@@ -2254,6 +2310,20 @@
     "comment": ""
   },
   {
+    "term": "Cannot open trash: '%1' is not installed",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Cannot open trash: no custom command set",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Cannot pair",
     "translation": "",
     "context": "",
@@ -2380,7 +2450,21 @@
     "comment": ""
   },
   {
+    "term": "Check interval",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Check your custom command in Settings → Dock → Trash.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2486,6 +2570,13 @@
   },
   {
     "term": "Choose icon",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose monochrome or a theme color tint for system tray icons",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3080,6 +3171,13 @@
     "comment": ""
   },
   {
+    "term": "Configure one in Settings → Dock → Trash.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Configure which displays show \"%1\"",
     "translation": "",
     "context": "",
@@ -3283,7 +3381,28 @@
     "comment": ""
   },
   {
+    "term": "Controls how much original icon color is removed before applying tint",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls how strongly the selected tint color is applied",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Controls opacity of all popouts, modals, and their content layers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls outlines around blurred foreground cards, pills, and notification cards",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3298,6 +3417,13 @@
   },
   {
     "term": "Controls the base blur radius and offset of shadows",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls the outer edge of protocol-blurred windows",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3396,6 +3522,13 @@
   },
   {
     "term": "Copy PID",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Copy Path",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3510,6 +3643,27 @@
     "term": "Critical Priority",
     "translation": "",
     "context": "notification rule urgency option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close",
+    "translation": "",
+    "context": "Keyboard hints when enter-to-paste is enabled",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -3738,6 +3892,20 @@
     "comment": ""
   },
   {
+    "term": "Custom command and terminal params are split on whitespace; paths with spaces will break.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Custom open-trash command",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Custom power profile",
     "translation": "",
     "context": "power profile description",
@@ -3748,6 +3916,13 @@
     "term": "Custom theme loaded from JSON file",
     "translation": "",
     "context": "custom theme description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Custom update command",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -4180,6 +4355,13 @@
   },
   {
     "term": "Details for \"%1\"",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Detected backends: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4774,6 +4956,27 @@
     "comment": ""
   },
   {
+    "term": "Empty Trash",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Empty Trash (%1)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Empty Trash?",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enable 10-bit color depth for wider color gamut and HDR support",
     "translation": "",
     "context": "",
@@ -5187,6 +5390,34 @@
     "comment": ""
   },
   {
+    "term": "Every 15 minutes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Every 30 minutes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Every 4 hours",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Every hour",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Exact",
     "translation": "",
     "context": "notification rule match type option",
@@ -5341,13 +5572,6 @@
     "comment": ""
   },
   {
-    "term": "Failed to check for updates:\n%1",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Failed to check pin limit",
     "translation": "",
     "context": "",
@@ -5446,6 +5670,13 @@
     "comment": ""
   },
   {
+    "term": "Failed to empty trash",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to enable IP location",
     "translation": "",
     "context": "",
@@ -5510,6 +5741,13 @@
   },
   {
     "term": "Failed to move job",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to move to trash",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5782,6 +6020,13 @@
     "comment": ""
   },
   {
+    "term": "Failed: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Features",
     "translation": "",
     "context": "greeter welcome page section header",
@@ -5845,6 +6090,13 @@
     "comment": ""
   },
   {
+    "term": "File manager used to open the trash. Pick \"custom\" to enter your own command.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "File received from",
     "translation": "",
     "context": "Phone Connect file share notification",
@@ -5902,13 +6154,6 @@
   },
   {
     "term": "Fingerprint error",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Fingerprint error: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6153,6 +6398,41 @@
     "comment": ""
   },
   {
+    "term": "For 1 hour",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "For 15 minutes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "For 3 hours",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "For 30 minutes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "For 8 hours",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Force HDR",
     "translation": "",
     "context": "",
@@ -6202,6 +6482,13 @@
     "comment": ""
   },
   {
+    "term": "Foreground Layers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Forever",
     "translation": "",
     "context": "notification history retention option",
@@ -6245,20 +6532,6 @@
   },
   {
     "term": "Format Legend",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Found %1 package to update:",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Found %1 packages to update:",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6804,13 +7077,6 @@
     "comment": ""
   },
   {
-    "term": "Hide Updater Widget",
-    "translation": "",
-    "context": "When updater widget is used, then hide it if no update found",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Hide When Typing",
     "translation": "",
     "context": "",
@@ -7014,6 +7280,13 @@
     "comment": ""
   },
   {
+    "term": "How often the server polls for new updates.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "How often to change wallpaper",
     "translation": "",
     "context": "",
@@ -7210,7 +7483,21 @@
     "comment": ""
   },
   {
+    "term": "Include AUR updates",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Include Files in All Tab",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Include Flatpak updates",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7799,6 +8086,13 @@
   },
   {
     "term": "Launcher Button Logo",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Layer Outline Opacity",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8897,6 +9191,13 @@
     "comment": ""
   },
   {
+    "term": "Move to Trash",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Moving to Paused",
     "translation": "",
     "context": "",
@@ -9632,13 +9933,6 @@
     "comment": ""
   },
   {
-    "term": "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "No plugin results",
     "translation": "",
     "context": "",
@@ -9717,6 +10011,20 @@
   },
   {
     "term": "No status output.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No supported package manager found.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No terminal configured",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10094,6 +10402,13 @@
     "comment": ""
   },
   {
+    "term": "On indefinitely",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "On-Demand",
     "translation": "",
     "context": "",
@@ -10109,6 +10424,13 @@
   },
   {
     "term": "On-screen Displays",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Once a day",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10185,7 +10507,28 @@
     "comment": ""
   },
   {
+    "term": "Open Trash",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open Trash With",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Open a new note",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open a terminal and run a custom command instead of the in-shell upgrade flow.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10710,6 +11053,13 @@
     "comment": ""
   },
   {
+    "term": "Permanently delete %1 item(s)? This cannot be undone.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Permission denied to set profile image.",
     "translation": "",
     "context": "",
@@ -10745,7 +11095,28 @@
     "comment": ""
   },
   {
+    "term": "Pick a different file manager in Settings → Dock → Trash.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Pick a different random video each time from the same folder",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Pick a terminal in Settings → Launcher (or set $TERMINAL).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Pick how long to pause notifications",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10811,6 +11182,13 @@
     "term": "Pixelate",
     "translation": "",
     "context": "wallpaper transition option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Place a trash bin at the end of the dock",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -11788,6 +12166,13 @@
     "comment": ""
   },
   {
+    "term": "Requires DMS server with sysupdate capability",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Requires DWL compositor",
     "translation": "",
     "context": "",
@@ -12068,6 +12453,13 @@
     "comment": ""
   },
   {
+    "term": "Run paru/yay with AUR enabled when 'Update All' is clicked.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Running Apps",
     "translation": "",
     "context": "",
@@ -12083,6 +12475,13 @@
   },
   {
     "term": "Running greeter sync…",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Running in terminal",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12943,28 +13342,7 @@
     "comment": ""
   },
   {
-    "term": "Shift+Del: Clear All • Esc: Close",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Shift+Enter to paste",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close",
-    "translation": "",
-    "context": "Keyboard hints when enter-to-paste is enabled",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13349,6 +13727,13 @@
     "comment": ""
   },
   {
+    "term": "Show Trash in Dock",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show Weather Condition",
     "translation": "",
     "context": "",
@@ -13427,6 +13812,13 @@
   },
   {
     "term": "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show foreground surfaces on blurred panels for stronger contrast",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13665,6 +14057,20 @@
   },
   {
     "term": "Signal:",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Silence for a while",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Silence notifications",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14161,6 +14567,13 @@
     "comment": ""
   },
   {
+    "term": "System Tray Icon Tint",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "System Update",
     "translation": "",
     "context": "",
@@ -14210,13 +14623,6 @@
     "comment": ""
   },
   {
-    "term": "System update custom command",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Tab",
     "translation": "",
     "context": "",
@@ -14238,7 +14644,7 @@
     "comment": ""
   },
   {
-    "term": "Terminal custom additional parameters",
+    "term": "Terminal additional parameters",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14609,6 +15015,20 @@
     "comment": ""
   },
   {
+    "term": "Tint Saturation",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tint Strength",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Title",
     "translation": "",
     "context": "",
@@ -14819,6 +15239,20 @@
     "comment": ""
   },
   {
+    "term": "Trash",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Trash command failed (exit %1)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Trending GIFs",
     "translation": "",
     "context": "",
@@ -14868,6 +15302,20 @@
     "comment": ""
   },
   {
+    "term": "Turn off",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Turn off Do Not Disturb",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Turn off all displays immediately when the lock screen activates",
     "translation": "",
     "context": "",
@@ -14876,6 +15324,20 @@
   },
   {
     "term": "Turn off monitors after",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Turn off monitors after lock",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Turn off now",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15148,6 +15610,34 @@
     "comment": ""
   },
   {
+    "term": "Until %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Until 8 AM",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Until I turn it off",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Until tomorrow, 8:00 AM",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Untitled",
     "translation": "",
     "context": "",
@@ -15184,6 +15674,13 @@
   },
   {
     "term": "Update Plugin",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Upgrading...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15330,7 +15827,7 @@
     "comment": ""
   },
   {
-    "term": "Use custom command for update your system",
+    "term": "Use custom command",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15828,13 +16325,6 @@
   },
   {
     "term": "When locked",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "When updater widget is used, then hide it if no update found",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16584,6 +17074,13 @@
   },
   {
     "term": "this app",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "until %1",
     "translation": "",
     "context": "",
     "reference": "",
