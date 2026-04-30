@@ -97,7 +97,8 @@ Item {
 
         Behavior on opacity {
             enabled: !Theme.isDirectionalEffect
-            DankAnim {
+            NumberAnimation {
+                easing.type: Easing.BezierSpline
                 duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1) * Theme.variantOpacityDurationScale)
                 easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
@@ -238,7 +239,8 @@ Item {
 
         Behavior on opacity {
             enabled: !Theme.isDirectionalEffect
-            DankAnim {
+            NumberAnimation {
+                easing.type: Easing.BezierSpline
                 duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2) * Theme.variantOpacityDurationScale)
                 easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
@@ -393,7 +395,8 @@ Item {
 
         Behavior on opacity {
             enabled: !Theme.isDirectionalEffect
-            DankAnim {
+            NumberAnimation {
+                easing.type: Easing.BezierSpline
                 duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3) * Theme.variantOpacityDurationScale)
                 easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }

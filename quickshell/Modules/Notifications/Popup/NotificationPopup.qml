@@ -36,10 +36,13 @@ PanelWindow {
 
     WindowBlur {
         targetWindow: win
-        blurX: content.x + content.cardInset + swipeTx.x + tx.x
-        blurY: content.y + content.cardInset + swipeTx.y + tx.y
-        blurWidth: !win._finalized && !win.connectedFrameMode ? Math.max(0, content.width - content.cardInset * 2) : 0
-        blurHeight: !win._finalized && !win.connectedFrameMode ? Math.max(0, content.height - content.cardInset * 2) : 0
+        readonly property real s: Math.min(1, content.scale) * Math.max(0, content.opacity)
+        readonly property real innerW: Math.max(0, content.width - content.cardInset * 2)
+        readonly property real innerH: Math.max(0, content.height - content.cardInset * 2)
+        blurX: content.x + content.cardInset + swipeTx.x + tx.x + innerW * (1 - s) * 0.5
+        blurY: content.y + content.cardInset + swipeTx.y + tx.y + innerH * (1 - s) * 0.5
+        blurWidth: !win._finalized && !win.connectedFrameMode ? innerW * s : 0
+        blurHeight: !win._finalized && !win.connectedFrameMode ? innerH * s : 0
         blurRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     }
 
@@ -993,7 +996,7 @@ PanelWindow {
                 z: 20
 
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
@@ -1048,7 +1051,7 @@ PanelWindow {
                 visible: actionCount < 3 && cardHoverHandler.hovered
                 opacity: visible ? 1 : 0
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
@@ -1136,7 +1139,7 @@ PanelWindow {
             }
 
             onTranslationChanged: {
-                if (win.exiting)
+                if (win.exiting || content.swipeDismissing)
                     return;
 
                 content.swipeOffset = translation.x;
@@ -1152,7 +1155,7 @@ PanelWindow {
         }
 
         Behavior on opacity {
-            enabled: !content.swipeActive
+            enabled: !content.swipeActive && !content.swipeDismissing
             NumberAnimation {
                 duration: Theme.shortDuration
             }
@@ -1269,7 +1272,6 @@ PanelWindow {
         NumberAnimation {
             target: content
             property: "opacity"
-            from: 1
             to: Theme.isDirectionalEffect ? 1 : 0
             duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
@@ -1279,7 +1281,6 @@ PanelWindow {
         NumberAnimation {
             target: content
             property: "scale"
-            from: 1
             to: Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed
             duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline

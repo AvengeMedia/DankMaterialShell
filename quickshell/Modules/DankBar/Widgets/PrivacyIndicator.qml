@@ -50,7 +50,7 @@ BasePill {
     ]
 
     Behavior on opacity {
-        NumberAnimation {
+        OpacityAnimator {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
         }
@@ -238,7 +238,7 @@ BasePill {
         Behavior on opacity {
             enabled: hasActivePrivacy && root.visible
 
-            NumberAnimation {
+            OpacityAnimator {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
             }

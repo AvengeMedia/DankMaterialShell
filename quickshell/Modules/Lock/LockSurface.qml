@@ -47,7 +47,7 @@ FocusScope {
         }
 
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: 200
             }
         }

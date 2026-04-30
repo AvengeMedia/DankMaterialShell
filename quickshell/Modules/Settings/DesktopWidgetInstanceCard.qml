@@ -182,7 +182,7 @@ SettingsCard {
         opacity: visible ? 1 : 0
 
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing
             }

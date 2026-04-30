@@ -47,7 +47,7 @@ BasePill {
                 anchors.centerIn: parent
 
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: Theme.shortDuration
                         easing.type: Easing.InOutQuad
                     }

@@ -20,7 +20,7 @@ Rectangle {
     }
 
     Behavior on opacity {
-        NumberAnimation {
+        OpacityAnimator {
             duration: standardAnimation.duration
             easing.type: standardAnimation["easing.type"]
             easing.bezierCurve: standardAnimation["easing.bezierCurve"]

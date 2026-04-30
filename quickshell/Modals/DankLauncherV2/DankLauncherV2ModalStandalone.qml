@@ -350,11 +350,11 @@ Item {
 
         WindowBlur {
             targetWindow: launcherWindow
-            readonly property real s: Math.min(1, modalContainer.scale)
+            readonly property real s: Math.min(1, modalContainer.publishedScale)
             blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5
             blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5
-            blurWidth: (contentVisible && modalContainer.opacity > 0) ? modalContainer.width * s : 0
-            blurHeight: (contentVisible && modalContainer.opacity > 0) ? modalContainer.height * s : 0
+            blurWidth: (contentVisible && modalContainer.publishedOpacity > 0) ? modalContainer.width * s : 0
+            blurHeight: (contentVisible && modalContainer.publishedOpacity > 0) ? modalContainer.height * s : 0
             blurRadius: root.cornerRadius
         }
 
@@ -411,23 +411,55 @@ Item {
             y: root.contentY
             width: root.alignedWidth
             height: root.alignedHeight
-            visible: contentVisible || opacity > 0
+            visible: _renderActive
+
+            property bool _renderActive: contentVisible
+            property real publishedOpacity: contentVisible ? 1 : 0
+            property real publishedScale: contentVisible ? 1 : 0.96
 
             opacity: contentVisible ? 1 : 0
             scale: contentVisible ? 1 : 0.96
             transformOrigin: Item.Center
 
             Behavior on opacity {
-                DankAnim {
+                OpacityAnimator {
+                    easing.type: Easing.BezierSpline
                     duration: Theme.modalAnimationDuration
                     easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
                 }
             }
 
-            Behavior on scale {
-                DankAnim {
+            Behavior on publishedOpacity {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
                     duration: Theme.modalAnimationDuration
                     easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                    onRunningChanged: if (!running && modalContainer.publishedOpacity === 0)
+                        modalContainer._renderActive = false
+                }
+            }
+
+            Behavior on scale {
+                ScaleAnimator {
+                    easing.type: Easing.BezierSpline
+                    duration: Theme.modalAnimationDuration
+                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                }
+            }
+
+            Behavior on publishedScale {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
+                    duration: Theme.modalAnimationDuration
+                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                }
+            }
+
+            Connections {
+                target: root
+                function onContentVisibleChanged() {
+                    if (root.contentVisible)
+                        modalContainer._renderActive = true;
                 }
             }
 

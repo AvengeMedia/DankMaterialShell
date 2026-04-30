@@ -23,7 +23,7 @@ ScrollBar {
     visible: policy !== ScrollBar.AlwaysOff
 
     Behavior on opacity {
-        NumberAnimation {
+        OpacityAnimator {
             duration: 160
             easing.type: Easing.OutQuad
         }

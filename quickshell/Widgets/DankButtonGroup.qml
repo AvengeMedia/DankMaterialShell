@@ -197,7 +197,7 @@ Row {
 
                         Behavior on opacity {
                             enabled: root.userInteracted
-                            NumberAnimation {
+                            OpacityAnimator {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
@@ -205,7 +205,7 @@ Row {
 
                         Behavior on scale {
                             enabled: root.userInteracted
-                            NumberAnimation {
+                            ScaleAnimator {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.emphasizedEasing
                             }

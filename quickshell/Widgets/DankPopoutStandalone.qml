@@ -527,7 +527,7 @@ Item {
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             readonly property bool trackBlurFromBarEdge: root.fluidStandaloneActive
-            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : (root.shouldBeVisible && contentWrapper.opacity > 0)
+            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : (root.shouldBeVisible && contentWrapper.publishedOpacity > 0)
 
             blurX: trackBlurFromBarEdge ? contentContainer.x + contentContainer.revealX : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
             blurY: trackBlurFromBarEdge ? contentContainer.y + contentContainer.revealY : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
@@ -595,9 +595,7 @@ Item {
         Item {
             id: contentContainer
             x: shadowBuffer + root.alignedX - root._surfaceBodyX
-            y: root._fullHeight
-                ? (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY)
-                : shadowBuffer + (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) - root._surfaceBodyY
+            y: root._fullHeight ? (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) : shadowBuffer + (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) - root._surfaceBodyY
             width: root.alignedWidth
             height: root.fluidStandaloneActive ? root.renderedAlignedHeight : root.alignedHeight
 
@@ -759,7 +757,7 @@ Item {
                         id: shadowSource
                         width: rollOutAdjuster.baseWidth
                         height: rollOutAdjuster.baseHeight
-                        opacity: contentWrapper.opacity
+                        opacity: contentWrapper.publishedOpacity
                         scale: root.fluidStandaloneActive ? 1 : contentWrapper.scale
                         x: root.fluidStandaloneActive ? 0 : contentWrapper.x
                         y: root.fluidStandaloneActive ? 0 : contentWrapper.y
@@ -775,23 +773,52 @@ Item {
                         id: contentWrapper
                         width: rollOutAdjuster.baseWidth
                         height: rollOutAdjuster.baseHeight
+
+                        // _renderActive pins visibility/layer for the full transition; flipped true on shouldBeVisible rising,
+                        // false only after the close animation completes. publishedOpacity tracks Item.opacity but on the GUI
+                        // thread so consumers (WindowBlur, ElevationShadow, sibling rect) see interpolated values while the
+                        // visual runs on the render thread via OpacityAnimator.
+                        property bool _renderActive: Theme.isDirectionalEffect || shouldBeVisible
+                        property bool _animating: false
+                        property real publishedOpacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
+
                         opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
-                        visible: opacity > 0
+                        visible: _renderActive
                         scale: contentContainer.scaleValue
                         transformOrigin: Item.Center
                         x: Theme.snap(contentContainer.animX + (rollOutAdjuster.baseWidth - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
                         y: Theme.snap(contentContainer.animY + (rollOutAdjuster.baseHeight - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
 
-                        layer.enabled: contentWrapper.opacity < 1
+                        layer.enabled: _animating || (!Theme.isDirectionalEffect && publishedOpacity < 1)
                         layer.smooth: false
                         layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
                         Behavior on opacity {
                             enabled: !Theme.isDirectionalEffect
+                            OpacityAnimator {
+                                duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                                onRunningChanged: contentWrapper._animating = running
+                            }
+                        }
+
+                        Behavior on publishedOpacity {
+                            enabled: !Theme.isDirectionalEffect
                             NumberAnimation {
                                 duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                                onRunningChanged: if (!running && contentWrapper.publishedOpacity === 0)
+                                    contentWrapper._renderActive = false
+                            }
+                        }
+
+                        Connections {
+                            target: root
+                            function onShouldBeVisibleChanged() {
+                                if (root.shouldBeVisible)
+                                    contentWrapper._renderActive = true;
                             }
                         }
 
@@ -808,7 +835,7 @@ Item {
                         height: rollOutAdjuster.baseHeight
                         x: root.fluidStandaloneActive ? 0 : contentWrapper.x
                         y: root.fluidStandaloneActive ? 0 : contentWrapper.y
-                        opacity: contentWrapper.opacity
+                        opacity: contentWrapper.publishedOpacity
                         scale: root.fluidStandaloneActive ? 1 : contentWrapper.scale
                         visible: contentWrapper.visible
                         radius: Theme.cornerRadius

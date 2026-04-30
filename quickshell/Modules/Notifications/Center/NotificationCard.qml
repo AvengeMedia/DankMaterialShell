@@ -75,7 +75,7 @@ Rectangle {
 
     Behavior on scale {
         enabled: listLevelScaleAnimationsEnabled
-        NumberAnimation {
+        ScaleAnimator {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
         }
@@ -545,7 +545,7 @@ Rectangle {
 
                         Behavior on x {
                             enabled: !expandedSwipeHandler.active && !expandedDelegateWrapper.isDismissing
-                            NumberAnimation {
+                            XAnimator {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
@@ -553,7 +553,7 @@ Rectangle {
 
                         Behavior on scale {
                             enabled: !expandedSwipeHandler.active
-                            NumberAnimation {
+                            ScaleAnimator {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
@@ -762,7 +762,7 @@ Rectangle {
                                         spacing: contentSpacing
 
                                         Behavior on opacity {
-                                            NumberAnimation {
+                                            OpacityAnimator {
                                                 duration: Theme.shortDuration
                                                 easing.type: Theme.standardEasing
                                             }
@@ -822,7 +822,7 @@ Rectangle {
                                             color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
 
                                             Behavior on opacity {
-                                                NumberAnimation {
+                                                OpacityAnimator {
                                                     duration: Theme.shortDuration
                                                     easing.type: Theme.standardEasing
                                                 }

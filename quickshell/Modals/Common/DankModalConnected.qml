@@ -154,6 +154,36 @@ Item {
         });
     }
 
+    property bool _animSyncQueued: false
+    function _queueAnimSync() {
+        if (_animSyncQueued)
+            return;
+        _animSyncQueued = true;
+        Qt.callLater(() => {
+            if (root && typeof root._flushAnimSync === "function")
+                root._flushAnimSync();
+        });
+    }
+    function _flushAnimSync() {
+        _animSyncQueued = false;
+        _syncModalAnim();
+    }
+
+    property bool _bodySyncQueued: false
+    function _queueBodySync() {
+        if (_bodySyncQueued)
+            return;
+        _bodySyncQueued = true;
+        Qt.callLater(() => {
+            if (root && typeof root._flushBodySync === "function")
+                root._flushBodySync();
+        });
+    }
+    function _flushBodySync() {
+        _bodySyncQueued = false;
+        _syncModalBody();
+    }
+
     function _syncModalAnim() {
         if (!frameOwnsConnectedChrome || !_chromeClaimId)
             return;
@@ -185,10 +215,10 @@ Item {
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
     onResolvedConnectedBarSideChanged: _queueFullSync()
     onShouldBeVisibleChanged: _queueFullSync()
-    onAlignedXChanged: _syncModalBody()
-    onAlignedYChanged: _syncModalBody()
-    onAlignedWidthChanged: _syncModalBody()
-    onAlignedHeightChanged: _syncModalBody()
+    onAlignedXChanged: _queueBodySync()
+    onAlignedYChanged: _queueBodySync()
+    onAlignedWidthChanged: _queueBodySync()
+    onAlignedHeightChanged: _queueBodySync()
 
     Component.onDestruction: _releaseModalChrome()
 
@@ -456,8 +486,8 @@ Item {
             readonly property real s: Math.min(1, modalContainer.scaleValue)
             blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
             blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
-            blurWidth: (root.shouldBeVisible && animatedContent.opacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.width * s : 0
-            blurHeight: (root.shouldBeVisible && animatedContent.opacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.height * s : 0
+            blurWidth: (root.shouldBeVisible && animatedContent.publishedOpacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.width * s : 0
+            blurHeight: (root.shouldBeVisible && animatedContent.publishedOpacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.height * s : 0
             blurRadius: root.effectiveCornerRadius
         }
 
@@ -666,9 +696,9 @@ Item {
             property real animY: root.shouldBeVisible ? 0 : root.frozenMotionOffsetY
 
             onAnimXChanged: if (root.frameOwnsConnectedChrome)
-                root._syncModalAnim()
+                root._queueAnimSync()
             onAnimYChanged: if (root.frameOwnsConnectedChrome)
-                root._syncModalAnim()
+                root._queueAnimSync()
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
             property real scaleValue: root.shouldBeVisible ? 1.0 : computedScaleCollapsed
@@ -711,11 +741,23 @@ Item {
                     id: animatedContent
                     anchors.fill: parent
                     clip: false
+
+                    property real publishedOpacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (root.shouldBeVisible ? 1 : 0)
+
                     opacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (root.shouldBeVisible ? 1 : 0)
                     scale: modalContainer.scaleValue
                     transformOrigin: Item.Center
 
                     Behavior on opacity {
+                        enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
+                        OpacityAnimator {
+                            duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                        }
+                    }
+
+                    Behavior on publishedOpacity {
                         enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
                         NumberAnimation {
                             duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)

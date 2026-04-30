@@ -53,7 +53,7 @@ Rectangle {
         opacity: mouseArea.containsMouse ? 0.08 : 0.0
 
         Behavior on opacity {
-            NumberAnimation {
+            OpacityAnimator {
                 duration: Theme.shortDuration
             }
         }
