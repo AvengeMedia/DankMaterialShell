@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 
 Item {
     id: root
@@ -16,10 +17,10 @@ Item {
     property string triggerSection: ""
     property string positioning: "center"
     property int animationDuration: Theme.popoutAnimationDuration
-    property real animationScaleCollapsed: 0.96
-    property real animationOffset: Theme.spacingL
-    property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
-    property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
+    property real animationScaleCollapsed: Theme.effectScaleCollapsed
+    property real animationOffset: Theme.effectAnimOffset
+    property list<real> animationEnterCurve: Theme.variantPopoutEnterCurve
+    property list<real> animationExitCurve: Theme.variantPopoutExitCurve
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
     property var customKeyboardFocus: null
@@ -73,6 +74,7 @@ Item {
     readonly property real barY: impl.item ? impl.item.barY : 0
     readonly property real barWidth: impl.item ? impl.item.barWidth : 0
     readonly property real barHeight: impl.item ? impl.item.barHeight : 0
+    readonly property bool useConnectedBackend: SettingsData.connectedFrameModeActive && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
 
     function open() {
         if (impl.item)
@@ -118,7 +120,8 @@ Item {
 
     Loader {
         id: impl
-        sourceComponent: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+        active: root.screen !== null
+        sourceComponent: root.useConnectedBackend ? connectedComp : standaloneComp
         onItemChanged: if (item)
             root._wireBackend(item)
     }
@@ -166,16 +169,7 @@ Item {
         it.effectiveBarPosition = Qt.binding(() => root.effectiveBarPosition);
         it.effectiveBarBottomGap = Qt.binding(() => root.effectiveBarBottomGap);
 
-        // shouldBeVisible is two-way — backend's open()/close() flips it internally.
         it.shouldBeVisible = root.shouldBeVisible;
-        it.shouldBeVisibleChanged.connect(function () {
-            if (root.shouldBeVisible !== it.shouldBeVisible)
-                root.shouldBeVisible = it.shouldBeVisible;
-        });
-
-        it.opened.connect(root.opened);
-        it.popoutClosed.connect(root.popoutClosed);
-        it.backgroundClicked.connect(root.backgroundClicked);
     }
 
     function primeContent() {
@@ -195,6 +189,28 @@ Item {
         function onShouldBeVisibleChanged() {
             if (impl.item && impl.item.shouldBeVisible !== root.shouldBeVisible)
                 impl.item.shouldBeVisible = root.shouldBeVisible;
+        }
+    }
+
+    Connections {
+        target: impl.item
+        ignoreUnknownSignals: true
+
+        function onShouldBeVisibleChanged() {
+            if (impl.item && root.shouldBeVisible !== impl.item.shouldBeVisible)
+                root.shouldBeVisible = impl.item.shouldBeVisible;
+        }
+
+        function onOpened() {
+            root.opened();
+        }
+
+        function onPopoutClosed() {
+            root.popoutClosed();
+        }
+
+        function onBackgroundClicked() {
+            root.backgroundClicked();
         }
     }
 }

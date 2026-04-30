@@ -586,8 +586,6 @@ Item {
                     }
                     return 0;
                 }
-                if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect)
-                    return 0;
                 if (slide && !directionalEffect && !depthEffect)
                     return 15;
                 if (directionalEffect) {
@@ -630,8 +628,6 @@ Item {
                     }
                     return 0;
                 }
-                if (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect)
-                    return 0;
                 if (slide && !directionalEffect && !depthEffect)
                     return -30;
                 if (directionalEffect) {
@@ -674,7 +670,7 @@ Item {
             onAnimYChanged: if (root.frameOwnsConnectedChrome)
                 root._syncModalAnim()
 
-            readonly property real computedScaleCollapsed: (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 && Theme.isDirectionalEffect) ? 0.0 : root.animationScaleCollapsed
+            readonly property real computedScaleCollapsed: root.animationScaleCollapsed
             property real scaleValue: root.shouldBeVisible ? 1.0 : computedScaleCollapsed
 
             Behavior on animX {

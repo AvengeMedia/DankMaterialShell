@@ -713,7 +713,7 @@ Item {
             // Declarative bindings — snap applied at render layer (contentWrapper x/y)
             property real animX: root._motionActive ? 0 : root._frozenMotionX
             property real animY: root._motionActive ? 0 : root._frozenMotionY
-            property real scaleValue: root._motionActive ? 1.0 : (Theme.isDirectionalEffect && typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2 ? Theme.effectScaleCollapsed : (Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed))
+            property real scaleValue: root._motionActive ? 1.0 : Theme.effectScaleCollapsed
 
             onAnimXChanged: if (root.frameOwnsConnectedChrome)
                 root._syncModalAnim()
@@ -737,7 +737,7 @@ Item {
             }
 
             Behavior on scaleValue {
-                enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || (typeof SettingsData !== "undefined" && SettingsData.directionalAnimationMode === 2))
+                enabled: root.animationsEnabled
                 DankAnim {
                     duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
                     easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve

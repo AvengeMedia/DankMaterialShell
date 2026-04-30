@@ -334,7 +334,6 @@ Item {
         sourceComponent: Component {
             DankDashPopout {
                 id: dankDashPopout
-                onPopoutClosed: PopoutService.unloadDankDash()
             }
         }
     }
