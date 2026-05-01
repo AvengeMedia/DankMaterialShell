@@ -38,7 +38,7 @@ StyledRect {
     property bool meetsRequirements: requiresDms ? PluginService.checkPluginCompatibility(requiresDms) : true
 
     Connections {
-        target: SystemUpdateService
+        target: ShellVersionService
         function onSemverVersionChanged() {
             root.meetsRequirementsChanged();
         }

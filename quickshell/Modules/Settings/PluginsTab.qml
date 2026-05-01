@@ -194,7 +194,7 @@ FocusScope {
                         }
 
                         Connections {
-                            target: SystemUpdateService
+                            target: ShellVersionService
                             function onSemverVersionChanged() {
                                 incompatWarning.refresh();
                             }
