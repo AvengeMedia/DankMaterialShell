@@ -326,7 +326,7 @@ Item {
                     settingKey: "frameLauncherArcExtender"
                     tags: ["frame", "connected", "launcher", "arc", "extender", "center"]
                     text: I18n.tr("Arc Extender")
-                    description: I18n.tr("Extend the launcher surface to the screen center")
+                    description: I18n.tr("Use the extended surface for launcher content")
                     checked: SettingsData.frameLauncherArcExtender
                     onToggled: checked => SettingsData.set("frameLauncherArcExtender", checked)
                 }
