@@ -66,6 +66,7 @@ Singleton {
             detectHibernateProcess.running = true;
             detectPrimeRunProcess.running = true;
             detectWtypeProcess.running = true;
+            cleanupOrphanedInhibitors();
             log.info("Native inhibitor available:", nativeInhibitorAvailable);
             if (!SettingsData.loginctlLockIntegration) {
                 log.debug("loginctl lock integration disabled by user");
@@ -458,6 +459,26 @@ Singleton {
                 log.warn("Inhibitor process crashed with exit code:", exitCode);
                 idleInhibited = false;
                 ToastService.showWarning("Idle inhibitor failed");
+            }
+        }
+    }
+
+    // Kill orphaned idle inhibitor processes left behind by previous quickshell sessions.
+    // When quickshell crashes or is force-killed, the child systemd-inhibit process gets
+    // reparented to PID 1 and continues to block idle indefinitely.
+    function cleanupOrphanedInhibitors() {
+        if (nativeInhibitorAvailable) return;
+        orphanCleanupProcess.running = true;
+    }
+
+    Process {
+        id: orphanCleanupProcess
+        running: false
+        command: ["pkill", "-f", "systemd-inhibit --what=idle --who=quickshell.*sleep infinity"]
+
+        onExited: function (exitCode) {
+            if (exitCode === 0) {
+                log.info("Cleaned up orphaned idle inhibitor process(es) from a previous session");
             }
         }
     }
