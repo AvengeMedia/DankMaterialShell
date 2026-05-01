@@ -15,7 +15,7 @@ PanelWindow {
     required property var targetScreen
 
     screen: targetScreen
-    visible: true
+    visible: _frameActive
 
     WlrLayershell.namespace: "dms:frame"
     WlrLayershell.layer: WlrLayer.Top
@@ -33,14 +33,14 @@ PanelWindow {
 
     readonly property var barEdges: {
         SettingsData.barConfigs;
-        return SettingsData.getActiveBarEdgesForScreen(win.screen);
+        return SettingsData.getActiveBarEdgesForScreen(win.targetScreen);
     }
 
-    readonly property real _dpr: CompositorService.getScreenScale(win.screen)
-    readonly property bool _frameActive: SettingsData.frameEnabled && SettingsData.isScreenInPreferences(win.screen, SettingsData.frameScreenPreferences)
+    readonly property real _dpr: CompositorService.getScreenScale(win.targetScreen)
+    readonly property bool _frameActive: SettingsData.frameEnabled && SettingsData.isScreenInPreferences(win.targetScreen, SettingsData.frameScreenPreferences)
     readonly property int _windowRegionWidth: win._regionInt(win.width)
     readonly property int _windowRegionHeight: win._regionInt(win.height)
-    readonly property string _screenName: win.screen ? win.screen.name : ""
+    readonly property string _screenName: win.targetScreen ? win.targetScreen.name : ""
     readonly property var _dockState: ConnectedModeState.dockStates[win._screenName] || ConnectedModeState.emptyDockState
     readonly property var _dockSlide: ConnectedModeState.dockSlides[win._screenName] || ({
             "x": 0,
@@ -1286,7 +1286,7 @@ PanelWindow {
         }
     }
 
-    Component.onCompleted: Qt.callLater(() => win._buildBlur())
+    Component.onCompleted: _blurRebuildTimer.restart()
     Component.onDestruction: win._teardownBlur()
 
     FrameBorder {
@@ -1304,8 +1304,8 @@ PanelWindow {
         anchors.fill: parent
         visible: win._connectedActive
         opacity: win._surfaceOpacity
-        // Skip FBO when disabled, or when neither elevation nor alpha blend is active
-        layer.enabled: !win._disableLayer && (Theme.elevationEnabled || win._surfaceOpacity < 1)
+        // Skip FBO when disabled, invisible, or when neither elevation nor alpha blend is active
+        layer.enabled: win._connectedActive && !win._disableLayer && (Theme.elevationEnabled || win._surfaceOpacity < 1)
         layer.smooth: false
 
         layer.effect: MultiEffect {

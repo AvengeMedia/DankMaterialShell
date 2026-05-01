@@ -93,6 +93,24 @@ Item {
     signal dialogClosed
     signal backgroundClicked
 
+    Timer {
+        id: _fullSyncTimer
+        interval: 0
+        onTriggered: root._flushFullSync()
+    }
+
+    Timer {
+        id: _animSyncTimer
+        interval: 0
+        onTriggered: root._flushAnimSync()
+    }
+
+    Timer {
+        id: _bodySyncTimer
+        interval: 0
+        onTriggered: root._flushBodySync()
+    }
+
     property bool animationsEnabled: true
 
     property string _chromeClaimId: ""
@@ -147,10 +165,7 @@ Item {
         if (_fullSyncPending)
             return;
         _fullSyncPending = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushFullSync === "function")
-                root._flushFullSync();
-        });
+        _fullSyncTimer.restart();
     }
 
     property bool _animSyncQueued: false
@@ -158,10 +173,7 @@ Item {
         if (_animSyncQueued)
             return;
         _animSyncQueued = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushAnimSync === "function")
-                root._flushAnimSync();
-        });
+        _animSyncTimer.restart();
     }
     function _flushAnimSync() {
         _animSyncQueued = false;
@@ -173,10 +185,7 @@ Item {
         if (_bodySyncQueued)
             return;
         _bodySyncQueued = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushBodySync === "function")
-                root._flushBodySync();
-        });
+        _bodySyncTimer.restart();
     }
     function _flushBodySync() {
         _bodySyncQueued = false;
@@ -483,8 +492,8 @@ Item {
             readonly property real s: Math.min(1, modalContainer.scaleValue)
             blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
             blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
-            blurWidth: (root.shouldBeVisible && animatedContent.publishedOpacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.width * s : 0
-            blurHeight: (root.shouldBeVisible && animatedContent.publishedOpacity > 0 && !root.frameOwnsConnectedChrome) ? modalContainer.height * s : 0
+            blurWidth: (root.shouldBeVisible && !root.frameOwnsConnectedChrome) ? modalContainer.width * s : 0
+            blurHeight: (root.shouldBeVisible && !root.frameOwnsConnectedChrome) ? modalContainer.height * s : 0
             blurRadius: root.effectiveCornerRadius
         }
 

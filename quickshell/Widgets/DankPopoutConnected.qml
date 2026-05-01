@@ -84,6 +84,24 @@ Item {
     signal popoutClosed
     signal backgroundClicked
 
+    Timer {
+        id: _fullSyncTimer
+        interval: 0
+        onTriggered: root._flushFullSync()
+    }
+
+    Timer {
+        id: _animSyncTimer
+        interval: 0
+        onTriggered: root._flushAnimSync()
+    }
+
+    Timer {
+        id: _bodySyncTimer
+        interval: 0
+        onTriggered: root._flushBodySync()
+    }
+
     property var _lastOpenedScreen: null
     property bool isClosing: false
 
@@ -266,11 +284,11 @@ Item {
         if (_fullSyncQueued)
             return;
         _fullSyncQueued = true;
-        Qt.callLater(() => {
-            root._fullSyncQueued = false;
-            if (typeof root._syncPopoutChromeState === "function")
-                root._syncPopoutChromeState();
-        });
+        _fullSyncTimer.restart();
+    }
+    function _flushFullSync() {
+        _fullSyncQueued = false;
+        _syncPopoutChromeState();
     }
 
     property bool _animSyncQueued: false
@@ -278,10 +296,7 @@ Item {
         if (_animSyncQueued)
             return;
         _animSyncQueued = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushAnimSync === "function")
-                root._flushAnimSync();
-        });
+        _animSyncTimer.restart();
     }
     function _flushAnimSync() {
         _animSyncQueued = false;
@@ -294,10 +309,7 @@ Item {
         if (_bodySyncQueued)
             return;
         _bodySyncQueued = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushBodySync === "function")
-                root._flushBodySync();
-        });
+        _bodySyncTimer.restart();
     }
     function _flushBodySync() {
         _bodySyncQueued = false;
@@ -707,8 +719,8 @@ Item {
 
             blurX: trackBlurFromBarEdge ? contentContainer.x + (contentContainer.barRight ? _dxClamp : 0) : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr) - contentContainer.horizontalConnectorExtent * s
             blurY: trackBlurFromBarEdge ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0) : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s
-            blurWidth: (shouldBeVisible && contentWrapper.publishedOpacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.width - Math.abs(_dxClamp)) : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s) : 0
-            blurHeight: (shouldBeVisible && contentWrapper.publishedOpacity > 0) ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) : 0
+            blurWidth: shouldBeVisible ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.width - Math.abs(_dxClamp)) : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s) : 0
+            blurHeight: shouldBeVisible ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) : 0
             blurRadius: Theme.isConnectedEffect ? Theme.connectedCornerRadius : Theme.connectedSurfaceRadius
         }
 
@@ -1077,7 +1089,11 @@ Item {
                                 duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                                onRunningChanged: contentWrapper._animating = running
+                                onRunningChanged: {
+                                    contentWrapper._animating = running;
+                                    if (!running && !root.shouldBeVisible)
+                                        contentWrapper._renderActive = false;
+                                }
                             }
                         }
 
@@ -1087,8 +1103,6 @@ Item {
                                 duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                                onRunningChanged: if (!running && contentWrapper.publishedOpacity === 0)
-                                    contentWrapper._renderActive = false
                             }
                         }
 
@@ -1097,6 +1111,14 @@ Item {
                             function onShouldBeVisibleChanged() {
                                 if (root.shouldBeVisible)
                                     contentWrapper._renderActive = true;
+                            }
+                        }
+
+                        Connections {
+                            target: contentWindow
+                            function onVisibleChanged() {
+                                if (!contentWindow.visible)
+                                    contentWrapper._renderActive = false;
                             }
                         }
 

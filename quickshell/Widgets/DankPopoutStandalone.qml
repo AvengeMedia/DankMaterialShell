@@ -553,7 +553,7 @@ Item {
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             readonly property bool trackBlurFromBarEdge: root.fluidStandaloneActive
-            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : (root.shouldBeVisible && contentWrapper.publishedOpacity > 0)
+            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : root.shouldBeVisible
 
             blurX: trackBlurFromBarEdge ? contentContainer.x + contentContainer.revealX : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
             blurY: trackBlurFromBarEdge ? contentContainer.y + contentContainer.revealY : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
@@ -825,7 +825,11 @@ Item {
                                 duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                                onRunningChanged: contentWrapper._animating = running
+                                onRunningChanged: {
+                                    contentWrapper._animating = running;
+                                    if (!running && !root.shouldBeVisible)
+                                        contentWrapper._renderActive = false;
+                                }
                             }
                         }
 
@@ -835,8 +839,6 @@ Item {
                                 duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                                onRunningChanged: if (!running && contentWrapper.publishedOpacity === 0)
-                                    contentWrapper._renderActive = false
                             }
                         }
 
@@ -845,6 +847,14 @@ Item {
                             function onShouldBeVisibleChanged() {
                                 if (root.shouldBeVisible)
                                     contentWrapper._renderActive = true;
+                            }
+                        }
+
+                        Connections {
+                            target: contentWindow
+                            function onVisibleChanged() {
+                                if (!contentWindow.visible)
+                                    contentWrapper._renderActive = false;
                             }
                         }
 

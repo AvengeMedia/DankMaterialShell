@@ -241,8 +241,8 @@ Item {
             readonly property real s: Math.min(1, modalContainer.scaleValue)
             blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
             blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
-            blurWidth: (shouldBeVisible && animatedContent.publishedOpacity > 0) ? modalContainer.width * s : 0
-            blurHeight: (shouldBeVisible && animatedContent.publishedOpacity > 0) ? modalContainer.height * s : 0
+            blurWidth: shouldBeVisible ? modalContainer.width * s : 0
+            blurHeight: shouldBeVisible ? modalContainer.height * s : 0
             blurRadius: root.cornerRadius
         }
 
@@ -400,8 +400,6 @@ Item {
                     anchors.fill: parent
                     clip: false
 
-                    property real publishedOpacity: root.shouldBeVisible ? 1 : 0
-
                     opacity: root.shouldBeVisible ? 1 : 0
                     scale: modalContainer.scaleValue
                     x: Theme.snap(modalContainer.animX, root.dpr) + (parent.width - width) * (1 - modalContainer.scaleValue) * 0.5
@@ -410,15 +408,6 @@ Item {
                     Behavior on opacity {
                         enabled: root.animationsEnabled
                         OpacityAnimator {
-                            duration: animationDuration
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                        }
-                    }
-
-                    Behavior on publishedOpacity {
-                        enabled: root.animationsEnabled
-                        NumberAnimation {
                             duration: animationDuration
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve

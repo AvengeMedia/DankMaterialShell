@@ -74,35 +74,76 @@ Item {
     readonly property real barY: impl.item ? impl.item.barY : 0
     readonly property real barWidth: impl.item ? impl.item.barWidth : 0
     readonly property real barHeight: impl.item ? impl.item.barHeight : 0
-    readonly property bool useConnectedBackend: SettingsData.connectedFrameModeActive && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
-    readonly property var _desiredBackend: useConnectedBackend ? connectedComp : standaloneComp
+    readonly property bool useConnectedBackend: _usesConnectedBackendForScreen(screen)
     property var _resolvedBackend: null
+    property bool _pendingOpen: false
+
+    Timer {
+        id: _pendingOpenTimer
+        interval: 0
+        onTriggered: {
+            if (!root._pendingOpen || !impl.item)
+                return;
+            root._pendingOpen = false;
+            impl.item.open();
+        }
+    }
 
     onUseConnectedBackendChanged: _maybeResolveBackend()
-    Component.onCompleted: _resolvedBackend = _desiredBackend
+    Component.onCompleted: _resolvedBackend = _backendForScreen(screen)
+
+    Connections {
+        target: SettingsData
+        function onConnectedFrameModeActiveChanged() {
+            root._maybeResolveBackend();
+        }
+        function onFrameScreenPreferencesChanged() {
+            root._maybeResolveBackend();
+        }
+    }
+
+    function _usesConnectedBackendForScreen(targetScreen) {
+        return SettingsData.connectedFrameModeActive && !!targetScreen && SettingsData.isScreenInPreferences(targetScreen, SettingsData.frameScreenPreferences);
+    }
+
+    function _backendForScreen(targetScreen) {
+        return _usesConnectedBackendForScreen(targetScreen) ? connectedComp : standaloneComp;
+    }
 
     // Defer Loader source-component swap until impl is fully closed; avoids
     // tearing down a popout mid-animation when frame mode is toggled.
     function _maybeResolveBackend() {
-        if (_resolvedBackend === _desiredBackend)
+        _resolveBackendForScreen(screen);
+    }
+
+    function _resolveBackendForScreen(targetScreen) {
+        const backend = _backendForScreen(targetScreen);
+        if (_resolvedBackend === backend)
             return;
         if (impl.item && (impl.item.shouldBeVisible || impl.item.isClosing))
             return;
-        _resolvedBackend = _desiredBackend;
+        _resolvedBackend = backend;
     }
 
     function open() {
-        if (impl.item)
+        _maybeResolveBackend();
+        if (impl.item) {
+            _pendingOpen = false;
             impl.item.open();
+            return;
+        }
+        _pendingOpen = true;
     }
 
     function close() {
+        _pendingOpen = false;
+        _pendingOpenTimer.stop();
         if (impl.item)
             impl.item.close();
     }
 
     function toggle() {
-        shouldBeVisible ? close() : open();
+        (shouldBeVisible || _pendingOpen) ? close() : open();
     }
 
     function setBarContext(position, bottomGap) {
@@ -126,6 +167,7 @@ Item {
 
         adjacentBarInfo = SettingsData.getAdjacentBarInfo(targetScreen, pos, barConfig);
         setBarContext(pos, bottomGap);
+        _resolveBackendForScreen(targetScreen);
     }
 
     function updateSurfacePosition() {
@@ -185,6 +227,10 @@ Item {
         it.effectiveBarBottomGap = Qt.binding(() => root.effectiveBarBottomGap);
 
         it.shouldBeVisible = root.shouldBeVisible;
+        if (root._primeContent && typeof it.primeContent === "function")
+            it.primeContent();
+        if (_pendingOpen)
+            _pendingOpenTimer.restart();
     }
 
     function primeContent() {

@@ -191,6 +191,24 @@ Item {
 
     signal dialogClosed
 
+    Timer {
+        id: _fullSyncTimer
+        interval: 0
+        onTriggered: root._flushFullSync()
+    }
+
+    Timer {
+        id: _animSyncTimer
+        interval: 0
+        onTriggered: root._flushAnimSync()
+    }
+
+    Timer {
+        id: _bodySyncTimer
+        interval: 0
+        onTriggered: root._flushBodySync()
+    }
+
     property string _chromeClaimId: ""
     property bool _fullSyncPending: false
 
@@ -243,10 +261,7 @@ Item {
         if (_fullSyncPending)
             return;
         _fullSyncPending = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushFullSync === "function")
-                root._flushFullSync();
-        });
+        _fullSyncTimer.restart();
     }
 
     property bool _animSyncQueued: false
@@ -254,10 +269,7 @@ Item {
         if (_animSyncQueued)
             return;
         _animSyncQueued = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushAnimSync === "function")
-                root._flushAnimSync();
-        });
+        _animSyncTimer.restart();
     }
     function _flushAnimSync() {
         _animSyncQueued = false;
@@ -269,10 +281,7 @@ Item {
         if (_bodySyncQueued)
             return;
         _bodySyncQueued = true;
-        Qt.callLater(() => {
-            if (root && typeof root._flushBodySync === "function")
-                root._flushBodySync();
-        });
+        _bodySyncTimer.restart();
     }
     function _flushBodySync() {
         _bodySyncQueued = false;
@@ -625,8 +634,8 @@ Item {
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             blurX: root._ccX + root.alignedWidth * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
             blurY: root._ccY + root.alignedHeight * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: (root.spotlightOpen || root.isClosing) && contentWrapper.publishedOpacity > 0 && !root.frameOwnsConnectedChrome ? root.alignedWidth * s : 0
-            blurHeight: (root.spotlightOpen || root.isClosing) && contentWrapper.publishedOpacity > 0 && !root.frameOwnsConnectedChrome ? root.alignedHeight * s : 0
+            blurWidth: (root.spotlightOpen || root.isClosing) && !root.frameOwnsConnectedChrome ? root.alignedWidth * s : 0
+            blurHeight: (root.spotlightOpen || root.isClosing) && !root.frameOwnsConnectedChrome ? root.alignedHeight * s : 0
             blurRadius: root.cornerRadius
         }
 
