@@ -12,6 +12,8 @@ import "../../Common/ConnectorGeometry.js" as ConnectorGeometry
 PanelWindow {
     id: win
 
+    readonly property var log: Log.scoped("FrameWindow")
+
     required property var targetScreen
 
     screen: targetScreen
@@ -1221,7 +1223,7 @@ PanelWindow {
             }
             win.BackgroundEffect.blurRegion = _staticBlurRegion;
         } catch (e) {
-            console.warn("FrameWindow: Failed to set blur region:", e);
+            win.log.warn("Failed to set blur region:", e);
         }
     }
 
@@ -1231,62 +1233,70 @@ PanelWindow {
         } catch (e) {}
     }
 
-    Timer {
-        id: _blurRebuildTimer
-        interval: 1
-        onTriggered: win._buildBlur()
+    // Coalesce bursts of settings-change signals into a single _buildBlur() call
+    // on the next event loop tick.
+    property bool _blurRebuildPending: false
+    function _scheduleBlurRebuild() {
+        if (_blurRebuildPending)
+            return;
+        _blurRebuildPending = true;
+        Qt.callLater(_runBlurRebuild);
+    }
+    function _runBlurRebuild() {
+        _blurRebuildPending = false;
+        win._buildBlur();
     }
 
     Connections {
         target: SettingsData
         function onFrameBlurEnabledChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onFrameEnabledChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onFrameThicknessChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onFrameBarSizeChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onFrameOpacityChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onFrameRoundingChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onFrameScreenPreferencesChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onBarConfigsChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onConnectedFrameModeActiveChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
         function onFrameCloseGapsChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
     }
 
     Connections {
         target: BlurService
         function onEnabledChanged() {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         }
     }
 
     onVisibleChanged: {
         if (visible) {
-            _blurRebuildTimer.restart();
+            win._scheduleBlurRebuild();
         } else {
             _teardownBlur();
         }
     }
 
-    Component.onCompleted: _blurRebuildTimer.restart()
+    Component.onCompleted: win._scheduleBlurRebuild()
     Component.onDestruction: win._teardownBlur()
 
     FrameBorder {

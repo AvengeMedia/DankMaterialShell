@@ -7,6 +7,8 @@ import qs.Services
 Item {
     id: root
 
+    readonly property var log: Log.scoped("DankPopoutStandalone")
+
     property var popoutHandle: root
     property string layerNamespace: "dms:popout"
     property alias content: contentLoader.sourceComponent
@@ -214,6 +216,17 @@ Item {
         }
     }
 
+    // Forces contentWindow to render a frame so Quickshell ships the updated
+    // WindowBlur region to the compositor. WindowBlur's property updates
+    // don't dirty the QML scene graph by themselves, so when the popup grows,
+    // shrinks, or closes without an animation running, the blur state can
+    // get stuck at its previous size. Called from the existing
+    // onAligned*Changed / onShouldBeVisibleChanged handlers.
+    function _kickBlurCommit() {
+        if (typeof contentWindow.update === "function")
+            contentWindow.update();
+    }
+
     function _setSettledSurfaceGeometry() {
         if (shouldBeVisible) {
             _setSurfaceGeometry(alignedX, alignedY, alignedWidth, alignedHeight);
@@ -247,16 +260,19 @@ Item {
     onAlignedXChanged: {
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
+        _kickBlurCommit();
     }
 
     onAlignedYChanged: {
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
+        _kickBlurCommit();
     }
 
     onAlignedWidthChanged: {
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
+        _kickBlurCommit();
     }
 
     function open() {
@@ -378,12 +394,14 @@ Item {
     onAlignedHeightChanged: {
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
+        _kickBlurCommit();
         if (!suspendShadowWhileResizing || !shouldBeVisible)
             return;
         _resizeActive = true;
         resizeSettleTimer.restart();
     }
     onShouldBeVisibleChanged: {
+        _kickBlurCommit();
         if (!shouldBeVisible) {
             _resizeActive = false;
             resizeSettleTimer.stop();
@@ -566,10 +584,10 @@ Item {
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_POPOUT_LAYER")) {
             case "bottom":
-                console.warn("DankPopout: 'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
+                root.log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "background":
-                console.warn("DankPopout: 'background' layer is not valid for popouts. Defaulting to 'top' layer.");
+                root.log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;
@@ -800,12 +818,10 @@ Item {
                         width: rollOutAdjuster.baseWidth
                         height: rollOutAdjuster.baseHeight
 
-                        // _renderActive pins visibility/layer for the full transition; flipped true on shouldBeVisible rising,
-                        // false only after the close animation completes. publishedOpacity tracks Item.opacity but on the GUI
-                        // thread so consumers (WindowBlur, ElevationShadow, sibling rect) see interpolated values while the
-                        // visual runs on the render thread via OpacityAnimator.
+                        // publishedOpacity tracks Item.opacity on the GUI thread so consumers (WindowBlur,
+                        // ElevationShadow, sibling rect) see interpolated values while the visual runs on
+                        // the render thread via OpacityAnimator.
                         property bool _renderActive: Theme.isDirectionalEffect || shouldBeVisible
-                        property bool _animating: false
                         property real publishedOpacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
 
                         opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
@@ -815,7 +831,7 @@ Item {
                         x: Theme.snap(contentContainer.animX + (rollOutAdjuster.baseWidth - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
                         y: Theme.snap(contentContainer.animY + (rollOutAdjuster.baseHeight - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
 
-                        layer.enabled: _animating || (!Theme.isDirectionalEffect && publishedOpacity < 1)
+                        layer.enabled: !Theme.isDirectionalEffect && publishedOpacity < 1
                         layer.smooth: false
                         layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
@@ -826,7 +842,6 @@ Item {
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                                 onRunningChanged: {
-                                    contentWrapper._animating = running;
                                     if (!running && !root.shouldBeVisible)
                                         contentWrapper._renderActive = false;
                                 }
