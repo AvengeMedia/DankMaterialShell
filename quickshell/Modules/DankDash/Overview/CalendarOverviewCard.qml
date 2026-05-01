@@ -402,7 +402,7 @@ Rectangle {
                                     opacity: isToday ? 0.9 : 0.7
 
                                     Behavior on opacity {
-                                        OpacityAnimator {
+                                        NumberAnimation {
                                             duration: Theme.shortDuration
                                             easing.type: Theme.standardEasing
                                         }

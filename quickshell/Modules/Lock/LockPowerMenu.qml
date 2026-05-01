@@ -779,7 +779,7 @@ Rectangle {
                     opacity: root.showHoldHint ? 1 : 0.5
 
                     Behavior on opacity {
-                        OpacityAnimator {
+                        NumberAnimation {
                             duration: 150
                         }
                     }

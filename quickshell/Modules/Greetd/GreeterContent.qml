@@ -714,7 +714,7 @@ Item {
         }
 
         Behavior on opacity {
-            OpacityAnimator {
+            NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.standardEasing
             }
@@ -1012,7 +1012,7 @@ Item {
                             opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length === 0 : GreeterState.usernameInput.length === 0) ? 1 : 0
 
                             Behavior on opacity {
-                                OpacityAnimator {
+                                NumberAnimation {
                                     duration: Theme.mediumDuration
                                     easing.type: Theme.standardEasing
                                 }
@@ -1049,7 +1049,7 @@ Item {
                             horizontalAlignment: implicitWidth > width ? Text.AlignRight : Text.AlignLeft
 
                             Behavior on opacity {
-                                OpacityAnimator {
+                                NumberAnimation {
                                     duration: Theme.mediumDuration
                                     easing.type: Theme.standardEasing
                                 }
@@ -1121,7 +1121,7 @@ Item {
                             }
 
                             Behavior on opacity {
-                                OpacityAnimator {
+                                NumberAnimation {
                                     duration: Theme.shortDuration
                                     easing.type: Theme.standardEasing
                                 }
@@ -1151,7 +1151,7 @@ Item {
                     opacity: root.authFeedbackMessage !== "" ? 1 : 0
 
                     Behavior on opacity {
-                        OpacityAnimator {
+                        NumberAnimation {
                             duration: Theme.shortDuration
                             easing.type: Theme.standardEasing
                         }
@@ -1169,7 +1169,7 @@ Item {
                     enabled: GreeterState.showPasswordInput
 
                     Behavior on opacity {
-                        OpacityAnimator {
+                        NumberAnimation {
                             duration: Theme.mediumDuration
                             easing.type: Theme.standardEasing
                         }

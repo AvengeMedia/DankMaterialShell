@@ -225,7 +225,7 @@ Item {
                     y: parent.midY - height / 2
                     z: 3
                     Behavior on x {
-                        XAnimator {
+                        NumberAnimation {
                             duration: 80
                         }
                     }

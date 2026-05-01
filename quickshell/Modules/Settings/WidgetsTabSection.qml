@@ -308,7 +308,7 @@ Column {
                                 }
 
                                 Behavior on opacity {
-                                    OpacityAnimator {
+                                    NumberAnimation {
                                         duration: Theme.shortDuration
                                         easing.type: Theme.standardEasing
                                     }
@@ -620,7 +620,7 @@ Column {
                                 }
 
                                 Behavior on opacity {
-                                    OpacityAnimator {
+                                    NumberAnimation {
                                         duration: Theme.shortDuration
                                         easing.type: Theme.standardEasing
                                     }

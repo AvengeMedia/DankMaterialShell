@@ -837,7 +837,7 @@ Item {
 
                         Behavior on opacity {
                             enabled: !Theme.isDirectionalEffect
-                            OpacityAnimator {
+                            NumberAnimation {
                                 duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve

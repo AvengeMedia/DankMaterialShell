@@ -514,14 +514,14 @@ Item {
                     height: (isInOverflow && !root.overflowExpanded) ? 0 : (itemData.type === "separator" ? (root.isVertical ? 8 : root.iconSize) : (root.isVertical ? root.iconSize * 1.2 : root.iconSize))
 
                     Behavior on opacity {
-                        OpacityAnimator {
+                        NumberAnimation {
                             duration: Theme.shortDuration
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Behavior on scale {
-                        ScaleAnimator {
+                        NumberAnimation {
                             duration: Theme.shortDuration
                             easing.type: Easing.OutCubic
                         }

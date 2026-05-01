@@ -587,7 +587,7 @@ FloatingWindow {
                                     border.color: buttonState === "incompatible" ? Theme.warning : Theme.outline
 
                                     Behavior on opacity {
-                                        OpacityAnimator {
+                                        NumberAnimation {
                                             duration: Theme.shortDuration
                                             easing.type: Theme.standardEasing
                                         }

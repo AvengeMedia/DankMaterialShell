@@ -214,13 +214,13 @@ Item {
                 color: root.accentColor
 
                 Behavior on x {
-                    XAnimator {
+                    NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
                 }
                 Behavior on y {
-                    YAnimator {
+                    NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
@@ -278,13 +278,13 @@ Item {
                 color: root.accentColor
 
                 Behavior on x {
-                    XAnimator {
+                    NumberAnimation {
                         duration: Theme.mediumDuration
                         easing.type: Theme.emphasizedEasing
                     }
                 }
                 Behavior on y {
-                    YAnimator {
+                    NumberAnimation {
                         duration: Theme.mediumDuration
                         easing.type: Theme.emphasizedEasing
                     }

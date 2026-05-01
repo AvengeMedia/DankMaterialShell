@@ -171,7 +171,7 @@ Item {
                 scale: active ? 1.05 : 1.0
 
                 Behavior on scale {
-                    ScaleAnimator {
+                    NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
@@ -278,7 +278,7 @@ Item {
                 }
 
                 Behavior on opacity {
-                    OpacityAnimator {
+                    NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }

@@ -474,14 +474,14 @@ BasePill {
             height: (isInOverflow && !root.overflowExpanded) ? 0 : visualHeight
 
             Behavior on opacity {
-                OpacityAnimator {
+                NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Easing.OutCubic
                 }
             }
 
             Behavior on scale {
-                ScaleAnimator {
+                NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Easing.OutCubic
                 }
@@ -666,7 +666,7 @@ BasePill {
                         transformOrigin: Item.Center
                         scale: appItem.enlargeScale
                         Behavior on scale {
-                            ScaleAnimator {
+                            NumberAnimation {
                                 duration: 120
                                 easing.type: Easing.OutCubic
                             }
@@ -711,7 +711,7 @@ BasePill {
                         transformOrigin: Item.Center
                         scale: appItem.enlargeScale
                         Behavior on scale {
-                            ScaleAnimator {
+                            NumberAnimation {
                                 duration: 120
                                 easing.type: Easing.OutCubic
                             }
@@ -734,7 +734,7 @@ BasePill {
                         transformOrigin: Item.Center
                         scale: appItem.enlargeScale
                         Behavior on scale {
-                            ScaleAnimator {
+                            NumberAnimation {
                                 duration: 120
                                 easing.type: Easing.OutCubic
                             }
@@ -758,7 +758,7 @@ BasePill {
                         transformOrigin: Item.Center
                         scale: appItem.enlargeScale
                         Behavior on scale {
-                            ScaleAnimator {
+                            NumberAnimation {
                                 duration: 120
                                 easing.type: Easing.OutCubic
                             }

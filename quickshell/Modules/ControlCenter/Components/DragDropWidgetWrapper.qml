@@ -51,7 +51,7 @@ Item {
             }
         }
         Behavior on opacity {
-            OpacityAnimator {
+            NumberAnimation {
                 duration: 150
             }
         }
@@ -299,7 +299,7 @@ Item {
         }
 
         Behavior on opacity {
-            OpacityAnimator {
+            NumberAnimation {
                 duration: 150
             }
         }

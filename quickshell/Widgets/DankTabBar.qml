@@ -201,7 +201,7 @@ FocusScope {
 
         Behavior on x {
             enabled: indicator.animationEnabled
-            XAnimator {
+            NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.standardEasing
             }

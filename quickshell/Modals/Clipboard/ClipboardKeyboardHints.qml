@@ -41,7 +41,7 @@ Rectangle {
     }
 
     Behavior on opacity {
-        OpacityAnimator {
+        NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
         }

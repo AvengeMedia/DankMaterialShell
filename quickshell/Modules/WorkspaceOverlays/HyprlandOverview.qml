@@ -120,7 +120,7 @@ Scope {
                     opacity: overviewScope.overviewOpen ? 0.5 : 0
 
                     Behavior on opacity {
-                        OpacityAnimator {
+                        NumberAnimation {
                             duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
@@ -173,7 +173,7 @@ Scope {
                         }
 
                         Behavior on opacity {
-                            OpacityAnimator {
+                            NumberAnimation {
                                 duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
@@ -181,7 +181,7 @@ Scope {
                         }
 
                         Behavior on scale {
-                            ScaleAnimator {
+                            NumberAnimation {
                                 duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
@@ -189,7 +189,7 @@ Scope {
                         }
 
                         Behavior on x {
-                            XAnimator {
+                            NumberAnimation {
                                 duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
@@ -197,7 +197,7 @@ Scope {
                         }
 
                         Behavior on y {
-                            YAnimator {
+                            NumberAnimation {
                                 duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
