@@ -168,14 +168,14 @@ Item {
                 scale: (toggle.checked && toggle.enabled) ? 1 : 0.6
 
                 Behavior on opacity {
-                    OpacityAnimator {
+                    NumberAnimation {
                         duration: Anims.durShort
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Anims.emphasized
                     }
                 }
                 Behavior on scale {
-                    ScaleAnimator {
+                    NumberAnimation {
                         duration: Anims.durShort
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Anims.emphasized

@@ -195,7 +195,7 @@ DankPopout {
 
                 Behavior on opacity {
                     enabled: !Theme.isDirectionalEffect
-                    OpacityAnimator {
+                    NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: root.shouldBeVisible ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve

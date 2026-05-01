@@ -173,7 +173,7 @@ BasePill {
             opacity: root.playerAvailable ? 1 : 0
 
             Behavior on opacity {
-                OpacityAnimator {
+                NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
                 }

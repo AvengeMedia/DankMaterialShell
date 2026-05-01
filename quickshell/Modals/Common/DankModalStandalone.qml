@@ -7,6 +7,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DankModalStandalone")
 
     property var modalHandle: root
     property string layerNamespace: "dms:modal"
@@ -252,10 +253,10 @@ Item {
                 return WlrLayershell.Overlay;
             switch (Quickshell.env("DMS_MODAL_LAYER")) {
             case "bottom":
-                console.error("DankModal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "background":
-                console.error("DankModal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;
@@ -318,7 +319,7 @@ Item {
 
             Behavior on opacity {
                 enabled: root.animationsEnabled
-                OpacityAnimator {
+                NumberAnimation {
                     easing.type: Easing.BezierSpline
                     duration: root.animationDuration
                     easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
@@ -407,7 +408,7 @@ Item {
 
                     Behavior on opacity {
                         enabled: root.animationsEnabled
-                        OpacityAnimator {
+                        NumberAnimation {
                             duration: animationDuration
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve

@@ -127,7 +127,7 @@ Item {
         opacity: modalVisible ? 1 : 0
 
         Behavior on opacity {
-            OpacityAnimator {
+            NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing
             }
@@ -316,14 +316,14 @@ Item {
         }
 
         Behavior on opacity {
-            OpacityAnimator {
+            NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing
             }
         }
 
         Behavior on scale {
-            ScaleAnimator {
+            NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing
             }

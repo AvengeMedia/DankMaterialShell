@@ -619,7 +619,7 @@ FloatingWindow {
                                 border.color: isInstalled ? (uninstallMouseArea.containsMouse ? Theme.error : Theme.outline) : "transparent"
 
                                 Behavior on opacity {
-                                    OpacityAnimator {
+                                    NumberAnimation {
                                         duration: Theme.shortDuration
                                         easing.type: Theme.standardEasing
                                     }

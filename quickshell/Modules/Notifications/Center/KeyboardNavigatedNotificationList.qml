@@ -226,7 +226,7 @@ DankListView {
 
             Behavior on x {
                 enabled: !swipeDragHandler.active && !delegateRoot.isDismissing && (listView.swipingCardIndex === -1 || !delegateRoot.isAdjacentToSwipe) && listView.listInitialized
-                XAnimator {
+                NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
                 }
@@ -234,7 +234,7 @@ DankListView {
 
             Behavior on opacity {
                 enabled: listView.listInitialized
-                OpacityAnimator {
+                NumberAnimation {
                     duration: listView.listInitialized ? Theme.shortDuration : 0
                 }
             }

@@ -8,6 +8,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DankLauncherV2ModalConnected")
 
     property var modalHandle: root
 
@@ -643,10 +644,10 @@ Item {
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_MODAL_LAYER")) {
             case "bottom":
-                console.error("DankLauncherV2Modal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "background":
-                console.error("DankLauncherV2Modal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;
@@ -836,7 +837,7 @@ Item {
 
                         Behavior on opacity {
                             enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
-                            OpacityAnimator {
+                            NumberAnimation {
                                 easing.type: Easing.BezierSpline
                                 duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
                                 easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve

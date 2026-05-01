@@ -8,6 +8,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DankLauncherV2ModalStandalone")
 
     property var modalHandle: root
 
@@ -362,10 +363,10 @@ Item {
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_MODAL_LAYER")) {
             case "bottom":
-                console.error("DankModal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "background":
-                console.error("DankModal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
+                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;
@@ -421,7 +422,7 @@ Item {
             transformOrigin: Item.Center
 
             Behavior on opacity {
-                OpacityAnimator {
+                NumberAnimation {
                     easing.type: Easing.BezierSpline
                     duration: Theme.modalAnimationDuration
                     easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
@@ -431,7 +432,7 @@ Item {
             }
 
             Behavior on scale {
-                ScaleAnimator {
+                NumberAnimation {
                     easing.type: Easing.BezierSpline
                     duration: Theme.modalAnimationDuration
                     easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized

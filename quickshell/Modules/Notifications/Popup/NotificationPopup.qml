@@ -996,7 +996,7 @@ PanelWindow {
                 z: 20
 
                 Behavior on opacity {
-                    OpacityAnimator {
+                    NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
@@ -1051,7 +1051,7 @@ PanelWindow {
                 visible: actionCount < 3 && cardHoverHandler.hovered
                 opacity: visible ? 1 : 0
                 Behavior on opacity {
-                    OpacityAnimator {
+                    NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }

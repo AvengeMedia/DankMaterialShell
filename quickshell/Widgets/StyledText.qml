@@ -40,7 +40,7 @@ Text {
     //renderType: Text.NativeRendering
 
     Behavior on opacity {
-        OpacityAnimator {
+        NumberAnimation {
             duration: standardAnimation.duration
             easing.type: standardAnimation["easing.type"]
             easing.bezierCurve: standardAnimation["easing.bezierCurve"]

@@ -22,7 +22,7 @@ Rectangle {
     scale: mouseArea.pressed ? 0.97 : 1
 
     Behavior on scale {
-        ScaleAnimator {
+        NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.emphasizedEasing
         }

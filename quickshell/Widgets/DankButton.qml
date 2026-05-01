@@ -28,7 +28,7 @@ Rectangle {
 
     Behavior on scale {
         enabled: enableScaleAnimation && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-        ScaleAnimator {
+        NumberAnimation {
             easing.type: Easing.BezierSpline
             duration: 100
             easing.bezierCurve: Theme.expressiveCurves.standard

@@ -7,6 +7,7 @@ import "../Common/ConnectorGeometry.js" as ConnectorGeometry
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DankPopoutConnected")
 
     property var popoutHandle: root
     property string layerNamespace: "dms:popout"
@@ -728,10 +729,10 @@ Item {
         WlrLayershell.layer: {
             switch (Quickshell.env("DMS_POPOUT_LAYER")) {
             case "bottom":
-                console.warn("DankPopout: 'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
+                log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "background":
-                console.warn("DankPopout: 'background' layer is not valid for popouts. Defaulting to 'top' layer.");
+                log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;
@@ -1085,7 +1086,7 @@ Item {
 
                         Behavior on opacity {
                             enabled: !Theme.isDirectionalEffect
-                            OpacityAnimator {
+                            NumberAnimation {
                                 duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
