@@ -61,26 +61,22 @@ Item {
                     border.color: Theme.primary
                     opacity: 0
 
-                    SequentialAnimation on opacity {
+                    OpacityAnimator on opacity {
                         running: root.isRunning
                         loops: Animation.Infinite
-                        NumberAnimation {
-                            from: 0.8
-                            to: 0
-                            duration: 1500
-                            easing.type: Easing.OutQuad
-                        }
+                        from: 0.8
+                        to: 0
+                        duration: 1500
+                        easing.type: Easing.OutQuad
                     }
 
-                    SequentialAnimation on scale {
+                    ScaleAnimator on scale {
                         running: root.isRunning
                         loops: Animation.Infinite
-                        NumberAnimation {
-                            from: 0.5
-                            to: 1.5
-                            duration: 1500
-                            easing.type: Easing.OutQuad
-                        }
+                        from: 0.5
+                        to: 1.5
+                        duration: 1500
+                        easing.type: Easing.OutQuad
                     }
                 }
 
@@ -95,26 +91,22 @@ Item {
                     border.color: Theme.secondary
                     opacity: 0
 
-                    SequentialAnimation on opacity {
+                    OpacityAnimator on opacity {
                         running: root.isRunning
                         loops: Animation.Infinite
-                        NumberAnimation {
-                            from: 0.8
-                            to: 0
-                            duration: 1500
-                            easing.type: Easing.OutQuad
-                        }
+                        from: 0.8
+                        to: 0
+                        duration: 1500
+                        easing.type: Easing.OutQuad
                     }
 
-                    SequentialAnimation on scale {
+                    ScaleAnimator on scale {
                         running: root.isRunning
                         loops: Animation.Infinite
-                        NumberAnimation {
-                            from: 0.3
-                            to: 1.3
-                            duration: 1500
-                            easing.type: Easing.OutQuad
-                        }
+                        from: 0.3
+                        to: 1.3
+                        duration: 1500
+                        easing.type: Easing.OutQuad
                     }
                 }
 

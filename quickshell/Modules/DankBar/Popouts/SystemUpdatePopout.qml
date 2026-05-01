@@ -148,19 +148,16 @@ DankPopout {
                         opacity: enabled ? 1.0 : 0.5
                         onClicked: SystemUpdateService.checkForUpdates()
 
-                        RotationAnimation {
-                            target: refreshButton
-                            property: "rotation"
+                        RotationAnimator on rotation {
                             from: 0
                             to: 360
                             duration: 1000
-                            running: SystemUpdateService.isChecking
                             loops: Animation.Infinite
+                            running: SystemUpdateService.isChecking
 
                             onRunningChanged: {
-                                if (!running) {
+                                if (!running)
                                     refreshButton.rotation = 0;
-                                }
                             }
                         }
                     }

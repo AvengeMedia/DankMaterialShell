@@ -1025,7 +1025,7 @@ Item {
                                     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
                                 }
 
-                                RotationAnimation on rotation {
+                                RotationAnimator on rotation {
                                     running: pam.passwd.active && !root.unlocking
                                     loops: Animation.Infinite
                                     duration: Anims.durLong
