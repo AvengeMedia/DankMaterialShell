@@ -16,6 +16,12 @@ Rectangle {
     property bool isActive: false
     property bool showExpandArea: true
 
+    property bool hasSlider: false
+    property real sliderValue: 50
+    property real sliderMin: 0
+    property real sliderMax: 100
+    property var sliderAction: null
+
     signal toggled
     signal expandClicked
     signal wheelEvent(var wheelEvent)
@@ -138,7 +144,9 @@ Rectangle {
             Column {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: root.hasSlider && root.primaryText ? parent.top : undefined
+                anchors.topMargin: root.hasSlider && root.primaryText ? 10 : 0
+                anchors.verticalCenter: root.hasSlider && root.primaryText ? undefined : parent.verticalCenter
                 spacing: 2
 
                 StyledText {
@@ -156,11 +164,27 @@ Rectangle {
                     text: root.secondaryText
                     color: _labelSecondary
                     font.pixelSize: Theme.fontSizeSmall
-                    visible: text.length > 0
+                    visible: text.length > 0 && !root.hasSlider
                     elide: Text.ElideRight
                     wrapMode: Text.NoWrap
                     horizontalAlignment: Text.AlignLeft
                 }
+            }
+
+            DankSlider {
+                id: inlineSlider
+                z: 1
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: root.primaryText ? parent.bottom : undefined
+                anchors.bottomMargin: root.primaryText ? 4 : 0
+                anchors.verticalCenter: root.primaryText ? undefined : parent.verticalCenter
+                height: 28
+                visible: root.hasSlider
+                minimum: root.sliderMin
+                maximum: root.sliderMax
+                value: root.sliderValue
+                onSliderValueChanged: (value) => { if (root.sliderAction) root.sliderAction(value) }
             }
 
             MouseArea {
