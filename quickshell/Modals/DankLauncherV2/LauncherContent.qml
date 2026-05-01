@@ -274,14 +274,16 @@ FocusScope {
 
         Item {
             id: footerBar
+            readonly property bool _connectedBottomEmerge: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom")
+            readonly property bool _connectedArcAtFooter: _connectedBottomEmerge && !(root.parentModal?.launcherArcExtenderActive ?? false)
+            readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
+
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.leftMargin: root.parentModal?.borderWidth ?? 1
             anchors.rightMargin: root.parentModal?.borderWidth ?? 1
-            anchors.bottomMargin: root.parentModal?.borderWidth ?? 1
-            readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
-            readonly property bool _connectedArcAtFooter: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom") && !(root.parentModal?.launcherArcExtenderActive ?? false)
+            anchors.bottomMargin: _connectedBottomEmerge ? Theme.spacingM : (root.parentModal?.borderWidth ?? 1)
             height: showFooter ? (_connectedArcAtFooter ? 76 : 36) : 0
             visible: showFooter
             clip: true

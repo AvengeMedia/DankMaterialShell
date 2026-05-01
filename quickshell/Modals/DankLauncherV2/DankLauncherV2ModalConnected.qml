@@ -596,16 +596,21 @@ Item {
         visible: false
         color: "transparent"
 
+        readonly property real _topMargin: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
+        readonly property real _bottomMargin: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
+        readonly property real _leftMargin: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
+        readonly property real _rightMargin: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
+
         WlrLayershell.namespace: "dms:spotlight:bg"
         WlrLayershell.layer: WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
         WlrLayershell.margins {
-            top: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
-            bottom: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
-            left: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
-            right: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
+            top: backgroundWindow._topMargin
+            bottom: backgroundWindow._bottomMargin
+            left: backgroundWindow._leftMargin
+            right: backgroundWindow._rightMargin
         }
 
         anchors {
@@ -617,11 +622,25 @@ Item {
 
         mask: Region {
             item: (spotlightOpen || isClosing) ? bgFullScreenMask : null
+
+            Region {
+                item: bgContentHole
+                intersection: Intersection.Subtract
+            }
         }
 
         Item {
             id: bgFullScreenMask
             anchors.fill: parent
+        }
+
+        Item {
+            id: bgContentHole
+            visible: false
+            x: root._cwMarginLeft + contentContainer.x - backgroundWindow._leftMargin
+            y: root._cwMarginTop + contentContainer.y - backgroundWindow._topMargin
+            width: root.alignedWidth
+            height: root.contentSurfaceHeight
         }
 
         Rectangle {
@@ -702,8 +721,8 @@ Item {
         Item {
             id: contentInputMask
             visible: false
-            x: contentContainer.x + contentWrapper.x
-            y: contentContainer.y + contentWrapper.y
+            x: contentContainer.x
+            y: contentContainer.y
             width: root.alignedWidth
             height: root.contentSurfaceHeight
         }
