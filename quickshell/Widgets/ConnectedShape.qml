@@ -23,7 +23,6 @@ Item {
 
     property color fillColor: "transparent"
 
-    // ── Derived layout ──
     readonly property bool _horiz: barSide === "top" || barSide === "bottom"
     readonly property real _sc: Math.max(0, startConnectorRadius)
     readonly property real _ec: Math.max(0, endConnectorRadius)

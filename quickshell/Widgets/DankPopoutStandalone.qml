@@ -178,15 +178,40 @@ Item {
         setBarContext(pos, bottomGap);
     }
 
+    // Briefly forces backgroundWindow.updatesEnabled true while the surface
+    // body changes, so the contentHoleRect mask carve-out commits to the
+    // compositor — otherwise the input region stays stuck at the popup's
+    // initial size and clicks in any newly-grown area dismiss the popup.
+    // Cleared by the frameSwapped Connections below as soon as the dirty
+    // frame ships, so the bg window goes back to skipping buffer updates.
+    property bool _bgCommitWindow: false
+
     function _setSurfaceGeometry(bodyX, bodyY, bodyW, bodyH) {
-        _surfaceBodyX = Theme.snap(bodyX, dpr);
-        _surfaceBodyY = Theme.snap(bodyY, dpr);
-        _surfaceBodyW = Theme.snap(bodyW, dpr);
-        _surfaceBodyH = Theme.snap(bodyH, dpr);
+        const newX = Theme.snap(bodyX, dpr);
+        const newY = Theme.snap(bodyY, dpr);
+        const newW = Theme.snap(bodyW, dpr);
+        const newH = Theme.snap(bodyH, dpr);
+        const changed = newX !== _surfaceBodyX || newY !== _surfaceBodyY || newW !== _surfaceBodyW || newH !== _surfaceBodyH;
+        _surfaceBodyX = newX;
+        _surfaceBodyY = newY;
+        _surfaceBodyW = newW;
+        _surfaceBodyH = newH;
         _surfaceMarginLeft = _surfaceBodyX - shadowBuffer;
         _surfaceMarginTop = _surfaceBodyY - shadowBuffer;
         _surfaceW = _surfaceBodyW + shadowBuffer * 2;
         _surfaceH = _surfaceBodyH + shadowBuffer * 2;
+        if (changed && backgroundWindow.visible) {
+            _bgCommitWindow = true;
+        }
+    }
+
+    Connections {
+        target: backgroundWindow
+        ignoreUnknownSignals: true
+        function onFrameSwapped() {
+            if (root._bgCommitWindow)
+                root._bgCommitWindow = false;
+        }
     }
 
     function _setSettledSurfaceGeometry() {
@@ -455,9 +480,10 @@ Item {
         screen: root.screen
         visible: false
         color: "transparent"
-        // When there's no overlay to render, skip buffer updates. Re-evaluates if
-        // overlayContent is assigned later (e.g., via a dispatcher forwarding it).
-        updatesEnabled: root.overlayContent !== null
+        // Skip buffer updates when there's nothing to render. Briefly flipped
+        // true via _bgCommitWindow when _surfaceBodyW/H changes so the
+        // contentHoleRect mask carve-out actually commits to the compositor.
+        updatesEnabled: root.overlayContent !== null || root._bgCommitWindow
 
         WlrLayershell.namespace: root.layerNamespace + ":background"
         WlrLayershell.layer: WlrLayershell.Top

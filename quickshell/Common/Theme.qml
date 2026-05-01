@@ -986,7 +986,6 @@ Singleton {
         "expressiveEffects": [0.34, 0.8, 0.34, 1, 1, 1]
     }
 
-    // ─── Animation variant proxy ──────────────────────────────────────────────
     // Theme is the canonical access point for animation variant state. The
     // aliases below forward to AnimVariants.qml so consumers don't need two
     // imports. ~200 call sites read through Theme.variantEnterCurve /

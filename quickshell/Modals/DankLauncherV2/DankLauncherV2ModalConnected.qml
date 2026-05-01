@@ -191,7 +191,6 @@ Item {
 
     signal dialogClosed
 
-    // ─── Connected chrome sync ────────────────────────────────────────────────
     property string _chromeClaimId: ""
     property bool _fullSyncPending: false
 
@@ -558,7 +557,6 @@ Item {
         }
     }
 
-    // ── Background window: fullscreen, handles darkening + click-to-dismiss ──
     PanelWindow {
         id: backgroundWindow
         visible: false
@@ -616,7 +614,6 @@ Item {
         }
     }
 
-    // ── Content window: SMALL, positioned with margins — only renders the modal area ──
     PanelWindow {
         id: contentWindow
         visible: false

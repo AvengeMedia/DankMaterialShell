@@ -95,7 +95,6 @@ Item {
 
     property bool animationsEnabled: true
 
-    // ─── Connected chrome sync ────────────────────────────────────────────────
     property string _chromeClaimId: ""
     property bool _fullSyncPending: false
 
@@ -340,8 +339,6 @@ Item {
     readonly property real shadowRenderPadding: (!frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
         if (Theme.isConnectedEffect)
-            return 0;
-        if (Theme.isDirectionalEffect)
             return 0;
         if (animationType === "slide")
             return 30;
