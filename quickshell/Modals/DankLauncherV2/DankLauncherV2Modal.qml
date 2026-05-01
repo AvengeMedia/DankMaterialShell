@@ -22,6 +22,7 @@ Item {
     readonly property real modalY: impl.item ? impl.item.modalY : 0
     readonly property bool frameOwnsConnectedChrome: impl.item ? (impl.item.frameOwnsConnectedChrome ?? false) : false
     readonly property string resolvedConnectedBarSide: impl.item ? (impl.item.resolvedConnectedBarSide ?? "") : ""
+    readonly property bool launcherArcExtenderActive: impl.item ? (impl.item.launcherArcExtenderActive ?? false) : false
 
     signal dialogClosed
 

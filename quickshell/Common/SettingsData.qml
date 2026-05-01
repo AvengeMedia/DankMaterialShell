@@ -242,6 +242,8 @@ Singleton {
     onFrameCloseGapsChanged: saveSettings()
     property string frameLauncherEmergeSide: "bottom"
     onFrameLauncherEmergeSideChanged: saveSettings()
+    property bool frameLauncherArcExtender: false
+    onFrameLauncherArcExtenderChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property string frameMode: "separate"
     onFrameModeChanged: saveSettings()

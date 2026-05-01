@@ -321,6 +321,15 @@ Item {
                         SettingsData.set("frameLauncherEmergeSide", index === 1 ? "top" : "bottom");
                     }
                 }
+
+                SettingsToggleRow {
+                    settingKey: "frameLauncherArcExtender"
+                    tags: ["frame", "connected", "launcher", "arc", "extender", "center"]
+                    text: I18n.tr("Arc Extender")
+                    description: I18n.tr("Extend the launcher surface to the screen center")
+                    checked: SettingsData.frameLauncherArcExtender
+                    onToggled: checked => SettingsData.set("frameLauncherArcExtender", checked)
+                }
             }
 
             SettingsCard {

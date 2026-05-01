@@ -281,7 +281,7 @@ FocusScope {
             anchors.rightMargin: root.parentModal?.borderWidth ?? 1
             anchors.bottomMargin: root.parentModal?.borderWidth ?? 1
             readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
-            readonly property bool _connectedArcAtFooter: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom")
+            readonly property bool _connectedArcAtFooter: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom") && !(root.parentModal?.launcherArcExtenderActive ?? false)
             height: showFooter ? (_connectedArcAtFooter ? 76 : 36) : 0
             visible: showFooter
             clip: true
