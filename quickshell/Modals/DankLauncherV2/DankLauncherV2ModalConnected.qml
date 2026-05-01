@@ -191,6 +191,7 @@ Item {
             return Theme.snap(Math.max(alignedHeight, screenHeight - _frameEdgeInset("bottom") - alignedY), dpr);
         return alignedHeight;
     }
+    readonly property real contentSurfaceHeight: launcherArcExtenderActive ? _connectedChromeHeight : alignedHeight
 
     // For directional/depth: window extends from screen top (content slides within)
     // For standard: small window tightly around the modal + shadow padding
@@ -210,7 +211,7 @@ Item {
     }
     // Where the content container sits inside the content window
     readonly property real _ccX: shadowPad
-    readonly property real _ccY: launcherArcExtenderActive ? Theme.snap(alignedY - _cwMarginTop, dpr) : (_needsExtendedWindow ? alignedY : shadowPad)
+    readonly property real _ccY: launcherArcExtenderActive ? 0 : (_needsExtendedWindow ? alignedY : shadowPad)
 
     signal dialogClosed
 
@@ -704,7 +705,7 @@ Item {
             x: contentContainer.x + contentWrapper.x
             y: contentContainer.y + contentWrapper.y
             width: root.alignedWidth
-            height: root.alignedHeight
+            height: root.contentSurfaceHeight
         }
 
         Item {
@@ -715,7 +716,7 @@ Item {
             x: root._ccX
             y: root._ccY
             width: root.alignedWidth
-            height: root.alignedHeight
+            height: root.contentSurfaceHeight
 
             readonly property int dockEdge: typeof SettingsData !== "undefined" ? SettingsData.dockPosition : 1
             readonly property bool dockTop: dockEdge === 0
