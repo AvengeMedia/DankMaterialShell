@@ -525,13 +525,13 @@ Column {
                             SequentialAnimation on opacity {
                                 running: textArea.activeFocus
                                 loops: Animation.Infinite
-                                PropertyAnimation {
+                                OpacityAnimator {
                                     from: 1.0
                                     to: 0.0
                                     duration: 650
                                     easing.type: Easing.InOutQuad
                                 }
-                                PropertyAnimation {
+                                OpacityAnimator {
                                     from: 0.0
                                     to: 1.0
                                     duration: 650

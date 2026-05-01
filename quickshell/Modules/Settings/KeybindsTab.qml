@@ -344,11 +344,7 @@ Item {
                                         return I18n.tr("%1 exists but is not included in config. Custom keybinds will not work until this is fixed.").arg(bindsFile);
                                     if (warningBox.showWarning) {
                                         const count = warningBox.status.overriddenBy;
-                                        return I18n.ntr(
-                                            "%1 DMS bind may be overridden by config binds that come after the include.",
-                                            "%1 DMS binds may be overridden by config binds that come after the include.",
-                                            count
-                                        ).arg(count);
+                                        return I18n.ntr("%1 DMS bind may be overridden by config binds that come after the include.", "%1 DMS binds may be overridden by config binds that come after the include.", count).arg(count);
                                     }
                                     return "";
                                 }
@@ -543,13 +539,11 @@ Item {
 
                         StyledText {
                             text: {
-                            if (KeybindsService.loading)
-                                return I18n.tr("Shortcuts");
-                            const count = keybindsTab._filteredBinds.length;
-                            return count === 1
-                                ? I18n.tr("Shortcut (%1)").arg(count)
-                                : I18n.tr("Shortcuts (%1)").arg(count);
-                        }
+                                if (KeybindsService.loading)
+                                    return I18n.tr("Shortcuts");
+                                const count = keybindsTab._filteredBinds.length;
+                                return count === 1 ? I18n.tr("Shortcut (%1)").arg(count) : I18n.tr("Shortcuts (%1)").arg(count);
+                            }
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -569,7 +563,7 @@ Item {
                             color: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
 
-                            RotationAnimation on rotation {
+                            RotationAnimator on rotation {
                                 from: 0
                                 to: 360
                                 duration: 1000
