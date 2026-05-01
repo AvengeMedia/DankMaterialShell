@@ -145,7 +145,6 @@ Variants {
             return Math.round(v * _dpr) / _dpr;
         }
 
-        // ─── ConnectedModeState sync ────────────────────────────────────────
         // Dock window origin in screen-relative coordinates (FrameWindow space).
         function _dockWindowOriginX() {
             if (!dock.isVertical)

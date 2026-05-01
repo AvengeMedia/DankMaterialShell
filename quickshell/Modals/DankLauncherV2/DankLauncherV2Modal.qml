@@ -60,9 +60,31 @@ Item {
             impl.item.toggleWithMode(mode);
     }
 
+    readonly property var _desiredBackend: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+    property var _resolvedBackend: null
+
+    Component.onCompleted: _resolvedBackend = _desiredBackend
+
+    Connections {
+        target: SettingsData
+        function onConnectedFrameModeActiveChanged() {
+            root._maybeResolveBackend();
+        }
+    }
+
+    // Defer Loader source-component swap until impl is fully closed; avoids
+    // tearing down the launcher mid-animation when frame mode is toggled.
+    function _maybeResolveBackend() {
+        if (_resolvedBackend === _desiredBackend)
+            return;
+        if (impl.item && (impl.item.spotlightOpen || impl.item.isClosing))
+            return;
+        _resolvedBackend = _desiredBackend;
+    }
+
     Loader {
         id: impl
-        sourceComponent: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+        sourceComponent: root._resolvedBackend
         onItemChanged: if (item)
             root._wireBackend(item)
     }
@@ -81,6 +103,15 @@ Item {
         if (!it)
             return;
         it.modalHandle = root;
-        it.dialogClosed.connect(root.dialogClosed);
+    }
+
+    Connections {
+        target: impl.item
+        ignoreUnknownSignals: true
+
+        function onDialogClosed() {
+            root.dialogClosed();
+            root._maybeResolveBackend();
+        }
     }
 }

@@ -49,7 +49,6 @@ PanelWindow {
     readonly property var _notifState: ConnectedModeState.notificationStates[win._screenName] || ConnectedModeState.emptyNotificationState
     readonly property var _modalState: ConnectedModeState.modalStates[win._screenName] || ConnectedModeState.emptyModalState
 
-    // ─── Connected chrome convenience properties ──────────────────────────────
     readonly property bool _connectedActive: win._frameActive && SettingsData.connectedFrameModeActive
     readonly property string _barSide: {
         const edges = win.barEdges;
@@ -780,7 +779,6 @@ PanelWindow {
             radius: win._blurCutoutRadius
         }
 
-        // ── Connected popout blur regions ──
         Region {
             item: _popoutBodyBlurAnchor
             radius: win._surfaceRadius
@@ -827,7 +825,6 @@ PanelWindow {
             }
         }
 
-        // ── Connected dock blur regions ──
         Region {
             item: _dockBodyBlurAnchor
             radius: win._dockBodyBlurRadius()
@@ -898,7 +895,6 @@ PanelWindow {
             }
         }
 
-        // ── Connected modal blur regions ──
         Region {
             item: _modalBodyBlurAnchor
             radius: win._surfaceRadius
@@ -945,8 +941,6 @@ PanelWindow {
             }
         }
     }
-
-    // ─── Connector position helpers ────────────────────────────────────────
 
     function _dockBodyBlurRadius() {
         return _dockBodyBlurAnchor._active ? Math.max(0, Math.min(win._surfaceRadius, _dockBodyBlurAnchor.width / 2, _dockBodyBlurAnchor.height / 2)) : win._surfaceRadius;
@@ -1219,8 +1213,6 @@ PanelWindow {
         return (arcCorner === "topLeft" || arcCorner === "topRight") ? connectorY - r : connectorY + connectorHeight - r;
     }
 
-    // ─── Blur build / teardown ────────────────────────────────────────────────
-
     function _buildBlur() {
         try {
             if (!BlurService.enabled || !SettingsData.frameBlurEnabled || !win._frameActive || !win.visible) {
@@ -1297,8 +1289,6 @@ PanelWindow {
     Component.onCompleted: Qt.callLater(() => win._buildBlur())
     Component.onDestruction: win._teardownBlur()
 
-    // ─── Frame border ─────────────────────────────────────────────────────────
-
     FrameBorder {
         anchors.fill: parent
         visible: win._frameActive && !win._connectedActive
@@ -1308,8 +1298,6 @@ PanelWindow {
         cutoutRightInset: win.cutoutRightInset
         cutoutRadius: win.cutoutRadius
     }
-
-    // ─── Connected chrome fills ───────────────────────────────────────────────
 
     Item {
         id: _connectedSurfaceLayer

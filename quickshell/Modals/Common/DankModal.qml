@@ -84,9 +84,31 @@ Item {
             impl.item.toggle();
     }
 
+    readonly property var _desiredBackend: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+    property var _resolvedBackend: null
+
+    Component.onCompleted: _resolvedBackend = _desiredBackend
+
+    Connections {
+        target: SettingsData
+        function onConnectedFrameModeActiveChanged() {
+            root._maybeResolveBackend();
+        }
+    }
+
+    // Defer Loader source-component swap until impl is fully closed; avoids
+    // tearing down a modal mid-animation when frame mode is toggled.
+    function _maybeResolveBackend() {
+        if (_resolvedBackend === _desiredBackend)
+            return;
+        if (impl.item && (impl.item.shouldBeVisible || impl.item.isClosing))
+            return;
+        _resolvedBackend = _desiredBackend;
+    }
+
     Loader {
         id: impl
-        sourceComponent: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+        sourceComponent: root._resolvedBackend
         onItemChanged: if (item)
             root._wireBackend(item)
     }
@@ -137,20 +159,7 @@ Item {
         it.useOverlayLayer = Qt.binding(() => root.useOverlayLayer);
 
         it.shouldBeVisible = root.shouldBeVisible;
-        it.shouldBeVisibleChanged.connect(function () {
-            if (root.shouldBeVisible !== it.shouldBeVisible)
-                root.shouldBeVisible = it.shouldBeVisible;
-        });
-
         it.shouldHaveFocus = root.shouldHaveFocus;
-        it.shouldHaveFocusChanged.connect(function () {
-            if (root.shouldHaveFocus !== it.shouldHaveFocus)
-                root.shouldHaveFocus = it.shouldHaveFocus;
-        });
-
-        it.opened.connect(root.opened);
-        it.dialogClosed.connect(root.dialogClosed);
-        it.backgroundClicked.connect(root.backgroundClicked);
 
         if (it.modalFocusScope)
             _modalFocusScope.parent = it.modalFocusScope;
@@ -165,6 +174,34 @@ Item {
         function onShouldHaveFocusChanged() {
             if (impl.item && impl.item.shouldHaveFocus !== root.shouldHaveFocus)
                 impl.item.shouldHaveFocus = root.shouldHaveFocus;
+        }
+    }
+
+    Connections {
+        target: impl.item
+        ignoreUnknownSignals: true
+
+        function onShouldBeVisibleChanged() {
+            if (impl.item && root.shouldBeVisible !== impl.item.shouldBeVisible)
+                root.shouldBeVisible = impl.item.shouldBeVisible;
+        }
+
+        function onShouldHaveFocusChanged() {
+            if (impl.item && root.shouldHaveFocus !== impl.item.shouldHaveFocus)
+                root.shouldHaveFocus = impl.item.shouldHaveFocus;
+        }
+
+        function onOpened() {
+            root.opened();
+        }
+
+        function onDialogClosed() {
+            root.dialogClosed();
+            root._maybeResolveBackend();
+        }
+
+        function onBackgroundClicked() {
+            root.backgroundClicked();
         }
     }
 }

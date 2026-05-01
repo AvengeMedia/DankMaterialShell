@@ -130,8 +130,8 @@ Scope {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: mouse => {
-                            const localPos = mapToItem(contentContainer, mouse.x, mouse.y);
-                            if (localPos.x < 0 || localPos.x > contentContainer.width || localPos.y < 0 || localPos.y > contentContainer.height) {
+                            const localPos = mapToItem(contentAnchor, mouse.x, mouse.y);
+                            if (localPos.x < 0 || localPos.x > contentAnchor.width || localPos.y < 0 || localPos.y > contentAnchor.height) {
                                 overviewScope.overviewOpen = false;
                                 closeTimer.restart();
                             }
@@ -140,46 +140,23 @@ Scope {
                 }
 
                 Item {
-                    id: contentContainer
+                    id: contentAnchor
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
                     anchors.topMargin: 100
-                    width: childrenRect.width
-                    height: childrenRect.height
+                    width: contentContainer.width
+                    height: contentContainer.height
 
-                    opacity: overviewScope.overviewOpen ? 1 : 0
-                    transform: [scaleTransform, motionTransform]
+                    Item {
+                        id: contentContainer
+                        width: childrenRect.width
+                        height: childrenRect.height
+                        transformOrigin: Item.Center
 
-                    Scale {
-                        id: scaleTransform
-                        origin.x: contentContainer.width / 2
-                        origin.y: contentContainer.height / 2
-                        xScale: overviewScope.overviewOpen ? 1 : Theme.effectScaleCollapsed
-                        yScale: overviewScope.overviewOpen ? 1 : Theme.effectScaleCollapsed
-
-                        Behavior on xScale {
-                            NumberAnimation {
-                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                            }
-                        }
-
-                        Behavior on yScale {
-                            NumberAnimation {
-                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                            }
-                        }
-                    }
-
-                    Translate {
-                        id: motionTransform
+                        opacity: overviewScope.overviewOpen ? 1 : 0
+                        scale: overviewScope.overviewOpen ? 1 : Theme.effectScaleCollapsed
                         x: {
                             if (overviewScope.overviewOpen)
-                                return 0;
-                            if (Theme.isDirectionalEffect)
                                 return 0;
                             if (Theme.isDepthEffect)
                                 return Theme.effectAnimOffset * 0.25;
@@ -195,8 +172,24 @@ Scope {
                             return Theme.effectAnimOffset;
                         }
 
+                        Behavior on opacity {
+                            OpacityAnimator {
+                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                            }
+                        }
+
+                        Behavior on scale {
+                            ScaleAnimator {
+                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
+                            }
+                        }
+
                         Behavior on x {
-                            NumberAnimation {
+                            XAnimator {
                                 duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
@@ -204,30 +197,22 @@ Scope {
                         }
 
                         Behavior on y {
-                            NumberAnimation {
+                            YAnimator {
                                 duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                             }
                         }
-                    }
 
-                    Behavior on opacity {
-                        OpacityAnimator {
-                            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                        }
-                    }
+                        Loader {
+                            id: overviewLoader
+                            active: overviewScope.overviewOpen
+                            asynchronous: false
 
-                    Loader {
-                        id: overviewLoader
-                        active: overviewScope.overviewOpen
-                        asynchronous: false
-
-                        sourceComponent: OverviewWidget {
-                            panelWindow: root
-                            overviewOpen: overviewScope.overviewOpen
+                            sourceComponent: OverviewWidget {
+                                panelWindow: root
+                                overviewOpen: overviewScope.overviewOpen
+                            }
                         }
                     }
                 }

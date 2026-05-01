@@ -200,8 +200,6 @@ Singleton {
         return true;
     }
 
-    // ─── Notification state (per screen, updated by NotificationSurface) ──────
-
     readonly property var emptyNotificationState: ({
             "visible": false,
             "barSide": "top",
@@ -369,8 +367,6 @@ Singleton {
         return true;
     }
 
-    // ─── Dock retract coordination ────────────────────────────────
-
     property var dockRetractRequests: ({})
 
     function requestDockRetract(requesterId, screenName, side) {
@@ -406,5 +402,65 @@ Singleton {
                 return true;
         }
         return false;
+    }
+
+    // Prune state for screens that are no longer connected. Stale entries
+    // accumulate across hotplug cycles otherwise — Frame's per-screen
+    // FrameInstance doesn't notice when its peer dicts go orphan.
+    function _pruneToLiveScreens() {
+        const live = {};
+        const screens = Quickshell.screens || [];
+        for (let i = 0; i < screens.length; i++) {
+            const s = screens[i];
+            if (s && s.name)
+                live[s.name] = true;
+        }
+
+        function pruneKeyed(dict) {
+            let changed = false;
+            const next = {};
+            for (const k in dict) {
+                if (live[k])
+                    next[k] = dict[k];
+                else
+                    changed = true;
+            }
+            return changed ? next : null;
+        }
+
+        const nextDock = pruneKeyed(dockStates);
+        if (nextDock !== null)
+            dockStates = nextDock;
+        const nextSlides = pruneKeyed(dockSlides);
+        if (nextSlides !== null)
+            dockSlides = nextSlides;
+        const nextNotif = pruneKeyed(notificationStates);
+        if (nextNotif !== null)
+            notificationStates = nextNotif;
+        const nextModal = pruneKeyed(modalStates);
+        if (nextModal !== null)
+            modalStates = nextModal;
+
+        let retractChanged = false;
+        const nextRetract = {};
+        for (const k in dockRetractRequests) {
+            const r = dockRetractRequests[k];
+            if (r && live[r.screenName])
+                nextRetract[k] = r;
+            else
+                retractChanged = true;
+        }
+        if (retractChanged)
+            dockRetractRequests = nextRetract;
+
+        if (popoutOwnerId && popoutScreen && !live[popoutScreen])
+            releasePopout(popoutOwnerId);
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            root._pruneToLiveScreens();
+        }
     }
 }

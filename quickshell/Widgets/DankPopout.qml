@@ -75,6 +75,21 @@ Item {
     readonly property real barWidth: impl.item ? impl.item.barWidth : 0
     readonly property real barHeight: impl.item ? impl.item.barHeight : 0
     readonly property bool useConnectedBackend: SettingsData.connectedFrameModeActive && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+    readonly property var _desiredBackend: useConnectedBackend ? connectedComp : standaloneComp
+    property var _resolvedBackend: null
+
+    onUseConnectedBackendChanged: _maybeResolveBackend()
+    Component.onCompleted: _resolvedBackend = _desiredBackend
+
+    // Defer Loader source-component swap until impl is fully closed; avoids
+    // tearing down a popout mid-animation when frame mode is toggled.
+    function _maybeResolveBackend() {
+        if (_resolvedBackend === _desiredBackend)
+            return;
+        if (impl.item && (impl.item.shouldBeVisible || impl.item.isClosing))
+            return;
+        _resolvedBackend = _desiredBackend;
+    }
 
     function open() {
         if (impl.item)
@@ -121,7 +136,7 @@ Item {
     Loader {
         id: impl
         active: root.screen !== null
-        sourceComponent: root.useConnectedBackend ? connectedComp : standaloneComp
+        sourceComponent: root._resolvedBackend
         onItemChanged: if (item)
             root._wireBackend(item)
     }
@@ -207,6 +222,7 @@ Item {
 
         function onPopoutClosed() {
             root.popoutClosed();
+            root._maybeResolveBackend();
         }
 
         function onBackgroundClicked() {
