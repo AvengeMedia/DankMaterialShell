@@ -73,6 +73,7 @@ Item {
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
     readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== ""
+    readonly property bool launcherArcExtenderActive: frameOwnsConnectedChrome && SettingsData.frameLauncherArcExtender && (resolvedConnectedBarSide === "top" || resolvedConnectedBarSide === "bottom")
 
     function _dockOccupiesSide(side) {
         if (!SettingsData.showDock)
@@ -110,10 +111,13 @@ Item {
             {
                 const insetL = _frameEdgeInset("left");
                 const insetR = _frameEdgeInset("right");
+                const insetT = _frameEdgeInset("top");
+                const insetB = _frameEdgeInset("bottom");
                 const usable = Math.max(0, screenWidth - insetL - insetR);
+                const usableH = Math.max(0, screenHeight - insetT - insetB);
                 return {
                     "x": insetL + Math.max(0, (usable - modalWidth) / 2),
-                    "y": resolvedConnectedBarSide === "top" ? _frameEdgeInset("top") : screenHeight - modalHeight - _frameEdgeInset("bottom")
+                    "y": launcherArcExtenderActive ? insetT + Math.max(0, (usableH - modalHeight) / 2) : (resolvedConnectedBarSide === "top" ? insetT : screenHeight - modalHeight - insetB)
                 };
             }
         case "left":
@@ -171,15 +175,33 @@ Item {
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
     readonly property real alignedX: Theme.snap(modalX, dpr)
     readonly property real alignedY: Theme.snap(modalY, dpr)
+    readonly property real _connectedChromeX: alignedX
+    readonly property real _connectedChromeY: {
+        if (!launcherArcExtenderActive)
+            return alignedY;
+        return resolvedConnectedBarSide === "top" ? Theme.snap(_frameEdgeInset("top"), dpr) : alignedY;
+    }
+    readonly property real _connectedChromeWidth: alignedWidth
+    readonly property real _connectedChromeHeight: {
+        if (!launcherArcExtenderActive)
+            return alignedHeight;
+        if (resolvedConnectedBarSide === "top")
+            return Theme.snap(Math.max(alignedHeight, alignedY + alignedHeight - _frameEdgeInset("top")), dpr);
+        if (resolvedConnectedBarSide === "bottom")
+            return Theme.snap(Math.max(alignedHeight, screenHeight - _frameEdgeInset("bottom") - alignedY), dpr);
+        return alignedHeight;
+    }
 
     // For directional/depth: window extends from screen top (content slides within)
     // For standard: small window tightly around the modal + shadow padding
     readonly property bool _needsExtendedWindow: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) || Theme.isDepthEffect
     // Content window geometry
     readonly property real _cwMarginLeft: Theme.snap(alignedX - shadowPad, dpr)
-    readonly property real _cwMarginTop: _needsExtendedWindow ? 0 : Theme.snap(alignedY - shadowPad, dpr)
+    readonly property real _cwMarginTop: launcherArcExtenderActive ? _connectedChromeY : (_needsExtendedWindow ? 0 : Theme.snap(alignedY - shadowPad, dpr))
     readonly property real _cwWidth: alignedWidth + shadowPad * 2
     readonly property real _cwHeight: {
+        if (launcherArcExtenderActive)
+            return _connectedChromeHeight;
         if (Theme.isDirectionalEffect && !Theme.isConnectedEffect)
             return screenHeight + shadowPad;
         if (Theme.isDepthEffect)
@@ -188,7 +210,7 @@ Item {
     }
     // Where the content container sits inside the content window
     readonly property real _ccX: shadowPad
-    readonly property real _ccY: _needsExtendedWindow ? alignedY : shadowPad
+    readonly property real _ccY: launcherArcExtenderActive ? Theme.snap(alignedY - _cwMarginTop, dpr) : (_needsExtendedWindow ? alignedY : shadowPad)
 
     signal dialogClosed
 
@@ -228,10 +250,10 @@ Item {
         ConnectedModeState.setModalState(screenName, {
             "visible": spotlightOpen || contentWindow.visible,
             "barSide": resolvedConnectedBarSide,
-            "bodyX": alignedX,
-            "bodyY": alignedY,
-            "bodyW": alignedWidth,
-            "bodyH": alignedHeight,
+            "bodyX": _connectedChromeX,
+            "bodyY": _connectedChromeY,
+            "bodyW": _connectedChromeWidth,
+            "bodyH": _connectedChromeHeight,
             "animX": contentContainer ? contentContainer.animX : 0,
             "animY": contentContainer ? contentContainer.animY : 0,
             "omitStartConnector": false,
@@ -304,7 +326,7 @@ Item {
         const screenName = _currentScreenName();
         if (!screenName)
             return;
-        ConnectedModeState.setModalBody(screenName, alignedX, alignedY, alignedWidth, alignedHeight);
+        ConnectedModeState.setModalBody(screenName, _connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight);
     }
 
     function _releaseModalChrome() {
@@ -318,6 +340,7 @@ Item {
     }
 
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
+    onLauncherArcExtenderActiveChanged: _queueFullSync()
     onResolvedConnectedBarSideChanged: _queueFullSync()
     onSpotlightOpenChanged: _queueFullSync()
     onAlignedXChanged: _queueBodySync()
@@ -705,7 +728,7 @@ Item {
             readonly property bool directionalEffect: Theme.isDirectionalEffect
             readonly property bool depthEffect: Theme.isDepthEffect
             readonly property real _connectedTravelX: Math.max(Theme.effectAnimOffset, root.alignedWidth + Theme.spacingL)
-            readonly property real _connectedTravelY: Math.max(Theme.effectAnimOffset, root.alignedHeight + Theme.spacingL)
+            readonly property real _connectedTravelY: root.launcherArcExtenderActive ? root._connectedChromeHeight : Math.max(Theme.effectAnimOffset, root.alignedHeight + Theme.spacingL)
             readonly property real collapsedMotionX: {
                 if (root.frameOwnsConnectedChrome) {
                     switch (root.resolvedConnectedBarSide) {

@@ -565,6 +565,7 @@ var SPEC = {
     frameBlurEnabled: { def: true },
     frameCloseGaps: { def: false },
     frameLauncherEmergeSide: { def: "bottom" },
+    frameLauncherArcExtender: { def: false },
     frameMode: { def: "separate" }
 };
 
