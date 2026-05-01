@@ -353,8 +353,8 @@ Item {
             readonly property real s: Math.min(1, modalContainer.publishedScale)
             blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5
             blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5
-            blurWidth: (contentVisible && modalContainer.publishedOpacity > 0) ? modalContainer.width * s : 0
-            blurHeight: (contentVisible && modalContainer.publishedOpacity > 0) ? modalContainer.height * s : 0
+            blurWidth: contentVisible ? modalContainer.width * s : 0
+            blurHeight: contentVisible ? modalContainer.height * s : 0
             blurRadius: root.cornerRadius
         }
 
@@ -414,7 +414,6 @@ Item {
             visible: _renderActive
 
             property bool _renderActive: contentVisible
-            property real publishedOpacity: contentVisible ? 1 : 0
             property real publishedScale: contentVisible ? 1 : 0.96
 
             opacity: contentVisible ? 1 : 0
@@ -426,15 +425,7 @@ Item {
                     easing.type: Easing.BezierSpline
                     duration: Theme.modalAnimationDuration
                     easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
-                }
-            }
-
-            Behavior on publishedOpacity {
-                NumberAnimation {
-                    easing.type: Easing.BezierSpline
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
-                    onRunningChanged: if (!running && modalContainer.publishedOpacity === 0)
+                    onRunningChanged: if (!running && !root.contentVisible)
                         modalContainer._renderActive = false
                 }
             }
