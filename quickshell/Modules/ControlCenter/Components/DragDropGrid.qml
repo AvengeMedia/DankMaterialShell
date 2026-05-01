@@ -150,13 +150,11 @@ Column {
                                 return builtinPluginWidgetComponent;
                             } else if (id.startsWith("plugin_")) {
                                 return pluginWidgetComponent;
-                            } else if (id === "wifi" || id === "bluetooth" || id === "audioOutput" || id === "audioInput") {
+} else if (id === "wifi" || id === "bluetooth" || id === "audioOutput" || id === "audioInput" || id === "brightnessSlider") {
                                 return compoundPillComponent;
                             } else if (id === "volumeSlider") {
                                 return audioSliderComponent;
                             } else if (id === "brightnessSlider") {
-                                return brightnessSliderComponent;
-                            } else if (id === "inputVolumeSlider") {
                                 return inputAudioSliderComponent;
                             } else if (id === "battery") {
                                 return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent;
@@ -235,6 +233,88 @@ Column {
             property var widgetDef: root.model?.getWidgetForId(widgetData.id || "")
             width: parent.width
             height: 60
+
+            hasSlider: {
+                const id = widgetData.id || "";
+                return id === "audioOutput" || id === "audioInput" || id === "brightnessSlider";
+            }
+            sliderValue: {
+                const id = widgetData.id || "";
+                if (id === "audioOutput") {
+                    return Math.round((AudioService.sink?.audio?.volume ?? 0.5) * 100);
+                } else if (id === "audioInput") {
+                    return Math.round((AudioService.source?.audio?.volume ?? 0.5) * 100);
+                } else if (id === "brightnessSlider") {
+                    DisplayService.brightnessVersion;
+                    const targetDeviceName = (() => {
+                        if (!DisplayService.brightnessAvailable || !DisplayService.devices || DisplayService.devices.length === 0) {
+                            return "";
+                        }
+                        const screenName = root.screenName || "";
+                        const pins = SettingsData.brightnessDevicePins || {};
+                        if (screenName && pins[screenName]) {
+                            const found = DisplayService.devices.find(d => d.name === pins[screenName]);
+                            if (found) return found.name;
+                        }
+                        const deviceName = widgetData.deviceName || "";
+                        if (deviceName) {
+                            const found = DisplayService.devices.find(d => d.name === deviceName);
+                            if (found) return found.name;
+                        }
+                        const currentDevice = DisplayService.currentDevice;
+                        if (currentDevice) {
+                            const found = DisplayService.devices.find(d => d.name === currentDevice);
+                            if (found) return found.name;
+                        }
+                        const backlight = DisplayService.devices.find(d => d.class === "backlight");
+                        if (backlight) return backlight.name;
+                        const ddc = DisplayService.devices.find(d => d.class === "ddc");
+                        if (ddc) return ddc.name;
+                        return DisplayService.devices[0]?.name || "";
+                    })();
+                    return targetDeviceName ? DisplayService.getDeviceBrightness(targetDeviceName) : 50;
+                }
+                return 50;
+            }
+            sliderAction: (value) => {
+                const id = widgetData.id || "";
+                if (id === "audioOutput" && AudioService.sink?.audio) {
+                    AudioService.sink.audio.volume = value / 100;
+                } else if (id === "audioInput" && AudioService.source?.audio) {
+                    AudioService.source.audio.volume = value / 100;
+                } else if (id === "brightnessSlider") {
+                    const targetDeviceName = (() => {
+                        if (!DisplayService.brightnessAvailable || !DisplayService.devices || DisplayService.devices.length === 0) {
+                            return "";
+                        }
+                        const screenName = root.screenName || "";
+                        const pins = SettingsData.brightnessDevicePins || {};
+                        if (screenName && pins[screenName]) {
+                            const found = DisplayService.devices.find(d => d.name === pins[screenName]);
+                            if (found) return found.name;
+                        }
+                        const deviceName = widgetData.deviceName || "";
+                        if (deviceName) {
+                            const found = DisplayService.devices.find(d => d.name === deviceName);
+                            if (found) return found.name;
+                        }
+                        const currentDevice = DisplayService.currentDevice;
+                        if (currentDevice) {
+                            const found = DisplayService.devices.find(d => d.name === currentDevice);
+                            if (found) return found.name;
+                        }
+                        const backlight = DisplayService.devices.find(d => d.class === "backlight");
+                        if (backlight) return backlight.name;
+                        const ddc = DisplayService.devices.find(d => d.class === "ddc");
+                        if (ddc) return ddc.name;
+                        return DisplayService.devices[0]?.name || "";
+                    })();
+                    if (targetDeviceName) {
+                        DisplayService.setBrightness(value, targetDeviceName);
+                    }
+                }
+            }
+
             iconName: {
                 switch (widgetData.id || "") {
                 case "wifi":
@@ -284,6 +364,46 @@ Column {
                         let muted = AudioService.source.audio.muted;
                         return muted ? "mic_off" : "mic";
                     }
+                case "brightnessSlider":
+                    {
+                        const targetDeviceName = (() => {
+                            if (!DisplayService.brightnessAvailable || !DisplayService.devices || DisplayService.devices.length === 0) {
+                                return "";
+                            }
+                            const screenName = root.screenName || "";
+                            const pins = SettingsData.brightnessDevicePins || {};
+                            if (screenName && pins[screenName]) {
+                                const found = DisplayService.devices.find(d => d.name === pins[screenName]);
+                                if (found) return found.name;
+                            }
+                            const deviceName = widgetData.deviceName || "";
+                            if (deviceName) {
+                                const found = DisplayService.devices.find(d => d.name === deviceName);
+                                if (found) return found.name;
+                            }
+                            const currentDevice = DisplayService.currentDevice;
+                            if (currentDevice) {
+                                const found = DisplayService.devices.find(d => d.name === currentDevice);
+                                if (found) return found.name;
+                            }
+                            const backlight = DisplayService.devices.find(d => d.class === "backlight");
+                            if (backlight) return backlight.name;
+                            const ddc = DisplayService.devices.find(d => d.class === "ddc");
+                            if (ddc) return ddc.name;
+                            return DisplayService.devices[0]?.name || "";
+                        })();
+                        const device = DisplayService.devices?.find(d => d.name === targetDeviceName);
+                        if (!device) return "brightness_low";
+                        if (device.class === "backlight" || device.class === "ddc") {
+                            const brightness = DisplayService.getDeviceBrightness(targetDeviceName);
+                            if (brightness <= 33) return "brightness_low";
+                            if (brightness <= 66) return "brightness_medium";
+                            return "brightness_high";
+                        } else if (targetDeviceName.includes("kbd")) {
+                            return "keyboard";
+                        }
+                        return "lightbulb";
+                    }
                 default:
                     return widgetDef?.icon || "help";
                 }
@@ -324,6 +444,8 @@ Column {
                     return AudioService.sink?.description || I18n.tr("No output device", "audio status");
                 case "audioInput":
                     return AudioService.source?.description || I18n.tr("No input device", "audio status");
+                case "brightnessSlider":
+                    return "";
                 default:
                     return widgetDef?.text || I18n.tr("Unknown", "widget status");
                 }
