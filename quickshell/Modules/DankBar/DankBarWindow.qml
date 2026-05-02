@@ -202,7 +202,9 @@ PanelWindow {
 
         Connections {
             target: SettingsData
-            function onFrameEnabledChanged() { barBlur.rebuild(); }
+            function onFrameEnabledChanged() {
+                barBlur.rebuild();
+            }
         }
 
         Connections {
@@ -256,9 +258,7 @@ PanelWindow {
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: SettingsData.frameEnabled
-        ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
-        : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: SettingsData.frameEnabled ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -415,12 +415,8 @@ PanelWindow {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: SettingsData.frameEnabled
-        ? SettingsData.frameBarSize
-        : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
-    readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled
-        ? SettingsData.frameShowOnOverview
-        : (barConfig?.openOnOverview ?? false)
+    readonly property real effectiveBarThickness: SettingsData.frameEnabled ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
     readonly property bool hasAdjacentTopBar: {
@@ -957,6 +953,17 @@ PanelWindow {
                         barWindow: barWindow
                         axis: axis
                         barConfig: barWindow.barConfig
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        z: -2
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                        onClicked: {
+                            const screenName = barWindow.screen?.name;
+                            if (screenName && PopoutManager.currentPopoutsByScreen[screenName])
+                                PopoutManager.closeAllPopouts();
+                        }
                     }
 
                     MouseArea {
