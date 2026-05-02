@@ -771,17 +771,17 @@ Item {
 
         Region {
             id: contentInputMask
-            // Outside-click dismissal needs full-screen input only while interactive.
-            item: (shouldBeVisible && backgroundInteractive) ? fullScreenMaskItem : contentMaskRect
+            // Use bar-aware mask so bar widget clicks pass through when a popout is open.
+            item: (shouldBeVisible && backgroundInteractive) ? backgroundDismissalMask : contentMaskRect
         }
 
         Item {
-            id: fullScreenMaskItem
+            id: backgroundDismissalMask
             visible: false
-            x: 0
-            y: 0
-            width: 32767
-            height: 32767
+            x: root.maskX
+            y: root.maskY
+            width: root.maskWidth
+            height: root.maskHeight
         }
 
         Item {

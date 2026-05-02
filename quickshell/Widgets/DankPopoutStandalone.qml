@@ -236,7 +236,7 @@ Item {
     function _setAnimatedSurfaceEnvelope() {
         if (!shouldBeVisible)
             return;
-        if (_fullHeight || !fluidStandaloneActive) {
+        if (_fullHeight) {
             _setSettledSurfaceGeometry();
             return;
         }
@@ -374,7 +374,7 @@ Item {
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
 
     Behavior on renderedAlignedY {
-        enabled: root.animationsEnabled && fluidStandaloneActive && contentWindow.visible && root.shouldBeVisible
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible
         NumberAnimation {
             duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
             easing.type: Easing.BezierSpline
@@ -383,7 +383,7 @@ Item {
     }
 
     Behavior on renderedAlignedHeight {
-        enabled: root.animationsEnabled && fluidStandaloneActive && contentWindow.visible && root.shouldBeVisible
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible
         NumberAnimation {
             duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
             easing.type: Easing.BezierSpline
@@ -633,15 +633,15 @@ Item {
             x: contentContainer.x
             y: contentContainer.y
             width: contentWindow.closeVisualActive ? root.alignedWidth : 0
-            height: contentWindow.closeVisualActive ? (root.fluidStandaloneActive ? root.renderedAlignedHeight : root.alignedHeight) : 0
+            height: contentWindow.closeVisualActive ? root.renderedAlignedHeight : 0
         }
 
         Item {
             id: contentContainer
             x: shadowBuffer + root.alignedX - root._surfaceBodyX
-            y: root._fullHeight ? (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) : shadowBuffer + (root.fluidStandaloneActive ? root.renderedAlignedY : root.alignedY) - root._surfaceBodyY
+            y: root._fullHeight ? root.renderedAlignedY : shadowBuffer + root.renderedAlignedY - root._surfaceBodyY
             width: root.alignedWidth
-            height: root.fluidStandaloneActive ? root.renderedAlignedHeight : root.alignedHeight
+            height: root.renderedAlignedHeight
 
             readonly property bool barTop: effectiveBarPosition === SettingsData.Position.Top
             readonly property bool barBottom: effectiveBarPosition === SettingsData.Position.Bottom

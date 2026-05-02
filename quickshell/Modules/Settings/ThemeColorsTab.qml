@@ -2250,12 +2250,20 @@ Item {
                 settingKey: "modalBackground"
                 iconName: "layers"
 
+                SettingsControlledByFrame {
+                    visible: themeColorsTab.connectedFrameModeActive
+                    parentModal: themeColorsTab.parentModal
+                    settingLabel: I18n.tr("Darken Modal Background")
+                    reason: I18n.tr("Managed by Frame in Connected Mode")
+                }
+
                 SettingsToggleRow {
                     tab: "theme"
                     tags: ["modal", "darken", "background", "overlay"]
                     settingKey: "modalDarkenBackground"
                     text: I18n.tr("Darken Modal Background")
                     description: I18n.tr("Show darkened overlay behind modal dialogs")
+                    visible: !themeColorsTab.connectedFrameModeActive
                     checked: SettingsData.modalDarkenBackground
                     onToggled: checked => SettingsData.set("modalDarkenBackground", checked)
                 }
