@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
@@ -295,9 +297,8 @@ Item {
         _lastOpenedScreen = screen;
 
         if (contentContainer) {
-            contentContainer.animX = Theme.snap(contentContainer.offsetX, root.dpr);
-            contentContainer.animY = Theme.snap(contentContainer.offsetY, root.dpr);
-            contentContainer.scaleValue = contentContainer.computedScaleCollapsed;
+            // animationsEnabled is false here, so this snaps to closed without animating.
+            morph.openProgress = 0;
         }
 
         _setSurfaceGeometry(alignedX, alignedY, alignedWidth, alignedHeight);
@@ -697,10 +698,25 @@ Item {
                 return barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0);
             }
 
-            property real animX: 0
-            property real animY: 0
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
-            property real scaleValue: computedScaleCollapsed
+
+            // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
+            QtObject {
+                id: morph
+                property real openProgress: 0
+                Behavior on openProgress {
+                    enabled: root.animationsEnabled
+                    NumberAnimation {
+                        duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                    }
+                }
+            }
+
+            readonly property real animX: contentContainer.offsetX * (1 - morph.openProgress)
+            readonly property real animY: contentContainer.offsetY * (1 - morph.openProgress)
+            readonly property real scaleValue: contentContainer.computedScaleCollapsed + (1.0 - contentContainer.computedScaleCollapsed) * morph.openProgress
             readonly property real clampedAnimX: Math.max(-width, Math.min(animX, width))
             readonly property real clampedAnimY: Math.max(-height, Math.min(animY, height))
             readonly property real revealWidth: {
@@ -724,54 +740,12 @@ Item {
             readonly property real revealX: root.fluidStandaloneActive && barRight ? Theme.snap(width - revealWidth, root.dpr) : 0
             readonly property real revealY: root.fluidStandaloneActive && barBottom ? Theme.snap(height - revealHeight, root.dpr) : 0
 
-            Component.onCompleted: {
-                animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr);
-                animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr);
-                scaleValue = root.shouldBeVisible ? 1.0 : computedScaleCollapsed;
-            }
-
-            onOffsetXChanged: {
-                if (!root.shouldBeVisible)
-                    animX = Theme.snap(offsetX, root.dpr);
-            }
-            onOffsetYChanged: {
-                if (!root.shouldBeVisible)
-                    animY = Theme.snap(offsetY, root.dpr);
-            }
+            Component.onCompleted: morph.openProgress = root.shouldBeVisible ? 1 : 0
 
             Connections {
                 target: root
                 function onShouldBeVisibleChanged() {
-                    contentContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetX, root.dpr);
-                    contentContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetY, root.dpr);
-                    contentContainer.scaleValue = root.shouldBeVisible ? 1.0 : contentContainer.computedScaleCollapsed;
-                }
-            }
-
-            Behavior on animX {
-                enabled: root.animationsEnabled
-                NumberAnimation {
-                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on animY {
-                enabled: root.animationsEnabled
-                NumberAnimation {
-                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on scaleValue {
-                enabled: root.animationsEnabled
-                NumberAnimation {
-                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                    morph.openProgress = root.shouldBeVisible ? 1 : 0;
                 }
             }
 

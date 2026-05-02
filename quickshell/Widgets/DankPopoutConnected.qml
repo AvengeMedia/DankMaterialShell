@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
@@ -85,22 +87,11 @@ Item {
     signal popoutClosed
     signal backgroundClicked
 
+    // Coalesce per-channel dirty bits; one ConnectedModeState write per tick.
     Timer {
-        id: _fullSyncTimer
+        id: _syncTimer
         interval: 0
-        onTriggered: root._flushFullSync()
-    }
-
-    Timer {
-        id: _animSyncTimer
-        interval: 0
-        onTriggered: root._flushAnimSync()
-    }
-
-    Timer {
-        id: _bodySyncTimer
-        interval: 0
-        onTriggered: root._flushBodySync()
+        onTriggered: root._flushSync()
     }
 
     property var _lastOpenedScreen: null
@@ -281,40 +272,39 @@ Item {
         ConnectedModeState.setPopoutBody(_chromeClaimId, root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
     }
 
-    function _queueFullSync() {
-        if (_fullSyncQueued)
-            return;
-        _fullSyncQueued = true;
-        _fullSyncTimer.restart();
-    }
-    function _flushFullSync() {
-        _fullSyncQueued = false;
-        _syncPopoutChromeState();
-    }
-
     property bool _animSyncQueued: false
-    function _queueAnimSync() {
-        if (_animSyncQueued)
-            return;
-        _animSyncQueued = true;
-        _animSyncTimer.restart();
-    }
-    function _flushAnimSync() {
-        _animSyncQueued = false;
-        _syncPopoutAnim("x");
-        _syncPopoutAnim("y");
-    }
-
     property bool _bodySyncQueued: false
-    function _queueBodySync() {
-        if (_bodySyncQueued)
-            return;
-        _bodySyncQueued = true;
-        _bodySyncTimer.restart();
+
+    function _queueFullSync() {
+        _fullSyncQueued = true;
+        if (!_syncTimer.running)
+            _syncTimer.restart();
     }
-    function _flushBodySync() {
+    function _queueAnimSync() {
+        _animSyncQueued = true;
+        if (!_syncTimer.running)
+            _syncTimer.restart();
+    }
+    function _queueBodySync() {
+        _bodySyncQueued = true;
+        if (!_syncTimer.running)
+            _syncTimer.restart();
+    }
+    function _flushSync() {
+        const fullDirty = _fullSyncQueued;
+        const animDirty = _animSyncQueued;
+        const bodyDirty = _bodySyncQueued;
+        _fullSyncQueued = false;
+        _animSyncQueued = false;
         _bodySyncQueued = false;
-        _syncPopoutBody();
+        if (fullDirty)
+            _syncPopoutChromeState();
+        if (animDirty) {
+            _syncPopoutAnim("x");
+            _syncPopoutAnim("y");
+        }
+        if (bodyDirty)
+            _syncPopoutBody();
     }
 
     onAlignedXChanged: _queueFullSync()
@@ -373,9 +363,8 @@ Item {
         _lastOpenedScreen = screen;
 
         if (contentContainer) {
-            contentContainer.animX = Theme.snap(contentContainer.offsetX, root.dpr);
-            contentContainer.animY = Theme.snap(contentContainer.offsetY, root.dpr);
-            contentContainer.scaleValue = root.animationScaleCollapsed;
+            // animationsEnabled is false here, so this snaps to closed without animating.
+            morph.openProgress = 0;
             _captureChromeAnimTravel();
         }
 
@@ -880,62 +869,36 @@ Item {
                 return barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0);
             }
 
-            property real animX: 0
-            property real animY: 0
-
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
-            property real scaleValue: computedScaleCollapsed
+
+            // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
+            QtObject {
+                id: morph
+                property real openProgress: 0
+                Behavior on openProgress {
+                    enabled: root.animationsEnabled
+                    NumberAnimation {
+                        duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                    }
+                }
+            }
+
+            readonly property real animX: contentContainer.offsetX * (1 - morph.openProgress)
+            readonly property real animY: contentContainer.offsetY * (1 - morph.openProgress)
+            readonly property real scaleValue: contentContainer.computedScaleCollapsed + (1.0 - contentContainer.computedScaleCollapsed) * morph.openProgress
 
             Component.onCompleted: {
-                animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr);
-                animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr);
-                scaleValue = root.shouldBeVisible ? 1.0 : computedScaleCollapsed;
+                morph.openProgress = root.shouldBeVisible ? 1 : 0;
                 root._captureChromeAnimTravel();
-            }
-
-            onOffsetXChanged: {
-                if (!root.shouldBeVisible)
-                    animX = Theme.snap(offsetX, root.dpr);
-            }
-            onOffsetYChanged: {
-                if (!root.shouldBeVisible)
-                    animY = Theme.snap(offsetY, root.dpr);
             }
 
             Connections {
                 target: root
                 function onShouldBeVisibleChanged() {
                     root._captureChromeAnimTravel();
-                    contentContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetX, root.dpr);
-                    contentContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : contentContainer.offsetY, root.dpr);
-                    contentContainer.scaleValue = root.shouldBeVisible ? 1.0 : contentContainer.computedScaleCollapsed;
-                }
-            }
-
-            Behavior on animX {
-                enabled: root.animationsEnabled
-                NumberAnimation {
-                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on animY {
-                enabled: root.animationsEnabled
-                NumberAnimation {
-                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on scaleValue {
-                enabled: root.animationsEnabled
-                NumberAnimation {
-                    duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                    morph.openProgress = root.shouldBeVisible ? 1 : 0;
                 }
             }
 
