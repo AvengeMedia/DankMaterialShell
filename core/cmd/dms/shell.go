@@ -225,6 +225,9 @@ func runShellInteractive(session bool) {
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
+	if os.Getenv("QSG_USE_SIMPLE_ANIMATION_DRIVER") == "" {
+		cmd.Env = append(cmd.Env, "QSG_USE_SIMPLE_ANIMATION_DRIVER=1")
+	}
 
 	cmd.Env = appendLogEnv(cmd.Env)
 
@@ -469,6 +472,9 @@ func runShellDaemon(session bool) {
 	}
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
+	}
+	if os.Getenv("QSG_USE_SIMPLE_ANIMATION_DRIVER") == "" {
+		cmd.Env = append(cmd.Env, "QSG_USE_SIMPLE_ANIMATION_DRIVER=1")
 	}
 
 	cmd.Env = appendLogEnv(cmd.Env)

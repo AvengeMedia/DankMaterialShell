@@ -307,9 +307,9 @@ Item {
 
                     DankButtonGroup {
                         id: fillModeGroup
-                        property var internalModes: ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"]
+                        property var internalModes: ["Stretch", "Fit", "Fill", "Scrolling", "Tile", "TileVertically", "TileHorizontally", "Pad"]
                         anchors.horizontalCenter: parent.horizontalCenter
-                        model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Pad", "wallpaper fill mode")]
+                        model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Scroll", "wallpaper fill mode"), I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Pad", "wallpaper fill mode")]
                         selectionMode: "single"
                         buttonHeight: 28
                         minButtonWidth: 48
