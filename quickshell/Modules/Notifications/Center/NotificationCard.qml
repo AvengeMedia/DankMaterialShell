@@ -66,11 +66,11 @@ Rectangle {
     function expansionMotionDuration() {
         if (isDescriptionToggleAnimation)
             return descriptionExpanded ? Theme.notificationInlineExpandDuration : Theme.notificationInlineCollapseDuration;
-        return root.connectedFrameMode ? Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded) : (root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration);
+        return Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded);
     }
 
     function expansionMotionCurve() {
-        return root.connectedFrameMode ? (root.expanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : Theme.expressiveCurves.emphasized;
+        return root.expanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve;
     }
 
     Behavior on scale {
@@ -114,7 +114,7 @@ Rectangle {
     }
 
     Behavior on expandedContentOpacity {
-        enabled: root.connectedFrameMode && root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
             duration: root.expansionMotionDuration()
             easing.type: Easing.BezierSpline
@@ -123,7 +123,7 @@ Rectangle {
     }
 
     Behavior on collapsedContentOpacity {
-        enabled: root.connectedFrameMode && root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
             duration: root.expansionMotionDuration()
             easing.type: Easing.BezierSpline
@@ -138,9 +138,7 @@ Rectangle {
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
             return Theme.primaryHoverLight;
         }
-        if (connectedFrameMode)
-            return Theme.popupLayerColor(Theme.surfaceContainerHigh);
-        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
+        return Theme.floatingSurfaceHigh;
     }
     border.color: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -166,16 +164,16 @@ Rectangle {
         }
         return Theme.layerOutlineWidth;
     }
-    clip: connectedFrameMode && _clipAnimatedContent
+    clip: _clipAnimatedContent
 
     onExpandedChanged: {
-        if (connectedFrameMode && __initialized && userInitiatedExpansion && animateExpansion)
+        if (__initialized && userInitiatedExpansion && animateExpansion)
             _clipAnimatedContent = true;
         if (expanded) {
             _retainedExpandedContent = false;
             return;
         }
-        if (connectedFrameMode && __initialized && userInitiatedExpansion && animateExpansion)
+        if (__initialized && userInitiatedExpansion && animateExpansion)
             _retainedExpandedContent = true;
     }
 

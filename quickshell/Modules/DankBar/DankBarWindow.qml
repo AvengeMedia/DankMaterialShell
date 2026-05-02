@@ -99,7 +99,9 @@ PanelWindow {
         case "background":
             return WlrLayer.background;
         default:
-            return WlrLayer.Top;
+            // Elevate to Overlay when Frame is enabled so the bar stays above
+            // the FrameWindow (WlrLayer.Top) when it is re-mapped on mode switch.
+            return SettingsData.frameEnabled ? WlrLayer.Overlay : WlrLayer.Top;
         }
     }
 

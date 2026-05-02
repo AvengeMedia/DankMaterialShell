@@ -29,6 +29,7 @@ Variants {
         }
 
         WlrLayershell.namespace: "dms:dock"
+        WlrLayershell.layer: SettingsData.frameEnabled ? WlrLayer.Overlay : WlrLayer.Top
 
         readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
 

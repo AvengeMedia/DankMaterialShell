@@ -258,7 +258,7 @@ PanelWindow {
     }
 
     Behavior on renderedAlignedHeight {
-        enabled: win.connectedFrameMode && !exiting && !_isDestroying
+        enabled: !win.exiting && !win._isDestroying
         NumberAnimation {
             id: renderedHeightAnim
             duration: win.inlineMotionDuration(win.inlineGeometryGrowing)
@@ -666,7 +666,7 @@ PanelWindow {
             sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
             sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
             sourceRect.radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
-            sourceRect.color: win.connectedFrameMode ? Theme.popupLayerColor(Theme.surfaceContainer) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            sourceRect.color: Theme.floatingSurface
             sourceRect.antialiasing: true
             sourceRect.layer.enabled: false
             sourceRect.layer.textureSize: Qt.size(0, 0)
