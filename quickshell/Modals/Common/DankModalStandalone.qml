@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
@@ -349,45 +351,22 @@ Item {
             readonly property real offsetX: slide ? 15 : 0
             readonly property real offsetY: slide ? -30 : root.animationOffset
 
-            property real animX: 0
-            property real animY: 0
-            property real scaleValue: root.animationScaleCollapsed
-
-            onOffsetXChanged: animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr)
-            onOffsetYChanged: animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr)
-
-            Connections {
-                target: root
-                function onShouldBeVisibleChanged() {
-                    modalContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : modalContainer.offsetX, root.dpr);
-                    modalContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : modalContainer.offsetY, root.dpr);
-                    modalContainer.scaleValue = root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed;
+            // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
+            QtObject {
+                id: morph
+                property real openProgress: root.shouldBeVisible ? 1 : 0
+                Behavior on openProgress {
+                    enabled: root.animationsEnabled
+                    DankAnim {
+                        duration: root.animationDuration
+                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                    }
                 }
             }
 
-            Behavior on animX {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: root.animationDuration
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on animY {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: root.animationDuration
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on scaleValue {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: root.animationDuration
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
+            readonly property real animX: modalContainer.offsetX * (1 - morph.openProgress)
+            readonly property real animY: modalContainer.offsetY * (1 - morph.openProgress)
+            readonly property real scaleValue: root.animationScaleCollapsed + (1.0 - root.animationScaleCollapsed) * morph.openProgress
 
             Item {
                 id: contentContainer

@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
 import qs.Services
@@ -8,20 +10,25 @@ QtObject {
     property var modelData
     property int topMargin: 0
     readonly property bool compactMode: SettingsData.notificationCompactMode
-    readonly property bool notificationConnectedMode: SettingsData.frameEnabled
-        && Theme.isConnectedEffect
-        && SettingsData.isScreenInPreferences(manager.modelData, SettingsData.frameScreenPreferences)
+    readonly property bool notificationConnectedMode: SettingsData.frameEnabled && Theme.isConnectedEffect && SettingsData.isScreenInPreferences(manager.modelData, SettingsData.frameScreenPreferences)
     readonly property bool closeGapNotifications: notificationConnectedMode && SettingsData.frameCloseGaps
     readonly property string notifBarSide: {
         const pos = SettingsData.notificationPopupPosition;
-        if (pos === -1) return "top";
+        if (pos === -1)
+            return "top";
         switch (pos) {
-        case SettingsData.Position.Top: return "right";
-        case SettingsData.Position.Left: return "left";
-        case SettingsData.Position.BottomCenter: return "bottom";
-        case SettingsData.Position.Right: return "right";
-        case SettingsData.Position.Bottom: return "left";
-        default: return "top";
+        case SettingsData.Position.Top:
+            return "right";
+        case SettingsData.Position.Left:
+            return "left";
+        case SettingsData.Position.BottomCenter:
+            return "bottom";
+        case SettingsData.Position.Right:
+            return "right";
+        case SettingsData.Position.Bottom:
+            return "left";
+        default:
+            return "top";
         }
     }
     readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
@@ -519,15 +526,11 @@ QtObject {
     }
 
     function _notificationOmitStartConnector() {
-        return closeGapNotifications
-            && (SettingsData.notificationPopupPosition === SettingsData.Position.Top
-                || SettingsData.notificationPopupPosition === SettingsData.Position.Left);
+        return closeGapNotifications && (SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left);
     }
 
     function _notificationOmitEndConnector() {
-        return closeGapNotifications
-            && (SettingsData.notificationPopupPosition === SettingsData.Position.Right
-                || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom);
+        return closeGapNotifications && (SettingsData.notificationPopupPosition === SettingsData.Position.Right || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom);
     }
 
     function _onPopupChromeGeometryChanged(p) {

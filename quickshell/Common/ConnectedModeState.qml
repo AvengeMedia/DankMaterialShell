@@ -161,12 +161,22 @@ Singleton {
         };
     }
 
+    function _sameDockState(a, b) {
+        if (!a || !b)
+            return false;
+        return a.reveal === b.reveal && a.barSide === b.barSide && Math.abs(a.bodyX - b.bodyX) < 0.5 && Math.abs(a.bodyY - b.bodyY) < 0.5 && Math.abs(a.bodyW - b.bodyW) < 0.5 && Math.abs(a.bodyH - b.bodyH) < 0.5 && Math.abs(a.slideX - b.slideX) < 0.5 && Math.abs(a.slideY - b.slideY) < 0.5;
+    }
+
     function setDockState(screenName, state) {
         if (!screenName || !state)
             return false;
 
+        const normalized = _normalizeDockState(state);
+        if (_sameDockState(dockStates[screenName], normalized))
+            return true;
+
         const next = _cloneDict(dockStates);
-        next[screenName] = _normalizeDockState(state);
+        next[screenName] = normalized;
         dockStates = next;
         return true;
     }
@@ -191,10 +201,15 @@ Singleton {
     function setDockSlide(screenName, x, y) {
         if (!screenName)
             return false;
+        const numX = Number(x);
+        const numY = Number(y);
+        const cur = dockSlides[screenName];
+        if (cur && Math.abs(cur.x - numX) < 0.5 && Math.abs(cur.y - numY) < 0.5)
+            return true;
         const next = _cloneDict(dockSlides);
         next[screenName] = {
-            "x": Number(x),
-            "y": Number(y)
+            "x": numX,
+            "y": numY
         };
         dockSlides = next;
         return true;

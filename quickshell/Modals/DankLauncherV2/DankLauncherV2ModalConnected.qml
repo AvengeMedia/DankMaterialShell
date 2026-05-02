@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
@@ -215,22 +217,11 @@ Item {
 
     signal dialogClosed
 
+    // Coalesce per-channel dirty bits; one ConnectedModeState write per tick.
     Timer {
-        id: _fullSyncTimer
+        id: _syncTimer
         interval: 0
-        onTriggered: root._flushFullSync()
-    }
-
-    Timer {
-        id: _animSyncTimer
-        interval: 0
-        onTriggered: root._flushAnimSync()
-    }
-
-    Timer {
-        id: _bodySyncTimer
-        interval: 0
-        onTriggered: root._flushBodySync()
+        onTriggered: root._flushSync()
     }
 
     property string _chromeClaimId: ""
@@ -276,40 +267,37 @@ Item {
             ConnectedModeState.releaseDockRetract(_chromeClaimId);
     }
 
-    function _flushFullSync() {
-        _fullSyncPending = false;
-        _syncModalChromeState();
-    }
+    property bool _animSyncQueued: false
+    property bool _bodySyncQueued: false
 
     function _queueFullSync() {
-        if (_fullSyncPending)
-            return;
         _fullSyncPending = true;
-        _fullSyncTimer.restart();
+        if (!_syncTimer.running)
+            _syncTimer.restart();
     }
-
-    property bool _animSyncQueued: false
     function _queueAnimSync() {
-        if (_animSyncQueued)
-            return;
         _animSyncQueued = true;
-        _animSyncTimer.restart();
+        if (!_syncTimer.running)
+            _syncTimer.restart();
     }
-    function _flushAnimSync() {
-        _animSyncQueued = false;
-        _syncModalAnim();
-    }
-
-    property bool _bodySyncQueued: false
     function _queueBodySync() {
-        if (_bodySyncQueued)
-            return;
         _bodySyncQueued = true;
-        _bodySyncTimer.restart();
+        if (!_syncTimer.running)
+            _syncTimer.restart();
     }
-    function _flushBodySync() {
+    function _flushSync() {
+        const fullDirty = _fullSyncPending;
+        const animDirty = _animSyncQueued;
+        const bodyDirty = _bodySyncQueued;
+        _fullSyncPending = false;
+        _animSyncQueued = false;
         _bodySyncQueued = false;
-        _syncModalBody();
+        if (fullDirty)
+            _syncModalChromeState();
+        if (animDirty)
+            _syncModalAnim();
+        if (bodyDirty)
+            _syncModalBody();
     }
 
     function _syncModalAnim() {
@@ -791,39 +779,27 @@ Item {
                 return -Math.max((root.shadowPad || 0) + Theme.effectAnimOffset, 40);
             }
 
-            // Declarative bindings — snap applied at render layer (contentWrapper x/y)
-            property real animX: root._motionActive ? 0 : root._frozenMotionX
-            property real animY: root._motionActive ? 0 : root._frozenMotionY
-            property real scaleValue: root._motionActive ? 1.0 : Theme.effectScaleCollapsed
+            // openProgress: 0 = closed (at frozenMotion, scaleCollapsed), 1 = open (at 0, scale 1).
+            QtObject {
+                id: morph
+                property real openProgress: root._motionActive ? 1 : 0
+                Behavior on openProgress {
+                    enabled: root.animationsEnabled
+                    DankAnim {
+                        duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
+                        easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
+                    }
+                }
+            }
+
+            readonly property real animX: root._frozenMotionX * (1 - morph.openProgress)
+            readonly property real animY: root._frozenMotionY * (1 - morph.openProgress)
+            readonly property real scaleValue: Theme.effectScaleCollapsed + (1.0 - Theme.effectScaleCollapsed) * morph.openProgress
 
             onAnimXChanged: if (root.frameOwnsConnectedChrome)
                 root._queueAnimSync()
             onAnimYChanged: if (root.frameOwnsConnectedChrome)
                 root._queueAnimSync()
-
-            Behavior on animX {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
-                    easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
-                }
-            }
-
-            Behavior on animY {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
-                    easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
-                }
-            }
-
-            Behavior on scaleValue {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
-                    easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
-                }
-            }
 
             Item {
                 id: directionalClipMask
