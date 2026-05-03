@@ -378,6 +378,7 @@ Item {
             id: lockNotificationPanel
 
             readonly property int notificationMode: SettingsData.lockScreenNotificationMode
+            readonly property bool notificationPrivacyMode: SettingsData.notificationPopupPrivacyMode
             readonly property var notifications: NotificationService.groupedNotifications
             readonly property int totalCount: {
                 let count = 0;
@@ -650,7 +651,7 @@ Item {
                                             elide: Text.ElideRight
                                             maximumLineCount: 2
                                             wrapMode: Text.WordWrap
-                                            visible: text.length > 0
+                                            visible: !lockNotificationPanel.notificationPrivacyMode && (text.length > 0)
                                         }
                                     }
                                 }
