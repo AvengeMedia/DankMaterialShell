@@ -666,7 +666,7 @@ PanelWindow {
             sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
             sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
             sourceRect.radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
-            sourceRect.color: Theme.floatingSurface
+            sourceRect.color: win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface
             sourceRect.antialiasing: true
             sourceRect.layer.enabled: false
             sourceRect.layer.textureSize: Qt.size(0, 0)
