@@ -878,9 +878,18 @@ Item {
 
         ProcessListModal {
             id: processListModal
+            property bool wasShown: false
 
             Component.onCompleted: {
                 PopoutService.processListModal = processListModal;
+            }
+
+            onVisibleChanged: {
+                if (visible) {
+                    wasShown = true;
+                } else if (wasShown) {
+                    PopoutService.unloadProcessListModal();
+                }
             }
         }
     }
