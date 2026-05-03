@@ -8,9 +8,6 @@ DankPopout {
 
     layerNamespace: "dms:app-launcher"
 
-    readonly property real screenWidth: screen?.width ?? 1920
-    readonly property real screenHeight: screen?.height ?? 1080
-
     property string _pendingMode: ""
     property string _pendingQuery: ""
 
@@ -44,35 +41,8 @@ DankPopout {
         openWithQuery(query);
     }
 
-    readonly property int _baseWidth: {
-        switch (SettingsData.dankLauncherV2Size) {
-        case "micro":
-            return 500;
-        case "medium":
-            return 720;
-        case "large":
-            return 860;
-        default:
-            return 620;
-        }
-    }
-
-    readonly property int _baseHeight: {
-        switch (SettingsData.dankLauncherV2Size) {
-        case "micro":
-            return 480;
-        case "medium":
-            return 720;
-        case "large":
-            return 860;
-        default:
-            return 600;
-        }
-    }
-
-    popupWidth: Math.min(_baseWidth, screenWidth - 100)
-    popupHeight: Math.min(_baseHeight, screenHeight - 100)
-
+    popupWidth: 560
+    popupHeight: 640
     triggerWidth: 40
     positioning: ""
     contentHandlesKeys: contentLoader.item?.launcherContent?.editMode ?? false
@@ -90,7 +60,7 @@ DankPopout {
         if (!lc)
             return;
 
-        const query = _pendingQuery || (SettingsData.rememberLastQuery ? SessionData.launcherLastQuery : "") || "";
+        const query = _pendingQuery;
         const mode = _pendingMode || SessionData.appDrawerLastMode || "apps";
         _pendingMode = "";
         _pendingQuery = "";
@@ -102,9 +72,12 @@ DankPopout {
         if (lc.controller) {
             lc.controller.searchMode = mode;
             lc.controller.pluginFilter = "";
-            lc.controller.searchQuery = query;
-
-            lc.controller.performSearch();
+            lc.controller.searchQuery = "";
+            if (query) {
+                lc.controller.setSearchQuery(query);
+            } else {
+                lc.controller.performSearch();
+            }
         }
         lc.resetScroll?.();
         lc.actionPanel?.hide();
@@ -133,7 +106,7 @@ DankPopout {
             QtObject {
                 id: modalAdapter
                 property bool spotlightOpen: appDrawerPopout.shouldBeVisible
-                readonly property bool isClosing: !appDrawerPopout.shouldBeVisible
+                property bool isClosing: appDrawerPopout.isClosing
 
                 function hide() {
                     appDrawerPopout.close();

@@ -14,6 +14,7 @@ DankPopout {
     property real stablePopupHeight: 400
     property real _lastAlignedContentHeight: -1
     property bool _pendingSizedOpen: false
+    property bool _heightUpdatePending: false
 
     function updateStablePopupHeight() {
         const item = contentLoader.item;
@@ -30,6 +31,16 @@ DankPopout {
         stablePopupHeight = target;
     }
 
+    function queueStablePopupHeightUpdate() {
+        if (_heightUpdatePending)
+            return;
+        _heightUpdatePending = true;
+        Qt.callLater(() => {
+            _heightUpdatePending = false;
+            updateStablePopupHeight();
+        });
+    }
+
     NotificationKeyboardController {
         id: keyboardController
         listView: null
@@ -39,11 +50,9 @@ DankPopout {
         }
     }
 
-    popupWidth: triggerScreen ? Math.min(500, Math.max(380, triggerScreen.width - 48)) : 400
+    popupWidth: 400
     popupHeight: stablePopupHeight
     positioning: ""
-    animationScaleCollapsed: 0.94
-    animationOffset: 0
     suspendShadowWhileResizing: false
 
     screen: triggerScreen
@@ -130,7 +139,7 @@ DankPopout {
     Connections {
         target: contentLoader.item
         function onImplicitHeightChanged() {
-            root.updateStablePopupHeight();
+            root.queueStablePopupHeightUpdate();
         }
     }
 

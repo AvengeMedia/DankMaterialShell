@@ -22,6 +22,7 @@ import qs.Modules.OSD
 import qs.Modules.ProcessList
 import qs.Modules.DankBar
 import qs.Modules.DankBar.Popouts
+import qs.Modules.Frame
 import qs.Modules.WorkspaceOverlays
 import qs.Services
 
@@ -187,6 +188,8 @@ Item {
         }
     }
 
+    Frame {}
+
     Repeater {
         id: dankBarRepeater
         model: ScriptModel {
@@ -331,7 +334,6 @@ Item {
         sourceComponent: Component {
             DankDashPopout {
                 id: dankDashPopout
-                onPopoutClosed: PopoutService.unloadDankDash()
             }
         }
     }

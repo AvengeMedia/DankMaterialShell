@@ -10,13 +10,40 @@ import qs.Widgets
 PanelWindow {
     id: win
 
+    readonly property bool connectedFrameMode: SettingsData.frameEnabled && Theme.isConnectedEffect && SettingsData.isScreenInPreferences(win.screen, SettingsData.frameScreenPreferences)
+    readonly property string notifBarSide: {
+        const pos = SettingsData.notificationPopupPosition;
+        if (pos === -1)
+            return "top";
+        switch (pos) {
+        case SettingsData.Position.Top:
+            return "right";
+        case SettingsData.Position.Left:
+            return "left";
+        case SettingsData.Position.BottomCenter:
+            return "bottom";
+        case SettingsData.Position.Right:
+            return "right";
+        case SettingsData.Position.Bottom:
+            return "left";
+        default:
+            return "top";
+        }
+    }
+    readonly property int inlineExpandDuration: Theme.notificationInlineExpandDuration
+    readonly property int inlineCollapseDuration: Theme.notificationInlineCollapseDuration
+    property bool inlineHeightAnimating: false
+
     WindowBlur {
         targetWindow: win
-        blurX: content.x + content.cardInset + swipeTx.x + tx.x
-        blurY: content.y + content.cardInset + swipeTx.y + tx.y
-        blurWidth: !win._finalized ? Math.max(0, content.width - content.cardInset * 2) : 0
-        blurHeight: !win._finalized ? Math.max(0, content.height - content.cardInset * 2) : 0
-        blurRadius: Theme.cornerRadius
+        readonly property real s: Math.min(1, content.scale) * Math.max(0, content.opacity)
+        readonly property real innerW: Math.max(0, content.width - content.cardInset * 2)
+        readonly property real innerH: Math.max(0, content.height - content.cardInset * 2)
+        blurX: content.x + content.cardInset + swipeTx.x + tx.x + innerW * (1 - s) * 0.5
+        blurY: content.y + content.cardInset + swipeTx.y + tx.y + innerH * (1 - s) * 0.5
+        blurWidth: !win._finalized && !win.connectedFrameMode ? innerW * s : 0
+        blurHeight: !win._finalized && !win.connectedFrameMode ? innerH * s : 0
+        blurRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     }
 
     WlrLayershell.namespace: "dms:notification-popup"
@@ -25,6 +52,15 @@ PanelWindow {
     required property string notificationId
     readonly property bool hasValidData: notificationData && notificationData.notification
     readonly property alias hovered: cardHoverHandler.hovered
+    readonly property alias swipeActive: content.swipeActive
+    readonly property alias swipeDismissing: content.swipeDismissing
+    readonly property bool swipeDismissTowardEdge: {
+        if (content.swipeDismissing)
+            return _swipeDismissesTowardFrameEdge();
+        if (content.swipeActive)
+            return content.swipeOffset * _frameEdgeSwipeDirection() > 0;
+        return false;
+    }
     property int screenY: 0
     property bool exiting: false
     property bool _isDestroying: false
@@ -32,18 +68,36 @@ PanelWindow {
     property real _lastReportedAlignedHeight: -1
     property real _storedTopMargin: 0
     property real _storedBottomMargin: 0
+    property bool _inlineGeometryReady: false
+    readonly property bool directionalEffect: Theme.isDirectionalEffect
+    readonly property bool depthEffect: Theme.isDepthEffect
+    readonly property real entryTravel: {
+        const base = Math.abs(Theme.effectAnimOffset);
+        if (directionalEffect) {
+            if (isCenterPosition)
+                return Math.max(base, Math.round(content.height * 1.1));
+            return Math.max(base, Math.round(content.width * 0.95));
+        }
+        if (depthEffect)
+            return Math.max(base, 44);
+        return base;
+    }
+    readonly property real exitTravel: {
+        if (directionalEffect) {
+            if (isCenterPosition)
+                return Math.max(1, content.height);
+            return Math.max(1, content.width);
+        }
+        if (depthEffect)
+            return Math.round(entryTravel * 1.35);
+        return Anims.slidePx;
+    }
     readonly property string clearText: I18n.tr("Dismiss")
     property bool descriptionExpanded: false
     readonly property bool hasExpandableBody: (notificationData?.htmlBody || "").replace(/<[^>]*>/g, "").trim().length > 0
     onDescriptionExpandedChanged: {
-        popupHeightChanged();
-    }
-    onImplicitHeightChanged: {
-        const aligned = Theme.px(implicitHeight, dpr);
-        if (Math.abs(aligned - _lastReportedAlignedHeight) < 0.5)
-            return;
-        _lastReportedAlignedHeight = aligned;
-        popupHeightChanged();
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
     }
 
     readonly property bool compactMode: SettingsData.notificationCompactMode
@@ -61,6 +115,7 @@ PanelWindow {
     signal exitStarted
     signal exitFinished
     signal popupHeightChanged
+    signal popupChromeGeometryChanged
 
     function startExit() {
         if (exiting || _isDestroying) {
@@ -68,6 +123,7 @@ PanelWindow {
         }
         exiting = true;
         exitStarted();
+        popupChromeGeometryChanged();
         exitAnim.restart();
         exitWatchdog.restart();
         if (NotificationService.removeFromVisibleNotifications)
@@ -132,22 +188,84 @@ PanelWindow {
             return basePopupHeightPrivacy;
         if (!descriptionExpanded)
             return basePopupHeight;
-        const bodyTextHeight = bodyText.contentHeight || 0;
+        const bodyTextHeight = expandedBodyMeasure.contentHeight || bodyText.contentHeight || 0;
         const collapsedBodyHeight = Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2);
         if (bodyTextHeight > collapsedBodyHeight + 2)
             return basePopupHeight + bodyTextHeight - collapsedBodyHeight;
         return basePopupHeight;
     }
+    readonly property real targetAlignedHeight: Theme.px(Math.max(0, contentImplicitHeight), dpr)
+    property real renderedAlignedHeight: targetAlignedHeight
+    property real allocatedAlignedHeight: targetAlignedHeight
+    readonly property bool inlineGeometryGrowing: targetAlignedHeight >= renderedAlignedHeight
+    readonly property bool contentAnchorsTop: isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left
+    readonly property real renderedContentOffsetY: contentAnchorsTop ? 0 : Math.max(0, allocatedAlignedHeight - renderedAlignedHeight)
     implicitWidth: contentImplicitWidth + (windowShadowPad * 2)
-    implicitHeight: contentImplicitHeight + (windowShadowPad * 2)
+    implicitHeight: allocatedAlignedHeight + (windowShadowPad * 2)
 
-    Behavior on implicitHeight {
-        enabled: !exiting && !_isDestroying
+    function inlineMotionDuration(growing) {
+        return growing ? inlineExpandDuration : inlineCollapseDuration;
+    }
+
+    function syncInlineTargetHeight() {
+        const target = Math.max(0, Number(targetAlignedHeight));
+        if (isNaN(target))
+            return;
+
+        if (!_inlineGeometryReady) {
+            renderedHeightAnim.stop();
+            renderedAlignedHeight = target;
+            allocatedAlignedHeight = target;
+            _lastReportedAlignedHeight = target;
+            return;
+        }
+
+        const currentRendered = Math.max(0, Number(renderedAlignedHeight));
+        const nextAllocation = Math.max(target, currentRendered, allocatedAlignedHeight);
+        if (Math.abs(nextAllocation - allocatedAlignedHeight) >= 0.5)
+            allocatedAlignedHeight = nextAllocation;
+
+        if (Math.abs(target - renderedAlignedHeight) < 0.5) {
+            finishInlineHeightAnimation();
+            return;
+        }
+
+        renderedAlignedHeight = target;
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
+        if (inlineMotionDuration(target >= currentRendered) <= 0)
+            Qt.callLater(() => finishInlineHeightAnimation());
+    }
+
+    function finishInlineHeightAnimation() {
+        const target = Math.max(0, Number(targetAlignedHeight));
+        if (isNaN(target))
+            return;
+        if (Math.abs(renderedAlignedHeight - target) >= 0.5)
+            renderedAlignedHeight = target;
+        if (Math.abs(allocatedAlignedHeight - target) >= 0.5)
+            allocatedAlignedHeight = target;
+        _lastReportedAlignedHeight = renderedAlignedHeight;
+        popupHeightChanged();
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
+    }
+
+    onTargetAlignedHeightChanged: syncInlineTargetHeight()
+    onAllocatedAlignedHeightChanged: {
+        if (connectedFrameMode)
+            popupChromeGeometryChanged();
+    }
+
+    Behavior on renderedAlignedHeight {
+        enabled: !win.exiting && !win._isDestroying
         NumberAnimation {
-            id: implicitHeightAnim
-            duration: descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
+            id: renderedHeightAnim
+            duration: win.inlineMotionDuration(win.inlineGeometryGrowing)
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasized
+            easing.bezierCurve: win.inlineGeometryGrowing ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+            onRunningChanged: win.inlineHeightAnimating = running
+            onFinished: win.finishInlineHeightAnimation()
         }
     }
 
@@ -157,7 +275,11 @@ PanelWindow {
         }
     }
     Component.onCompleted: {
-        _lastReportedAlignedHeight = Theme.px(implicitHeight, dpr);
+        renderedHeightAnim.stop();
+        renderedAlignedHeight = targetAlignedHeight;
+        allocatedAlignedHeight = targetAlignedHeight;
+        _inlineGeometryReady = true;
+        _lastReportedAlignedHeight = renderedAlignedHeight;
         _storedTopMargin = getTopMargin();
         _storedBottomMargin = getBottomMargin();
         if (SettingsData.notificationPopupPrivacyMode)
@@ -195,7 +317,8 @@ PanelWindow {
     readonly property real maxPopupShadowBlurPx: Math.max((Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined) ? Theme.elevationLevel3.blurPx : 12, (Theme.elevationLevel4 && Theme.elevationLevel4.blurPx !== undefined) ? Theme.elevationLevel4.blurPx : 16)
     readonly property real maxPopupShadowOffsetXPx: Math.max(Math.abs(Theme.elevationOffsetX(Theme.elevationLevel3)), Math.abs(Theme.elevationOffsetX(Theme.elevationLevel4)))
     readonly property real maxPopupShadowOffsetYPx: Math.max(Math.abs(Theme.elevationOffsetY(Theme.elevationLevel3, 6)), Math.abs(Theme.elevationOffsetY(Theme.elevationLevel4, 8)))
-    readonly property real windowShadowPad: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
+    readonly property bool popupWindowShadowActive: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !connectedFrameMode
+    readonly property real windowShadowPad: popupWindowShadowActive ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
 
     anchors.top: true
     anchors.left: true
@@ -240,12 +363,32 @@ PanelWindow {
         });
     }
 
+    function _frameEdgeInset(side) {
+        if (!screen)
+            return 0;
+        const raw = SettingsData.frameEdgeInsetForSide(screen, side);
+        return Math.max(0, Math.round(Theme.px(raw, dpr)));
+    }
+
+    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !connectedFrameMode && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+
+    // Frame ON + Connected OFF. frameEdgeInset is the full bar/frame inset
+    function _frameGapMargin(side) {
+        return _frameEdgeInset(side) + Theme.popupDistance;
+    }
+
     function getTopMargin() {
         const popupPos = SettingsData.notificationPopupPosition;
         const isTop = isTopCenter || popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Left;
         if (!isTop)
             return 0;
 
+        if (connectedFrameMode) {
+            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps) ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            return _frameEdgeInset("top") + cornerClear + screenY;
+        }
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("top") + screenY;
         const barInfo = getBarInfo();
         const base = barInfo.topBar > 0 ? barInfo.topBar : Theme.popupDistance;
         return base + screenY;
@@ -257,6 +400,12 @@ PanelWindow {
         if (!isBottom)
             return 0;
 
+        if (connectedFrameMode) {
+            const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps) ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
+            return _frameEdgeInset("bottom") + cornerClear + screenY;
+        }
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("bottom") + screenY;
         const barInfo = getBarInfo();
         const base = barInfo.bottomBar > 0 ? barInfo.bottomBar : Theme.popupDistance;
         return base + screenY;
@@ -271,6 +420,10 @@ PanelWindow {
         if (!isLeft)
             return 0;
 
+        if (connectedFrameMode)
+            return _frameEdgeInset("left");
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("left");
         const barInfo = getBarInfo();
         return barInfo.leftBar > 0 ? barInfo.leftBar : Theme.popupDistance;
     }
@@ -284,6 +437,10 @@ PanelWindow {
         if (!isRight)
             return 0;
 
+        if (connectedFrameMode)
+            return _frameEdgeInset("right");
+        if (frameOnlyNoConnected)
+            return _frameGapMargin("right");
         const barInfo = getBarInfo();
         return barInfo.rightBar > 0 ? barInfo.rightBar : Theme.popupDistance;
     }
@@ -303,7 +460,7 @@ PanelWindow {
         return Theme.snap(screen.width - alignedWidth - barRight, dpr);
     }
 
-    function getContentY() {
+    function getAllocatedContentY() {
         if (!screen)
             return 0;
 
@@ -313,7 +470,11 @@ PanelWindow {
         const isTop = isTopCenter || popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Left;
         if (isTop)
             return Theme.snap(barTop, dpr);
-        return Theme.snap(screen.height - alignedHeight - barBottom, dpr);
+        return Theme.snap(screen.height - allocatedAlignedHeight - barBottom, dpr);
+    }
+
+    function getContentY() {
+        return Theme.snap(getAllocatedContentY() + renderedContentOffsetY, dpr);
     }
 
     function getWindowLeftMargin() {
@@ -325,23 +486,107 @@ PanelWindow {
     function getWindowTopMargin() {
         if (!screen)
             return 0;
-        return Theme.snap(getContentY() - windowShadowPad, dpr);
+        return Theme.snap(getAllocatedContentY() - windowShadowPad, dpr);
+    }
+
+    function _swipeDismissTarget() {
+        return (content.swipeDismissDirection < 0 ? -1 : 1) * content.width;
+    }
+
+    function _frameEdgeSwipeDirection() {
+        const popupPos = SettingsData.notificationPopupPosition;
+        return (popupPos === SettingsData.Position.Left || popupPos === SettingsData.Position.Bottom) ? -1 : 1;
+    }
+
+    function _swipeDismissesTowardFrameEdge() {
+        return content.swipeDismissDirection === _frameEdgeSwipeDirection();
+    }
+
+    function popupChromeMotionActive() {
+        return popupChromeOpenProgress() < 1 || exiting || content.swipeActive || content.swipeDismissing || Math.abs(content.swipeOffset) > 0.5;
+    }
+
+    function popupLayoutReservesSlot() {
+        return !content.swipeDismissing;
+    }
+
+    function popupChromeReservesSlot() {
+        return !content.swipeDismissing;
+    }
+
+    function _chromeMotionOffset() {
+        return isCenterPosition ? tx.y : tx.x;
+    }
+
+    function _chromeCardTravel() {
+        return Math.max(1, isCenterPosition ? alignedHeight : alignedWidth);
+    }
+
+    function popupChromeOpenProgress() {
+        if (exiting || content.swipeDismissing)
+            return 1;
+        return Math.max(0, Math.min(1, 1 - Math.abs(_chromeMotionOffset()) / _chromeCardTravel()));
+    }
+
+    function popupChromeReleaseProgress() {
+        if (exiting) {
+            const exitRel = Math.max(0, Math.min(1, Math.abs(_chromeMotionOffset()) / _chromeCardTravel()));
+            if (content.swipeDismissing) {
+                const swipeRel = Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
+                return Math.max(exitRel, swipeRel);
+            }
+            return exitRel;
+        }
+        if (content.swipeDismissing)
+            return Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
+        if (content.swipeActive && content.swipeOffset * _frameEdgeSwipeDirection() > 0)
+            return Math.max(0, Math.min(1, Math.abs(content.swipeOffset) / Math.max(1, content.swipeTravelDistance)));
+        return 0;
+    }
+
+    function popupChromeFollowsCardMotion() {
+        return false;
+    }
+
+    function popupChromeMotionX() {
+        if (!popupChromeMotionActive() || isCenterPosition)
+            return 0;
+        const motion = content.swipeOffset + tx.x;
+        if (content.swipeDismissing && !_swipeDismissesTowardFrameEdge())
+            return exiting ? Theme.snap(tx.x, dpr) : 0;
+        if (content.swipeActive && motion * _frameEdgeSwipeDirection() < 0)
+            return 0;
+        return Theme.snap(motion, dpr);
+    }
+
+    function popupChromeMotionY() {
+        return popupChromeMotionActive() ? Theme.snap(tx.y, dpr) : 0;
     }
 
     readonly property bool screenValid: win.screen && !_isDestroying
     readonly property real dpr: screenValid ? CompositorService.getScreenScale(win.screen) : 1
     readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2)), dpr)
-    readonly property real alignedHeight: Theme.px(Math.max(0, implicitHeight - (windowShadowPad * 2)), dpr)
+    readonly property real alignedHeight: renderedAlignedHeight
+    onScreenYChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
+    onScreenChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
+    // Intentionally unconditional: Manager needs the signal when frame mode toggles off
+    onConnectedFrameModeChanged: popupChromeGeometryChanged()
+    onAlignedWidthChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
+    onAlignedHeightChanged: if (connectedFrameMode)
+        popupChromeGeometryChanged()
 
     Item {
         id: content
 
         x: Theme.snap(windowShadowPad, dpr)
-        y: Theme.snap(windowShadowPad, dpr)
+        y: Theme.snap(windowShadowPad + renderedContentOffsetY, dpr)
         width: alignedWidth
         height: alignedHeight
-        visible: !win._finalized
-        scale: cardHoverHandler.hovered ? 1.01 : 1.0
+        visible: !win._finalized && !chromeOnlyExit
+        scale: (!win.inlineHeightAnimating && cardHoverHandler.hovered) ? 1.01 : 1.0
         transformOrigin: Item.Center
 
         Behavior on scale {
@@ -352,15 +597,27 @@ PanelWindow {
         }
 
         property real swipeOffset: 0
-        readonly property real dismissThreshold: isCenterPosition ? height * 0.4 : width * 0.35
+        property real swipeDismissDirection: 1
+        property bool chromeOnlyExit: false
+        readonly property real dismissThreshold: width * 0.35
         readonly property real swipeFadeStartRatio: 0.75
-        readonly property real swipeTravelDistance: isCenterPosition ? height : width
+        readonly property real swipeTravelDistance: width
         readonly property real swipeFadeStartOffset: swipeTravelDistance * swipeFadeStartRatio
         readonly property real swipeFadeDistance: Math.max(1, swipeTravelDistance - swipeFadeStartOffset)
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
+        onSwipeDismissingChanged: {
+            if (!win.connectedFrameMode)
+                return;
+            win.popupHeightChanged();
+            win.popupChromeGeometryChanged();
+        }
+        onSwipeOffsetChanged: {
+            if (win.connectedFrameMode)
+                win.popupChromeGeometryChanged();
+        }
 
-        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !BlurService.enabled
+        readonly property bool shadowsAllowed: win.popupWindowShadowActive
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
         readonly property real cardInset: Theme.snap(4, win.dpr)
         readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)) + 8), win.dpr) : 0
@@ -370,21 +627,21 @@ PanelWindow {
 
         Behavior on shadowBlurPx {
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: win.inlineHeightAnimating ? win.inlineExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
 
         Behavior on shadowOffsetX {
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: win.inlineHeightAnimating ? win.inlineExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
 
         Behavior on shadowOffsetY {
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: win.inlineHeightAnimating ? win.inlineExpandDuration : Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
@@ -399,7 +656,7 @@ PanelWindow {
             shadowOffsetX: content.shadowOffsetX
             shadowOffsetY: content.shadowOffsetY
             shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
-            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
+            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
@@ -408,38 +665,42 @@ PanelWindow {
             sourceRect.y: content.shadowRenderPadding + content.cardInset
             sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
             sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
-            sourceRect.radius: Theme.cornerRadius
-            sourceRect.color: Theme.readableSurface
-            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.outlineMedium
-            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 1
+            sourceRect.radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+            sourceRect.color: win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface
+            sourceRect.antialiasing: true
+            sourceRect.layer.enabled: false
+            sourceRect.layer.textureSize: Qt.size(0, 0)
+            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
+            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
+        }
 
-            Rectangle {
-                x: bgShadowLayer.sourceRect.x
-                y: bgShadowLayer.sourceRect.y
-                width: bgShadowLayer.sourceRect.width
-                height: bgShadowLayer.sourceRect.height
-                radius: bgShadowLayer.sourceRect.radius
-                visible: notificationData && notificationData.urgency === NotificationUrgency.Critical
-                opacity: 1
-                clip: true
+        // Keep critical accent outside shadow rendering so connected mode still shows it.
+        Rectangle {
+            x: content.cardInset
+            y: content.cardInset
+            width: Math.max(0, content.width - content.cardInset * 2)
+            height: Math.max(0, content.height - content.cardInset * 2)
+            radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+            visible: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical
+            opacity: 1
+            clip: true
 
-                gradient: Gradient {
-                    orientation: Gradient.Horizontal
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
 
-                    GradientStop {
-                        position: 0
-                        color: Theme.primary
-                    }
+                GradientStop {
+                    position: 0
+                    color: Theme.primary
+                }
 
-                    GradientStop {
-                        position: 0.02
-                        color: Theme.primary
-                    }
+                GradientStop {
+                    position: 0.02
+                    color: Theme.primary
+                }
 
-                    GradientStop {
-                        position: 0.021
-                        color: "transparent"
-                    }
+                GradientStop {
+                    position: 0.021
+                    color: "transparent"
                 }
             }
         }
@@ -447,11 +708,10 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             anchors.margins: content.cardInset
-            radius: Theme.cornerRadius
-            antialiasing: true
+            radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
             color: "transparent"
-            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-            border.width: BlurService.enabled ? BlurService.borderWidth : 1
+            border.color: win.connectedFrameMode ? "transparent" : BlurService.borderColor
+            border.width: win.connectedFrameMode ? 0 : BlurService.borderWidth
             z: 100
         }
 
@@ -482,10 +742,23 @@ PanelWindow {
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
+            StyledText {
+                id: expandedBodyMeasure
+
+                visible: false
+                width: Math.max(0, backgroundContainer.width - Theme.spacingL - (Theme.spacingL + Theme.notificationHoverRevealMargin) - popupIconSize - Theme.spacingM)
+                text: notificationData ? (notificationData.htmlBody || "") : ""
+                font.pixelSize: Theme.fontSizeSmall
+                elide: Text.ElideNone
+                horizontalAlignment: Text.AlignLeft
+                maximumLineCount: -1
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            }
+
             Item {
                 id: notificationContent
 
-                readonly property real expandedTextHeight: bodyText.contentHeight || 0
+                readonly property real expandedTextHeight: expandedBodyMeasure.contentHeight || bodyText.contentHeight || 0
                 readonly property real collapsedBodyHeight: Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)
                 readonly property real effectiveCollapsedHeight: (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) ? win.privacyCollapsedContentHeight : win.collapsedContentHeight
                 readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedBodyHeight + 2) ? (expandedTextHeight - collapsedBodyHeight) : 0
@@ -653,7 +926,7 @@ PanelWindow {
                                     win.descriptionExpanded = !win.descriptionExpanded;
                             }
 
-                            propagateComposedEvents: true
+                            propagateComposedEvents: false
                             onPressed: mouse => {
                                 if (parent.hoveredLink)
                                     mouse.accepted = false;
@@ -849,14 +1122,15 @@ PanelWindow {
         DragHandler {
             id: swipeDragHandler
             target: null
-            xAxis.enabled: !isCenterPosition
-            yAxis.enabled: isCenterPosition
+            xAxis.enabled: true
+            yAxis.enabled: false
 
             onActiveChanged: {
                 if (active || win.exiting || content.swipeDismissing)
                     return;
 
                 if (Math.abs(content.swipeOffset) > content.dismissThreshold) {
+                    content.swipeDismissDirection = content.swipeOffset < 0 ? -1 : 1;
                     content.swipeDismissing = true;
                     swipeDismissAnim.start();
                 } else {
@@ -865,18 +1139,10 @@ PanelWindow {
             }
 
             onTranslationChanged: {
-                if (win.exiting)
+                if (win.exiting || content.swipeDismissing)
                     return;
 
-                const raw = isCenterPosition ? translation.y : translation.x;
-                if (isTopCenter) {
-                    content.swipeOffset = Math.min(0, raw);
-                } else if (isBottomCenter) {
-                    content.swipeOffset = Math.max(0, raw);
-                } else {
-                    const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-                    content.swipeOffset = isLeft ? Math.min(0, raw) : Math.max(0, raw);
-                }
+                content.swipeOffset = translation.x;
             }
         }
 
@@ -889,7 +1155,7 @@ PanelWindow {
         }
 
         Behavior on opacity {
-            enabled: !content.swipeActive
+            enabled: !content.swipeActive && !content.swipeDismissing
             NumberAnimation {
                 duration: Theme.shortDuration
             }
@@ -907,20 +1173,28 @@ PanelWindow {
             id: swipeDismissAnim
             target: content
             property: "swipeOffset"
-            to: isTopCenter ? -content.height : isBottomCenter ? content.height : (SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom ? -content.width : content.width)
+            to: win._swipeDismissTarget()
             duration: Theme.notificationExitDuration
             easing.type: Easing.OutCubic
             onStopped: {
-                NotificationService.dismissNotification(notificationData);
-                win.forceExit();
+                const inwardConnectedExit = win.connectedFrameMode && !win.isCenterPosition && !win._swipeDismissesTowardFrameEdge();
+                if (inwardConnectedExit)
+                    content.chromeOnlyExit = true;
+                if (win.connectedFrameMode) {
+                    win.startExit();
+                    NotificationService.dismissNotification(notificationData);
+                } else {
+                    NotificationService.dismissNotification(notificationData);
+                    win.forceExit();
+                }
             }
         }
 
         transform: [
             Translate {
                 id: swipeTx
-                x: isCenterPosition ? 0 : content.swipeOffset
-                y: isCenterPosition ? content.swipeOffset : 0
+                x: content.swipeOffset
+                y: 0
             },
             Translate {
                 id: tx
@@ -928,9 +1202,17 @@ PanelWindow {
                     if (isCenterPosition)
                         return 0;
                     const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-                    return isLeft ? -Anims.slidePx : Anims.slidePx;
+                    return isLeft ? -entryTravel : entryTravel;
                 }
-                y: isTopCenter ? -Anims.slidePx : isBottomCenter ? Anims.slidePx : 0
+                y: isTopCenter ? -entryTravel : isBottomCenter ? entryTravel : 0
+                onXChanged: {
+                    if (win.connectedFrameMode)
+                        win.popupChromeGeometryChanged();
+                }
+                onYChanged: {
+                    if (win.connectedFrameMode)
+                        win.popupChromeGeometryChanged();
+                }
             }
         ]
     }
@@ -942,16 +1224,16 @@ PanelWindow {
         property: isCenterPosition ? "y" : "x"
         from: {
             if (isTopCenter)
-                return -Anims.slidePx;
+                return -entryTravel;
             if (isBottomCenter)
-                return Anims.slidePx;
+                return entryTravel;
             const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-            return isLeft ? -Anims.slidePx : Anims.slidePx;
+            return isLeft ? -entryTravel : entryTravel;
         }
         to: 0
         duration: Theme.notificationEnterDuration
         easing.type: Easing.BezierSpline
-        easing.bezierCurve: isCenterPosition ? Theme.expressiveCurves.standardDecel : Theme.expressiveCurves.emphasizedDecel
+        easing.bezierCurve: Theme.variantPopoutEnterCurve
         onStopped: {
             if (!win.exiting && !win._isDestroying) {
                 if (isCenterPosition) {
@@ -976,35 +1258,33 @@ PanelWindow {
             from: 0
             to: {
                 if (isTopCenter)
-                    return -Anims.slidePx;
+                    return -exitTravel;
                 if (isBottomCenter)
-                    return Anims.slidePx;
+                    return exitTravel;
                 const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
-                return isLeft ? -Anims.slidePx : Anims.slidePx;
+                return isLeft ? -exitTravel : exitTravel;
             }
             duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedAccel
+            easing.bezierCurve: Theme.variantPopoutExitCurve
         }
 
         NumberAnimation {
             target: content
             property: "opacity"
-            from: 1
-            to: 0
+            to: Theme.isDirectionalEffect ? 1 : 0
             duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.standardAccel
+            easing.bezierCurve: Theme.variantPopoutExitCurve
         }
 
         NumberAnimation {
             target: content
             property: "scale"
-            from: 1
-            to: 0.98
+            to: Theme.isDirectionalEffect ? 1 : Theme.effectScaleCollapsed
             duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasizedAccel
+            easing.bezierCurve: Theme.variantPopoutExitCurve
         }
     }
 

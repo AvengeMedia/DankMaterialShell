@@ -248,6 +248,10 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 6;
     }
 
+    if (currentVersion < 11) {
+        settings.configVersion = 11;
+    }
+
     return settings;
 }
 

@@ -986,6 +986,46 @@ Singleton {
         "expressiveEffects": [0.34, 0.8, 0.34, 1, 1, 1]
     }
 
+    // Theme is the canonical access point for animation variant state. The
+    // aliases below forward to AnimVariants.qml so consumers don't need two
+    // imports. ~200 call sites read through Theme.variantEnterCurve /
+    // Theme.isConnectedEffect / etc. — do NOT migrate to AnimVariants directly.
+    readonly property list<real> variantEnterCurve: AnimVariants.variantEnterCurve
+    readonly property list<real> variantExitCurve: AnimVariants.variantExitCurve
+    readonly property list<real> variantModalEnterCurve: AnimVariants.variantModalEnterCurve
+    readonly property list<real> variantModalExitCurve: AnimVariants.variantModalExitCurve
+    readonly property list<real> variantPopoutEnterCurve: AnimVariants.variantPopoutEnterCurve
+    readonly property list<real> variantPopoutExitCurve: AnimVariants.variantPopoutExitCurve
+    readonly property real variantEnterDurationFactor: AnimVariants.variantEnterDurationFactor
+    readonly property real variantExitDurationFactor: AnimVariants.variantExitDurationFactor
+    readonly property real variantOpacityDurationScale: AnimVariants.variantOpacityDurationScale
+    readonly property bool isDirectionalEffect: AnimVariants.isDirectionalEffect
+    readonly property bool isDepthEffect: AnimVariants.isDepthEffect
+    readonly property bool isConnectedEffect: AnimVariants.isConnectedEffect
+    readonly property real connectedCornerRadius: {
+        if (typeof SettingsData === "undefined")
+            return 12;
+        return SettingsData.connectedFrameModeActive ? SettingsData.frameRounding : cornerRadius;
+    }
+    readonly property color connectedSurfaceColor: {
+        if (typeof SettingsData === "undefined")
+            return withAlpha(surfaceContainer, popupTransparency);
+        return isConnectedEffect ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : withAlpha(surfaceContainer, popupTransparency);
+    }
+    readonly property real connectedSurfaceRadius: isConnectedEffect ? connectedCornerRadius : cornerRadius
+    readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined") ? true : (!isConnectedEffect || SettingsData.frameBlurEnabled)
+    readonly property real effectScaleCollapsed: AnimVariants.effectScaleCollapsed
+    readonly property real effectAnimOffset: AnimVariants.effectAnimOffset
+    function variantDuration(baseDuration, entering) {
+        return AnimVariants.variantDuration(baseDuration, entering);
+    }
+    function variantExitCleanupPadding() {
+        return AnimVariants.variantExitCleanupPadding();
+    }
+    function variantCloseInterval(baseDuration) {
+        return AnimVariants.variantCloseInterval(baseDuration);
+    }
+
     readonly property var animationPresetDurations: {
         "none": 0,
         "short": 250,
@@ -1060,6 +1100,9 @@ Singleton {
         const base = notificationAnimationBaseDuration;
         return base === 0 ? 0 : Math.round(base * 0.85);
     }
+
+    readonly property int notificationInlineExpandDuration: notificationAnimationBaseDuration === 0 ? 0 : 185
+    readonly property int notificationInlineCollapseDuration: notificationAnimationBaseDuration === 0 ? 0 : 150
 
     readonly property real notificationIconSizeNormal: 56
     readonly property real notificationIconSizeCompact: 48
@@ -1151,7 +1194,13 @@ Singleton {
     property real iconSizeLarge: 32
 
     property real panelTransparency: 0.85
-    property real popupTransparency: typeof SettingsData !== "undefined" && SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0
+    property real popupTransparency: {
+        if (typeof SettingsData === "undefined")
+            return 1.0;
+        if (isConnectedEffect)
+            return SettingsData.frameOpacity !== undefined ? SettingsData.frameOpacity : 1.0;
+        return SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0;
+    }
 
     function screenTransition() {
         if (CompositorService.isNiri) {
@@ -1850,6 +1899,12 @@ Singleton {
 
     function withAlpha(c, a) {
         return Qt.rgba(c.r, c.g, c.b, a);
+    }
+
+    function popupLayerColor(baseColor) {
+        if (isConnectedEffect)
+            return connectedSurfaceColor;
+        return withAlpha(baseColor, popupTransparency);
     }
 
     function blendAlpha(c, a) {

@@ -693,7 +693,7 @@ Item {
                                 onTriggered: refreshButton.isRefreshing = false
                             }
 
-                            NumberAnimation on rotation {
+                            RotationAnimator on rotation {
                                 running: refreshButton.isRefreshing
                                 from: 0
                                 to: 360

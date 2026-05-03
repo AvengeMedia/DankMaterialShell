@@ -73,20 +73,17 @@ BasePill {
                     return root.isActive ? Theme.primary : Theme.surfaceText;
                 }
 
-                RotationAnimation {
+                RotationAnimator on rotation {
                     id: rotationAnimation
-                    target: statusIcon
-                    property: "rotation"
                     from: 0
                     to: 360
                     duration: 1000
-                    running: root.isChecking
                     loops: Animation.Infinite
+                    running: root.isChecking
 
                     onRunningChanged: {
-                        if (!running) {
+                        if (!running)
                             statusIcon.rotation = 0;
-                        }
                     }
                 }
             }
@@ -130,20 +127,17 @@ BasePill {
                         return root.isActive ? Theme.primary : Theme.surfaceText;
                     }
 
-                    RotationAnimation {
+                    RotationAnimator on rotation {
                         id: rotationAnimationHorizontal
-                        target: statusIconHorizontal
-                        property: "rotation"
                         from: 0
                         to: 360
                         duration: 1000
-                        running: root.isChecking
                         loops: Animation.Infinite
+                        running: root.isChecking
 
                         onRunningChanged: {
-                            if (!running) {
+                            if (!running)
                                 statusIconHorizontal.rotation = 0;
-                            }
                         }
                     }
                 }

@@ -49,6 +49,8 @@ var SPEC = {
     modalAnimationSpeed: { def: 1 },
     modalCustomAnimationDuration: { def: 150 },
     enableRippleEffects: { def: true },
+    animationVariant: { def: 0 },
+    motionEffect: { def: 0 },
     m3ElevationEnabled: { def: true },
     m3ElevationIntensity: { def: 12 },
     m3ElevationOpacity: { def: 30 },
@@ -443,6 +445,7 @@ var SPEC = {
     displayProfileAutoSelect: { def: false },
     displayShowDisconnected: { def: false },
     displaySnapToEdge: { def: true },
+    connectedFrameBarStyleBackups: { def: {} },
 
     barConfigs: {
         def: [{
@@ -549,7 +552,21 @@ var SPEC = {
     clipboardEnterToPaste: { def: false },
 
     launcherPluginVisibility: { def: {} },
-    launcherPluginOrder: { def: [] }
+    launcherPluginOrder: { def: [] },
+
+    frameEnabled: { def: false },
+    frameThickness: { def: 16 },
+    frameRounding: { def: 23 },
+    frameColor: { def: "" },
+    frameOpacity: { def: 1.0 },
+    frameScreenPreferences: { def: ["all"] },
+    frameBarSize: { def: 40 },
+    frameShowOnOverview: { def: false },
+    frameBlurEnabled: { def: true },
+    frameCloseGaps: { def: true },
+    frameLauncherEmergeSide: { def: "bottom" },
+    frameLauncherArcExtender: { def: false },
+    frameMode: { def: "separate" }
 };
 
 function getValidKeys() {

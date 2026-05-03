@@ -458,7 +458,7 @@ Item {
                                     enabled: !CupsService.loadingDevices
                                     onClicked: CupsService.getDevices()
 
-                                    RotationAnimation on rotation {
+                                    RotationAnimator on rotation {
                                         running: CupsService.loadingDevices
                                         loops: Animation.Infinite
                                         from: 0
@@ -736,7 +736,7 @@ Item {
                                     enabled: !CupsService.loadingPPDs
                                     onClicked: CupsService.getPPDs()
 
-                                    RotationAnimation on rotation {
+                                    RotationAnimator on rotation {
                                         running: CupsService.loadingPPDs
                                         loops: Animation.Infinite
                                         from: 0

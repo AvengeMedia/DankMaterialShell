@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 5
+    readonly property int settingsConfigVersion: 11
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -36,6 +36,18 @@ Singleton {
         Medium,
         Long,
         Custom
+    }
+
+    enum AnimationVariant {
+        Material,
+        Fluent,
+        Dynamic
+    }
+
+    enum AnimationEffect {
+        Standard,     // 0 — M3: scale-in, rises from below
+        Directional,  // 1 — pure large slide, no scale
+        Depth         // 2 — medium slide with deep depth scale pop
     }
 
     enum SuspendBehavior {
@@ -169,6 +181,10 @@ Singleton {
     property int modalCustomAnimationDuration: 150
     property bool enableRippleEffects: true
     onEnableRippleEffectsChanged: saveSettings()
+    property int animationVariant: SettingsData.AnimationVariant.Material
+    onAnimationVariantChanged: saveSettings()
+    property int motionEffect: SettingsData.AnimationEffect.Standard
+    onMotionEffectChanged: saveSettings()
     property bool m3ElevationEnabled: true
     onM3ElevationEnabledChanged: saveSettings()
     property int m3ElevationIntensity: 12
@@ -187,6 +203,7 @@ Singleton {
     onPopoutElevationEnabledChanged: saveSettings()
     property bool barElevationEnabled: true
     onBarElevationEnabledChanged: saveSettings()
+
     property bool blurEnabled: false
     onBlurEnabledChanged: saveSettings()
     property bool blurForegroundLayers: true
@@ -202,6 +219,53 @@ Singleton {
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false
+
+    property bool frameEnabled: false
+    onFrameEnabledChanged: saveSettings()
+    property real frameThickness: 16
+    onFrameThicknessChanged: saveSettings()
+    property real frameRounding: 23
+    onFrameRoundingChanged: saveSettings()
+    property string frameColor: ""
+    onFrameColorChanged: saveSettings()
+    property real frameOpacity: 1.0
+    onFrameOpacityChanged: saveSettings()
+    property var frameScreenPreferences: ["all"]
+    onFrameScreenPreferencesChanged: saveSettings()
+    property real frameBarSize: 40
+    onFrameBarSizeChanged: saveSettings()
+    property bool frameShowOnOverview: false
+    onFrameShowOnOverviewChanged: saveSettings()
+    property bool frameBlurEnabled: true
+    onFrameBlurEnabledChanged: saveSettings()
+    property bool frameCloseGaps: true
+    onFrameCloseGapsChanged: saveSettings()
+    property string frameLauncherEmergeSide: "bottom"
+    onFrameLauncherEmergeSideChanged: saveSettings()
+    property bool frameLauncherArcExtender: false
+    onFrameLauncherArcExtenderChanged: saveSettings()
+    readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
+    property string frameMode: "separate"
+    onFrameModeChanged: saveSettings()
+    property var connectedFrameBarStyleBackups: ({})
+    onConnectedFrameBarStyleBackupsChanged: saveSettings()
+    readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
+    onConnectedFrameModeActiveChanged: {
+        if (_loading)
+            return;
+        _reconcileConnectedFrameBarStyles();
+    }
+
+    readonly property color effectiveFrameColor: {
+        const fc = frameColor;
+        if (!fc || fc === "default")
+            return Theme.surfaceContainer;
+        if (fc === "primary")
+            return Theme.primary;
+        if (fc === "surface")
+            return Theme.surface;
+        return fc;
+    }
 
     property bool showLauncherButton: true
     property bool showWorkspaceSwitcher: true
@@ -1276,6 +1340,9 @@ Singleton {
 
             Store.parse(root, obj);
 
+            if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
+                frameMode = "connected";
+
             if (obj?.weatherLocation !== undefined)
                 _legacyWeatherLocation = obj.weatherLocation;
             if (obj?.weatherCoordinates !== undefined)
@@ -1303,6 +1370,7 @@ Singleton {
             _loading = false;
         }
         loadPluginSettings();
+        Qt.callLater(() => _reconcileConnectedFrameBarStyles());
     }
 
     property var _pendingMigration: null
@@ -1414,6 +1482,141 @@ Singleton {
         if (_pluginSettingsLoading || _pluginParseError)
             return;
         pluginSettingsFile.setText(JSON.stringify(pluginSettings, null, 2));
+    }
+
+    function _connectedFrameBarStyleSnapshot(config) {
+        return {
+            "shadowIntensity": config?.shadowIntensity ?? 0,
+            "squareCorners": config?.squareCorners ?? false,
+            "gothCornersEnabled": config?.gothCornersEnabled ?? false,
+            "borderEnabled": config?.borderEnabled ?? false
+        };
+    }
+
+    function _hasConnectedFrameBarStyleBackups() {
+        return connectedFrameBarStyleBackups && Object.keys(connectedFrameBarStyleBackups).length > 0;
+    }
+
+    function _captureConnectedFrameBarStyleBackups(configs, overwriteExisting) {
+        if (!Array.isArray(configs))
+            return;
+
+        const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
+        const validIds = {};
+        let changed = false;
+
+        for (let i = 0; i < configs.length; i++) {
+            const config = configs[i];
+            if (!config?.id)
+                continue;
+            validIds[config.id] = true;
+
+            if (!overwriteExisting && nextBackups[config.id] !== undefined)
+                continue;
+
+            const snapshot = _connectedFrameBarStyleSnapshot(config);
+            if (JSON.stringify(nextBackups[config.id]) !== JSON.stringify(snapshot)) {
+                nextBackups[config.id] = snapshot;
+                changed = true;
+            }
+        }
+
+        if (overwriteExisting) {
+            for (const barId in nextBackups) {
+                if (validIds[barId])
+                    continue;
+                delete nextBackups[barId];
+                changed = true;
+            }
+        }
+
+        if (changed)
+            connectedFrameBarStyleBackups = nextBackups;
+    }
+
+    function _restoreConnectedFrameBarStyleBackups() {
+        if (!_hasConnectedFrameBarStyleBackups())
+            return;
+
+        const backups = connectedFrameBarStyleBackups || {};
+        const configs = JSON.parse(JSON.stringify(barConfigs));
+        let changed = false;
+
+        for (let i = 0; i < configs.length; i++) {
+            const backup = backups[configs[i].id];
+            if (!backup)
+                continue;
+            for (const key in backup) {
+                if (configs[i][key] === backup[key])
+                    continue;
+                configs[i][key] = backup[key];
+                changed = true;
+            }
+        }
+
+        if (changed)
+            barConfigs = configs;
+        connectedFrameBarStyleBackups = ({});
+        if (changed)
+            updateBarConfigs();
+    }
+
+    // Zeroes out connected-mode-hostile fields (shadow, square/goth corners, border).
+    // Returns { configs, changed } — `configs` is the same ref when no change.
+    function _sanitizeBarConfigsForConnectedFrame(configs) {
+        if (!connectedFrameModeActive || !Array.isArray(configs))
+            return {
+                "configs": configs,
+                "changed": false
+            };
+
+        let anyChanged = false;
+        const out = configs.map(cfg => {
+            if (!cfg)
+                return cfg;
+            let dirty = false;
+            const s = Object.assign({}, cfg);
+            if ((s.shadowIntensity ?? 0) !== 0) {
+                s.shadowIntensity = 0;
+                dirty = true;
+            }
+            if (s.squareCorners ?? false) {
+                s.squareCorners = false;
+                dirty = true;
+            }
+            if (s.gothCornersEnabled ?? false) {
+                s.gothCornersEnabled = false;
+                dirty = true;
+            }
+            if (s.borderEnabled ?? false) {
+                s.borderEnabled = false;
+                dirty = true;
+            }
+            if (dirty)
+                anyChanged = true;
+            return dirty ? s : cfg;
+        });
+        return {
+            "configs": anyChanged ? out : configs,
+            "changed": anyChanged
+        };
+    }
+
+    // Single entry point for connected-mode bar-style state.
+    //   active  → capture backups (if not yet) and sanitize bar configs
+    //   !active → restore backups
+    function _reconcileConnectedFrameBarStyles() {
+        if (!connectedFrameModeActive) {
+            _restoreConnectedFrameBarStyleBackups();
+            return;
+        }
+        if (!_hasConnectedFrameBarStyleBackups())
+            _captureConnectedFrameBarStyleBackups(barConfigs, true);
+        const result = _sanitizeBarConfigsForConnectedFrame(barConfigs);
+        if (result.changed) {
+            barConfigs = result.configs;
+            updateBarConfigs();
+        }
     }
 
     function detectAvailableIconThemes() {
@@ -1563,35 +1766,37 @@ Singleton {
         const spacing = barSpacing !== undefined ? barSpacing : (defaultBar?.spacing ?? 4);
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
         const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
-        const bottomGap = Math.max(0, rawBottomGap);
+        const isConnected = connectedFrameModeActive;
+        const bottomGap = isConnected ? 0 : Math.max(0, rawBottomGap);
 
         const useAutoGaps = (barConfig && barConfig.popupGapsAuto !== undefined) ? barConfig.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
         const manualGapValue = (barConfig && barConfig.popupGapsManual !== undefined) ? barConfig.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
-        const popupGap = useAutoGaps ? Math.max(4, spacing) : manualGapValue;
+        const popupGap = isConnected ? 0 : (useAutoGaps ? Math.max(4, spacing) : manualGapValue);
+        const edgeSpacing = isConnected ? 0 : spacing;
 
         switch (position) {
         case SettingsData.Position.Left:
             return {
-                "x": barThickness + spacing + popupGap,
+                "x": barThickness + edgeSpacing + popupGap,
                 "y": relativeY,
                 "width": widgetWidth
             };
         case SettingsData.Position.Right:
             return {
-                "x": (screen?.width || 0) - (barThickness + spacing + popupGap),
+                "x": (screen?.width || 0) - (barThickness + edgeSpacing + popupGap),
                 "y": relativeY,
                 "width": widgetWidth
             };
         case SettingsData.Position.Bottom:
             return {
                 "x": relativeX,
-                "y": (screen?.height || 0) - (barThickness + spacing + bottomGap + popupGap),
+                "y": (screen?.height || 0) - (barThickness + edgeSpacing + bottomGap + popupGap),
                 "width": widgetWidth
             };
         default:
             return {
                 "x": relativeX,
-                "y": barThickness + spacing + bottomGap + popupGap,
+                "y": barThickness + edgeSpacing + bottomGap + popupGap,
                 "width": widgetWidth
             };
         }
@@ -1685,7 +1890,9 @@ Singleton {
         const screenWidth = screen.width;
         const screenHeight = screen.height;
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
-        const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
+        const isConnected = connectedFrameModeActive;
+        const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
+        const bottomGap = isConnected ? 0 : rawBottomGap;
 
         let topOffset = 0;
         let bottomOffset = 0;
@@ -1707,7 +1914,7 @@ Singleton {
                 const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
                 const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
                 const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing + wingSize;
-                const otherBottomGap = other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0);
+                const otherBottomGap = isConnected ? 0 : (other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0));
 
                 switch (other.position) {
                 case SettingsData.Position.Top:
@@ -1798,7 +2005,9 @@ Singleton {
     function addBarConfig(config) {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         configs.push(config);
-        barConfigs = configs;
+        if (connectedFrameModeActive)
+            _captureConnectedFrameBarStyleBackups(configs, false);
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
         updateBarConfigs();
     }
 
@@ -1810,7 +2019,7 @@ Singleton {
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
 
         Object.assign(configs[index], updates);
-        barConfigs = configs;
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
         updateBarConfigs();
 
         if (positionChanged) {
@@ -1864,6 +2073,11 @@ Singleton {
             return;
         const configs = barConfigs.filter(cfg => cfg.id !== barId);
         barConfigs = configs;
+        if (connectedFrameBarStyleBackups?.[barId] !== undefined) {
+            const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
+            delete nextBackups[barId];
+            connectedFrameBarStyleBackups = nextBackups;
+        }
         updateBarConfigs();
     }
 
@@ -1956,6 +2170,95 @@ Singleton {
             return Quickshell.screens;
         }
         return filtered;
+    }
+
+    function getFrameFilteredScreens() {
+        var prefs = frameScreenPreferences || ["all"];
+        if (!prefs || prefs.length === 0 || prefs.includes("all")) {
+            return Quickshell.screens;
+        }
+        return Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
+    }
+
+    function getActiveBarEdgeForScreen(screen) {
+        if (!screen)
+            return "";
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled)
+                continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
+            switch (bc.position ?? 0) {
+            case SettingsData.Position.Top:
+                return "top";
+            case SettingsData.Position.Bottom:
+                return "bottom";
+            case SettingsData.Position.Left:
+                return "left";
+            case SettingsData.Position.Right:
+                return "right";
+            }
+        }
+        return "";
+    }
+
+    function getActiveBarEdgesForScreen(screen) {
+        if (!screen)
+            return [];
+        var edges = [];
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled)
+                continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
+            switch (bc.position ?? 0) {
+            case SettingsData.Position.Top:
+                edges.push("top");
+                break;
+            case SettingsData.Position.Bottom:
+                edges.push("bottom");
+                break;
+            case SettingsData.Position.Left:
+                edges.push("left");
+                break;
+            case SettingsData.Position.Right:
+                edges.push("right");
+                break;
+            }
+        }
+        return edges;
+    }
+
+    function frameEdgeInsetForSide(screen, side) {
+        if (!frameEnabled || !screen)
+            return 0;
+        const edges = getActiveBarEdgesForScreen(screen);
+        return edges.includes(side) ? frameBarSize : frameThickness;
+    }
+
+    function getActiveBarThicknessForScreen(screen) {
+        if (frameEnabled)
+            return frameBarSize;
+        if (!screen)
+            return frameThickness;
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled)
+                continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
+            const innerPadding = bc.innerPadding ?? 4;
+            const barT = Math.max(26 + innerPadding * 0.6, Theme.barHeight - 4 - (8 - innerPadding));
+            const spacing = bc.spacing ?? 4;
+            const bottomGap = bc.bottomGap ?? 0;
+            return barT + spacing + bottomGap;
+        }
+        return frameThickness;
     }
 
     function sendTestNotifications() {

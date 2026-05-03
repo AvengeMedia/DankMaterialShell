@@ -64,11 +64,19 @@ DankModal {
         activeImageLoads = 0;
         shouldHaveFocus = true;
         ClipboardService.reset();
-        if (clipboardAvailable)
-            ClipboardService.refresh();
         keyboardController.reset();
 
         Qt.callLater(function () {
+            if (clipboardAvailable) {
+                if (Theme.isConnectedEffect) {
+                    Qt.callLater(() => {
+                        if (clipboardHistoryModal.shouldBeVisible)
+                            ClipboardService.refresh();
+                    });
+                } else {
+                    ClipboardService.refresh();
+                }
+            }
             if (contentLoader.item?.searchField) {
                 contentLoader.item.searchField.text = "";
                 contentLoader.item.searchField.forceActiveFocus();

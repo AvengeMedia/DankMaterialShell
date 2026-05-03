@@ -20,14 +20,16 @@ Variants {
 
         WindowBlur {
             targetWindow: dock
+            blurEnabled: dock.effectiveBlurEnabled && !SettingsData.connectedFrameModeActive
             blurX: dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x
             blurY: dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y
             blurWidth: dock.hasApps && dock.reveal ? dockBackground.width : 0
             blurHeight: dock.hasApps && dock.reveal ? dockBackground.height : 0
-            blurRadius: Theme.cornerRadius
+            blurRadius: Theme.isConnectedEffect ? Theme.connectedCornerRadius : dock.surfaceRadius
         }
 
         WlrLayershell.namespace: "dms:dock"
+        WlrLayershell.layer: SettingsData.frameEnabled ? WlrLayer.Overlay : WlrLayer.Top
 
         readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
 
@@ -43,6 +45,25 @@ Variants {
         property real backgroundTransparency: SettingsData.dockTransparency
         property bool groupByApp: SettingsData.dockGroupByApp
         readonly property int borderThickness: SettingsData.dockBorderEnabled ? SettingsData.dockBorderThickness : 0
+        readonly property string connectedBarSide: SettingsData.dockPosition === SettingsData.Position.Top ? "top" : SettingsData.dockPosition === SettingsData.Position.Bottom ? "bottom" : SettingsData.dockPosition === SettingsData.Position.Left ? "left" : "right"
+        readonly property bool connectedBarActiveOnEdge: Theme.isConnectedEffect && !!(dock.screen || modelData) && SettingsData.getActiveBarEdgesForScreen(dock.screen || modelData).includes(connectedBarSide)
+        readonly property real connectedJoinInset: {
+            if (Theme.isConnectedEffect)
+                return connectedBarActiveOnEdge ? SettingsData.frameBarSize : SettingsData.frameThickness;
+            if (SettingsData.frameEnabled)
+                return SettingsData.frameEdgeInsetForSide(dock.screen || modelData, dock.connectedBarSide);
+            return 0;
+        }
+        readonly property real surfaceRadius: Theme.connectedSurfaceRadius
+        readonly property color surfaceColor: Theme.isConnectedEffect ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
+        readonly property color surfaceBorderColor: Theme.isConnectedEffect ? "transparent" : BlurService.borderColor
+        readonly property real surfaceBorderWidth: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
+        readonly property real surfaceTopLeftRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Left) ? 0 : surfaceRadius
+        readonly property real surfaceTopRightRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Right) ? 0 : surfaceRadius
+        readonly property real surfaceBottomLeftRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Bottom || SettingsData.dockPosition === SettingsData.Position.Left) ? 0 : surfaceRadius
+        readonly property real surfaceBottomRightRadius: Theme.isConnectedEffect && (SettingsData.dockPosition === SettingsData.Position.Bottom || SettingsData.dockPosition === SettingsData.Position.Right) ? 0 : surfaceRadius
+        readonly property real horizontalConnectorExtent: Theme.isConnectedEffect && !isVertical ? Theme.connectedCornerRadius : 0
+        readonly property real verticalConnectorExtent: Theme.isConnectedEffect && isVertical ? Theme.connectedCornerRadius : 0
 
         readonly property int hasApps: dockApps.implicitWidth > 0 || dockApps.implicitHeight > 0
 
@@ -114,14 +135,76 @@ Variants {
             return getBarHeight(leftBar);
         }
 
-        readonly property real dockMargin: SettingsData.dockSpacing
-        readonly property real positionSpacing: barSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin
+        readonly property real dockMargin: SettingsData.dockMargin
+        readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
+        readonly property real effectiveDockBottomGap: Theme.isConnectedEffect ? 0 : SettingsData.dockBottomGap
+        readonly property real effectiveDockMargin: Theme.isConnectedEffect ? 0 : SettingsData.dockMargin
+        readonly property real positionSpacing: barSpacing + effectiveDockBottomGap + effectiveDockMargin
+        readonly property real joinedEdgeMargin: Theme.isConnectedEffect ? 0 : (barSpacing + effectiveDockMargin + 1 + dock.borderThickness)
         readonly property real _dpr: (dock.screen && dock.screen.devicePixelRatio) ? dock.screen.devicePixelRatio : 1
         function px(v) {
             return Math.round(v * _dpr) / _dpr;
         }
 
-        property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData) || (dockVariants.trashContextMenu && dockVariants.trashContextMenu.visible && dockVariants.trashContextMenu.screen === modelData)
+        // Dock window origin in screen-relative coordinates (FrameWindow space).
+        function _dockWindowOriginX() {
+            if (!dock.isVertical)
+                return 0;
+            if (SettingsData.dockPosition === SettingsData.Position.Right)
+                return (dock.screen ? dock.screen.width : 0) - dock.width;
+            return 0;
+        }
+        function _dockWindowOriginY() {
+            if (dock.isVertical)
+                return 0;
+            if (SettingsData.dockPosition === SettingsData.Position.Bottom)
+                return (dock.screen ? dock.screen.height : 0) - dock.height;
+            return 0;
+        }
+
+        readonly property string _dockScreenName: dock.modelData ? dock.modelData.name : (dock.screen ? dock.screen.name : "")
+
+        function _syncDockChromeState() {
+            if (!dock._dockScreenName)
+                return;
+            if (!SettingsData.connectedFrameModeActive) {
+                ConnectedModeState.clearDockState(dock._dockScreenName);
+                return;
+            }
+
+            ConnectedModeState.setDockState(dock._dockScreenName, {
+                "reveal": dock.visible && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps,
+                "barSide": dock.connectedBarSide,
+                "bodyX": dock._dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x,
+                "bodyY": dock._dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y,
+                "bodyW": dock.hasApps ? dockBackground.width : 0,
+                "bodyH": dock.hasApps ? dockBackground.height : 0,
+                "slideX": dockSlide.x,
+                "slideY": dockSlide.y
+            });
+        }
+
+        function _syncDockSlide() {
+            if (!dock._dockScreenName || !SettingsData.connectedFrameModeActive)
+                return;
+            ConnectedModeState.setDockSlide(dock._dockScreenName, dockSlide.x, dockSlide.y);
+        }
+
+        property bool _slideSyncPending: false
+        function _queueSlideSync() {
+            if (!SettingsData.connectedFrameModeActive)
+                return;
+            if (_slideSyncPending)
+                return;
+            _slideSyncPending = true;
+            Qt.callLater(dock._flushSlideSync);
+        }
+        function _flushSlideSync() {
+            _slideSyncPending = false;
+            dock._syncDockSlide();
+        }
+
+        property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData)
         property bool revealSticky: false
 
         readonly property bool shouldHideForWindows: {
@@ -131,7 +214,7 @@ Variants {
                 return false;
 
             const screenName = dock.modelData?.name ?? "";
-            const dockThickness = effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin;
+            const dockThickness = dock.connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin;
             const screenWidth = dock.screen?.width ?? 0;
             const screenHeight = dock.screen?.height ?? 0;
 
@@ -259,7 +342,17 @@ Variants {
             onTriggered: dock.revealSticky = false
         }
 
+        // Flip `reveal` false when a modal claims this edge; reuses the slide animation
+        readonly property bool _modalRetractActive: {
+            if (!dock._dockScreenName)
+                return false;
+            return ConnectedModeState.dockRetractActiveForSide(dock._dockScreenName, dock.connectedBarSide);
+        }
+
         property bool reveal: {
+            if (_modalRetractActive)
+                return false;
+
             if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview) {
                 return true;
             }
@@ -279,6 +372,23 @@ Variants {
             if (!contextMenuOpen && autoHide && !dockMouseArea.containsMouse) {
                 revealSticky = true;
                 revealHold.restart();
+            }
+        }
+
+        Component.onCompleted: Qt.callLater(() => dock._syncDockChromeState())
+        Component.onDestruction: ConnectedModeState.clearDockState(dock._dockScreenName)
+
+        onRevealChanged: dock._syncDockChromeState()
+        onWidthChanged: dock._syncDockChromeState()
+        onHeightChanged: dock._syncDockChromeState()
+        onVisibleChanged: dock._syncDockChromeState()
+        onHasAppsChanged: dock._syncDockChromeState()
+        onConnectedBarSideChanged: dock._syncDockChromeState()
+
+        Connections {
+            target: SettingsData
+            function onConnectedFrameModeActiveChanged() {
+                dock._syncDockChromeState();
             }
         }
 
@@ -303,13 +413,13 @@ Variants {
                 return -1;
             if (barSpacing > 0)
                 return -1;
-            return px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin);
+            return px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockBottomGap + effectiveDockMargin);
         }
 
         property real animationHeadroom: Math.ceil(SettingsData.dockIconSize * 0.35)
 
-        implicitWidth: isVertical ? (px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
-        implicitHeight: !isVertical ? (px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+        implicitWidth: isVertical ? (px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+        implicitHeight: !isVertical ? (px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
 
         Item {
             id: maskItem
@@ -319,17 +429,17 @@ Variants {
             x: {
                 const baseX = dockCore.x + dockMouseArea.x;
                 if (isVertical && SettingsData.dockPosition === SettingsData.Position.Right)
-                    return baseX - (expanded ? animationHeadroom + borderThickness : 0);
-                return baseX - (expanded ? borderThickness : 0);
+                    return baseX - (expanded ? animationHeadroom + borderThickness + dock.horizontalConnectorExtent : 0);
+                return baseX - (expanded ? borderThickness + dock.horizontalConnectorExtent : 0);
             }
             y: {
                 const baseY = dockCore.y + dockMouseArea.y;
                 if (!isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom)
-                    return baseY - (expanded ? animationHeadroom + borderThickness : 0);
-                return baseY - (expanded ? borderThickness : 0);
+                    return baseY - (expanded ? animationHeadroom + borderThickness + dock.verticalConnectorExtent : 0);
+                return baseY - (expanded ? borderThickness + dock.verticalConnectorExtent : 0);
             }
-            width: dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 : 0)
-            height: dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 : 0)
+            width: dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.horizontalConnectorExtent * 2 : 0)
+            height: dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.verticalConnectorExtent * 2 : 0)
         }
 
         mask: Region {
@@ -389,7 +499,7 @@ Variants {
             const screenHeight = dock.screen ? dock.screen.height : 0;
 
             const gap = Theme.spacingS;
-            const bgMargin = barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness;
+            const bgMargin = dock.joinedEdgeMargin + dock.connectedJoinInset;
             const btnW = dock.hoveredButton.width;
             const btnH = dock.hoveredButton.height;
 
@@ -460,11 +570,11 @@ Variants {
                         // Keep the taller hit area regardless of the reveal state to prevent shrinking loop
                         return Math.min(Math.max(dockBackground.height + 64, 200), maxDockHeight);
                     }
-                    return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1;
+                    return dock.reveal ? px(dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin) : 1;
                 }
                 width: {
                     if (dock.isVertical) {
-                        return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1;
+                        return dock.reveal ? px(dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin) : 1;
                     }
                     // Keep the wider hit area regardless of the reveal state to prevent shrinking loop
                     return Math.min(dockBackground.width + 8 + dock.borderThickness, maxDockWidth);
@@ -506,7 +616,11 @@ Variants {
                                 return 0;
                             if (dock.reveal)
                                 return 0;
-                            const hideDistance = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin + 10;
+                            if (Theme.isConnectedEffect) {
+                                const retractDist = dockBackground.width + SettingsData.dockSpacing + 10;
+                                return SettingsData.dockPosition === SettingsData.Position.Right ? retractDist : -retractDist;
+                            }
+                            const hideDistance = dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin + 10;
                             if (SettingsData.dockPosition === SettingsData.Position.Right) {
                                 return hideDistance;
                             } else {
@@ -518,7 +632,11 @@ Variants {
                                 return 0;
                             if (dock.reveal)
                                 return 0;
-                            const hideDistance = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin + 10;
+                            if (Theme.isConnectedEffect) {
+                                const retractDist = dockBackground.height + SettingsData.dockSpacing + 10;
+                                return SettingsData.dockPosition === SettingsData.Position.Bottom ? retractDist : -retractDist;
+                            }
+                            const hideDistance = dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin + 10;
                             if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
                                 return hideDistance;
                             } else {
@@ -529,18 +647,27 @@ Variants {
                         Behavior on x {
                             NumberAnimation {
                                 id: slideXAnimation
-                                duration: Theme.shortDuration
-                                easing.type: Easing.OutCubic
+                                duration: Theme.isConnectedEffect ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal) : Theme.shortDuration
+                                easing.type: Theme.isConnectedEffect ? Easing.BezierSpline : Easing.OutCubic
+                                easing.bezierCurve: Theme.isConnectedEffect ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : []
+                                onRunningChanged: if (!running)
+                                    dock._syncDockChromeState()
                             }
                         }
 
                         Behavior on y {
                             NumberAnimation {
                                 id: slideYAnimation
-                                duration: Theme.shortDuration
-                                easing.type: Easing.OutCubic
+                                duration: Theme.isConnectedEffect ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal) : Theme.shortDuration
+                                easing.type: Theme.isConnectedEffect ? Easing.BezierSpline : Easing.OutCubic
+                                easing.bezierCurve: Theme.isConnectedEffect ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : []
+                                onRunningChanged: if (!running)
+                                    dock._syncDockChromeState()
                             }
                         }
+
+                        onXChanged: dock._queueSlideSync()
+                        onYChanged: dock._queueSlideSync()
                     }
 
                     Item {
@@ -554,33 +681,60 @@ Variants {
                             right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined) : undefined
                             verticalCenter: dock.isVertical ? parent.verticalCenter : undefined
                         }
-                        anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
-                        anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
-                        anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
-                        anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? barSpacing + SettingsData.dockMargin + 1 + dock.borderThickness : 0
+                        anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
+                        anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
+                        anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
+                        anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
 
                         implicitWidth: dock.isVertical ? (dockApps.implicitHeight + SettingsData.dockSpacing * 2) : (dockApps.implicitWidth + SettingsData.dockSpacing * 2)
                         implicitHeight: dock.isVertical ? (dockApps.implicitWidth + SettingsData.dockSpacing * 2) : (dockApps.implicitHeight + SettingsData.dockSpacing * 2)
                         width: implicitWidth
                         height: implicitHeight
 
-                        layer.enabled: true
+                        // Avoid an offscreen texture seam where the connected dock meets the frame.
+                        layer.enabled: !Theme.isConnectedEffect
                         clip: false
 
                         Rectangle {
                             anchors.fill: parent
-                            color: Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
-                            radius: Theme.cornerRadius
+                            visible: !SettingsData.connectedFrameModeActive && !(Theme.isConnectedEffect && dock.reveal)
+                            color: dock.surfaceColor
+                            topLeftRadius: dock.surfaceTopLeftRadius
+                            topRightRadius: dock.surfaceTopRightRadius
+                            bottomLeftRadius: dock.surfaceBottomLeftRadius
+                            bottomRightRadius: dock.surfaceBottomRightRadius
                         }
 
                         Rectangle {
                             anchors.fill: parent
+                            visible: !SettingsData.connectedFrameModeActive && !(Theme.isConnectedEffect && dock.reveal)
                             color: "transparent"
-                            radius: Theme.cornerRadius
-                            border.color: BlurService.borderColor
-                            border.width: BlurService.borderWidth
+                            topLeftRadius: dock.surfaceTopLeftRadius
+                            topRightRadius: dock.surfaceTopRightRadius
+                            bottomLeftRadius: dock.surfaceBottomLeftRadius
+                            bottomRightRadius: dock.surfaceBottomRightRadius
+                            border.color: dock.surfaceBorderColor
+                            border.width: dock.surfaceBorderWidth
                             z: 100
                         }
+
+                        // Sync dockBackground geometry to ConnectedModeState
+                        onXChanged: dock._syncDockChromeState()
+                        onYChanged: dock._syncDockChromeState()
+                        onWidthChanged: dock._syncDockChromeState()
+                        onHeightChanged: dock._syncDockChromeState()
+                    }
+
+                    ConnectedShape {
+                        visible: Theme.isConnectedEffect && dock.reveal && !SettingsData.connectedFrameModeActive
+                        barSide: dock.connectedBarSide
+                        bodyWidth: dockBackground.width
+                        bodyHeight: dockBackground.height
+                        connectorRadius: Theme.connectedCornerRadius
+                        surfaceRadius: dock.surfaceRadius
+                        fillColor: dock.surfaceColor
+                        x: dockBackground.x - bodyX
+                        y: dockBackground.y - bodyY
                     }
 
                     Shape {
@@ -589,12 +743,12 @@ Variants {
                         y: dockBackground.y - borderThickness
                         width: dockBackground.width + borderThickness * 2
                         height: dockBackground.height + borderThickness * 2
-                        visible: SettingsData.dockBorderEnabled && dock.hasApps
+                        visible: SettingsData.dockBorderEnabled && dock.hasApps && !Theme.isConnectedEffect
                         preferredRendererType: Shape.CurveRenderer
 
                         readonly property real borderThickness: Math.max(1, dock.borderThickness)
                         readonly property real i: borderThickness / 2
-                        readonly property real cr: Theme.cornerRadius
+                        readonly property real cr: dock.surfaceRadius
                         readonly property real w: dockBackground.width
                         readonly property real h: dockBackground.height
 

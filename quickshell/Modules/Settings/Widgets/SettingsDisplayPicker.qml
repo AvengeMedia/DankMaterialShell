@@ -83,7 +83,6 @@ Item {
                     description: modelData.width + "×" + modelData.height
                     checked: localChecked
                     onToggled: isChecked => {
-                        localChecked = isChecked;
                         var prefs = JSON.parse(JSON.stringify(root.displayPreferences));
                         if (!Array.isArray(prefs) || prefs.includes("all"))
                             prefs = [];
@@ -94,6 +93,11 @@ Item {
                                 model: modelData.model || ""
                             });
                         }
+                        if (prefs.length === 0) {
+                            localChecked = true;
+                            return;
+                        }
+                        localChecked = isChecked;
                         root.preferencesChanged(prefs);
                     }
                 }

@@ -27,6 +27,7 @@ Item {
         const pos = selectedBarConfig?.position ?? SettingsData.Position.Top;
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
+    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
 
     Timer {
         id: horizontalBarChangeDebounce
@@ -695,6 +696,8 @@ Item {
 
                 SettingsToggleRow {
                     visible: CompositorService.isNiri
+                    enabled: !SettingsData.frameEnabled
+                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     text: I18n.tr("Show on Overview")
                     checked: selectedBarConfig?.openOnOverview ?? false
                     onToggled: toggled => {
@@ -705,11 +708,18 @@ Item {
                 }
             }
 
+            SettingsControlledByFrame {
+                visible: SettingsData.frameEnabled
+                parentModal: dankBarTab.parentModal
+                settingLabel: I18n.tr("Bar spacing and size")
+                reason: I18n.tr("Managed by Frame")
+            }
+
             SettingsCard {
                 iconName: "space_bar"
                 title: I18n.tr("Spacing")
                 settingKey: "barSpacing"
-                visible: selectedBarConfig?.enabled
+                visible: (selectedBarConfig?.enabled ?? false) && !SettingsData.frameEnabled
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
@@ -860,6 +870,7 @@ Item {
 
                 SettingsSliderRow {
                     id: barTransparencySlider
+                    visible: !SettingsData.frameEnabled
                     text: I18n.tr("Bar Transparency")
                     value: (selectedBarConfig?.transparency ?? 1.0) * 100
                     minimum: 0
@@ -900,6 +911,13 @@ Item {
                         value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
                         restoreMode: Binding.RestoreBinding
                     }
+                }
+
+                SettingsControlledByFrame {
+                    visible: SettingsData.frameEnabled
+                    parentModal: dankBarTab.parentModal
+                    settingLabel: I18n.tr("Bar transparency")
+                    reason: I18n.tr("Managed by Frame")
                 }
             }
 
@@ -961,8 +979,16 @@ Item {
                 expanded: false
                 visible: selectedBarConfig?.enabled
 
+                SettingsControlledByFrame {
+                    visible: SettingsData.frameEnabled
+                    parentModal: dankBarTab.parentModal
+                    settingLabel: I18n.tr("Bar corners and background")
+                    reason: I18n.tr("Managed by Frame")
+                }
+
                 SettingsToggleRow {
                     text: I18n.tr("Square Corners")
+                    visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.squareCorners ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             squareCorners: checked
@@ -971,6 +997,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("No Background")
+                    visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.noBackground ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             noBackground: checked
@@ -1010,6 +1037,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Goth Corners")
+                    visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             gothCornersEnabled: checked
@@ -1345,6 +1373,13 @@ Item {
                 }
             }
 
+            SettingsControlledByFrame {
+                visible: dankBarTab.connectedFrameModeActive
+                parentModal: dankBarTab.parentModal
+                settingLabel: I18n.tr("Bar shadow, border, and corners")
+                reason: I18n.tr("Managed by Frame in Connected Mode")
+            }
+
             SettingsCard {
                 id: shadowCard
                 iconName: "layers"
@@ -1352,7 +1387,7 @@ Item {
                 settingKey: "barShadow"
                 collapsible: true
                 expanded: false
-                visible: selectedBarConfig?.enabled
+                visible: (selectedBarConfig?.enabled ?? false) && !dankBarTab.connectedFrameModeActive
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"

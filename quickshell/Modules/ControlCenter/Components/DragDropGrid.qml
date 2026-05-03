@@ -52,6 +52,35 @@ Column {
         return Math.max(100, maxPopoutHeight - totalRowHeight - rowSpacing);
     }
 
+    readonly property real targetImplicitHeight: {
+        const rows = layoutResult.rows;
+        let totalHeight = 0;
+        for (let i = 0; i < rows.length; i++) {
+            const widgets = rows[i] || [];
+            const sliderOnly = widgets.length > 0 && widgets.every(w => {
+                const id = w.id || "";
+                return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
+            });
+            totalHeight += sliderOnly ? (editMode ? 56 : 36) : 60;
+            if (expandedSection !== "" && i === expandedRowIndex)
+                totalHeight += detailHeightForSection(expandedSection) + Theme.spacingS;
+        }
+        totalHeight += Math.max(0, rows.length - 1) * spacing;
+        return totalHeight;
+    }
+
+    function detailHeightForSection(section) {
+        if (!section)
+            return 0;
+        if (section === "wifi" || section === "bluetooth" || section === "builtin_vpn")
+            return Math.min(350, _maxDetailHeight);
+        if (section.startsWith("brightnessSlider_"))
+            return Math.min(400, _maxDetailHeight);
+        if (section.startsWith("plugin_"))
+            return Math.min(250, _maxDetailHeight);
+        return Math.min(250, _maxDetailHeight);
+    }
+
     function calculateRowsAndWidgets() {
         return LayoutUtils.calculateRowsAndWidgets(root, expandedSection, expandedWidgetIndex);
     }
@@ -182,7 +211,10 @@ Column {
                 id: detailHost
                 width: parent.width
                 maxAvailableHeight: root._maxDetailHeight
-                height: active ? (getDetailHeight(root.expandedSection) + Theme.spacingS) : 0
+                height: active ? (root.detailHeightForSection(root.expandedSection) + Theme.spacingS) : 0
+                clip: true
+                property string retainedSection: ""
+                property var retainedWidgetData: null
                 property bool active: {
                     if (root.expandedSection === "")
                         return false;
@@ -199,14 +231,48 @@ Column {
 
                     return rowIndex === root.expandedRowIndex;
                 }
-                visible: active
-                expandedSection: root.expandedSection
-                expandedWidgetData: root.expandedWidgetData
+                visible: active || height > 0.5
+                expandedSection: active ? root.expandedSection : retainedSection
+                expandedWidgetData: active ? root.expandedWidgetData : retainedWidgetData
                 bluetoothCodecSelector: root.bluetoothCodecSelector
                 widgetModel: root.model
                 collapseCallback: root.requestCollapse
                 screenName: root.screenName
                 screenModel: root.screenModel
+
+                function retainActiveDetail() {
+                    if (!active || !root.expandedSection)
+                        return;
+                    retainedSection = root.expandedSection;
+                    retainedWidgetData = root.expandedWidgetData;
+                }
+
+                onActiveChanged: retainActiveDetail()
+                onHeightChanged: {
+                    if (!active && height <= 0.5) {
+                        retainedSection = "";
+                        retainedWidgetData = null;
+                    }
+                }
+
+                Connections {
+                    target: root
+                    function onExpandedSectionChanged() {
+                        detailHost.retainActiveDetail();
+                    }
+                    function onExpandedWidgetDataChanged() {
+                        detailHost.retainActiveDetail();
+                    }
+                }
+
+                Behavior on height {
+                    enabled: true
+                    NumberAnimation {
+                        duration: Theme.variantDuration(Theme.popoutAnimationDuration, detailHost.active)
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: detailHost.active ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+                    }
+                }
             }
         }
     }

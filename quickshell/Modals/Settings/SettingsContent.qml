@@ -112,7 +112,9 @@ FocusScope {
             focus: active
 
             sourceComponent: Component {
-                DockTab {}
+                DockTab {
+                    parentModal: root.parentModal
+                }
             }
 
             onActiveChanged: {
@@ -218,7 +220,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: ThemeColorsTab {}
+            sourceComponent: ThemeColorsTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)
@@ -512,6 +516,21 @@ FocusScope {
             focus: active
 
             sourceComponent: MuxTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: frameLoader
+            anchors.fill: parent
+            active: root.currentIndex === 33
+            visible: active
+            focus: active
+
+            sourceComponent: FrameTab {}
 
             onActiveChanged: {
                 if (active && item)

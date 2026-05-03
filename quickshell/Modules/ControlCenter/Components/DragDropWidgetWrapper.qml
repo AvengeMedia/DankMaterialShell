@@ -23,11 +23,15 @@ Item {
     signal toggleWidgetSize(int index)
 
     width: {
-        const widgetWidth = widgetData?.width || 50
-        if (widgetWidth <= 25) return gridCellWidth
-        else if (widgetWidth <= 50) return gridCellWidth * 2
-        else if (widgetWidth <= 75) return gridCellWidth * 3
-        else return gridCellWidth * 4
+        const widgetWidth = widgetData?.width || 50;
+        if (widgetWidth <= 25)
+            return gridCellWidth;
+        else if (widgetWidth <= 50)
+            return gridCellWidth * 2;
+        else if (widgetWidth <= 75)
+            return gridCellWidth * 3;
+        else
+            return gridCellWidth * 4;
     }
     height: isSlider ? 16 : gridCellHeight
 
@@ -42,10 +46,14 @@ Item {
         z: dragArea.drag.active ? 10000 : 1
 
         Behavior on border.width {
-            NumberAnimation { duration: 150 }
+            NumberAnimation {
+                duration: 150
+            }
         }
         Behavior on opacity {
-            NumberAnimation { duration: 150 }
+            NumberAnimation {
+                duration: 150
+            }
         }
     }
 
@@ -58,14 +66,17 @@ Item {
         property int globalWidgetIndex: root.widgetIndex
         property int widgetWidth: root.widgetData?.width || 50
 
-
         MouseArea {
             id: editModeBlocker
             anchors.fill: parent
             enabled: root.editMode
             acceptedButtons: Qt.AllButtons
-            onPressed: function(mouse) { mouse.accepted = true }
-            onWheel: function(wheel) { wheel.accepted = true }
+            onPressed: function (mouse) {
+                mouse.accepted = true;
+            }
+            onWheel: function (wheel) {
+                wheel.accepted = true;
+            }
             z: 100
         }
     }
@@ -79,19 +90,19 @@ Item {
         drag.axis: Drag.XAndYAxis
         drag.smoothed: true
 
-        onPressed: function(mouse) {
+        onPressed: function (mouse) {
             if (editMode) {
-                cursorShape = Qt.ClosedHandCursor
+                cursorShape = Qt.ClosedHandCursor;
                 if (root.gridLayout && root.gridLayout.moveToTop) {
-                    root.gridLayout.moveToTop(root)
+                    root.gridLayout.moveToTop(root);
                 }
             }
         }
 
-        onReleased: function(mouse) {
+        onReleased: function (mouse) {
             if (editMode) {
-                cursorShape = Qt.OpenHandCursor
-                root.snapToGrid()
+                cursorShape = Qt.OpenHandCursor;
+                root.snapToGrid();
             }
         }
     }
@@ -101,9 +112,11 @@ Item {
     Drag.hotSpot.y: height / 2
 
     function swapIndices(i, j) {
-        if (i === j) return;
+        if (i === j)
+            return;
         const arr = SettingsData.controlCenterWidgets;
-        if (!arr || i < 0 || j < 0 || i >= arr.length || j >= arr.length) return;
+        if (!arr || i < 0 || j < 0 || i >= arr.length || j >= arr.length)
+            return;
 
         const copy = arr.slice();
         const tmp = copy[i];
@@ -114,37 +127,41 @@ Item {
     }
 
     function snapToGrid() {
-        if (!editMode || !gridLayout) return
+        if (!editMode || !gridLayout)
+            return;
+        const globalPos = root.mapToItem(gridLayout, 0, 0);
+        const cellWidth = gridLayout.width / gridColumns;
+        const cellHeight = gridCellHeight + Theme.spacingS;
 
-        const globalPos = root.mapToItem(gridLayout, 0, 0)
-        const cellWidth = gridLayout.width / gridColumns
-        const cellHeight = gridCellHeight + Theme.spacingS
+        const centerX = globalPos.x + (root.width / 2);
+        const centerY = globalPos.y + (root.height / 2);
 
-        const centerX = globalPos.x + (root.width / 2)
-        const centerY = globalPos.y + (root.height / 2)
+        let targetCol = Math.max(0, Math.floor(centerX / cellWidth));
+        let targetRow = Math.max(0, Math.floor(centerY / cellHeight));
 
-        let targetCol = Math.max(0, Math.floor(centerX / cellWidth))
-        let targetRow = Math.max(0, Math.floor(centerY / cellHeight))
+        targetCol = Math.min(targetCol, gridColumns - 1);
 
-        targetCol = Math.min(targetCol, gridColumns - 1)
-
-        const newIndex = findBestInsertionIndex(targetRow, targetCol)
+        const newIndex = findBestInsertionIndex(targetRow, targetCol);
 
         if (newIndex !== widgetIndex && newIndex >= 0 && newIndex < (SettingsData.controlCenterWidgets?.length || 0)) {
-            swapIndices(widgetIndex, newIndex)
+            swapIndices(widgetIndex, newIndex);
         }
     }
 
     function findBestInsertionIndex(targetRow, targetCol) {
         const widgets = SettingsData.controlCenterWidgets || [];
         const n = widgets.length;
-        if (!n || widgetIndex < 0 || widgetIndex >= n) return -1;
+        if (!n || widgetIndex < 0 || widgetIndex >= n)
+            return -1;
 
         function spanFor(width) {
             const w = width ?? 50;
-            if (w <= 25) return 1;
-            if (w <= 50) return 2;
-            if (w <= 75) return 3;
+            if (w <= 25)
+                return 1;
+            if (w <= 50)
+                return 2;
+            if (w <= 75)
+                return 3;
             return 4;
         }
 
@@ -169,7 +186,13 @@ Item {
             if (i === widgetIndex) {
                 draggedOrigKey = centerKey;
             } else {
-                pos.push({ index: i, row, startCol, span, centerKey });
+                pos.push({
+                    index: i,
+                    row,
+                    startCol,
+                    span,
+                    centerKey
+                });
             }
 
             col += span;
@@ -179,7 +202,8 @@ Item {
             }
         }
 
-        if (pos.length === 0) return -1;
+        if (pos.length === 0)
+            return -1;
 
         const centerColCoord = targetCol + 0.5;
         const targetKey = targetRow * cols + centerColCoord;
@@ -192,15 +216,20 @@ Item {
         }
 
         let lo = 0, hi = pos.length - 1;
-        if (targetKey <= pos[0].centerKey) return pos[0].index;
-        if (targetKey >= pos[hi].centerKey) return pos[hi].index;
+        if (targetKey <= pos[0].centerKey)
+            return pos[0].index;
+        if (targetKey >= pos[hi].centerKey)
+            return pos[hi].index;
 
         while (lo <= hi) {
             const mid = (lo + hi) >> 1;
             const mk = pos[mid].centerKey;
-            if (targetKey < mk) hi = mid - 1;
-            else if (targetKey > mk) lo = mid + 1;
-            else return pos[mid].index;
+            if (targetKey < mk)
+                hi = mid - 1;
+            else if (targetKey > mk)
+                lo = mid + 1;
+            else
+                return pos[mid].index;
         }
         const movingUp = (draggedOrigKey != null) ? (targetKey < draggedOrigKey) : false;
         return (movingUp ? pos[lo].index : pos[hi].index);
@@ -240,11 +269,11 @@ Item {
         currentSize: root.widgetData?.width || 50
         isSlider: root.isSlider
         widgetIndex: root.widgetIndex
-        onSizeChanged: (newSize) => {
-            var widgets = SettingsData.controlCenterWidgets.slice()
+        onSizeChanged: newSize => {
+            var widgets = SettingsData.controlCenterWidgets.slice();
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
-                widgets[widgetIndex].width = newSize
-                SettingsData.set("controlCenterWidgets", widgets)
+                widgets[widgetIndex].width = newSize;
+                SettingsData.set("controlCenterWidgets", widgets);
             }
         }
     }
@@ -270,7 +299,9 @@ Item {
         }
 
         Behavior on opacity {
-            NumberAnimation { duration: 150 }
+            NumberAnimation {
+                duration: 150
+            }
         }
     }
 
@@ -283,7 +314,9 @@ Item {
         z: -1
 
         Behavior on color {
-            ColorAnimation { duration: Theme.shortDuration }
+            ColorAnimation {
+                duration: Theme.shortDuration
+            }
         }
     }
 }

@@ -1,19 +1,18 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
-
-pragma ComponentBehavior: Bound
 
 Column {
     id: root
 
     Component.onCompleted: {
         if (PluginService.isPluginLoaded("dankNotepadModule")) {
-            pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "")
+            pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "");
         }
     }
 
@@ -33,65 +32,57 @@ Column {
     property string lastPluginContent: ""
     property int loadRequestId: 0
 
-    signal saveRequested()
-    signal openRequested()
-    signal newRequested()
-    signal previewRequested()
-    signal escapePressed()
-    signal contentChanged()
-    signal settingsRequested()
+    signal saveRequested
+    signal openRequested
+    signal newRequested
+    signal previewRequested
+    signal escapePressed
+    signal contentChanged
+    signal settingsRequested
 
     function hasUnsavedChanges() {
         if (!currentTab || !contentLoaded) {
-            return false
+            return false;
         }
 
         if (currentTab.isTemporary) {
-            return textArea.text.length > 0
+            return textArea.text.length > 0;
         }
-        return textArea.text !== lastSavedContent
+        return textArea.text !== lastSavedContent;
     }
 
     function loadCurrentTabContent() {
-        if (!currentTab) return
-
-        const requestedTabId = currentTab.id
-        const requestId = ++loadRequestId
-        contentLoaded = false
-        NotepadStorageService.loadTabContent(
-            NotepadStorageService.currentTabIndex,
-            (content) => {
-                const activeTab = NotepadStorageService.tabs.length > NotepadStorageService.currentTabIndex
-                    ? NotepadStorageService.tabs[NotepadStorageService.currentTabIndex]
-                    : null
-                if (requestId !== loadRequestId || !activeTab || activeTab.id !== requestedTabId)
-                    return
-
-                lastSavedContent = content
-                textArea.text = content
-                contentLoaded = true
-                syncContentToPlugin()
-            }
-        )
+        if (!currentTab)
+            return;
+        const requestedTabId = currentTab.id;
+        const requestId = ++loadRequestId;
+        contentLoaded = false;
+        NotepadStorageService.loadTabContent(NotepadStorageService.currentTabIndex, content => {
+            const activeTab = NotepadStorageService.tabs.length > NotepadStorageService.currentTabIndex ? NotepadStorageService.tabs[NotepadStorageService.currentTabIndex] : null;
+            if (requestId !== loadRequestId || !activeTab || activeTab.id !== requestedTabId)
+                return;
+            lastSavedContent = content;
+            textArea.text = content;
+            contentLoaded = true;
+            syncContentToPlugin();
+        });
     }
 
     function saveCurrentTabContent() {
-        if (!currentTab || !contentLoaded) return
-
-        NotepadStorageService.saveTabContent(
-            NotepadStorageService.currentTabIndex,
-            textArea.text
-        )
-        lastSavedContent = textArea.text
+        if (!currentTab || !contentLoaded)
+            return;
+        NotepadStorageService.saveTabContent(NotepadStorageService.currentTabIndex, textArea.text);
+        lastSavedContent = textArea.text;
     }
 
     function autoSaveToSession() {
-        if (!currentTab || !contentLoaded) return
-        saveCurrentTabContent()
+        if (!currentTab || !contentLoaded)
+            return;
+        saveCurrentTabContent();
     }
 
     function setTextDocumentLineHeight() {
-        return
+        return;
     }
 
     property string lastTextForLineModel: ""
@@ -99,147 +90,146 @@ Column {
 
     function updateLineModel() {
         if (!SettingsData.notepadShowLineNumbers) {
-            lineModel = []
-            lastTextForLineModel = ""
-            return
+            lineModel = [];
+            lastTextForLineModel = "";
+            return;
         }
 
         if (textArea.text !== lastTextForLineModel || lineModel.length === 0) {
-            lastTextForLineModel = textArea.text
-            lineModel = textArea.text.split('\n')
+            lastTextForLineModel = textArea.text;
+            lineModel = textArea.text.split('\n');
         }
     }
 
     function performSearch() {
-        let matches = []
-        currentMatchIndex = -1
+        let matches = [];
+        currentMatchIndex = -1;
 
         if (!searchQuery || searchQuery.length === 0) {
-            searchMatches = []
-            matchCount = 0
-            textArea.select(0, 0)
-            return
+            searchMatches = [];
+            matchCount = 0;
+            textArea.select(0, 0);
+            return;
         }
 
-        const text = textArea.text
-        const query = searchQuery.toLowerCase()
-        let index = 0
+        const text = textArea.text;
+        const query = searchQuery.toLowerCase();
+        let index = 0;
 
         while (index < text.length) {
-            const foundIndex = text.toLowerCase().indexOf(query, index)
-            if (foundIndex === -1) break
-
+            const foundIndex = text.toLowerCase().indexOf(query, index);
+            if (foundIndex === -1)
+                break;
             matches.push({
                 start: foundIndex,
                 end: foundIndex + searchQuery.length
-            })
-            index = foundIndex + 1
+            });
+            index = foundIndex + 1;
         }
 
-        searchMatches = matches
-        matchCount = matches.length
+        searchMatches = matches;
+        matchCount = matches.length;
 
         if (matchCount > 0) {
-            currentMatchIndex = 0
-            highlightCurrentMatch()
+            currentMatchIndex = 0;
+            highlightCurrentMatch();
         } else {
-            textArea.select(0, 0)
+            textArea.select(0, 0);
         }
     }
 
     function highlightCurrentMatch() {
         if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
-            const match = searchMatches[currentMatchIndex]
+            const match = searchMatches[currentMatchIndex];
 
-            textArea.cursorPosition = match.start
-            textArea.moveCursorSelection(match.end, TextEdit.SelectCharacters)
+            textArea.cursorPosition = match.start;
+            textArea.moveCursorSelection(match.end, TextEdit.SelectCharacters);
 
-            const flickable = textArea.parent
+            const flickable = textArea.parent;
             if (flickable && flickable.contentY !== undefined) {
-                const lineHeight = textArea.font.pixelSize * 1.5
-                const approxLine = textArea.text.substring(0, match.start).split('\n').length
-                const targetY = approxLine * lineHeight - flickable.height / 2
-                flickable.contentY = Math.max(0, Math.min(targetY, flickable.contentHeight - flickable.height))
+                const lineHeight = textArea.font.pixelSize * 1.5;
+                const approxLine = textArea.text.substring(0, match.start).split('\n').length;
+                const targetY = approxLine * lineHeight - flickable.height / 2;
+                flickable.contentY = Math.max(0, Math.min(targetY, flickable.contentHeight - flickable.height));
             }
         }
     }
 
     function findNext() {
-        if (matchCount === 0 || searchMatches.length === 0) return
-
-        currentMatchIndex = (currentMatchIndex + 1) % matchCount
-        highlightCurrentMatch()
+        if (matchCount === 0 || searchMatches.length === 0)
+            return;
+        currentMatchIndex = (currentMatchIndex + 1) % matchCount;
+        highlightCurrentMatch();
     }
 
     function findPrevious() {
-        if (matchCount === 0 || searchMatches.length === 0) return
-
-        currentMatchIndex = currentMatchIndex <= 0 ? matchCount - 1 : currentMatchIndex - 1
-        highlightCurrentMatch()
+        if (matchCount === 0 || searchMatches.length === 0)
+            return;
+        currentMatchIndex = currentMatchIndex <= 0 ? matchCount - 1 : currentMatchIndex - 1;
+        highlightCurrentMatch();
     }
 
     function showSearch() {
-        searchVisible = true
+        searchVisible = true;
         Qt.callLater(() => {
-            searchField.forceActiveFocus()
-        })
+            searchField.forceActiveFocus();
+        });
     }
 
     function togglePreview() {
         if (!inlinePreviewVisible) {
-            inlinePreviewVisible = true
-            previewMode = "split"
+            inlinePreviewVisible = true;
+            previewMode = "split";
         } else if (previewMode === "split") {
-            previewMode = "full"
+            previewMode = "full";
         } else {
-            inlinePreviewVisible = false
-            previewMode = "split"
+            inlinePreviewVisible = false;
+            previewMode = "split";
         }
-        syncContentToPlugin()
+        syncContentToPlugin();
     }
 
     function renderPreviewHtml() {
-        if (!inlinePreviewVisible) return ""
-        return pluginHighlightedHtml.length > 0 ? pluginHighlightedHtml : "<p><i>Rendering preview…</i></p>"
+        if (!inlinePreviewVisible)
+            return "";
+        return pluginHighlightedHtml.length > 0 ? pluginHighlightedHtml : "<p><i>Rendering preview…</i></p>";
     }
 
     function syncContentToPlugin() {
         if (!PluginService.isPluginLoaded("dankNotepadModule"))
-            return
-
+            return;
         if (!currentTab)
-            return
-
-        const filePath = currentTab?.filePath || ""
-        const ext = filePath.split('.').pop().toLowerCase()
-        const content = textArea.text
+            return;
+        const filePath = currentTab?.filePath || "";
+        const ext = filePath.split('.').pop().toLowerCase();
+        const content = textArea.text;
 
         if (content === lastPluginContent && SettingsData.getBuiltInPluginSetting("dankNotepadModule", "previewActive", false) === inlinePreviewVisible) {
-            return
+            return;
         }
 
-        lastPluginContent = content
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "previewActive", inlinePreviewVisible)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFilePath", filePath)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFileExtension", ext)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "sourceContent", content)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "updatedAt", Date.now())
+        lastPluginContent = content;
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "previewActive", inlinePreviewVisible);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFilePath", filePath);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFileExtension", ext);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "sourceContent", content);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "updatedAt", Date.now());
     }
 
     function hideSearch() {
-        searchVisible = false
-        searchQuery = ""
-        searchMatches = []
-        matchCount = 0
-        currentMatchIndex = -1
-        textArea.select(0, 0)
-        textArea.forceActiveFocus()
+        searchVisible = false;
+        searchQuery = "";
+        searchMatches = [];
+        matchCount = 0;
+        currentMatchIndex = -1;
+        textArea.select(0, 0);
+        textArea.forceActiveFocus();
     }
 
     function copyPlainTextToClipboard() {
-        if (!inlinePreviewVisible || !textArea.text) return
-
-        const content = textArea.text
+        if (!inlinePreviewVisible || !textArea.text)
+            return;
+        const content = textArea.text;
         if (content.length > 0) {
             const proc = Qt.createQmlObject(`
                 import QtQuick
@@ -249,22 +239,19 @@ Column {
                     command: ["sh", "-c", "printf '%s' \\"$CONTENT\\" | dms clipboard copy"]
                     environment: { "CONTENT": content }
                     running: false
-                }`,
-                root,
-                "copyProc"
-            )
-            proc.content = content
-            proc.running = true
+                }`, root, "copyProc");
+            proc.content = content;
+            proc.running = true;
             proc.exited.connect(() => {
-                ToastService.showInfo(I18n.tr("Copied to clipboard"))
-                proc.destroy()
-            })
+                ToastService.showInfo(I18n.tr("Copied to clipboard"));
+                proc.destroy();
+            });
         }
     }
 
     function copyHtmlToClipboard() {
-        if (!inlinePreviewVisible || !pluginHighlightedHtml) return
-
+        if (!inlinePreviewVisible || !pluginHighlightedHtml)
+            return;
         if (pluginHighlightedHtml.length > 0) {
             const proc = Qt.createQmlObject(`
                 import QtQuick
@@ -274,16 +261,13 @@ Column {
                     command: ["sh", "-c", "printf '%s' \\"$CONTENT\\" | dms clipboard copy"]
                     environment: { "CONTENT": content }
                     running: false
-                }`,
-                root,
-                "copyProcHtml"
-            )
-            proc.content = pluginHighlightedHtml
-            proc.running = true
+                }`, root, "copyProcHtml");
+            proc.content = pluginHighlightedHtml;
+            proc.running = true;
             proc.exited.connect(() => {
-                ToastService.showInfo(I18n.tr("HTML copied to clipboard"))
-                proc.destroy()
-            })
+                ToastService.showInfo(I18n.tr("HTML copied to clipboard"));
+                proc.destroy();
+            });
         }
     }
 
@@ -334,43 +318,43 @@ Column {
                 clip: true
 
                 Component.onCompleted: {
-                    text = root.searchQuery
+                    text = root.searchQuery;
                 }
 
                 Connections {
                     target: root
                     function onSearchQueryChanged() {
                         if (searchField.text !== root.searchQuery) {
-                            searchField.text = root.searchQuery
+                            searchField.text = root.searchQuery;
                         }
                     }
                 }
 
                 onTextChanged: {
                     if (root.searchQuery !== text) {
-                        root.searchQuery = text
-                        root.performSearch()
+                        root.searchQuery = text;
+                        root.performSearch();
                     }
                 }
                 Keys.onEscapePressed: event => {
-                    root.hideSearch()
-                    event.accepted = true
+                    root.hideSearch();
+                    event.accepted = true;
                 }
                 Keys.onReturnPressed: event => {
                     if (event.modifiers & Qt.ShiftModifier) {
-                        root.findPrevious()
+                        root.findPrevious();
                     } else {
-                        root.findNext()
+                        root.findNext();
                     }
-                    event.accepted = true
+                    event.accepted = true;
                 }
                 Keys.onEnterPressed: event => {
                     if (event.modifiers & Qt.ShiftModifier) {
-                        root.findPrevious()
+                        root.findPrevious();
                     } else {
-                        root.findNext()
+                        root.findNext();
                     }
-                    event.accepted = true
+                    event.accepted = true;
                 }
             }
 
@@ -541,31 +525,41 @@ Column {
                             SequentialAnimation on opacity {
                                 running: textArea.activeFocus
                                 loops: Animation.Infinite
-                                PropertyAnimation { from: 1.0; to: 0.0; duration: 650; easing.type: Easing.InOutQuad }
-                                PropertyAnimation { from: 0.0; to: 1.0; duration: 650; easing.type: Easing.InOutQuad }
+                                OpacityAnimator {
+                                    from: 1.0
+                                    to: 0.0
+                                    duration: 650
+                                    easing.type: Easing.InOutQuad
+                                }
+                                OpacityAnimator {
+                                    from: 0.0
+                                    to: 1.0
+                                    duration: 650
+                                    easing.type: Easing.InOutQuad
+                                }
                             }
                         }
 
                         Component.onCompleted: {
-                            loadCurrentTabContent()
-                            setTextDocumentLineHeight()
-                            root.updateLineModel()
+                            loadCurrentTabContent();
+                            setTextDocumentLineHeight();
+                            root.updateLineModel();
                             Qt.callLater(() => {
-                                textArea.forceActiveFocus()
-                            })
+                                textArea.forceActiveFocus();
+                            });
                         }
 
                         Connections {
                             target: NotepadStorageService
                             function onCurrentTabIndexChanged() {
-                                loadCurrentTabContent()
+                                loadCurrentTabContent();
                                 Qt.callLater(() => {
-                                    textArea.forceActiveFocus()
-                                })
+                                    textArea.forceActiveFocus();
+                                });
                             }
                             function onTabsChanged() {
                                 if (NotepadStorageService.tabs.length > 0 && !contentLoaded) {
-                                    loadCurrentTabContent()
+                                    loadCurrentTabContent();
                                 }
                             }
                         }
@@ -573,53 +567,53 @@ Column {
                         Connections {
                             target: SettingsData
                             function onNotepadShowLineNumbersChanged() {
-                                root.updateLineModel()
+                                root.updateLineModel();
                             }
                         }
 
                         onTextChanged: {
                             if (contentLoaded && text !== lastSavedContent) {
-                                autoSaveTimer.restart()
+                                autoSaveTimer.restart();
                             }
-                            root.contentChanged()
-                            root.updateLineModel()
-                            pluginSyncTimer.restart()
+                            root.contentChanged();
+                            root.updateLineModel();
+                            pluginSyncTimer.restart();
                         }
 
-                        Keys.onEscapePressed: (event) => {
-                            root.escapePressed()
-                            event.accepted = true
+                        Keys.onEscapePressed: event => {
+                            root.escapePressed();
+                            event.accepted = true;
                         }
 
-                        Keys.onPressed: (event) => {
+                        Keys.onPressed: event => {
                             if (event.modifiers & Qt.ControlModifier) {
                                 switch (event.key) {
                                 case Qt.Key_S:
-                                    event.accepted = true
-                                    root.saveRequested()
-                                    break
+                                    event.accepted = true;
+                                    root.saveRequested();
+                                    break;
                                 case Qt.Key_O:
-                                    event.accepted = true
-                                    root.openRequested()
-                                    break
+                                    event.accepted = true;
+                                    root.openRequested();
+                                    break;
                                 case Qt.Key_N:
-                                    event.accepted = true
-                                    root.newRequested()
-                                    break
+                                    event.accepted = true;
+                                    root.newRequested();
+                                    break;
                                 case Qt.Key_A:
-                                    event.accepted = true
-                                    textArea.selectAll()
-                                    break
+                                    event.accepted = true;
+                                    textArea.selectAll();
+                                    break;
                                 case Qt.Key_F:
-                                    event.accepted = true
-                                    root.showSearch()
-                                    break
+                                    event.accepted = true;
+                                    root.showSearch();
+                                    break;
                                 case Qt.Key_P:
                                     if (PluginService.isPluginLoaded("dankNotepadModule")) {
-                                        event.accepted = true
-                                        root.previewRequested()
+                                        event.accepted = true;
+                                        root.previewRequested();
                                     }
-                                    break
+                                    break;
                                 }
                             }
                         }
@@ -845,19 +839,16 @@ Column {
             StyledText {
                 text: {
                     const len = textArea.text.length;
-                    if (len === 0) return I18n.tr("Empty");
-                    return len === 1
-                        ? I18n.tr("%1 character").arg(len)
-                        : I18n.tr("%1 characters").arg(len);
+                    if (len === 0)
+                        return I18n.tr("Empty");
+                    return len === 1 ? I18n.tr("%1 character").arg(len) : I18n.tr("%1 characters").arg(len);
                 }
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
             }
 
             StyledText {
-                text: textArea.lineCount === 1
-                    ? I18n.tr("Line: %1").arg(textArea.lineCount)
-                    : I18n.tr("Lines: %1").arg(textArea.lineCount)
+                text: textArea.lineCount === 1 ? I18n.tr("Line: %1").arg(textArea.lineCount) : I18n.tr("Lines: %1").arg(textArea.lineCount)
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 visible: textArea.text.length > 0
@@ -867,29 +858,29 @@ Column {
             StyledText {
                 text: {
                     if (autoSaveTimer.running) {
-                        return I18n.tr("Auto-saving...")
+                        return I18n.tr("Auto-saving...");
                     }
 
                     if (hasUnsavedChanges()) {
                         if (currentTab && currentTab.isTemporary) {
-                            return I18n.tr("Unsaved note...")
+                            return I18n.tr("Unsaved note...");
                         } else {
-                            return I18n.tr("Unsaved changes")
+                            return I18n.tr("Unsaved changes");
                         }
                     } else {
-                        return I18n.tr("Saved")
+                        return I18n.tr("Saved");
                     }
                 }
                 font.pixelSize: Theme.fontSizeSmall
                 color: {
                     if (autoSaveTimer.running) {
-                        return Theme.primary
+                        return Theme.primary;
                     }
 
                     if (hasUnsavedChanges()) {
-                        return Theme.warning
+                        return Theme.warning;
                     } else {
-                        return Theme.success
+                        return Theme.success;
                     }
                 }
                 opacity: textArea.text.length > 0 ? 1.0 : 0.0
@@ -902,7 +893,7 @@ Column {
         interval: 2000
         repeat: false
         onTriggered: {
-            autoSaveToSession()
+            autoSaveToSession();
         }
     }
 
@@ -917,7 +908,7 @@ Column {
         target: SettingsData
         function onBuiltInPluginSettingsChanged() {
             if (PluginService.isPluginLoaded("dankNotepadModule")) {
-                pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "")
+                pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "");
             }
         }
     }

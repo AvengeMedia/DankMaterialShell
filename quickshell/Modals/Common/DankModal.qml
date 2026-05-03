@@ -1,25 +1,18 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
 import qs.Common
 import qs.Services
-import qs.Widgets
 
 Item {
     id: root
     readonly property var log: Log.scoped("DankModal")
 
+    readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
     property string layerNamespace: "dms:modal"
-    property alias content: contentLoader.sourceComponent
-    property alias contentLoader: contentLoader
+    property Component content: null
     property Item directContent: null
     property real modalWidth: 400
     property real modalHeight: 300
     property var targetScreen
-    readonly property var effectiveScreen: contentWindow.screen ?? targetScreen
-    readonly property real screenWidth: effectiveScreen?.width ?? 1920
-    readonly property real screenHeight: effectiveScreen?.height ?? 1080
-    readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
     property bool showBackground: true
     property real backgroundOpacity: 0.5
     property string positioning: "center"
@@ -37,7 +30,6 @@ Item {
     property real borderWidth: 0
     property real cornerRadius: Theme.cornerRadius
     property bool enableShadow: true
-    property alias modalFocusScope: focusScope
     property bool shouldBeVisible: false
     property bool shouldHaveFocus: shouldBeVisible
     property bool allowFocusOverride: false
@@ -46,452 +38,170 @@ Item {
     property bool keepPopoutsOpen: false
     property var customKeyboardFocus: null
     property bool useOverlayLayer: false
-    readonly property alias contentWindow: contentWindow
-    readonly property alias clickCatcher: clickCatcher
-    readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
-    readonly property bool useBackground: showBackground && SettingsData.modalDarkenBackground
-    readonly property bool useSingleWindow: CompositorService.isHyprland || useBackground
 
     signal opened
     signal dialogClosed
     signal backgroundClicked
 
-    property bool animationsEnabled: true
+    readonly property var contentLoader: impl.item ? impl.item.contentLoader : null
+    readonly property alias modalFocusScope: _modalFocusScope
+
+    FocusScope {
+        id: _modalFocusScope
+        objectName: "modalFocusScope"
+        focus: true
+        anchors.fill: parent
+    }
+    readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
+    readonly property var clickCatcher: impl.item ? impl.item.clickCatcher : null
+    readonly property var effectiveScreen: impl.item ? impl.item.effectiveScreen : null
+    readonly property real screenWidth: impl.item ? impl.item.screenWidth : 1920
+    readonly property real screenHeight: impl.item ? impl.item.screenHeight : 1080
+    readonly property real dpr: impl.item ? impl.item.dpr : 1
+    readonly property bool isClosing: impl.item ? (impl.item.isClosing ?? false) : false
+    readonly property real alignedX: impl.item ? impl.item.alignedX : 0
+    readonly property real alignedY: impl.item ? impl.item.alignedY : 0
+    readonly property real alignedWidth: impl.item ? impl.item.alignedWidth : 0
+    readonly property real alignedHeight: impl.item ? impl.item.alignedHeight : 0
 
     function open() {
-        closeTimer.stop();
-        const focusedScreen = CompositorService.getFocusedScreen();
-        const screenChanged = focusedScreen && contentWindow.screen !== focusedScreen;
-        if (focusedScreen) {
-            if (screenChanged)
-                contentWindow.visible = false;
-            contentWindow.screen = focusedScreen;
-            if (!useSingleWindow) {
-                if (screenChanged)
-                    clickCatcher.visible = false;
-                clickCatcher.screen = focusedScreen;
-            }
-        }
-        if (screenChanged) {
-            Qt.callLater(() => root._finishOpen());
-        } else {
-            _finishOpen();
-        }
-    }
-
-    function _finishOpen() {
-        ModalManager.openModal(root);
-        shouldBeVisible = true;
-        if (!useSingleWindow)
-            clickCatcher.visible = true;
-        contentWindow.visible = true;
-        shouldHaveFocus = false;
-        Qt.callLater(() => shouldHaveFocus = Qt.binding(() => shouldBeVisible));
+        if (impl.item)
+            impl.item.open();
     }
 
     function close() {
-        shouldBeVisible = false;
-        shouldHaveFocus = false;
-        ModalManager.closeModal(root);
-        closeTimer.restart();
+        if (impl.item)
+            impl.item.close();
     }
 
     function instantClose() {
-        animationsEnabled = false;
-        shouldBeVisible = false;
-        shouldHaveFocus = false;
-        ModalManager.closeModal(root);
-        closeTimer.stop();
-        contentWindow.visible = false;
-        if (!useSingleWindow)
-            clickCatcher.visible = false;
-        dialogClosed();
-        Qt.callLater(() => animationsEnabled = true);
+        if (impl.item && typeof impl.item.instantClose === "function")
+            impl.item.instantClose();
     }
 
     function toggle() {
-        shouldBeVisible ? close() : open();
+        if (impl.item)
+            impl.item.toggle();
+    }
+
+    readonly property var _desiredBackend: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+    property var _resolvedBackend: null
+
+    Component.onCompleted: _resolvedBackend = _desiredBackend
+
+    Connections {
+        target: SettingsData
+        function onConnectedFrameModeActiveChanged() {
+            root._maybeResolveBackend();
+        }
+    }
+
+    // Defer Loader source-component swap until impl is fully closed; avoids
+    // tearing down a modal mid-animation when frame mode is toggled.
+    function _maybeResolveBackend() {
+        if (_resolvedBackend === _desiredBackend)
+            return;
+        if (impl.item && (impl.item.shouldBeVisible || impl.item.isClosing))
+            return;
+        _resolvedBackend = _desiredBackend;
+    }
+
+    Loader {
+        id: impl
+        sourceComponent: root._resolvedBackend
+        onItemChanged: if (item)
+            root._wireBackend(item)
+    }
+
+    Component {
+        id: standaloneComp
+        DankModalStandalone {}
+    }
+
+    Component {
+        id: connectedComp
+        DankModalConnected {}
+    }
+
+    function _wireBackend(it) {
+        if (!it)
+            return;
+
+        it.modalHandle = root;
+        it.layerNamespace = Qt.binding(() => root.layerNamespace);
+        it.content = Qt.binding(() => root.content);
+        it.directContent = Qt.binding(() => root.directContent);
+        it.modalWidth = Qt.binding(() => root.modalWidth);
+        it.modalHeight = Qt.binding(() => root.modalHeight);
+        it.targetScreen = Qt.binding(() => root.targetScreen);
+        it.showBackground = Qt.binding(() => root.showBackground);
+        it.backgroundOpacity = Qt.binding(() => root.backgroundOpacity);
+        it.positioning = Qt.binding(() => root.positioning);
+        it.customPosition = Qt.binding(() => root.customPosition);
+        it.closeOnEscapeKey = Qt.binding(() => root.closeOnEscapeKey);
+        it.closeOnBackgroundClick = Qt.binding(() => root.closeOnBackgroundClick);
+        it.animationType = Qt.binding(() => root.animationType);
+        it.animationDuration = Qt.binding(() => root.animationDuration);
+        it.animationScaleCollapsed = Qt.binding(() => root.animationScaleCollapsed);
+        it.animationOffset = Qt.binding(() => root.animationOffset);
+        it.animationEnterCurve = Qt.binding(() => root.animationEnterCurve);
+        it.animationExitCurve = Qt.binding(() => root.animationExitCurve);
+        it.backgroundColor = Qt.binding(() => root.backgroundColor);
+        it.borderColor = Qt.binding(() => root.borderColor);
+        it.borderWidth = Qt.binding(() => root.borderWidth);
+        it.cornerRadius = Qt.binding(() => root.cornerRadius);
+        it.enableShadow = Qt.binding(() => root.enableShadow);
+        it.allowFocusOverride = Qt.binding(() => root.allowFocusOverride);
+        it.allowStacking = Qt.binding(() => root.allowStacking);
+        it.keepContentLoaded = Qt.binding(() => root.keepContentLoaded);
+        it.keepPopoutsOpen = Qt.binding(() => root.keepPopoutsOpen);
+        it.customKeyboardFocus = Qt.binding(() => root.customKeyboardFocus);
+        it.useOverlayLayer = Qt.binding(() => root.useOverlayLayer);
+
+        it.shouldBeVisible = root.shouldBeVisible;
+        it.shouldHaveFocus = root.shouldHaveFocus;
+
+        if (it.modalFocusScope)
+            _modalFocusScope.parent = it.modalFocusScope;
     }
 
     Connections {
-        target: ModalManager
-        function onCloseAllModalsExcept(excludedModal) {
-            if (excludedModal !== root && !allowStacking && shouldBeVisible)
-                close();
+        target: root
+        function onShouldBeVisibleChanged() {
+            if (impl.item && impl.item.shouldBeVisible !== root.shouldBeVisible)
+                impl.item.shouldBeVisible = root.shouldBeVisible;
+        }
+        function onShouldHaveFocusChanged() {
+            if (impl.item && impl.item.shouldHaveFocus !== root.shouldHaveFocus)
+                impl.item.shouldHaveFocus = root.shouldHaveFocus;
         }
     }
 
     Connections {
-        target: Quickshell
-        function onScreensChanged() {
-            if (!contentWindow.screen)
-                return;
-            const currentScreenName = contentWindow.screen.name;
-            let screenStillExists = false;
-            for (let i = 0; i < Quickshell.screens.length; i++) {
-                if (Quickshell.screens[i].name === currentScreenName) {
-                    screenStillExists = true;
-                    break;
-                }
-            }
-            if (screenStillExists)
-                return;
-            const newScreen = CompositorService.getFocusedScreen();
-            if (newScreen) {
-                contentWindow.screen = newScreen;
-                if (!useSingleWindow)
-                    clickCatcher.screen = newScreen;
-            }
-        }
-    }
+        target: impl.item
+        ignoreUnknownSignals: true
 
-    Timer {
-        id: closeTimer
-        interval: animationDuration + 50
-        onTriggered: {
-            if (shouldBeVisible)
-                return;
-            contentWindow.visible = false;
-            if (!useSingleWindow)
-                clickCatcher.visible = false;
-            dialogClosed();
-        }
-    }
-
-    readonly property var shadowLevel: Theme.elevationLevel3
-    readonly property real shadowFallbackOffset: 6
-    readonly property real shadowRenderPadding: (root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
-    readonly property real shadowMotionPadding: animationType === "slide" ? 30 : Math.max(0, animationOffset)
-    readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
-    readonly property real alignedWidth: Theme.px(modalWidth, dpr)
-    readonly property real alignedHeight: Theme.px(modalHeight, dpr)
-
-    readonly property real alignedX: Theme.snap((() => {
-            switch (positioning) {
-            case "center":
-                return (screenWidth - alignedWidth) / 2;
-            case "top-right":
-                return Math.max(Theme.spacingL, screenWidth - alignedWidth - Theme.spacingL);
-            case "custom":
-                return customPosition.x;
-            default:
-                return 0;
-            }
-        })(), dpr)
-
-    readonly property real alignedY: Theme.snap((() => {
-            switch (positioning) {
-            case "center":
-                return (screenHeight - alignedHeight) / 2;
-            case "top-right":
-                return Theme.barHeight + Theme.spacingXS;
-            case "custom":
-                return customPosition.y;
-            default:
-                return 0;
-            }
-        })(), dpr)
-
-    PanelWindow {
-        id: clickCatcher
-        visible: false
-        color: "transparent"
-
-        WlrLayershell.namespace: root.layerNamespace + ":clickcatcher"
-        WlrLayershell.layer: WlrLayershell.Top
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
+        function onShouldBeVisibleChanged() {
+            if (impl.item && root.shouldBeVisible !== impl.item.shouldBeVisible)
+                root.shouldBeVisible = impl.item.shouldBeVisible;
         }
 
-        mask: Region {
-            item: Rectangle {
-                x: root.alignedX
-                y: root.alignedY
-                width: root.alignedWidth
-                height: root.alignedHeight
-            }
-            intersection: Intersection.Xor
+        function onShouldHaveFocusChanged() {
+            if (impl.item && root.shouldHaveFocus !== impl.item.shouldHaveFocus)
+                root.shouldHaveFocus = impl.item.shouldHaveFocus;
         }
 
-        MouseArea {
-            anchors.fill: parent
-            enabled: root.closeOnBackgroundClick && root.shouldBeVisible
-            onClicked: root.backgroundClicked()
-        }
-    }
-
-    PanelWindow {
-        id: contentWindow
-        visible: false
-        color: "transparent"
-
-        WindowBlur {
-            targetWindow: contentWindow
-            readonly property real s: Math.min(1, modalContainer.scaleValue)
-            blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
-            blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
-            blurWidth: (shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.width * s : 0
-            blurHeight: (shouldBeVisible && animatedContent.opacity > 0) ? modalContainer.height * s : 0
-            blurRadius: root.cornerRadius
+        function onOpened() {
+            root.opened();
         }
 
-        WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: {
-            if (root.useOverlayLayer)
-                return WlrLayershell.Overlay;
-            switch (Quickshell.env("DMS_MODAL_LAYER")) {
-            case "bottom":
-                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldHaveFocus)
-                return WlrKeyboardFocus.None;
-            if (root.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
+        function onDialogClosed() {
+            root.dialogClosed();
+            root._maybeResolveBackend();
         }
 
-        anchors {
-            left: true
-            top: true
-            right: root.useSingleWindow
-            bottom: root.useSingleWindow
-        }
-
-        WlrLayershell.margins {
-            left: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
-            top: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
-            right: 0
-            bottom: 0
-        }
-
-        implicitWidth: root.useSingleWindow ? 0 : root.alignedWidth + (shadowBuffer * 2)
-        implicitHeight: root.useSingleWindow ? 0 : root.alignedHeight + (shadowBuffer * 2)
-
-        onVisibleChanged: {
-            if (visible) {
-                opened();
-            } else {
-                if (Qt.inputMethod) {
-                    Qt.inputMethod.hide();
-                    Qt.inputMethod.reset();
-                }
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: root.useSingleWindow && root.closeOnBackgroundClick && root.shouldBeVisible
-            z: -2
-            onClicked: root.backgroundClicked()
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            z: -1
-            color: "black"
-            opacity: root.useBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
-            visible: root.useBackground
-
-            Behavior on opacity {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: root.animationDuration
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-        }
-
-        Item {
-            id: modalContainer
-            x: root.useSingleWindow ? root.alignedX : shadowBuffer
-            y: root.useSingleWindow ? root.alignedY : shadowBuffer
-
-            width: root.alignedWidth
-            height: root.alignedHeight
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: root.useSingleWindow && root.shouldBeVisible
-                hoverEnabled: false
-                acceptedButtons: Qt.AllButtons
-                onPressed: mouse.accepted = true
-                onClicked: mouse.accepted = true
-                z: -1
-            }
-
-            readonly property bool slide: root.animationType === "slide"
-            readonly property real offsetX: slide ? 15 : 0
-            readonly property real offsetY: slide ? -30 : root.animationOffset
-
-            property real animX: 0
-            property real animY: 0
-            property real scaleValue: root.animationScaleCollapsed
-
-            onOffsetXChanged: animX = Theme.snap(root.shouldBeVisible ? 0 : offsetX, root.dpr)
-            onOffsetYChanged: animY = Theme.snap(root.shouldBeVisible ? 0 : offsetY, root.dpr)
-
-            Connections {
-                target: root
-                function onShouldBeVisibleChanged() {
-                    modalContainer.animX = Theme.snap(root.shouldBeVisible ? 0 : modalContainer.offsetX, root.dpr);
-                    modalContainer.animY = Theme.snap(root.shouldBeVisible ? 0 : modalContainer.offsetY, root.dpr);
-                    modalContainer.scaleValue = root.shouldBeVisible ? 1.0 : root.animationScaleCollapsed;
-                }
-            }
-
-            Behavior on animX {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: root.animationDuration
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on animY {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: root.animationDuration
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Behavior on scaleValue {
-                enabled: root.animationsEnabled
-                DankAnim {
-                    duration: root.animationDuration
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-
-            Item {
-                id: contentContainer
-                anchors.centerIn: parent
-                width: parent.width
-                height: parent.height
-                clip: false
-
-                Item {
-                    id: animatedContent
-                    anchors.fill: parent
-                    clip: false
-                    opacity: root.shouldBeVisible ? 1 : 0
-                    scale: modalContainer.scaleValue
-                    x: Theme.snap(modalContainer.animX, root.dpr) + (parent.width - width) * (1 - modalContainer.scaleValue) * 0.5
-                    y: Theme.snap(modalContainer.animY, root.dpr) + (parent.height - height) * (1 - modalContainer.scaleValue) * 0.5
-
-                    Behavior on opacity {
-                        enabled: root.animationsEnabled
-                        NumberAnimation {
-                            duration: animationDuration
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                        }
-                    }
-
-                    ElevationShadow {
-                        id: modalShadowLayer
-                        anchors.fill: parent
-                        level: root.shadowLevel
-                        fallbackOffset: root.shadowFallbackOffset
-                        targetRadius: root.cornerRadius
-                        targetColor: root.backgroundColor
-                        borderColor: root.borderColor
-                        borderWidth: root.borderWidth
-                        shadowEnabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !BlurService.enabled
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: root.cornerRadius
-                        color: "transparent"
-                        border.color: BlurService.borderColor
-                        border.width: BlurService.borderWidth
-                        z: 100
-                    }
-
-                    FocusScope {
-                        anchors.fill: parent
-                        focus: root.shouldBeVisible
-                        clip: false
-
-                        Item {
-                            id: directContentWrapper
-                            anchors.fill: parent
-                            visible: root.directContent !== null
-                            focus: true
-                            clip: false
-
-                            Component.onCompleted: {
-                                if (root.directContent) {
-                                    root.directContent.parent = directContentWrapper;
-                                    root.directContent.anchors.fill = directContentWrapper;
-                                    Qt.callLater(() => root.directContent.forceActiveFocus());
-                                }
-                            }
-
-                            Connections {
-                                target: root
-                                function onDirectContentChanged() {
-                                    if (root.directContent) {
-                                        root.directContent.parent = directContentWrapper;
-                                        root.directContent.anchors.fill = directContentWrapper;
-                                        Qt.callLater(() => root.directContent.forceActiveFocus());
-                                    }
-                                }
-                            }
-                        }
-
-                        Loader {
-                            id: contentLoader
-                            anchors.fill: parent
-                            active: root.directContent === null && (root.keepContentLoaded || root.shouldBeVisible || contentWindow.visible)
-                            asynchronous: false
-                            focus: true
-                            clip: false
-                            visible: root.directContent === null
-
-                            onLoaded: {
-                                if (item) {
-                                    Qt.callLater(() => item.forceActiveFocus());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        FocusScope {
-            id: focusScope
-            objectName: "modalFocusScope"
-            anchors.fill: parent
-            visible: root.shouldBeVisible || contentWindow.visible
-            focus: root.shouldBeVisible
-            Keys.onEscapePressed: event => {
-                if (root.closeOnEscapeKey && shouldHaveFocus) {
-                    root.close();
-                    event.accepted = true;
-                }
-            }
+        function onBackgroundClicked() {
+            root.backgroundClicked();
         }
     }
 }

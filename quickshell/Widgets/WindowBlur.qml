@@ -1,4 +1,5 @@
 import QtQuick
+import qs.Common
 import qs.Services
 
 Item {
@@ -8,6 +9,7 @@ Item {
 
     required property var targetWindow
     property var blurItem: null
+    property bool blurEnabled: Theme.connectedSurfaceBlurEnabled
     property real blurX: 0
     property real blurY: 0
     property real blurWidth: 0
@@ -17,7 +19,7 @@ Item {
     property var _region: null
 
     function _apply() {
-        if (!BlurService.enabled || !targetWindow) {
+        if (!blurEnabled || !BlurService.enabled || !targetWindow) {
             _cleanup();
             return;
         }
@@ -43,6 +45,8 @@ Item {
         _region = null;
     }
 
+    onBlurEnabledChanged: _apply()
+
     Connections {
         target: BlurService
         function onEnabledChanged() {
@@ -51,7 +55,7 @@ Item {
     }
 
     Connections {
-        target: root.targetWindow
+        target: root.targetWindow ?? null
         function onVisibleChanged() {
             if (root.targetWindow && root.targetWindow.visible) {
                 root._region = null;

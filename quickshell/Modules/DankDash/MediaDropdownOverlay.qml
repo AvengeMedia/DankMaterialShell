@@ -50,11 +50,9 @@ Item {
     }
 
     function volumeAreaExited() {
-        __volumeHoverCount--;
-        Qt.callLater(() => {
-            if (__volumeHoverCount <= 0)
-                panelExited();
-        });
+        __volumeHoverCount = Math.max(0, __volumeHoverCount - 1);
+        if (__volumeHoverCount === 0)
+            panelExited();
     }
 
     readonly property Item __activePanel: {
@@ -93,23 +91,25 @@ Item {
         border.color: Theme.outlineStrong
         border.width: 1
 
-        opacity: dropdownType === 1 ? 1 : 0
-        scale: dropdownType === 1 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 1 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 1 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
@@ -233,23 +233,25 @@ Item {
         border.color: Theme.outlineStrong
         border.width: 2
 
-        opacity: dropdownType === 2 ? 1 : 0
-        scale: dropdownType === 2 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 2 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 2 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
@@ -387,23 +389,25 @@ Item {
         border.color: Theme.outlineStrong
         border.width: 2
 
-        opacity: dropdownType === 3 ? 1 : 0
-        scale: dropdownType === 3 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 3 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 3 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 

@@ -123,327 +123,327 @@ Rectangle {
             anchors.margins: Theme.spacingL
             spacing: Theme.spacingM
 
-        StyledText {
-            text: I18n.tr("Notification Settings")
-            font.pixelSize: Theme.fontSizeMedium
-            font.weight: Font.Bold
-            color: Theme.surfaceText
-        }
-
-        Item {
-            width: parent.width
-            height: Math.max(dndRow.implicitHeight, dndToggle.implicitHeight) + Theme.spacingS
-
-            Row {
-                id: dndRow
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: SessionData.doNotDisturb ? "notifications_off" : "notifications"
-                    size: Theme.iconSizeSmall
-                    color: SessionData.doNotDisturb ? Theme.error : Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: I18n.tr("Do Not Disturb")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+            StyledText {
+                text: I18n.tr("Notification Settings")
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Font.Bold
+                color: Theme.surfaceText
             }
 
-            DankToggle {
-                id: dndToggle
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                checked: SessionData.doNotDisturb
-                onToggled: SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
-            }
-        }
+            Item {
+                width: parent.width
+                height: Math.max(dndRow.implicitHeight, dndToggle.implicitHeight) + Theme.spacingS
 
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
-        }
+                Row {
+                    id: dndRow
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
 
-        StyledText {
-            text: I18n.tr("Notification Timeouts")
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Font.Medium
-            color: Theme.surfaceVariantText
-        }
-
-        DankDropdown {
-            text: I18n.tr("Low Priority")
-            description: I18n.tr("Timeout for low priority notifications")
-            currentValue: getTimeoutText(SettingsData.notificationTimeoutLow)
-            options: timeoutOptions.map(opt => opt.text)
-            onValueChanged: value => {
-                for (let i = 0; i < timeoutOptions.length; i++) {
-                    if (timeoutOptions[i].text === value) {
-                        SettingsData.set("notificationTimeoutLow", timeoutOptions[i].value);
-                        break;
+                    DankIcon {
+                        name: SessionData.doNotDisturb ? "notifications_off" : "notifications"
+                        size: Theme.iconSizeSmall
+                        color: SessionData.doNotDisturb ? Theme.error : Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
                     }
-                }
-            }
-        }
-
-        DankDropdown {
-            text: I18n.tr("Normal Priority")
-            description: I18n.tr("Timeout for normal priority notifications")
-            currentValue: getTimeoutText(SettingsData.notificationTimeoutNormal)
-            options: timeoutOptions.map(opt => opt.text)
-            onValueChanged: value => {
-                for (let i = 0; i < timeoutOptions.length; i++) {
-                    if (timeoutOptions[i].text === value) {
-                        SettingsData.set("notificationTimeoutNormal", timeoutOptions[i].value);
-                        break;
-                    }
-                }
-            }
-        }
-
-        DankDropdown {
-            text: I18n.tr("Critical Priority")
-            description: I18n.tr("Timeout for critical priority notifications")
-            currentValue: getTimeoutText(SettingsData.notificationTimeoutCritical)
-            options: timeoutOptions.map(opt => opt.text)
-            onValueChanged: value => {
-                for (let i = 0; i < timeoutOptions.length; i++) {
-                    if (timeoutOptions[i].text === value) {
-                        SettingsData.set("notificationTimeoutCritical", timeoutOptions[i].value);
-                        break;
-                    }
-                }
-            }
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
-        }
-
-        Item {
-            width: parent.width
-            height: Math.max(overlayRow.implicitHeight, overlayToggle.implicitHeight) + Theme.spacingS
-
-            Row {
-                id: overlayRow
-                anchors.left: parent.left
-                anchors.right: overlayToggle.left
-                anchors.rightMargin: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: "notifications_active"
-                    size: Theme.iconSizeSmall
-                    color: SettingsData.notificationOverlayEnabled ? Theme.primary : Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Column {
-                    spacing: 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: overlayRow.width - Theme.iconSizeSmall - Theme.spacingM
 
                     StyledText {
-                        width: parent.width
-                        text: I18n.tr("Notification Overlay")
+                        text: I18n.tr("Do Not Disturb")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceText
-                        wrapMode: Text.Wrap
+                        anchors.verticalCenter: parent.verticalCenter
                     }
+                }
 
-                    StyledText {
-                        width: parent.width
-                        text: I18n.tr("Display all priorities over fullscreen apps")
-                        font.pixelSize: Theme.fontSizeSmall - 1
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.Wrap
+                DankToggle {
+                    id: dndToggle
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: SessionData.doNotDisturb
+                    onToggled: SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+            }
+
+            StyledText {
+                text: I18n.tr("Notification Timeouts")
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Medium
+                color: Theme.surfaceVariantText
+            }
+
+            DankDropdown {
+                text: I18n.tr("Low Priority")
+                description: I18n.tr("Timeout for low priority notifications")
+                currentValue: getTimeoutText(SettingsData.notificationTimeoutLow)
+                options: timeoutOptions.map(opt => opt.text)
+                onValueChanged: value => {
+                    for (let i = 0; i < timeoutOptions.length; i++) {
+                        if (timeoutOptions[i].text === value) {
+                            SettingsData.set("notificationTimeoutLow", timeoutOptions[i].value);
+                            break;
+                        }
                     }
                 }
             }
 
-            DankToggle {
-                id: overlayToggle
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                checked: SettingsData.notificationOverlayEnabled
-                onToggled: toggled => SettingsData.set("notificationOverlayEnabled", toggled)
+            DankDropdown {
+                text: I18n.tr("Normal Priority")
+                description: I18n.tr("Timeout for normal priority notifications")
+                currentValue: getTimeoutText(SettingsData.notificationTimeoutNormal)
+                options: timeoutOptions.map(opt => opt.text)
+                onValueChanged: value => {
+                    for (let i = 0; i < timeoutOptions.length; i++) {
+                        if (timeoutOptions[i].text === value) {
+                            SettingsData.set("notificationTimeoutNormal", timeoutOptions[i].value);
+                            break;
+                        }
+                    }
+                }
             }
-        }
 
-        Item {
-            width: parent.width
-            height: Math.max(privacyRow.implicitHeight, privacyToggle.implicitHeight) + Theme.spacingS
+            DankDropdown {
+                text: I18n.tr("Critical Priority")
+                description: I18n.tr("Timeout for critical priority notifications")
+                currentValue: getTimeoutText(SettingsData.notificationTimeoutCritical)
+                options: timeoutOptions.map(opt => opt.text)
+                onValueChanged: value => {
+                    for (let i = 0; i < timeoutOptions.length; i++) {
+                        if (timeoutOptions[i].text === value) {
+                            SettingsData.set("notificationTimeoutCritical", timeoutOptions[i].value);
+                            break;
+                        }
+                    }
+                }
+            }
 
-            Row {
-                id: privacyRow
-                anchors.left: parent.left
-                anchors.right: privacyToggle.left
-                anchors.rightMargin: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+            }
 
-                DankIcon {
-                    name: "privacy_tip"
-                    size: Theme.iconSizeSmall
-                    color: SettingsData.notificationPopupPrivacyMode ? Theme.primary : Theme.surfaceText
+            Item {
+                width: parent.width
+                height: Math.max(overlayRow.implicitHeight, overlayToggle.implicitHeight) + Theme.spacingS
+
+                Row {
+                    id: overlayRow
+                    anchors.left: parent.left
+                    anchors.right: overlayToggle.left
+                    anchors.rightMargin: Theme.spacingM
                     anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "notifications_active"
+                        size: Theme.iconSizeSmall
+                        color: SettingsData.notificationOverlayEnabled ? Theme.primary : Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Column {
+                        spacing: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: overlayRow.width - Theme.iconSizeSmall - Theme.spacingM
+
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("Notification Overlay")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            wrapMode: Text.Wrap
+                        }
+
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("Display all priorities over fullscreen apps")
+                            font.pixelSize: Theme.fontSizeSmall - 1
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.Wrap
+                        }
+                    }
                 }
 
-                Column {
-                    spacing: 2
+                DankToggle {
+                    id: overlayToggle
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    width: privacyRow.width - Theme.iconSizeSmall - Theme.spacingM
+                    checked: SettingsData.notificationOverlayEnabled
+                    onToggled: toggled => SettingsData.set("notificationOverlayEnabled", toggled)
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: Math.max(privacyRow.implicitHeight, privacyToggle.implicitHeight) + Theme.spacingS
+
+                Row {
+                    id: privacyRow
+                    anchors.left: parent.left
+                    anchors.right: privacyToggle.left
+                    anchors.rightMargin: Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "privacy_tip"
+                        size: Theme.iconSizeSmall
+                        color: SettingsData.notificationPopupPrivacyMode ? Theme.primary : Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Column {
+                        spacing: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: privacyRow.width - Theme.iconSizeSmall - Theme.spacingM
+
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("Privacy Mode")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            wrapMode: Text.Wrap
+                        }
+
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("Hide notification content until expanded")
+                            font.pixelSize: Theme.fontSizeSmall - 1
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.Wrap
+                        }
+                    }
+                }
+
+                DankToggle {
+                    id: privacyToggle
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: SettingsData.notificationPopupPrivacyMode
+                    onToggled: toggled => SettingsData.set("notificationPopupPrivacyMode", toggled)
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+            }
+
+            StyledText {
+                text: I18n.tr("History Settings")
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Medium
+                color: Theme.surfaceVariantText
+            }
+
+            Item {
+                width: parent.width
+                height: Math.max(lowRow.implicitHeight, lowToggle.implicitHeight) + Theme.spacingS
+
+                Row {
+                    id: lowRow
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "low_priority"
+                        size: Theme.iconSizeSmall
+                        color: SettingsData.notificationHistorySaveLow ? Theme.primary : Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
 
                     StyledText {
-                        width: parent.width
-                        text: I18n.tr("Privacy Mode")
+                        text: I18n.tr("Low Priority")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceText
-                        wrapMode: Text.Wrap
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                DankToggle {
+                    id: lowToggle
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: SettingsData.notificationHistorySaveLow
+                    onToggled: toggled => SettingsData.set("notificationHistorySaveLow", toggled)
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: Math.max(normalRow.implicitHeight, normalToggle.implicitHeight) + Theme.spacingS
+
+                Row {
+                    id: normalRow
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "notifications"
+                        size: Theme.iconSizeSmall
+                        color: SettingsData.notificationHistorySaveNormal ? Theme.primary : Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
                     }
 
                     StyledText {
-                        width: parent.width
-                        text: I18n.tr("Hide notification content until expanded")
-                        font.pixelSize: Theme.fontSizeSmall - 1
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.Wrap
+                        text: I18n.tr("Normal Priority")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
-            }
 
-            DankToggle {
-                id: privacyToggle
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                checked: SettingsData.notificationPopupPrivacyMode
-                onToggled: toggled => SettingsData.set("notificationPopupPrivacyMode", toggled)
-            }
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
-        }
-
-        StyledText {
-            text: I18n.tr("History Settings")
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Font.Medium
-            color: Theme.surfaceVariantText
-        }
-
-        Item {
-            width: parent.width
-            height: Math.max(lowRow.implicitHeight, lowToggle.implicitHeight) + Theme.spacingS
-
-            Row {
-                id: lowRow
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: "low_priority"
-                    size: Theme.iconSizeSmall
-                    color: SettingsData.notificationHistorySaveLow ? Theme.primary : Theme.surfaceText
+                DankToggle {
+                    id: normalToggle
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: I18n.tr("Low Priority")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
+                    checked: SettingsData.notificationHistorySaveNormal
+                    onToggled: toggled => SettingsData.set("notificationHistorySaveNormal", toggled)
                 }
             }
 
-            DankToggle {
-                id: lowToggle
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                checked: SettingsData.notificationHistorySaveLow
-                onToggled: toggled => SettingsData.set("notificationHistorySaveLow", toggled)
+            Item {
+                width: parent.width
+                height: Math.max(criticalRow.implicitHeight, criticalToggle.implicitHeight) + Theme.spacingS
+
+                Row {
+                    id: criticalRow
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "priority_high"
+                        size: Theme.iconSizeSmall
+                        color: SettingsData.notificationHistorySaveCritical ? Theme.primary : Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Critical Priority")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                DankToggle {
+                    id: criticalToggle
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: SettingsData.notificationHistorySaveCritical
+                    onToggled: toggled => SettingsData.set("notificationHistorySaveCritical", toggled)
+                }
             }
         }
-
-        Item {
-            width: parent.width
-            height: Math.max(normalRow.implicitHeight, normalToggle.implicitHeight) + Theme.spacingS
-
-            Row {
-                id: normalRow
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: "notifications"
-                    size: Theme.iconSizeSmall
-                    color: SettingsData.notificationHistorySaveNormal ? Theme.primary : Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: I18n.tr("Normal Priority")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            DankToggle {
-                id: normalToggle
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                checked: SettingsData.notificationHistorySaveNormal
-                onToggled: toggled => SettingsData.set("notificationHistorySaveNormal", toggled)
-            }
-        }
-
-        Item {
-            width: parent.width
-            height: Math.max(criticalRow.implicitHeight, criticalToggle.implicitHeight) + Theme.spacingS
-
-            Row {
-                id: criticalRow
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: "priority_high"
-                    size: Theme.iconSizeSmall
-                    color: SettingsData.notificationHistorySaveCritical ? Theme.primary : Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: I18n.tr("Critical Priority")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            DankToggle {
-                id: criticalToggle
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                checked: SettingsData.notificationHistorySaveCritical
-                onToggled: toggled => SettingsData.set("notificationHistorySaveCritical", toggled)
-            }
-        }
-    }
     }
 }

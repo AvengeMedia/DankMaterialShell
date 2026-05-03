@@ -178,7 +178,7 @@ Rectangle {
                 size: 32
                 color: Theme.primary
 
-                RotationAnimation on rotation {
+                RotationAnimator on rotation {
                     running: NetworkService.wifiToggling
                     loops: Animation.Infinite
                     from: 0
@@ -494,7 +494,7 @@ Rectangle {
             size: 48
             color: Qt.rgba(Theme.surfaceText.r || 0.8, Theme.surfaceText.g || 0.8, Theme.surfaceText.b || 0.8, 0.3)
 
-            RotationAnimation on rotation {
+            RotationAnimator on rotation {
                 running: wifiScanningOverlay.visible
                 loops: Animation.Infinite
                 from: 0

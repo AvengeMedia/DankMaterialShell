@@ -43,10 +43,10 @@ PanelWindow {
         }
     }
 
-    function triggerWallpaperBrowser() {
+    function triggerDashTab(tabIndex) {
         dankDashPopoutLoader.active = true;
         if (!dankDashPopoutLoader.item) {
-            return;
+            return false;
         }
 
         let section = "center";
@@ -82,7 +82,12 @@ PanelWindow {
             dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
         }
 
-        PopoutManager.requestPopout(dankDashPopoutLoader.item, 2, (barConfig?.id ?? "default") + "-" + section + "-2");
+        PopoutManager.requestPopout(dankDashPopoutLoader.item, tabIndex, (barConfig?.id ?? "default") + "-" + section + "-" + tabIndex);
+        return true;
+    }
+
+    function triggerWallpaperBrowser() {
+        triggerDashTab(2);
     }
 
     readonly property var dBarLayer: {
@@ -94,7 +99,9 @@ PanelWindow {
         case "background":
             return WlrLayer.background;
         default:
-            return WlrLayer.Top;
+            // Elevate to Overlay when Frame is enabled so the bar stays above
+            // the FrameWindow (WlrLayer.Top) when it is re-mapped on mode switch.
+            return SettingsData.frameEnabled ? WlrLayer.Overlay : WlrLayer.Top;
         }
     }
 
@@ -133,6 +140,11 @@ PanelWindow {
         function rebuild() {
             teardown();
             if (!BlurService.enabled || !BlurService.available)
+                return;
+            // In frame mode, FrameWindow owns the blur region for the entire screen edge
+            // (including the bar area). The bar must not set its own competing blur region
+            // so that frameBlurEnabled acts as the single control for all blur in frame mode.
+            if (SettingsData.frameEnabled)
                 return;
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
@@ -189,6 +201,13 @@ PanelWindow {
         }
 
         Connections {
+            target: SettingsData
+            function onFrameEnabledChanged() {
+                barBlur.rebuild();
+            }
+        }
+
+        Connections {
             target: topBarSlide
             function onXChanged() {
                 if (barWindow.blurRegion)
@@ -239,7 +258,7 @@ PanelWindow {
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: SettingsData.frameEnabled ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -385,7 +404,7 @@ PanelWindow {
         shouldHideForWindows = filtered.length > 0;
     }
 
-    property real effectiveSpacing: hasMaximizedToplevel ? 0 : (barConfig?.spacing ?? 4)
+    property real effectiveSpacing: SettingsData.frameEnabled ? 0 : (hasMaximizedToplevel ? 0 : (barConfig?.spacing ?? 4))
 
     Behavior on effectiveSpacing {
         enabled: barWindow.visible
@@ -396,7 +415,8 @@ PanelWindow {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property real effectiveBarThickness: SettingsData.frameEnabled ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
     readonly property bool hasAdjacentTopBar: {
@@ -645,14 +665,14 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    exclusiveZone: (!(barConfig?.visible ?? true) || topBarCore.autoHide) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (barConfig?.bottomGap ?? 0))
+    exclusiveZone: (!(barConfig?.visible ?? true) || topBarCore.autoHide) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (Theme.isConnectedEffect ? 0 : (barConfig?.bottomGap ?? 0)))
 
     Item {
         id: inputMask
 
         readonly property int barThickness: Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr)
 
-        readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false)
+        readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
         readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
 
@@ -793,7 +813,7 @@ PanelWindow {
         }
 
         property bool reveal: {
-            const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false);
+            const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview;
             if (inOverviewWithShow)
                 return true;
 
@@ -890,7 +910,7 @@ PanelWindow {
                 top: barWindow.isVertical ? parent.top : undefined
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
-            readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false)
+            readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
             hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.hasActivePopout
             acceptedButtons: Qt.NoButton
             enabled: (barConfig?.autoHide ?? false) && !inOverview
@@ -933,6 +953,17 @@ PanelWindow {
                         barWindow: barWindow
                         axis: axis
                         barConfig: barWindow.barConfig
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        z: -2
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                        onClicked: {
+                            const screenName = barWindow.screen?.name;
+                            if (screenName && PopoutManager.currentPopoutsByScreen[screenName])
+                                PopoutManager.closeAllPopouts();
+                        }
                     }
 
                     MouseArea {
