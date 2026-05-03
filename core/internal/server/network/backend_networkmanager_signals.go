@@ -238,6 +238,14 @@ func (b *NetworkManagerBackend) handleNetworkManagerChange(changes map[string]db
 				b.stateMutex.Unlock()
 				needsUpdate = true
 			}
+		case "WwanEnabled":
+			nm := b.nmConn.(gonetworkmanager.NetworkManager)
+			if enabled, err := nm.GetPropertyWwanEnabled(); err == nil {
+				b.stateMutex.Lock()
+				b.state.CellularEnabled = enabled
+				b.stateMutex.Unlock()
+				needsUpdate = true
+			}
 		default:
 			continue
 		}
@@ -248,10 +256,14 @@ func (b *NetworkManagerBackend) handleNetworkManagerChange(changes map[string]db
 		if _, exists := changes["State"]; exists {
 			b.updateEthernetState()
 			b.updateWiFiState()
+			b.updateCellularState()
 		}
 		if _, exists := changes["ActiveConnections"]; exists {
 			b.updateVPNConnectionState()
 			b.ListActiveVPN()
+			b.updateCellularState()
+			b.listCellularConnections()
+			b.ListActiveCellular()
 		}
 		if b.onStateChange != nil {
 			b.onStateChange()
@@ -295,8 +307,10 @@ func (b *NetworkManagerBackend) handleDeviceChange(devicePath dbus.ObjectPath, c
 	b.updateEthernetState()
 	b.updateAllWiFiDevices()
 	b.updateWiFiState()
+	b.updateCellularState()
 	if stateChanged {
 		b.listEthernetConnections()
+		b.listCellularConnections()
 		b.updatePrimaryConnection()
 	}
 	if b.onStateChange != nil {
@@ -391,7 +405,8 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 		return
 	}
 
-	if devType != gonetworkmanager.NmDeviceTypeEthernet && devType != gonetworkmanager.NmDeviceTypeWifi {
+	// NmDeviceTypeModem = 8
+	if devType != gonetworkmanager.NmDeviceTypeEthernet && devType != gonetworkmanager.NmDeviceTypeWifi && devType != 8 {
 		return
 	}
 
@@ -458,6 +473,12 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 
 		b.updateAllWiFiDevices()
 		b.updateWiFiState()
+
+	case 8: // NmDeviceTypeModem
+		b.updateCellularState()
+		b.listCellularConnections()
+		b.ListCellularProfiles()
+		b.ListActiveCellular()
 	}
 
 	if b.onStateChange != nil {
@@ -526,5 +547,13 @@ func (b *NetworkManagerBackend) handleDeviceRemoved(devicePath dbus.ObjectPath) 
 			}
 			return
 		}
+	}
+
+	// If not found in ethernet/wifi maps, it may be a modem device
+	b.updateCellularState()
+	b.listCellularConnections()
+	b.ListActiveCellular()
+	if b.onStateChange != nil {
+		b.onStateChange()
 	}
 }

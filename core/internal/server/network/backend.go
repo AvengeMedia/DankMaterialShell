@@ -27,6 +27,23 @@ type Backend interface {
 	DisconnectEthernetDevice(device string) error
 	ActivateWiredConnection(uuid string) error
 
+	GetCellularEnabled() (bool, error)
+	SetCellularEnabled(enabled bool) error
+	GetCellularDevices() []CellularDevice
+	GetCellularConnections() ([]CellularConnection, error)
+	GetCellularNetworkDetails(uuid string) (*CellularNetworkInfoResponse, error)
+	ConnectCellular(uuid string) error
+	DisconnectCellular() error
+	DisconnectCellularDevice(device string) error
+	ActivateCellularConnection(uuid string) error
+	ListCellularProfiles() ([]CellularProfile, error)
+	ListActiveCellular() ([]CellularActive, error)
+	GetCellularProfile(uuidOrName string) (*CellularProfile, error)
+	UpdateCellularProfile(uuid string, updates map[string]any) error
+	GetSIMStatus(device string) (*CellularDevice, error)
+	SubmitSIMPin(device string, pin string) error
+	GetSIMPinTriesLeft(device string) (int, error)
+
 	ListVPNProfiles() ([]VPNProfile, error)
 	ListActiveVPN() ([]VPNActive, error)
 	ConnectVPN(uuidOrName string, singleActive bool) error
@@ -69,6 +86,17 @@ type BackendState struct {
 	WiFiNetworks           []WiFiNetwork
 	WiFiDevices            []WiFiDevice
 	WiredConnections       []WiredConnection
+	CellularIP             string
+	CellularDevice         string
+	CellularConnected      bool
+	CellularEnabled        bool
+	CellularOperator       string
+	CellularTechnology     string
+	CellularSignal         uint8
+	CellularDevices        []CellularDevice
+	CellularConnections    []CellularConnection
+	CellularProfiles       []CellularProfile
+	CellularActive         []CellularActive
 	VPNProfiles            []VPNProfile
 	VPNActive              []VPNActive
 	IsConnecting           bool

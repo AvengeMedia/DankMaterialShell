@@ -243,3 +243,67 @@ func (b *HybridIwdNetworkdBackend) GetWiFiDevices() []WiFiDevice {
 func (b *HybridIwdNetworkdBackend) SetVPNCredentials(uuid, username, password string, save bool) error {
 	return fmt.Errorf("VPN not supported in hybrid mode")
 }
+
+func (b *HybridIwdNetworkdBackend) GetCellularEnabled() (bool, error) {
+	return false, fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) SetCellularEnabled(enabled bool) error {
+	return fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) GetCellularDevices() []CellularDevice {
+	return []CellularDevice{}
+}
+
+func (b *HybridIwdNetworkdBackend) GetCellularConnections() ([]CellularConnection, error) {
+	return nil, fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) GetCellularNetworkDetails(uuid string) (*CellularNetworkInfoResponse, error) {
+	return nil, fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) ConnectCellular(uuid string) error {
+	return fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) DisconnectCellular() error {
+	return fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) DisconnectCellularDevice(device string) error {
+	return fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) ActivateCellularConnection(uuid string) error {
+	return fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) ListCellularProfiles() ([]CellularProfile, error) {
+	return []CellularProfile{}, nil
+}
+
+func (b *HybridIwdNetworkdBackend) ListActiveCellular() ([]CellularActive, error) {
+	return []CellularActive{}, nil
+}
+
+func (b *HybridIwdNetworkdBackend) GetCellularProfile(uuidOrName string) (*CellularProfile, error) {
+	return nil, fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) UpdateCellularProfile(uuid string, updates map[string]any) error {
+	return fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) GetSIMStatus(device string) (*CellularDevice, error) {
+	return nil, fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) SubmitSIMPin(device string, pin string) error {
+	return fmt.Errorf("cellular not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) GetSIMPinTriesLeft(device string) (int, error) {
+	return 0, fmt.Errorf("cellular not supported in hybrid mode")
+}
