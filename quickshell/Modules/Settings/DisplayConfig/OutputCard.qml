@@ -168,7 +168,7 @@ StyledRect {
                         const pendingScale = DisplayConfigState.getPendingValue(root.outputName, "scale");
                         if (pendingScale !== undefined)
                             return parseFloat(pendingScale.toFixed(2)).toString();
-                        const scale = DisplayConfigState.outputs[root.outputName]?.logical?.scale ?? 1.0;
+                        const scale = root.outputData?.logical?.scale || 1.0;
                         return parseFloat(scale.toFixed(2)).toString();
                     }
 
@@ -251,8 +251,7 @@ StyledRect {
                         const pendingTransform = DisplayConfigState.getPendingValue(root.outputName, "transform");
                         if (pendingTransform)
                             return DisplayConfigState.getTransformLabel(pendingTransform);
-                        const data = DisplayConfigState.outputs[root.outputName];
-                        return DisplayConfigState.getTransformLabel(data?.logical?.transform ?? "Normal");
+                        return DisplayConfigState.getTransformLabel(root.outputData?.logical?.transform ?? "Normal");
                     }
                     options: [I18n.tr("Normal"), I18n.tr("90°"), I18n.tr("180°"), I18n.tr("270°"), I18n.tr("Flipped"), I18n.tr("Flipped 90°"), I18n.tr("Flipped 180°"), I18n.tr("Flipped 270°")]
                     onValueChanged: value => DisplayConfigState.setPendingChange(root.outputName, "transform", DisplayConfigState.getTransformValue(value))
