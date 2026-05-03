@@ -301,11 +301,11 @@ Item {
 
                 SettingsToggleRow {
                     settingKey: "frameCloseGaps"
-                    tags: ["frame", "connected", "gap", "edge", "flush", "popout", "notification"]
-                    text: I18n.tr("Close the Gaps")
-                    description: I18n.tr("Connected popouts sit flush with the frame")
-                    checked: SettingsData.frameCloseGaps
-                    onToggled: checked => SettingsData.set("frameCloseGaps", checked)
+                    tags: ["frame", "connected", "gap", "edge", "curves", "arcs", "expose", "popout", "notification"]
+                    text: I18n.tr("Expose the Arcs")
+                    description: I18n.tr("Reveal the arcs where surfaces meet the frame")
+                    checked: !SettingsData.frameCloseGaps
+                    onToggled: checked => SettingsData.set("frameCloseGaps", !checked)
                 }
 
                 SettingsButtonGroupRow {

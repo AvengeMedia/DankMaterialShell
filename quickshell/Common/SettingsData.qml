@@ -238,7 +238,7 @@ Singleton {
     onFrameShowOnOverviewChanged: saveSettings()
     property bool frameBlurEnabled: true
     onFrameBlurEnabledChanged: saveSettings()
-    property bool frameCloseGaps: false
+    property bool frameCloseGaps: true
     onFrameCloseGapsChanged: saveSettings()
     property string frameLauncherEmergeSide: "bottom"
     onFrameLauncherEmergeSideChanged: saveSettings()

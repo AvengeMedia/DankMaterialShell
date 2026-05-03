@@ -563,7 +563,7 @@ var SPEC = {
     frameBarSize: { def: 40 },
     frameShowOnOverview: { def: false },
     frameBlurEnabled: { def: true },
-    frameCloseGaps: { def: false },
+    frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
     frameMode: { def: "separate" }
