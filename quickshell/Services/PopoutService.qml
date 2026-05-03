@@ -631,6 +631,13 @@ Singleton {
         processListModal?.hide();
     }
 
+    function unloadProcessListModal() {
+        if (processListModalLoader) {
+            processListModal = null;
+            processListModalLoader.active = false;
+        }
+    }
+
     function toggleProcessListModal() {
         if (processListModal) {
             processListModal.toggle();
