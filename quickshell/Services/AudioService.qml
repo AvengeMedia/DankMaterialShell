@@ -84,19 +84,51 @@ Singleton {
         return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
     }
 
-    // Resolve a PwNode by name from the live typed list and assign it as the
-    // default sink. Going through Pipewire.nodes.values directly (no .filter
-    // / spread / .sort / property var) avoids QML type erasure to QObject*,
-    // which newer quickshell rejects when assigning to preferredDefaultAudioSink.
+    property list<PwNode> typedSinks: []
+    property list<PwNode> typedSources: []
+
+    function rebuildTypedNodeLists() {
+        const newSinks = [];
+        const newSources = [];
+        for (const node of Pipewire.nodes.values) {
+            if (!node?.audio || node.isStream)
+                continue;
+            if (node.isSink)
+                newSinks.push(node);
+            else
+                newSources.push(node);
+        }
+        typedSinks = newSinks;
+        typedSources = newSources;
+    }
+
+    Connections {
+        target: Pipewire.nodes
+        function onValuesChanged() {
+            root.rebuildTypedNodeLists();
+        }
+    }
+
+    function setSink(node: PwNode): bool {
+        if (!node)
+            return false;
+        Pipewire.preferredDefaultAudioSink = node;
+        return true;
+    }
+
+    function setSource(node: PwNode): bool {
+        if (!node)
+            return false;
+        Pipewire.preferredDefaultAudioSource = node;
+        return true;
+    }
+
     function setDefaultSinkByName(name) {
         if (!name)
             return false;
-        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-            const node = Pipewire.nodes.values[i];
-            if (node && node.name === name && node.audio && node.isSink && !node.isStream) {
-                Pipewire.preferredDefaultAudioSink = node;
-                return true;
-            }
+        for (const node of typedSinks) {
+            if (node?.name === name)
+                return setSink(node);
         }
         return false;
     }
@@ -104,12 +136,9 @@ Singleton {
     function setDefaultSourceByName(name) {
         if (!name)
             return false;
-        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-            const node = Pipewire.nodes.values[i];
-            if (node && node.name === name && node.audio && !node.isSink && !node.isStream) {
-                Pipewire.preferredDefaultAudioSource = node;
-                return true;
-            }
+        for (const node of typedSources) {
+            if (node?.name === name)
+                return setSource(node);
         }
         return false;
     }
@@ -123,8 +152,7 @@ Singleton {
         const currentIndex = sinks.findIndex(s => s.name === currentName);
         const nextIndex = (currentIndex + 1) % sinks.length;
         const nextSink = sinks[nextIndex];
-        if (!setDefaultSinkByName(nextSink.name))
-            Pipewire.preferredDefaultAudioSink = nextSink;
+        setDefaultSinkByName(nextSink.name);
         const name = displayName(nextSink);
         audioOutputCycled(name, sinkIcon(nextSink));
         return name;
@@ -1097,6 +1125,8 @@ EOFCONFIG
     }
 
     Component.onCompleted: {
+        rebuildTypedNodeLists();
+
         if (soundsAvailable) {
             checkGsettings();
             Qt.callLater(createSoundPlayers);
