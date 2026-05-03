@@ -446,6 +446,7 @@ var SPEC = {
     displayShowDisconnected: { def: false },
     displaySnapToEdge: { def: true },
     connectedFrameBarStyleBackups: { def: {} },
+    connectedFrameModalDarkenBackup: { def: null },
 
     barConfigs: {
         def: [{

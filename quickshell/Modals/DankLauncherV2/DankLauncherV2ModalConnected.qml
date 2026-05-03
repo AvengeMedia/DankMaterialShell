@@ -635,17 +635,8 @@ Item {
             id: backgroundDarken
             anchors.fill: parent
             color: "black"
-            opacity: launcherMotionVisible && SettingsData.modalDarkenBackground ? 0.5 : 0
-            visible: launcherMotionVisible || opacity > 0
-
-            Behavior on opacity {
-                enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
-                NumberAnimation {
-                    easing.type: Easing.BezierSpline
-                    duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
-                    easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
-                }
-            }
+            opacity: 0
+            visible: false
         }
 
         MouseArea {
