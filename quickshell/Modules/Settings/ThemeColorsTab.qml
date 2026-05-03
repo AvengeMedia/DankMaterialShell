@@ -2647,6 +2647,18 @@ Item {
 
                 SettingsToggleRow {
                     tab: "theme"
+                    tags: ["matugen", "vencord", "discord", "template"]
+                    settingKey: "matugenTemplateVencord"
+                    text: "vencord"
+                    description: getTemplateDescription("vencord", "")
+                    descriptionColor: getTemplateDescriptionColor("vencord")
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateVencord
+                    onToggled: checked => SettingsData.set("matugenTemplateVencord", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
                     tags: ["matugen", "equibop", "discord", "template"]
                     settingKey: "matugenTemplateEquibop"
                     text: "equibop"
