@@ -38,7 +38,7 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== ""
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking
 
     function _dockOccupiesSide(side) {
         if (!SettingsData.showDock)
@@ -200,10 +200,10 @@ Item {
     }
 
     function _releaseModalChrome() {
-        if (_chromeClaimId) {
-            ConnectedModeState.releaseDockRetract(_chromeClaimId);
-            _chromeClaimId = "";
-        }
+        if (!_chromeClaimId)
+            return;
+        ConnectedModeState.releaseDockRetract(_chromeClaimId);
+        _chromeClaimId = "";
         const screenName = _currentScreenName();
         if (screenName)
             ConnectedModeState.clearModalState(screenName);

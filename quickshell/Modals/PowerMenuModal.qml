@@ -259,20 +259,24 @@ DankModal {
         cancelHold();
         close();
     }
-    onOpened: () => {
+    onShouldBeVisibleChanged: {
+        if (!shouldBeVisible)
+            return;
         holdAction = "";
         holdActionIndex = -1;
         holdProgress = 0;
         showHoldHint = false;
         updateVisibleActions();
         const defaultIndex = getDefaultActionIndex();
+        selectedIndex = defaultIndex;
         if (SettingsData.powerMenuGridLayout) {
             selectedRow = Math.floor(defaultIndex / gridColumns);
             selectedCol = defaultIndex % gridColumns;
-            selectedIndex = defaultIndex;
-        } else {
-            selectedIndex = defaultIndex;
         }
+    }
+    onShouldHaveFocusChanged: {
+        if (!shouldHaveFocus)
+            return;
         Qt.callLater(() => modalFocusScope.forceActiveFocus());
     }
     onDialogClosed: () => {
