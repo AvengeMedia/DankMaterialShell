@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"sync"
 	"syscall"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
 type RunOptions struct {
@@ -75,6 +77,18 @@ func Capture(ctx context.Context, argv []string) (string, error) {
 	cmd := exec.CommandContext(ctx, argv[0], argv[1:]...)
 	out, err := cmd.Output()
 	return string(out), err
+}
+
+// privescBin returns the binary to use for privilege escalation.
+// When useSudo is true it auto-detects the best available tool (sudo/doas/run0).
+// When false it falls back to pkexec for GUI callers.
+func privescBin(useSudo bool) string {
+	if useSudo {
+		if t, err := privesc.Detect(); err == nil {
+			return t.Name()
+		}
+	}
+	return "pkexec"
 }
 
 func findTerminal(override string) string {

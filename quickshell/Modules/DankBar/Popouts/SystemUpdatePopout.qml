@@ -365,19 +365,31 @@ DankPopout {
                                     elide: Text.ElideRight
                                 }
 
-                                StyledText {
+                                Row {
                                     width: parent.width
-                                    text: {
-                                        const from = modelData.fromVersion || "";
-                                        const to = modelData.toVersion || "";
-                                        if (from && to) {
-                                            return `${from} → ${to}`;
+                                    spacing: 4
+
+                                    StyledText {
+                                        text: {
+                                            const from = modelData.fromVersion || "";
+                                            const to = modelData.toVersion || "";
+                                            if (from && to)
+                                                return `${from} →`;
+                                            return "";
                                         }
-                                        return to || from || "";
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        visible: text !== ""
                                     }
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    elide: Text.ElideRight
+
+                                    StyledText {
+                                        text: modelData.toVersion || modelData.fromVersion || ""
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.primary
+                                        font.weight: Font.Medium
+                                        elide: Text.ElideRight
+                                        width: parent.width - (parent.children[0].visible ? parent.children[0].implicitWidth + 4 : 0)
+                                    }
                                 }
                             }
                         }

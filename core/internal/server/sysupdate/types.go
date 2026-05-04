@@ -76,6 +76,7 @@ type UpgradeOptions struct {
 	IncludeFlatpak bool
 	IncludeAUR     bool
 	DryRun         bool
+	UseSudo        bool
 	CustomCommand  string
 	Terminal       string
 	Targets        []Package

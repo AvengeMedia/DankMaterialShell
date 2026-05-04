@@ -78,6 +78,7 @@ func (zypperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine fu
 	if len(names) == 0 {
 		return nil
 	}
-	argv := append([]string{"pkexec", "zypper", "--non-interactive", "update"}, names...)
+	privesc := privescBin(opts.UseSudo)
+	argv := append([]string{privesc, "zypper", "--non-interactive", "update"}, names...)
 	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }

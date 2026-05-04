@@ -43,18 +43,19 @@ func (b dnfBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
 
 func (b dnfBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
 	if opts.DryRun {
-		return Run(ctx, []string{b.bin, "upgrade", "--refresh", "--assumeno"}, RunOptions{OnLine: onLine})
+		return Run(ctx, []string{b.bin, "upgrade", "--assumeno"}, RunOptions{OnLine: onLine})
 	}
 	names := pickTargetNames(opts.Targets, b.bin, true)
 	if len(names) == 0 {
 		return nil
 	}
-	argv := append([]string{"pkexec", b.bin, "upgrade", "--refresh", "-y"}, names...)
+	privesc := privescBin(opts.UseSudo)
+	argv := append([]string{privesc, b.bin, "upgrade", "-y"}, names...)
 	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }
 
 func dnfListUpgrades(ctx context.Context, bin string) (string, error) {
-	cmd := exec.CommandContext(ctx, bin, "list", "--upgrades", "--quiet")
+	cmd := exec.CommandContext(ctx, bin, "list", "--upgrades", "--refresh", "--quiet")
 	out, err := cmd.Output()
 	if err == nil {
 		return string(out), nil

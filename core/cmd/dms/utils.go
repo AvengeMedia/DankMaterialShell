@@ -15,7 +15,7 @@ func isReadOnlyCommand(args []string) bool {
 			continue
 		}
 		switch arg {
-		case "completion", "help", "__complete":
+		case "completion", "help", "__complete", "system":
 			return true
 		}
 		return false

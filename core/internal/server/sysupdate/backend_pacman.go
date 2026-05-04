@@ -47,7 +47,8 @@ func (b pacmanBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 	if len(names) == 0 {
 		return nil
 	}
-	argv := append([]string{"pkexec", "pacman", "-Sy", "--noconfirm", "--needed"}, names...)
+	privesc := privescBin(opts.UseSudo)
+	argv := append([]string{privesc, "pacman", "-Sy", "--noconfirm", "--needed"}, names...)
 	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }
 

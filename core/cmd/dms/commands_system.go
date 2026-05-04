@@ -12,6 +12,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
 
@@ -98,6 +99,8 @@ func runSystemUpdateCheck() {
 		log.Fatal("No supported package manager found")
 	}
 
+	stopSpin := startSpinner("Checking for updates… ")
+
 	type backendResult struct {
 		ID       string              `json:"id"`
 		Display  string              `json:"displayName"`
@@ -115,6 +118,7 @@ func runSystemUpdateCheck() {
 		results = append(results, backendResult{ID: b.ID(), Display: b.DisplayName(), Packages: pkgs})
 		allPkgs = append(allPkgs, pkgs...)
 	}
+	stopSpin()
 
 	if sysUpdateJSON {
 		out, _ := json.MarshalIndent(map[string]any{
@@ -137,7 +141,7 @@ func runSystemUpdateCheck() {
 	}
 	fmt.Println()
 	for _, p := range allPkgs {
-		fmt.Printf("  [%s] %s  %s -> %s\n", p.Repo, p.Name, defaultIfEmpty(p.FromVersion, "?"), defaultIfEmpty(p.ToVersion, "?"))
+		printPackage(p)
 	}
 }
 
@@ -150,7 +154,9 @@ func runSystemUpdateApply() {
 		log.Fatal("No supported package manager found")
 	}
 
+	stopSpin := startSpinner("Checking for updates…")
 	pkgs, firstErr := collectUpdates(checkCtx, backends)
+	stopSpin()
 	if firstErr != nil {
 		fmt.Printf("Warning: %v\n\n", firstErr)
 	}
@@ -163,12 +169,12 @@ func runSystemUpdateApply() {
 	}
 	fmt.Println()
 	for _, p := range pkgs {
-		fmt.Printf("  [%s] %s  %s -> %s\n", p.Repo, p.Name, defaultIfEmpty(p.FromVersion, "?"), defaultIfEmpty(p.ToVersion, "?"))
+		printPackage(p)
 	}
 	fmt.Println()
 
 	if !sysUpdateNoConfirm && !sysUpdateDry {
-		if !promptYesNo("Proceed with upgrade? [y/N]: ") {
+		if !promptYesNo("Proceed with upgrade? [Y/n]: ") {
 			fmt.Println("Aborted.")
 			return
 		}
@@ -178,9 +184,11 @@ func runSystemUpdateApply() {
 	defer cancel()
 
 	opts := sysupdate.UpgradeOptions{
+		Targets:        pkgs,
 		IncludeFlatpak: !sysUpdateNoFlatpak,
 		IncludeAUR:     !sysUpdateNoAUR,
 		DryRun:         sysUpdateDry,
+		UseSudo:        true,
 	}
 
 	onLine := func(line string) { fmt.Println(line) }
@@ -236,10 +244,10 @@ func promptYesNo(prompt string) bool {
 		return false
 	}
 	switch strings.ToLower(strings.TrimSpace(line)) {
-	case "y", "yes":
-		return true
-	default:
+	case "n", "no":
 		return false
+	default:
+		return true
 	}
 }
 
@@ -260,6 +268,57 @@ func stdinIsTTY() bool {
 		return false
 	}
 	return (fi.Mode() & os.ModeCharDevice) != 0
+}
+
+func stdoutIsTTY() bool {
+	fi, err := os.Stdout.Stat()
+	if err != nil {
+		return false
+	}
+	return (fi.Mode() & os.ModeCharDevice) != 0
+}
+
+// startSpinner prints an animated spinner to stdout for progress indication
+func startSpinner(msg string) func() {
+	if !stdoutIsTTY() {
+		return func() {}
+	}
+	frames := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+	done := make(chan struct{})
+	go func() {
+		for i := 0; ; i++ {
+			select {
+			case <-done:
+				fmt.Print("\r\033[K")
+				return
+			case <-time.After(80 * time.Millisecond):
+				fmt.Printf("\r%s %s", frames[i%len(frames)], msg)
+			}
+		}
+	}()
+	return func() { close(done) }
+}
+
+var (
+	styleRepo  = lipgloss.NewStyle().Foreground(lipgloss.Color("244")).Bold(false)
+	styleName  = lipgloss.NewStyle().Foreground(lipgloss.Color("39")).Bold(true)
+	styleFrom  = lipgloss.NewStyle().Foreground(lipgloss.Color("243"))
+	styleArrow = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
+	styleTo    = lipgloss.NewStyle().Foreground(lipgloss.Color("76")).Bold(true)
+)
+
+func printPackage(p sysupdate.Package) {
+	if !stdoutIsTTY() {
+		fmt.Printf("  [%s] %s  %s -> %s\n", p.Repo, p.Name, defaultIfEmpty(p.FromVersion, "?"), defaultIfEmpty(p.ToVersion, "?"))
+		return
+	}
+	fmt.Printf("  %s %s  %s %s %s\n",
+		styleRepo.Render("["+string(p.Repo)+"]"),
+		styleName.Render(p.Name),
+		styleFrom.Render(defaultIfEmpty(p.FromVersion, "?")),
+		styleArrow.Render("->"),
+		styleTo.Render(defaultIfEmpty(p.ToVersion, "?")),
+	)
 }
 
 func errOrEmpty(err error) string {

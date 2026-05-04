@@ -49,7 +49,8 @@ func (aptBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(
 	if len(names) == 0 {
 		return nil
 	}
-	argv := append([]string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", bin, "install", "-y", "--only-upgrade"}, names...)
+	privesc := privescBin(opts.UseSudo)
+	argv := append([]string{privesc, "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", bin, "install", "-y", "--only-upgrade"}, names...)
 	return Run(ctx, argv, RunOptions{OnLine: onLine})
 }
 
