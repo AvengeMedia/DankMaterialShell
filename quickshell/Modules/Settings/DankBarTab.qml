@@ -136,6 +136,7 @@ Item {
             popupGapsAuto: defaultBar.popupGapsAuto ?? true,
             popupGapsManual: defaultBar.popupGapsManual ?? 4,
             maximizeDetection: defaultBar.maximizeDetection ?? true,
+            fullscreenDetection: defaultBar.fullscreenDetection ?? true,
             scrollEnabled: defaultBar.scrollEnabled ?? true,
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
@@ -704,6 +705,24 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             openOnOverview: toggled
                         });
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Hide When Fullscreen", "bar visibility toggle: hide the bar when a window is fullscreen")
+                    checked: selectedBarConfig?.fullscreenDetection ?? true
+                    onToggled: toggled => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            fullscreenDetection: toggled
+                        });
+                        notifyHorizontalBarChange();
                     }
                 }
             }
