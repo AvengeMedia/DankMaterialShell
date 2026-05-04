@@ -164,6 +164,8 @@ Variants {
 
         readonly property string _dockScreenName: dock.modelData ? dock.modelData.name : (dock.screen ? dock.screen.name : "")
         readonly property bool hasFullscreenToplevel: {
+            if (!SettingsData.dockHideOnFullscreen)
+                return false;
             CompositorService.sortedToplevels;
             ToplevelManager.activeToplevel;
             if (CompositorService.isNiri) {

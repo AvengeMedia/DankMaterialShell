@@ -310,6 +310,10 @@ PanelWindow {
     }
 
     function _updateHasFullscreenToplevel() {
+        if (!(barConfig?.fullscreenDetection ?? true)) {
+            hasFullscreenToplevel = false;
+            return;
+        }
         hasFullscreenToplevel = CompositorService.hasFullscreenToplevelOnScreen(screenName);
     }
 
@@ -593,6 +597,7 @@ PanelWindow {
             barWindow.updateGpuTempConfig();
             barWindow._updateBackgroundAlpha();
             barWindow._updateHasMaximizedToplevel();
+            barWindow._updateHasFullscreenToplevel();
             barWindow._updateShouldHideForWindows();
         }
 

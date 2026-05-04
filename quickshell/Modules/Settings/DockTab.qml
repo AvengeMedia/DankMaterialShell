@@ -87,6 +87,16 @@ Item {
                     visible: CompositorService.isNiri
                     onToggled: checked => SettingsData.set("dockOpenOnOverview", checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "dockHideOnFullscreen"
+                    tags: ["dock", "fullscreen", "hide"]
+                    text: I18n.tr("Hide When Fullscreen", "dock visibility toggle: hide the dock when a window is fullscreen")
+                    description: I18n.tr("Hide the dock when a window is fullscreen", "dock visibility toggle description")
+                    checked: SettingsData.dockHideOnFullscreen
+                    visible: SettingsData.showDock
+                    onToggled: checked => SettingsData.set("dockHideOnFullscreen", checked)
+                }
             }
 
             SettingsCard {
