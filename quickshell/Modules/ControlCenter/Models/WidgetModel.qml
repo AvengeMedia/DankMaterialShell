@@ -10,6 +10,7 @@ QtObject {
 
     property var vpnBuiltinInstance: null
     property var cupsBuiltinInstance: null
+    property var tailscaleBuiltinInstance: null
 
     property var vpnLoader: Loader {
         active: false
@@ -58,6 +59,35 @@ QtObject {
                 if (!hasCupsWidget && cupsLoader.active) {
                     log.debug("CupsWidget: No CUPS widget in control center, deactivating loader");
                     cupsLoader.active = false;
+                }
+            }
+        }
+    }
+
+    property var tailscaleLoader: Loader {
+        active: false
+        sourceComponent: Component {
+            TailscaleWidget {}
+        }
+
+        onItemChanged: {
+            root.tailscaleBuiltinInstance = item;
+        }
+
+        onActiveChanged: {
+            if (!active) {
+                root.tailscaleBuiltinInstance = null;
+            }
+        }
+
+        Connections {
+            target: SettingsData
+            function onControlCenterWidgetsChanged() {
+                const widgets = SettingsData.controlCenterWidgets || [];
+                const hasTailscaleWidget = widgets.some(w => w.id === "builtin_tailscale");
+                if (!hasTailscaleWidget && tailscaleLoader.active) {
+                    root.log.debug("No Tailscale widget in control center, deactivating loader");
+                    tailscaleLoader.active = false;
                 }
             }
         }
@@ -201,6 +231,16 @@ QtObject {
             "type": "builtin_plugin",
             "enabled": CupsService.available,
             "warning": !CupsService.available ? I18n.tr("CUPS not available") : undefined,
+            "isBuiltinPlugin": true
+        },
+        {
+            "id": "builtin_tailscale",
+            "text": I18n.tr("Tailscale", "Tailscale mesh VPN widget title"),
+            "description": I18n.tr("Tailscale Network", "Tailscale control center widget description"),
+            "icon": "device_hub",
+            "type": "builtin_plugin",
+            "enabled": TailscaleService.available,
+            "warning": !TailscaleService.available ? I18n.tr("Tailscale not available", "Warning when Tailscale service is not running") : undefined,
             "isBuiltinPlugin": true
         }
     ]

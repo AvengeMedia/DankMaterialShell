@@ -14764,5 +14764,107 @@
     "context": "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:30",
     "comment": "Keyboard hints when enter-to-paste is enabled"
+  },
+  {
+    "term": "Tailscale",
+    "context": "Tailscale mesh VPN widget title",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml, Modules/ControlCenter/Models/WidgetModel.qml",
+    "comment": ""
+  },
+  {
+    "term": "Tailscale Network",
+    "context": "Tailscale control center widget description",
+    "reference": "Modules/ControlCenter/Models/WidgetModel.qml",
+    "comment": ""
+  },
+  {
+    "term": "Tailscale not available",
+    "context": "Warning when Tailscale service is not running",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml, Modules/ControlCenter/Models/WidgetModel.qml",
+    "comment": ""
+  },
+  {
+    "term": "%1 online",
+    "context": "Number of online Tailscale peers",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "Search devices...",
+    "context": "Tailscale device search placeholder",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "This device",
+    "context": "Label for the user's own device in Tailscale",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "Network: %1",
+    "context": "Tailscale network name",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "Version: %1",
+    "context": "Tailscale version",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "No matching devices",
+    "context": "No Tailscale devices match search",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "No peers found",
+    "context": "No Tailscale peers found",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "relay: %1",
+    "context": "Tailscale relay server name",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "direct",
+    "context": "Tailscale direct connection",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "last seen %1",
+    "context": "Tailscale peer last seen time",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "Tags: %1",
+    "context": "Tailscale device tags",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "Owner: %1",
+    "context": "Tailscale device owner",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "Show my online devices",
+    "context": "Toggle to show only online devices owned by the user",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
+  },
+  {
+    "term": "Show all devices (%1)",
+    "context": "Toggle to show all Tailscale devices",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml",
+    "comment": ""
   }
 ]
