@@ -291,6 +291,42 @@ Singleton {
         return Date.now() / 1000.0;
     }
 
+    function _notificationDedupKey(source) {
+        if (!source)
+            return "";
+        const app = (source.appName || source.desktopEntry || "").toString();
+        const summary = (source.summary || "").toString();
+        const body = (source.body || "").toString();
+        const urgency = typeof source.urgency === "number" ? source.urgency : NotificationUrgency.Normal;
+        const icon = (source.appIcon || "").toString();
+        if (!app && !summary && !body)
+            return "";
+        const sep = "";
+        return app + sep + summary + sep + body + sep + urgency + sep + icon;
+    }
+
+    function _findActiveDuplicate(notif) {
+        const key = _notificationDedupKey(notif);
+        if (!key)
+            return null;
+
+        for (const w of visibleNotifications) {
+            if (!w || !w.notification || !w.popup)
+                continue;
+            if (_notificationDedupKey(w.notification) === key)
+                return w;
+        }
+
+        for (const w of notificationQueue) {
+            if (!w || !w.notification)
+                continue;
+            if (_notificationDedupKey(w.notification) === key)
+                return w;
+        }
+
+        return null;
+    }
+
     function _ingressAllowed(urgency) {
         const t = _nowSec();
         if (t - _lastIngressSec >= 1.0) {
@@ -595,6 +631,16 @@ Singleton {
 
             const policy = _evaluateNotificationPolicy(notif);
             if (policy.drop) {
+                try {
+                    notif.dismiss();
+                } catch (e) {}
+                return;
+            }
+
+            const duplicate = _findActiveDuplicate(notif);
+            if (duplicate) {
+                if (duplicate.timer && duplicate.timer.running)
+                    duplicate.timer.restart();
                 try {
                     notif.dismiss();
                 } catch (e) {}
