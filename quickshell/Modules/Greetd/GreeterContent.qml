@@ -1601,7 +1601,11 @@ Item {
                 }
             });
         }
-        return dirs;
+
+        // _addSession guards against a session name already existing
+        // so we have to load from the user directories first so they
+        // correctly override a system configuration
+        return dirs.reverse();
     }
 
     property var _pendingFiles: ({})
