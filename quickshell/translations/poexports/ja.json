@@ -51,10 +51,10 @@
     "%1 filtered": "フィルター済み %1 件"
   },
   "%1 h %2 m left": {
-    "%1 h %2 m left": ""
+    "%1 h %2 m left": "残り %1 時間 %2 分"
   },
   "%1 h left": {
-    "%1 h left": ""
+    "%1 h left": "残り %1 時間"
   },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 は設定に含まれるようになりました"
@@ -66,10 +66,13 @@
     "%1 issues found": "問題 %1 件を検出"
   },
   "%1 min left": {
-    "%1 min left": ""
+    "%1 min left": "残り %1 分"
   },
   "%1 notifications": {
     "%1 notifications": "通知 %1 件"
+  },
+  "%1 online": {
+    "%1 online": ""
   },
   "%1 update": {
     "%1 update": "更新 %1 件"
@@ -156,7 +159,7 @@
     "14 days": "14日"
   },
   "15 min": {
-    "15 min": ""
+    "15 min": "15 分"
   },
   "15 minutes": {
     "15 minutes": "15分"
@@ -216,7 +219,7 @@
     "30 days": "30日"
   },
   "30 min": {
-    "30 min": ""
+    "30 min": "30 分"
   },
   "30 minutes": {
     "30 minutes": "30分"
@@ -294,7 +297,7 @@
     "API": "API"
   },
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
-    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": ""
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "AUR ヘルパーは対話式です。プロンプトは端末ウィンドウで確認してください。このポップアウトはアップグレードの終了時にアイドル状態へ戻ります。"
   },
   "Aborted": {
     "Aborted": "中止"
@@ -352,6 +355,9 @@
   },
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "アクティブなロック画面モニター"
+  },
+  "Active VPN": {
+    "Active VPN": ""
   },
   "Active tile background and icon color": {
     "Active tile background and icon color": "アクティブタイルの背景色とアイコン色"
@@ -482,6 +488,9 @@
   "Animation Speed": {
     "Animation Speed": "アニメーション速度"
   },
+  "Animation Style": {
+    "Animation Style": ""
+  },
   "Anonymous Identity": {
     "Anonymous Identity": "匿名 ID"
   },
@@ -519,13 +528,16 @@
     "Apply Changes": "変更を適用"
   },
   "Apply Flatpak updates alongside system updates when running 'Update All'.": {
-    "Apply Flatpak updates alongside system updates when running 'Update All'.": ""
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": "「すべて更新」の実行時に、システムアップデートとあわせて Flatpak の更新も適用します。"
   },
   "Apply GTK Colors": {
     "Apply GTK Colors": "GTKカラーを適用"
   },
   "Apply Qt Colors": {
     "Apply Qt Colors": "Qtカラーを適用"
+  },
+  "Apply compositor blur behind the frame border": {
+    "Apply compositor blur behind the frame border": ""
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "目の疲れを軽減するために、暖色系の色温度を適用します。以下の自動化設定で、いつアクティブにするか制御できます。"
@@ -554,6 +566,9 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "通知ポップアップがミュートされているアプリ。ミュート解除するか削除すると除外されます。"
   },
+  "Arc Extender": {
+    "Arc Extender": ""
+  },
   "Architecture": {
     "Architecture": "アーキテクチャ"
   },
@@ -562,6 +577,9 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "ディスプレイを配置し、解像度、リフレッシュレート、VRR を設定"
+  },
+  "At least one output must remain enabled": {
+    "At least one output must remain enabled": ""
   },
   "Attach": {
     "Attach": "添付"
@@ -756,7 +774,7 @@
     "Backend": "バックエンド"
   },
   "Backends: %1": {
-    "Backends: %1": ""
+    "Backends: %1": "バックエンド: %1"
   },
   "Background": {
     "Background": "背景"
@@ -793,6 +811,18 @@
   },
   "Bar Transparency": {
     "Bar Transparency": "バーの透明度"
+  },
+  "Bar corners and background": {
+    "Bar corners and background": ""
+  },
+  "Bar shadow, border, and corners": {
+    "Bar shadow, border, and corners": ""
+  },
+  "Bar spacing and size": {
+    "Bar spacing and size": ""
+  },
+  "Bar transparency": {
+    "Bar transparency": ""
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "影の基本色（透明度は自動的に適用されます）"
@@ -884,11 +914,17 @@
   "Border Opacity": {
     "Border Opacity": "ボーダーの透明度"
   },
+  "Border Radius": {
+    "Border Radius": ""
+  },
   "Border Size": {
     "Border Size": "ボーダーサイズ"
   },
   "Border Thickness": {
     "Border Thickness": "ボーダーの太さ"
+  },
+  "Border Width": {
+    "Border Width": ""
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": "ぼかしたサーフェスの周囲のボーダー色"
@@ -989,11 +1025,14 @@
   "Canceled": {
     "Canceled": "取り消し済み"
   },
+  "Cannot disable the only output": {
+    "Cannot disable the only output": ""
+  },
   "Cannot open trash: '%1' is not installed": {
-    "Cannot open trash: '%1' is not installed": ""
+    "Cannot open trash: '%1' is not installed": "ゴミ箱を開けません: '%1' がインストールされていません"
   },
   "Cannot open trash: no custom command set": {
-    "Cannot open trash: no custom command set": ""
+    "Cannot open trash: no custom command set": "ゴミ箱を開けません: カスタムコマンドが設定されていません"
   },
   "Cannot pair": {
     "Cannot pair": "ペアリングできません"
@@ -1050,13 +1089,13 @@
     "Check for system updates": "システムアップデートを検査"
   },
   "Check interval": {
-    "Check interval": ""
+    "Check interval": "確認間隔"
   },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "必要に応じて同期状態を確認します。Sync はテーマ、設定、壁紙設定をログイン画面にコピーします。認証の変更は自動的に適用されます。"
   },
   "Check your custom command in Settings → Dock → Trash.": {
-    "Check your custom command in Settings → Dock → Trash.": ""
+    "Check your custom command in Settings → Dock → Trash.": "設定 → ドック → ゴミ箱でカスタムコマンドを確認してください。"
   },
   "Checking for updates...": {
     "Checking for updates...": "更新を確認中..."
@@ -1104,7 +1143,7 @@
     "Choose icon": "アイコンを選ぶ"
   },
   "Choose monochrome or a theme color tint for system tray icons": {
-    "Choose monochrome or a theme color tint for system tray icons": ""
+    "Choose monochrome or a theme color tint for system tray icons": "システムトレイアイコンにモノクロまたはテーマカラーの色合いを選択します"
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "ウィジェットの背景色を選んでください"
@@ -1362,7 +1401,7 @@
     "Configure match criteria and actions": "一致条件とアクションを設定"
   },
   "Configure one in Settings → Dock → Trash.": {
-    "Configure one in Settings → Dock → Trash.": ""
+    "Configure one in Settings → Dock → Trash.": "設定 → ドック → ゴミ箱で設定してください。"
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "\"%1\" を表示するディスプレイを設定"
@@ -1405,6 +1444,9 @@
   },
   "Connected Displays": {
     "Connected Displays": "接続されたディスプレイ"
+  },
+  "Connected Options": {
+    "Connected Options": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "デバイスに接続中"
@@ -1452,16 +1494,16 @@
     "Control workspaces and columns by scrolling on the bar": "バー上のスクロールでワークスペースと列を操作"
   },
   "Controls how much original icon color is removed before applying tint": {
-    "Controls how much original icon color is removed before applying tint": ""
+    "Controls how much original icon color is removed before applying tint": "色合いを適用する前に、元のアイコン色をどの程度取り除くかを調整します"
   },
   "Controls how strongly the selected tint color is applied": {
-    "Controls how strongly the selected tint color is applied": ""
+    "Controls how strongly the selected tint color is applied": "選択した色合いをどの程度強く適用するかを調整します"
   },
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "すべてのポップアウト、モーダル、およびそのコンテンツレイヤーの透明度を制御"
   },
   "Controls outlines around blurred foreground cards, pills, and notification cards": {
-    "Controls outlines around blurred foreground cards, pills, and notification cards": ""
+    "Controls outlines around blurred foreground cards, pills, and notification cards": "ぼかした前景カード、ピル型要素、通知カードのアウトラインを調整します"
   },
   "Controls shadow cast direction for elevation layers": {
     "Controls shadow cast direction for elevation layers": "エレベーションレイヤーの影の方向を制御"
@@ -1470,7 +1512,7 @@
     "Controls the base blur radius and offset of shadows": "影の基本ぼかし半径とオフセットを制御"
   },
   "Controls the outer edge of protocol-blurred windows": {
-    "Controls the outer edge of protocol-blurred windows": ""
+    "Controls the outer edge of protocol-blurred windows": "プロトコルによるぼかしが適用されたウィンドウの外縁を調整します"
   },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "影の透明度を制御"
@@ -1515,7 +1557,7 @@
     "Copy PID": "PIDをコピー"
   },
   "Copy Path": {
-    "Copy Path": ""
+    "Copy Path": "パスをコピー"
   },
   "Copy Text": {
     "Copy Text": "テキストをコピー"
@@ -1566,13 +1608,13 @@
     "Critical Priority": "最優先事項"
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": ""
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: タブ切替 • Ctrl+S: ピン留め/解除 • Shift+Del: すべてクリア • Esc: 閉じる"
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": ""
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: タブ切替 • Ctrl+S: ピン留め/解除 • Shift+Enter: コピー • Shift+Del: すべてクリア • Esc: 閉じる"
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": ""
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: タブ切替 • Ctrl+S: ピン留め/解除 • Shift+Enter: 貼り付け • Shift+Del: すべてクリア • Esc: 閉じる"
   },
   "Current": {
     "Current": "現在"
@@ -1671,10 +1713,10 @@
     "Custom Transparency": "カスタム透明度"
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
-    "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": "カスタムコマンドと端末のパラメーターは空白で分割されます。空白を含むパスは動作しません。"
   },
   "Custom open-trash command": {
-    "Custom open-trash command": ""
+    "Custom open-trash command": "ゴミ箱を開くカスタムコマンド"
   },
   "Custom power profile": {
     "Custom power profile": "カスタム電源プロファイル"
@@ -1683,7 +1725,7 @@
     "Custom theme loaded from JSON file": "JSON ファイルからカスタムテーマを読み込みました"
   },
   "Custom update command": {
-    "Custom update command": ""
+    "Custom update command": "カスタム更新コマンド"
   },
   "Custom...": {
     "Custom...": "カスタム..."
@@ -1841,6 +1883,12 @@
   "Dependencies & documentation": {
     "Dependencies & documentation": "依存関係とドキュメント"
   },
+  "Depth": {
+    "Depth": ""
+  },
+  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "下にある画像に密接に一致する色を導き出します。"
   },
@@ -1872,7 +1920,7 @@
     "Details for \"%1\"": "\"%1\" の詳細"
   },
   "Detected backends: %1": {
-    "Detected backends: %1": ""
+    "Detected backends: %1": "検出されたバックエンド: %1"
   },
   "Development": {
     "Development": "開発"
@@ -1897,6 +1945,12 @@
   },
   "Direction Source": {
     "Direction Source": "方向ソース"
+  },
+  "Directional": {
+    "Directional": ""
+  },
+  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "自動接続を無効"
@@ -2042,6 +2096,9 @@
   "Dock Visibility": {
     "Dock Visibility": "ドックの表示"
   },
+  "Dock spacing, transparency, and border": {
+    "Dock spacing, transparency, and border": ""
+  },
   "Docs": {
     "Docs": "ドキュメント"
   },
@@ -2071,6 +2128,9 @@
   },
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "ワークスペースインジケーターをドラッグして並べ替え"
+  },
+  "Draw a connected picture-frame border around the entire display": {
+    "Draw a connected picture-frame border around the entire display": ""
   },
   "Driver": {
     "Driver": "ドライバー"
@@ -2111,8 +2171,14 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "動的カラー、プリセット"
   },
+  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+  },
   "Edge Spacing": {
     "Edge Spacing": "端の余白"
+  },
+  "Edge the launcher slides from": {
+    "Edge the launcher slides from": ""
   },
   "Edit App": {
     "Edit App": "アプリを編集"
@@ -2127,13 +2193,13 @@
     "Empty": "空白"
   },
   "Empty Trash": {
-    "Empty Trash": ""
+    "Empty Trash": "ゴミ箱を空にする"
   },
   "Empty Trash (%1)": {
-    "Empty Trash (%1)": ""
+    "Empty Trash (%1)": "ゴミ箱を空にする (%1)"
   },
   "Empty Trash?": {
-    "Empty Trash?": ""
+    "Empty Trash?": "ゴミ箱を空にしますか?"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "より広い色域と HDR サポートのために 10 ビット色深度を有効にします"
@@ -2146,6 +2212,9 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "サイレントモードを有効にする"
+  },
+  "Enable Frame": {
+    "Enable Frame": ""
   },
   "Enable History": {
     "Enable History": "履歴を有効にする"
@@ -2313,16 +2382,16 @@
     "Ethernet": "Ethernet"
   },
   "Every 15 minutes": {
-    "Every 15 minutes": ""
+    "Every 15 minutes": "15分ごと"
   },
   "Every 30 minutes": {
-    "Every 30 minutes": ""
+    "Every 30 minutes": "30分ごと"
   },
   "Every 4 hours": {
-    "Every 4 hours": ""
+    "Every 4 hours": "4時間ごと"
   },
   "Every hour": {
-    "Every hour": ""
+    "Every hour": "1時間ごと"
   },
   "Exact": {
     "Exact": "完全一致"
@@ -2338,6 +2407,9 @@
   },
   "Exponential": {
     "Exponential": "指数"
+  },
+  "Expose the Arcs": {
+    "Expose the Arcs": ""
   },
   "Expressive": {
     "Expressive": "表現豊か"
@@ -2380,6 +2452,9 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "クラスへのプリンター追加に失敗しました"
+  },
+  "Failed to apply profile": {
+    "Failed to apply profile": ""
   },
   "Failed to browse device": {
     "Failed to browse device": "デバイスの参照に失敗しました"
@@ -2436,7 +2511,7 @@
     "Failed to disconnect WiFi": "WiFiの切断ができませんでした"
   },
   "Failed to empty trash": {
-    "Failed to empty trash": ""
+    "Failed to empty trash": "ゴミ箱を空にする処理に失敗しました"
   },
   "Failed to enable IP location": {
     "Failed to enable IP location": "IP 位置情報の有効化に失敗しました"
@@ -2469,7 +2544,7 @@
     "Failed to move job": "ジョブの移動に失敗しました"
   },
   "Failed to move to trash": {
-    "Failed to move to trash": ""
+    "Failed to move to trash": "ゴミ箱への移動に失敗しました"
   },
   "Failed to parse plugin_settings.json": {
     "Failed to parse plugin_settings.json": "plugin_settings.json の解析に失敗しました"
@@ -2524,6 +2599,9 @@
   },
   "Failed to save keybind": {
     "Failed to save keybind": "キーバインドの保存に失敗しました"
+  },
+  "Failed to save profile": {
+    "Failed to save profile": ""
   },
   "Failed to save profile file": {
     "Failed to save profile file": "プロファイルファイルの保存に失敗しました"
@@ -2586,7 +2664,7 @@
     "Failed to write temp file for validation": "検証用の一時ファイル書き込みに失敗しました"
   },
   "Failed: %1": {
-    "Failed: %1": ""
+    "Failed: %1": "失敗: %1"
   },
   "Features": {
     "Features": "機能"
@@ -2616,7 +2694,7 @@
     "File Information": "ファイル情報"
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
-    "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
+    "File manager used to open the trash. Pick \"custom\" to enter your own command.": "ゴミ箱を開くために使用するファイルマネージャーです。独自のコマンドを入力するには「カスタム」を選択してください。"
   },
   "File received from": {
     "File received from": "ファイルの受信元"
@@ -2693,6 +2771,12 @@
   "Float": {
     "Float": "フロート"
   },
+  "Fluent": {
+    "Fluent": ""
+  },
+  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+  },
   "Focus": {
     "Focus": "フォーカス"
   },
@@ -2751,19 +2835,19 @@
     "Font used on the login screen": "ログイン画面で使用するフォント"
   },
   "For 1 hour": {
-    "For 1 hour": ""
+    "For 1 hour": "1時間"
   },
   "For 15 minutes": {
-    "For 15 minutes": ""
+    "For 15 minutes": "15分"
   },
   "For 3 hours": {
-    "For 3 hours": ""
+    "For 3 hours": "3時間"
   },
   "For 30 minutes": {
-    "For 30 minutes": ""
+    "For 30 minutes": "30分"
   },
   "For 8 hours": {
-    "For 8 hours": ""
+    "For 8 hours": "8時間"
   },
   "Force HDR": {
     "Force HDR": "HDR を強制"
@@ -2787,7 +2871,7 @@
     "Forecast Not Available": "予報は利用できません"
   },
   "Foreground Layers": {
-    "Foreground Layers": ""
+    "Foreground Layers": "前景レイヤー"
   },
   "Forever": {
     "Forever": "常時"
@@ -2815,6 +2899,18 @@
   },
   "Found %1 packages to update:": {
     "Found %1 packages to update:": "更新可能なパッケージが %1 個見つかりました:"
+  },
+  "Frame": {
+    "Frame": ""
+  },
+  "Frame Blur": {
+    "Frame Blur": ""
+  },
+  "Frame Blur follows Background Blur in Theme & Colors": {
+    "Frame Blur follows Background Blur in Theme & Colors": ""
+  },
+  "Frame Border Color": {
+    "Frame Border Color": ""
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "ランチャーを閉じたときに VRAM/メモリを解放します。再度開く際にわずかな遅延が発生する場合があります。"
@@ -3116,6 +3212,9 @@
   "Home": {
     "Home": "ホーム"
   },
+  "Horizontal and vertical bar thickness": {
+    "Horizontal and vertical bar thickness": ""
+  },
   "Host": {
     "Host": "ホスト"
   },
@@ -3138,7 +3237,7 @@
     "Hourly Forecast Count": "時間別予報件数"
   },
   "How often the server polls for new updates.": {
-    "How often the server polls for new updates.": ""
+    "How often the server polls for new updates.": "サーバーが新しい更新を確認する頻度です。"
   },
   "How often to change wallpaper": {
     "How often to change wallpaper": "壁紙を切り替える間隔"
@@ -3225,13 +3324,13 @@
     "Inactive Monitor Color": "非アクティブモニターの色"
   },
   "Include AUR updates": {
-    "Include AUR updates": ""
+    "Include AUR updates": "AUR の更新を含める"
   },
   "Include Files in All Tab": {
     "Include Files in All Tab": "All タブにファイルを含める"
   },
   "Include Flatpak updates": {
-    "Include Flatpak updates": ""
+    "Include Flatpak updates": "Flatpak の更新を含める"
   },
   "Include Folders in All Tab": {
     "Include Folders in All Tab": "All タブにフォルダーを含める"
@@ -3334,6 +3433,9 @@
   },
   "Installing: %1": {
     "Installing: %1": "インストール中: %1"
+  },
+  "Integrations": {
+    "Integrations": ""
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "インテリジェント自動非表示"
@@ -3485,8 +3587,11 @@
   "Launcher Button Logo": {
     "Launcher Button Logo": "ランチャーのボタンロゴ"
   },
+  "Launcher Emerge Side": {
+    "Launcher Emerge Side": ""
+  },
   "Layer Outline Opacity": {
-    "Layer Outline Opacity": ""
+    "Layer Outline Opacity": "レイヤーアウトラインの透明度"
   },
   "Layout": {
     "Layout": "レイアウト"
@@ -3650,6 +3755,12 @@
   "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "最大4つの独立したバー構成を管理できます。各バーには独自の位置、ウィジェット、スタイリング、表示割り当てがあります。"
   },
+  "Managed by Frame": {
+    "Managed by Frame": ""
+  },
+  "Managed by Frame in Connected Mode": {
+    "Managed by Frame in Connected Mode": ""
+  },
   "Management": {
     "Management": "管理"
   },
@@ -3695,6 +3806,9 @@
   "Matches profile: %1": {
     "Matches profile: %1": "一致するプロファイル: %1"
   },
+  "Material": {
+    "Material": ""
+  },
   "Material Colors": {
     "Material Colors": "Material Colors"
   },
@@ -3706,6 +3820,9 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "モーダル、ポップアウト、ダイアログに Material 風の影とエレベーションを適用"
+  },
+  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen コントラスト"
@@ -3926,6 +4043,9 @@
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "ダイナミックテーマの色を駆動する壁紙をモニター"
   },
+  "Monitors in \"%1\":": {
+    "Monitors in \"%1\":": ""
+  },
   "Monochrome": {
     "Monochrome": "モノクロ"
   },
@@ -3940,6 +4060,9 @@
   },
   "Morning": {
     "Morning": "朝"
+  },
+  "Motion Effects": {
+    "Motion Effects": ""
   },
   "Mount Points": {
     "Mount Points": "マウントポイント"
@@ -3957,7 +4080,7 @@
     "Move Widget": "ウィジェットを移動"
   },
   "Move to Trash": {
-    "Move to Trash": ""
+    "Move to Trash": "ゴミ箱へ移動"
   },
   "Moving to Paused": {
     "Moving to Paused": "一時停止への移行"
@@ -3991,6 +4114,9 @@
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "落ち着いた色調のパレット。"
+  },
+  "My Online": {
+    "My Online": ""
   },
   "NM not supported": {
     "NM not supported": "NMが利用できません"
@@ -4259,6 +4385,9 @@
   "No matches": {
     "No matches": "一致するものはありません"
   },
+  "No matching devices": {
+    "No matching devices": ""
+  },
   "No matching processes": {
     "No matching processes": "一致するプロセスはありません"
   },
@@ -4276,6 +4405,9 @@
   },
   "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "パッケージマネージャーが見つかりません。Arch 系システムで更新を確認するには 'paru' または 'yay' をインストールしてください。"
+  },
+  "No peers found": {
+    "No peers found": ""
   },
   "No plugin results": {
     "No plugin results": "プラグイン結果はありません"
@@ -4314,10 +4446,10 @@
     "No status output.": "ステータス出力はありません。"
   },
   "No supported package manager found.": {
-    "No supported package manager found.": ""
+    "No supported package manager found.": "対応するパッケージマネージャーが見つかりません。"
   },
   "No terminal configured": {
-    "No terminal configured": ""
+    "No terminal configured": "端末が設定されていません"
   },
   "No themes found": {
     "No themes found": "テーマが見つかりませんでした"
@@ -4479,7 +4611,7 @@
     "On": "オン"
   },
   "On indefinitely": {
-    "On indefinitely": ""
+    "On indefinitely": "無期限にオン"
   },
   "On-Demand": {
     "On-Demand": "オンデマンド"
@@ -4491,7 +4623,10 @@
     "On-screen Displays": "オンスクリーンディスプレイ"
   },
   "Once a day": {
-    "Once a day": ""
+    "Once a day": "1日1回"
+  },
+  "Online": {
+    "Online": ""
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "ガンマは、時間または場所のルールに基づいてのみ調整します。"
@@ -4517,6 +4652,9 @@
   "Open App": {
     "Open App": "アプリを開く"
   },
+  "Open Frame": {
+    "Open Frame": ""
+  },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "スマートフォンで KDE Connect を開く"
   },
@@ -4524,16 +4662,16 @@
     "Open Notepad File": "メモ帳ファイルを開く"
   },
   "Open Trash": {
-    "Open Trash": ""
+    "Open Trash": "ゴミ箱を開く"
   },
   "Open Trash With": {
-    "Open Trash With": ""
+    "Open Trash With": "ゴミ箱を開く方法"
   },
   "Open a new note": {
     "Open a new note": "新しいメモを開く"
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
-    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "端末を開き、シェル内のアップグレード処理の代わりにカスタムコマンドを実行します。"
   },
   "Open folder": {
     "Open folder": "フォルダーを開く"
@@ -4649,6 +4787,9 @@
   "Overwrite": {
     "Overwrite": "上書き"
   },
+  "Owner: %1": {
+    "Owner: %1": ""
+  },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM はすでに指紋認証を提供しています。ログイン時に表示するにはこれを有効にしてください。"
   },
@@ -4758,7 +4899,7 @@
     "Performance": "パフォーマンス"
   },
   "Permanently delete %1 item(s)? This cannot be undone.": {
-    "Permanently delete %1 item(s)? This cannot be undone.": ""
+    "Permanently delete %1 item(s)? This cannot be undone.": "%1 件の項目を完全に削除しますか? この操作は元に戻せません。"
   },
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "プロフィール画像の設定権限が拒否されました。"
@@ -4776,16 +4917,16 @@
     "Phone number": "電話番号"
   },
   "Pick a different file manager in Settings → Dock → Trash.": {
-    "Pick a different file manager in Settings → Dock → Trash.": ""
+    "Pick a different file manager in Settings → Dock → Trash.": "設定 → ドック → ゴミ箱で別のファイルマネージャーを選択してください。"
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "同じフォルダーから毎回別のランダムな動画を選びます"
   },
   "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": ""
+    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "設定 → ランチャーで端末を選択するか、$TERMINAL を設定してください。"
   },
   "Pick how long to pause notifications": {
-    "Pick how long to pause notifications": ""
+    "Pick how long to pause notifications": "通知を一時停止する時間を選択"
   },
   "Pictures": {
     "Pictures": "画像"
@@ -4815,7 +4956,7 @@
     "Pixelate": "ピクセル化"
   },
   "Place a trash bin at the end of the dock": {
-    "Place a trash bin at the end of the dock": ""
+    "Place a trash bin at the end of the dock": "ドックの末尾にゴミ箱を配置します"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "プラグインディレクトリをここに配置します。各プラグインには plugin.json マニフェストファイルが必要です。"
@@ -4968,7 +5109,7 @@
     "Precip": "降水"
   },
   "Precipitation": {
-    "Precipitation": "降水"
+    "Precipitation": "降水確率"
   },
   "Precipitation Chance": {
     "Precipitation Chance": "降水確率"
@@ -4992,7 +5133,7 @@
     "Press key...": "キーを押してください..."
   },
   "Pressure": {
-    "Pressure": "プレッシャー"
+    "Pressure": "気圧"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "画面のタイムアウトを防止"
@@ -5083,6 +5224,9 @@
   },
   "Profile not found": {
     "Profile not found": "プロファイルが見つかりません"
+  },
+  "Profile not found in monitors.json": {
+    "Profile not found in monitors.json": ""
   },
   "Profile saved: %1": {
     "Profile saved: %1": "プロファイルを保存しました: %1"
@@ -5235,7 +5379,7 @@
     "Requires DMS %1": "DMS %1 が必要"
   },
   "Requires DMS server with sysupdate capability": {
-    "Requires DMS server with sysupdate capability": ""
+    "Requires DMS server with sysupdate capability": "sysupdate 機能に対応した DMS サーバーが必要です"
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "DWLコンポジターが必要"
@@ -5281,6 +5425,9 @@
   },
   "Resume": {
     "Resume": "レジュメ"
+  },
+  "Reveal the arcs where surfaces meet the frame": {
+    "Reveal the arcs where surfaces meet the frame": ""
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "スクロール方向を反転"
@@ -5358,7 +5505,7 @@
     "Run a shell command (e.g., notify-send)": "シェルコマンドを実行（例: notify-send）"
   },
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
-    "Run paru/yay with AUR enabled when 'Update All' is clicked.": ""
+    "Run paru/yay with AUR enabled when 'Update All' is clicked.": "「すべて更新」をクリックしたときに、AUR を有効にして paru/yay を実行します。"
   },
   "Running Apps": {
     "Running Apps": "実行中のアプリ"
@@ -5370,7 +5517,7 @@
     "Running greeter sync…": "Greeter 同期を実行中…"
   },
   "Running in terminal": {
-    "Running in terminal": ""
+    "Running in terminal": "端末で実行中"
   },
   "SDR Brightness": {
     "SDR Brightness": "SDR の明るさ"
@@ -5488,6 +5635,9 @@
   },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "キーの組み合わせ、説明、またはアクション名で検索します。\n\n既定の操作ではキーバインドをクリップボードにコピーします。\nよく使うキーバインドは右クリックまたは右矢印キーでピン留めできます。検索していないときに上部に表示されます。"
+  },
+  "Search devices...": {
+    "Search devices...": ""
   },
   "Search for a location...": {
     "Search for a location...": "ロケーションを検索..."
@@ -5653,6 +5803,9 @@
   },
   "Sending": {
     "Sending": "送信中"
+  },
+  "Separate": {
+    "Separate": ""
   },
   "Separator": {
     "Separator": "区切り"
@@ -5913,7 +6066,7 @@
     "Show Top Processes": "上位プロセスを表示"
   },
   "Show Trash in Dock": {
-    "Show Trash in Dock": ""
+    "Show Trash in Dock": "ドックにゴミ箱を表示"
   },
   "Show Weather Condition": {
     "Show Weather Condition": "天気の状態を表示"
@@ -5951,8 +6104,11 @@
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "通知ポップアップにドロップシャドウを表示します。Theme & Colors で M3 Elevation を有効にする必要があります。"
   },
+  "Show during Niri overview": {
+    "Show during Niri overview": ""
+  },
   "Show foreground surfaces on blurred panels for stronger contrast": {
-    "Show foreground surfaces on blurred panels for stronger contrast": ""
+    "Show foreground surfaces on blurred panels for stronger contrast": "コントラストを強めるため、ぼかしたパネル上に前景サーフェスを表示します"
   },
   "Show in GB": {
     "Show in GB": "GB で表示"
@@ -6057,10 +6213,10 @@
     "Signal:": "Signal:"
   },
   "Silence for a while": {
-    "Silence for a while": ""
+    "Silence for a while": "しばらくミュート"
   },
   "Silence notifications": {
-    "Silence notifications": ""
+    "Silence notifications": "通知をミュート"
   },
   "Size": {
     "Size": "サイズ"
@@ -6149,6 +6305,9 @@
   "Standard": {
     "Standard": "標準"
   },
+  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+  },
   "Start": {
     "Start": "始める"
   },
@@ -6197,8 +6356,20 @@
   "Surface": {
     "Surface": "表面"
   },
+  "Surface Behavior": {
+    "Surface Behavior": ""
+  },
+  "Surface Opacity": {
+    "Surface Opacity": ""
+  },
   "Surface Variant": {
     "Surface Variant": "サーフェスバリアント"
+  },
+  "Surfaces emerge flush from the bar": {
+    "Surfaces emerge flush from the bar": ""
+  },
+  "Surfaces float independently of the frame": {
+    "Surfaces float independently of the frame": ""
   },
   "Suspend": {
     "Suspend": "スリープ"
@@ -6273,7 +6444,7 @@
     "System Tray": "システムトレイ"
   },
   "System Tray Icon Tint": {
-    "System Tray Icon Tint": ""
+    "System Tray Icon Tint": "システムトレイアイコンの色合い"
   },
   "System Update": {
     "System Update": "システムアップデート"
@@ -6305,11 +6476,23 @@
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: ナビゲーション • ←→↑↓: グリッドナビゲーション • Enter/Space: 選択"
   },
+  "Tags: %1": {
+    "Tags: %1": ""
+  },
+  "Tailscale": {
+    "Tailscale": ""
+  },
+  "Tailscale Network": {
+    "Tailscale Network": ""
+  },
+  "Tailscale not available": {
+    "Tailscale not available": ""
+  },
   "Terminal": {
     "Terminal": "端末"
   },
   "Terminal additional parameters": {
-    "Terminal additional parameters": ""
+    "Terminal additional parameters": "端末の追加パラメーター"
   },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "端末のカスタム追加パラメーター"
@@ -6395,6 +6578,9 @@
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "このバインドは config.kdl によって上書きされています"
   },
+  "This device": {
+    "This device": ""
+  },
   "This may take a few seconds": {
     "This may take a few seconds": "これには数秒かかる場合があります"
   },
@@ -6471,10 +6657,10 @@
     "Timeout for normal priority notifications": "通常優先度通知のタイムアウト"
   },
   "Tint Saturation": {
-    "Tint Saturation": ""
+    "Tint Saturation": "色合いの彩度"
   },
   "Tint Strength": {
-    "Tint Strength": ""
+    "Tint Strength": "色合いの強さ"
   },
   "Title": {
     "Title": "タイトル"
@@ -6567,10 +6753,10 @@
     "Transparency": "透明度"
   },
   "Trash": {
-    "Trash": ""
+    "Trash": "ゴミ箱"
   },
   "Trash command failed (exit %1)": {
-    "Trash command failed (exit %1)": ""
+    "Trash command failed (exit %1)": "ゴミ箱コマンドが失敗しました (終了コード %1)"
   },
   "Trending GIFs": {
     "Trending GIFs": "人気の GIF"
@@ -6594,10 +6780,10 @@
     "Try a different search": "別の検索を試してください"
   },
   "Turn off": {
-    "Turn off": ""
+    "Turn off": "オフにする"
   },
   "Turn off Do Not Disturb": {
-    "Turn off Do Not Disturb": ""
+    "Turn off Do Not Disturb": "サイレントモードをオフにする"
   },
   "Turn off all displays immediately when the lock screen activates": {
     "Turn off all displays immediately when the lock screen activates": "ロック画面が有効になったらすべてのディスプレイをすぐにオフにする"
@@ -6606,10 +6792,10 @@
     "Turn off monitors after": "後にモニターの電源を切る"
   },
   "Turn off monitors after lock": {
-    "Turn off monitors after lock": ""
+    "Turn off monitors after lock": "ロック後にモニターの電源を切る"
   },
   "Turn off now": {
-    "Turn off now": ""
+    "Turn off now": "今すぐオフにする"
   },
   "Type": {
     "Type": "種類"
@@ -6726,16 +6912,16 @@
     "Unsaved note...": "保存されていないメモ..."
   },
   "Until %1": {
-    "Until %1": ""
+    "Until %1": "%1まで"
   },
   "Until 8 AM": {
-    "Until 8 AM": ""
+    "Until 8 AM": "午前8時まで"
   },
   "Until I turn it off": {
-    "Until I turn it off": ""
+    "Until I turn it off": "オフにするまで"
   },
   "Until tomorrow, 8:00 AM": {
-    "Until tomorrow, 8:00 AM": ""
+    "Until tomorrow, 8:00 AM": "明日の午前8時まで"
   },
   "Untitled": {
     "Untitled": "無題"
@@ -6756,7 +6942,7 @@
     "Update Plugin": "プラグインを更新"
   },
   "Upgrading...": {
-    "Upgrading...": ""
+    "Upgrading...": "アップグレード中..."
   },
   "Uptime": {
     "Uptime": "稼働時間"
@@ -6819,7 +7005,7 @@
     "Use custom border/focus-ring width": "カスタムの境界線/フォーカスリング幅を使用"
   },
   "Use custom command": {
-    "Use custom command": ""
+    "Use custom command": "カスタムコマンドを使用"
   },
   "Use custom command for update your system": {
     "Use custom command for update your system": "カスタムコマンドを使用してシステムを更新"
@@ -6850,6 +7036,9 @@
   },
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "システム設定からサウンドテーマを使用"
+  },
+  "Use the extended surface for launcher content": {
+    "Use the extended surface for launcher content": ""
   },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "すべてのディスプレイで同じ位置とサイズを使用"
@@ -7247,6 +7436,9 @@
   "dgop not available": {
     "dgop not available": "dgop は利用できません"
   },
+  "direct": {
+    "direct": ""
+  },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms は、<a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3 に着想を得た</a>デザインを持つ、高度にカスタマイズ可能なモダンなデスクトップシェルです。<br /><br/>デスクトップシェルを構築するための QT6 フレームワークである <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a> と、静的型付けのコンパイル言語である <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a> で構築されています。"
   },
@@ -7276,6 +7468,9 @@
   },
   "featured": {
     "featured": "おすすめ"
+  },
+  "last seen %1": {
+    "last seen %1": ""
   },
   "leave empty for default": {
     "leave empty for default": "既定値を使うには空のままにしてください"
@@ -7352,6 +7547,9 @@
   "r/niri Subreddit": {
     "r/niri Subreddit": "r/niri サブレディット"
   },
+  "relay: %1": {
+    "relay: %1": ""
+  },
   "seconds": {
     "seconds": "秒"
   },
@@ -7362,7 +7560,7 @@
     "this app": "このアプリ"
   },
   "until %1": {
-    "until %1": ""
+    "until %1": "%1まで"
   },
   "up": {
     "up": "上"

@@ -71,6 +71,9 @@
   "%1 notifications": {
     "%1 notifications": "%1 notiser"
   },
+  "%1 online": {
+    "%1 online": ""
+  },
   "%1 update": {
     "%1 update": "%1 uppdatering"
   },
@@ -353,6 +356,9 @@
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "Aktiv låsskärmsbildskärm"
   },
+  "Active VPN": {
+    "Active VPN": ""
+  },
   "Active tile background and icon color": {
     "Active tile background and icon color": "Bakgrund och iconfärg för aktiv platta"
   },
@@ -482,6 +488,9 @@
   "Animation Speed": {
     "Animation Speed": "Animeringshastighet"
   },
+  "Animation Style": {
+    "Animation Style": ""
+  },
   "Anonymous Identity": {
     "Anonymous Identity": "Anonym identitet"
   },
@@ -527,6 +536,9 @@
   "Apply Qt Colors": {
     "Apply Qt Colors": "Tillämpa Qt-färger"
   },
+  "Apply compositor blur behind the frame border": {
+    "Apply compositor blur behind the frame border": ""
+  },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Applicera varm färgtemperatur för att minska ögontrötthet. Använd automatiseringsinställningarna nedan för att styra när det aktiveras."
   },
@@ -554,6 +566,9 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Appar med tystade notisbanderoller. Ta bort tystning eller radera för att ta bort."
   },
+  "Arc Extender": {
+    "Arc Extender": ""
+  },
   "Architecture": {
     "Architecture": "Arkitektur"
   },
@@ -562,6 +577,9 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Arrangera bildskärmar och konfigurera upplösning, uppdateringsfrekvens och VRR"
+  },
+  "At least one output must remain enabled": {
+    "At least one output must remain enabled": ""
   },
   "Attach": {
     "Attach": "Anslut"
@@ -794,6 +812,18 @@
   "Bar Transparency": {
     "Bar Transparency": "Genomskinlighet på menyraden"
   },
+  "Bar corners and background": {
+    "Bar corners and background": ""
+  },
+  "Bar shadow, border, and corners": {
+    "Bar shadow, border, and corners": ""
+  },
+  "Bar spacing and size": {
+    "Bar spacing and size": ""
+  },
+  "Bar transparency": {
+    "Bar transparency": ""
+  },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Basfärg för skuggor (opacitet tillämpas automatiskt)"
   },
@@ -884,11 +914,17 @@
   "Border Opacity": {
     "Border Opacity": "Opacitet på kantlinje"
   },
+  "Border Radius": {
+    "Border Radius": ""
+  },
   "Border Size": {
     "Border Size": "Ramstorlek"
   },
   "Border Thickness": {
     "Border Thickness": "Tjocklek på kantlinje"
+  },
+  "Border Width": {
+    "Border Width": ""
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": ""
@@ -988,6 +1024,9 @@
   },
   "Canceled": {
     "Canceled": "Avbruten"
+  },
+  "Cannot disable the only output": {
+    "Cannot disable the only output": ""
   },
   "Cannot open trash: '%1' is not installed": {
     "Cannot open trash: '%1' is not installed": ""
@@ -1405,6 +1444,9 @@
   },
   "Connected Displays": {
     "Connected Displays": "Anslutna bildskärmar"
+  },
+  "Connected Options": {
+    "Connected Options": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "Ansluter till enhet"
@@ -1841,6 +1883,12 @@
   "Dependencies & documentation": {
     "Dependencies & documentation": "Beroenden och dokumentation"
   },
+  "Depth": {
+    "Depth": ""
+  },
+  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Hämtar färger som nära matchar den underliggande bilden."
   },
@@ -1897,6 +1945,12 @@
   },
   "Direction Source": {
     "Direction Source": "Riktningskälla"
+  },
+  "Directional": {
+    "Directional": ""
+  },
+  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Avaktivera automatisk anslutning"
@@ -2042,6 +2096,9 @@
   "Dock Visibility": {
     "Dock Visibility": "Docksynlighet"
   },
+  "Dock spacing, transparency, and border": {
+    "Dock spacing, transparency, and border": ""
+  },
   "Docs": {
     "Docs": "Dokumentation"
   },
@@ -2071,6 +2128,9 @@
   },
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Dra arbetsytans indikatorer för att ordna om dem"
+  },
+  "Draw a connected picture-frame border around the entire display": {
+    "Draw a connected picture-frame border around the entire display": ""
   },
   "Driver": {
     "Driver": "Drivrutin"
@@ -2111,8 +2171,14 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Dynamiska färger, förinställningar"
   },
+  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+  },
   "Edge Spacing": {
     "Edge Spacing": "Avstånd från skärmkanter"
+  },
+  "Edge the launcher slides from": {
+    "Edge the launcher slides from": ""
   },
   "Edit App": {
     "Edit App": "Redigera app"
@@ -2146,6 +2212,9 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Aktivera Stör ej"
+  },
+  "Enable Frame": {
+    "Enable Frame": ""
   },
   "Enable History": {
     "Enable History": "Aktivera historik"
@@ -2339,6 +2408,9 @@
   "Exponential": {
     "Exponential": "Exponentiell"
   },
+  "Expose the Arcs": {
+    "Expose the Arcs": ""
+  },
   "Expressive": {
     "Expressive": "Uttrycksfull"
   },
@@ -2380,6 +2452,9 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "Misslyckades med att lägga till skrivare i klass"
+  },
+  "Failed to apply profile": {
+    "Failed to apply profile": ""
   },
   "Failed to browse device": {
     "Failed to browse device": "Misslyckades med att bläddra på enhet"
@@ -2524,6 +2599,9 @@
   },
   "Failed to save keybind": {
     "Failed to save keybind": "Misslyckades med att spara kortkommando"
+  },
+  "Failed to save profile": {
+    "Failed to save profile": ""
   },
   "Failed to save profile file": {
     "Failed to save profile file": "Misslyckades med att spara profilfil"
@@ -2693,6 +2771,12 @@
   "Float": {
     "Float": "Flytande"
   },
+  "Fluent": {
+    "Fluent": ""
+  },
+  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+  },
   "Focus": {
     "Focus": "Fokus"
   },
@@ -2815,6 +2899,18 @@
   },
   "Found %1 packages to update:": {
     "Found %1 packages to update:": "Hittade %1 paket att uppdatera:"
+  },
+  "Frame": {
+    "Frame": ""
+  },
+  "Frame Blur": {
+    "Frame Blur": ""
+  },
+  "Frame Blur follows Background Blur in Theme & Colors": {
+    "Frame Blur follows Background Blur in Theme & Colors": ""
+  },
+  "Frame Border Color": {
+    "Frame Border Color": ""
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Frigör VRAM/minne när startaren stängs. Kan orsaka en liten fördröjning vid återöppning."
@@ -3116,6 +3212,9 @@
   "Home": {
     "Home": "Hem"
   },
+  "Horizontal and vertical bar thickness": {
+    "Horizontal and vertical bar thickness": ""
+  },
   "Host": {
     "Host": "Värd"
   },
@@ -3335,6 +3434,9 @@
   "Installing: %1": {
     "Installing: %1": "Installerar: %1"
   },
+  "Integrations": {
+    "Integrations": ""
+  },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "Intelligent auto-döljande"
   },
@@ -3484,6 +3586,9 @@
   },
   "Launcher Button Logo": {
     "Launcher Button Logo": "Appstartarknappens ikon"
+  },
+  "Launcher Emerge Side": {
+    "Launcher Emerge Side": ""
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": ""
@@ -3650,6 +3755,12 @@
   "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Hantera upp till 4 oberoende menyradskonfigurationer. Varje menyrad har sin egen position, widgetar, stil och bildskärmstilldelning."
   },
+  "Managed by Frame": {
+    "Managed by Frame": ""
+  },
+  "Managed by Frame in Connected Mode": {
+    "Managed by Frame in Connected Mode": ""
+  },
   "Management": {
     "Management": "Hantering"
   },
@@ -3695,6 +3806,9 @@
   "Matches profile: %1": {
     "Matches profile: %1": "Matchar profil: %1"
   },
+  "Material": {
+    "Material": ""
+  },
   "Material Colors": {
     "Material Colors": "Material-färger"
   },
@@ -3706,6 +3820,9 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Materialinspirerade skuggor och upphöjning på dialogrutor, popupfönster och dialoger"
+  },
+  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
   },
   "Matugen Contrast": {
     "Matugen Contrast": ""
@@ -3926,6 +4043,9 @@
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "Bildskärm vars bakgrundsbild styr dynamiska temafärger"
   },
+  "Monitors in \"%1\":": {
+    "Monitors in \"%1\":": ""
+  },
   "Monochrome": {
     "Monochrome": "Monokrom"
   },
@@ -3940,6 +4060,9 @@
   },
   "Morning": {
     "Morning": "Förmiddag"
+  },
+  "Motion Effects": {
+    "Motion Effects": ""
   },
   "Mount Points": {
     "Mount Points": "Monteringspunkter"
@@ -3991,6 +4114,9 @@
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Dämpad palett med lugnande toner."
+  },
+  "My Online": {
+    "My Online": ""
   },
   "NM not supported": {
     "NM not supported": "NM stöds inte"
@@ -4259,6 +4385,9 @@
   "No matches": {
     "No matches": "Inga träffar"
   },
+  "No matching devices": {
+    "No matching devices": ""
+  },
   "No matching processes": {
     "No matching processes": "Inga matchande processer"
   },
@@ -4276,6 +4405,9 @@
   },
   "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "Ingen pakethanterare hittades. Installera 'paru' eller 'yay' på Arch-baserade system för att söka efter uppdateringar."
+  },
+  "No peers found": {
+    "No peers found": ""
   },
   "No plugin results": {
     "No plugin results": "Inga tilläggsresultat"
@@ -4493,6 +4625,9 @@
   "Once a day": {
     "Once a day": ""
   },
+  "Online": {
+    "Online": ""
+  },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Justera bara gamma baserat på tids- eller platsregler."
   },
@@ -4516,6 +4651,9 @@
   },
   "Open App": {
     "Open App": "Öppna app"
+  },
+  "Open Frame": {
+    "Open Frame": ""
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "Öppna KDE Connect på din telefon"
@@ -4648,6 +4786,9 @@
   },
   "Overwrite": {
     "Overwrite": "Ersätt"
+  },
+  "Owner: %1": {
+    "Owner: %1": ""
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM tillhandahåller redan fingeravtrycksautentisering. Aktivera detta för att visa det vid inloggning."
@@ -5084,6 +5225,9 @@
   "Profile not found": {
     "Profile not found": "Profil hittades inte"
   },
+  "Profile not found in monitors.json": {
+    "Profile not found in monitors.json": ""
+  },
   "Profile saved: %1": {
     "Profile saved: %1": "Profil sparad: %1"
   },
@@ -5281,6 +5425,9 @@
   },
   "Resume": {
     "Resume": "Återuppta"
+  },
+  "Reveal the arcs where surfaces meet the frame": {
+    "Reveal the arcs where surfaces meet the frame": ""
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Omvänd rullningsriktning"
@@ -5489,6 +5636,9 @@
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Sök efter tangentkombination, beskrivning eller åtgärdsnamn.\n\nStandardåtgärden kopierar kortkommandot till urklipp.\nHögerklicka eller tryck på högerpil för att fästa kortkommandon – de visas överst när du inte söker."
   },
+  "Search devices...": {
+    "Search devices...": ""
+  },
   "Search for a location...": {
     "Search for a location...": "Sök efter en plats..."
   },
@@ -5653,6 +5803,9 @@
   },
   "Sending": {
     "Sending": "Skickar"
+  },
+  "Separate": {
+    "Separate": ""
   },
   "Separator": {
     "Separator": "Avskiljare"
@@ -5951,6 +6104,9 @@
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Visa droppskugga på notisbanderoller. Kräver att M3-upphöjning är aktiverat i Teman och färger."
   },
+  "Show during Niri overview": {
+    "Show during Niri overview": ""
+  },
   "Show foreground surfaces on blurred panels for stronger contrast": {
     "Show foreground surfaces on blurred panels for stronger contrast": ""
   },
@@ -6149,6 +6305,9 @@
   "Standard": {
     "Standard": "Standard"
   },
+  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+  },
   "Start": {
     "Start": "Start"
   },
@@ -6197,8 +6356,20 @@
   "Surface": {
     "Surface": "Yta"
   },
+  "Surface Behavior": {
+    "Surface Behavior": ""
+  },
+  "Surface Opacity": {
+    "Surface Opacity": ""
+  },
   "Surface Variant": {
     "Surface Variant": "Ytvariant"
+  },
+  "Surfaces emerge flush from the bar": {
+    "Surfaces emerge flush from the bar": ""
+  },
+  "Surfaces float independently of the frame": {
+    "Surfaces float independently of the frame": ""
   },
   "Suspend": {
     "Suspend": "Strömsparläge"
@@ -6305,6 +6476,18 @@
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Skift+Tab: Navigering • ←→↑↓: Rutnätsnavigering • Retur/Blanksteg: Välj"
   },
+  "Tags: %1": {
+    "Tags: %1": ""
+  },
+  "Tailscale": {
+    "Tailscale": ""
+  },
+  "Tailscale Network": {
+    "Tailscale Network": ""
+  },
+  "Tailscale not available": {
+    "Tailscale not available": ""
+  },
   "Terminal": {
     "Terminal": "Terminal"
   },
@@ -6394,6 +6577,9 @@
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "Denna bindning åsidosätts av config.kdl"
+  },
+  "This device": {
+    "This device": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Detta kan ta några sekunder"
@@ -6851,6 +7037,9 @@
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "Använd ljudtemat från systeminställningarna"
   },
+  "Use the extended surface for launcher content": {
+    "Use the extended surface for launcher content": ""
+  },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Använd samma position och storlek på alla bildskärmar"
   },
@@ -7247,6 +7436,9 @@
   "dgop not available": {
     "dgop not available": "dgop är inte tillgängligt"
   },
+  "direct": {
+    "direct": ""
+  },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms är ett mycket anpassningsbart, modernt skrivbordsskal med en <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3-inspirerad</a> design.<br /><br/>Det är byggt med <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, ett QT6-ramverk för att bygga skrivbordsskal, och <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, ett statiskt typat kompilerat programmeringsspråk."
   },
@@ -7276,6 +7468,9 @@
   },
   "featured": {
     "featured": "utvald"
+  },
+  "last seen %1": {
+    "last seen %1": ""
   },
   "leave empty for default": {
     "leave empty for default": "lämna tomt för standard"
@@ -7351,6 +7546,9 @@
   },
   "r/niri Subreddit": {
     "r/niri Subreddit": "r/niri Subreddit"
+  },
+  "relay: %1": {
+    "relay: %1": ""
   },
   "seconds": {
     "seconds": "sekunder"

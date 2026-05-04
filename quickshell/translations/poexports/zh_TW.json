@@ -51,10 +51,10 @@
     "%1 filtered": "%1 個已篩選"
   },
   "%1 h %2 m left": {
-    "%1 h %2 m left": ""
+    "%1 h %2 m left": "剩餘 %1 小時 %2 分鐘"
   },
   "%1 h left": {
-    "%1 h left": ""
+    "%1 h left": "剩餘 %1 小時"
   },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 現已包含在設定中"
@@ -66,10 +66,13 @@
     "%1 issues found": "發現 %1 個問題"
   },
   "%1 min left": {
-    "%1 min left": ""
+    "%1 min left": "剩餘 %1 分鐘"
   },
   "%1 notifications": {
     "%1 notifications": "%1 則通知"
+  },
+  "%1 online": {
+    "%1 online": ""
   },
   "%1 update": {
     "%1 update": "%1 個更新"
@@ -156,7 +159,7 @@
     "14 days": "14 天"
   },
   "15 min": {
-    "15 min": ""
+    "15 min": "15 分鐘"
   },
   "15 minutes": {
     "15 minutes": "15 分鐘"
@@ -216,7 +219,7 @@
     "30 days": "30 天"
   },
   "30 min": {
-    "30 min": ""
+    "30 min": "30 分鐘"
   },
   "30 minutes": {
     "30 minutes": "30 分鐘"
@@ -294,7 +297,7 @@
     "API": "API"
   },
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
-    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": ""
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "AUR 助手是互動式的 — 請參閱終端機視窗以獲取提示。當升級退出時，此彈出視窗將返回閒置狀態。"
   },
   "Aborted": {
     "Aborted": "已中止"
@@ -353,6 +356,9 @@
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "活動鎖定畫面監視器"
   },
+  "Active VPN": {
+    "Active VPN": ""
+  },
   "Active tile background and icon color": {
     "Active tile background and icon color": "啟用磚背景與圖示顏色"
   },
@@ -369,7 +375,7 @@
     "Adapters": "轉接器"
   },
   "Adaptive Media Width": {
-    "Adaptive Media Width": ""
+    "Adaptive Media Width": "自適應媒體寬度"
   },
   "Add": {
     "Add": "新增"
@@ -411,7 +417,7 @@
     "Adjust volume per scroll indent": "調整每滾動縮排的音量"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "調整生成顏色的對比度（-100 = 最小值，0 = 標準，100 = 最大值）"
   },
   "Advanced": {
     "Advanced": "進階"
@@ -482,6 +488,9 @@
   "Animation Speed": {
     "Animation Speed": "動畫速度"
   },
+  "Animation Style": {
+    "Animation Style": ""
+  },
   "Anonymous Identity": {
     "Anonymous Identity": "匿名身份"
   },
@@ -519,7 +528,7 @@
     "Apply Changes": "套用變更"
   },
   "Apply Flatpak updates alongside system updates when running 'Update All'.": {
-    "Apply Flatpak updates alongside system updates when running 'Update All'.": ""
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": "執行「全部更新」時，同時套用 Flatpak 更新和系統更新。"
   },
   "Apply GTK Colors": {
     "Apply GTK Colors": "套用 GTK 顏色"
@@ -527,11 +536,14 @@
   "Apply Qt Colors": {
     "Apply Qt Colors": "套用 Qt 顏色"
   },
+  "Apply compositor blur behind the frame border": {
+    "Apply compositor blur behind the frame border": ""
+  },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "應用暖色溫以減輕眼睛疲勞。使用下方的自動化設定來控制其啟動時間。"
   },
   "Applying authentication changes…": {
-    "Applying authentication changes…": ""
+    "Applying authentication changes…": "正在套用身份驗證變更…"
   },
   "Apps": {
     "Apps": "應用程式"
@@ -554,6 +566,9 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "已靜音通知彈出視窗的應用程式。解除靜音或刪除以移除。"
   },
+  "Arc Extender": {
+    "Arc Extender": ""
+  },
   "Architecture": {
     "Architecture": "架構"
   },
@@ -562,6 +577,9 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "排列顯示器並設定解析度、重新整理頻率和 VRR"
+  },
+  "At least one output must remain enabled": {
+    "At least one output must remain enabled": ""
   },
   "Attach": {
     "Attach": "附加"
@@ -618,16 +636,16 @@
     "Authentication Required": "需要驗證"
   },
   "Authentication changes applied.": {
-    "Authentication changes applied.": ""
+    "Authentication changes applied.": "身份驗證變更已套用。"
   },
   "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": ""
+    "Authentication changes apply automatically.": "身份驗證變更會自動套用。"
   },
   "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": {
-    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": ""
+    "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": "身份驗證變更會自動套用。僅限指紋登入可能無法解鎖金鑰圈。"
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
-    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "身份驗證變更需要 sudo。正在開啟終端機，以便您使用密碼或指紋。"
   },
   "Authentication error - try again": {
     "Authentication error - try again": "驗證錯誤 - 請再試一次"
@@ -690,7 +708,7 @@
     "Autoconnect enabled": "自動連線啟用"
   },
   "Autofill last remembered query when opened": {
-    "Autofill last remembered query when opened": ""
+    "Autofill last remembered query when opened": "開啟時自動填入上次記住的查詢"
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "自動顏色模式"
@@ -756,19 +774,19 @@
     "Backend": "後端"
   },
   "Backends: %1": {
-    "Backends: %1": ""
+    "Backends: %1": "後端：%1"
   },
   "Background": {
     "Background": "背景"
   },
   "Background Blur": {
-    "Background Blur": ""
+    "Background Blur": "背景模糊"
   },
   "Background Opacity": {
     "Background Opacity": "背景不透明度"
   },
   "Background authentication sync failed. Trying terminal mode.": {
-    "Background authentication sync failed. Trying terminal mode.": ""
+    "Background authentication sync failed. Trying terminal mode.": "背景身份驗證同步失敗。正在嘗試終端機模式。"
   },
   "Background image": {
     "Background image": "背景圖片"
@@ -793,6 +811,18 @@
   },
   "Bar Transparency": {
     "Bar Transparency": "欄透明度"
+  },
+  "Bar corners and background": {
+    "Bar corners and background": ""
+  },
+  "Bar shadow, border, and corners": {
+    "Bar shadow, border, and corners": ""
+  },
+  "Bar spacing and size": {
+    "Bar spacing and size": ""
+  },
+  "Bar transparency": {
+    "Bar transparency": ""
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "陰影的基礎顏色 (不透明度會自動套用)"
@@ -855,10 +885,10 @@
     "Bluetooth not available": "藍牙不可用"
   },
   "Blur Border Color": {
-    "Blur Border Color": ""
+    "Blur Border Color": "模糊邊框顏色"
   },
   "Blur Border Opacity": {
-    "Blur Border Opacity": ""
+    "Blur Border Opacity": "模糊邊框不透明度"
   },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "模糊桌布圖層"
@@ -867,7 +897,7 @@
     "Blur on Overview": "模糊概覽"
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
-    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "模糊 bar、彈出視窗、模態視窗和通知後面的背景。需要合成器支援和配置。"
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "當 niri 概覽打開時模糊桌布"
@@ -884,14 +914,20 @@
   "Border Opacity": {
     "Border Opacity": "邊框不透明度"
   },
+  "Border Radius": {
+    "Border Radius": ""
+  },
   "Border Size": {
     "Border Size": "邊框大小"
   },
   "Border Thickness": {
     "Border Thickness": "邊框厚度"
   },
+  "Border Width": {
+    "Border Width": ""
+  },
   "Border color around blurred surfaces": {
-    "Border color around blurred surfaces": ""
+    "Border color around blurred surfaces": "模糊表面周圍的邊框顏色"
   },
   "Border with BG": {
     "Border with BG": "含背景邊界"
@@ -989,11 +1025,14 @@
   "Canceled": {
     "Canceled": "已取消"
   },
+  "Cannot disable the only output": {
+    "Cannot disable the only output": ""
+  },
   "Cannot open trash: '%1' is not installed": {
-    "Cannot open trash: '%1' is not installed": ""
+    "Cannot open trash: '%1' is not installed": "無法開啟垃圾桶：未安裝「%1」"
   },
   "Cannot open trash: no custom command set": {
-    "Cannot open trash: no custom command set": ""
+    "Cannot open trash: no custom command set": "無法開啟垃圾桶：未設定自訂指令"
   },
   "Cannot pair": {
     "Cannot pair": "無法配對"
@@ -1050,13 +1089,13 @@
     "Check for system updates": "檢查系統更新"
   },
   "Check interval": {
-    "Check interval": ""
+    "Check interval": "檢查間隔"
   },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
-    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
+    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "按需檢查同步狀態。同步會將您的主題、設定和桌布配置複製到登入畫面。身份驗證變更會自動套用。"
   },
   "Check your custom command in Settings → Dock → Trash.": {
-    "Check your custom command in Settings → Dock → Trash.": ""
+    "Check your custom command in Settings → Dock → Trash.": "請在「設定」→「Dock」→「垃圾桶」中檢查您的自訂指令。"
   },
   "Checking for updates...": {
     "Checking for updates...": "正在檢查更新..."
@@ -1104,7 +1143,7 @@
     "Choose icon": "選擇圖示"
   },
   "Choose monochrome or a theme color tint for system tray icons": {
-    "Choose monochrome or a theme color tint for system tray icons": ""
+    "Choose monochrome or a theme color tint for system tray icons": "為系統匣圖示選擇單色或主題色彩色調"
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "選擇部件的背景顏色"
@@ -1362,7 +1401,7 @@
     "Configure match criteria and actions": "設定符合條件與動作"
   },
   "Configure one in Settings → Dock → Trash.": {
-    "Configure one in Settings → Dock → Trash.": ""
+    "Configure one in Settings → Dock → Trash.": "請在「設定」→「Dock」→「垃圾桶」中配置一個。"
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "設定哪些顯示器顯示 \"%1\""
@@ -1406,11 +1445,14 @@
   "Connected Displays": {
     "Connected Displays": "已連接的螢幕"
   },
+  "Connected Options": {
+    "Connected Options": ""
+  },
   "Connecting to Device": {
     "Connecting to Device": "正在連接裝置"
   },
   "Connecting to clipboard service…": {
-    "Connecting to clipboard service…": ""
+    "Connecting to clipboard service…": "正在連接到剪貼簿服務…"
   },
   "Connecting...": {
     "Connecting...": "連線中..."
@@ -1452,16 +1494,16 @@
     "Control workspaces and columns by scrolling on the bar": "透過在列上捲動來控制工作區和欄位"
   },
   "Controls how much original icon color is removed before applying tint": {
-    "Controls how much original icon color is removed before applying tint": ""
+    "Controls how much original icon color is removed before applying tint": "控制在套用色調之前移除多少原始圖示顏色"
   },
   "Controls how strongly the selected tint color is applied": {
-    "Controls how strongly the selected tint color is applied": ""
+    "Controls how strongly the selected tint color is applied": "控制選定的色調強度"
   },
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "控制所有彈出視窗、互動視窗及其內容層的透明度"
   },
   "Controls outlines around blurred foreground cards, pills, and notification cards": {
-    "Controls outlines around blurred foreground cards, pills, and notification cards": ""
+    "Controls outlines around blurred foreground cards, pills, and notification cards": "控制模糊前景卡片、藥丸狀元素和通知卡片周圍的輪廓"
   },
   "Controls shadow cast direction for elevation layers": {
     "Controls shadow cast direction for elevation layers": "控制高程層的陰影投射方向"
@@ -1470,7 +1512,7 @@
     "Controls the base blur radius and offset of shadows": "控制陰影的基本模糊半徑和偏移"
   },
   "Controls the outer edge of protocol-blurred windows": {
-    "Controls the outer edge of protocol-blurred windows": ""
+    "Controls the outer edge of protocol-blurred windows": "控制協定模糊視窗的外邊緣"
   },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "控制陰影的透明度"
@@ -1515,7 +1557,7 @@
     "Copy PID": "複製 PID"
   },
   "Copy Path": {
-    "Copy Path": ""
+    "Copy Path": "複製路徑"
   },
   "Copy Text": {
     "Copy Text": "複製文字"
@@ -1566,13 +1608,13 @@
     "Critical Priority": "關鍵優先級"
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": ""
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab：切換分頁 • Ctrl+S：釘選/取消釘選 • Shift+Del：全部清除 • Esc：關閉"
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": ""
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab：切換分頁 • Ctrl+S：釘選/取消釘選 • Shift+Enter：複製 • Shift+Del：全部清除 • Esc：關閉"
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": ""
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab：切換分頁 • Ctrl+S：釘選/取消釘選 • Shift+Enter：貼上 • Shift+Del：全部清除 • Esc：關閉"
   },
   "Current": {
     "Current": "目前"
@@ -1671,10 +1713,10 @@
     "Custom Transparency": "自訂透明度"
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
-    "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": "自訂指令和終端機參數會依據空白字元分割；路徑中帶有空格會導致問題。"
   },
   "Custom open-trash command": {
-    "Custom open-trash command": ""
+    "Custom open-trash command": "自訂開啟垃圾桶指令"
   },
   "Custom power profile": {
     "Custom power profile": "自訂電源設定檔"
@@ -1683,7 +1725,7 @@
     "Custom theme loaded from JSON file": "從 JSON 檔案載入自訂主題"
   },
   "Custom update command": {
-    "Custom update command": ""
+    "Custom update command": "自訂更新指令"
   },
   "Custom...": {
     "Custom...": "自訂..."
@@ -1710,7 +1752,7 @@
     "DMS Shortcuts": "DMS 捷徑"
   },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
-    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+    "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": "DMS 歡迎介面需要：greetd, dms-greeter。指紋：fprintd, pam_fprintd。安全金鑰：pam_u2f。將您的使用者加入 greeter 群組。身份驗證變更會自動套用，當需要 sudo 身份驗證時可能會開啟終端機。"
   },
   "DMS out of date": {
     "DMS out of date": "DMS 已過期"
@@ -1841,6 +1883,12 @@
   "Dependencies & documentation": {
     "Dependencies & documentation": "依賴項與文件"
   },
+  "Depth": {
+    "Depth": ""
+  },
+  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "提取與底層圖像高度匹配的顏色。"
   },
@@ -1872,7 +1920,7 @@
     "Details for \"%1\"": "「%1」的詳細資訊"
   },
   "Detected backends: %1": {
-    "Detected backends: %1": ""
+    "Detected backends: %1": "偵測到的後端：%1"
   },
   "Development": {
     "Development": "開發"
@@ -1897,6 +1945,12 @@
   },
   "Direction Source": {
     "Direction Source": "方向來源"
+  },
+  "Directional": {
+    "Directional": ""
+  },
+  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "關閉自動連線"
@@ -2042,6 +2096,9 @@
   "Dock Visibility": {
     "Dock Visibility": "Dock 可見性"
   },
+  "Dock spacing, transparency, and border": {
+    "Dock spacing, transparency, and border": ""
+  },
   "Docs": {
     "Docs": "文件"
   },
@@ -2071,6 +2128,9 @@
   },
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "拖曳工作區指示器以重新排序"
+  },
+  "Draw a connected picture-frame border around the entire display": {
+    "Draw a connected picture-frame border around the entire display": ""
   },
   "Driver": {
     "Driver": "驅動程式"
@@ -2111,8 +2171,14 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "動態顏色、預設集"
   },
+  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+  },
   "Edge Spacing": {
     "Edge Spacing": "邊緣間距"
+  },
+  "Edge the launcher slides from": {
+    "Edge the launcher slides from": ""
   },
   "Edit App": {
     "Edit App": "編輯應用程式"
@@ -2127,13 +2193,13 @@
     "Empty": "空白"
   },
   "Empty Trash": {
-    "Empty Trash": ""
+    "Empty Trash": "清空垃圾桶"
   },
   "Empty Trash (%1)": {
-    "Empty Trash (%1)": ""
+    "Empty Trash (%1)": "清空垃圾桶 (%1)"
   },
   "Empty Trash?": {
-    "Empty Trash?": ""
+    "Empty Trash?": "清空垃圾桶？"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "啟用 10 位元色彩深度以獲得更寬廣的色域和 HDR 支援"
@@ -2146,6 +2212,9 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "啟用勿擾模式"
+  },
+  "Enable Frame": {
+    "Enable Frame": ""
   },
   "Enable History": {
     "Enable History": "啟用歷史記錄"
@@ -2181,7 +2250,7 @@
     "Enable fingerprint authentication": "啟用指紋驗證"
   },
   "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
+    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": "為 DMS 歡迎介面啟用指紋或安全金鑰。身份驗證變更會自動套用。"
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "啟用 loginctl 鎖定整合"
@@ -2202,13 +2271,13 @@
     "Enabled, but no fingerprint reader was detected.": "已啟用，但未偵測到指紋讀取器。"
   },
   "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": {
-    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": ""
+    "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.": "已啟用，但尚未註冊指紋。一旦您註冊指紋，身份驗證變更會自動套用。"
   },
   "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": {
     "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.": "已啟用，但尚未註冊指紋。請註冊指紋並執行同步。"
   },
   "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": {
-    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": ""
+    "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.": "已啟用，但尚未找到已註冊的安全金鑰。一旦您的金鑰註冊或 U2F 配置更新，身份驗證變更會自動套用。"
   },
   "Enabled, but no registered security key was found yet. Register a key and run Sync.": {
     "Enabled, but no registered security key was found yet. Register a key and run Sync.": "已啟用，但尚未找到已註冊的安全金鑰。請註冊金鑰並執行同步。"
@@ -2313,16 +2382,16 @@
     "Ethernet": "乙太網路"
   },
   "Every 15 minutes": {
-    "Every 15 minutes": ""
+    "Every 15 minutes": "每 15 分鐘"
   },
   "Every 30 minutes": {
-    "Every 30 minutes": ""
+    "Every 30 minutes": "每30分鐘"
   },
   "Every 4 hours": {
-    "Every 4 hours": ""
+    "Every 4 hours": "每4小時"
   },
   "Every hour": {
-    "Every hour": ""
+    "Every hour": "每小時"
   },
   "Exact": {
     "Exact": "精確"
@@ -2338,6 +2407,9 @@
   },
   "Exponential": {
     "Exponential": "指數"
+  },
+  "Expose the Arcs": {
+    "Expose the Arcs": ""
   },
   "Expressive": {
     "Expressive": "生動"
@@ -2380,6 +2452,9 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "無法將印表機新增至類別"
+  },
+  "Failed to apply profile": {
+    "Failed to apply profile": ""
   },
   "Failed to browse device": {
     "Failed to browse device": "無法瀏覽裝置"
@@ -2436,7 +2511,7 @@
     "Failed to disconnect WiFi": "無法斷開 WiFi"
   },
   "Failed to empty trash": {
-    "Failed to empty trash": ""
+    "Failed to empty trash": "清空垃圾桶失敗"
   },
   "Failed to enable IP location": {
     "Failed to enable IP location": "無法啟用 IP 位置"
@@ -2469,7 +2544,7 @@
     "Failed to move job": "無法移動工作"
   },
   "Failed to move to trash": {
-    "Failed to move to trash": ""
+    "Failed to move to trash": "移動到垃圾桶失敗"
   },
   "Failed to parse plugin_settings.json": {
     "Failed to parse plugin_settings.json": "無法解析 plugin_settings.json"
@@ -2524,6 +2599,9 @@
   },
   "Failed to save keybind": {
     "Failed to save keybind": "保存按鍵綁定失敗"
+  },
+  "Failed to save profile": {
+    "Failed to save profile": ""
   },
   "Failed to save profile file": {
     "Failed to save profile file": "無法儲存設定檔"
@@ -2586,7 +2664,7 @@
     "Failed to write temp file for validation": "寫入驗證的暫存檔案失敗"
   },
   "Failed: %1": {
-    "Failed: %1": ""
+    "Failed: %1": "失敗：%1"
   },
   "Features": {
     "Features": "功能"
@@ -2616,7 +2694,7 @@
     "File Information": "檔案資訊"
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
-    "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
+    "File manager used to open the trash. Pick \"custom\" to enter your own command.": "檔案管理器用於開啟垃圾桶。選擇「自訂」以輸入您自己的指令。"
   },
   "File received from": {
     "File received from": "檔案接收自"
@@ -2643,13 +2721,13 @@
     "Fingerprint availability could not be confirmed.": "無法確認指紋可用性。"
   },
   "Fingerprint error": {
-    "Fingerprint error": ""
+    "Fingerprint error": "指紋錯誤"
   },
   "Fingerprint error: %1": {
-    "Fingerprint error: %1": ""
+    "Fingerprint error: %1": "指紋錯誤：%1"
   },
   "Fingerprint not recognized (%1/%2). Please try again or use password.": {
-    "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": "指紋無法識別 (%1/%2)。請再試一次或使用密碼。"
   },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
     "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "已偵測到指紋讀取器，但尚未註冊指紋。您可以現在啟用並稍後註冊。"
@@ -2693,6 +2771,12 @@
   "Float": {
     "Float": "浮動"
   },
+  "Fluent": {
+    "Fluent": ""
+  },
+  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+  },
   "Focus": {
     "Focus": "聚焦"
   },
@@ -2724,7 +2808,7 @@
     "Folders": "資料夾"
   },
   "Follow DMS background color": {
-    "Follow DMS background color": ""
+    "Follow DMS background color": "遵循 DMS 背景顏色"
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "跟隨螢幕焦點"
@@ -2751,19 +2835,19 @@
     "Font used on the login screen": "登入畫面使用的字體"
   },
   "For 1 hour": {
-    "For 1 hour": ""
+    "For 1 hour": "1小時"
   },
   "For 15 minutes": {
-    "For 15 minutes": ""
+    "For 15 minutes": "15分鐘"
   },
   "For 3 hours": {
-    "For 3 hours": ""
+    "For 3 hours": "3小時"
   },
   "For 30 minutes": {
-    "For 30 minutes": ""
+    "For 30 minutes": "30分鐘"
   },
   "For 8 hours": {
-    "For 8 hours": ""
+    "For 8 hours": "8小時"
   },
   "Force HDR": {
     "Force HDR": "強制 HDR"
@@ -2787,7 +2871,7 @@
     "Forecast Not Available": "預報不可用"
   },
   "Foreground Layers": {
-    "Foreground Layers": ""
+    "Foreground Layers": "前景圖層"
   },
   "Forever": {
     "Forever": "永遠"
@@ -2815,6 +2899,18 @@
   },
   "Found %1 packages to update:": {
     "Found %1 packages to update:": "找到 %1 個待更新套件："
+  },
+  "Frame": {
+    "Frame": ""
+  },
+  "Frame Blur": {
+    "Frame Blur": ""
+  },
+  "Frame Blur follows Background Blur in Theme & Colors": {
+    "Frame Blur follows Background Blur in Theme & Colors": ""
+  },
+  "Frame Border Color": {
+    "Frame Border Color": ""
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "啟動器關閉時釋放 VRAM/記憶體。重新打開時可能會造成輕微延遲。"
@@ -3116,6 +3212,9 @@
   "Home": {
     "Home": "家"
   },
+  "Horizontal and vertical bar thickness": {
+    "Horizontal and vertical bar thickness": ""
+  },
   "Host": {
     "Host": "主機"
   },
@@ -3138,7 +3237,7 @@
     "Hourly Forecast Count": "每小時預報數量"
   },
   "How often the server polls for new updates.": {
-    "How often the server polls for new updates.": ""
+    "How often the server polls for new updates.": "伺服器輪詢新更新的頻率。"
   },
   "How often to change wallpaper": {
     "How often to change wallpaper": "多久更換一次桌布"
@@ -3225,16 +3324,16 @@
     "Inactive Monitor Color": "非活動監視器顏色"
   },
   "Include AUR updates": {
-    "Include AUR updates": ""
+    "Include AUR updates": "包括AUR更新"
   },
   "Include Files in All Tab": {
-    "Include Files in All Tab": ""
+    "Include Files in All Tab": "在「所有」分頁中包含檔案"
   },
   "Include Flatpak updates": {
-    "Include Flatpak updates": ""
+    "Include Flatpak updates": "包括Flatpak更新"
   },
   "Include Folders in All Tab": {
-    "Include Folders in All Tab": ""
+    "Include Folders in All Tab": "在「所有」分頁中包含資料夾"
   },
   "Include Transitions": {
     "Include Transitions": "包括過渡"
@@ -3255,7 +3354,7 @@
     "Incorrect password - next failures may trigger account lockout": "密碼不正確 - 接下來的失敗可能會觸發帳戶鎖定"
   },
   "Incorrect password - try again": {
-    "Incorrect password - try again": ""
+    "Incorrect password - try again": "密碼不正確 - 請再試一次"
   },
   "Indicator Style": {
     "Indicator Style": "指示樣式"
@@ -3285,7 +3384,7 @@
     "Input Volume Slider": "輸入音量滑桿"
   },
   "Insert your security key...": {
-    "Insert your security key...": ""
+    "Insert your security key...": "插入您的安全金鑰..."
   },
   "Install": {
     "Install": "安裝"
@@ -3334,6 +3433,9 @@
   },
   "Installing: %1": {
     "Installing: %1": "正在安裝：%1"
+  },
+  "Integrations": {
+    "Integrations": ""
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "智慧型自動隱藏"
@@ -3474,7 +3576,7 @@
     "Launch on dGPU": "在 dGPU 上啟動"
   },
   "Launch on dGPU by default": {
-    "Launch on dGPU by default": ""
+    "Launch on dGPU by default": "預設在獨顯上啟動"
   },
   "Launcher": {
     "Launcher": "啟動器"
@@ -3485,8 +3587,11 @@
   "Launcher Button Logo": {
     "Launcher Button Logo": "啟動器按鈕 Logo"
   },
+  "Launcher Emerge Side": {
+    "Launcher Emerge Side": ""
+  },
   "Layer Outline Opacity": {
-    "Layer Outline Opacity": ""
+    "Layer Outline Opacity": "圖層輪廓不透明度"
   },
   "Layout": {
     "Layout": "佈局"
@@ -3603,7 +3708,7 @@
     "Lock fade grace period": "鎖定淡出緩衝期"
   },
   "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
-    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
+    "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": "鎖定畫面身份驗證變更會自動套用，當需要 sudo 身份驗證時可能會開啟終端機。"
   },
   "Locked": {
     "Locked": "已鎖定"
@@ -3615,7 +3720,7 @@
     "Logging in...": "正在登入..."
   },
   "Login": {
-    "Login": ""
+    "Login": "登入"
   },
   "Login Authentication": {
     "Login Authentication": "登入驗證"
@@ -3649,6 +3754,12 @@
   },
   "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "管理最多 4 個獨立的欄設定。每個欄都有自己的位置、小工具、樣式和顯示分配。"
+  },
+  "Managed by Frame": {
+    "Managed by Frame": ""
+  },
+  "Managed by Frame in Connected Mode": {
+    "Managed by Frame in Connected Mode": ""
   },
   "Management": {
     "Management": "管理"
@@ -3695,6 +3806,9 @@
   "Matches profile: %1": {
     "Matches profile: %1": "符合設定檔：%1"
   },
+  "Material": {
+    "Material": ""
+  },
   "Material Colors": {
     "Material Colors": "手動調整顏色"
   },
@@ -3707,8 +3821,11 @@
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "受 Material Design 啟發的陰影和抬升效果，應用於模態框、彈出視窗和對話框"
   },
+  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
+  },
   "Matugen Contrast": {
-    "Matugen Contrast": ""
+    "Matugen Contrast": "Matugen 對比度"
   },
   "Matugen Missing": {
     "Matugen Missing": "Matugen 遺失"
@@ -3774,7 +3891,7 @@
     "Maximum Pinned Entries": "最大釘選項目數量"
   },
   "Maximum fingerprint attempts reached. Please use password.": {
-    "Maximum fingerprint attempts reached. Please use password.": ""
+    "Maximum fingerprint attempts reached. Please use password.": "指紋嘗試次數達到上限。請使用密碼。"
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "剪貼簿項目保留數量上限"
@@ -3843,10 +3960,10 @@
     "Memory usage indicator": "記憶體使用率指示器"
   },
   "Merge indexed file results into the All tab (requires dsearch).": {
-    "Merge indexed file results into the All tab (requires dsearch).": ""
+    "Merge indexed file results into the All tab (requires dsearch).": "將索引檔案結果合併到「所有」分頁中（需要 dsearch）。"
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
-    "Merge indexed folder results into the All tab (requires dsearch).": ""
+    "Merge indexed folder results into the All tab (requires dsearch).": "將索引資料夾結果合併到「所有」分頁中（需要 dsearch）。"
   },
   "Message": {
     "Message": "訊息"
@@ -3926,6 +4043,9 @@
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "系統介面顏色依據哪一個螢幕上的桌布來決定"
   },
+  "Monitors in \"%1\":": {
+    "Monitors in \"%1\":": ""
+  },
   "Monochrome": {
     "Monochrome": "單色"
   },
@@ -3940,6 +4060,9 @@
   },
   "Morning": {
     "Morning": "早上"
+  },
+  "Motion Effects": {
+    "Motion Effects": ""
   },
   "Mount Points": {
     "Mount Points": "掛載點"
@@ -3957,7 +4080,7 @@
     "Move Widget": "移動小工具"
   },
   "Move to Trash": {
-    "Move to Trash": ""
+    "Move to Trash": "移至垃圾桶"
   },
   "Moving to Paused": {
     "Moving to Paused": "正在移至暫停"
@@ -3991,6 +4114,9 @@
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "柔和的調色板，柔和、平靜的色調。"
+  },
+  "My Online": {
+    "My Online": ""
   },
   "NM not supported": {
     "NM not supported": "NM 不支援"
@@ -4259,6 +4385,9 @@
   "No matches": {
     "No matches": "不匹配"
   },
+  "No matching devices": {
+    "No matching devices": ""
+  },
   "No matching processes": {
     "No matching processes": "無符合的處理程序"
   },
@@ -4276,6 +4405,9 @@
   },
   "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "未找到套件管理器。請在基於 Arch 的系統上安裝 'paru' 或 'yay' 來檢查更新。"
+  },
+  "No peers found": {
+    "No peers found": ""
   },
   "No plugin results": {
     "No plugin results": "沒有外掛程式結果"
@@ -4314,10 +4446,10 @@
     "No status output.": "無狀態輸出。"
   },
   "No supported package manager found.": {
-    "No supported package manager found.": ""
+    "No supported package manager found.": "找不到支援的套件管理器。"
   },
   "No terminal configured": {
-    "No terminal configured": ""
+    "No terminal configured": "未配置終端機"
   },
   "No themes found": {
     "No themes found": "找不到任何主題"
@@ -4479,7 +4611,7 @@
     "On": "開啟"
   },
   "On indefinitely": {
-    "On indefinitely": ""
+    "On indefinitely": "無限期"
   },
   "On-Demand": {
     "On-Demand": "按需"
@@ -4491,7 +4623,10 @@
     "On-screen Displays": "螢幕顯示"
   },
   "Once a day": {
-    "Once a day": ""
+    "Once a day": "每天一次"
+  },
+  "Online": {
+    "Online": ""
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "僅根據時間或位置規則調整 gamma。"
@@ -4517,6 +4652,9 @@
   "Open App": {
     "Open App": "開啟應用程式"
   },
+  "Open Frame": {
+    "Open Frame": ""
+  },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "在您的手機上開啟 KDE Connect"
   },
@@ -4524,16 +4662,16 @@
     "Open Notepad File": "打開筆記文件"
   },
   "Open Trash": {
-    "Open Trash": ""
+    "Open Trash": "開啟垃圾桶"
   },
   "Open Trash With": {
-    "Open Trash With": ""
+    "Open Trash With": "使用...開啟垃圾桶"
   },
   "Open a new note": {
     "Open a new note": "開啟新筆記"
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
-    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "開啟終端機並運行自訂指令，而不是在殼層中升級。"
   },
   "Open folder": {
     "Open folder": "開啟資料夾"
@@ -4649,6 +4787,9 @@
   "Overwrite": {
     "Overwrite": "覆寫"
   },
+  "Owner: %1": {
+    "Owner: %1": ""
+  },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM 已提供指紋驗證。啟用此選項以在登入時顯示。"
   },
@@ -4758,7 +4899,7 @@
     "Performance": "效能"
   },
   "Permanently delete %1 item(s)? This cannot be undone.": {
-    "Permanently delete %1 item(s)? This cannot be undone.": ""
+    "Permanently delete %1 item(s)? This cannot be undone.": "永久刪除 %1 個項目？此操作無法撤銷。"
   },
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "權限不足，無法設定個人資料圖片。"
@@ -4776,16 +4917,16 @@
     "Phone number": "電話號碼"
   },
   "Pick a different file manager in Settings → Dock → Trash.": {
-    "Pick a different file manager in Settings → Dock → Trash.": ""
+    "Pick a different file manager in Settings → Dock → Trash.": "請在「設定」→「Dock」→「垃圾桶」中選擇不同的檔案管理器。"
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "每次從同一個資料夾中選擇一個不同的隨機影片"
   },
   "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": ""
+    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "請在「設定」→「啟動器」中選擇終端機（或設定 $TERMINAL）。"
   },
   "Pick how long to pause notifications": {
-    "Pick how long to pause notifications": ""
+    "Pick how long to pause notifications": "選擇暫停通知的時間長度"
   },
   "Pictures": {
     "Pictures": "圖片"
@@ -4815,7 +4956,7 @@
     "Pixelate": "馬賽克"
   },
   "Place a trash bin at the end of the dock": {
-    "Place a trash bin at the end of the dock": ""
+    "Place a trash bin at the end of the dock": "在 Dock 結尾處放置垃圾桶"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "將插件資料夾放在這裡。每個插件都應該有一個 plugin.json 清單檔案。"
@@ -4827,7 +4968,7 @@
     "Play a video when the screen locks.": "螢幕鎖定時播放影片。"
   },
   "Play sound after logging in": {
-    "Play sound after logging in": ""
+    "Play sound after logging in": "登入後播放聲音"
   },
   "Play sound when new notification arrives": {
     "Play sound when new notification arrives": "收到新通知時播放音效"
@@ -5084,6 +5225,9 @@
   "Profile not found": {
     "Profile not found": "找不到設定檔"
   },
+  "Profile not found in monitors.json": {
+    "Profile not found in monitors.json": ""
+  },
   "Profile saved: %1": {
     "Profile saved: %1": "設定檔已儲存：%1"
   },
@@ -5181,7 +5325,7 @@
     "Remaining / Total": "剩餘 / 總計"
   },
   "Remember Last Query": {
-    "Remember Last Query": ""
+    "Remember Last Query": "記住上次查詢"
   },
   "Remember last session": {
     "Remember last session": "記住上次會話"
@@ -5235,13 +5379,13 @@
     "Requires DMS %1": "需要 DMS %1"
   },
   "Requires DMS server with sysupdate capability": {
-    "Requires DMS server with sysupdate capability": ""
+    "Requires DMS server with sysupdate capability": "需要具有 sysupdate 功能的 DMS 伺服器"
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "需要 DWL 混成器"
   },
   "Requires a newer version of Quickshell": {
-    "Requires a newer version of Quickshell": ""
+    "Requires a newer version of Quickshell": "需要較新版本的 Quickshell"
   },
   "Requires night mode support": {
     "Requires night mode support": "需要夜間模式支援"
@@ -5281,6 +5425,9 @@
   },
   "Resume": {
     "Resume": "恢復"
+  },
+  "Reveal the arcs where surfaces meet the frame": {
+    "Reveal the arcs where surfaces meet the frame": ""
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "反轉捲動方向"
@@ -5358,7 +5505,7 @@
     "Run a shell command (e.g., notify-send)": "執行 shell 指令 (例如，notify-send)"
   },
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
-    "Run paru/yay with AUR enabled when 'Update All' is clicked.": ""
+    "Run paru/yay with AUR enabled when 'Update All' is clicked.": "點擊「全部更新」時，啟用 AUR 運行 paru/yay。"
   },
   "Running Apps": {
     "Running Apps": "正在運行的應用程式"
@@ -5370,7 +5517,7 @@
     "Running greeter sync…": "正在同步歡迎畫面…"
   },
   "Running in terminal": {
-    "Running in terminal": ""
+    "Running in terminal": "在終端機中運行"
   },
   "SDR Brightness": {
     "SDR Brightness": "SDR 亮度"
@@ -5488,6 +5635,9 @@
   },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "按組合鍵、描述或動作名稱搜尋。\n\n預設動作將綁定鍵複製到剪貼簿。\n右鍵點擊或按右箭頭以釘選常用綁定鍵 — 搜尋時它們將出現在頂部。"
+  },
+  "Search devices...": {
+    "Search devices...": ""
   },
   "Search for a location...": {
     "Search for a location...": "搜尋位置..."
@@ -5653,6 +5803,9 @@
   },
   "Sending": {
     "Sending": "傳送中"
+  },
+  "Separate": {
+    "Separate": ""
   },
   "Separator": {
     "Separator": "分隔符"
@@ -5913,7 +6066,7 @@
     "Show Top Processes": "顯示最佔用程序"
   },
   "Show Trash in Dock": {
-    "Show Trash in Dock": ""
+    "Show Trash in Dock": "在 Dock 中顯示垃圾桶"
   },
   "Show Weather Condition": {
     "Show Weather Condition": "顯示天氣狀況"
@@ -5951,8 +6104,11 @@
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "在通知彈出視窗上顯示陰影。需要在主題和顏色中啟用 M3 抬升。"
   },
+  "Show during Niri overview": {
+    "Show during Niri overview": ""
+  },
   "Show foreground surfaces on blurred panels for stronger contrast": {
-    "Show foreground surfaces on blurred panels for stronger contrast": ""
+    "Show foreground surfaces on blurred panels for stronger contrast": "在模糊面板上顯示前景表面以增強對比度"
   },
   "Show in GB": {
     "Show in GB": "以 GB 顯示"
@@ -6045,7 +6201,7 @@
     "Shows when microphone, camera, or screen sharing is active": "顯示麥克風、攝影機或螢幕共用處於活動狀態"
   },
   "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
-    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": ""
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "縮小媒體小部件以適應較短的歌曲標題，同時仍尊重配置的最大尺寸"
   },
   "Shutdown": {
     "Shutdown": "關機"
@@ -6057,10 +6213,10 @@
     "Signal:": "訊號："
   },
   "Silence for a while": {
-    "Silence for a while": ""
+    "Silence for a while": "靜音一會兒"
   },
   "Silence notifications": {
-    "Silence notifications": ""
+    "Silence notifications": "靜音通知"
   },
   "Size": {
     "Size": "大小"
@@ -6149,6 +6305,9 @@
   "Standard": {
     "Standard": "標準"
   },
+  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+  },
   "Start": {
     "Start": "開始"
   },
@@ -6197,8 +6356,20 @@
   "Surface": {
     "Surface": "表面"
   },
+  "Surface Behavior": {
+    "Surface Behavior": ""
+  },
+  "Surface Opacity": {
+    "Surface Opacity": ""
+  },
   "Surface Variant": {
     "Surface Variant": "表面變化"
+  },
+  "Surfaces emerge flush from the bar": {
+    "Surfaces emerge flush from the bar": ""
+  },
+  "Surfaces float independently of the frame": {
+    "Surfaces float independently of the frame": ""
   },
   "Suspend": {
     "Suspend": "睡眠"
@@ -6273,7 +6444,7 @@
     "System Tray": "系統匣"
   },
   "System Tray Icon Tint": {
-    "System Tray Icon Tint": ""
+    "System Tray Icon Tint": "系統匣圖示著色"
   },
   "System Update": {
     "System Update": "系統更新"
@@ -6305,23 +6476,35 @@
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: 切換焦點 • ←→↑↓: 切換焦點 • Enter/Space: 選擇"
   },
+  "Tags: %1": {
+    "Tags: %1": ""
+  },
+  "Tailscale": {
+    "Tailscale": ""
+  },
+  "Tailscale Network": {
+    "Tailscale Network": ""
+  },
+  "Tailscale not available": {
+    "Tailscale not available": ""
+  },
   "Terminal": {
     "Terminal": "終端機"
   },
   "Terminal additional parameters": {
-    "Terminal additional parameters": ""
+    "Terminal additional parameters": "終端機額外參數"
   },
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "自訂終端附加參數"
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "終端機備用失敗。請安裝支援的終端機模擬器或手動執行 'dms auth sync'。"
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "終端機回退失敗。請安裝受支援的終端模擬器之一，或手動執行 'dms greeter sync'。"
   },
   "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": {
-    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": ""
+    "Terminal fallback opened. Complete authentication setup there; it will close automatically when done.": "終端機備用已開啟。請在那裡完成身份驗證設定；完成後它會自動關閉。"
   },
   "Terminal fallback opened. Complete sync there; it will close automatically when done.": {
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": "終端機回退已開啟。請在那裡完成同步；完成後它將自動關閉。"
@@ -6330,7 +6513,7 @@
     "Terminal multiplexer backend to use": "要使用的終端多工器後端"
   },
   "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
-    "Terminal opened. Complete authentication setup there; it will close automatically when done.": ""
+    "Terminal opened. Complete authentication setup there; it will close automatically when done.": "終端機已開啟。請在那裡完成身份驗證設定；完成後它會自動關閉。"
   },
   "Terminal opened. Complete sync authentication there; it will close automatically when done.": {
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": "終端機已開啟。請在那裡完成同步驗證；完成後它將自動關閉。"
@@ -6394,6 +6577,9 @@
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "此綁定已被 config.kdl 覆蓋"
+  },
+  "This device": {
+    "This device": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "這可能需要幾秒鐘"
@@ -6471,10 +6657,10 @@
     "Timeout for normal priority notifications": "正常優先級通知的超時"
   },
   "Tint Saturation": {
-    "Tint Saturation": ""
+    "Tint Saturation": "著色飽和度"
   },
   "Tint Strength": {
-    "Tint Strength": ""
+    "Tint Strength": "著色強度"
   },
   "Title": {
     "Title": "標題"
@@ -6516,7 +6702,7 @@
     "Toner Low": "碳粉不足"
   },
   "Too many attempts - locked out": {
-    "Too many attempts - locked out": ""
+    "Too many attempts - locked out": "嘗試次數過多 - 已鎖定"
   },
   "Too many failed attempts - account may be locked": {
     "Too many failed attempts - account may be locked": "嘗試失敗次數過多 - 帳戶可能已鎖定"
@@ -6555,7 +6741,7 @@
     "Total Jobs": "總工作數"
   },
   "Touch your security key...": {
-    "Touch your security key...": ""
+    "Touch your security key...": "輕觸您的安全金鑰..."
   },
   "Transform": {
     "Transform": "變形"
@@ -6567,10 +6753,10 @@
     "Transparency": "透明度"
   },
   "Trash": {
-    "Trash": ""
+    "Trash": "垃圾桶"
   },
   "Trash command failed (exit %1)": {
-    "Trash command failed (exit %1)": ""
+    "Trash command failed (exit %1)": "垃圾桶指令失敗（返回碼 %1）"
   },
   "Trending GIFs": {
     "Trending GIFs": "熱門 GIF"
@@ -6594,10 +6780,10 @@
     "Try a different search": "嘗試不同的搜尋"
   },
   "Turn off": {
-    "Turn off": ""
+    "Turn off": "關閉"
   },
   "Turn off Do Not Disturb": {
-    "Turn off Do Not Disturb": ""
+    "Turn off Do Not Disturb": "關閉勿擾模式"
   },
   "Turn off all displays immediately when the lock screen activates": {
     "Turn off all displays immediately when the lock screen activates": "鎖定螢幕啟用時立即關閉所有顯示器"
@@ -6606,10 +6792,10 @@
     "Turn off monitors after": "指定時間後關閉螢幕"
   },
   "Turn off monitors after lock": {
-    "Turn off monitors after lock": ""
+    "Turn off monitors after lock": "鎖定後關閉螢幕"
   },
   "Turn off now": {
-    "Turn off now": ""
+    "Turn off now": "立即關閉"
   },
   "Type": {
     "Type": "類型"
@@ -6726,16 +6912,16 @@
     "Unsaved note...": "未儲存筆記..."
   },
   "Until %1": {
-    "Until %1": ""
+    "Until %1": "直到 %1"
   },
   "Until 8 AM": {
-    "Until 8 AM": ""
+    "Until 8 AM": "直到早上8點"
   },
   "Until I turn it off": {
-    "Until I turn it off": ""
+    "Until I turn it off": "直到我關閉它"
   },
   "Until tomorrow, 8:00 AM": {
-    "Until tomorrow, 8:00 AM": ""
+    "Until tomorrow, 8:00 AM": "直到明天早上8:00"
   },
   "Untitled": {
     "Untitled": "無標題"
@@ -6756,7 +6942,7 @@
     "Update Plugin": "更新插件"
   },
   "Upgrading...": {
-    "Upgrading...": ""
+    "Upgrading...": "正在升級..."
   },
   "Uptime": {
     "Uptime": "開機時間"
@@ -6789,7 +6975,7 @@
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "使用英制單位（°F, mph, inHg）而非公制單位（°C, km/h, hPa）"
   },
   "Use Inline Expansion": {
-    "Use Inline Expansion": ""
+    "Use Inline Expansion": "使用行內展開"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "使用等寬字體"
@@ -6819,7 +7005,7 @@
     "Use custom border/focus-ring width": "使用自訂邊框/焦點環寬度"
   },
   "Use custom command": {
-    "Use custom command": ""
+    "Use custom command": "使用自訂指令"
   },
   "Use custom command for update your system": {
     "Use custom command for update your system": "使用自訂指令更新您的系統"
@@ -6850,6 +7036,9 @@
   },
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "使用系統設定中的音效主題"
+  },
+  "Use the extended surface for launcher content": {
+    "Use the extended surface for launcher content": ""
   },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "在所有螢幕上使用相同的位置與大小"
@@ -7247,6 +7436,9 @@
   "dgop not available": {
     "dgop not available": "dgop 無法使用"
   },
+  "direct": {
+    "direct": ""
+  },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms 是一個高度可自訂的現代桌面外殼，其設計<a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">靈感來自 material 3</a>。<br /><br/>它使用 <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>（一個用於構建桌面外殼的 QT6 框架）和 <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>（一種靜態類型、編譯式程式語言）構建。"
   },
@@ -7276,6 +7468,9 @@
   },
   "featured": {
     "featured": "精選"
+  },
+  "last seen %1": {
+    "last seen %1": ""
   },
   "leave empty for default": {
     "leave empty for default": "留空以使用預設值"
@@ -7352,6 +7547,9 @@
   "r/niri Subreddit": {
     "r/niri Subreddit": "r/niri Subreddit"
   },
+  "relay: %1": {
+    "relay: %1": ""
+  },
   "seconds": {
     "seconds": "秒"
   },
@@ -7362,7 +7560,7 @@
     "this app": "此應用程式"
   },
   "until %1": {
-    "until %1": ""
+    "until %1": "直到 %1"
   },
   "up": {
     "up": "向上"

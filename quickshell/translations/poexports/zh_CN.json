@@ -71,6 +71,9 @@
   "%1 notifications": {
     "%1 notifications": "%1条通知"
   },
+  "%1 online": {
+    "%1 online": ""
+  },
   "%1 update": {
     "%1 update": "%1个更新"
   },
@@ -353,6 +356,9 @@
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "活动锁屏显示器"
   },
+  "Active VPN": {
+    "Active VPN": ""
+  },
   "Active tile background and icon color": {
     "Active tile background and icon color": "激活平铺背景与图标颜色"
   },
@@ -482,6 +488,9 @@
   "Animation Speed": {
     "Animation Speed": "动画速度"
   },
+  "Animation Style": {
+    "Animation Style": ""
+  },
   "Anonymous Identity": {
     "Anonymous Identity": "匿名身份"
   },
@@ -527,6 +536,9 @@
   "Apply Qt Colors": {
     "Apply Qt Colors": "应用 Qt 配色"
   },
+  "Apply compositor blur behind the frame border": {
+    "Apply compositor blur behind the frame border": ""
+  },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "应用暖色温以减轻眼睛疲劳，可通过下方设置配置按时间自动启用。"
   },
@@ -554,6 +566,9 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "已静音通知弹窗的应用。请取消静音或删除以移除。"
   },
+  "Arc Extender": {
+    "Arc Extender": ""
+  },
   "Architecture": {
     "Architecture": "架构"
   },
@@ -562,6 +577,9 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "排列显示器、配置分辨率、刷新率和VRR"
+  },
+  "At least one output must remain enabled": {
+    "At least one output must remain enabled": ""
   },
   "Attach": {
     "Attach": "标记"
@@ -794,6 +812,18 @@
   "Bar Transparency": {
     "Bar Transparency": "状态栏透明度"
   },
+  "Bar corners and background": {
+    "Bar corners and background": ""
+  },
+  "Bar shadow, border, and corners": {
+    "Bar shadow, border, and corners": ""
+  },
+  "Bar spacing and size": {
+    "Bar spacing and size": ""
+  },
+  "Bar transparency": {
+    "Bar transparency": ""
+  },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "阴影基础颜色（不透明度会自动应用）"
   },
@@ -884,11 +914,17 @@
   "Border Opacity": {
     "Border Opacity": "边框透明度"
   },
+  "Border Radius": {
+    "Border Radius": ""
+  },
   "Border Size": {
     "Border Size": "边框宽度"
   },
   "Border Thickness": {
     "Border Thickness": "边框厚度"
+  },
+  "Border Width": {
+    "Border Width": ""
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": "模糊表面周围的边框颜色"
@@ -988,6 +1024,9 @@
   },
   "Canceled": {
     "Canceled": "已取消"
+  },
+  "Cannot disable the only output": {
+    "Cannot disable the only output": ""
   },
   "Cannot open trash: '%1' is not installed": {
     "Cannot open trash: '%1' is not installed": ""
@@ -1405,6 +1444,9 @@
   },
   "Connected Displays": {
     "Connected Displays": "已连接显示器"
+  },
+  "Connected Options": {
+    "Connected Options": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "连接设备中"
@@ -1841,6 +1883,12 @@
   "Dependencies & documentation": {
     "Dependencies & documentation": "依赖与文档"
   },
+  "Depth": {
+    "Depth": ""
+  },
+  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "提取与壁纸高度匹配的颜色。"
   },
@@ -1897,6 +1945,12 @@
   },
   "Direction Source": {
     "Direction Source": "方向源"
+  },
+  "Directional": {
+    "Directional": ""
+  },
+  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "禁用自动连接"
@@ -2042,6 +2096,9 @@
   "Dock Visibility": {
     "Dock Visibility": "程序坞可见性"
   },
+  "Dock spacing, transparency, and border": {
+    "Dock spacing, transparency, and border": ""
+  },
   "Docs": {
     "Docs": "文档"
   },
@@ -2071,6 +2128,9 @@
   },
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "拖动工作区指示器以重新排序"
+  },
+  "Draw a connected picture-frame border around the entire display": {
+    "Draw a connected picture-frame border around the entire display": ""
   },
   "Driver": {
     "Driver": "驱动程序"
@@ -2111,8 +2171,14 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "动态颜色与预设"
   },
+  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+  },
   "Edge Spacing": {
     "Edge Spacing": "边缘间距"
+  },
+  "Edge the launcher slides from": {
+    "Edge the launcher slides from": ""
   },
   "Edit App": {
     "Edit App": "编辑应用"
@@ -2146,6 +2212,9 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "启用请勿打扰"
+  },
+  "Enable Frame": {
+    "Enable Frame": ""
   },
   "Enable History": {
     "Enable History": "启用历史记录"
@@ -2339,6 +2408,9 @@
   "Exponential": {
     "Exponential": "指数"
   },
+  "Expose the Arcs": {
+    "Expose the Arcs": ""
+  },
   "Expressive": {
     "Expressive": "具有表现力的"
   },
@@ -2380,6 +2452,9 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "将打印机添加到类别失败"
+  },
+  "Failed to apply profile": {
+    "Failed to apply profile": ""
   },
   "Failed to browse device": {
     "Failed to browse device": "浏览设备失败"
@@ -2524,6 +2599,9 @@
   },
   "Failed to save keybind": {
     "Failed to save keybind": "保存按键绑定失败"
+  },
+  "Failed to save profile": {
+    "Failed to save profile": ""
   },
   "Failed to save profile file": {
     "Failed to save profile file": "保存配置文件失败"
@@ -2693,6 +2771,12 @@
   "Float": {
     "Float": "浮动"
   },
+  "Fluent": {
+    "Fluent": ""
+  },
+  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+  },
   "Focus": {
     "Focus": "聚焦"
   },
@@ -2815,6 +2899,18 @@
   },
   "Found %1 packages to update:": {
     "Found %1 packages to update:": "找到了%1个可更新的包："
+  },
+  "Frame": {
+    "Frame": ""
+  },
+  "Frame Blur": {
+    "Frame Blur": ""
+  },
+  "Frame Blur follows Background Blur in Theme & Colors": {
+    "Frame Blur follows Background Blur in Theme & Colors": ""
+  },
+  "Frame Border Color": {
+    "Frame Border Color": ""
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "关闭启动器时释放显存/内存。重新打开时可能会有轻微延迟。"
@@ -3116,6 +3212,9 @@
   "Home": {
     "Home": "家"
   },
+  "Horizontal and vertical bar thickness": {
+    "Horizontal and vertical bar thickness": ""
+  },
   "Host": {
     "Host": "主机"
   },
@@ -3335,6 +3434,9 @@
   "Installing: %1": {
     "Installing: %1": "安装中：%1"
   },
+  "Integrations": {
+    "Integrations": ""
+  },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "智能自动隐藏"
   },
@@ -3484,6 +3586,9 @@
   },
   "Launcher Button Logo": {
     "Launcher Button Logo": "启动器按钮 Logo"
+  },
+  "Launcher Emerge Side": {
+    "Launcher Emerge Side": ""
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": ""
@@ -3650,6 +3755,12 @@
   "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "至多可管理4个独立的状态栏配置。每个状态栏都有自己的位置、控件、样式和显示布局。"
   },
+  "Managed by Frame": {
+    "Managed by Frame": ""
+  },
+  "Managed by Frame in Connected Mode": {
+    "Managed by Frame in Connected Mode": ""
+  },
   "Management": {
     "Management": "管理"
   },
@@ -3695,6 +3806,9 @@
   "Matches profile: %1": {
     "Matches profile: %1": "匹配配置文件：%1"
   },
+  "Material": {
+    "Material": ""
+  },
   "Material Colors": {
     "Material Colors": "Material 配色"
   },
@@ -3706,6 +3820,9 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "模态、弹窗与对话框上出现的阴影（受Material启发的）与提升"
+  },
+  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen对比度"
@@ -3926,6 +4043,9 @@
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "监视使用动态主题色的壁纸"
   },
+  "Monitors in \"%1\":": {
+    "Monitors in \"%1\":": ""
+  },
   "Monochrome": {
     "Monochrome": "单色"
   },
@@ -3940,6 +4060,9 @@
   },
   "Morning": {
     "Morning": "上午"
+  },
+  "Motion Effects": {
+    "Motion Effects": ""
   },
   "Mount Points": {
     "Mount Points": "挂载点"
@@ -3991,6 +4114,9 @@
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "柔和配色，带来舒缓的视觉感受。"
+  },
+  "My Online": {
+    "My Online": ""
   },
   "NM not supported": {
     "NM not supported": "不支持 NM"
@@ -4259,6 +4385,9 @@
   "No matches": {
     "No matches": "未找到匹配项"
   },
+  "No matching devices": {
+    "No matching devices": ""
+  },
   "No matching processes": {
     "No matching processes": "无匹配进程"
   },
@@ -4276,6 +4405,9 @@
   },
   "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "未找到包管理器。请在基于Arch的系统上安装paru或yay以检测更新。"
+  },
+  "No peers found": {
+    "No peers found": ""
   },
   "No plugin results": {
     "No plugin results": "无插件结果"
@@ -4493,6 +4625,9 @@
   "Once a day": {
     "Once a day": ""
   },
+  "Online": {
+    "Online": ""
+  },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "根据时间或位置调节伽马值。"
   },
@@ -4516,6 +4651,9 @@
   },
   "Open App": {
     "Open App": "打开应用"
+  },
+  "Open Frame": {
+    "Open Frame": ""
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "在你的手机上打开KDE Connect"
@@ -4648,6 +4786,9 @@
   },
   "Overwrite": {
     "Overwrite": "覆盖"
+  },
+  "Owner: %1": {
+    "Owner: %1": ""
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM已提供指纹认证。启用以在登录时显示。"
@@ -5084,6 +5225,9 @@
   "Profile not found": {
     "Profile not found": "未找到配置"
   },
+  "Profile not found in monitors.json": {
+    "Profile not found in monitors.json": ""
+  },
   "Profile saved: %1": {
     "Profile saved: %1": "已保存档案：%1"
   },
@@ -5281,6 +5425,9 @@
   },
   "Resume": {
     "Resume": "恢复"
+  },
+  "Reveal the arcs where surfaces meet the frame": {
+    "Reveal the arcs where surfaces meet the frame": ""
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "反转滚动方向"
@@ -5489,6 +5636,9 @@
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "通过按键组合、描述或动作名称进行搜索。\n\n默认操作是将按键绑定复制到剪贴板。\n右键或右箭头可以固定常用的快捷键——不搜索时它们会出现在顶部。"
   },
+  "Search devices...": {
+    "Search devices...": ""
+  },
   "Search for a location...": {
     "Search for a location...": "搜索位置..."
   },
@@ -5653,6 +5803,9 @@
   },
   "Sending": {
     "Sending": "发送中"
+  },
+  "Separate": {
+    "Separate": ""
   },
   "Separator": {
     "Separator": "分隔符"
@@ -5951,6 +6104,9 @@
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "在通知弹窗上显示下拉阴影。需要在主题与颜色中启用M3提升。"
   },
+  "Show during Niri overview": {
+    "Show during Niri overview": ""
+  },
   "Show foreground surfaces on blurred panels for stronger contrast": {
     "Show foreground surfaces on blurred panels for stronger contrast": ""
   },
@@ -6149,6 +6305,9 @@
   "Standard": {
     "Standard": "基础设置"
   },
+  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+  },
   "Start": {
     "Start": "开始"
   },
@@ -6197,8 +6356,20 @@
   "Surface": {
     "Surface": "表面色"
   },
+  "Surface Behavior": {
+    "Surface Behavior": ""
+  },
+  "Surface Opacity": {
+    "Surface Opacity": ""
+  },
   "Surface Variant": {
     "Surface Variant": "表面变体"
+  },
+  "Surfaces emerge flush from the bar": {
+    "Surfaces emerge flush from the bar": ""
+  },
+  "Surfaces float independently of the frame": {
+    "Surfaces float independently of the frame": ""
   },
   "Suspend": {
     "Suspend": "挂起"
@@ -6305,6 +6476,18 @@
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: 导航 • ←→↑↓: 网格导航 • 回车/空格: 选中"
   },
+  "Tags: %1": {
+    "Tags: %1": ""
+  },
+  "Tailscale": {
+    "Tailscale": ""
+  },
+  "Tailscale Network": {
+    "Tailscale Network": ""
+  },
+  "Tailscale not available": {
+    "Tailscale not available": ""
+  },
   "Terminal": {
     "Terminal": "终端"
   },
@@ -6394,6 +6577,9 @@
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "此绑定已被 config.kdl 覆盖"
+  },
+  "This device": {
+    "This device": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "此操作可能会花费一些时间"
@@ -6851,6 +7037,9 @@
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "使用系统设置中的声音主题"
   },
+  "Use the extended surface for launcher content": {
+    "Use the extended surface for launcher content": ""
+  },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "在所有显示器上使用同样的位置与大小"
   },
@@ -7247,6 +7436,9 @@
   "dgop not available": {
     "dgop not available": "dgop不可用"
   },
+  "direct": {
+    "direct": ""
+  },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "DMS是一款高度可自定义的现代桌面shell，深受<a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3</a>的启发而设计。<br /><br/>DMS基于<a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>——一个专为创建桌面shell的QT6框架，并通过<a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go语言</a>——一种静态类型化、编译的编程语言开发。"
   },
@@ -7276,6 +7468,9 @@
   },
   "featured": {
     "featured": "已生效"
+  },
+  "last seen %1": {
+    "last seen %1": ""
   },
   "leave empty for default": {
     "leave empty for default": "留空使用默认"
@@ -7351,6 +7546,9 @@
   },
   "r/niri Subreddit": {
     "r/niri Subreddit": "r/niri 红迪子版块"
+  },
+  "relay: %1": {
+    "relay: %1": ""
   },
   "seconds": {
     "seconds": "秒"

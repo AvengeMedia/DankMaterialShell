@@ -71,6 +71,9 @@
   "%1 notifications": {
     "%1 notifications": "%1 уведомлений"
   },
+  "%1 online": {
+    "%1 online": ""
+  },
   "%1 update": {
     "%1 update": ""
   },
@@ -353,6 +356,9 @@
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "Монитор экрана блокировки"
   },
+  "Active VPN": {
+    "Active VPN": ""
+  },
   "Active tile background and icon color": {
     "Active tile background and icon color": "Фон активной плитки и цвет значка"
   },
@@ -482,6 +488,9 @@
   "Animation Speed": {
     "Animation Speed": "Скорость анимации"
   },
+  "Animation Style": {
+    "Animation Style": ""
+  },
   "Anonymous Identity": {
     "Anonymous Identity": "Анонимный идентификатор"
   },
@@ -527,6 +536,9 @@
   "Apply Qt Colors": {
     "Apply Qt Colors": "Применить цвета Qt"
   },
+  "Apply compositor blur behind the frame border": {
+    "Apply compositor blur behind the frame border": ""
+  },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Применить тёплую цветовую температуру для снижения нагрузки на глаза. Используйте настройки автоматизации ниже для управления активацией."
   },
@@ -554,6 +566,9 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Приложения с отключёнными всплывающими уведомлениями. Включите звук или удалите для удаления."
   },
+  "Arc Extender": {
+    "Arc Extender": ""
+  },
   "Architecture": {
     "Architecture": "Архитектура"
   },
@@ -562,6 +577,9 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Расположить дисплеи и настроить разрешение, частоту обновления и VRR"
+  },
+  "At least one output must remain enabled": {
+    "At least one output must remain enabled": ""
   },
   "Attach": {
     "Attach": ""
@@ -794,6 +812,18 @@
   "Bar Transparency": {
     "Bar Transparency": "Прозрачность бара"
   },
+  "Bar corners and background": {
+    "Bar corners and background": ""
+  },
+  "Bar shadow, border, and corners": {
+    "Bar shadow, border, and corners": ""
+  },
+  "Bar spacing and size": {
+    "Bar spacing and size": ""
+  },
+  "Bar transparency": {
+    "Bar transparency": ""
+  },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": ""
   },
@@ -884,11 +914,17 @@
   "Border Opacity": {
     "Border Opacity": "Границы Непрозрачность"
   },
+  "Border Radius": {
+    "Border Radius": ""
+  },
   "Border Size": {
     "Border Size": "Размер границы"
   },
   "Border Thickness": {
     "Border Thickness": "Толщина рамки"
+  },
+  "Border Width": {
+    "Border Width": ""
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": ""
@@ -988,6 +1024,9 @@
   },
   "Canceled": {
     "Canceled": "Отменено"
+  },
+  "Cannot disable the only output": {
+    "Cannot disable the only output": ""
   },
   "Cannot open trash: '%1' is not installed": {
     "Cannot open trash: '%1' is not installed": ""
@@ -1405,6 +1444,9 @@
   },
   "Connected Displays": {
     "Connected Displays": "Подключённые Мониторы"
+  },
+  "Connected Options": {
+    "Connected Options": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "Подключение к устройству"
@@ -1841,6 +1883,12 @@
   "Dependencies & documentation": {
     "Dependencies & documentation": ""
   },
+  "Depth": {
+    "Depth": ""
+  },
+  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Извлекает цвета, которые точно соответствуют исходному изображению."
   },
@@ -1897,6 +1945,12 @@
   },
   "Direction Source": {
     "Direction Source": ""
+  },
+  "Directional": {
+    "Directional": ""
+  },
+  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Отключите Автоподключение"
@@ -2042,6 +2096,9 @@
   "Dock Visibility": {
     "Dock Visibility": "Видимость дока"
   },
+  "Dock spacing, transparency, and border": {
+    "Dock spacing, transparency, and border": ""
+  },
   "Docs": {
     "Docs": "Документация"
   },
@@ -2071,6 +2128,9 @@
   },
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Перетащите индикаторы рабочих пространств для изменения порядка"
+  },
+  "Draw a connected picture-frame border around the entire display": {
+    "Draw a connected picture-frame border around the entire display": ""
   },
   "Driver": {
     "Driver": "Драйвер"
@@ -2111,8 +2171,14 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Динамические цвета, предустановки"
   },
+  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+  },
   "Edge Spacing": {
     "Edge Spacing": "Отступ краёв"
+  },
+  "Edge the launcher slides from": {
+    "Edge the launcher slides from": ""
   },
   "Edit App": {
     "Edit App": "Изменить приложение"
@@ -2146,6 +2212,9 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Включить режим 'Не беспокоить'"
+  },
+  "Enable Frame": {
+    "Enable Frame": ""
   },
   "Enable History": {
     "Enable History": "Включить историю"
@@ -2339,6 +2408,9 @@
   "Exponential": {
     "Exponential": "Экспоненциальный"
   },
+  "Expose the Arcs": {
+    "Expose the Arcs": ""
+  },
   "Expressive": {
     "Expressive": "Яркий"
   },
@@ -2380,6 +2452,9 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "Не удалось добавить принтер в класс"
+  },
+  "Failed to apply profile": {
+    "Failed to apply profile": ""
   },
   "Failed to browse device": {
     "Failed to browse device": "Не удалось просмотреть устройство"
@@ -2524,6 +2599,9 @@
   },
   "Failed to save keybind": {
     "Failed to save keybind": "Не удалось сохранить комбинацию клавиш"
+  },
+  "Failed to save profile": {
+    "Failed to save profile": ""
   },
   "Failed to save profile file": {
     "Failed to save profile file": "Не удалось сохранить файл профиля"
@@ -2693,6 +2771,12 @@
   "Float": {
     "Float": "Плавающий"
   },
+  "Fluent": {
+    "Fluent": ""
+  },
+  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+  },
   "Focus": {
     "Focus": "Фокус"
   },
@@ -2815,6 +2899,18 @@
   },
   "Found %1 packages to update:": {
     "Found %1 packages to update:": ""
+  },
+  "Frame": {
+    "Frame": ""
+  },
+  "Frame Blur": {
+    "Frame Blur": ""
+  },
+  "Frame Blur follows Background Blur in Theme & Colors": {
+    "Frame Blur follows Background Blur in Theme & Colors": ""
+  },
+  "Frame Border Color": {
+    "Frame Border Color": ""
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Освободить VRAM/память при закрытии лаунчера. Может вызвать небольшую задержку при повторном открытии."
@@ -3116,6 +3212,9 @@
   "Home": {
     "Home": "Домой"
   },
+  "Horizontal and vertical bar thickness": {
+    "Horizontal and vertical bar thickness": ""
+  },
   "Host": {
     "Host": ""
   },
@@ -3335,6 +3434,9 @@
   "Installing: %1": {
     "Installing: %1": "Установка: %1"
   },
+  "Integrations": {
+    "Integrations": ""
+  },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "Умное автоскрытие"
   },
@@ -3484,6 +3586,9 @@
   },
   "Launcher Button Logo": {
     "Launcher Button Logo": "Логотип кнопки лаунчера"
+  },
+  "Launcher Emerge Side": {
+    "Launcher Emerge Side": ""
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": ""
@@ -3650,6 +3755,12 @@
   "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Управление до 4 независимыми конфигурациями панели. Каждая панель имеет собственную позицию, виджетов, стиль и назначение Display."
   },
+  "Managed by Frame": {
+    "Managed by Frame": ""
+  },
+  "Managed by Frame in Connected Mode": {
+    "Managed by Frame in Connected Mode": ""
+  },
   "Management": {
     "Management": "Управление"
   },
@@ -3695,6 +3806,9 @@
   "Matches profile: %1": {
     "Matches profile: %1": "Соответствует профилю: %1"
   },
+  "Material": {
+    "Material": ""
+  },
   "Material Colors": {
     "Material Colors": "Акцентные Цвета"
   },
@@ -3706,6 +3820,9 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": ""
+  },
+  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
   },
   "Matugen Contrast": {
     "Matugen Contrast": ""
@@ -3926,6 +4043,9 @@
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "Монитор, чьи обои определяют цвета динамической темы"
   },
+  "Monitors in \"%1\":": {
+    "Monitors in \"%1\":": ""
+  },
   "Monochrome": {
     "Monochrome": "Яркий"
   },
@@ -3940,6 +4060,9 @@
   },
   "Morning": {
     "Morning": "Утро"
+  },
+  "Motion Effects": {
+    "Motion Effects": ""
   },
   "Mount Points": {
     "Mount Points": "Точки монтирования"
@@ -3991,6 +4114,9 @@
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Приглушённая палитра со спокойными тонами."
+  },
+  "My Online": {
+    "My Online": ""
   },
   "NM not supported": {
     "NM not supported": "NM не поддерживается"
@@ -4259,6 +4385,9 @@
   "No matches": {
     "No matches": "Нет совпадений"
   },
+  "No matching devices": {
+    "No matching devices": ""
+  },
   "No matching processes": {
     "No matching processes": "Нет соответствующих процессов"
   },
@@ -4276,6 +4405,9 @@
   },
   "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": ""
+  },
+  "No peers found": {
+    "No peers found": ""
   },
   "No plugin results": {
     "No plugin results": "Нет результатов плагинов"
@@ -4493,6 +4625,9 @@
   "Once a day": {
     "Once a day": ""
   },
+  "Online": {
+    "Online": ""
+  },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Регулировать цветовую температуру только на основе правил времени или местоположения."
   },
@@ -4516,6 +4651,9 @@
   },
   "Open App": {
     "Open App": "Открыть приложение"
+  },
+  "Open Frame": {
+    "Open Frame": ""
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "Откройте KDE Connect на телефоне"
@@ -4648,6 +4786,9 @@
   },
   "Overwrite": {
     "Overwrite": "Перезаписать"
+  },
+  "Owner: %1": {
+    "Owner: %1": ""
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": ""
@@ -5084,6 +5225,9 @@
   "Profile not found": {
     "Profile not found": "Профиль не найден"
   },
+  "Profile not found in monitors.json": {
+    "Profile not found in monitors.json": ""
+  },
   "Profile saved: %1": {
     "Profile saved: %1": "Профиль сохранён: %1"
   },
@@ -5281,6 +5425,9 @@
   },
   "Resume": {
     "Resume": "Продолжить"
+  },
+  "Reveal the arcs where surfaces meet the frame": {
+    "Reveal the arcs where surfaces meet the frame": ""
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Обратить направление прокрутки"
@@ -5489,6 +5636,9 @@
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Поиск по комбинации клавиш, описанию или имени действия.\n\nДействие по умолчанию копирует комбинацию клавиш в буфер обмена.\nЩёлкните ПКМ или нажмите стрелку вправо для закрепления часто используемых комбинаций клавиш — они будут отображаться вверху при отсутствии поиска."
   },
+  "Search devices...": {
+    "Search devices...": ""
+  },
   "Search for a location...": {
     "Search for a location...": "Поиск местоположения..."
   },
@@ -5653,6 +5803,9 @@
   },
   "Sending": {
     "Sending": "Отправка"
+  },
+  "Separate": {
+    "Separate": ""
   },
   "Separator": {
     "Separator": "Разделитель"
@@ -5951,6 +6104,9 @@
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": ""
   },
+  "Show during Niri overview": {
+    "Show during Niri overview": ""
+  },
   "Show foreground surfaces on blurred panels for stronger contrast": {
     "Show foreground surfaces on blurred panels for stronger contrast": ""
   },
@@ -6149,6 +6305,9 @@
   "Standard": {
     "Standard": "Стандарт"
   },
+  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+  },
   "Start": {
     "Start": "Старт"
   },
@@ -6197,8 +6356,20 @@
   "Surface": {
     "Surface": "Поверхность"
   },
+  "Surface Behavior": {
+    "Surface Behavior": ""
+  },
+  "Surface Opacity": {
+    "Surface Opacity": ""
+  },
   "Surface Variant": {
     "Surface Variant": "Вариант поверхности"
+  },
+  "Surfaces emerge flush from the bar": {
+    "Surfaces emerge flush from the bar": ""
+  },
+  "Surfaces float independently of the frame": {
+    "Surfaces float independently of the frame": ""
   },
   "Suspend": {
     "Suspend": "Приостановить"
@@ -6305,6 +6476,18 @@
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Навигация • ←→↑↓: Навигация сетки • Enter/Space: Выбрать"
   },
+  "Tags: %1": {
+    "Tags: %1": ""
+  },
+  "Tailscale": {
+    "Tailscale": ""
+  },
+  "Tailscale Network": {
+    "Tailscale Network": ""
+  },
+  "Tailscale not available": {
+    "Tailscale not available": ""
+  },
   "Terminal": {
     "Terminal": ""
   },
@@ -6394,6 +6577,9 @@
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "Эта комбинация клавиш переопределена в config.kdl"
+  },
+  "This device": {
+    "This device": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Это может занять несколько секунд"
@@ -6851,6 +7037,9 @@
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "Использовать звуковую тему из системных настроек"
   },
+  "Use the extended surface for launcher content": {
+    "Use the extended surface for launcher content": ""
+  },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Использовать одинаковую позицию и размер на всех дисплеях"
   },
@@ -7247,6 +7436,9 @@
   "dgop not available": {
     "dgop not available": "dgop недоступен"
   },
+  "direct": {
+    "direct": ""
+  },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
   },
@@ -7276,6 +7468,9 @@
   },
   "featured": {
     "featured": "избранное"
+  },
+  "last seen %1": {
+    "last seen %1": ""
   },
   "leave empty for default": {
     "leave empty for default": "оставьте пустым для значения по умолчанию"
@@ -7351,6 +7546,9 @@
   },
   "r/niri Subreddit": {
     "r/niri Subreddit": ""
+  },
+  "relay: %1": {
+    "relay: %1": ""
   },
   "seconds": {
     "seconds": "секунд"

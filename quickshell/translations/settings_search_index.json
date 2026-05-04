@@ -2534,40 +2534,24 @@
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
-      "alert",
-      "alerts",
       "appearance",
       "background",
-      "bars",
-      "behind",
       "blur",
       "colors",
-      "compositor",
-      "config",
-      "configuration",
-      "configure",
       "frosted",
       "glass",
       "look",
-      "modals",
-      "notif",
-      "notifications",
-      "notifs",
-      "panel",
-      "popouts",
+      "newer",
+      "quickshell",
       "requires",
       "scheme",
-      "setup",
-      "statusbar",
       "style",
-      "support",
-      "taskbar",
       "theme",
-      "topbar",
-      "transparency"
+      "transparency",
+      "version"
     ],
     "icon": "blur_on",
-    "description": "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration."
+    "description": "Requires a newer version of Quickshell"
   },
   {
     "section": "barElevationEnabled",
@@ -3700,35 +3684,6 @@
     "description": "Shadow elevation on popouts, OSDs, and dropdowns"
   },
   {
-    "section": "popupTransparency",
-    "label": "Surface Opacity",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "alpha",
-      "appearance",
-      "colors",
-      "content",
-      "controls",
-      "layers",
-      "look",
-      "modal",
-      "modals",
-      "opacity",
-      "popouts",
-      "popup",
-      "scheme",
-      "style",
-      "surface",
-      "their",
-      "theme",
-      "translucent",
-      "transparency",
-      "transparent"
-    ],
-    "description": "Controls opacity of all popouts, modals, and their content layers"
-  },
-  {
     "section": "runDmsMatugenTemplates",
     "label": "Run DMS Templates",
     "tabIndex": 10,
@@ -3862,6 +3817,32 @@
       "theme"
     ],
     "description": "Material inspired shadows and elevation on modals, popouts, and dialogs"
+  },
+  {
+    "section": "popupTransparency",
+    "label": "Surface Opacity",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "content",
+      "controls",
+      "layers",
+      "look",
+      "modal",
+      "modals",
+      "opacity",
+      "popouts",
+      "popup",
+      "scheme",
+      "style",
+      "surface",
+      "their",
+      "theme",
+      "transparency"
+    ],
+    "description": "Controls opacity of all popouts, modals, and their content layers"
   },
   {
     "section": "syncModeWithPortal",
@@ -4439,6 +4420,24 @@
     ]
   },
   {
+    "section": "matugenTemplateVencord",
+    "label": "vencord",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "discord",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme",
+      "vencord"
+    ]
+  },
+  {
     "section": "matugenTemplateVesktop",
     "label": "vesktop",
     "tabIndex": 10,
@@ -4454,24 +4453,6 @@
       "template",
       "theme",
       "vesktop"
-    ]
-  },
-  {
-    "section": "matugenTemplateVencord",
-    "label": "vencord",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "discord",
-      "vencord",
-      "look",
-      "matugen",
-      "scheme",
-      "style",
-      "template",
-      "theme"
     ]
   },
   {
@@ -5083,6 +5064,28 @@
     "description": "Globally scale all animation durations"
   },
   {
+    "section": "animationVariant",
+    "label": "Animation Style",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "dynamic",
+      "fluent",
+      "fonts",
+      "motion",
+      "slide",
+      "style",
+      "text",
+      "transition",
+      "typography",
+      "variant"
+    ],
+    "icon": "auto_awesome_motion"
+  },
+  {
     "section": "popoutCustomAnimationDuration",
     "label": "Custom Duration",
     "tabIndex": 14,
@@ -5192,6 +5195,27 @@
       "typography"
     ],
     "description": "Select monospace font for process list and technical displays"
+  },
+  {
+    "section": "motionEffect",
+    "label": "Motion Effects",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "depth",
+      "directional",
+      "effect",
+      "effects",
+      "fonts",
+      "motion",
+      "physics",
+      "slide",
+      "spring",
+      "text",
+      "typography"
+    ],
+    "icon": "motion_photos_on"
   },
   {
     "section": "fontFamily",
@@ -7427,5 +7451,16 @@
       "settings"
     ],
     "icon": "terminal"
+  },
+  {
+    "section": "_tab_33",
+    "label": "Frame",
+    "tabIndex": 33,
+    "category": "Settings",
+    "keywords": [
+      "frame",
+      "settings"
+    ],
+    "icon": "frame_source"
   }
 ]

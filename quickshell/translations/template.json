@@ -168,6 +168,13 @@
     "comment": ""
   },
   {
+    "term": "%1 online",
+    "translation": "",
+    "context": "Number of online Tailscale peers",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 update",
     "translation": "",
     "context": "",
@@ -826,6 +833,13 @@
     "comment": ""
   },
   {
+    "term": "Active VPN",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Active tile background and icon color",
     "translation": "",
     "context": "control center tile color setting description",
@@ -982,7 +996,7 @@
   {
     "term": "All",
     "translation": "",
-    "context": "notification history filter",
+    "context": "Tailscale filter: all devices | notification history filter",
     "reference": "",
     "comment": ""
   },
@@ -1127,6 +1141,13 @@
     "comment": ""
   },
   {
+    "term": "Animation Style",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Anonymous Identity",
     "translation": "",
     "context": "",
@@ -1232,6 +1253,13 @@
     "comment": ""
   },
   {
+    "term": "Apply compositor blur behind the frame border",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.",
     "translation": "",
     "context": "",
@@ -1295,6 +1323,13 @@
     "comment": ""
   },
   {
+    "term": "Arc Extender",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Architecture",
     "translation": "",
     "context": "system info label",
@@ -1310,6 +1345,13 @@
   },
   {
     "term": "Arrange displays and configure resolution, refresh rate, and VRR",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "At least one output must remain enabled",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1855,6 +1897,34 @@
     "comment": ""
   },
   {
+    "term": "Bar corners and background",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar shadow, border, and corners",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar spacing and size",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar transparency",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Base color for shadows (opacity is applied automatically)",
     "translation": "",
     "context": "",
@@ -2065,6 +2135,13 @@
     "comment": ""
   },
   {
+    "term": "Border Radius",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Border Size",
     "translation": "",
     "context": "",
@@ -2073,6 +2150,13 @@
   },
   {
     "term": "Border Thickness",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Border Width",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2304,6 +2388,13 @@
   },
   {
     "term": "Canceled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Cannot disable the only output",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3087,13 +3178,6 @@
     "comment": ""
   },
   {
-    "term": "Compositor not supported",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Config Format",
     "translation": "",
     "context": "",
@@ -3270,6 +3354,13 @@
   },
   {
     "term": "Connected Displays",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Connected Options",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3488,7 +3579,7 @@
   {
     "term": "Copy",
     "translation": "",
-    "context": "",
+    "context": "Copy to clipboard",
     "reference": "",
     "comment": ""
   },
@@ -4291,6 +4382,20 @@
     "comment": ""
   },
   {
+    "term": "Depth",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Derives colors that closely match the underlying image.",
     "translation": "",
     "context": "",
@@ -4424,6 +4529,20 @@
     "comment": ""
   },
   {
+    "term": "Directional",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Disable Autoconnect",
     "translation": "",
     "context": "",
@@ -4496,7 +4615,7 @@
   {
     "term": "Disconnected",
     "translation": "",
-    "context": "",
+    "context": "Tailscale disconnected status",
     "reference": "",
     "comment": ""
   },
@@ -4760,6 +4879,13 @@
     "comment": ""
   },
   {
+    "term": "Dock spacing, transparency, and border",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Docs",
     "translation": "",
     "context": "greeter documentation link",
@@ -4824,6 +4950,13 @@
   },
   {
     "term": "Drag workspace indicators to reorder them",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Draw a connected picture-frame border around the entire display",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4921,7 +5054,21 @@
     "comment": ""
   },
   {
+    "term": "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Edge Spacing",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Edge the launcher slides from",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4999,6 +5146,13 @@
   },
   {
     "term": "Enable Do Not Disturb",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enable Frame",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5453,6 +5607,13 @@
     "comment": ""
   },
   {
+    "term": "Expose the Arcs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Expressive",
     "translation": "",
     "context": "matugen color scheme option",
@@ -5530,13 +5691,6 @@
     "comment": ""
   },
   {
-    "term": "Failed to activate profile - file not found",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Failed to add binds include",
     "translation": "",
     "context": "",
@@ -5545,6 +5699,13 @@
   },
   {
     "term": "Failed to add printer to class",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to apply profile",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5601,13 +5762,6 @@
   },
   {
     "term": "Failed to create printer",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Failed to create profiles directory",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5880,7 +6034,7 @@
     "comment": ""
   },
   {
-    "term": "Failed to save profile file",
+    "term": "Failed to save profile",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6265,6 +6419,20 @@
     "comment": ""
   },
   {
+    "term": "Fluent",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Focus",
     "translation": "",
     "context": "",
@@ -6532,6 +6700,34 @@
   },
   {
     "term": "Format Legend",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Frame",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Frame Blur",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Frame Blur follows Background Blur in Theme & Colors",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Frame Border Color",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7231,6 +7427,13 @@
     "comment": ""
   },
   {
+    "term": "Horizontal and vertical bar thickness",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Host",
     "translation": "",
     "context": "Label for printer IP address or hostname input field",
@@ -7742,6 +7945,13 @@
     "comment": ""
   },
   {
+    "term": "Integrations",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Intelligent Auto-hide",
     "translation": "",
     "context": "",
@@ -8064,13 +8274,6 @@
     "comment": ""
   },
   {
-    "term": "Launch on dGPU by default",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Launcher",
     "translation": "",
     "context": "",
@@ -8086,6 +8289,13 @@
   },
   {
     "term": "Launcher Button Logo",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Launcher Emerge Side",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8477,6 +8687,20 @@
     "comment": ""
   },
   {
+    "term": "Managed by Frame",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Managed by Frame in Connected Mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Management",
     "translation": "",
     "context": "",
@@ -8575,7 +8799,7 @@
     "comment": ""
   },
   {
-    "term": "Matches profile: %1",
+    "term": "Material",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8604,6 +8828,13 @@
   },
   {
     "term": "Material inspired shadows and elevation on modals, popouts, and dialogs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Material: Material Design 3 Expressive bezier curves. The DMS default feel.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9121,6 +9352,13 @@
     "comment": ""
   },
   {
+    "term": "Monitors in \"%1\":",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Monochrome",
     "translation": "",
     "context": "matugen color scheme option",
@@ -9150,6 +9388,13 @@
   },
   {
     "term": "Morning",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Motion Effects",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9271,6 +9516,13 @@
     "term": "Muted palette with subdued, calming tones.",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "My Online",
+    "translation": "",
+    "context": "Tailscale filter: my online devices",
     "reference": "",
     "comment": ""
   },
@@ -9898,6 +10150,13 @@
     "comment": ""
   },
   {
+    "term": "No matching devices",
+    "translation": "",
+    "context": "No Tailscale devices match search",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No matching processes",
     "translation": "",
     "context": "empty state in process list",
@@ -9929,6 +10188,13 @@
     "term": "No output devices found",
     "translation": "",
     "context": "Audio settings empty state",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No peers found",
+    "translation": "",
+    "context": "No Tailscale peers found",
     "reference": "",
     "comment": ""
   },
@@ -10145,7 +10411,7 @@
   {
     "term": "Not available",
     "translation": "",
-    "context": "",
+    "context": "Tailscale service not available",
     "reference": "",
     "comment": ""
   },
@@ -10437,6 +10703,13 @@
     "comment": ""
   },
   {
+    "term": "Online",
+    "translation": "",
+    "context": "Tailscale filter: all online devices",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Only adjust gamma based on time or location rules.",
     "translation": "",
     "context": "",
@@ -10489,6 +10762,13 @@
     "term": "Open App",
     "translation": "",
     "context": "KDE Connect open SMS app button",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open Frame",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -10797,6 +11077,13 @@
     "term": "Overwrite",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Owner: %1",
+    "translation": "",
+    "context": "Tailscale device owner",
     "reference": "",
     "comment": ""
   },
@@ -11382,13 +11669,6 @@
     "comment": ""
   },
   {
-    "term": "Popup Transparency",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Popup behavior, position",
     "translation": "",
     "context": "greeter notifications description",
@@ -11816,6 +12096,13 @@
     "comment": ""
   },
   {
+    "term": "Profile not found in monitors.json",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Profile saved: %1",
     "translation": "",
     "context": "",
@@ -11979,7 +12266,7 @@
   {
     "term": "Refresh",
     "translation": "",
-    "context": "Phone Connect refresh tooltip",
+    "context": "Phone Connect refresh tooltip | Refresh Tailscale device status",
     "reference": "",
     "comment": ""
   },
@@ -12272,6 +12559,13 @@
   },
   {
     "term": "Resume",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reveal the arcs where surfaces meet the frame",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12761,6 +13055,13 @@
     "comment": ""
   },
   {
+    "term": "Search devices...",
+    "translation": "",
+    "context": "Tailscale device search placeholder",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Search for a location...",
     "translation": "",
     "context": "",
@@ -13142,6 +13443,13 @@
     "term": "Sending",
     "translation": "",
     "context": "Phone Connect file send",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Separate",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -13818,6 +14126,13 @@
     "comment": ""
   },
   {
+    "term": "Show during Niri overview",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show foreground surfaces on blurred panels for stronger contrast",
     "translation": "",
     "context": "",
@@ -14280,6 +14595,13 @@
     "comment": ""
   },
   {
+    "term": "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Start",
     "translation": "",
     "context": "",
@@ -14392,9 +14714,37 @@
     "comment": ""
   },
   {
+    "term": "Surface Behavior",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Surface Opacity",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Surface Variant",
     "translation": "",
     "context": "button color option | shadow color option | tile color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Surfaces emerge flush from the bar",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Surfaces float independently of the frame",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -14637,6 +14987,34 @@
     "comment": ""
   },
   {
+    "term": "Tags: %1",
+    "translation": "",
+    "context": "Tailscale device tags",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tailscale",
+    "translation": "",
+    "context": "Tailscale mesh VPN widget title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tailscale Network",
+    "translation": "",
+    "context": "Tailscale control center widget description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tailscale not available",
+    "translation": "",
+    "context": "Warning when Tailscale service is not running",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Terminal",
     "translation": "",
     "context": "",
@@ -14836,6 +15214,13 @@
     "term": "This bind is overridden by config.kdl",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This device",
+    "translation": "",
+    "context": "Label for the user's own device in Tailscale",
     "reference": "",
     "comment": ""
   },
@@ -15897,6 +16282,13 @@
     "comment": ""
   },
   {
+    "term": "Use the extended surface for launcher content",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use the same position and size on all displays",
     "translation": "",
     "context": "",
@@ -16814,6 +17206,13 @@
     "comment": ""
   },
   {
+    "term": "direct",
+    "translation": "",
+    "context": "Tailscale direct connection",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.",
     "translation": "",
     "context": "",
@@ -16880,6 +17279,13 @@
     "term": "featured",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "last seen %1",
+    "translation": "",
+    "context": "Tailscale peer last seen time",
     "reference": "",
     "comment": ""
   },
@@ -17059,6 +17465,13 @@
     "comment": ""
   },
   {
+    "term": "relay: %1",
+    "translation": "",
+    "context": "Tailscale relay server name",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "seconds",
     "translation": "",
     "context": "",
@@ -17223,125 +17636,6 @@
     "term": "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help",
     "translation": "",
     "context": "Keyboard hints when enter-to-paste is enabled",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Tailscale",
-    "translation": "",
-    "context": "Tailscale mesh VPN widget title",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Tailscale Network",
-    "translation": "",
-    "context": "Tailscale control center widget description",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Tailscale not available",
-    "translation": "",
-    "context": "Warning when Tailscale service is not running",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "%1 online",
-    "translation": "",
-    "context": "Number of online Tailscale peers",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Search devices...",
-    "translation": "",
-    "context": "Tailscale device search placeholder",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "This device",
-    "translation": "",
-    "context": "Label for the user's own device in Tailscale",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Network: %1",
-    "translation": "",
-    "context": "Tailscale network name",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Version: %1",
-    "translation": "",
-    "context": "Tailscale version",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "No matching devices",
-    "translation": "",
-    "context": "No Tailscale devices match search",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "No peers found",
-    "translation": "",
-    "context": "No Tailscale peers found",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "relay: %1",
-    "translation": "",
-    "context": "Tailscale relay server name",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "direct",
-    "translation": "",
-    "context": "Tailscale direct connection",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "last seen %1",
-    "translation": "",
-    "context": "Tailscale peer last seen time",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Tags: %1",
-    "translation": "",
-    "context": "Tailscale device tags",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Owner: %1",
-    "translation": "",
-    "context": "Tailscale device owner",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Show my online devices",
-    "translation": "",
-    "context": "Toggle to show only online devices owned by the user",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Show all devices (%1)",
-    "translation": "",
-    "context": "Toggle to show all Tailscale devices",
     "reference": "",
     "comment": ""
   }
