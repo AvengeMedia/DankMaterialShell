@@ -1638,6 +1638,8 @@ Item {
 
             for (const id in profiles) {
                 const p = profiles[id];
+                if (!p.name)
+                    continue;
                 const flags = [];
                 if (id === activeId)
                     flags.push("active");
@@ -1680,7 +1682,7 @@ Item {
             SettingsData.displayProfileAutoSelect = !SettingsData.displayProfileAutoSelect;
             SettingsData.saveSettings();
             if (SettingsData.displayProfileAutoSelect)
-                DisplayConfigState.autoSelectProfile();
+                DisplayConfigState.applyAutoConfig();
             return `Auto profile selection: ${SettingsData.displayProfileAutoSelect ? "enabled" : "disabled"}`;
         }
 
