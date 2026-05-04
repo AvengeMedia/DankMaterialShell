@@ -228,7 +228,7 @@ Singleton {
     }
 
     function getCodecInfo(codecName) {
-        const codec = codecName.replace(/-/g, "_").toUpperCase();
+        const codec = codecName.replace(/[-\s]+/g, "_").toUpperCase();
 
         const codecMap = {
             "LDAC": {
@@ -406,8 +406,8 @@ Singleton {
                         if (parts.length >= 2) {
                             let profile = parts[0].trim();
                             let description = parts[1];
-                            let codecMatch = description.match(/codec ([^\)\s]+)/i);
-                            let codecName = codecMatch ? codecMatch[1].toUpperCase() : "UNKNOWN";
+                            let codecMatch = description.match(/codec ([^\)]+)\)/i);
+                            let codecName = codecMatch ? codecMatch[1].trim().toUpperCase() : "UNKNOWN";
                             let codecInfo = root.getCodecInfo(codecName);
                             if (codecInfo && !codecQueryProcess.availableCodecs.some(c => {
                                 return c.profile === profile;
@@ -480,8 +480,8 @@ Singleton {
                         if (parts.length >= 2) {
                             let profile = parts[0].trim();
                             let description = parts[1];
-                            let codecMatch = description.match(/codec ([^\)\s]+)/i);
-                            let codecName = codecMatch ? codecMatch[1].toUpperCase() : "UNKNOWN";
+                            let codecMatch = description.match(/codec ([^\)]+)\)/i);
+                            let codecName = codecMatch ? codecMatch[1].trim().toUpperCase() : "UNKNOWN";
                             let codecInfo = root.getCodecInfo(codecName);
                             if (codecInfo && !codecFullQueryProcess.availableCodecs.some(c => {
                                 return c.profile === profile;

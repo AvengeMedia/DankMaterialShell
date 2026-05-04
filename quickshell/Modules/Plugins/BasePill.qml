@@ -172,7 +172,7 @@ Item {
     }
 
     property bool _blurRegistered: false
-    readonly property bool _shouldBlur: BlurService.enabled && blurBarWindow && blurBarWindow.registerBlurWidget && !(barConfig?.noBackground ?? false) && root.visible && root.width > 0
+    readonly property bool _shouldBlur: BlurService.enabled && !!blurBarWindow && !!blurBarWindow.registerBlurWidget && !(barConfig?.noBackground ?? false) && root.visible && root.width > 0
 
     on_ShouldBlurChanged: _updateBlurRegistration()
 
