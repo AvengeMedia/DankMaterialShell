@@ -618,7 +618,7 @@ Singleton {
     function applyAutoConfig() {
         if (!profilesReady || !SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
             return;
-        
+
         readMonitorsJson(data => {
             // 1. Exact match
             const match = findConfigEntry(data, currentOutputSet);
