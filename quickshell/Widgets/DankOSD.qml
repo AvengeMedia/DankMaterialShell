@@ -273,7 +273,7 @@ PanelWindow {
             id: background
             anchors.fill: parent
             radius: Theme.cornerRadius
-            color: Theme.transparentBlurLayers ? "transparent" : Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
+            color: "transparent"
             border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
             border.width: BlurService.enabled ? BlurService.borderWidth : 1
             z: -1
@@ -282,12 +282,11 @@ PanelWindow {
         ElevationShadow {
             id: bgShadowLayer
             anchors.fill: parent
-            visible: osdContainer.popupSurfaceAlpha >= 0.95
             z: -1
             level: Theme.elevationLevel3
             fallbackOffset: 6
             targetRadius: Theme.cornerRadius
-            targetColor: Theme.transparentBlurLayers ? "transparent" : Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
+            targetColor: Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
             borderColor: Theme.outlineMedium
             borderWidth: 1
             shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
