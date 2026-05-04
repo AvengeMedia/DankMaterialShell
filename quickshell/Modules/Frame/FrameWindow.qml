@@ -1195,16 +1195,16 @@ PanelWindow {
 
     // Coalesce bursts of settings-change signals into a single _buildBlur() call
     // on the next event loop tick.
-    property bool _blurRebuildPending: false
+    DeferredAction {
+        id: blurRebuildAction
+        onTriggered: win._runBlurRebuild()
+    }
+
     function _scheduleBlurRebuild() {
-        if (_blurRebuildPending)
-            return;
-        _blurRebuildPending = true;
-        Qt.callLater(_runBlurRebuild);
+        blurRebuildAction.schedule();
     }
     function _runBlurRebuild() {
-        _blurRebuildPending = false;
-        win._buildBlur();
+        _buildBlur();
     }
 
     Connections {
@@ -1257,7 +1257,10 @@ PanelWindow {
     }
 
     Component.onCompleted: win._scheduleBlurRebuild()
-    Component.onDestruction: win._teardownBlur()
+    Component.onDestruction: {
+        blurRebuildAction.cancel();
+        win._teardownBlur();
+    }
 
     FrameBorder {
         anchors.fill: parent

@@ -164,7 +164,22 @@ Item {
         }
     }
 
+    property bool barSurfacesLoaded: true
+
+    function recreateBarSurfaces() {
+        if (barSurfacesLoaded)
+            barSurfacesLoaded = false;
+        barSurfaceReloadAction.schedule();
+    }
+
+    DeferredAction {
+        id: barSurfaceReloadAction
+        onTriggered: root.barSurfacesLoaded = true
+    }
+
     property string _barLayoutStateJson: {
+        if (!barSurfacesLoaded)
+            return "[]";
         const configs = SettingsData.barConfigs;
         const mapped = configs.map(c => ({
                     id: c.id,
@@ -188,6 +203,19 @@ Item {
         }
     }
 
+    Connections {
+        target: SettingsData
+        function onFrameEnabledChanged() {
+            root.recreateBarSurfaces();
+        }
+        function onConnectedFrameModeActiveChanged() {
+            root.recreateBarSurfaces();
+        }
+        function onForceDankBarLayoutRefresh() {
+            root.recreateBarSurfaces();
+        }
+    }
+
     Frame {}
 
     Repeater {
@@ -203,7 +231,7 @@ Item {
             id: barLoader
             required property var modelData
             property var barConfig: SettingsData.barConfigs.find(cfg => cfg.id === modelData.id) || null
-            active: barConfig?.enabled ?? false
+            active: root.barSurfacesLoaded && (barConfig?.enabled ?? false)
             asynchronous: false
 
             sourceComponent: DankBar {

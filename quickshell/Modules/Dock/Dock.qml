@@ -202,18 +202,21 @@ Variants {
             ConnectedModeState.setDockSlide(dock._dockScreenName, dockSlide.x, dockSlide.y);
         }
 
-        property bool _slideSyncPending: false
+        DeferredAction {
+            id: dockSlideSync
+            enabled: SettingsData.connectedFrameModeActive
+            onTriggered: dock._syncDockSlide()
+        }
+
         function _queueSlideSync() {
             if (!SettingsData.connectedFrameModeActive)
                 return;
-            if (_slideSyncPending)
-                return;
-            _slideSyncPending = true;
-            Qt.callLater(dock._flushSlideSync);
+            dockSlideSync.schedule();
         }
-        function _flushSlideSync() {
-            _slideSyncPending = false;
-            dock._syncDockSlide();
+
+        DeferredAction {
+            id: dockChromeSync
+            onTriggered: dock._syncDockChromeState()
         }
 
         property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData)
@@ -390,8 +393,12 @@ Variants {
             }
         }
 
-        Component.onCompleted: Qt.callLater(() => dock._syncDockChromeState())
-        Component.onDestruction: ConnectedModeState.clearDockState(dock._dockScreenName)
+        Component.onCompleted: dockChromeSync.schedule()
+        Component.onDestruction: {
+            dockChromeSync.cancel();
+            dockSlideSync.cancel();
+            ConnectedModeState.clearDockState(dock._dockScreenName);
+        }
 
         onRevealChanged: dock._syncDockChromeState()
         onWidthChanged: dock._syncDockChromeState()
@@ -404,6 +411,7 @@ Variants {
         Connections {
             target: SettingsData
             function onConnectedFrameModeActiveChanged() {
+                dockSlideSync.cancel();
                 dock._syncDockChromeState();
             }
         }

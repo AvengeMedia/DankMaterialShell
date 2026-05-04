@@ -510,17 +510,6 @@ PanelWindow {
     property var nativeInhibitor: null
 
     Component.onCompleted: {
-        if (SettingsData.forceStatusBarLayoutRefresh) {
-            SettingsData.forceStatusBarLayoutRefresh.connect(() => {
-                Qt.callLater(() => {
-                    stackContainer.visible = false;
-                    Qt.callLater(() => {
-                        stackContainer.visible = true;
-                    });
-                });
-            });
-        }
-
         updateGpuTempConfig();
         _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
