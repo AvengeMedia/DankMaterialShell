@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtCore
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Common
 import qs.Services
 
@@ -42,6 +43,16 @@ Singleton {
     property bool profilesLoading: false
     property var validatedProfiles: ({})
     property bool manualActivation: false
+    property bool profilesReady: false
+    property var monitorsCache: ({
+            "version": 1,
+            "configurations": []
+        })
+    property bool _monitorsSelfWrite: false
+    // Last config entry that was applied (set by applyConfigEntry / confirmChanges).
+    // Used to recover position, scale, and transform for disabled outputs that wlr
+    // no longer reports a logical viewport for.
+    property var lastAppliedEntry: null
 
     signal changesApplied(var changeDescriptions)
     signal changesConfirmed
@@ -71,224 +82,611 @@ Singleton {
         return outputName;
     }
 
-    function validateProfiles() {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profilesDir = getProfilesDir();
-        const ext = getProfileExtension();
+    FileView {
+        id: monitorsFile
 
-        if (!profilesDir) {
-            validatedProfiles = {};
-            return;
-        }
-
-        const profileIds = Object.keys(profiles);
-        if (profileIds.length === 0) {
-            validatedProfiles = {};
-            return;
-        }
-
-        const fileChecks = profileIds.map(id => profilesDir + "/" + id + ext).join(" ");
-        Proc.runCommand("validate-profiles", ["sh", "-c", `for f in ${fileChecks}; do [ -f "$f" ] && echo "$f"; done`], (output, exitCode) => {
-            const existingFiles = new Set(output.trim().split("\n").filter(f => f));
-            const validated = {};
-            for (const profileId of profileIds) {
-                const profileFile = profilesDir + "/" + profileId + ext;
-                if (existingFiles.has(profileFile))
-                    validated[profileId] = profiles[profileId];
-                else
-                    SettingsData.removeDisplayProfile(compositor, profileId);
+        path: Paths.strip(Paths.config) + "/monitors.json"
+        blockLoading: true
+        blockWrites: true
+        atomicWrites: true
+        watchChanges: true
+        printErrors: false
+        onLoaded: root._reparseMonitorsJson(monitorsFile.text())
+        onLoadFailed: root._reparseMonitorsJson("")
+        onFileChanged: {
+            if (root._monitorsSelfWrite) {
+                root._monitorsSelfWrite = false;
+                return;
             }
+            monitorsFile.reload();
+        }
+        onSaveFailed: error => {
+            root._monitorsSelfWrite = false;
+            log.warn("Failed to save monitors.json:", error);
+        }
+    }
+
+    function _reparseMonitorsJson(text) {
+        if (!text || !text.trim()) {
+            monitorsCache = {
+                "version": 1,
+                "configurations": []
+            };
+        } else {
+            try {
+                const parsed = JSON.parse(text);
+                if (!Array.isArray(parsed.configurations))
+                    parsed.configurations = [];
+                monitorsCache = parsed;
+            } catch (e) {
+                log.warn("Failed to parse monitors.json, using empty config");
+                monitorsCache = {
+                    "version": 1,
+                    "configurations": []
+                };
+            }
+        }
+        _initializeProfiles();
+    }
+
+    function _initializeProfiles() {
+        if (!profilesReady && _shouldMigrateLegacyProfiles()) {
+            _migrateLegacyProfiles();
+            return;
+        }
+        validateProfiles();
+    }
+
+    function _shouldMigrateLegacyProfiles() {
+        if ((monitorsCache.configurations || []).length > 0)
+            return false;
+        const legacy = SettingsData.displayProfiles || {};
+        for (const c in legacy) {
+            if (Object.keys(legacy[c] || {}).length > 0)
+                return true;
+        }
+        return false;
+    }
+
+    function _migrateLegacyProfiles() {
+        const legacy = SettingsData.displayProfiles || {};
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        const compositorDirs = {
+            "niri": configDir + "/niri/dms/profiles",
+            "hyprland": configDir + "/hypr/dms/profiles",
+            "dwl": configDir + "/mango/dms/profiles"
+        };
+        const compositorExts = {
+            "niri": ".kdl",
+            "hyprland": ".conf",
+            "dwl": ".conf"
+        };
+
+        const tasks = [];
+        for (const compositor in legacy) {
+            const dir = compositorDirs[compositor];
+            const ext = compositorExts[compositor];
+            if (!dir || !ext)
+                continue;
+            for (const profileId in (legacy[compositor] || {})) {
+                tasks.push({
+                    compositor: compositor,
+                    id: profileId,
+                    name: legacy[compositor][profileId]?.name || "",
+                    file: dir + "/" + profileId + ext
+                });
+            }
+        }
+
+        if (tasks.length === 0) {
+            validateProfiles();
+            return;
+        }
+
+        log.info("Migrating", tasks.length, "legacy display profiles to monitors.json");
+
+        const migrated = [];
+        let pending = tasks.length;
+        const tryFinish = () => {
+            pending--;
+            if (pending > 0)
+                return;
+            const data = monitorsCache;
+            data.configurations = (data.configurations || []).concat(migrated);
+            writeMonitorsJson(data, success => {
+                if (success) {
+                    SettingsData.displayProfiles = {};
+                    SettingsData.saveSettings();
+                    log.info("Migrated", migrated.length, "of", tasks.length, "legacy profiles");
+                } else {
+                    log.warn("Failed to write migrated monitors.json");
+                }
+                validateProfiles();
+            });
+        };
+
+        for (const task of tasks) {
+            (function (t) {
+                    Proc.runCommand("migrate-read-" + t.id, ["cat", t.file], (content, exitCode) => {
+                        if (exitCode !== 0 || !content) {
+                            log.warn("Skipping migration of profile", t.id, "- can't read", t.file);
+                            tryFinish();
+                            return;
+                        }
+                        let parsed;
+                        switch (t.compositor) {
+                        case "niri":
+                            parsed = parseNiriOutputs(content);
+                            break;
+                        case "hyprland":
+                            parsed = parseHyprlandOutputs(content);
+                            break;
+                        case "dwl":
+                            parsed = parseMangoOutputs(content);
+                            break;
+                        default:
+                            parsed = {};
+                        }
+                        const niriSettings = SettingsData.niriOutputSettings || {};
+                        const hyprSettings = SettingsData.hyprlandOutputSettings || {};
+                        const profileOutputs = {};
+                        for (const outputName in parsed) {
+                            const od = parsed[outputName];
+                            profileOutputs[outputName] = extractOutputNeutralConfig(outputName, od, niriSettings, hyprSettings);
+                        }
+                        if (Object.keys(profileOutputs).length > 0)
+                            migrated.push({
+                                "id": t.id,
+                                "name": t.name,
+                                "outputs": profileOutputs
+                            });
+                        tryFinish();
+                    });
+                })(task);
+        }
+    }
+
+    function readMonitorsJson(callback) {
+        callback(monitorsCache);
+    }
+
+    function writeMonitorsJson(data, callback) {
+        monitorsCache = data;
+        _monitorsSelfWrite = true;
+        monitorsFile.setText(JSON.stringify(data, null, 2));
+        if (callback)
+            callback(true);
+    }
+
+    function generateProfileId() {
+        return "profile_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+    }
+
+    function configFingerprint(configEntry) {
+        return Object.keys(configEntry.outputs || {}).sort().join("+");
+    }
+
+    function outputSetFingerprint(outputIdentifiers) {
+        return [...outputIdentifiers].sort().join("+");
+    }
+
+    function findConfigEntryById(data, id) {
+        const configs = data.configurations || [];
+        for (let i = 0; i < configs.length; i++) {
+            if (configs[i].id === id)
+                return {
+                    entry: configs[i],
+                    index: i
+                };
+        }
+        return null;
+    }
+
+    function findConfigEntryByFingerprint(data, outputIdentifiers) {
+        const targetKey = outputSetFingerprint(outputIdentifiers);
+        const configs = data.configurations || [];
+        for (let i = 0; i < configs.length; i++) {
+            if (configFingerprint(configs[i]) === targetKey)
+                return {
+                    entry: configs[i],
+                    index: i
+                };
+        }
+        return null;
+    }
+
+    function findPartialConfigEntry(data, outputIdentifiers) {
+        const currentSet = new Set(outputIdentifiers);
+        const configs = data.configurations || [];
+        let bestEntry = null;
+        let bestCount = 0;
+        for (let i = 0; i < configs.length; i++) {
+            const cfgKeys = Object.keys(configs[i].outputs || {});
+            if (cfgKeys.length === 0)
+                continue;
+            if (!cfgKeys.every(k => currentSet.has(k)))
+                continue;
+            if (cfgKeys.length > bestCount) {
+                bestCount = cfgKeys.length;
+                bestEntry = {
+                    entry: configs[i],
+                    index: i
+                };
+            }
+        }
+        return bestEntry;
+    }
+
+    function getProfileMonitorInclusion(profileId) {
+        const profile = validatedProfiles[profileId];
+        const profileOutputIds = new Set(Object.keys(profile?.outputs || {}));
+        const result = {};
+        for (const rawName in allOutputs) {
+            const od = allOutputs[rawName];
+            const id = od ? getOutputIdentifier(od, rawName) : rawName;
+            result[rawName] = profileOutputIds.has(id);
+        }
+        return result;
+    }
+
+    function updateProfileMonitors(profileId, enabledRawNames) {
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (!match) {
+                profileError(I18n.tr("Profile not found"));
+                return;
+            }
+            const profileName = match.entry.name;
+            const existingOutputs = match.entry.outputs || {};
+            const mergedAll = buildOutputsWithPendingChanges();
+            const niriSettings = buildMergedNiriSettings();
+            const hyprlandSettings = buildMergedHyprlandSettings();
+            const newOutputConfigs = {};
+            for (const rawName of enabledRawNames) {
+                const od = mergedAll[rawName] || allOutputs[rawName];
+                if (!od)
+                    continue;
+                const outputId = getOutputIdentifier(od, rawName);
+                newOutputConfigs[outputId] = existingOutputs[outputId] || extractOutputNeutralConfig(rawName, od, niriSettings, hyprlandSettings);
+            }
+            data.configurations[match.index] = {
+                "id": profileId,
+                "name": profileName,
+                "outputs": newOutputConfigs
+            };
+            writeMonitorsJson(data, success => {
+                if (!success)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                updated[profileId] = {
+                    id: profileId,
+                    name: profileName,
+                    outputs: newOutputConfigs
+                };
+                validatedProfiles = updated;
+                matchedProfile = findMatchingProfile();
+                profileSaved(profileId, profileName);
+            });
+        });
+    }
+
+    // Extract neutral per-output config from current live state
+    function extractOutputNeutralConfig(outputName, outputData, niriSettings, hyprlandSettings) {
+        const modeData = (outputData.modes && outputData.current_mode !== undefined) ? outputData.modes[outputData.current_mode] : null;
+        const modeStr = modeData ? modeData.width + "x" + modeData.height + "@" + (modeData.refresh_rate / 1000).toFixed(3) : null;
+        const cfg = {
+            "mode": modeStr,
+            "position": {
+                "x": outputData.logical?.x ?? 0,
+                "y": outputData.logical?.y ?? 0
+            },
+            "scale": outputData.logical?.scale || 1.0,
+            "transform": outputData.logical?.transform ?? "Normal",
+            "vrr": outputData.vrr_enabled ?? false,
+            "disabled": false
+        };
+        if (CompositorService.isNiri) {
+            cfg.niri = Object.assign({}, niriSettings?.[getNiriOutputIdentifier(outputData, outputName)] || {});
+            if (cfg.niri.disabled) {
+                delete cfg.niri.disabled;
+                cfg.disabled = true;
+            }
+        }
+        if (CompositorService.isHyprland) {
+            cfg.hyprland = Object.assign({}, hyprlandSettings?.[getHyprlandOutputIdentifier(outputData, outputName)] || {});
+            if (outputData.mirror)
+                cfg.hyprland.mirror = outputData.mirror;
+            if (cfg.hyprland.disabled) {
+                delete cfg.hyprland.disabled;
+                cfg.disabled = true;
+            }
+        }
+        return cfg;
+    }
+
+    // Convert monitors.json config entry → internal outputsData map
+    function generateOutputsDataFromConfig(configEntry) {
+        const result = {};
+        const cfgOutputs = configEntry.outputs || {};
+        for (const outputId in cfgOutputs) {
+            const cfg = cfgOutputs[outputId];
+            // Find matching live output to get modes list
+            let liveOutput = null;
+            for (const name in outputs) {
+                if (getOutputIdentifier(outputs[name], name) === outputId || name === outputId) {
+                    liveOutput = outputs[name];
+                    break;
+                }
+            }
+            const liveModes = liveOutput?.modes || [];
+            let currentMode = liveModes.findIndex(m => {
+                const s = m.width + "x" + m.height + "@" + (m.refresh_rate / 1000).toFixed(3);
+                return s === cfg.mode;
+            });
+            if (currentMode < 0 && liveModes.length > 0)
+                currentMode = 0;
+            const entry = {
+                "name": outputId,
+                "make": liveOutput?.make || "",
+                "model": liveOutput?.model || "",
+                "serial": liveOutput?.serial || "",
+                "modes": liveModes,
+                "current_mode": currentMode,
+                "vrr_supported": liveOutput?.vrr_supported ?? false,
+                "vrr_enabled": cfg.vrr ?? false,
+                "logical": {
+                    "x": cfg.position?.x ?? 0,
+                    "y": cfg.position?.y ?? 0,
+                    "scale": cfg.scale ?? 1.0,
+                    "transform": cfg.transform ?? "Normal"
+                }
+            };
+            if (cfg.hyprland?.mirror)
+                entry.mirror = cfg.hyprland.mirror;
+            result[outputId] = entry;
+        }
+        return result;
+    }
+
+    // Extract niri settings map from neutral config entry for generateNiriOutputsKdl
+    function getNiriSettingsFromConfig(configEntry) {
+        const result = {};
+        for (const outputId in (configEntry.outputs || {})) {
+            const cfg = configEntry.outputs[outputId];
+            const settings = Object.assign({}, cfg.niri || {});
+            if (cfg.disabled)
+                settings.disabled = true;
+            if (Object.keys(settings).length > 0)
+                result[outputId] = settings;
+        }
+        return result;
+    }
+
+    // Extract hyprland settings map from neutral config entry
+    function getHyprlandSettingsFromConfig(configEntry) {
+        const result = {};
+        for (const outputId in (configEntry.outputs || {})) {
+            const cfg = configEntry.outputs[outputId];
+            const settings = Object.assign({}, cfg.hyprland || {});
+            if (cfg.disabled)
+                settings.disabled = true;
+            if (Object.keys(settings).length > 0)
+                result[outputId] = settings;
+        }
+        return result;
+    }
+
+    function ensureEnabledOutput(configEntry) {
+        const outputKeys = Object.keys(configEntry.outputs || {});
+        if (outputKeys.length === 0)
+            return false;
+        const hasEnabled = outputKeys.some(k => !configEntry.outputs[k].disabled);
+        if (hasEnabled)
+            return false;
+        delete configEntry.outputs[outputKeys[0]].disabled;
+        return true;
+    }
+
+    // Write compositor config from a neutral config entry and optionally reload
+    function applyConfigEntry(configEntry, configId, profileName, isManual) {
+        ensureEnabledOutput(configEntry);
+        // Capture the entry being applied so disabled-output settings fields can read
+        // scale/position/transform back even when wlr reports no logical viewport.
+        root.lastAppliedEntry = JSON.parse(JSON.stringify(configEntry));
+        const outputsData = generateOutputsDataFromConfig(configEntry);
+
+        const onWriteFailed = () => {
+            if (isManual) {
+                profilesLoading = false;
+                manualActivation = false;
+                profileError(I18n.tr("Failed to apply profile"));
+            }
+        };
+        const onWriteSuccess = () => {
+            SettingsData.setActiveDisplayProfile(CompositorService.compositor, configEntry.name ? configId : "");
+            if (isManual) {
+                WlrOutputService.requestState();
+                profilesLoading = false;
+                profileActivated(configId, profileName);
+                manualActivationTimer.restart();
+            } else {
+                saveConfigEntry(configEntry);
+            }
+        };
+
+        switch (CompositorService.compositor) {
+        case "niri":
+            {
+                const paths = getConfigPaths();
+                if (!paths) {
+                    onWriteFailed();
+                    return;
+                }
+                const configContent = generateNiriOutputsKdl(outputsData, getNiriSettingsFromConfig(configEntry));
+                Proc.runCommand("apply-config-write", ["sh", "-c", `mkdir -p "$(dirname "${paths.outputsFile}")" && cat > "${paths.outputsFile}" << 'EOF'\n${configContent}EOF`], (output, exitCode) => {
+                    if (exitCode !== 0) {
+                        onWriteFailed();
+                        return;
+                    }
+                    onWriteSuccess();
+                });
+                break;
+            }
+        case "hyprland":
+            HyprlandService.generateOutputsConfig(outputsData, getHyprlandSettingsFromConfig(configEntry), success => {
+                if (success)
+                    onWriteSuccess();
+                else
+                    onWriteFailed();
+            });
+            break;
+        case "dwl":
+            DwlService.generateOutputsConfig(outputsData, success => {
+                if (success)
+                    onWriteSuccess();
+                else
+                    onWriteFailed();
+            });
+            break;
+        default:
+            onWriteFailed();
+        }
+    }
+
+    // ── Profile management ─────────────────────────────────────────────────
+
+    function validateProfiles() {
+        log.info("Validating profiles against current outputs...");
+        readMonitorsJson(data => {
+            const validated = {};
+            let dirty = false;
+            for (const entry of (data.configurations || [])) {
+                const fp = configFingerprint(entry);
+                if (!fp)
+                    continue;
+                if (!entry.id) {
+                    entry.id = generateProfileId();
+                    dirty = true;
+                }
+                if (ensureEnabledOutput(entry))
+                    dirty = true;
+                validated[entry.id] = {
+                    id: entry.id,
+                    name: entry?.name || "",
+                    outputs: entry.outputs
+                };
+            }
+            if (dirty)
+                writeMonitorsJson(data, null);
             validatedProfiles = validated;
             matchedProfile = findMatchingProfile();
+            if (!profilesReady) {
+                profilesReady = true;
+                applyAutoConfig();
+            }
         });
     }
 
     function findMatchingProfile() {
-        const profiles = validatedProfiles;
-
-        log.debug("[Profile Match] Current outputs:", JSON.stringify(currentOutputSet));
-
-        let bestMatch = "";
-        let bestScore = -1;
-        let bestUpdatedAt = 0;
-
-        for (const profileId in profiles) {
-            const profile = profiles[profileId];
-            const profileSet = new Set(profile.outputSet);
-
-            log.debug("[Profile Match] Checking", profile.name, "outputSet:", JSON.stringify(profile.outputSet));
-
-            let allCurrentPresent = true;
-            for (const output of currentOutputSet) {
-                if (!profileSet.has(output)) {
-                    log.debug("[Profile Match]  - Missing output:", output);
-                    allCurrentPresent = false;
-                    break;
-                }
-            }
-            if (!allCurrentPresent) {
-                log.debug("[Profile Match]  - SKIP: not all current outputs present");
-                continue;
-            }
-
-            const disconnectedCount = profile.outputSet.length - currentOutputSet.length;
-            const score = currentOutputSet.length * 100 - disconnectedCount;
-            const updatedAt = profile.updatedAt || profile.createdAt || 0;
-            log.debug("[Profile Match]  - MATCH score:", score, "(disconnected:", disconnectedCount, "updatedAt:", updatedAt + ")");
-
-            if (score > bestScore || (score === bestScore && updatedAt > bestUpdatedAt)) {
-                bestScore = score;
-                bestMatch = profileId;
-                bestUpdatedAt = updatedAt;
-            }
+        const currentKey = currentOutputSet.join("+");
+        for (const id in validatedProfiles) {
+            const p = validatedProfiles[id];
+            if (Object.keys(p.outputs || {}).sort().join("+") === currentKey)
+                return id;
         }
-        log.debug("[Profile Match] Best match:", bestMatch, "score:", bestScore);
-        return bestMatch;
+        return "";
     }
 
-    function getProfilesDir() {
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        switch (CompositorService.compositor) {
-        case "niri":
-            return configDir + "/niri/dms/profiles";
-        case "hyprland":
-            return configDir + "/hypr/dms/profiles";
-        case "dwl":
-            return configDir + "/mango/dms/profiles";
-        default:
-            return "";
-        }
-    }
-
-    function getProfileExtension() {
-        return CompositorService.compositor === "niri" ? ".kdl" : ".conf";
-    }
-
-    function createProfile(name) {
-        const compositor = CompositorService.compositor;
-        const profileId = "profile_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
-        const outputSet = buildCurrentOutputSet();
-        const now = Date.now();
-
-        const profileData = {
-            "id": profileId,
-            "name": name,
-            "outputSet": outputSet,
-            "createdAt": now,
-            "updatedAt": now
-        };
-
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
-        const paths = getConfigPaths();
-        if (!paths) {
-            profileError(I18n.tr("Compositor not supported"));
-            return;
-        }
+    function createProfile(profileName) {
+        const outputConfigs = buildCurrentOutputConfigs();
+        const id = generateProfileId();
 
         profilesLoading = true;
-        Proc.runCommand("create-profile-dir", ["mkdir", "-p", profilesDir], (output, exitCode) => {
-            if (exitCode !== 0) {
+        readMonitorsJson(data => {
+            data.configurations.push({
+                "id": id,
+                "name": profileName,
+                "outputs": outputConfigs
+            });
+
+            writeMonitorsJson(data, success => {
                 profilesLoading = false;
-                profileError(I18n.tr("Failed to create profiles directory"));
-                return;
-            }
-            Proc.runCommand("copy-profile", ["cp", "-L", paths.outputsFile, profileFile], (output2, exitCode2) => {
-                if (exitCode2 !== 0) {
-                    profilesLoading = false;
-                    profileError(I18n.tr("Failed to save profile file"));
+                if (!success) {
+                    profileError(I18n.tr("Failed to save profile"));
                     return;
                 }
-                SettingsData.setDisplayProfile(compositor, profileId, profileData);
-                SettingsData.setActiveDisplayProfile(compositor, profileId);
                 const updated = JSON.parse(JSON.stringify(validatedProfiles));
-                updated[profileId] = profileData;
+                updated[id] = {
+                    id: id,
+                    name: profileName,
+                    outputs: outputConfigs
+                };
                 validatedProfiles = updated;
-                Proc.runCommand("link-new-profile", ["ln", "-sf", profileFile, paths.outputsFile], () => {
-                    profilesLoading = false;
-                    currentOutputSet = outputSet;
-                    matchedProfile = profileId;
-                    profileSaved(profileId, name);
-                });
+                currentOutputSet = buildCurrentOutputSet();
+                matchedProfile = findMatchingProfile();
+                SettingsData.setActiveDisplayProfile(CompositorService.compositor, id);
+                profileSaved(id, profileName);
             });
         });
     }
 
     function renameProfile(profileId, newName) {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profile = profiles[profileId];
-        if (!profile) {
-            profileError(I18n.tr("Profile not found"));
-            return;
-        }
-        profile.name = newName;
-        profile.updatedAt = Date.now();
-        SettingsData.setDisplayProfile(compositor, profileId, profile);
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (!match) {
+                profileError(I18n.tr("Profile not found"));
+                return;
+            }
+            match.entry.name = newName;
+            data.configurations[match.index] = match.entry;
+            writeMonitorsJson(data, success => {
+                if (!success)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                if (updated[profileId])
+                    updated[profileId].name = newName;
+                validatedProfiles = updated;
+            });
+        });
     }
 
     function deleteProfile(profileId) {
         const compositor = CompositorService.compositor;
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
         const isActive = SettingsData.getActiveDisplayProfile(compositor) === profileId;
 
         profilesLoading = true;
-        Proc.runCommand("delete-profile", ["rm", "-f", profileFile], (output, exitCode) => {
-            profilesLoading = false;
-            SettingsData.removeDisplayProfile(compositor, profileId);
-            if (isActive) {
-                SettingsData.setActiveDisplayProfile(compositor, "");
-                backendWriteOutputsConfig(allOutputs);
-            }
-            const updated = JSON.parse(JSON.stringify(validatedProfiles));
-            delete updated[profileId];
-            validatedProfiles = updated;
-            matchedProfile = findMatchingProfile();
-            profileDeleted(profileId);
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (match)
+                data.configurations.splice(match.index, 1);
+            writeMonitorsJson(data, success => {
+                profilesLoading = false;
+                SettingsData.removeDisplayProfile(compositor, profileId);
+                if (isActive) {
+                    SettingsData.setActiveDisplayProfile(compositor, "");
+                    backendWriteOutputsConfig(allOutputs);
+                }
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                delete updated[profileId];
+                validatedProfiles = updated;
+                matchedProfile = findMatchingProfile();
+                profileDeleted(profileId);
+            });
         });
     }
 
     function activateProfile(profileId) {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profile = profiles[profileId];
-        if (!profile) {
-            profileError(I18n.tr("Profile not found"));
-            return;
-        }
-
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
-        const paths = getConfigPaths();
-        if (!paths)
-            return;
-
         manualActivation = true;
         profilesLoading = true;
-        Proc.runCommand("activate-profile", ["ln", "-sf", profileFile, paths.outputsFile], (output, exitCode) => {
-            if (exitCode !== 0) {
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (!match) {
                 profilesLoading = false;
                 manualActivation = false;
-                profileError(I18n.tr("Failed to activate profile - file not found"));
+                profileError(I18n.tr("Profile not found in monitors.json"));
                 return;
             }
-            SettingsData.setActiveDisplayProfile(compositor, profileId);
-
-            const reloadCmd = CompositorService.isNiri ? ["niri", "msg", "action", "reload-config-or-panic"] : CompositorService.isHyprland ? ["hyprctl", "reload"] : [];
-            if (reloadCmd.length > 0) {
-                Proc.runCommand("reload-compositor", reloadCmd, (output2, exitCode2) => {
-                    profilesLoading = false;
-                    WlrOutputService.requestState();
-                    profileActivated(profileId, profile.name);
-                    manualActivationTimer.restart();
-                });
-            } else {
-                profilesLoading = false;
-                profileActivated(profileId, profile.name);
-                manualActivationTimer.restart();
-            }
+            applyConfigEntry(match.entry, profileId, match.entry.name || profileId, true);
         });
     }
 
@@ -298,27 +696,72 @@ Singleton {
         onTriggered: root.manualActivation = false
     }
 
-    Timer {
-        id: autoSelectDebounceTimer
-        interval: 800
-        onTriggered: root.doAutoSelectProfile()
-    }
-
-    // ! TODO - auto profile switching is buggy on niri and other compositors, might need a longer debounce before updating output configuration idk
-    function autoSelectProfile() {
-        return; // disabled
-        autoSelectDebounceTimer.restart();
-    }
-
-    function doAutoSelectProfile() {
-        return; // disabled
-        if (!SettingsData.displayProfileAutoSelect || manualActivation)
+    function applyAutoConfig() {
+        if (!profilesReady || !SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
             return;
-        currentOutputSet = buildCurrentOutputSet();
-        const matched = findMatchingProfile();
-        matchedProfile = matched;
-        if (matched && matched !== SettingsData.getActiveDisplayProfile(CompositorService.compositor))
-            activateProfile(matched);
+
+        readMonitorsJson(data => {
+            const match = findConfigEntryByFingerprint(data, currentOutputSet);
+            if (match) {
+                applyConfigEntry(match.entry, match.entry.id, match.entry.name || "", false);
+                return;
+            }
+
+            const partial = findPartialConfigEntry(data, currentOutputSet);
+            const niriSettings = buildMergedNiriSettings();
+            const hyprlandSettings = buildMergedHyprlandSettings();
+            const mergedOutputs = buildOutputsWithPendingChanges();
+
+            const outputConfigs = partial ? JSON.parse(JSON.stringify(partial.entry.outputs || {})) : {};
+
+            for (const name in outputs) {
+                const outputId = getOutputIdentifier(outputs[name], name);
+                const alreadyCovered = Object.keys(outputConfigs).some(k => k === outputId);
+                if (!alreadyCovered) {
+                    const od = mergedOutputs[name];
+                    if (od)
+                        outputConfigs[outputId] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
+                }
+            }
+
+            if (Object.keys(outputConfigs).length === 0)
+                return;
+
+            const syntheticEntry = {
+                name: "",
+                outputs: outputConfigs
+            };
+            applyConfigEntry(syntheticEntry, "", "", false);
+        });
+    }
+
+    function buildCurrentOutputConfigs() {
+        const mergedAll = buildOutputsWithPendingChanges();
+        const niriSettings = buildMergedNiriSettings();
+        const hyprlandSettings = buildMergedHyprlandSettings();
+        const outputConfigs = {};
+        for (const name in outputs) {
+            const od = mergedAll[name];
+            if (od)
+                outputConfigs[getOutputIdentifier(od, name)] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
+        }
+        return outputConfigs;
+    }
+
+    function saveConfigEntry(configEntry) {
+        if (!configEntry.id || !configEntry.name)
+            return;
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, configEntry.id);
+            if (!match)
+                return;
+            data.configurations[match.index] = {
+                "id": configEntry.id,
+                "name": configEntry.name,
+                "outputs": configEntry.outputs
+            };
+            writeMonitorsJson(data, null);
+        });
     }
 
     function deleteDisconnectedOutput(outputName) {
@@ -346,22 +789,52 @@ Singleton {
             });
         }
         for (const name in outputs) {
-            result[name] = Object.assign({}, outputs[name], {
-                "connected": true
-            });
+            const entry = JSON.parse(JSON.stringify(outputs[name]));
+            entry.connected = true;
+            // For disabled outputs wlr reports scale=0 (no logical viewport).
+            // Overlay scale/position/transform from the last applied profile so
+            // the settings UI can display meaningful values.
+            if (!(entry.logical?.scale > 0)) {
+                const profileCfg = getProfileOutputConfig(name);
+                if (profileCfg) {
+                    if (!entry.logical)
+                        entry.logical = {};
+                    entry.logical.scale = profileCfg.scale ?? 1.0;
+                    entry.logical.x = profileCfg.position?.x ?? entry.logical.x ?? 0;
+                    entry.logical.y = profileCfg.position?.y ?? entry.logical.y ?? 0;
+                    if (profileCfg.transform)
+                        entry.logical.transform = profileCfg.transform;
+                } else if (entry.logical) {
+                    entry.logical.scale = entry.logical.scale || 1.0;
+                }
+            }
+            result[name] = entry;
         }
         return result;
     }
 
+    function getProfileOutputConfig(outputName) {
+        const sourceEntry = lastAppliedEntry || (matchedProfile ? validatedProfiles[matchedProfile] : null);
+        if (!sourceEntry)
+            return null;
+        const cfgOutputs = sourceEntry.outputs || {};
+        const outputId = getOutputIdentifier(outputs[outputName] || {}, outputName);
+        return Object.entries(cfgOutputs).find(([key]) => key === outputId)?.[1] ?? null;
+    }
+
     onOutputsChanged: {
         allOutputs = buildAllOutputsMap();
-        currentOutputSet = buildCurrentOutputSet();
-        matchedProfile = findMatchingProfile();
-        // ! TODO - auto profile switching disabled for now
-        // if (SettingsData.displayProfileAutoSelect)
-        //     Qt.callLater(autoSelectProfile);
+        const newOutputSet = buildCurrentOutputSet();
+        if (JSON.stringify(newOutputSet) === JSON.stringify(currentOutputSet))
+            return;
+        // Physical output set changed — pending tweaks belong to the previous setup
+        if (hasPendingChanges)
+            clearPendingChanges();
+        currentOutputSet = newOutputSet;
+        applyAutoConfig();
     }
     onSavedOutputsChanged: allOutputs = buildAllOutputsMap()
+    onLastAppliedEntryChanged: allOutputs = buildAllOutputsMap()
 
     Connections {
         target: WlrOutputService
@@ -371,12 +844,16 @@ Singleton {
         }
     }
 
+    Connections {
+        target: CompositorService
+        function onCompositorChanged() {
+            root.checkIncludeStatus();
+        }
+    }
+
     Component.onCompleted: {
         outputs = buildOutputsMap();
         reloadSavedOutputs();
-        checkIncludeStatus();
-        currentOutputSet = buildCurrentOutputSet();
-        validateProfiles();
     }
 
     function reloadSavedOutputs() {
@@ -841,7 +1318,7 @@ Singleton {
                     "y": output.y ?? 0,
                     "width": output.currentMode?.width ?? 1920,
                     "height": output.currentMode?.height ?? 1080,
-                    "scale": output.scale ?? 1.0,
+                    "scale": output.scale || 1.0,
                     "transform": mapWlrTransform(output.transform)
                 }
             };
@@ -1020,14 +1497,7 @@ Singleton {
     }
 
     function getOutputDisplayName(output, outputName) {
-        if (SettingsData.displayNameMode === "model" && output?.make && output?.model) {
-            if (CompositorService.isNiri) {
-                const serial = output.serial || "Unknown";
-                return output.make + " " + output.model + " " + serial;
-            }
-            return output.make + " " + output.model;
-        }
-        return outputName;
+        return getOutputIdentifier(output, outputName);
     }
 
     function getNiriOutputIdentifier(output, outputName) {
@@ -1184,6 +1654,28 @@ Singleton {
         return pending !== undefined ? pending : originalValue;
     }
 
+    // Returns true if the given output can currently be disabled.
+    // Prevents disabling all outputs and prevents disabling the only output
+    // in a single-display configuration.
+    function canDisableOutput() {
+        if (!CompositorService.isNiri && !CompositorService.isHyprland)
+            return false;
+        const totalOutputs = Object.keys(outputs).length;
+        if (totalOutputs <= 1)
+            return false;
+        let enabledCount = 0;
+        for (const name in outputs) {
+            let disabled = false;
+            if (CompositorService.isNiri)
+                disabled = getNiriSetting(outputs[name], name, "disabled", false);
+            else if (CompositorService.isHyprland)
+                disabled = getHyprlandSetting(outputs[name], name, "disabled", false);
+            if (!disabled)
+                enabledCount++;
+        }
+        return enabledCount >= 2;
+    }
+
     function clearPendingChanges() {
         pendingChanges = {};
         pendingNiriChanges = {};
@@ -1322,6 +1814,11 @@ Singleton {
                 merged[outputId][key] = pendingNiriChanges[outputId][key];
             }
         }
+        // Never disable the only connected output — clear any stale flag
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in merged)
+                delete merged[id].disabled;
+        }
         return merged;
     }
 
@@ -1329,6 +1826,13 @@ Singleton {
         for (const outputId in pendingNiriChanges) {
             for (const key in pendingNiriChanges[outputId]) {
                 SettingsData.setNiriOutputSetting(outputId, key, pendingNiriChanges[outputId][key]);
+            }
+        }
+        // Clear stale disabled from SettingsData so NiriService reads clean state
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in SettingsData.niriOutputSettings) {
+                if (SettingsData.niriOutputSettings[id]?.disabled)
+                    SettingsData.setNiriOutputSetting(id, "disabled", null);
             }
         }
     }
@@ -1346,6 +1850,11 @@ Singleton {
                     merged[outputId][key] = val;
             }
         }
+        // Never disable the only connected output — clear any stale flag
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in merged)
+                delete merged[id].disabled;
+        }
         return merged;
     }
 
@@ -1357,6 +1866,13 @@ Singleton {
                     SettingsData.removeHyprlandOutputSetting(outputId, key);
                 else
                     SettingsData.setHyprlandOutputSetting(outputId, key, val);
+            }
+        }
+        // Clear stale disabled from SettingsData so HyprlandService reads clean state
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in SettingsData.hyprlandOutputSettings) {
+                if (SettingsData.hyprlandOutputSettings[id]?.disabled)
+                    SettingsData.removeHyprlandOutputSetting(id, "disabled");
             }
         }
     }
@@ -1464,6 +1980,23 @@ Singleton {
     }
 
     function confirmChanges() {
+        const outputConfigs = buildCurrentOutputConfigs();
+        lastAppliedEntry = {
+            outputs: outputConfigs
+        };
+
+        readMonitorsJson(data => {
+            const match = findConfigEntryByFingerprint(data, Object.keys(outputConfigs));
+            if (!match || !match.entry.name)
+                return;
+            data.configurations[match.index] = {
+                "id": match.entry.id,
+                "name": match.entry.name,
+                "outputs": outputConfigs
+            };
+            writeMonitorsJson(data, null);
+        });
+
         clearPendingChanges();
         changesConfirmed();
     }

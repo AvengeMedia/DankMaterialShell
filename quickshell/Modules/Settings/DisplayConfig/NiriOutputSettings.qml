@@ -61,6 +61,8 @@ Column {
         DankToggle {
             width: parent.width
             text: I18n.tr("Disable Output")
+            enabled: checked || DisplayConfigState.canDisableOutput()
+            description: (!checked && !DisplayConfigState.canDisableOutput()) ? (Object.keys(DisplayConfigState.outputs).length <= 1 ? I18n.tr("Cannot disable the only output") : I18n.tr("At least one output must remain enabled")) : ""
             checked: DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "disabled", false)
             onToggled: checked => DisplayConfigState.setNiriSetting(root.outputData, root.outputName, "disabled", checked)
         }

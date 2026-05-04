@@ -24,6 +24,7 @@ import qs.Modules.DankBar
 import qs.Modules.DankBar.Popouts
 import qs.Modules.Frame
 import qs.Modules.WorkspaceOverlays
+import qs.Modules.Settings.DisplayConfig
 import qs.Services
 
 Item {
@@ -304,6 +305,8 @@ Item {
         dockRecreateDebounce.start();
         // Force PolkitService singleton to initialize
         PolkitService.polkitAvailable;
+        // Force DisplayConfigState singleton to initialize so auto-config runs at startup
+        DisplayConfigState.hasOutputBackend;
         loginSoundTimer.start();
     }
 
