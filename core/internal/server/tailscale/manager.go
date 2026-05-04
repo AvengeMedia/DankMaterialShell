@@ -13,7 +13,10 @@ import (
 	"tailscale.com/ipn/ipnstate"
 )
 
-const statusTimeout = 3 * time.Second
+const (
+	statusTimeout  = 3 * time.Second
+	debounceWindow = 150 * time.Millisecond
+)
 
 // tailscaleClient abstracts the Tailscale local API for testing.
 type tailscaleClient interface {
@@ -42,13 +45,17 @@ func (w *localClientWrapper) Status(ctx context.Context) (*ipnstate.Status, erro
 
 // Manager manages Tailscale state via IPN bus events and subscriber notifications.
 type Manager struct {
-	state       *TailscaleState
-	stateMutex  sync.RWMutex
-	subscribers syncmap.Map[string, chan TailscaleState]
-	client      tailscaleClient
-	cancel      context.CancelFunc
-	watchWG     sync.WaitGroup
-	closed      atomic.Bool
+	state                *TailscaleState
+	stateMutex           sync.RWMutex
+	subscribers          syncmap.Map[string, chan TailscaleState]
+	client               tailscaleClient
+	ctx                  context.Context
+	cancel               context.CancelFunc
+	watchWG              sync.WaitGroup
+	closed               atomic.Bool
+	dirty                chan struct{}
+	available            atomic.Bool
+	availabilityCallback atomic.Pointer[func(bool)]
 }
 
 // NewManager creates a new Tailscale manager and starts watching the IPN bus.
@@ -62,11 +69,14 @@ func newManager(client tailscaleClient) *Manager {
 	m := &Manager{
 		state:  &TailscaleState{},
 		client: client,
+		ctx:    ctx,
 		cancel: cancel,
+		dirty:  make(chan struct{}, 1),
 	}
 
-	m.watchWG.Add(1)
+	m.watchWG.Add(2)
 	go m.watchLoop(ctx)
+	go m.debounceLoop(ctx)
 
 	return m
 }
@@ -103,9 +113,8 @@ func (m *Manager) watchLoop(ctx context.Context) {
 		unreachableSent = false
 		backoff = time.Second
 		log.Info("[Tailscale] Connected to IPN bus")
+		m.markAvailable()
 
-		// Initial state arrives via NotifyInitialState/NotifyInitialNetMap
-		// events in the loop below.
 		for {
 			notify, err := watcher.Next()
 			if err != nil {
@@ -113,12 +122,46 @@ func (m *Manager) watchLoop(ctx context.Context) {
 				break
 			}
 
-			if notify.State != nil || notify.NetMap != nil {
-				m.fetchAndBroadcast(ctx)
+			if notify.State == nil && notify.NetMap == nil {
+				continue
+			}
+			select {
+			case m.dirty <- struct{}{}:
+			default:
 			}
 		}
 
 		watcher.Close()
+	}
+}
+
+// debounceLoop coalesces rapid bus notifications into a single Status RPC
+// per debounceWindow, since NetMap events can fire many times per second
+// on busy tailnets.
+func (m *Manager) debounceLoop(ctx context.Context) {
+	defer m.watchWG.Done()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-m.dirty:
+		}
+
+		timer := time.NewTimer(debounceWindow)
+		collecting := true
+		for collecting {
+			select {
+			case <-ctx.Done():
+				timer.Stop()
+				return
+			case <-m.dirty:
+			case <-timer.C:
+				collecting = false
+			}
+		}
+
+		m.fetchAndBroadcast(ctx)
 	}
 }
 
@@ -155,6 +198,29 @@ func (m *Manager) broadcastState(state TailscaleState) {
 		}
 		return true
 	})
+}
+
+// IsAvailable reports whether tailscaled has been reachable via the IPN bus
+// at least once since the manager started. False means tailscaled appears
+// to not be installed or has never been running.
+func (m *Manager) IsAvailable() bool {
+	return m.available.Load()
+}
+
+// SetAvailabilityCallback registers a callback fired when the manager
+// transitions from unavailable to available. Replaces any previously set
+// callback. Must be set before the manager has a chance to detect tailscaled.
+func (m *Manager) SetAvailabilityCallback(cb func(bool)) {
+	m.availabilityCallback.Store(&cb)
+}
+
+func (m *Manager) markAvailable() {
+	if m.available.Swap(true) {
+		return
+	}
+	if cb := m.availabilityCallback.Load(); cb != nil {
+		(*cb)(true)
+	}
 }
 
 // GetState returns a copy of the current Tailscale state.
@@ -197,7 +263,7 @@ func (m *Manager) Close() {
 
 // RefreshState triggers an immediate status fetch and broadcasts.
 func (m *Manager) RefreshState() {
-	ctx, cancel := context.WithTimeout(context.Background(), statusTimeout)
+	ctx, cancel := context.WithTimeout(m.ctx, statusTimeout)
 	defer cancel()
 
 	status, err := m.client.Status(ctx)

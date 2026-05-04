@@ -100,7 +100,7 @@ func convertPeerStatus(ps *ipnstate.PeerStatus, users map[tailcfg.UserID]tailcfg
 		}
 	}
 
-	if !ps.LastSeen.IsZero() && ps.LastSeen.Year() > 1 {
+	if !ps.LastSeen.IsZero() {
 		peer.LastSeen = formatRelativeTime(ps.LastSeen)
 	}
 

@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
 import Quickshell
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -15,7 +13,7 @@ PluginComponent {
         service: TailscaleService
     }
 
-    ccWidgetIcon: TailscaleService.connected ? "device_hub" : "device_hub"
+    ccWidgetIcon: "device_hub"
     ccWidgetPrimaryText: I18n.tr("Tailscale", "Tailscale mesh VPN widget title")
     ccWidgetSecondaryText: {
         if (!TailscaleService.available)
@@ -121,9 +119,18 @@ PluginComponent {
                             showCounts: true
                             chipHeight: 26
                             model: [
-                                { "label": I18n.tr("My Online", "Tailscale filter: my online devices"), "count": TailscaleService.getMyOnlinePeers().length },
-                                { "label": I18n.tr("Online", "Tailscale filter: all online devices"), "count": TailscaleService.getOnlinePeers().length },
-                                { "label": I18n.tr("All", "Tailscale filter: all devices"), "count": TailscaleService.allPeersWithSelf().length }
+                                {
+                                    "label": I18n.tr("My Online", "Tailscale filter: my online devices"),
+                                    "count": TailscaleService.myOnlinePeers.length
+                                },
+                                {
+                                    "label": I18n.tr("Online", "Tailscale filter: all online devices"),
+                                    "count": TailscaleService.onlinePeers.length
+                                },
+                                {
+                                    "label": I18n.tr("All", "Tailscale filter: all devices"),
+                                    "count": TailscaleService.allPeersList.length
+                                }
                             ]
                             onSelectionChanged: index => {
                                 detailRoot.filterIndex = index;
@@ -149,13 +156,20 @@ PluginComponent {
                             property var filteredPeers: {
                                 let base;
                                 switch (detailRoot.filterIndex) {
-                                case 0: base = TailscaleService.getMyOnlinePeers() || []; break;
-                                case 1: base = TailscaleService.getOnlinePeers() || []; break;
-                                case 2: base = TailscaleService.allPeersWithSelf() || []; break;
-                                default: base = [];
+                                case 0:
+                                    base = TailscaleService.myOnlinePeers;
+                                    break;
+                                case 1:
+                                    base = TailscaleService.onlinePeers;
+                                    break;
+                                case 2:
+                                    base = TailscaleService.allPeersList;
+                                    break;
+                                default:
+                                    base = [];
                                 }
                                 if (detailRoot.searchQuery.length > 0)
-                                    return TailscaleService.searchPeers(detailRoot.searchQuery, base) || [];
+                                    return TailscaleService.searchPeers(detailRoot.searchQuery, base);
                                 return base;
                             }
 
@@ -263,7 +277,8 @@ PluginComponent {
                                         StyledText {
                                             text: {
                                                 const parts = [];
-                                                if (modelData.os) parts.push(modelData.os);
+                                                if (modelData.os)
+                                                    parts.push(modelData.os);
                                                 if (modelData.online) {
                                                     parts.push(modelData.relay ? I18n.tr("relay: %1", "Tailscale relay server name").arg(modelData.relay) : I18n.tr("direct", "Tailscale direct connection"));
                                                 } else if (modelData.lastSeen) {

@@ -7,6 +7,7 @@ import qs.Common
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("TailscaleService")
 
     property int refCount: 0
 
@@ -44,16 +45,30 @@ Singleton {
     property bool available: false
     property bool stateInitialized: false
 
-    readonly property int onlinePeerCount: {
-        if (!peers || peers.length === 0)
-            return 0;
-        let count = 0;
-        for (let i = 0; i < peers.length; i++) {
-            if (peers[i].online)
-                count++;
-        }
-        return count;
+    readonly property var allPeersList: {
+        const result = [];
+        if (selfNode)
+            result.push(selfNode);
+        if (peers)
+            result.push(...peers);
+        return result;
     }
+
+    readonly property var onlinePeers: allPeersList.filter(p => p.online)
+
+    readonly property var myPeers: {
+        if (!selfNode)
+            return allPeersList;
+        return allPeersList.filter(p => isMine(p));
+    }
+
+    readonly property var myOnlinePeers: {
+        if (!selfNode)
+            return onlinePeers;
+        return allPeersList.filter(p => p.online && isMine(p));
+    }
+
+    readonly property int onlinePeerCount: onlinePeers.length
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -79,7 +94,7 @@ Singleton {
         enabled: DMSService.isConnected
 
         function onTailscaleStateUpdate(data) {
-            console.log("TailscaleService: Subscription update received");
+            root.log.debug("Subscription update received");
             updateState(data);
         }
 
@@ -93,12 +108,17 @@ Singleton {
             return;
         if (DMSService.capabilities.length === 0)
             return;
+        const wasAvailable = available;
         available = DMSService.capabilities.includes("tailscale");
 
-        if (available && !stateInitialized) {
+        if (!available)
+            return;
+        if (!stateInitialized) {
             stateInitialized = true;
             getStatus();
         }
+        if (!wasAvailable)
+            ensureSubscription();
     }
 
     function getStatus() {
@@ -132,42 +152,21 @@ Singleton {
         });
     }
 
-    // All filter functions prepend selfNode so it appears first in lists
-    function allPeersWithSelf() {
-        if (!available) return [];
-        const result = [];
-        if (selfNode) result.push(selfNode);
-        if (peers) result.push(...peers);
-        return result;
-    }
-
     function isMine(peer) {
         const myOwner = selfNode ? (selfNode.owner || "") : "";
-        if (peer.owner === myOwner && myOwner !== "") return true;
-        // Tagged devices belong to the tailnet but have a different UserID
-        if (peer.tags && peer.tags.length > 0) return true;
+        if (peer.owner === myOwner && myOwner !== "")
+            return true;
+        if (peer.tags && peer.tags.length > 0)
+            return true;
         return false;
     }
 
-    function getMyPeers() {
-        if (!available || !selfNode) return allPeersWithSelf();
-        return allPeersWithSelf().filter(p => isMine(p));
-    }
-
-    function getOnlinePeers() {
-        return allPeersWithSelf().filter(p => p.online);
-    }
-
-    function getMyOnlinePeers() {
-        if (!available || !selfNode) return getOnlinePeers();
-        return allPeersWithSelf().filter(p => p.online && isMine(p));
-    }
-
-    function searchPeers(query, peers) {
-        const list = peers || allPeersWithSelf();
-        if (!query || query.length === 0) return list;
+    function searchPeers(query, list) {
+        const base = list || allPeersList;
+        if (!query || query.length === 0)
+            return base;
         const q = query.toLowerCase();
-        return list.filter(p => {
+        return base.filter(p => {
             if (p.hostname && p.hostname.toLowerCase().includes(q))
                 return true;
             if (p.dnsName && p.dnsName.toLowerCase().includes(q))

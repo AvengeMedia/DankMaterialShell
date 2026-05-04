@@ -86,7 +86,6 @@ const dbusClientID = "dms-dbus-client"
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsSubscribers syncmap.Map[string, bool]
 var cupsSubscriberCount atomic.Int32
-var tailscaleManagerMu sync.Mutex
 var extWorkspaceAvailable atomic.Bool
 var extWorkspaceInitMutex sync.Mutex
 
@@ -492,7 +491,7 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "cups")
 	}
 
-	if tailscaleManager != nil {
+	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		caps = append(caps, "tailscale")
 	}
 
@@ -566,7 +565,7 @@ func getServerInfo() ServerInfo {
 		caps = append(caps, "cups")
 	}
 
-	if tailscaleManager != nil {
+	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		caps = append(caps, "tailscale")
 	}
 
@@ -1050,7 +1049,7 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}
 	}
 
-	if shouldSubscribe("tailscale") && tailscaleManager != nil {
+	if shouldSubscribe("tailscale") && tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		wg.Add(1)
 		tailscaleChan := tailscaleManager.Subscribe(clientID + "-tailscale")
 		go func() {
@@ -1460,10 +1459,13 @@ func cleanupManagers() {
 func Start(printDocs bool) error {
 	cleanupStaleSockets()
 
-	// Tailscale manager always starts — reconnects internally via WatchIPNBus
-	tailscaleManagerMu.Lock()
+	// Tailscale manager always starts — reconnects internally via WatchIPNBus.
+	// The capability is only advertised once tailscaled is reachable; the
+	// callback wakes capability subscribers so QML clients see it transition.
 	tailscaleManager = tailscale.NewManager("")
-	tailscaleManagerMu.Unlock()
+	tailscaleManager.SetAvailabilityCallback(func(bool) {
+		notifyCapabilityChange()
+	})
 
 	socketPath := GetSocketPath()
 	os.Remove(socketPath)

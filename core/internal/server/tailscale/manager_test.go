@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -135,6 +136,37 @@ func TestWatchLoop_StateChange(t *testing.T) {
 	assert.Equal(t, "cachyos", state.Self.Hostname)
 }
 
+func TestWatchLoop_CoalescesNotifies(t *testing.T) {
+	stateVal := ipn.Running
+	var statusCalls atomic.Int32
+
+	notifies := make([]ipn.Notify, 0, 20)
+	for range 20 {
+		notifies = append(notifies, ipn.Notify{State: &stateVal})
+	}
+
+	client := &mockClient{
+		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+			return newMockWatcher(ctx, notifies, nil), nil
+		},
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
+			statusCalls.Add(1)
+			return runningStatus(), nil
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	// Wait for the debounce window to expire plus margin so the burst settles.
+	time.Sleep(debounceWindow + 100*time.Millisecond)
+
+	calls := statusCalls.Load()
+	assert.Less(t, int(calls), 5,
+		"20 rapid notifies should coalesce to a small number of Status RPCs, got %d", calls)
+	assert.Greater(t, int(calls), 0, "expected at least one Status RPC")
+}
+
 func TestWatchLoop_Reconnect(t *testing.T) {
 	watchCalled := make(chan struct{}, 4)
 
@@ -210,6 +242,47 @@ func TestManager_Close(t *testing.T) {
 	assert.NotPanics(t, func() {
 		m.Close()
 	})
+}
+
+func TestManager_Availability(t *testing.T) {
+	var watchAttempts atomic.Int32
+
+	client := &mockClient{
+		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+			n := watchAttempts.Add(1)
+			if n == 1 {
+				return nil, fmt.Errorf("tailscaled socket not found")
+			}
+			return newMockWatcher(ctx, nil, nil), nil
+		},
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
+			return runningStatus(), nil
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	cbFired := make(chan bool, 1)
+	m.SetAvailabilityCallback(func(b bool) {
+		select {
+		case cbFired <- b:
+		default:
+		}
+	})
+
+	assert.False(t, m.IsAvailable())
+
+	require.Eventually(t, func() bool {
+		return m.IsAvailable()
+	}, 3*time.Second, 50*time.Millisecond)
+
+	select {
+	case b := <-cbFired:
+		assert.True(t, b)
+	case <-time.After(time.Second):
+		t.Fatal("availability callback did not fire")
+	}
 }
 
 func TestManager_RefreshState(t *testing.T) {

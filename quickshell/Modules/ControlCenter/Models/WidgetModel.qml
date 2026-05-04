@@ -86,7 +86,7 @@ QtObject {
                 const widgets = SettingsData.controlCenterWidgets || [];
                 const hasTailscaleWidget = widgets.some(w => w.id === "builtin_tailscale");
                 if (!hasTailscaleWidget && tailscaleLoader.active) {
-                    console.log("TailscaleWidget: No Tailscale widget in control center, deactivating loader");
+                    root.log.debug("No Tailscale widget in control center, deactivating loader");
                     tailscaleLoader.active = false;
                 }
             }
