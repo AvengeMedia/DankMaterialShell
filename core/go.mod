@@ -4,14 +4,14 @@ go 1.26.1
 
 require (
 	github.com/Wifx/gonetworkmanager/v2 v2.2.0
-	github.com/alecthomas/chroma/v2 v2.24.0
+	github.com/alecthomas/chroma/v2 v2.24.1
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/log v1.0.0
-	github.com/fsnotify/fsnotify v1.9.0
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/godbus/dbus/v5 v5.2.2
-	github.com/holoplot/go-evdev v0.0.0-20250804134636-ab1d56a1fe83
+	github.com/holoplot/go-evdev v0.0.0-20260504100651-66d1748fe847
 	github.com/pilebones/go-udev v0.9.1
 	github.com/sblinch/kdl-go v0.0.0-20260121213736-8b7053306ca6
 	github.com/spf13/cobra v1.10.2
@@ -24,7 +24,7 @@ require (
 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
 	golang.org/x/image v0.39.0
-	tailscale.com v1.96.1
+	tailscale.com v1.96.5
 )
 
 require (
@@ -35,27 +35,27 @@ require (
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
-	github.com/coder/websocket v1.8.12 // indirect
+	github.com/coder/websocket v1.8.14 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
-	github.com/dblohm7/wingoes v0.0.0-20240119213807-a09d6be7affa // indirect
+	github.com/dblohm7/wingoes v0.0.0-20250822163801-6d8e6105c62d // indirect
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fogleman/gg v1.3.0 // indirect
-	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.9.2 // indirect
 	github.com/go-git/gcfg/v2 v2.0.2 // indirect
-	github.com/go-git/go-billy/v6 v6.0.0-20260424211911-732291493fb8 // indirect
-	github.com/go-json-experiment/json v0.0.0-20250813024750-ebf49471dced // indirect
+	github.com/go-git/go-billy/v6 v6.0.0-20260504142752-cb8e9d337266 // indirect
+	github.com/go-json-experiment/json v0.0.0-20260430182902-b6187a392ed4 // indirect
 	github.com/go-logfmt/logfmt v0.6.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/hdevalence/ed25519consensus v0.2.0 // indirect
-	github.com/jsimonetti/rtnetlink v1.4.0 // indirect
+	github.com/jsimonetti/rtnetlink v1.4.2 // indirect
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
-	github.com/mdlayher/netlink v1.7.3-0.20250113171957-fbb4dce95f42 // indirect
-	github.com/mdlayher/socket v0.5.0 // indirect
+	github.com/mdlayher/netlink v1.11.1 // indirect
+	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
-	github.com/pjbgf/sha1cd v0.5.0 // indirect
+	github.com/pjbgf/sha1cd v0.6.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
@@ -66,7 +66,7 @@ require (
 	golang.org/x/crypto v0.50.0 // indirect
 	golang.org/x/net v0.53.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
+	golang.zx2c4.com/wireguard/windows v1.0.1 // indirect
 )
 
 require (
