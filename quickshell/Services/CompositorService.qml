@@ -391,6 +391,63 @@ Singleton {
         return toplevels;
     }
 
+    function _screenName(screenOrName) {
+        if (typeof screenOrName === "string")
+            return screenOrName;
+        return screenOrName?.name ?? "";
+    }
+
+    function _toplevelOnScreen(toplevel, screenName) {
+        if (!toplevel || !screenName)
+            return false;
+        const screens = toplevel.screens;
+        if (!screens)
+            return false;
+        for (let i = 0; i < screens.length; i++) {
+            if (screens[i]?.name === screenName)
+                return true;
+        }
+        return false;
+    }
+
+    function hasFullscreenToplevelOnScreen(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!screenName)
+            return false;
+
+        if (isNiri) {
+            const active = ToplevelManager.activeToplevel;
+            if (active?.fullscreen && active?.activated && NiriService.currentOutput === screenName)
+                return true;
+
+            const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
+            for (let i = 0; i < filtered.length; i++) {
+                const toplevel = filtered[i];
+                if (toplevel?.fullscreen && toplevel?.activated)
+                    return true;
+            }
+            return false;
+        }
+
+        if (isHyprland) {
+            const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
+            for (let i = 0; i < filtered.length; i++) {
+                if (filtered[i]?.fullscreen)
+                    return true;
+            }
+            return false;
+        }
+
+        if (!ToplevelManager.toplevels?.values)
+            return false;
+
+        for (const toplevel of ToplevelManager.toplevels.values) {
+            if (toplevel?.fullscreen && _toplevelOnScreen(toplevel, screenName))
+                return true;
+        }
+        return false;
+    }
+
     function filterHyprlandCurrentDisplaySafe(toplevels, screenName) {
         if (!toplevels || toplevels.length === 0 || !Hyprland.toplevels)
             return toplevels;

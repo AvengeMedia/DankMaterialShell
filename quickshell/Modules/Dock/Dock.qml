@@ -29,7 +29,7 @@ Variants {
         }
 
         WlrLayershell.namespace: "dms:dock"
-        WlrLayershell.layer: SettingsData.frameEnabled ? WlrLayer.Overlay : WlrLayer.Top
+        WlrLayershell.layer: SettingsData.frameEnabled && !dock.hasFullscreenToplevel ? WlrLayer.Overlay : WlrLayer.Top
 
         readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
 
@@ -163,6 +163,18 @@ Variants {
         }
 
         readonly property string _dockScreenName: dock.modelData ? dock.modelData.name : (dock.screen ? dock.screen.name : "")
+        readonly property bool hasFullscreenToplevel: {
+            CompositorService.sortedToplevels;
+            ToplevelManager.activeToplevel;
+            if (CompositorService.isNiri) {
+                NiriService.currentOutput;
+                NiriService.windows;
+                NiriService.allWorkspaces;
+            }
+            if (CompositorService.isHyprland)
+                Hyprland.focusedWorkspace;
+            return CompositorService.hasFullscreenToplevelOnScreen(dock._dockScreenName);
+        }
 
         function _syncDockChromeState() {
             if (!dock._dockScreenName)
@@ -353,6 +365,9 @@ Variants {
             if (_modalRetractActive)
                 return false;
 
+            if (dock.hasFullscreenToplevel)
+                return false;
+
             if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview) {
                 return true;
             }
@@ -384,6 +399,7 @@ Variants {
         onVisibleChanged: dock._syncDockChromeState()
         onHasAppsChanged: dock._syncDockChromeState()
         onConnectedBarSideChanged: dock._syncDockChromeState()
+        onHasFullscreenToplevelChanged: dock._syncDockChromeState()
 
         Connections {
             target: SettingsData
@@ -409,6 +425,8 @@ Variants {
         color: "transparent"
 
         exclusiveZone: {
+            if (dock.hasFullscreenToplevel)
+                return -1;
             if (!SettingsData.showDock || autoHide)
                 return -1;
             if (barSpacing > 0)

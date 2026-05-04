@@ -97,11 +97,14 @@ PanelWindow {
         case "overlay":
             return WlrLayer.Overlay;
         case "background":
-            return WlrLayer.background;
+            return WlrLayer.Background;
+        case "top":
+            return WlrLayer.Top;
         default:
             // Elevate to Overlay when Frame is enabled so the bar stays above
-            // the FrameWindow (WlrLayer.Top) when it is re-mapped on mode switch.
-            return SettingsData.frameEnabled ? WlrLayer.Overlay : WlrLayer.Top;
+            // the FrameWindow (WlrLayer.Top) when it is re-mapped on mode switch,
+            // but drop back to Top while a true fullscreen app owns this screen.
+            return SettingsData.frameEnabled && !barWindow.hasFullscreenToplevel ? WlrLayer.Overlay : WlrLayer.Top;
         }
     }
 
@@ -307,22 +310,7 @@ PanelWindow {
     }
 
     function _updateHasFullscreenToplevel() {
-        if (!CompositorService.isHyprland) {
-            hasFullscreenToplevel = false;
-            return;
-        }
-
-        const filtered = CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
-        for (let i = 0; i < filtered.length; i++) {
-            if (filtered[i]?.fullscreen) {
-                // On niri, fullscreen windows in inactive columns should not hide the bar
-                if (CompositorService.isNiri && !filtered[i]?.activated)
-                    continue;
-                hasFullscreenToplevel = true;
-                return;
-            }
-        }
-        hasFullscreenToplevel = false;
+        hasFullscreenToplevel = CompositorService.hasFullscreenToplevelOnScreen(screenName);
     }
 
     function _updateShouldHideForWindows() {
@@ -536,6 +524,7 @@ PanelWindow {
         updateGpuTempConfig();
         _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
+        _updateHasFullscreenToplevel();
         _updateShouldHideForWindows();
 
         inhibitorInitTimer.start();
@@ -647,6 +636,13 @@ PanelWindow {
     }
 
     Connections {
+        target: ToplevelManager
+        function onActiveToplevelChanged() {
+            barWindow._updateHasFullscreenToplevel();
+        }
+    }
+
+    Connections {
         function onNvidiaGpuTempEnabledChanged() {
             barWindow.updateGpuTempConfig();
         }
@@ -665,7 +661,7 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    exclusiveZone: (!(barConfig?.visible ?? true) || topBarCore.autoHide) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (Theme.isConnectedEffect ? 0 : (barConfig?.bottomGap ?? 0)))
+    exclusiveZone: (barWindow.hasFullscreenToplevel || !(barConfig?.visible ?? true) || topBarCore.autoHide) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (Theme.isConnectedEffect ? 0 : (barConfig?.bottomGap ?? 0)))
 
     Item {
         id: inputMask
@@ -674,9 +670,9 @@ PanelWindow {
 
         readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
-        readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
+        readonly property bool showing: effectiveVisible && !barWindow.hasFullscreenToplevel && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
 
-        readonly property int maskThickness: showing ? barThickness : 1
+        readonly property int maskThickness: barWindow.hasFullscreenToplevel ? 0 : (showing ? barThickness : 1)
 
         x: {
             if (!axis.isVertical) {
@@ -813,12 +809,12 @@ PanelWindow {
         }
 
         property bool reveal: {
+            if (barWindow.hasFullscreenToplevel)
+                return false;
+
             const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview;
             if (inOverviewWithShow)
                 return true;
-
-            if (barWindow.hasFullscreenToplevel)
-                return false;
 
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland)) {
@@ -911,9 +907,9 @@ PanelWindow {
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
             readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
-            hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.hasActivePopout
+            hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !barWindow.hasFullscreenToplevel && !topBarCore.hasActivePopout
             acceptedButtons: Qt.NoButton
-            enabled: (barConfig?.autoHide ?? false) && !inOverview
+            enabled: (barConfig?.autoHide ?? false) && !inOverview && !barWindow.hasFullscreenToplevel
 
             Item {
                 id: topBarContainer
