@@ -56,6 +56,15 @@ release_base() {
     echo "$1" | sed -E 's/ppa[0-9]+$//' | sed -E 's/-[0-9]+$//'
 }
 
+ppa_suffix() {
+    local version="$1"
+    if [[ "$version" =~ ppa([0-9]+)$ ]]; then
+        echo "${BASH_REMATCH[1]}"
+    else
+        echo "0"
+    fi
+}
+
 embedded_commit() {
     echo "$1" | sed -nE 's/.*[+~]git[0-9]+\.([a-f0-9]{7,12}).*/\1/p'
 }
@@ -73,6 +82,18 @@ target_ppa() {
     else
         echo "1"
     fi
+}
+
+rebuild_release_is_newer() {
+    local series="$1"
+    local published="$2"
+    local requested current
+
+    [[ -n "$REBUILD_RELEASE" ]] || return 1
+
+    requested="$(target_ppa "$series")"
+    current="$(ppa_suffix "$published")"
+    [[ "$requested" -gt "$current" ]]
 }
 
 include_package() {
@@ -93,10 +114,7 @@ for pkg_info in "${PACKAGES[@]}"; do
         needs_update=false
         reason=""
 
-        if [[ -n "$REBUILD_RELEASE" ]]; then
-            needs_update=true
-            reason="manual rebuild"
-        elif [[ -z "$ppa_version" ]]; then
+        if [[ -z "$ppa_version" ]]; then
             needs_update=true
             reason="missing from ${series}"
         elif [[ "$type" == "git" ]]; then
@@ -114,6 +132,11 @@ for pkg_info in "${PACKAGES[@]}"; do
                 needs_update=true
                 reason="version ${ppa_base:-none} -> ${LATEST_TAG}"
             fi
+        fi
+
+        if [[ "$needs_update" != "true" ]] && rebuild_release_is_newer "$series" "$ppa_version"; then
+            needs_update=true
+            reason="rebuild ppa$(ppa_suffix "$ppa_version") -> ppa$(target_ppa "$series")"
         fi
 
         if [[ "$needs_update" == "true" ]]; then
