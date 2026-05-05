@@ -330,8 +330,17 @@ if [ "$PPA_NAME" = "danklinux" ] || [ "$PPA_NAME" = "dms" ] || [ "$PPA_NAME" = "
     info "  - $BUILDINFO"
     echo
 
-    LFTP_SCRIPT=$(mktemp)
-    cat >"$LFTP_SCRIPT" <<EOF
+    if [[ -n "${GITHUB_ACTIONS:-}" || -n "${CI:-}" ]] && command -v dput >/dev/null 2>&1; then
+        info "Using dput for CI upload"
+        if dput "ppa:avengemedia/$PPA_NAME" "$CHANGES_FILE"; then
+            success "Upload successful!"
+        else
+            error "dput upload failed!"
+            exit 1
+        fi
+    else
+        LFTP_SCRIPT=$(mktemp)
+        cat >"$LFTP_SCRIPT" <<EOF
 cd ~avengemedia/ubuntu/$PPA_NAME/
 lcd $BUILD_DIR
 mput $CHANGES_BASENAME
@@ -341,13 +350,14 @@ mput $BUILDINFO
 bye
 EOF
 
-    if lftp -d ftp://anonymous:@ppa.launchpad.net <"$LFTP_SCRIPT"; then
-        success "Upload successful!"
-        rm -f "$LFTP_SCRIPT"
-    else
-        error "Upload failed!"
-        rm -f "$LFTP_SCRIPT"
-        exit 1
+        if lftp -d ftp://anonymous:@ppa.launchpad.net <"$LFTP_SCRIPT"; then
+            success "Upload successful!"
+            rm -f "$LFTP_SCRIPT"
+        else
+            error "Upload failed!"
+            rm -f "$LFTP_SCRIPT"
+            exit 1
+        fi
     fi
 else
     # This branch should not be reached for DMS packages

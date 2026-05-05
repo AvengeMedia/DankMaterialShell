@@ -22,12 +22,13 @@ on:
 
 jobs:
   check-updates:
-    name: Check for updates
+    name: Check package/series updates
     runs-on: ubuntu-latest
 
     outputs:
       has_updates: ${{ steps.check.outputs.has_updates }}
-      packages: ${{ steps.check.outputs.packages }}
+      targets: ${{ steps.check.outputs.targets }}
+      targets_json: ${{ steps.check.outputs.targets_json }}
 
     steps:
       - name: Checkout
@@ -35,125 +36,57 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl git
+
       - name: Check for updates
         id: check
         run: |
-          # Helper function to check dms-git commit
-          check_dms_git() {
-            local CURRENT_COMMIT=$(git rev-parse --short=8 HEAD)
-            local PPA_VERSION=$(curl -s "https://api.launchpad.net/1.0/~avengemedia/+archive/ubuntu/dms-git?ws.op=getPublishedSources&source_name=dms-git&status=Published" | grep -oP '"source_package_version":\s*"\K[^"]+' | head -1 || echo "")
-            local PPA_COMMIT=$(echo "$PPA_VERSION" | grep -oP '\.[a-f0-9]{8}' | tr -d '.' || echo "")
-
-            if [[ -n "$PPA_COMMIT" && "$CURRENT_COMMIT" == "$PPA_COMMIT" ]]; then
-              echo "📋 dms-git: Commit $CURRENT_COMMIT already exists, skipping"
-              return 1  # No update needed
-            else
-              echo "📋 dms-git: New commit $CURRENT_COMMIT (PPA has ${PPA_COMMIT:-none})"
-              return 0  # Update needed
-            fi
-          }
-
-          # Helper function to check stable package tag
-          check_stable_package() {
-            local PKG="$1"
-            local PPA_NAME="$2"
-            # Use git ls-remote to find the latest tag, sorted by version (descending)
-            local LATEST_TAG=$(git ls-remote --tags --refs --sort='-v:refname' https://github.com/AvengeMedia/DankMaterialShell.git | head -n1 | awk -F/ '{print $NF}' | sed 's/^v//')
-            local PPA_VERSION=$(curl -s "https://api.launchpad.net/1.0/~avengemedia/+archive/ubuntu/$PPA_NAME?ws.op=getPublishedSources&source_name=$PKG&status=Published" | grep -oP '"source_package_version":\s*"\K[^"]+' | head -1 || echo "")
-            local PPA_BASE_VERSION=$(echo "$PPA_VERSION" | sed 's/ppa[0-9]*$//')
-
-            if [[ -n "$LATEST_TAG" && "$LATEST_TAG" == "$PPA_BASE_VERSION" ]]; then
-              echo "📋 $PKG: Tag $LATEST_TAG already exists, skipping"
-              return 1  # No update needed
-            else
-              echo "📋 $PKG: New tag ${LATEST_TAG:-unknown} (PPA has ${PPA_BASE_VERSION:-none})"
-              return 0  # Update needed
-            fi
-          }
-
-          # Main logic
-          REBUILD="${{ github.event.inputs.rebuild_release }}"
+          chmod +x distro/scripts/ppa-sync-plan.sh
 
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
-            # Scheduled run - check dms-git only
-            echo "packages=dms-git" >> $GITHUB_OUTPUT
-            if check_dms_git; then
-              echo "has_updates=true" >> $GITHUB_OUTPUT
-            else
-              echo "has_updates=false" >> $GITHUB_OUTPUT
-            fi
-
-          elif [[ -n "${{ github.event.inputs.package }}" ]]; then
-            # Manual workflow trigger
-            PKG="${{ github.event.inputs.package }}"
-
-            if [[ -n "$REBUILD" ]]; then
-              # Rebuild requested - always proceed
-              echo "packages=$PKG" >> $GITHUB_OUTPUT
-              echo "has_updates=true" >> $GITHUB_OUTPUT
-              echo "🔄 Manual rebuild requested: $PKG (ppa$REBUILD)"
-
-            elif [[ "$PKG" == "all" ]]; then
-              # Check each package and build list of those needing updates
-              PACKAGES_TO_UPDATE=()
-              check_dms_git && PACKAGES_TO_UPDATE+=("dms-git")
-              check_stable_package "dms" "dms" && PACKAGES_TO_UPDATE+=("dms")
-              check_stable_package "dms-greeter" "danklinux" && PACKAGES_TO_UPDATE+=("dms-greeter")
-
-              if [[ ${#PACKAGES_TO_UPDATE[@]} -gt 0 ]]; then
-                echo "packages=${PACKAGES_TO_UPDATE[*]}" >> $GITHUB_OUTPUT
-                echo "has_updates=true" >> $GITHUB_OUTPUT
-                echo "✓ Packages to update: ${PACKAGES_TO_UPDATE[*]}"
-              else
-                echo "packages=" >> $GITHUB_OUTPUT
-                echo "has_updates=false" >> $GITHUB_OUTPUT
-                echo "✓ All packages up to date"
-              fi
-
-            elif [[ "$PKG" == "dms-git" ]]; then
-              if check_dms_git; then
-                echo "packages=$PKG" >> $GITHUB_OUTPUT
-                echo "has_updates=true" >> $GITHUB_OUTPUT
-              else
-                echo "packages=" >> $GITHUB_OUTPUT
-                echo "has_updates=false" >> $GITHUB_OUTPUT
-              fi
-
-            elif [[ "$PKG" == "dms" ]]; then
-              if check_stable_package "dms" "dms"; then
-                echo "packages=$PKG" >> $GITHUB_OUTPUT
-                echo "has_updates=true" >> $GITHUB_OUTPUT
-              else
-                echo "packages=" >> $GITHUB_OUTPUT
-                echo "has_updates=false" >> $GITHUB_OUTPUT
-              fi
-
-            elif [[ "$PKG" == "dms-greeter" ]]; then
-              if check_stable_package "dms-greeter" "danklinux"; then
-                echo "packages=$PKG" >> $GITHUB_OUTPUT
-                echo "has_updates=true" >> $GITHUB_OUTPUT
-              else
-                echo "packages=" >> $GITHUB_OUTPUT
-                echo "has_updates=false" >> $GITHUB_OUTPUT
-              fi
-
-            else
-              # Unknown package - proceed anyway
-              echo "packages=$PKG" >> $GITHUB_OUTPUT
-              echo "has_updates=true" >> $GITHUB_OUTPUT
-              echo "Manual trigger: $PKG"
-            fi
+            PACKAGE="dms-git"
           else
-            # Fallback
-            echo "packages=dms" >> $GITHUB_OUTPUT
-            echo "has_updates=true" >> $GITHUB_OUTPUT
+            PACKAGE="${{ github.event.inputs.package }}"
+          fi
+
+          REBUILD_RELEASE="${{ github.event.inputs.rebuild_release }}"
+          ARGS=(--package "$PACKAGE" --json)
+          if [[ -n "$REBUILD_RELEASE" ]]; then
+            ARGS+=(--rebuild "$REBUILD_RELEASE")
+          fi
+
+          TARGETS_JSON=$(distro/scripts/ppa-sync-plan.sh "${ARGS[@]}" 2> ppa-audit.log)
+          cat ppa-audit.log
+
+          TARGETS=$(echo "$TARGETS_JSON" | jq -r 'join(" ")')
+          if [[ "$TARGETS_JSON" != "[]" ]]; then
+            echo "has_updates=true" >> "$GITHUB_OUTPUT"
+            echo "targets=$TARGETS" >> "$GITHUB_OUTPUT"
+            echo "targets_json=$TARGETS_JSON" >> "$GITHUB_OUTPUT"
+            echo "Package/series targets: $TARGETS"
+          else
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            echo "targets=" >> "$GITHUB_OUTPUT"
+            echo "targets_json=[]" >> "$GITHUB_OUTPUT"
+            echo "No package/series uploads needed"
           fi
 
   upload-ppa:
-    name: Upload to PPA
+    name: Upload ${{ matrix.target }}
     needs: check-updates
     runs-on: ubuntu-latest
     if: needs.check-updates.outputs.has_updates == 'true'
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.check-updates.outputs.targets_json) }}
+    concurrency:
+      group: ppa-dms-${{ matrix.target }}
+      cancel-in-progress: false
 
     steps:
       - name: Checkout
@@ -185,106 +118,30 @@ jobs:
         run: |
           echo "$GPG_KEY" | gpg --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
-          echo "DEBSIGN_KEYID=$GPG_KEY_ID" >> $GITHUB_ENV
+          echo "DEBSIGN_KEYID=$GPG_KEY_ID" >> "$GITHUB_ENV"
 
-      - name: Determine packages to upload
-        id: packages
+      - name: Upload target
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
-          # Use packages determined by check-updates job
-          echo "packages=${{ needs.check-updates.outputs.packages }}" >> $GITHUB_OUTPUT
+          IFS=':' read -r PACKAGE UBUNTU_SERIES PPA_NUM <<< "$TARGET"
 
-          if [[ "${{ github.event_name }}" == "schedule" ]]; then
-            echo "Triggered by schedule: uploading git package"
-          elif [[ -n "${{ github.event.inputs.package }}" ]]; then
-            echo "Manual trigger: ${{ needs.check-updates.outputs.packages }}"
-          fi
+          case "$PACKAGE" in
+            dms) PPA_NAME="dms" ;;
+            dms-git) PPA_NAME="dms-git" ;;
+            dms-greeter) PPA_NAME="danklinux" ;;
+            *) echo "::error::Unknown package $PACKAGE"; exit 1 ;;
+          esac
 
-      - name: Upload to PPA
-        run: |
-          PACKAGES="${{ steps.packages.outputs.packages }}"
-          REBUILD_RELEASE="${{ github.event.inputs.rebuild_release }}"
-
-          if [[ -z "$PACKAGES" ]]; then
-            echo "✓ No packages need uploading. All up to date!"
-            exit 0
-          fi
-
-          # Export REBUILD_RELEASE so ppa-build.sh can use it
-          if [[ -n "$REBUILD_RELEASE" ]]; then
-            export REBUILD_RELEASE
-            echo "✓ Using rebuild release number: ppa$REBUILD_RELEASE"
-          fi
-
-          # PACKAGES can be space-separated list (e.g., "dms-git dms dms-greeter" from "all" check)
-          # Loop through each package and upload
-          for PKG in $PACKAGES; do
-            # Map package to PPA name
-            case "$PKG" in
-              dms)
-                PPA_NAME="dms"
-                ;;
-              dms-git)
-                PPA_NAME="dms-git"
-                ;;
-              dms-greeter)
-                PPA_NAME="danklinux"
-                ;;
-              *)
-                echo "⚠️ Unknown package: $PKG, skipping"
-                continue
-                ;;
-            esac
-
-            echo ""
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "Uploading $PKG to PPA $PPA_NAME..."
-            if [[ -n "$REBUILD_RELEASE" ]]; then
-              echo "🔄 Using rebuild release number: ppa$REBUILD_RELEASE"
-            fi
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            # ppa-upload.sh uploads to questing + resolute when series is omitted
-            if ! bash distro/scripts/ppa-upload.sh "$PKG" "$PPA_NAME" "" ${REBUILD_RELEASE:+"$REBUILD_RELEASE"}; then
-              echo "::error::Upload failed for $PKG"
-              exit 1
-            fi
-          done
+          echo "Uploading $PACKAGE to $PPA_NAME/$UBUNTU_SERIES with ppa$PPA_NUM"
+          bash distro/scripts/ppa-upload.sh "$PACKAGE" "$PPA_NAME" "$UBUNTU_SERIES" "$PPA_NUM"
 
       - name: Summary
         if: always()
         run: |
-          echo "### PPA Package Upload Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          PACKAGES="${{ steps.packages.outputs.packages }}"
-
-          if [[ -z "$PACKAGES" ]]; then
-            echo "**Status:** ✅ All packages up to date (no uploads needed)" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "All packages are current. Run will complete successfully." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "**Packages Uploaded:**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-
-            for PKG in $PACKAGES; do
-              case "$PKG" in
-                dms)
-                  echo "- ✅ **dms** → [View builds](https://launchpad.net/~avengemedia/+archive/ubuntu/dms/+packages)" >> $GITHUB_STEP_SUMMARY
-                  ;;
-                dms-git)
-                  echo "- ✅ **dms-git** → [View builds](https://launchpad.net/~avengemedia/+archive/ubuntu/dms-git/+packages)" >> $GITHUB_STEP_SUMMARY
-                  ;;
-                dms-greeter)
-                  echo "- ✅ **dms-greeter** → [View builds](https://launchpad.net/~avengemedia/+archive/ubuntu/danklinux/+packages)" >> $GITHUB_STEP_SUMMARY
-                  ;;
-              esac
-            done
-
-            echo "" >> $GITHUB_STEP_SUMMARY
-
-            if [[ -n "${{ github.event.inputs.rebuild_release }}" ]]; then
-              echo "**Rebuild Number:** ppa${{ github.event.inputs.rebuild_release }}" >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-            fi
-
-            echo "Builds will appear once Launchpad processes the uploads." >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "### PPA Package Upload" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Target:** ${{ matrix.target }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **DMS PPA:** https://launchpad.net/~avengemedia/+archive/ubuntu/dms/+packages" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **DMS-Git PPA:** https://launchpad.net/~avengemedia/+archive/ubuntu/dms-git/+packages" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **DankLinux PPA:** https://launchpad.net/~avengemedia/+archive/ubuntu/danklinux/+packages" >> "$GITHUB_STEP_SUMMARY"
