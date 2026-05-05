@@ -16,11 +16,12 @@ import (
 )
 
 const (
-	defaultIntervalSeconds = 30 * 60
-	minIntervalSeconds     = 5 * 60
-	recentLogCapacity      = 200
-	checkTimeout           = 5 * time.Minute
-	upgradeTimeout         = 30 * time.Minute
+	defaultIntervalSeconds   = 30 * 60
+	minIntervalSeconds       = 5 * 60
+	recentLogCapacity        = 200
+	checkTimeout             = 5 * time.Minute
+	upgradeTimeout           = 30 * time.Minute
+	postUpgradeCompleteDelay = 3 * time.Second
 )
 
 type Manager struct {
@@ -310,16 +311,16 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		return
 	}
 
-	backends := upgradeBackends(m.selection, opts)
-	if len(backends) == 0 {
-		m.setError(ErrCodeNoBackend, "no backend selected for upgrade")
-		return
-	}
-
 	if len(opts.Targets) == 0 {
 		m.mu.RLock()
 		opts.Targets = append([]Package(nil), m.state.Packages...)
 		m.mu.RUnlock()
+	}
+
+	backends := upgradeBackends(m.selection, opts)
+	if len(backends) == 0 {
+		m.setError(ErrCodeNoBackend, "no backend selected for upgrade")
+		return
 	}
 
 	opID := fmt.Sprintf("op-%d", time.Now().UnixNano())
@@ -351,13 +352,7 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		}
 	}
 
-	m.mu.Lock()
-	m.state.Phase = PhaseIdle
-	m.state.OperationID = ""
-	m.state.OperationStarted = 0
-	m.mu.Unlock()
-	m.markDirty()
-	go m.runRefresh(context.Background())
+	m.finishSuccessfulUpgrade(true)
 }
 
 func (m *Manager) runCustomUpgrade(ctx context.Context, command, terminalOverride string) {
@@ -395,10 +390,29 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, command, terminalOverrid
 		return
 	}
 
+	m.finishSuccessfulUpgrade(false)
+}
+
+func (m *Manager) finishSuccessfulUpgrade(clearPackages bool) {
+	m.appendLog("Upgrade complete.")
+
+	timer := time.NewTimer(postUpgradeCompleteDelay)
+	defer timer.Stop()
+
+	select {
+	case <-m.stopChan:
+		return
+	case <-timer.C:
+	}
+
 	m.mu.Lock()
 	m.state.Phase = PhaseIdle
 	m.state.OperationID = ""
 	m.state.OperationStarted = 0
+	if clearPackages {
+		m.state.Packages = m.state.Packages[:0]
+		m.state.Count = 0
+	}
 	m.mu.Unlock()
 	m.markDirty()
 	go m.runRefresh(context.Background())
@@ -407,16 +421,23 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, command, terminalOverrid
 func upgradeBackends(sel Selection, opts UpgradeOptions) []Backend {
 	var out []Backend
 	if sel.System != nil {
-		out = append(out, sel.System)
+		out = appendUpgradeBackend(out, sel.System, opts)
 	}
 	for _, b := range sel.Overlay {
 		switch {
 		case b.Repo() == RepoFlatpak && !opts.IncludeFlatpak:
 			continue
 		}
-		out = append(out, b)
+		out = appendUpgradeBackend(out, b, opts)
 	}
 	return out
+}
+
+func appendUpgradeBackend(out []Backend, b Backend, opts UpgradeOptions) []Backend {
+	if !BackendHasTargets(b, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
+		return out
+	}
+	return append(out, b)
 }
 
 func (m *Manager) appendLog(line string) {

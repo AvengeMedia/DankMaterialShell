@@ -117,9 +117,16 @@ func bootedDeployment(deps []ostreeDeployment) *ostreeDeployment {
 }
 
 func (rpmOstreeBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
+	if !BackendHasTargets(rpmOstreeBackend{}, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
+		return nil
+	}
+	return Run(ctx, rpmOstreeUpgradeArgv(opts), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+}
+
+func rpmOstreeUpgradeArgv(opts UpgradeOptions) []string {
 	argv := []string{"rpm-ostree", "upgrade"}
 	if opts.DryRun {
 		argv = append(argv, "--check")
 	}
-	return Run(ctx, argv, RunOptions{OnLine: onLine})
+	return argv
 }

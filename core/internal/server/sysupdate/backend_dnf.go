@@ -45,25 +45,35 @@ func (b dnfBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine fun
 	if opts.DryRun {
 		return Run(ctx, []string{b.bin, "upgrade", "--assumeno"}, RunOptions{OnLine: onLine})
 	}
-	names := pickTargetNames(opts.Targets, b.bin, true)
-	if len(names) == 0 {
+	if !BackendHasTargets(b, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
 		return nil
 	}
-	privesc := privescBin(opts.UseSudo)
-	argv := append([]string{privesc, b.bin, "upgrade", "-y"}, names...)
-	return Run(ctx, argv, RunOptions{OnLine: onLine})
+	return Run(ctx, dnfUpgradeArgv(b.bin, opts), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+}
+
+func dnfUpgradeArgv(bin string, opts UpgradeOptions) []string {
+	return privilegedArgv(opts, bin, "upgrade", "--refresh", "-y")
 }
 
 func dnfListUpgrades(ctx context.Context, bin string) (string, error) {
-	cmd := exec.CommandContext(ctx, bin, "list", "--upgrades", "--refresh", "--quiet")
-	out, err := cmd.Output()
+	argv := dnfCheckUpdatesArgv(bin)
+	cmd := exec.CommandContext(ctx, argv[0], argv[1:]...)
+	out, err := cmd.CombinedOutput()
 	if err == nil {
 		return string(out), nil
 	}
-	if exitErr, ok := errors.AsType[*exec.ExitError](err); ok && exitErr.ExitCode() == 1 {
-		return "", nil
+	if exitErr, ok := errors.AsType[*exec.ExitError](err); ok && exitErr.ExitCode() == 100 {
+		return string(out), nil
 	}
 	return "", err
+}
+
+func dnfCheckUpdatesArgv(bin string) []string {
+	subcommand := "check-update"
+	if bin == "dnf5" {
+		subcommand = "check-upgrade"
+	}
+	return []string{bin, subcommand, "--refresh", "--quiet"}
 }
 
 func rpmInstalledVersions(ctx context.Context) map[string]string {

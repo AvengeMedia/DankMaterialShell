@@ -74,11 +74,12 @@ func (zypperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine fu
 	if opts.DryRun {
 		return Run(ctx, []string{"zypper", "--non-interactive", "--dry-run", "update"}, RunOptions{OnLine: onLine})
 	}
-	names := pickTargetNames(opts.Targets, "zypper", true)
-	if len(names) == 0 {
+	if !BackendHasTargets(zypperBackend{}, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
 		return nil
 	}
-	privesc := privescBin(opts.UseSudo)
-	argv := append([]string{privesc, "zypper", "--non-interactive", "update"}, names...)
-	return Run(ctx, argv, RunOptions{OnLine: onLine})
+	return Run(ctx, zypperUpgradeArgv(opts), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+}
+
+func zypperUpgradeArgv(opts UpgradeOptions) []string {
+	return privilegedArgv(opts, "zypper", "--non-interactive", "update")
 }

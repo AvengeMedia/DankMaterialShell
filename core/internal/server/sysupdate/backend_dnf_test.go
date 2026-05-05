@@ -67,6 +67,21 @@ bash.x86_64       5.2.40-1.fc41       updates`,
 				{Name: "bash.x86_64", Repo: RepoSystem, Backend: "dnf", FromVersion: "", ToVersion: "5.2.40-1.fc41"},
 			},
 		},
+		{
+			name: "skips dnf warning lines while keeping package rows",
+			input: `Failed to expire repository cache in path "/home/user/.cache/libdnf5/updates": cannot open file
+example-driver.x86_64                2:9.8.7-1.fc99                updates
+example-tool.noarch                  1.2.3^45.gitabcdef-1.fc99     copr`,
+			backendID: "dnf5",
+			installed: map[string]string{
+				"example-driver": "2:9.8.6-1.fc99",
+				"example-tool":   "1.2.2^44.gitabcdef-1.fc99",
+			},
+			want: []Package{
+				{Name: "example-driver.x86_64", Repo: RepoSystem, Backend: "dnf5", FromVersion: "2:9.8.6-1.fc99", ToVersion: "2:9.8.7-1.fc99"},
+				{Name: "example-tool.noarch", Repo: RepoSystem, Backend: "dnf5", FromVersion: "1.2.2^44.gitabcdef-1.fc99", ToVersion: "1.2.3^45.gitabcdef-1.fc99"},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -74,6 +89,25 @@ bash.x86_64       5.2.40-1.fc41       updates`,
 			got := parseDnfList(tt.input, tt.backendID, tt.installed)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("parseDnfList() = %#v\nwant %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDnfCheckUpdatesArgv(t *testing.T) {
+	tests := []struct {
+		bin  string
+		want []string
+	}{
+		{bin: "dnf5", want: []string{"dnf5", "check-upgrade", "--refresh", "--quiet"}},
+		{bin: "dnf", want: []string{"dnf", "check-update", "--refresh", "--quiet"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.bin, func(t *testing.T) {
+			got := dnfCheckUpdatesArgv(tt.bin)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Fatalf("dnfCheckUpdatesArgv(%q) = %#v, want %#v", tt.bin, got, tt.want)
 			}
 		})
 	}

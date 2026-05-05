@@ -77,6 +77,7 @@ type UpgradeOptions struct {
 	IncludeAUR     bool
 	DryRun         bool
 	UseSudo        bool
+	AttachStdio    bool
 	CustomCommand  string
 	Terminal       string
 	Targets        []Package

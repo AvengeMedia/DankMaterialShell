@@ -45,13 +45,14 @@ func (aptBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(
 			OnLine: onLine,
 		})
 	}
-	names := pickTargetNames(opts.Targets, "apt", true)
-	if len(names) == 0 {
+	if !BackendHasTargets(aptBackend{}, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
 		return nil
 	}
-	privesc := privescBin(opts.UseSudo)
-	argv := append([]string{privesc, "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", bin, "install", "-y", "--only-upgrade"}, names...)
-	return Run(ctx, argv, RunOptions{OnLine: onLine})
+	return Run(ctx, aptUpgradeArgv(bin, opts), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+}
+
+func aptUpgradeArgv(bin string, opts UpgradeOptions) []string {
+	return privilegedArgv(opts, "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", bin, "upgrade", "-y")
 }
 
 func parseAptUpgradable(text string) []Package {

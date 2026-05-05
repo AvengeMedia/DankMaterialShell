@@ -14,8 +14,9 @@ import (
 )
 
 type RunOptions struct {
-	Env    []string
-	OnLine func(string)
+	Env         []string
+	OnLine      func(string)
+	AttachStdio bool
 }
 
 func Run(ctx context.Context, argv []string, opts RunOptions) error {
@@ -27,6 +28,19 @@ func Run(ctx context.Context, argv []string, opts RunOptions) error {
 	if len(opts.Env) > 0 {
 		cmd.Env = append(cmd.Environ(), opts.Env...)
 	}
+	if opts.AttachStdio {
+		cmd.Cancel = func() error {
+			if cmd.Process == nil {
+				return nil
+			}
+			return cmd.Process.Kill()
+		}
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		return cmd.Run()
+	}
+
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Cancel = func() error {
 		if cmd.Process == nil {

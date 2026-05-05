@@ -43,13 +43,14 @@ func (b pacmanBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 	if opts.DryRun {
 		return Run(ctx, []string{"pacman", "-Sup"}, RunOptions{OnLine: onLine})
 	}
-	names := pickTargetNames(opts.Targets, b.ID(), opts.IncludeAUR)
-	if len(names) == 0 {
+	if !BackendHasTargets(b, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
 		return nil
 	}
-	privesc := privescBin(opts.UseSudo)
-	argv := append([]string{privesc, "pacman", "-Sy", "--noconfirm", "--needed"}, names...)
-	return Run(ctx, argv, RunOptions{OnLine: onLine})
+	return Run(ctx, pacmanUpgradeArgv(opts), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+}
+
+func pacmanUpgradeArgv(opts UpgradeOptions) []string {
+	return privilegedArgv(opts, "pacman", "-Syu", "--noconfirm", "--needed")
 }
 
 type archHelperBackend struct {
@@ -94,35 +95,28 @@ func (b archHelperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onL
 	if opts.DryRun {
 		return Run(ctx, []string{b.id, "-Sup"}, RunOptions{OnLine: onLine})
 	}
-	names := pickTargetNames(opts.Targets, b.id, opts.IncludeAUR)
-	if len(names) == 0 {
+	if !BackendHasTargets(b, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
 		return nil
 	}
 	if os.Getenv("DMS_FORCE_PKEXEC") == "1" {
-		argv := append([]string{"pkexec", b.id, "-Sy", "--noconfirm", "--needed"}, names...)
-		return Run(ctx, argv, RunOptions{OnLine: onLine})
+		argv := append([]string{"pkexec"}, archHelperUpgradeArgv(b.id, opts.IncludeAUR)...)
+		return Run(ctx, argv, RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
 	}
 	term := findTerminal(opts.Terminal)
 	if term == "" {
 		return fmt.Errorf("no terminal found (pick one in DMS settings, set $TERMINAL, or install kitty/ghostty/foot/alacritty)")
 	}
-	cmd := fmt.Sprintf("%s -Sy --noconfirm --needed %s", b.id, strings.Join(names, " "))
+	cmd := strings.Join(archHelperUpgradeArgv(b.id, opts.IncludeAUR), " ")
 	title := fmt.Sprintf("DMS — System Update (%s)", b.id)
 	return Run(ctx, wrapInTerminal(term, title, cmd), RunOptions{OnLine: onLine})
 }
 
-func pickTargetNames(targets []Package, backendID string, includeAUR bool) []string {
-	out := make([]string, 0, len(targets))
-	for _, p := range targets {
-		if p.Backend != backendID {
-			continue
-		}
-		if !includeAUR && p.Repo == RepoAUR {
-			continue
-		}
-		out = append(out, p.Name)
+func archHelperUpgradeArgv(id string, includeAUR bool) []string {
+	argv := []string{id, "-Syu", "--noconfirm", "--needed"}
+	if !includeAUR {
+		argv = append(argv, "--repo")
 	}
-	return out
+	return argv
 }
 
 func pacmanRepoUpdates(ctx context.Context) (string, error) {

@@ -100,29 +100,13 @@ func runSystemUpdateCheck() {
 	}
 
 	stopSpin := startSpinner("Checking for updates… ")
-
-	type backendResult struct {
-		ID       string              `json:"id"`
-		Display  string              `json:"displayName"`
-		Packages []sysupdate.Package `json:"packages"`
-	}
-	var results []backendResult
-	var allPkgs []sysupdate.Package
-	var firstErr error
-
-	for _, b := range backends {
-		pkgs, err := b.CheckUpdates(ctx)
-		if err != nil && firstErr == nil {
-			firstErr = fmt.Errorf("%s: %w", b.ID(), err)
-		}
-		results = append(results, backendResult{ID: b.ID(), Display: b.DisplayName(), Packages: pkgs})
-		allPkgs = append(allPkgs, pkgs...)
-	}
+	allPkgs, firstErr := collectUpdates(ctx, backends)
 	stopSpin()
+	allPkgs = filterUpdateTargets(allPkgs)
 
 	if sysUpdateJSON {
 		out, _ := json.MarshalIndent(map[string]any{
-			"backends": results,
+			"backends": backendResults(backends, allPkgs),
 			"packages": allPkgs,
 			"error":    errOrEmpty(firstErr),
 			"count":    len(allPkgs),
@@ -145,6 +129,26 @@ func runSystemUpdateCheck() {
 	}
 }
 
+type backendResult struct {
+	ID       string              `json:"id"`
+	Display  string              `json:"displayName"`
+	Packages []sysupdate.Package `json:"packages"`
+}
+
+func backendResults(backends []sysupdate.Backend, pkgs []sysupdate.Package) []backendResult {
+	results := make([]backendResult, 0, len(backends))
+	for _, b := range backends {
+		var backendPkgs []sysupdate.Package
+		for _, p := range pkgs {
+			if sysupdate.BackendHasTargets(b, []sysupdate.Package{p}, true, true) {
+				backendPkgs = append(backendPkgs, p)
+			}
+		}
+		results = append(results, backendResult{ID: b.ID(), Display: b.DisplayName(), Packages: backendPkgs})
+	}
+	return results
+}
+
 func runSystemUpdateApply() {
 	checkCtx, checkCancel := context.WithTimeout(context.Background(), sysUpdateListPmTime)
 	defer checkCancel()
@@ -157,6 +161,7 @@ func runSystemUpdateApply() {
 	stopSpin := startSpinner("Checking for updates…")
 	pkgs, firstErr := collectUpdates(checkCtx, backends)
 	stopSpin()
+	pkgs = filterUpdateTargets(pkgs)
 	if firstErr != nil {
 		fmt.Printf("Warning: %v\n\n", firstErr)
 	}
@@ -190,13 +195,23 @@ func runSystemUpdateApply() {
 		DryRun:         sysUpdateDry,
 		UseSudo:        true,
 	}
+	opts.AttachStdio = sysupdate.UpgradeNeedsPrivilege(backends, pkgs, opts)
 
 	onLine := func(line string) { fmt.Println(line) }
+	ran := false
 	for _, b := range backends {
+		if !sysupdate.BackendHasTargets(b, pkgs, opts.IncludeAUR, opts.IncludeFlatpak) {
+			continue
+		}
+		ran = true
 		fmt.Printf("\n== %s ==\n", b.DisplayName())
 		if err := b.Upgrade(ctx, opts, onLine); err != nil {
 			log.Fatalf("%s upgrade failed: %v", b.ID(), err)
 		}
+	}
+	if !ran {
+		fmt.Println("Nothing to upgrade.")
+		return
 	}
 	if sysUpdateDry {
 		fmt.Println("\nDry run complete (no changes applied).")
@@ -216,6 +231,20 @@ func collectUpdates(ctx context.Context, backends []sysupdate.Backend) ([]sysupd
 		all = append(all, pkgs...)
 	}
 	return all, firstErr
+}
+
+func filterUpdateTargets(pkgs []sysupdate.Package) []sysupdate.Package {
+	if !sysUpdateNoAUR {
+		return pkgs
+	}
+	out := pkgs[:0]
+	for _, p := range pkgs {
+		if p.Repo == sysupdate.RepoAUR {
+			continue
+		}
+		out = append(out, p)
+	}
+	return out
 }
 
 func runSystemUpdateSetInterval(seconds int) {
