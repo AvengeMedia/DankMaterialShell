@@ -110,7 +110,8 @@ jobs:
             lftp \
             build-essential \
             fakeroot \
-            dpkg-dev
+            dpkg-dev \
+            openssh-client
 
       - name: Configure GPG
         env:
@@ -123,6 +124,8 @@ jobs:
       - name: Upload target
         env:
           TARGET: ${{ matrix.target }}
+          LAUNCHPAD_SSH_PRIVATE_KEY: ${{ secrets.LAUNCHPAD_SSH_PRIVATE_KEY }}
+          LAUNCHPAD_SSH_LOGIN: ${{ secrets.LAUNCHPAD_SSH_LOGIN }}
         run: |
           IFS=':' read -r PACKAGE UBUNTU_SERIES PPA_NUM <<< "$TARGET"
 

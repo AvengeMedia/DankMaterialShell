@@ -217,6 +217,42 @@ fi
 PACKAGE_DIR=$(cd "$PACKAGE_DIR" && pwd)
 PARENT_DIR=$(dirname "$PACKAGE_DIR")
 
+setup_launchpad_sftp() {
+    if [[ -z "${LAUNCHPAD_SSH_PRIVATE_KEY:-}" ]]; then
+        error "LAUNCHPAD_SSH_PRIVATE_KEY is required for CI SFTP uploads."
+        error "Add a GitHub Actions secret containing a private SSH key whose public key is registered in Launchpad."
+        error "Optional: set LAUNCHPAD_SSH_LOGIN if the Launchpad login is not 'avengemedia'."
+        exit 1
+    fi
+
+    local ssh_dir="$HOME/.ssh"
+    local key_file="$ssh_dir/launchpad_ppa"
+    local login="${LAUNCHPAD_SSH_LOGIN:-avengemedia}"
+    local strict_host_key_checking="yes"
+
+    mkdir -p "$ssh_dir"
+    chmod 700 "$ssh_dir"
+    printf '%s\n' "$LAUNCHPAD_SSH_PRIVATE_KEY" > "$key_file"
+    chmod 600 "$key_file"
+
+    if ssh-keyscan -H ppa.launchpad.net >> "$ssh_dir/known_hosts" 2>/dev/null; then
+        chmod 600 "$ssh_dir/known_hosts"
+    else
+        warn "Could not prefetch ppa.launchpad.net SSH host key; allowing OpenSSH to trust it on first SFTP connection"
+        strict_host_key_checking="accept-new"
+    fi
+
+    cat > "$ssh_dir/config" <<EOF
+Host ppa.launchpad.net
+    HostName ppa.launchpad.net
+    User ${login}
+    IdentityFile ${key_file}
+    IdentitiesOnly yes
+    StrictHostKeyChecking ${strict_host_key_checking}
+EOF
+    chmod 600 "$ssh_dir/config"
+}
+
 if [[ ${#SERIES_LIST[@]} -gt 1 ]]; then
     SOURCE_FORMAT_LINE=$(head -1 "$PACKAGE_DIR/debian/source/format" 2>/dev/null || echo "")
     IS_NATIVE_DUAL=false
@@ -331,10 +367,23 @@ if [ "$PPA_NAME" = "danklinux" ] || [ "$PPA_NAME" = "dms" ] || [ "$PPA_NAME" = "
     echo
 
     if [[ -n "${GITHUB_ACTIONS:-}" || -n "${CI:-}" ]] && command -v dput >/dev/null 2>&1; then
-        info "Using dput for CI upload"
-        if dput "ppa:avengemedia/$PPA_NAME" "$CHANGES_FILE"; then
+        setup_launchpad_sftp
+        DPUT_CONFIG=$(mktemp)
+        cat >"$DPUT_CONFIG" <<EOF
+[avengemedia-${PPA_NAME}]
+fqdn = ppa.launchpad.net
+method = sftp
+incoming = ~avengemedia/ubuntu/${PPA_NAME}/
+login = ${LAUNCHPAD_SSH_LOGIN:-avengemedia}
+allow_unsigned_uploads = 0
+EOF
+
+        info "Using dput for CI upload (SFTP)"
+        if dput -c "$DPUT_CONFIG" "avengemedia-${PPA_NAME}" "$CHANGES_FILE"; then
             success "Upload successful!"
+            rm -f "$DPUT_CONFIG"
         else
+            rm -f "$DPUT_CONFIG"
             error "dput upload failed!"
             exit 1
         fi
