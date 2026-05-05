@@ -129,6 +129,9 @@ Variants {
             property string _deferredSource: ""
             // ANDed into parallaxLoader.active; bounced to rebuild the ShaderEffect after a wl_output rebind.
             property bool _parallaxRefreshGate: true
+            // Bumped by parallaxHeartbeatTimer to keep the wayland surface in the
+            // compositor's frame schedule when the spring is settled.
+            property real _parallaxHeartbeat: 0
             readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
 
             Connections {
@@ -273,6 +276,18 @@ Variants {
                 id: overviewBlurSettleTimer
                 interval: 150
                 onTriggered: root._overviewBlurSettling = false
+            }
+
+            // Lazy heartbeat: while parallax is active and the spring is settled,
+            // dirty the scene at ~30Hz so the wayland surface keeps committing.
+            // Without this, the surface drops out of the compositor's frame
+            // schedule during idle and the next scroll cold-starts.
+            Timer {
+                id: parallaxHeartbeatTimer
+                interval: 33
+                repeat: true
+                running: root.effectiveScrolling && !frameAnim.running
+                onTriggered: root._parallaxHeartbeat = (root._parallaxHeartbeat + 1) % 1024
             }
 
             function getFillMode(modeName) {
@@ -833,6 +848,7 @@ Variants {
 
                     property real scrollX: root.currentScrollX
                     property real scrollY: root.currentScrollY
+                    property real heartbeat: root._parallaxHeartbeat
                     property real uvScaleX: parallaxUV.uvScaleX
                     property real uvScaleY: parallaxUV.uvScaleY
                     property real scrollRangeX: parallaxUV.scrollsHorizontal ? parallaxUV.scrollRangeX : 0.0
