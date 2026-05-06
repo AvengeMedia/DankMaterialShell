@@ -121,6 +121,7 @@ FocusScope {
         }
 
         var hasCtrl = event.modifiers & Qt.ControlModifier;
+        var hasAlt = event.modifiers & Qt.AltModifier;
         event.accepted = true;
 
         switch (event.key) {
@@ -229,28 +230,28 @@ FocusScope {
             }
             return;
         case Qt.Key_1:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("all");
                 return;
             }
             event.accepted = false;
             return;
         case Qt.Key_2:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("apps");
                 return;
             }
             event.accepted = false;
             return;
         case Qt.Key_3:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("files");
                 return;
             }
             event.accepted = false;
             return;
         case Qt.Key_4:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("plugins");
                 return;
             }
