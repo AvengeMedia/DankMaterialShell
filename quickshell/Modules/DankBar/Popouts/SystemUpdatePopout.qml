@@ -34,6 +34,16 @@ DankPopout {
     }
 
     Connections {
+        target: PolkitService.agent
+        enabled: PolkitService.polkitAvailable && triggerScreen !== null
+
+        function onAuthenticationRequestStarted() {
+            if (PopoutService.polkitAuthModal && triggerScreen)
+                PopoutService.polkitAuthModal.screen = triggerScreen;
+        }
+    }
+
+    Connections {
         target: SystemUpdateService
         function onIsUpgradingChanged() {
             if (SystemUpdateService.isUpgrading) {
