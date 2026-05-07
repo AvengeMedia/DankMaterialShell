@@ -35,7 +35,6 @@ func Run(ctx context.Context, argv []string, opts RunOptions) error {
 			}
 			return cmd.Process.Kill()
 		}
-		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		return cmd.Run()
