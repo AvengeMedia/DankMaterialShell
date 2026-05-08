@@ -875,9 +875,12 @@ Singleton {
             if (CompositorService.isHyprland) {
                 initHyprlandSettingsFromConfig(parsed);
                 syncHyprlandVrrFromConfig(parsed);
+                syncHyprlandDisabledFromConfig(parsed);
             }
-            if (CompositorService.isNiri)
+            if (CompositorService.isNiri) {
                 syncNiriVrrFromConfig(parsed);
+                syncNiriDisabledFromConfig(parsed);
+            }
         });
     }
 
@@ -954,6 +957,44 @@ Singleton {
             SettingsData.saveSettings();
     }
 
+    function syncHyprlandDisabledFromConfig(parsedOutputs) {
+        const current = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        let changed = false;
+        for (const outputName in parsedOutputs) {
+            const settings = parsedOutputs[outputName]?.hyprlandSettings;
+            const fromConfig = settings?.disabled ?? false;
+            const stored = current[outputName]?.disabled ?? false;
+            if (fromConfig === stored)
+                continue;
+            if (!current[outputName])
+                current[outputName] = {};
+            if (fromConfig)
+                current[outputName].disabled = true;
+            else
+                delete current[outputName].disabled;
+            changed = true;
+        }
+        if (changed) {
+            SettingsData.hyprlandOutputSettings = current;
+            SettingsData.saveSettings();
+        }
+    }
+
+    function syncNiriDisabledFromConfig(parsedOutputs) {
+        let changed = false;
+        for (const outputName in parsedOutputs) {
+            const output = parsedOutputs[outputName];
+            const fromConfig = output.disabled ?? false;
+            const current = SettingsData.getNiriOutputSetting(outputName, "disabled", false);
+            if (current === fromConfig)
+                continue;
+            SettingsData.setNiriOutputSetting(outputName, "disabled", fromConfig || undefined);
+            changed = true;
+        }
+        if (changed)
+            SettingsData.saveSettings();
+    }
+
     function filterDisconnectedOnly(parsedOutputs) {
         const result = {};
         const liveNames = Object.keys(outputs);
@@ -997,6 +1038,15 @@ Singleton {
         while ((match = outputRegex.exec(content)) !== null) {
             const name = match[1];
             const body = match[2];
+
+            if (body.trim() === "off") {
+                result[name] = {
+                    "name": name,
+                    "disabled": true,
+                    "logical": { "x": 0, "y": 0, "scale": 1.0, "transform": "Normal" }
+                };
+                continue;
+            }
 
             const modeMatch = body.match(/mode\s+"(\d+)x(\d+)@([\d.]+)"/);
             const posMatch = body.match(/position\s+x=(-?\d+)\s+y=(-?\d+)/);
