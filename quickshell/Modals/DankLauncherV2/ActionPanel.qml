@@ -69,6 +69,13 @@ Rectangle {
                 }
             }
             break;
+        case "file":
+            if (selectedItem?.actions) {
+                for (var i = 0; i < selectedItem.actions.length; i++) {
+                    result.push(selectedItem.actions[i]);
+                }
+            }
+            break;
         }
         return result;
     }
@@ -80,6 +87,8 @@ Rectangle {
         case "plugin":
             return getPluginContextMenuActions().length > 0;
         case "plugin_browse":
+            return selectedItem?.actions?.length > 0;
+        case "file":
             return selectedItem?.actions?.length > 0;
         default:
             return actions.length > 1;
@@ -209,7 +218,7 @@ Rectangle {
 
     function cycleAction(reverse = false) {
         if (actions.length > 0) {
-            if (! reverse)
+            if (!reverse)
                 selectedActionIndex = (selectedActionIndex + 1) % actions.length;
             else
                 selectedActionIndex = (selectedActionIndex - 1) % actions.length;
