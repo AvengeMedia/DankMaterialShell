@@ -235,11 +235,11 @@ Item {
         return effectiveScreen ? effectiveScreen.name : "";
     }
 
-    function _publishModalChromeState() {
+    function _publishModalChromeState(isClaim) {
         const screenName = _currentScreenName();
         if (!screenName)
             return;
-        ConnectedModeState.setModalState(screenName, {
+        const state = {
             "visible": spotlightOpen || contentWindow.visible,
             "barSide": resolvedConnectedBarSide,
             "bodyX": _connectedChromeX,
@@ -250,7 +250,11 @@ Item {
             "animY": contentContainer ? contentContainer.animY : 0,
             "omitStartConnector": false,
             "omitEndConnector": false
-        });
+        };
+        if (isClaim)
+            ConnectedModeState.claimModalState(screenName, state, _chromeClaimId);
+        else
+            ConnectedModeState.updateModalState(screenName, state, _chromeClaimId);
     }
 
     function _syncModalChromeState() {
@@ -258,9 +262,10 @@ Item {
             _releaseModalChrome();
             return;
         }
+        const isClaim = !_chromeClaimId;
         if (!_chromeClaimId)
             _chromeClaimId = _nextChromeClaimId();
-        _publishModalChromeState();
+        _publishModalChromeState(isClaim);
         if (_dockBlocksEmergence && (spotlightOpen || contentWindow.visible))
             ConnectedModeState.requestDockRetract(_chromeClaimId, _currentScreenName(), resolvedConnectedBarSide);
         else
@@ -306,7 +311,7 @@ Item {
         const screenName = _currentScreenName();
         if (!screenName || !contentContainer)
             return;
-        ConnectedModeState.setModalAnim(screenName, contentContainer.animX, contentContainer.animY);
+        ConnectedModeState.setModalAnim(screenName, contentContainer.animX, contentContainer.animY, _chromeClaimId);
     }
 
     function _syncModalBody() {
@@ -315,17 +320,18 @@ Item {
         const screenName = _currentScreenName();
         if (!screenName)
             return;
-        ConnectedModeState.setModalBody(screenName, _connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight);
+        ConnectedModeState.setModalBody(screenName, _connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight, _chromeClaimId);
     }
 
     function _releaseModalChrome() {
-        if (_chromeClaimId) {
-            ConnectedModeState.releaseDockRetract(_chromeClaimId);
-            _chromeClaimId = "";
-        }
+        if (!_chromeClaimId)
+            return;
+        ConnectedModeState.releaseDockRetract(_chromeClaimId);
+        const claimId = _chromeClaimId;
+        _chromeClaimId = "";
         const screenName = _currentScreenName();
         if (screenName)
-            ConnectedModeState.clearModalState(screenName);
+            ConnectedModeState.clearModalState(screenName, claimId);
     }
 
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()

@@ -284,7 +284,7 @@ FocusScope {
             anchors.bottom: parent.bottom
             anchors.leftMargin: root.parentModal?.borderWidth ?? 1
             anchors.rightMargin: root.parentModal?.borderWidth ?? 1
-            anchors.bottomMargin: _connectedBottomEmerge ? Theme.spacingM : (root.parentModal?.borderWidth ?? 1)
+            anchors.bottomMargin: _connectedBottomEmerge ? Theme.spacingS : (root.parentModal?.borderWidth ?? 1)
             height: showFooter ? (_connectedArcAtFooter ? 76 : 36) : 0
             visible: showFooter
             clip: true

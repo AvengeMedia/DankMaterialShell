@@ -88,7 +88,7 @@ Rectangle {
 
     width: parent?.width ?? 200
     height: expanded && hasActions ? 52 : 0
-    color: Theme.surfaceContainerHigh
+    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     radius: Theme.cornerRadius
 
     clip: true

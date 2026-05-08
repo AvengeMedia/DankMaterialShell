@@ -116,11 +116,11 @@ Item {
         return effectiveScreen ? effectiveScreen.name : "";
     }
 
-    function _publishModalChromeState() {
+    function _publishModalChromeState(isClaim) {
         const screenName = _currentScreenName();
         if (!screenName)
             return;
-        ConnectedModeState.setModalState(screenName, {
+        const state = {
             "visible": shouldBeVisible || contentWindow.visible,
             "barSide": resolvedConnectedBarSide,
             "bodyX": alignedX,
@@ -131,7 +131,11 @@ Item {
             "animY": modalContainer ? modalContainer.animY : 0,
             "omitStartConnector": false,
             "omitEndConnector": false
-        });
+        };
+        if (isClaim)
+            ConnectedModeState.claimModalState(screenName, state, _chromeClaimId);
+        else
+            ConnectedModeState.updateModalState(screenName, state, _chromeClaimId);
     }
 
     function _syncModalChromeState() {
@@ -139,9 +143,10 @@ Item {
             _releaseModalChrome();
             return;
         }
+        const isClaim = !_chromeClaimId;
         if (!_chromeClaimId)
             _chromeClaimId = _nextChromeClaimId();
-        _publishModalChromeState();
+        _publishModalChromeState(isClaim);
         if (_dockBlocksEmergence && (shouldBeVisible || contentWindow.visible))
             ConnectedModeState.requestDockRetract(_chromeClaimId, _currentScreenName(), resolvedConnectedBarSide);
         else
@@ -187,7 +192,7 @@ Item {
         const screenName = _currentScreenName();
         if (!screenName || !modalContainer)
             return;
-        ConnectedModeState.setModalAnim(screenName, modalContainer.animX, modalContainer.animY);
+        ConnectedModeState.setModalAnim(screenName, modalContainer.animX, modalContainer.animY, _chromeClaimId);
     }
 
     function _syncModalBody() {
@@ -196,17 +201,18 @@ Item {
         const screenName = _currentScreenName();
         if (!screenName)
             return;
-        ConnectedModeState.setModalBody(screenName, alignedX, alignedY, alignedWidth, alignedHeight);
+        ConnectedModeState.setModalBody(screenName, alignedX, alignedY, alignedWidth, alignedHeight, _chromeClaimId);
     }
 
     function _releaseModalChrome() {
         if (!_chromeClaimId)
             return;
         ConnectedModeState.releaseDockRetract(_chromeClaimId);
+        const claimId = _chromeClaimId;
         _chromeClaimId = "";
         const screenName = _currentScreenName();
         if (screenName)
-            ConnectedModeState.clearModalState(screenName);
+            ConnectedModeState.clearModalState(screenName, claimId);
     }
 
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
@@ -262,6 +268,10 @@ Item {
     }
 
     function close() {
+        if (modalContainer) {
+            frozenMotionOffsetX = modalContainer.offsetX;
+            frozenMotionOffsetY = modalContainer.offsetY;
+        }
         shouldBeVisible = false;
         shouldHaveFocus = false;
         ModalManager.closeModal(modalHandle);
