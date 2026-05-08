@@ -2760,6 +2760,12 @@
     "comment": ""
   },
   {
+    "term": "This output is disabled in the current profile",
+    "context": "This output is disabled in the current profile",
+    "reference": "Modules/Settings/DisplayConfig/OutputCard.qml",
+    "comment": ""
+  },
+  {
     "term": "Configure",
     "context": "Configure",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:356",
