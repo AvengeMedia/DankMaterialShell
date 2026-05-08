@@ -53,10 +53,15 @@ Column {
     }
 
     Column {
+        id: settingsColumn
         width: parent.width
         spacing: Theme.spacingS
         visible: root.expanded
         topPadding: Theme.spacingS
+        property bool isDisabled: {
+            void (DisplayConfigState.pendingNiriChanges);
+            return DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "disabled", false);
+        }
 
         DankToggle {
             width: parent.width
@@ -70,6 +75,7 @@ Column {
         DankToggle {
             width: parent.width
             text: I18n.tr("Focus at Startup")
+            enabled: !settingsColumn.isDisabled
             checked: DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "focusAtStartup", false)
             onToggled: checked => DisplayConfigState.setNiriSetting(root.outputData, root.outputName, "focusAtStartup", checked)
         }
@@ -78,6 +84,7 @@ Column {
             width: parent.width
             text: I18n.tr("Hot Corners")
             addHorizontalPadding: true
+            enabled: !settingsColumn.isDisabled
 
             property var hotCornersData: {
                 void (DisplayConfigState.pendingNiriChanges);
@@ -139,6 +146,7 @@ Column {
                 anchors.horizontalCenter: parent.horizontalCenter
                 selectionMode: "multi"
                 checkEnabled: false
+                enabled: !settingsColumn.isDisabled
                 buttonHeight: 32
                 buttonPadding: parent.width < 400 ? Theme.spacingXS : Theme.spacingM
                 minButtonWidth: parent.width < 400 ? 28 : 56
@@ -225,6 +233,7 @@ Column {
                             width: parent.width
                             height: 40
                             placeholderText: I18n.tr("Inherit")
+                            enabled: !settingsColumn.isDisabled
                             text: {
                                 const layout = DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "layout", null);
                                 if (layout?.gaps === undefined)
@@ -262,6 +271,7 @@ Column {
                             width: parent.width
                             height: 40
                             placeholderText: I18n.tr("Inherit")
+                            enabled: !settingsColumn.isDisabled
                             text: {
                                 const layout = DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "layout", null);
                                 if (!layout?.defaultColumnWidth)
@@ -312,6 +322,7 @@ Column {
                         width: parent.width
                         height: 40
                         placeholderText: I18n.tr("Inherit")
+                        enabled: !settingsColumn.isDisabled
                         text: {
                             const layout = DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "layout", null);
                             const presets = layout?.presetColumnWidths || [];
@@ -354,6 +365,7 @@ Column {
         DankToggle {
             width: parent.width
             text: I18n.tr("Center Single Column")
+            enabled: !settingsColumn.isDisabled
             property var layoutData: DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "layout", null)
             checked: layoutData?.alwaysCenterSingleColumn ?? false
             onToggled: checked => {

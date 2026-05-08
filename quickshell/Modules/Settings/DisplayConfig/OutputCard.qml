@@ -12,6 +12,17 @@ StyledRect {
     required property string outputName
     required property var outputData
     property bool isConnected: outputData?.connected ?? false
+    property bool isDisabled: {
+        void (DisplayConfigState.pendingHyprlandChanges);
+        void (DisplayConfigState.pendingNiriChanges);
+        if (!root.isConnected)
+            return false;
+        if (CompositorService.isHyprland)
+            return DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "disabled", false);
+        if (CompositorService.isNiri)
+            return DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "disabled", false);
+        return false;
+    }
 
     width: parent.width
     height: settingsColumn.implicitHeight + Theme.spacingM * 2
@@ -19,7 +30,7 @@ StyledRect {
     color: Theme.withAlpha(Theme.surfaceContainerHigh, isConnected ? 0.5 : 0.3)
     border.color: Theme.withAlpha(Theme.outline, 0.3)
     border.width: 1
-    opacity: isConnected ? 1.0 : 0.7
+    opacity: isConnected ? (isDisabled ? 0.5 : 1.0) : 0.7
 
     Column {
         id: settingsColumn
@@ -32,14 +43,14 @@ StyledRect {
             spacing: Theme.spacingM
 
             DankIcon {
-                name: root.isConnected ? "desktop_windows" : "desktop_access_disabled"
+                name: root.isConnected && !root.isDisabled ? "desktop_windows" : "desktop_access_disabled"
                 size: Theme.iconSize - 4
-                color: root.isConnected ? Theme.primary : Theme.surfaceVariantText
+                color: root.isConnected && !root.isDisabled ? Theme.primary : Theme.surfaceVariantText
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Column {
-                width: parent.width - Theme.iconSize - Theme.spacingM - (disconnectedBadge.visible ? disconnectedBadge.width + deleteButton.width + Theme.spacingS * 2 : 0)
+                width: parent.width - Theme.iconSize - Theme.spacingM - (disconnectedBadge.visible ? disconnectedBadge.width + deleteButton.width + Theme.spacingS * 2 : disabledBadge.visible ? disabledBadge.width + Theme.spacingS : 0)
                 spacing: 2
 
                 StyledText {
@@ -102,12 +113,30 @@ StyledRect {
                     onClicked: DisplayConfigState.deleteDisconnectedOutput(root.outputName)
                 }
             }
+
+            Rectangle {
+                id: disabledBadge
+                visible: root.isDisabled
+                width: disabledText.implicitWidth + Theme.spacingM
+                height: disabledText.implicitHeight + Theme.spacingXS
+                radius: height / 2
+                color: Theme.withAlpha(Theme.outline, 0.3)
+                anchors.verticalCenter: parent.verticalCenter
+
+                StyledText {
+                    id: disabledText
+                    text: I18n.tr("Disabled")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    anchors.centerIn: parent
+                }
+            }
         }
 
         DankDropdown {
             width: parent.width
             text: I18n.tr("Resolution & Refresh")
-            visible: root.isConnected
+            visible: root.isConnected && !root.isDisabled
             currentValue: {
                 const pendingMode = DisplayConfigState.getPendingValue(root.outputName, "mode");
                 if (pendingMode)
@@ -141,10 +170,20 @@ StyledRect {
             horizontalAlignment: Text.AlignLeft
         }
 
+        StyledText {
+            visible: root.isDisabled
+            text: I18n.tr("This output is disabled in the current profile")
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceVariantText
+            wrapMode: Text.WordWrap
+            width: parent.width
+            horizontalAlignment: Text.AlignLeft
+        }
+
         Row {
             width: parent.width
             spacing: Theme.spacingM
-            visible: root.isConnected
+            visible: root.isConnected && !root.isDisabled
 
             Column {
                 width: (parent.width - Theme.spacingM) / 2
@@ -262,7 +301,7 @@ StyledRect {
         DankToggle {
             width: parent.width
             text: I18n.tr("Variable Refresh Rate")
-            visible: root.isConnected && !CompositorService.isDwl && !CompositorService.isHyprland && !CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
+            visible: root.isConnected && !root.isDisabled && !CompositorService.isDwl && !CompositorService.isHyprland && !CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
             checked: {
                 const pendingVrr = DisplayConfigState.getPendingValue(root.outputName, "vrr");
                 if (pendingVrr !== undefined)
@@ -275,7 +314,7 @@ StyledRect {
         DankDropdown {
             width: parent.width
             text: I18n.tr("Variable Refresh Rate")
-            visible: root.isConnected && CompositorService.isHyprland && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
+            visible: root.isConnected && !root.isDisabled && CompositorService.isHyprland && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
             options: [I18n.tr("Off"), I18n.tr("On"), I18n.tr("Fullscreen Only")]
             currentValue: {
                 DisplayConfigState.pendingHyprlandChanges;
@@ -298,7 +337,7 @@ StyledRect {
         DankDropdown {
             width: parent.width
             text: I18n.tr("Variable Refresh Rate")
-            visible: root.isConnected && CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
+            visible: root.isConnected && !root.isDisabled && CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
             options: [I18n.tr("Off"), I18n.tr("On"), I18n.tr("On-Demand")]
             currentValue: {
                 DisplayConfigState.pendingNiriChanges;

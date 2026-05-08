@@ -2198,9 +2198,21 @@ Singleton {
         };
     }
 
+    function isOutputDisabled(outputName) {
+        if (!outputs[outputName])
+            return false;
+        if (CompositorService.isHyprland)
+            return getHyprlandSetting(outputs[outputName], outputName, "disabled", false);
+        if (CompositorService.isNiri)
+            return getNiriSetting(outputs[outputName], outputName, "disabled", false);
+        return false;
+    }
+
     function checkOverlap(testName, testX, testY, testW, testH) {
         for (const name in outputs) {
             if (name === testName)
+                continue;
+            if (isOutputDisabled(name))
                 continue;
             const output = outputs[name];
             if (!output.logical)
@@ -2223,6 +2235,8 @@ Singleton {
 
         for (const name in outputs) {
             if (name === testName)
+                continue;
+            if (isOutputDisabled(name))
                 continue;
             const output = outputs[name];
             if (!output.logical)
@@ -2300,7 +2314,7 @@ Singleton {
     }
 
     function findBestSnapPosition(testName, posX, posY, testW, testH) {
-        const outputNames = Object.keys(outputs).filter(n => n !== testName);
+        const outputNames = Object.keys(outputs).filter(n => n !== testName && !isOutputDisabled(n));
 
         if (outputNames.length === 0)
             return Qt.point(posX, posY);
