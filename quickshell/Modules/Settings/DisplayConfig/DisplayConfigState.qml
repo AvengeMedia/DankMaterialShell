@@ -262,6 +262,17 @@ Singleton {
         return "profile_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
     }
 
+    function generateAutoProfileId(outputIdentifiers) {
+        const fp = outputSetFingerprint(outputIdentifiers);
+        let hash = 0;
+        for (let i = 0; i < fp.length; i++) {
+            const char = fp.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+        }
+        const hashStr = (hash >>> 0).toString(16);
+        return "auto_" + hashStr;
+    }
+
     function configFingerprint(configEntry) {
         return Object.keys(configEntry.outputs || {}).sort().join("+");
     }
@@ -282,15 +293,18 @@ Singleton {
         return null;
     }
 
-    function findConfigEntryByFingerprint(data, outputIdentifiers) {
+    function findConfigEntryByFingerprint(data, outputIdentifiers, autoOnly) {
         const targetKey = outputSetFingerprint(outputIdentifiers);
         const configs = data.configurations || [];
         for (let i = 0; i < configs.length; i++) {
-            if (configFingerprint(configs[i]) === targetKey)
+            if (configFingerprint(configs[i]) === targetKey) {
+                if (autoOnly && configs[i].name)
+                    continue;
                 return {
                     entry: configs[i],
                     index: i
                 };
+            }
         }
         return null;
     }
@@ -503,15 +517,15 @@ Singleton {
             }
         };
         const onWriteSuccess = () => {
-            SettingsData.setActiveDisplayProfile(CompositorService.compositor, configEntry.name ? configId : "");
+            SettingsData.setActiveDisplayProfile(CompositorService.compositor, configId);
             if (isManual) {
-                WlrOutputService.requestState();
                 profilesLoading = false;
                 profileActivated(configId, profileName);
                 manualActivationTimer.restart();
             } else {
                 saveConfigEntry(configEntry);
             }
+            WlrOutputService.requestState();
         };
 
         switch (CompositorService.compositor) {
@@ -591,6 +605,8 @@ Singleton {
         const currentKey = currentOutputSet.join("+");
         for (const id in validatedProfiles) {
             const p = validatedProfiles[id];
+            if (p.name === "")
+                continue;
             if (Object.keys(p.outputs || {}).sort().join("+") === currentKey)
                 return id;
         }
@@ -696,42 +712,57 @@ Singleton {
         onTriggered: root.manualActivation = false
     }
 
+    Timer {
+        id: autoSelectDebounceTimer
+        interval: 400
+        onTriggered: {
+            if (root.hasPendingChanges)
+                return;
+            root.applyAutoConfig();
+        }
+    }
+
     function applyAutoConfig() {
         if (!profilesReady || !SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
             return;
 
         readMonitorsJson(data => {
-            const match = findConfigEntryByFingerprint(data, currentOutputSet);
+            const match = findConfigEntryByFingerprint(data, currentOutputSet, true);
             if (match) {
-                applyConfigEntry(match.entry, match.entry.id, match.entry.name || "", false);
+                applyConfigEntry(match.entry, match.entry.id, "", false);
                 return;
             }
 
-            const partial = findPartialConfigEntry(data, currentOutputSet);
-            const niriSettings = buildMergedNiriSettings();
-            const hyprlandSettings = buildMergedHyprlandSettings();
-            const mergedOutputs = buildOutputsWithPendingChanges();
-
-            const outputConfigs = partial ? JSON.parse(JSON.stringify(partial.entry.outputs || {})) : {};
-
-            for (const name in outputs) {
-                const outputId = getOutputIdentifier(outputs[name], name);
-                const alreadyCovered = Object.keys(outputConfigs).some(k => k === outputId);
-                if (!alreadyCovered) {
-                    const od = mergedOutputs[name];
-                    if (od)
-                        outputConfigs[outputId] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
-                }
-            }
-
-            if (Object.keys(outputConfigs).length === 0)
-                return;
-
-            const syntheticEntry = {
-                name: "",
-                outputs: outputConfigs
-            };
-            applyConfigEntry(syntheticEntry, "", "", false);
+            const outputConfigs = buildCurrentOutputConfigs();
+            const id = generateAutoProfileId(currentOutputSet);
+            const existingIdx = data.configurations.findIndex(c => c.id === id);
+            if (existingIdx >= 0)
+                data.configurations[existingIdx] = {
+                    "id": id,
+                    "name": "",
+                    "outputs": outputConfigs
+                };
+            else
+                data.configurations.push({
+                    "id": id,
+                    "name": "",
+                    "outputs": outputConfigs
+                });
+            writeMonitorsJson(data, success => {
+                if (!success)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                updated[id] = {
+                    id: id,
+                    name: "",
+                    outputs: outputConfigs
+                };
+                validatedProfiles = updated;
+                matchedProfile = "";
+                const match = findConfigEntryById(data, id);
+                if (match)
+                    applyConfigEntry(match.entry, id, "", false);
+            });
         });
     }
 
@@ -831,7 +862,7 @@ Singleton {
         if (hasPendingChanges)
             clearPendingChanges();
         currentOutputSet = newOutputSet;
-        applyAutoConfig();
+        autoSelectDebounceTimer.restart();
     }
     onSavedOutputsChanged: allOutputs = buildAllOutputsMap()
     onLastAppliedEntryChanged: allOutputs = buildAllOutputsMap()
