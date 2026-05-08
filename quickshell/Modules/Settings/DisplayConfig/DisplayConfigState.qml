@@ -309,28 +309,6 @@ Singleton {
         return null;
     }
 
-    function findPartialConfigEntry(data, outputIdentifiers) {
-        const currentSet = new Set(outputIdentifiers);
-        const configs = data.configurations || [];
-        let bestEntry = null;
-        let bestCount = 0;
-        for (let i = 0; i < configs.length; i++) {
-            const cfgKeys = Object.keys(configs[i].outputs || {});
-            if (cfgKeys.length === 0)
-                continue;
-            if (!cfgKeys.every(k => currentSet.has(k)))
-                continue;
-            if (cfgKeys.length > bestCount) {
-                bestCount = cfgKeys.length;
-                bestEntry = {
-                    entry: configs[i],
-                    index: i
-                };
-            }
-        }
-        return bestEntry;
-    }
-
     function getProfileMonitorInclusion(profileId) {
         const profile = validatedProfiles[profileId];
         const profileOutputIds = new Set(Object.keys(profile?.outputs || {}));
@@ -522,8 +500,6 @@ Singleton {
                 profilesLoading = false;
                 profileActivated(configId, profileName);
                 manualActivationTimer.restart();
-            } else {
-                saveConfigEntry(configEntry);
             }
             WlrOutputService.requestState();
         };
@@ -777,22 +753,6 @@ Singleton {
                 outputConfigs[getOutputIdentifier(od, name)] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
         }
         return outputConfigs;
-    }
-
-    function saveConfigEntry(configEntry) {
-        if (!configEntry.id || !configEntry.name)
-            return;
-        readMonitorsJson(data => {
-            const match = findConfigEntryById(data, configEntry.id);
-            if (!match)
-                return;
-            data.configurations[match.index] = {
-                "id": configEntry.id,
-                "name": configEntry.name,
-                "outputs": configEntry.outputs
-            };
-            writeMonitorsJson(data, null);
-        });
     }
 
     function deleteDisconnectedOutput(outputName) {
@@ -2060,23 +2020,23 @@ Singleton {
         return block;
     }
 
-    function confirmChanges() {
+    function confirmChanges(profileId) {
         const outputConfigs = buildCurrentOutputConfigs();
-        lastAppliedEntry = {
-            outputs: outputConfigs
-        };
+        lastAppliedEntry = { outputs: outputConfigs };
 
-        readMonitorsJson(data => {
-            const match = findConfigEntryByFingerprint(data, Object.keys(outputConfigs));
-            if (!match || !match.entry.name)
-                return;
-            data.configurations[match.index] = {
-                "id": match.entry.id,
-                "name": match.entry.name,
-                "outputs": outputConfigs
-            };
-            writeMonitorsJson(data, null);
-        });
+        if (profileId) {
+            readMonitorsJson(data => {
+                const match = findConfigEntryById(data, profileId);
+                if (match) {
+                    data.configurations[match.index] = {
+                        "id": match.entry.id,
+                        "name": match.entry.name || "",
+                        "outputs": outputConfigs
+                    };
+                    writeMonitorsJson(data, null);
+                }
+            });
+        }
 
         clearPendingChanges();
         changesConfirmed();

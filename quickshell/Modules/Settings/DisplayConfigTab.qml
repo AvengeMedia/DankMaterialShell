@@ -624,7 +624,7 @@ Item {
 
     DisplayConfirmationModal {
         id: confirmationModal
-        onConfirmed: DisplayConfigState.confirmChanges()
+        onConfirmed: DisplayConfigState.confirmChanges(root.selectedProfileId)
         onReverted: DisplayConfigState.revertChanges()
     }
 }
