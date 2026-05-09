@@ -417,7 +417,7 @@ Singleton {
 
         if (isNiri) {
             const active = ToplevelManager.activeToplevel;
-            if (active?.fullscreen && active?.activated && NiriService.currentOutput === screenName)
+            if (active?.fullscreen && active?.activated && _toplevelOnScreen(active, screenName))
                 return true;
 
             const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
