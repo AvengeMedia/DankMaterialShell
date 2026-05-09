@@ -37,34 +37,34 @@ Item {
     property bool _hadAdjacentLeftBar: false
     property bool _hadAdjacentRightBar: false
 
-    onHasAdjacentTopBarLiveChanged: if (hasAdjacentTopBarLive) _hadAdjacentTopBar = true
-    onHasAdjacentBottomBarLiveChanged: if (hasAdjacentBottomBarLive) _hadAdjacentBottomBar = true
-    onHasAdjacentLeftBarLiveChanged: if (hasAdjacentLeftBarLive) _hadAdjacentLeftBar = true
-    onHasAdjacentRightBarLiveChanged: if (hasAdjacentRightBarLive) _hadAdjacentRightBar = true
+    onHasAdjacentTopBarLiveChanged: if (hasAdjacentTopBarLive)
+        _hadAdjacentTopBar = true
+    onHasAdjacentBottomBarLiveChanged: if (hasAdjacentBottomBarLive)
+        _hadAdjacentBottomBar = true
+    onHasAdjacentLeftBarLiveChanged: if (hasAdjacentLeftBarLive)
+        _hadAdjacentLeftBar = true
+    onHasAdjacentRightBarLiveChanged: if (hasAdjacentRightBarLive)
+        _hadAdjacentRightBar = true
 
     readonly property real _frameLeftInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || _barIsVertical) return 0
-        return hasAdjacentLeftBarLive
-            ? SettingsData.frameBarSize
-            : (_hadAdjacentLeftBar ? _frameEdgeFloorInset : 0)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || _barIsVertical)
+            return 0;
+        return hasAdjacentLeftBarLive ? SettingsData.frameBarSize : (_hadAdjacentLeftBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameRightInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || _barIsVertical) return 0
-        return hasAdjacentRightBarLive
-            ? SettingsData.frameBarSize
-            : (_hadAdjacentRightBar ? _frameEdgeFloorInset : 0)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || _barIsVertical)
+            return 0;
+        return hasAdjacentRightBarLive ? SettingsData.frameBarSize : (_hadAdjacentRightBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameTopInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_barIsVertical) return 0
-        return hasAdjacentTopBarLive
-            ? SettingsData.frameThickness
-            : (_hadAdjacentTopBar ? _frameEdgeFloorInset : 0)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_barIsVertical)
+            return 0;
+        return hasAdjacentTopBarLive ? SettingsData.frameThickness : (_hadAdjacentTopBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameBottomInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_barIsVertical) return 0
-        return hasAdjacentBottomBarLive
-            ? SettingsData.frameThickness
-            : (_hadAdjacentBottomBar ? _frameEdgeFloorInset : 0)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_barIsVertical)
+            return 0;
+        return hasAdjacentBottomBarLive ? SettingsData.frameThickness : (_hadAdjacentBottomBar ? _frameEdgeFloorInset : 0);
     }
 
     property alias hLeftSection: hLeftSection
@@ -75,14 +75,10 @@ Item {
     property alias vRightSection: vRightSection
 
     anchors.fill: parent
-    anchors.leftMargin:   _edgeBaseMargin + _frameLeftInset
-    anchors.rightMargin:  _edgeBaseMargin + _frameRightInset
-    anchors.topMargin:    (_barIsVertical
-        ? (hasAdjacentTopBarLive ? outlineThickness : Theme.spacingXS)
-        : 0) + _frameTopInset
-    anchors.bottomMargin: (_barIsVertical
-        ? (hasAdjacentBottomBarLive ? outlineThickness : Theme.spacingXS)
-        : 0) + _frameBottomInset
+    anchors.leftMargin: _edgeBaseMargin + _frameLeftInset
+    anchors.rightMargin: _edgeBaseMargin + _frameRightInset
+    anchors.topMargin: (_barIsVertical ? (hasAdjacentTopBarLive ? outlineThickness : Theme.spacingXS) : 0) + _frameTopInset
+    anchors.bottomMargin: (_barIsVertical ? (hasAdjacentBottomBarLive ? outlineThickness : Theme.spacingXS) : 0) + _frameBottomInset
     clip: false
 
     DeferredAction {
@@ -1535,6 +1531,16 @@ Item {
             section: topBarContent.getWidgetSection(parent) || "right"
             popoutTarget: systemUpdateLoader.item ?? null
             parentScreen: barWindow.screen
+
+            Component.onCompleted: {
+                barWindow.systemUpdateButtonRef = this;
+            }
+
+            Component.onDestruction: {
+                if (barWindow.systemUpdateButtonRef === this)
+                    barWindow.systemUpdateButtonRef = null;
+            }
+
             onClicked: {
                 systemUpdateLoader.active = true;
                 if (!systemUpdateLoader.item)

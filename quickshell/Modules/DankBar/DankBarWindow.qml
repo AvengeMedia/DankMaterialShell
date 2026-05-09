@@ -20,6 +20,24 @@ PanelWindow {
 
     property var controlCenterButtonRef: null
     property var clockButtonRef: null
+    property var systemUpdateButtonRef: null
+
+    function triggerSystemUpdate() {
+        systemUpdateLoader.active = true;
+        if (!systemUpdateLoader.item)
+            return;
+        const popout = systemUpdateLoader.item;
+        const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
+        if (systemUpdateButtonRef && popout.setTriggerPosition) {
+            const screenPos = systemUpdateButtonRef.mapToItem(null, 0, 0);
+            const pos = SettingsData.getPopupTriggerPosition(screenPos, barWindow.screen, barWindow.effectiveBarThickness, systemUpdateButtonRef.width, barConfig?.spacing ?? 4, barPosition, barConfig);
+            const section = systemUpdateButtonRef.section || "right";
+            popout.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, barConfig?.spacing ?? 4, barConfig);
+        } else {
+            popout.screen = barWindow.screen;
+        }
+        PopoutManager.requestPopout(popout, undefined, "systemUpdate");
+    }
 
     function triggerControlCenter() {
         controlCenterLoader.active = true;

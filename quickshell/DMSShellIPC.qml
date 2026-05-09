@@ -1161,6 +1161,39 @@ Item {
     }
 
     IpcHandler {
+        function toggle(): string {
+            if (PopoutService.systemUpdatePopout?.shouldBeVisible) {
+                PopoutService.systemUpdatePopout.close();
+                return "SYSTEMUPDATER_TOGGLE_SUCCESS";
+            }
+            const bar = root.getPreferredBar("systemUpdateButtonRef");
+            if (bar) {
+                bar.triggerSystemUpdate();
+                return "SYSTEMUPDATER_TOGGLE_SUCCESS";
+            }
+            return "SYSTEMUPDATER_TOGGLE_FAILED";
+        }
+
+        function open(): string {
+            if (PopoutService.systemUpdatePopout?.shouldBeVisible)
+                return "SYSTEMUPDATER_ALREADY_OPEN";
+            const bar = root.getPreferredBar("systemUpdateButtonRef");
+            if (bar) {
+                bar.triggerSystemUpdate();
+                return "SYSTEMUPDATER_OPEN_SUCCESS";
+            }
+            return "SYSTEMUPDATER_OPEN_FAILED";
+        }
+
+        function close(): string {
+            PopoutService.closeSystemUpdate();
+            return "SYSTEMUPDATER_CLOSE_SUCCESS";
+        }
+
+        target: "systemupdater"
+    }
+
+    IpcHandler {
         function open(): string {
             if (!PopoutService.clipboardHistoryModal) {
                 return "CLIPBOARD_NOT_AVAILABLE";

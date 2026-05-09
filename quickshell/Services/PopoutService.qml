@@ -304,7 +304,8 @@ Singleton {
 
     function openSystemUpdate(x, y, width, section, screen) {
         if (systemUpdatePopout) {
-            setPosition(systemUpdatePopout, x, y, width, section, screen);
+            if (arguments.length >= 5)
+                setPosition(systemUpdatePopout, x, y, width, section, screen);
             systemUpdatePopout.open();
         }
     }
@@ -322,7 +323,8 @@ Singleton {
 
     function toggleSystemUpdate(x, y, width, section, screen) {
         if (systemUpdatePopout) {
-            setPosition(systemUpdatePopout, x, y, width, section, screen);
+            if (arguments.length >= 5)
+                setPosition(systemUpdatePopout, x, y, width, section, screen);
             systemUpdatePopout.toggle();
         }
     }
