@@ -27,16 +27,7 @@ DockContextMenuBase {
         model: {
             if (!root.appData || root.appData.type !== "grouped")
                 return [];
-
-            const toplevels = [];
-            const allToplevels = ToplevelManager.toplevels.values;
-            for (let i = 0; i < allToplevels.length; i++) {
-                const toplevel = allToplevels[i];
-                if (toplevel.appId === root.appData.appId) {
-                    toplevels.push(toplevel);
-                }
-            }
-            return toplevels;
+            return (root.appData.allWindows || []).map(w => w.toplevel).filter(t => t != null);
         }
 
         Rectangle {
