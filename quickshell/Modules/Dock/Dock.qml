@@ -46,14 +46,10 @@ Variants {
         property bool groupByApp: SettingsData.dockGroupByApp
         readonly property int borderThickness: SettingsData.dockBorderEnabled ? SettingsData.dockBorderThickness : 0
         readonly property string connectedBarSide: SettingsData.dockPosition === SettingsData.Position.Top ? "top" : SettingsData.dockPosition === SettingsData.Position.Bottom ? "bottom" : SettingsData.dockPosition === SettingsData.Position.Left ? "left" : "right"
-        readonly property bool connectedBarActiveOnEdge: Theme.isConnectedEffect && !!(dock.screen || modelData) && SettingsData.getActiveBarEdgesForScreen(dock.screen || modelData).includes(connectedBarSide)
-        readonly property real connectedJoinInset: {
-            if (Theme.isConnectedEffect)
-                return connectedBarActiveOnEdge ? SettingsData.frameBarSize : SettingsData.frameThickness;
-            if (SettingsData.frameEnabled)
-                return SettingsData.frameEdgeInsetForSide(dock.screen || modelData, dock.connectedBarSide);
-            return 0;
-        }
+        readonly property bool frameDockExclusionActive: dockGeometry.frameExclusionActive
+        readonly property bool connectedBarActiveOnEdge: dockGeometry.connectedBarActiveOnEdge
+        readonly property real connectedJoinInset: dockGeometry.connectedJoinInset
+        readonly property real dockFrameInset: dockGeometry.frameInset
         readonly property real surfaceRadius: Theme.connectedSurfaceRadius
         readonly property color surfaceColor: Theme.isConnectedEffect ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
         readonly property color surfaceBorderColor: Theme.isConnectedEffect ? "transparent" : BlurService.borderColor
@@ -68,7 +64,7 @@ Variants {
         readonly property int hasApps: dockApps.implicitWidth > 0 || dockApps.implicitHeight > 0
 
         readonly property real widgetHeight: SettingsData.dockIconSize
-        readonly property real effectiveBarHeight: widgetHeight + SettingsData.dockSpacing * 2 + 10 + borderThickness * 2
+        readonly property real effectiveBarHeight: dockGeometry.visualThickness
         function getBarHeight(barConfig) {
             if (!barConfig)
                 return 0;
@@ -137,13 +133,30 @@ Variants {
 
         readonly property real dockMargin: SettingsData.dockMargin
         readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
-        readonly property real effectiveDockBottomGap: Theme.isConnectedEffect ? 0 : SettingsData.dockBottomGap
-        readonly property real effectiveDockMargin: Theme.isConnectedEffect ? 0 : SettingsData.dockMargin
+        readonly property real effectiveDockBottomGap: dockGeometry.visualOffset
+        readonly property real effectiveDockMargin: dockGeometry.effectiveMargin
         readonly property real positionSpacing: barSpacing + effectiveDockBottomGap + effectiveDockMargin
-        readonly property real joinedEdgeMargin: Theme.isConnectedEffect ? 0 : (barSpacing + effectiveDockMargin + 1 + dock.borderThickness)
+        readonly property real joinedEdgeMargin: dockGeometry.joinedEdgeMargin
         readonly property real _dpr: (dock.screen && dock.screen.devicePixelRatio) ? dock.screen.devicePixelRatio : 1
         function px(v) {
             return Math.round(v * _dpr) / _dpr;
+        }
+
+        DockGeometry {
+            id: dockGeometry
+
+            screen: dock.screen || dock.modelData
+            edge: dock.connectedBarSide
+            dockVisible: dock.visible
+            autoHide: dock.autoHide
+            hasFullscreenToplevel: dock.hasFullscreenToplevel
+            iconSize: dock.widgetHeight
+            spacing: SettingsData.dockSpacing
+            borderThickness: dock.borderThickness
+            offset: SettingsData.dockBottomGap
+            margin: SettingsData.dockMargin
+            barSpacing: dock.barSpacing
+            dpr: dock._dpr
         }
 
         // Dock window origin in screen-relative coordinates (FrameWindow space).
@@ -231,7 +244,7 @@ Variants {
                 return false;
 
             const screenName = dock.modelData?.name ?? "";
-            const dockThickness = dock.connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin;
+            const dockThickness = dockGeometry.motionThickness;
             const screenWidth = dock.screen?.width ?? 0;
             const screenHeight = dock.screen?.height ?? 0;
 
@@ -434,20 +447,21 @@ Variants {
         }
         color: "transparent"
 
+        readonly property real dockReserveZone: dockGeometry.reserveZone
+        readonly property bool shouldReserveDockSpace: dockGeometry.shouldReserveSpace
+
         exclusiveZone: {
-            if (dock.hasFullscreenToplevel)
+            if (!dock.shouldReserveDockSpace)
                 return -1;
-            if (!SettingsData.showDock || autoHide)
+            if (dock.frameDockExclusionActive)
                 return -1;
-            if (barSpacing > 0)
-                return -1;
-            return px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockBottomGap + effectiveDockMargin);
+            return dock.dockReserveZone;
         }
 
         property real animationHeadroom: Math.ceil(SettingsData.dockIconSize * 0.35)
 
-        implicitWidth: isVertical ? (px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
-        implicitHeight: !isVertical ? (px(connectedJoinInset + effectiveBarHeight + SettingsData.dockSpacing + effectiveDockMargin + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+        implicitWidth: isVertical ? (px(dockGeometry.surfaceThickness + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+        implicitHeight: !isVertical ? (px(dockGeometry.surfaceThickness + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
 
         Item {
             id: maskItem
@@ -472,6 +486,28 @@ Variants {
 
         mask: Region {
             item: maskItem
+        }
+
+        PanelWindow {
+            id: dockExclusion
+
+            screen: dock.screen || dock.modelData
+            visible: dock.frameDockExclusionActive && dock.shouldReserveDockSpace
+            color: "transparent"
+            mask: Region {}
+            implicitWidth: dock.isVertical ? dock.dockReserveZone : 1
+            implicitHeight: dock.isVertical ? 1 : dock.dockReserveZone
+            exclusiveZone: visible ? dock.dockReserveZone : -1
+
+            WlrLayershell.namespace: "dms:dock-exclusion"
+            WlrLayershell.layer: WlrLayer.Top
+
+            anchors {
+                top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top) : true
+                bottom: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom) : true
+                left: !dock.isVertical ? true : (SettingsData.dockPosition === SettingsData.Position.Left)
+                right: !dock.isVertical ? true : (SettingsData.dockPosition === SettingsData.Position.Right)
+            }
         }
 
         property var hoveredButton: {
@@ -527,7 +563,7 @@ Variants {
             const screenHeight = dock.screen ? dock.screen.height : 0;
 
             const gap = Theme.spacingS;
-            const bgMargin = dock.joinedEdgeMargin + dock.connectedJoinInset;
+            const bgMargin = dockGeometry.bodyEdgeMargin;
             const btnW = dock.hoveredButton.width;
             const btnH = dock.hoveredButton.height;
 
@@ -598,11 +634,11 @@ Variants {
                         // Keep the taller hit area regardless of the reveal state to prevent shrinking loop
                         return Math.min(Math.max(dockBackground.height + 64, 200), maxDockHeight);
                     }
-                    return dock.reveal ? px(dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin) : 1;
+                    return dock.reveal ? px(dockGeometry.motionThickness) : 1;
                 }
                 width: {
                     if (dock.isVertical) {
-                        return dock.reveal ? px(dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin) : 1;
+                        return dock.reveal ? px(dockGeometry.motionThickness) : 1;
                     }
                     // Keep the wider hit area regardless of the reveal state to prevent shrinking loop
                     return Math.min(dockBackground.width + 8 + dock.borderThickness, maxDockWidth);
@@ -648,7 +684,7 @@ Variants {
                                 const retractDist = dockBackground.width + SettingsData.dockSpacing + 10;
                                 return SettingsData.dockPosition === SettingsData.Position.Right ? retractDist : -retractDist;
                             }
-                            const hideDistance = dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin + 10;
+                            const hideDistance = dockGeometry.motionThickness + 10;
                             if (SettingsData.dockPosition === SettingsData.Position.Right) {
                                 return hideDistance;
                             } else {
@@ -664,7 +700,7 @@ Variants {
                                 const retractDist = dockBackground.height + SettingsData.dockSpacing + 10;
                                 return SettingsData.dockPosition === SettingsData.Position.Bottom ? retractDist : -retractDist;
                             }
-                            const hideDistance = dock.connectedJoinInset + dock.effectiveBarHeight + SettingsData.dockSpacing + dock.effectiveDockBottomGap + dock.effectiveDockMargin + 10;
+                            const hideDistance = dockGeometry.motionThickness + 10;
                             if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
                                 return hideDistance;
                             } else {
@@ -709,10 +745,10 @@ Variants {
                             right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined) : undefined
                             verticalCenter: dock.isVertical ? parent.verticalCenter : undefined
                         }
-                        anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
-                        anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
-                        anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
-                        anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? (dock.connectedJoinInset + dock.joinedEdgeMargin) : 0
+                        anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? dockGeometry.bodyEdgeMargin : 0
+                        anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? dockGeometry.bodyEdgeMargin : 0
+                        anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? dockGeometry.bodyEdgeMargin : 0
+                        anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? dockGeometry.bodyEdgeMargin : 0
 
                         implicitWidth: dock.isVertical ? (dockApps.implicitHeight + SettingsData.dockSpacing * 2) : (dockApps.implicitWidth + SettingsData.dockSpacing * 2)
                         implicitHeight: dock.isVertical ? (dockApps.implicitWidth + SettingsData.dockSpacing * 2) : (dockApps.implicitHeight + SettingsData.dockSpacing * 2)

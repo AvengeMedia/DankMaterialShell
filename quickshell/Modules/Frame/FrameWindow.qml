@@ -91,6 +91,8 @@ PanelWindow {
     readonly property real _popoutFillOverlapYValue: (ConnectedModeState.popoutBarSide === "left" || ConnectedModeState.popoutBarSide === "right") ? win._seamOverlap : 0
     readonly property real _dockFillOverlapXValue: win._dockHorizontal ? win._seamOverlap : 0
     readonly property real _dockFillOverlapYValue: (win._dockState.barSide === "left" || win._dockState.barSide === "right") ? win._seamOverlap : 0
+    readonly property real _dockJoinOverlapXValue: ConnectorGeometry.isVertical(win._dockState.barSide) ? win._seamOverlap : 0
+    readonly property real _dockJoinOverlapYValue: ConnectorGeometry.isHorizontal(win._dockState.barSide) ? win._seamOverlap : 0
     readonly property real _notifSideUnderlapValue: ConnectorGeometry.isVertical(win._notifState.barSide) ? win._seamOverlap : 0
     readonly property real _notifStartUnderlapValue: win._notifState.omitStartConnector ? win._seamOverlap : 0
     readonly property real _notifEndUnderlapValue: win._notifState.omitEndConnector ? win._seamOverlap : 0
@@ -1117,6 +1119,14 @@ PanelWindow {
         return ((win._dockState.barSide === "left" || win._dockState.barSide === "right") ? win._dockConnectorRadiusValue : 0) - win._dockFillOverlapYValue;
     }
 
+    function _dockJoinOverlapXOffset() {
+        return win._dockState.barSide === "left" ? -win._dockJoinOverlapXValue : 0;
+    }
+
+    function _dockJoinOverlapYOffset() {
+        return win._dockState.barSide === "top" ? -win._dockJoinOverlapYValue : 0;
+    }
+
     function _farConnectorBarSide(sourceSide, placement) {
         if (sourceSide === "top" || sourceSide === "bottom")
             return placement === "left" ? "left" : "right";
@@ -1359,10 +1369,10 @@ PanelWindow {
 
                 Rectangle {
                     id: _dockFill
-                    x: win._dockBodyXInChrome()
-                    y: win._dockBodyYInChrome()
-                    width: _dockBodyBlurAnchor.width + win._dockFillOverlapXValue * 2
-                    height: _dockBodyBlurAnchor.height + win._dockFillOverlapYValue * 2
+                    x: win._dockBodyXInChrome() + win._dockJoinOverlapXOffset()
+                    y: win._dockBodyYInChrome() + win._dockJoinOverlapYOffset()
+                    width: _dockBodyBlurAnchor.width + win._dockFillOverlapXValue * 2 + win._dockJoinOverlapXValue
+                    height: _dockBodyBlurAnchor.height + win._dockFillOverlapYValue * 2 + win._dockJoinOverlapYValue
                     color: win._opaqueSurfaceColor
                     z: 1
 
