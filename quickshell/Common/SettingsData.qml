@@ -249,8 +249,6 @@ Singleton {
     onFrameModeChanged: saveSettings()
     property var connectedFrameBarStyleBackups: ({})
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
-    property var connectedFrameModalDarkenBackup: null
-    onConnectedFrameModalDarkenBackupChanged: saveSettings()
     readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
     onConnectedFrameModeActiveChanged: {
         if (_loading)
@@ -1610,10 +1608,6 @@ Singleton {
     function _reconcileConnectedFrameBarStyles() {
         if (!connectedFrameModeActive) {
             _restoreConnectedFrameBarStyleBackups();
-            if (connectedFrameModalDarkenBackup === true) {
-                connectedFrameModalDarkenBackup = null;
-                set("modalDarkenBackground", true);
-            }
             return;
         }
         if (!_hasConnectedFrameBarStyleBackups())
@@ -1622,11 +1616,6 @@ Singleton {
         if (result.changed) {
             barConfigs = result.configs;
             updateBarConfigs();
-        }
-        // Force modalDarkenBackground off; capture backup if not already set
-        if (modalDarkenBackground) {
-            connectedFrameModalDarkenBackup = true;
-            set("modalDarkenBackground", false);
         }
     }
 

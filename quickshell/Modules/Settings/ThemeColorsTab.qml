@@ -13,6 +13,7 @@ Item {
 
     property var parentModal: null
     readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
+    readonly property bool frameModeActive: SettingsData.frameEnabled
     property var cachedIconThemes: SettingsData.availableIconThemes
     property var cachedCursorThemes: SettingsData.availableCursorThemes
     property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
@@ -2251,10 +2252,10 @@ Item {
                 iconName: "layers"
 
                 SettingsControlledByFrame {
-                    visible: themeColorsTab.connectedFrameModeActive
+                    visible: themeColorsTab.frameModeActive
                     parentModal: themeColorsTab.parentModal
                     settingLabel: I18n.tr("Darken Modal Background")
-                    reason: I18n.tr("Managed by Frame in Connected Mode")
+                    reason: I18n.tr("Disabled by Frame Mode")
                 }
 
                 SettingsToggleRow {
@@ -2263,7 +2264,7 @@ Item {
                     settingKey: "modalDarkenBackground"
                     text: I18n.tr("Darken Modal Background")
                     description: I18n.tr("Show darkened overlay behind modal dialogs")
-                    visible: !themeColorsTab.connectedFrameModeActive
+                    visible: !themeColorsTab.frameModeActive
                     checked: SettingsData.modalDarkenBackground
                     onToggled: checked => SettingsData.set("modalDarkenBackground", checked)
                 }

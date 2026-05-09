@@ -78,6 +78,7 @@ Item {
     readonly property real windowHeight: alignedHeight + contentY + shadowPad
 
     readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    readonly property bool useBackgroundDarken: !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
     readonly property real cornerRadius: Theme.cornerRadius
     readonly property color borderColor: {
         if (!SettingsData.dankLauncherV2BorderEnabled)
@@ -295,9 +296,9 @@ Item {
     PanelWindow {
         id: clickCatcher
         screen: launcherWindow.screen
-        visible: spotlightOpen
+        visible: spotlightOpen || isClosing
         color: "transparent"
-        updatesEnabled: false
+        updatesEnabled: root.useBackgroundDarken && (spotlightOpen || isClosing)
 
         WlrLayershell.namespace: "dms:spotlight:clickcatcher"
         WlrLayershell.layer: WlrLayershell.Top
@@ -330,16 +331,32 @@ Item {
             id: outsideClickHole
             visible: false
             color: "transparent"
-            x: root.alignedX
-            y: root.alignedY
-            width: root.alignedWidth
-            height: root.alignedHeight
+            x: root.windowX
+            y: root.windowY
+            width: root.windowWidth
+            height: root.windowHeight
         }
 
         MouseArea {
             anchors.fill: parent
             enabled: spotlightOpen
             onClicked: root.hide()
+        }
+
+        Rectangle {
+            id: backgroundDarken
+            anchors.fill: parent
+            color: "black"
+            opacity: contentVisible && root.useBackgroundDarken ? 0.5 : 0
+            visible: (spotlightOpen || isClosing) && (root.useBackgroundDarken || opacity > 0)
+
+            Behavior on opacity {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
+                    duration: Theme.modalAnimationDuration
+                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                }
+            }
         }
     }
 
@@ -361,6 +378,8 @@ Item {
 
         WlrLayershell.namespace: "dms:spotlight"
         WlrLayershell.layer: {
+            if (root.useBackgroundDarken)
+                return WlrLayershell.Overlay;
             switch (Quickshell.env("DMS_MODAL_LAYER")) {
             case "bottom":
                 log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");

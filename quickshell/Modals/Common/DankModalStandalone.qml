@@ -53,7 +53,7 @@ Item {
     readonly property alias contentWindow: contentWindow
     readonly property alias clickCatcher: clickCatcher
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
-    readonly property bool useBackground: showBackground && SettingsData.modalDarkenBackground
+    readonly property bool useBackground: showBackground && !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
     readonly property bool useSingleWindow: CompositorService.isHyprland || useBackground
 
     signal opened
