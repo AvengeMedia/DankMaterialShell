@@ -192,18 +192,4 @@ Singleton {
         DMSService.sysupdateRelease(null);
     }
 
-    IpcHandler {
-        target: "systemupdater"
-
-        function updatestatus(): string {
-            if (root.isChecking) {
-                return "ERROR: already checking";
-            }
-            if (root.backends.length === 0) {
-                return "ERROR: no package manager available";
-            }
-            root.checkForUpdates();
-            return "SUCCESS: Now checking...";
-        }
-    }
 }

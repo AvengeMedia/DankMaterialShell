@@ -1190,6 +1190,17 @@ Item {
             return "SYSTEMUPDATER_CLOSE_SUCCESS";
         }
 
+        function updatestatus(): string {
+            if (SystemUpdateService.isChecking) {
+                return "ERROR: already checking";
+            }
+            if (SystemUpdateService.backends.length === 0) {
+                return "ERROR: no package manager available";
+            }
+            SystemUpdateService.checkForUpdates();
+            return "SUCCESS: Now checking...";
+        }
+
         target: "systemupdater"
     }
 

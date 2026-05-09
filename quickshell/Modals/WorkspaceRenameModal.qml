@@ -214,18 +214,4 @@ FloatingWindow {
         targetWindow: root
     }
 
-    IpcHandler {
-        target: "workspace-rename"
-
-        function open(): string {
-            const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-            show(ws?.name || "");
-            return "WORKSPACE_RENAME_MODAL_OPENED";
-        }
-
-        function close(): string {
-            hide();
-            return "WORKSPACE_RENAME_MODAL_CLOSED";
-        }
-    }
 }
