@@ -721,6 +721,7 @@ Singleton {
     property bool displayProfileAutoSelect: false
     property bool displayShowDisconnected: false
     property bool displaySnapToEdge: true
+    property var barIpcRevealStates: ({})
 
     property var barConfigs: [
         {
@@ -2002,6 +2003,33 @@ Singleton {
         return barConfigs.find(cfg => cfg.id === barId) || null;
     }
 
+    function isBarIpcRevealed(barId) {
+        if (!barId)
+            return false;
+        return !!barIpcRevealStates[barId];
+    }
+
+    function setBarIpcReveal(barId, revealed) {
+        if (!barId)
+            return;
+        const nextRevealed = !!revealed;
+        if (!!barIpcRevealStates[barId] === nextRevealed)
+            return;
+        const states = Object.assign({}, barIpcRevealStates);
+        if (nextRevealed) {
+            states[barId] = true;
+        } else {
+            delete states[barId];
+        }
+        barIpcRevealStates = states;
+    }
+
+    function toggleBarIpcReveal(barId) {
+        const revealed = !isBarIpcRevealed(barId);
+        setBarIpcReveal(barId, revealed);
+        return revealed;
+    }
+
     function addBarConfig(config) {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         configs.push(config);
@@ -2017,6 +2045,8 @@ Singleton {
         if (index === -1)
             return;
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
+        if (updates.autoHide === false || updates.visible === false)
+            setBarIpcReveal(barId, false);
 
         Object.assign(configs[index], updates);
         barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
@@ -2078,6 +2108,7 @@ Singleton {
             delete nextBackups[barId];
             connectedFrameBarStyleBackups = nextBackups;
         }
+        setBarIpcReveal(barId, false);
         updateBarConfigs();
     }
 

@@ -810,6 +810,7 @@ PanelWindow {
 
         property bool autoHide: barConfig?.autoHide ?? false
         property bool revealSticky: false
+        readonly property bool ipcReveal: !!SettingsData.barIpcRevealStates[barConfig?.id ?? ""]
 
         Timer {
             id: revealHold
@@ -832,14 +833,14 @@ PanelWindow {
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland)) {
                 if (barWindow.shouldHideForWindows)
-                    return topBarMouseArea.containsMouse || revealSticky;
+                    return topBarMouseArea.containsMouse || revealSticky || ipcReveal;
                 return true;
             }
 
             if (CompositorService.isNiri && NiriService.inOverview)
-                return topBarMouseArea.containsMouse || revealSticky;
+                return topBarMouseArea.containsMouse || revealSticky || ipcReveal;
 
-            return (barConfig?.visible ?? true) && (!autoHide || topBarMouseArea.containsMouse || revealSticky);
+            return (barConfig?.visible ?? true) && (!autoHide || topBarMouseArea.containsMouse || revealSticky || ipcReveal);
         }
 
         Connections {
@@ -855,6 +856,7 @@ PanelWindow {
                 return;
 
             if (topBarMouseArea.containsMouse) {
+                SettingsData.setBarIpcReveal(barConfig?.id ?? "", false);
                 revealSticky = true;
                 revealHold.stop();
                 return;

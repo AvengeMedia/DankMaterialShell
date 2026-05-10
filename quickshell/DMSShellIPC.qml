@@ -699,6 +699,26 @@ Item {
             return barConfig.autoHide ? "BAR_MANUAL_HIDE_SUCCESS" : "BAR_AUTO_HIDE_SUCCESS";
         }
 
+        function toggleReveal(selector: string, value: string): string {
+            const {
+                barConfig,
+                error
+            } = getBarConfig(selector, value);
+            if (error)
+                return error;
+            if (!barConfig.autoHide)
+                return "BAR_AUTO_HIDE_DISABLED";
+            if (!(barConfig.visible ?? true)) {
+                SettingsData.updateBarConfig(barConfig.id, {
+                    visible: true
+                });
+                SettingsData.setBarIpcReveal(barConfig.id, true);
+                return "BAR_REVEAL_SUCCESS";
+            }
+            const revealed = SettingsData.toggleBarIpcReveal(barConfig.id);
+            return revealed ? "BAR_REVEAL_SUCCESS" : "BAR_TUCK_SUCCESS";
+        }
+
         function getPosition(selector: string, value: string): string {
             const {
                 barConfig,

@@ -83,6 +83,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call bar toggle index 0", label: "Bar: Toggle (Primary)" },
     { id: "spawn dms ipc call bar reveal index 0", label: "Bar: Reveal (Primary)" },
     { id: "spawn dms ipc call bar hide index 0", label: "Bar: Hide (Primary)" },
+    { id: "spawn dms ipc call bar toggleReveal index 0", label: "Bar: Toggle Autohide Reveal (Primary)" },
     { id: "spawn dms ipc call bar toggleAutoHide index 0", label: "Bar: Toggle Auto-Hide (Primary)" },
     { id: "spawn dms ipc call bar autoHide index 0", label: "Bar: Enable Auto-Hide (Primary)" },
     { id: "spawn dms ipc call bar manualHide index 0", label: "Bar: Disable Auto-Hide (Primary)" },
