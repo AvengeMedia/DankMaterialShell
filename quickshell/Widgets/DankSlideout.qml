@@ -58,7 +58,7 @@ PanelWindow {
 
     color: "transparent"
 
-    readonly property bool slideoutBlurActive: root.visible && BlurService.enabled
+    readonly property bool slideoutBlurActive: root.visible && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
     WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.exclusiveZone: 0
@@ -125,7 +125,7 @@ PanelWindow {
             layer.textureSize: Qt.size(width * root.dpr, height * root.dpr)
             opacity: 1
 
-            readonly property real effectiveTransparency: root.customTransparency >= 0 ? root.customTransparency : SettingsData.popupTransparency
+            readonly property color slideoutSurfaceColor: root.customTransparency >= 0 ? Theme.withAlpha(Theme.surfaceContainer, root.customTransparency) : Theme.popupLayerColor(Theme.surfaceContainer)
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
@@ -134,10 +134,10 @@ PanelWindow {
 
             Rectangle {
                 anchors.fill: parent
-                color: Theme.transparentBlurLayers ? "transparent" : Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, contentRect.effectiveTransparency)
-                radius: Theme.cornerRadius
-                border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-                border.width: BlurService.borderWidth
+                color: contentRect.slideoutSurfaceColor
+                radius: Theme.connectedSurfaceRadius
+                border.color: Theme.isConnectedEffect ? "transparent" : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
+                border.width: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
             }
 
             Column {
@@ -222,6 +222,6 @@ PanelWindow {
         blurY: root.slideoutBlurActive ? slideContainer.y : 0
         blurWidth: root.slideoutBlurActive ? slideContainer.width : 0
         blurHeight: root.slideoutBlurActive ? slideContainer.height : 0
-        blurRadius: Theme.cornerRadius
+        blurRadius: Theme.connectedSurfaceRadius
     }
 }
