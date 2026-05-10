@@ -673,7 +673,9 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    exclusiveZone: (barWindow.hasFullscreenToplevel || !(barConfig?.visible ?? true) || topBarCore.autoHide) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (Theme.isConnectedEffect ? 0 : (barConfig?.bottomGap ?? 0)))
+    readonly property bool reserveExclusiveWhenAutoHidden: SettingsData.connectedFrameModeActive && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
+
+    exclusiveZone: (barWindow.hasFullscreenToplevel || !(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (Theme.isConnectedEffect ? 0 : (barConfig?.bottomGap ?? 0)))
 
     Item {
         id: inputMask
@@ -814,9 +816,8 @@ PanelWindow {
             interval: barWindow.clickThroughEnabled ? Math.max((barConfig?.autoHideDelay ?? 250) * 6, 1500) : (barConfig?.autoHideDelay ?? 250)
             repeat: false
             onTriggered: {
-                if (!topBarMouseArea.containsMouse && !topBarCore.hasActivePopout) {
+                if (!topBarMouseArea.containsMouse)
                     topBarCore.revealSticky = false;
-                }
             }
         }
 
@@ -831,44 +832,14 @@ PanelWindow {
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland)) {
                 if (barWindow.shouldHideForWindows)
-                    return topBarMouseArea.containsMouse || hasActivePopout || revealSticky;
+                    return topBarMouseArea.containsMouse || revealSticky;
                 return true;
             }
 
             if (CompositorService.isNiri && NiriService.inOverview)
-                return topBarMouseArea.containsMouse || hasActivePopout || revealSticky;
+                return topBarMouseArea.containsMouse || revealSticky;
 
-            return (barConfig?.visible ?? true) && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky);
-        }
-
-        property bool hasActivePopout: false
-
-        onHasActivePopoutChanged: evaluateReveal()
-
-        function updateActivePopoutState() {
-            if (!barWindow.screen)
-                return;
-            const screenName = barWindow.screen.name;
-            const activePopout = PopoutManager.currentPopoutsByScreen[screenName];
-            const activeTrayMenu = TrayMenuManager.activeTrayMenus[screenName];
-            const trayOpen = rootWindow.systemTrayMenuOpen;
-
-            const hasVisiblePopout = activePopout && activePopout.shouldBeVisible;
-            topBarCore.hasActivePopout = !!(hasVisiblePopout || activeTrayMenu || trayOpen);
-        }
-
-        Connections {
-            target: PopoutManager
-            function onPopoutChanged() {
-                topBarCore.updateActivePopoutState();
-            }
-        }
-
-        Connections {
-            target: TrayMenuManager
-            function onActiveTrayMenusChanged() {
-                topBarCore.updateActivePopoutState();
-            }
+            return (barConfig?.visible ?? true) && (!autoHide || topBarMouseArea.containsMouse || revealSticky);
         }
 
         Connections {
@@ -883,7 +854,7 @@ PanelWindow {
             if (!autoHide)
                 return;
 
-            if (topBarMouseArea.containsMouse || hasActivePopout) {
+            if (topBarMouseArea.containsMouse) {
                 revealSticky = true;
                 revealHold.stop();
                 return;
@@ -895,13 +866,6 @@ PanelWindow {
         Connections {
             target: topBarMouseArea
             function onContainsMouseChanged() {
-                topBarCore.evaluateReveal();
-            }
-        }
-
-        Connections {
-            target: PopoutManager
-            function onPopoutOpening() {
                 topBarCore.evaluateReveal();
             }
         }
@@ -919,7 +883,7 @@ PanelWindow {
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
             readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
-            hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !barWindow.hasFullscreenToplevel && !topBarCore.hasActivePopout
+            hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !barWindow.hasFullscreenToplevel
             acceptedButtons: Qt.NoButton
             enabled: (barConfig?.autoHide ?? false) && !inOverview && !barWindow.hasFullscreenToplevel
 
