@@ -630,7 +630,7 @@ BasePill {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                         onPressed: mouse => {
                             const pos = mapToItem(visualContent, mouse.x, mouse.y);
                             itemRipple.trigger(pos.x, pos.y);
@@ -681,6 +681,12 @@ BasePill {
                                         const isBottom = root.axis?.edge === "bottom";
                                         const yPos = isBottom ? (screenHeight - root.barThickness - root.barSpacing - 32 - Theme.spacingXS) : (root.barThickness + root.barSpacing + Theme.spacingXS);
                                         windowContextMenuLoader.item.showAt(relativeX, yPos, false, root.axis?.edge);
+                                    }
+                                }
+                            } else if (mouse.button === Qt.MiddleButton) {
+                                if (toplevelObject) {
+                                    if (typeof toplevelObject.close === "function") {
+                                        toplevelObject.close();
                                     }
                                 }
                             }
