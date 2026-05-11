@@ -116,6 +116,7 @@ StyledRect {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: root.bottomPadding
         font.pixelSize: Theme.fontSizeMedium
+        font.family: Theme.fontFamily
         color: Theme.surfaceText
         selectionColor: Theme.primaryContainer
         selectedTextColor: Theme.primary
