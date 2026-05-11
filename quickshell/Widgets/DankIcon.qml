@@ -11,6 +11,7 @@ Item {
     property real fill: filled ? 1.0 : 0.0
     property int grade: Theme.isLightMode ? 0 : -25
     property int weight: filled ? 500 : 400
+    property bool smoothTransform: false
 
     implicitWidth: Math.round(size)
     implicitHeight: Math.round(size)
@@ -28,12 +29,13 @@ Item {
         anchors.fill: parent
 
         font.family: materialSymbolsFont.name
-        font.pixelSize: Theme.fontSizeMedium
+        font.pixelSize: Math.round(Theme.fontSizeMedium)
         font.weight: root.weight
+        font.hintingPreference: Font.PreferNoHinting
         color: Theme.surfaceText
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        antialiasing: true
+        renderType: root.smoothTransform ? Text.QtRendering : Text.NativeRendering
 
         Behavior on color {
             enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None

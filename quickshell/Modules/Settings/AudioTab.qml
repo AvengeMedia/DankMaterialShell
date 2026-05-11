@@ -483,6 +483,7 @@ Item {
                     size: 40
                     color: Theme.primary
                     anchors.centerIn: parent
+                    smoothTransform: loadingOverlay.visible
 
                     RotationAnimator {
                         target: spinningIcon

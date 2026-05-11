@@ -562,6 +562,7 @@ Item {
                             size: 20
                             color: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
+                            smoothTransform: KeybindsService.loading
 
                             RotationAnimator on rotation {
                                 from: 0

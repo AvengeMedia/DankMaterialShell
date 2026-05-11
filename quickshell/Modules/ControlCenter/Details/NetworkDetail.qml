@@ -177,6 +177,7 @@ Rectangle {
                 name: "sync"
                 size: 32
                 color: Theme.primary
+                smoothTransform: NetworkService.wifiToggling
 
                 RotationAnimator on rotation {
                     running: NetworkService.wifiToggling
@@ -493,6 +494,7 @@ Rectangle {
             name: "refresh"
             size: 48
             color: Qt.rgba(Theme.surfaceText.r || 0.8, Theme.surfaceText.g || 0.8, Theme.surfaceText.b || 0.8, 0.3)
+            smoothTransform: wifiScanningOverlay.visible
 
             RotationAnimator on rotation {
                 running: wifiScanningOverlay.visible

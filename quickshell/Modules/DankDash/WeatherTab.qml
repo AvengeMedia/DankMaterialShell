@@ -146,6 +146,7 @@ Item {
                 color: Theme.withAlpha(Theme.surfaceText, 0.4)
                 anchors.top: parent.top
                 anchors.verticalCenter: parent.verticalCenter
+                smoothTransform: isRefreshing
 
                 property bool isRefreshing: false
                 enabled: !isRefreshing
@@ -884,6 +885,7 @@ Item {
                 color: Theme.withAlpha(Theme.surfaceText, 0.4)
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
+                smoothTransform: isRefreshing
 
                 property bool isRefreshing: false
                 enabled: !isRefreshing

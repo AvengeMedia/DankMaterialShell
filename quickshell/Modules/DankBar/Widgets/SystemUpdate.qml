@@ -55,6 +55,7 @@ BasePill {
                 id: statusIcon
                 anchors.centerIn: parent
                 visible: root.isVerticalOrientation
+                smoothTransform: root.isChecking
                 name: {
                     if (root.isChecking)
                         return "refresh";
@@ -109,6 +110,7 @@ BasePill {
                 DankIcon {
                     id: statusIconHorizontal
                     anchors.verticalCenter: parent.verticalCenter
+                    smoothTransform: root.isChecking
                     name: {
                         if (root.isChecking)
                             return "refresh";

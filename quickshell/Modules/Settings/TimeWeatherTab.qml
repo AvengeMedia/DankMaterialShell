@@ -671,6 +671,7 @@ Item {
                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
                             anchors.right: parent.right
                             anchors.top: parent.top
+                            smoothTransform: isRefreshing
 
                             property bool isRefreshing: false
                             enabled: !isRefreshing

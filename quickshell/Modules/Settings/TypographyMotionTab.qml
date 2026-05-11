@@ -331,6 +331,153 @@ Item {
 
             SettingsCard {
                 tab: "typography"
+                tags: ["text", "render", "rendering", "quality", "anti-aliasing", "freetype", "distance", "field"]
+                title: I18n.tr("Text Rendering")
+                settingKey: "textRenderType"
+                iconName: "text_format"
+
+                Item {
+                    width: parent.width
+                    height: renderTypeGroup.implicitHeight
+                    clip: true
+
+                    DankButtonGroup {
+                        id: renderTypeGroup
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
+                        minButtonWidth: parent.width < 480 ? 64 : 96
+                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                        model: ["Native", "Qt", "Curve"]
+                        selectionMode: "single"
+                        currentIndex: {
+                            switch (SettingsData.textRenderType) {
+                            case SettingsData.TextRenderType.Qt:
+                                return 1;
+                            case SettingsData.TextRenderType.Curve:
+                                return 2;
+                            default:
+                                return 0;
+                            }
+                        }
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            switch (index) {
+                            case 1:
+                                SettingsData.set("textRenderType", SettingsData.TextRenderType.Qt);
+                                break;
+                            case 2:
+                                SettingsData.set("textRenderType", SettingsData.TextRenderType.Curve);
+                                break;
+                            default:
+                                SettingsData.set("textRenderType", SettingsData.TextRenderType.Native);
+                                break;
+                            }
+                        }
+
+                        Connections {
+                            target: SettingsData
+                            function onTextRenderTypeChanged() {
+                                switch (SettingsData.textRenderType) {
+                                case SettingsData.TextRenderType.Qt:
+                                    renderTypeGroup.currentIndex = 1;
+                                    break;
+                                case SettingsData.TextRenderType.Curve:
+                                    renderTypeGroup.currentIndex = 2;
+                                    break;
+                                default:
+                                    renderTypeGroup.currentIndex = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                }
+
+                Item {
+                    width: parent.width
+                    height: renderTypeDescription.implicitHeight + Theme.spacingS * 2
+
+                    StyledText {
+                        id: renderTypeDescription
+                        x: Theme.spacingM
+                        y: Theme.spacingS
+                        width: parent.width - Theme.spacingM * 2
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        text: {
+                            switch (SettingsData.textRenderType) {
+                            case SettingsData.TextRenderType.Qt:
+                                return I18n.tr("Qt: distance-field renderer.");
+                            case SettingsData.TextRenderType.Curve:
+                                return I18n.tr("Curve: curve rasterizer.");
+                            default:
+                                return I18n.tr("Native: platform renderer (FreeType).");
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                    visible: SettingsData.textRenderType === SettingsData.TextRenderType.Qt
+                }
+
+                Item {
+                    width: parent.width
+                    height: visible ? qualityGroup.implicitHeight + qualityLabel.implicitHeight + Theme.spacingS : 0
+                    visible: SettingsData.textRenderType === SettingsData.TextRenderType.Qt
+                    clip: true
+
+                    StyledText {
+                        id: qualityLabel
+                        x: Theme.spacingM
+                        text: I18n.tr("Quality")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                    }
+
+                    DankButtonGroup {
+                        id: qualityGroup
+                        anchors.top: qualityLabel.bottom
+                        anchors.topMargin: Theme.spacingS
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        buttonPadding: parent.width < 480 ? Theme.spacingXS : Theme.spacingS
+                        minButtonWidth: parent.width < 480 ? 40 : 56
+                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                        model: ["Default", "Low", "Normal", "High", "Very High"]
+                        selectionMode: "single"
+                        currentIndex: SettingsData.textRenderQuality
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            SettingsData.set("textRenderQuality", index);
+                        }
+
+                        Connections {
+                            target: SettingsData
+                            function onTextRenderQualityChanged() {
+                                qualityGroup.currentIndex = SettingsData.textRenderQuality;
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "typography"
                 tags: ["animation", "speed", "motion", "duration"]
                 title: I18n.tr("Animation Speed")
                 settingKey: "animationSpeed"

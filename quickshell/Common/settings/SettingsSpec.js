@@ -242,6 +242,8 @@ var SPEC = {
     monoFontFamily: { def: "Fira Code" },
     fontWeight: { def: 400 },
     fontScale: { def: 1.0 },
+    textRenderType: { def: 1 },
+    textRenderQuality: { def: 0 },
 
     notepadUseMonospace: { def: true },
     notepadFontFamily: { def: "" },

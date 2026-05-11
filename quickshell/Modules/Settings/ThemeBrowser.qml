@@ -343,6 +343,7 @@ FloatingWindow {
                             size: 48
                             color: Theme.primary
                             anchors.horizontalCenter: parent.horizontalCenter
+                            smoothTransform: root.isLoading
 
                             RotationAnimator on rotation {
                                 from: 0

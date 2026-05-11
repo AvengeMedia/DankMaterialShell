@@ -61,6 +61,20 @@ Singleton {
         Colorful
     }
 
+    enum TextRenderType {
+        Qt,
+        Native,
+        Curve
+    }
+
+    enum TextRenderQuality {
+        Default,
+        Low,
+        Normal,
+        High,
+        VeryHigh
+    }
+
     readonly property string _homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
@@ -483,6 +497,8 @@ Singleton {
     property int fontWeight: Font.Normal
     property real fontScale: 1.0
     property real dankBarFontScale: 1.0
+    property int textRenderType: SettingsData.TextRenderType.Native
+    property int textRenderQuality: SettingsData.TextRenderQuality.Default
 
     property bool notepadUseMonospace: true
     property string notepadFontFamily: ""

@@ -3,7 +3,6 @@ import qs.Common
 
 Text {
     property bool isMonospace: false
-
     FontLoader {
         id: interFont
         source: Qt.resolvedUrl("../assets/fonts/inter/InterVariable.ttf")
@@ -24,6 +23,32 @@ Text {
         return requestedFont;
     }
 
+    readonly property int resolvedRenderType: {
+        switch (SettingsData.textRenderType) {
+        case SettingsData.TextRenderType.Qt:
+            return Text.QtRendering;
+        case SettingsData.TextRenderType.Curve:
+            return Text.CurveRendering;
+        default:
+            return Text.NativeRendering;
+        }
+    }
+
+    readonly property int resolvedRenderQuality: {
+        switch (SettingsData.textRenderQuality) {
+        case SettingsData.TextRenderQuality.Low:
+            return Text.LowRenderTypeQuality;
+        case SettingsData.TextRenderQuality.Normal:
+            return Text.NormalRenderTypeQuality;
+        case SettingsData.TextRenderQuality.High:
+            return Text.HighRenderTypeQuality;
+        case SettingsData.TextRenderQuality.VeryHigh:
+            return Text.VeryHighRenderTypeQuality;
+        default:
+            return Text.DefaultRenderTypeQuality;
+        }
+    }
+
     readonly property var standardAnimation: {
         "duration": Appearance.anim.durations.normal,
         "easing.type": Easing.BezierSpline,
@@ -37,7 +62,8 @@ Text {
     wrapMode: Text.WordWrap
     elide: Text.ElideRight
     verticalAlignment: Text.AlignVCenter
-    //renderType: Text.NativeRendering
+    renderType: resolvedRenderType
+    renderTypeQuality: resolvedRenderQuality
 
     Behavior on opacity {
         NumberAnimation {
