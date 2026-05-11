@@ -17638,5 +17638,12 @@
     "context": "Keyboard hints when enter-to-paste is enabled",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "This output is disabled in the current profile",
+    "translation": "",
+    "context": "This output is disabled in the current profile",
+    "reference": "Modules/Settings/DisplayConfig/OutputCard.qml",
+    "comment": ""
   }
 ]

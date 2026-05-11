@@ -262,6 +262,17 @@ Singleton {
         return "profile_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
     }
 
+    function generateAutoProfileId(outputIdentifiers) {
+        const fp = outputSetFingerprint(outputIdentifiers);
+        let hash = 0;
+        for (let i = 0; i < fp.length; i++) {
+            const char = fp.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+        }
+        const hashStr = (hash >>> 0).toString(16);
+        return "auto_" + hashStr;
+    }
+
     function configFingerprint(configEntry) {
         return Object.keys(configEntry.outputs || {}).sort().join("+");
     }
@@ -282,39 +293,20 @@ Singleton {
         return null;
     }
 
-    function findConfigEntryByFingerprint(data, outputIdentifiers) {
+    function findConfigEntryByFingerprint(data, outputIdentifiers, autoOnly) {
         const targetKey = outputSetFingerprint(outputIdentifiers);
         const configs = data.configurations || [];
         for (let i = 0; i < configs.length; i++) {
-            if (configFingerprint(configs[i]) === targetKey)
+            if (configFingerprint(configs[i]) === targetKey) {
+                if (autoOnly && configs[i].name)
+                    continue;
                 return {
-                    entry: configs[i],
-                    index: i
-                };
-        }
-        return null;
-    }
-
-    function findPartialConfigEntry(data, outputIdentifiers) {
-        const currentSet = new Set(outputIdentifiers);
-        const configs = data.configurations || [];
-        let bestEntry = null;
-        let bestCount = 0;
-        for (let i = 0; i < configs.length; i++) {
-            const cfgKeys = Object.keys(configs[i].outputs || {});
-            if (cfgKeys.length === 0)
-                continue;
-            if (!cfgKeys.every(k => currentSet.has(k)))
-                continue;
-            if (cfgKeys.length > bestCount) {
-                bestCount = cfgKeys.length;
-                bestEntry = {
                     entry: configs[i],
                     index: i
                 };
             }
         }
-        return bestEntry;
+        return null;
     }
 
     function getProfileMonitorInclusion(profileId) {
@@ -503,15 +495,13 @@ Singleton {
             }
         };
         const onWriteSuccess = () => {
-            SettingsData.setActiveDisplayProfile(CompositorService.compositor, configEntry.name ? configId : "");
+            SettingsData.setActiveDisplayProfile(CompositorService.compositor, configId);
             if (isManual) {
-                WlrOutputService.requestState();
                 profilesLoading = false;
                 profileActivated(configId, profileName);
                 manualActivationTimer.restart();
-            } else {
-                saveConfigEntry(configEntry);
             }
+            WlrOutputService.requestState();
         };
 
         switch (CompositorService.compositor) {
@@ -591,6 +581,8 @@ Singleton {
         const currentKey = currentOutputSet.join("+");
         for (const id in validatedProfiles) {
             const p = validatedProfiles[id];
+            if (p.name === "")
+                continue;
             if (Object.keys(p.outputs || {}).sort().join("+") === currentKey)
                 return id;
         }
@@ -696,42 +688,57 @@ Singleton {
         onTriggered: root.manualActivation = false
     }
 
+    Timer {
+        id: autoSelectDebounceTimer
+        interval: 400
+        onTriggered: {
+            if (root.hasPendingChanges)
+                return;
+            root.applyAutoConfig();
+        }
+    }
+
     function applyAutoConfig() {
         if (!profilesReady || !SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
             return;
 
         readMonitorsJson(data => {
-            const match = findConfigEntryByFingerprint(data, currentOutputSet);
+            const match = findConfigEntryByFingerprint(data, currentOutputSet, true);
             if (match) {
-                applyConfigEntry(match.entry, match.entry.id, match.entry.name || "", false);
+                applyConfigEntry(match.entry, match.entry.id, "", false);
                 return;
             }
 
-            const partial = findPartialConfigEntry(data, currentOutputSet);
-            const niriSettings = buildMergedNiriSettings();
-            const hyprlandSettings = buildMergedHyprlandSettings();
-            const mergedOutputs = buildOutputsWithPendingChanges();
-
-            const outputConfigs = partial ? JSON.parse(JSON.stringify(partial.entry.outputs || {})) : {};
-
-            for (const name in outputs) {
-                const outputId = getOutputIdentifier(outputs[name], name);
-                const alreadyCovered = Object.keys(outputConfigs).some(k => k === outputId);
-                if (!alreadyCovered) {
-                    const od = mergedOutputs[name];
-                    if (od)
-                        outputConfigs[outputId] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
-                }
-            }
-
-            if (Object.keys(outputConfigs).length === 0)
-                return;
-
-            const syntheticEntry = {
-                name: "",
-                outputs: outputConfigs
-            };
-            applyConfigEntry(syntheticEntry, "", "", false);
+            const outputConfigs = buildCurrentOutputConfigs();
+            const id = generateAutoProfileId(currentOutputSet);
+            const existingIdx = data.configurations.findIndex(c => c.id === id);
+            if (existingIdx >= 0)
+                data.configurations[existingIdx] = {
+                    "id": id,
+                    "name": "",
+                    "outputs": outputConfigs
+                };
+            else
+                data.configurations.push({
+                    "id": id,
+                    "name": "",
+                    "outputs": outputConfigs
+                });
+            writeMonitorsJson(data, success => {
+                if (!success)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                updated[id] = {
+                    id: id,
+                    name: "",
+                    outputs: outputConfigs
+                };
+                validatedProfiles = updated;
+                matchedProfile = "";
+                const match = findConfigEntryById(data, id);
+                if (match)
+                    applyConfigEntry(match.entry, id, "", false);
+            });
         });
     }
 
@@ -746,22 +753,6 @@ Singleton {
                 outputConfigs[getOutputIdentifier(od, name)] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
         }
         return outputConfigs;
-    }
-
-    function saveConfigEntry(configEntry) {
-        if (!configEntry.id || !configEntry.name)
-            return;
-        readMonitorsJson(data => {
-            const match = findConfigEntryById(data, configEntry.id);
-            if (!match)
-                return;
-            data.configurations[match.index] = {
-                "id": configEntry.id,
-                "name": configEntry.name,
-                "outputs": configEntry.outputs
-            };
-            writeMonitorsJson(data, null);
-        });
     }
 
     function deleteDisconnectedOutput(outputName) {
@@ -831,7 +822,7 @@ Singleton {
         if (hasPendingChanges)
             clearPendingChanges();
         currentOutputSet = newOutputSet;
-        applyAutoConfig();
+        autoSelectDebounceTimer.restart();
     }
     onSavedOutputsChanged: allOutputs = buildAllOutputsMap()
     onLastAppliedEntryChanged: allOutputs = buildAllOutputsMap()
@@ -875,9 +866,12 @@ Singleton {
             if (CompositorService.isHyprland) {
                 initHyprlandSettingsFromConfig(parsed);
                 syncHyprlandVrrFromConfig(parsed);
+                syncHyprlandDisabledFromConfig(parsed);
             }
-            if (CompositorService.isNiri)
+            if (CompositorService.isNiri) {
                 syncNiriVrrFromConfig(parsed);
+                syncNiriDisabledFromConfig(parsed);
+            }
         });
     }
 
@@ -954,6 +948,44 @@ Singleton {
             SettingsData.saveSettings();
     }
 
+    function syncHyprlandDisabledFromConfig(parsedOutputs) {
+        const current = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        let changed = false;
+        for (const outputName in parsedOutputs) {
+            const settings = parsedOutputs[outputName]?.hyprlandSettings;
+            const fromConfig = settings?.disabled ?? false;
+            const stored = current[outputName]?.disabled ?? false;
+            if (fromConfig === stored)
+                continue;
+            if (!current[outputName])
+                current[outputName] = {};
+            if (fromConfig)
+                current[outputName].disabled = true;
+            else
+                delete current[outputName].disabled;
+            changed = true;
+        }
+        if (changed) {
+            SettingsData.hyprlandOutputSettings = current;
+            SettingsData.saveSettings();
+        }
+    }
+
+    function syncNiriDisabledFromConfig(parsedOutputs) {
+        let changed = false;
+        for (const outputName in parsedOutputs) {
+            const output = parsedOutputs[outputName];
+            const fromConfig = output.disabled ?? false;
+            const current = SettingsData.getNiriOutputSetting(outputName, "disabled", false);
+            if (current === fromConfig)
+                continue;
+            SettingsData.setNiriOutputSetting(outputName, "disabled", fromConfig || undefined);
+            changed = true;
+        }
+        if (changed)
+            SettingsData.saveSettings();
+    }
+
     function filterDisconnectedOnly(parsedOutputs) {
         const result = {};
         const liveNames = Object.keys(outputs);
@@ -997,6 +1029,15 @@ Singleton {
         while ((match = outputRegex.exec(content)) !== null) {
             const name = match[1];
             const body = match[2];
+
+            if (body.trim() === "off") {
+                result[name] = {
+                    "name": name,
+                    "disabled": true,
+                    "logical": { "x": 0, "y": 0, "scale": 1.0, "transform": "Normal" }
+                };
+                continue;
+            }
 
             const modeMatch = body.match(/mode\s+"(\d+)x(\d+)@([\d.]+)"/);
             const posMatch = body.match(/position\s+x=(-?\d+)\s+y=(-?\d+)/);
@@ -1979,23 +2020,23 @@ Singleton {
         return block;
     }
 
-    function confirmChanges() {
+    function confirmChanges(profileId) {
         const outputConfigs = buildCurrentOutputConfigs();
-        lastAppliedEntry = {
-            outputs: outputConfigs
-        };
+        lastAppliedEntry = { outputs: outputConfigs };
 
-        readMonitorsJson(data => {
-            const match = findConfigEntryByFingerprint(data, Object.keys(outputConfigs));
-            if (!match || !match.entry.name)
-                return;
-            data.configurations[match.index] = {
-                "id": match.entry.id,
-                "name": match.entry.name,
-                "outputs": outputConfigs
-            };
-            writeMonitorsJson(data, null);
-        });
+        if (profileId) {
+            readMonitorsJson(data => {
+                const match = findConfigEntryById(data, profileId);
+                if (match) {
+                    data.configurations[match.index] = {
+                        "id": match.entry.id,
+                        "name": match.entry.name || "",
+                        "outputs": outputConfigs
+                    };
+                    writeMonitorsJson(data, null);
+                }
+            });
+        }
 
         clearPendingChanges();
         changesConfirmed();
@@ -2148,9 +2189,21 @@ Singleton {
         };
     }
 
+    function isOutputDisabled(outputName) {
+        if (!outputs[outputName])
+            return false;
+        if (CompositorService.isHyprland)
+            return getHyprlandSetting(outputs[outputName], outputName, "disabled", false);
+        if (CompositorService.isNiri)
+            return getNiriSetting(outputs[outputName], outputName, "disabled", false);
+        return false;
+    }
+
     function checkOverlap(testName, testX, testY, testW, testH) {
         for (const name in outputs) {
             if (name === testName)
+                continue;
+            if (isOutputDisabled(name))
                 continue;
             const output = outputs[name];
             if (!output.logical)
@@ -2173,6 +2226,8 @@ Singleton {
 
         for (const name in outputs) {
             if (name === testName)
+                continue;
+            if (isOutputDisabled(name))
                 continue;
             const output = outputs[name];
             if (!output.logical)
@@ -2250,7 +2305,7 @@ Singleton {
     }
 
     function findBestSnapPosition(testName, posX, posY, testW, testH) {
-        const outputNames = Object.keys(outputs).filter(n => n !== testName);
+        const outputNames = Object.keys(outputs).filter(n => n !== testName && !isOutputDisabled(n));
 
         if (outputNames.length === 0)
             return Qt.point(posX, posY);

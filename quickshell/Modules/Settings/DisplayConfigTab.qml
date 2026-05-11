@@ -11,7 +11,15 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    property string selectedProfileId: SettingsData.getActiveDisplayProfile(CompositorService.compositor)
+    property string selectedProfileId: {
+        const id = SettingsData.activeDisplayProfile[CompositorService.compositor] || "";
+        if (!SettingsData.displayProfileAutoSelect) {
+            const profile = DisplayConfigState.validatedProfiles[id];
+            if (profile && profile.name === "")
+                return "";
+        }
+        return id;
+    }
     property bool showNewProfileDialog: false
     property bool showDeleteConfirmDialog: false
     property bool showRenameDialog: false
@@ -60,15 +68,12 @@ Item {
         function onChangesReverted() {
         }
         function onProfileActivated(profileId, profileName) {
-            root.selectedProfileId = profileId;
             ToastService.showInfo(I18n.tr("Profile activated: %1").arg(profileName));
         }
         function onProfileSaved(profileId, profileName) {
-            root.selectedProfileId = profileId;
             ToastService.showInfo(I18n.tr("Profile saved: %1").arg(profileName));
         }
         function onProfileDeleted(profileId) {
-            root.selectedProfileId = SettingsData.getActiveDisplayProfile(CompositorService.compositor);
             ToastService.showInfo(I18n.tr("Profile deleted"));
         }
         function onProfileError(message) {
@@ -163,6 +168,8 @@ Item {
                                 checked: SettingsData.displayProfileAutoSelect
                                 onToggled: checked => {
                                     SettingsData.displayProfileAutoSelect = checked;
+                                    if (!checked)
+                                        SettingsData.setActiveDisplayProfile(CompositorService.compositor, "");
                                     SettingsData.saveSettings();
                                     if (checked)
                                         DisplayConfigState.applyAutoConfig();
@@ -624,7 +631,7 @@ Item {
 
     DisplayConfirmationModal {
         id: confirmationModal
-        onConfirmed: DisplayConfigState.confirmChanges()
+        onConfirmed: DisplayConfigState.confirmChanges(root.selectedProfileId)
         onReverted: DisplayConfigState.revertChanges()
     }
 }

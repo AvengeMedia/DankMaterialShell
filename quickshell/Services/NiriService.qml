@@ -1317,6 +1317,8 @@ Singleton {
 
             if (niriSettings.disabled) {
                 kdlContent += `    off\n`;
+                kdlContent += `}\n\n`;
+                continue;
             }
 
             if (output.current_mode !== undefined && output.modes && output.modes[output.current_mode]) {
