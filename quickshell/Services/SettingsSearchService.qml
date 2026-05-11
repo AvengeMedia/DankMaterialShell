@@ -54,10 +54,12 @@ Singleton {
     function registerCard(settingKey, item, flickable) {
         if (!settingKey)
             return;
-        registeredCards[settingKey] = {
+        var cards = Object.assign({}, registeredCards);
+        cards[settingKey] = {
             item: item,
             flickable: flickable
         };
+        registeredCards = cards;
         if (targetSection === settingKey)
             scrollTimer.restart();
     }
@@ -65,7 +67,7 @@ Singleton {
     function unregisterCard(settingKey) {
         if (!settingKey)
             return;
-        let cards = registeredCards;
+        var cards = Object.assign({}, registeredCards);
         delete cards[settingKey];
         registeredCards = cards;
     }
