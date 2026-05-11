@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Services
 
@@ -8,7 +10,6 @@ Item {
     visible: false
 
     required property var targetWindow
-    property var blurItem: null
     property bool blurEnabled: Theme.connectedSurfaceBlurEnabled
     property real blurX: 0
     property real blurY: 0
@@ -16,54 +17,38 @@ Item {
     property real blurHeight: 0
     property real blurRadius: 0
 
-    property var _region: null
+    readonly property bool _active: blurEnabled && BlurService.enabled && !!targetWindow
+
+    Region {
+        id: blurRegion
+        x: root.blurX
+        y: root.blurY
+        width: root.blurWidth
+        height: root.blurHeight
+        radius: root.blurRadius
+    }
 
     function _apply() {
-        if (!blurEnabled || !BlurService.enabled || !targetWindow) {
-            _cleanup();
+        if (!targetWindow)
             return;
-        }
-
-        if (!_region)
-            _region = BlurService.createBlurRegion(targetWindow);
-
-        if (!_region)
-            return;
-
-        _region.item = Qt.binding(() => root.blurItem);
-        _region.x = Qt.binding(() => root.blurX);
-        _region.y = Qt.binding(() => root.blurY);
-        _region.width = Qt.binding(() => root.blurWidth);
-        _region.height = Qt.binding(() => root.blurHeight);
-        _region.radius = Qt.binding(() => root.blurRadius);
+        targetWindow.BackgroundEffect.blurRegion = _active ? blurRegion : null;
     }
 
-    function _cleanup() {
-        if (!_region)
-            return;
-        BlurService.destroyBlurRegion(targetWindow, _region);
-        _region = null;
-    }
-
-    onBlurEnabledChanged: _apply()
-
-    Connections {
-        target: BlurService
-        function onEnabledChanged() {
-            root._apply();
-        }
-    }
+    on_ActiveChanged: _apply()
+    onTargetWindowChanged: _apply()
 
     Connections {
         target: root.targetWindow ?? null
+        ignoreUnknownSignals: true
         function onVisibleChanged() {
-            if (root.targetWindow && root.targetWindow.visible) {
-                root._region = null;
+            if (root.targetWindow && root.targetWindow.visible)
                 root._apply();
-            }
         }
     }
 
     Component.onCompleted: _apply()
-    Component.onDestruction: _cleanup()
+    Component.onDestruction: {
+        if (targetWindow)
+            targetWindow.BackgroundEffect.blurRegion = null;
+    }
 }

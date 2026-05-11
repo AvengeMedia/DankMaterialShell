@@ -18,6 +18,7 @@ PanelWindow {
 
     screen: targetScreen
     visible: _frameActive
+    updatesEnabled: _connectedActive
 
     WlrLayershell.namespace: "dms:frame"
     WlrLayershell.layer: WlrLayer.Top

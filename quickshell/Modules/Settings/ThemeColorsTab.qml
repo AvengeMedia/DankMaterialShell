@@ -3064,6 +3064,7 @@ Item {
 
         ThemeBrowser {
             id: themeBrowserItem
+            parentModal: themeColorsTab.parentModal
         }
     }
 

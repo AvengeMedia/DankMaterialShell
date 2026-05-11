@@ -5,31 +5,28 @@ Item {
 
     readonly property real edgeSize: 8
     required property var targetWindow
-    property bool supported: typeof targetWindow.startSystemMove === "function"
     readonly property bool canMaximize: targetWindow.minimumSize.width !== targetWindow.maximumSize.width || targetWindow.minimumSize.height !== targetWindow.maximumSize.height
 
     anchors.fill: parent
 
     function tryStartMove() {
-        if (!supported)
-            return;
         targetWindow.startSystemMove();
     }
 
     function tryStartResize(edges) {
-        if (!supported || !canMaximize)
+        if (!canMaximize)
             return;
         targetWindow.startSystemResize(edges);
     }
 
     function tryToggleMaximize() {
-        if (!supported || !canMaximize)
+        if (!canMaximize)
             return;
         targetWindow.maximized = !targetWindow.maximized;
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         height: root.edgeSize
         anchors.left: parent.left
         anchors.right: parent.right
@@ -41,7 +38,7 @@ Item {
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         width: root.edgeSize
         anchors.left: parent.left
         anchors.top: parent.top
@@ -53,7 +50,7 @@ Item {
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         width: root.edgeSize
         anchors.right: parent.right
         anchors.top: parent.top
@@ -65,7 +62,7 @@ Item {
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         width: root.edgeSize
         height: root.edgeSize
         anchors.left: parent.left
@@ -75,7 +72,7 @@ Item {
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         width: root.edgeSize
         height: root.edgeSize
         anchors.right: parent.right
@@ -85,7 +82,7 @@ Item {
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         height: root.edgeSize
         anchors.left: parent.left
         anchors.right: parent.right
@@ -97,7 +94,7 @@ Item {
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         width: root.edgeSize
         height: root.edgeSize
         anchors.left: parent.left
@@ -107,7 +104,7 @@ Item {
     }
 
     MouseArea {
-        visible: root.supported && root.canMaximize
+        visible: root.canMaximize
         width: root.edgeSize
         height: root.edgeSize
         anchors.right: parent.right

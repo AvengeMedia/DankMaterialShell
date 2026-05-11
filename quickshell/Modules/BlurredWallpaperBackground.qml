@@ -85,8 +85,7 @@ Variants {
             }
 
             Component.onCompleted: {
-                if (typeof blurWallpaperWindow.updatesEnabled !== "undefined")
-                    blurWallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+                blurWallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
                 isInitialized = true;
             }
 

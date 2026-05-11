@@ -4,7 +4,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland // ! Import is needed despite what qmlls says
 import qs.Common
 import qs.Services
 
@@ -12,9 +11,8 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("BlurService")
 
-    property bool quickshellSupported: false
     property bool compositorSupported: false
-    property bool available: quickshellSupported && compositorSupported
+    readonly property bool available: compositorSupported
     readonly property bool enabled: available && (SettingsData.blurEnabled ?? false)
 
     readonly property color borderColor: {
@@ -42,41 +40,6 @@ Singleton {
         return Theme.withAlpha(baseColor, hoverAlpha ?? 0.15);
     }
 
-    function createBlurRegion(targetWindow) {
-        if (!available)
-            return null;
-
-        try {
-            const region = Qt.createQmlObject(`
-                import Quickshell
-                Region {}
-            `, targetWindow, "BlurRegion");
-            targetWindow.BackgroundEffect.blurRegion = region;
-            return region;
-        } catch (e) {
-            log.warn("Failed to create blur region:", e);
-            return null;
-        }
-    }
-
-    function reapplyBlurRegion(targetWindow, region) {
-        if (!region || !available)
-            return;
-        try {
-            targetWindow.BackgroundEffect.blurRegion = region;
-            region.changed();
-        } catch (e) {}
-    }
-
-    function destroyBlurRegion(targetWindow, region) {
-        if (!region)
-            return;
-        try {
-            targetWindow.BackgroundEffect.blurRegion = null;
-        } catch (e) {}
-        region.destroy();
-    }
-
     Process {
         id: blurProbe
         running: false
@@ -98,18 +61,5 @@ Singleton {
         }
     }
 
-    Component.onCompleted: {
-        try {
-            const test = Qt.createQmlObject(`
-                import Quickshell
-                Region { radius: 0 }
-            `, root, "BlurAvailabilityTest");
-            test.destroy();
-            quickshellSupported = true;
-            log.info("Quickshell blur support available");
-            blurProbe.running = true;
-        } catch (e) {
-            log.info("BackgroundEffect not available - blur disabled. Requires a newer version of Quickshell.");
-        }
-    }
+    Component.onCompleted: blurProbe.running = true
 }

@@ -182,13 +182,18 @@ Item {
         setBarContext(pos, bottomGap);
     }
 
-    // Briefly forces backgroundWindow.updatesEnabled true while the surface
-    // body changes, so the contentHoleRect mask carve-out commits to the
-    // compositor — otherwise the input region stays stuck at the popup's
-    // initial size and clicks in any newly-grown area dismiss the popup.
-    // Cleared by the frameSwapped Connections below as soon as the dirty
-    // frame ships, so the bg window goes back to skipping buffer updates.
+    // Holds backgroundWindow.updatesEnabled true while the surface body is
+    // changing so the contentHoleRect mask carve-out tracks the popup body —
+    // otherwise clicks in newly-grown areas hit the bg window and dismiss.
+    // Debounced off ~250ms after the last change so a stable popup doesn't
+    // keep the bg window in active-update mode.
     property bool _bgCommitWindow: false
+
+    Timer {
+        id: bgCommitSettleTimer
+        interval: 250
+        onTriggered: root._bgCommitWindow = false
+    }
 
     function _setSurfaceGeometry(bodyX, bodyY, bodyW, bodyH) {
         const newX = Theme.snap(bodyX, dpr);
@@ -206,15 +211,7 @@ Item {
         _surfaceH = _surfaceBodyH + shadowBuffer * 2;
         if (changed && backgroundWindow.visible) {
             _bgCommitWindow = true;
-        }
-    }
-
-    Connections {
-        target: backgroundWindow
-        ignoreUnknownSignals: true
-        function onFrameSwapped() {
-            if (root._bgCommitWindow)
-                root._bgCommitWindow = false;
+            bgCommitSettleTimer.restart();
         }
     }
 

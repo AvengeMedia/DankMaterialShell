@@ -208,8 +208,7 @@ func (a *ArchDistribution) getQuickshellMapping(variant deps.PackageVariant) Pac
 	if forceQuickshellGit || variant == deps.VariantGit {
 		return PackageMapping{Name: "quickshell-git", Repository: RepoTypeAUR}
 	}
-	// ! TODO - for now we're only forcing quickshell-git on ARCH, as other distros use DL repos which pin a newer quickshell
-	return PackageMapping{Name: "quickshell-git", Repository: RepoTypeAUR}
+	return PackageMapping{Name: "quickshell", Repository: RepoTypeSystem}
 }
 
 func (a *ArchDistribution) getHyprlandMapping(_ deps.PackageVariant) PackageMapping {
@@ -332,6 +331,12 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 		aurPkgs = slices.DeleteFunc(aurPkgs, func(p string) bool { return p == "quickshell-git" })
 	}
 
+	if slices.Contains(systemPkgs, "quickshell") && a.packageInstalled("quickshell-git") {
+		if err := a.removeQuickshellGit(ctx, sudoPassword, progressChan); err != nil {
+			return fmt.Errorf("failed to remove quickshell-git: %w", err)
+		}
+	}
+
 	// Phase 3: System Packages
 	if len(systemPkgs) > 0 {
 		progressChan <- InstallProgressMsg{
@@ -447,6 +452,20 @@ func (a *ArchDistribution) categorizePackages(dependencies []deps.Dependency, wm
 	}
 
 	return systemPkgs, aurPkgs, manualPkgs, variantMap
+}
+
+func (a *ArchDistribution) removeQuickshellGit(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseSystemPackages,
+		Progress:    0.33,
+		Step:        "Removing quickshell-git...",
+		IsComplete:  false,
+		NeedsSudo:   true,
+		CommandInfo: "sudo pacman -Rdd --noconfirm quickshell-git",
+		LogOutput:   "Removing quickshell-git so stable quickshell can be installed",
+	}
+	cmd := privesc.ExecCommand(ctx, sudoPassword, "pacman -Rdd --noconfirm quickshell-git")
+	return a.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.33, 0.35)
 }
 
 func (a *ArchDistribution) preinstallQuickshellGit(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {

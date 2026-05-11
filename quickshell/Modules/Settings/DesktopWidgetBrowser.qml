@@ -15,6 +15,7 @@ FloatingWindow {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property var parentModal: null
+    parentWindow: parentModal
 
     signal widgetAdded(string widgetType)
 
@@ -233,7 +234,7 @@ FloatingWindow {
                     spacing: Theme.spacingXS
 
                     DankActionButton {
-                        visible: windowControls.supported
+                        visible: windowControls.canMaximize
                         circular: false
                         iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
                         iconSize: Theme.iconSize - 4

@@ -22,17 +22,30 @@ Singleton {
     property string currentSoundTheme: ""
     property var soundFilePaths: ({})
 
-    property var volumeChangeSound: null
-    property var powerPlugSound: null
-    property var powerUnplugSound: null
-    property var normalNotificationSound: null
-    property var criticalNotificationSound: null
-    property var loginSound: null
+    readonly property var volumeChangeSound: soundsLoader.item?.volumeChangeSound ?? null
+    readonly property var powerPlugSound: soundsLoader.item?.powerPlugSound ?? null
+    readonly property var powerUnplugSound: soundsLoader.item?.powerUnplugSound ?? null
+    readonly property var normalNotificationSound: soundsLoader.item?.normalNotificationSound ?? null
+    readonly property var criticalNotificationSound: soundsLoader.item?.criticalNotificationSound ?? null
+    readonly property var loginSound: soundsLoader.item?.loginSound ?? null
+    readonly property var mediaDevices: soundsLoader.item?.mediaDevices ?? null
     property real notificationsVolume: 1.0
     property bool notificationsAudioMuted: false
 
-    property var mediaDevices: null
-    property var mediaDevicesConnections: null
+    Loader {
+        id: soundsLoader
+        active: root.soundsAvailable
+        source: "AudioSoundPlayers.qml"
+        onLoaded: {
+            item.volume = Qt.binding(() => root.notificationsVolume);
+            item.volumeChangeSource = Qt.binding(() => root.getSoundPath("audio-volume-change"));
+            item.powerPlugSource = Qt.binding(() => root.getSoundPath("power-plug"));
+            item.powerUnplugSource = Qt.binding(() => root.getSoundPath("power-unplug"));
+            item.normalNotificationSource = Qt.binding(() => root.getSoundPath("message"));
+            item.criticalNotificationSource = Qt.binding(() => root.getSoundPath("message-new-instant"));
+            item.loginSource = Qt.binding(() => root.getSoundPath("desktop-login"));
+        }
+    }
 
     property var deviceAliases: ({})
     property string wireplumberConfigPath: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/wireplumber/wireplumber.conf.d/51-dms-audio-aliases.conf"
@@ -452,10 +465,6 @@ EOFCONFIG
     function discoverSoundFiles(themeName) {
         if (!themeName) {
             soundFilePaths = {};
-            if (soundsAvailable) {
-                destroySoundPlayers();
-                createSoundPlayers();
-            }
             return;
         }
 
@@ -514,11 +523,6 @@ EOFCONFIG
                 }
             }
             soundFilePaths = paths;
-
-            if (soundsAvailable) {
-                destroySoundPlayers();
-                createSoundPlayers();
-            }
         }, 0);
     }
 
@@ -559,159 +563,6 @@ EOFCONFIG
             discoverSoundFiles(currentSoundTheme);
         } else {
             soundFilePaths = {};
-            if (soundsAvailable) {
-                destroySoundPlayers();
-                createSoundPlayers();
-            }
-        }
-    }
-
-    function setupMediaDevices() {
-        if (!soundsAvailable || mediaDevices) {
-            return;
-        }
-
-        try {
-            mediaDevices = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaDevices {
-                    id: devices
-                    Component.onCompleted: {
-                        log.debug("MediaDevices initialized, default output:", defaultAudioOutput?.description)
-                    }
-                }
-            `, root, "AudioService.MediaDevices");
-
-            if (mediaDevices) {
-                mediaDevicesConnections = Qt.createQmlObject(`
-                    import QtQuick
-                    Connections {
-                        target: root.mediaDevices
-                        function onDefaultAudioOutputChanged() {
-                            log.debug("Default audio output changed, recreating sound players")
-                            root.destroySoundPlayers()
-                            root.createSoundPlayers()
-                        }
-                    }
-                `, root, "AudioService.MediaDevicesConnections");
-            }
-        } catch (e) {
-            log.debug("MediaDevices not available, using default audio output");
-            mediaDevices = null;
-        }
-    }
-
-    function destroySoundPlayers() {
-        if (volumeChangeSound) {
-            volumeChangeSound.destroy();
-            volumeChangeSound = null;
-        }
-        if (powerPlugSound) {
-            powerPlugSound.destroy();
-            powerPlugSound = null;
-        }
-        if (powerUnplugSound) {
-            powerUnplugSound.destroy();
-            powerUnplugSound = null;
-        }
-        if (normalNotificationSound) {
-            normalNotificationSound.destroy();
-            normalNotificationSound = null;
-        }
-        if (criticalNotificationSound) {
-            criticalNotificationSound.destroy();
-            criticalNotificationSound = null;
-        }
-        if (loginSound) {
-            loginSound.destroy();
-            loginSound = null;
-        }
-    }
-
-    function createSoundPlayers() {
-        if (!soundsAvailable) {
-            return;
-        }
-
-        setupMediaDevices();
-
-        try {
-            const deviceProperty = mediaDevices ? `device: root.mediaDevices.defaultAudioOutput\n                    ` : "";
-
-            const volumeChangePath = getSoundPath("audio-volume-change");
-            volumeChangeSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${volumeChangePath}"
-                    audioOutput: AudioOutput {
-                        ${deviceProperty}volume: notificationsVolume
-                    }
-                }
-            `, root, "AudioService.VolumeChangeSound");
-
-            const powerPlugPath = getSoundPath("power-plug");
-            powerPlugSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${powerPlugPath}"
-                    audioOutput: AudioOutput {
-                        ${deviceProperty}volume: notificationsVolume
-                    }
-                }
-            `, root, "AudioService.PowerPlugSound");
-
-            const powerUnplugPath = getSoundPath("power-unplug");
-            powerUnplugSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${powerUnplugPath}"
-                    audioOutput: AudioOutput {
-                        ${deviceProperty}volume: notificationsVolume
-                    }
-                }
-            `, root, "AudioService.PowerUnplugSound");
-
-            const messagePath = getSoundPath("message");
-            normalNotificationSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${messagePath}"
-                    audioOutput: AudioOutput {
-                        ${deviceProperty}volume: notificationsVolume
-                    }
-                }
-            `, root, "AudioService.NormalNotificationSound");
-
-            const messageNewInstantPath = getSoundPath("message-new-instant");
-            criticalNotificationSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${messageNewInstantPath}"
-                    audioOutput: AudioOutput {
-                        ${deviceProperty}volume: notificationsVolume
-                    }
-                }
-            `, root, "AudioService.CriticalNotificationSound");
-
-            const loginPath = getSoundPath("desktop-login");
-            loginSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${loginPath}"
-                    audioOutput: AudioOutput {
-                        ${deviceProperty}volume: notificationsVolume
-                    }
-                }
-            `, root, "AudioService.LoginSound");
-        } catch (e) {
-            log.warn("Error creating sound players:", e);
         }
     }
 
@@ -955,16 +806,6 @@ EOFCONFIG
         objects: Pipewire.nodes.values.filter(node => node.audio && !node.isStream)
     }
 
-    Connections {
-        target: Pipewire
-        function onDefaultAudioSinkChanged() {
-            if (soundsAvailable) {
-                Qt.callLater(root.destroySoundPlayers);
-                Qt.callLater(root.createSoundPlayers);
-            }
-        }
-    }
-
     function setVolume(percentage) {
         if (!root.sink?.audio)
             return "No audio sink available";
@@ -1127,10 +968,8 @@ EOFCONFIG
     Component.onCompleted: {
         rebuildTypedNodeLists();
 
-        if (soundsAvailable) {
+        if (soundsAvailable)
             checkGsettings();
-            Qt.callLater(createSoundPlayers);
-        }
 
         loadDeviceAliases();
     }

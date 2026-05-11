@@ -232,7 +232,7 @@ func (b *BaseDistribution) detectQuickshell() deps.Dependency {
 	}
 
 	versionStr := string(output)
-	versionRegex := regexp.MustCompile(`quickshell (\d+\.\d+\.\d+)`)
+	versionRegex := regexp.MustCompile(`(?i)quickshell (\d+\.\d+\.\d+)`)
 	matches := versionRegex.FindStringSubmatch(versionStr)
 
 	if len(matches) < 2 {

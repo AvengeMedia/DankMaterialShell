@@ -523,6 +523,8 @@ Item {
         enabled: PolkitService.polkitAvailable
 
         function onAuthenticationRequestStarted() {
+            if (PopoutService.systemUpdatePopout?.shouldBeVisible)
+                return;
             polkitAuthModalLoader.active = true;
             if (polkitAuthModalLoader.item)
                 polkitAuthModalLoader.item.show();

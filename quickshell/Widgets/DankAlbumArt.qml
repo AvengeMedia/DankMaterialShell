@@ -71,8 +71,13 @@ Item {
             PathCubic {}
         }
 
+        Component {
+            id: pathMoveComp
+            PathMove {}
+        }
+
         Component.onCompleted: {
-            shapePath.pathElements.push(Qt.createQmlObject('import QtQuick; import QtQuick.Shapes; PathMove {}', shapePath));
+            shapePath.pathElements.push(pathMoveComp.createObject(shapePath));
 
             for (let i = 0; i < segments; i++) {
                 const seg = cubicSegment.createObject(shapePath);

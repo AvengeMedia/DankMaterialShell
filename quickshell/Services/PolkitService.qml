@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Services.Polkit
 
 Singleton {
     id: root
@@ -10,33 +11,15 @@ Singleton {
 
     readonly property bool disablePolkitIntegration: Quickshell.env("DMS_DISABLE_POLKIT") === "1"
 
-    property bool polkitAvailable: false
-    property var agent: null
+    readonly property bool polkitAvailable: !disablePolkitIntegration
+    readonly property alias agent: polkitAgentInstance
 
-    function createPolkitAgent() {
-        try {
-            const qmlString = `
-                import QtQuick
-                import Quickshell.Services.Polkit
-import qs.Services
-
-                PolkitAgent {
-                }
-            `
-
-            agent = Qt.createQmlObject(qmlString, root, "PolkitService.Agent")
-            polkitAvailable = true
-            log.info("Initialized successfully")
-        } catch (e) {
-            polkitAvailable = false
-            log.warn("Polkit not available - authentication prompts disabled. This requires a newer version of Quickshell.")
-        }
+    PolkitAgent {
+        id: polkitAgentInstance
     }
 
     Component.onCompleted: {
-        if (disablePolkitIntegration) {
-            return
-        }
-        createPolkitAgent()
+        if (!disablePolkitIntegration)
+            log.info("Initialized successfully");
     }
 }

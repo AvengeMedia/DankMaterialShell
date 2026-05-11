@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -230,44 +231,41 @@ Column {
         if (!inlinePreviewVisible || !textArea.text)
             return;
         const content = textArea.text;
-        if (content.length > 0) {
-            const proc = Qt.createQmlObject(`
-                import QtQuick
-                import Quickshell.Io
-                Process {
-                    property string content: ""
-                    command: ["sh", "-c", "printf '%s' \\"$CONTENT\\" | dms clipboard copy"]
-                    environment: { "CONTENT": content }
-                    running: false
-                }`, root, "copyProc");
-            proc.content = content;
-            proc.running = true;
-            proc.exited.connect(() => {
-                ToastService.showInfo(I18n.tr("Copied to clipboard"));
-                proc.destroy();
-            });
-        }
+        if (content.length === 0)
+            return;
+        const proc = clipboardCopyProcComp.createObject(root, {
+            content: content,
+            running: true
+        });
+        proc.exited.connect(() => {
+            ToastService.showInfo(I18n.tr("Copied to clipboard"));
+            proc.destroy();
+        });
     }
 
     function copyHtmlToClipboard() {
         if (!inlinePreviewVisible || !pluginHighlightedHtml)
             return;
-        if (pluginHighlightedHtml.length > 0) {
-            const proc = Qt.createQmlObject(`
-                import QtQuick
-                import Quickshell.Io
-                Process {
-                    property string content: ""
-                    command: ["sh", "-c", "printf '%s' \\"$CONTENT\\" | dms clipboard copy"]
-                    environment: { "CONTENT": content }
-                    running: false
-                }`, root, "copyProcHtml");
-            proc.content = pluginHighlightedHtml;
-            proc.running = true;
-            proc.exited.connect(() => {
-                ToastService.showInfo(I18n.tr("HTML copied to clipboard"));
-                proc.destroy();
-            });
+        if (pluginHighlightedHtml.length === 0)
+            return;
+        const proc = clipboardCopyProcComp.createObject(root, {
+            content: pluginHighlightedHtml,
+            running: true
+        });
+        proc.exited.connect(() => {
+            ToastService.showInfo(I18n.tr("HTML copied to clipboard"));
+            proc.destroy();
+        });
+    }
+
+    Component {
+        id: clipboardCopyProcComp
+        Process {
+            property string content: ""
+            command: ["sh", "-c", "printf '%s' \"$CONTENT\" | dms clipboard copy"]
+            environment: ({
+                    "CONTENT": content
+                })
         }
     }
 

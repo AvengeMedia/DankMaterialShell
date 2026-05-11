@@ -11,25 +11,8 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("IdleService")
 
-    readonly property bool idleMonitorAvailable: {
-        try {
-            return typeof IdleMonitor !== "undefined";
-        } catch (e) {
-            return false;
-        }
-    }
-
-    readonly property bool idleInhibitorAvailable: {
-        try {
-            return typeof IdleInhibitor !== "undefined";
-        } catch (e) {
-            return false;
-        }
-    }
-
     property bool enabled: true
     property bool respectInhibitors: true
-    property bool _enableGate: true
 
     readonly property bool externalInhibitActive: DMSService.screensaverInhibited
 
@@ -43,17 +26,28 @@ Singleton {
 
     readonly property bool mediaPlaying: MprisController.activePlayer !== null && MprisController.activePlayer.isPlaying
 
+    onEnabledChanged: _applyMonitorEnableds()
+    onPostLockMonitorActiveChanged: _applyMonitorEnableds()
     onMonitorTimeoutChanged: _rearmIdleMonitors()
     onLockTimeoutChanged: _rearmIdleMonitors()
     onSuspendTimeoutChanged: _rearmIdleMonitors()
     onPostLockMonitorTimeoutChanged: _rearmIdleMonitors()
     onIsShellLockedChanged: _rearmIdleMonitors()
 
+    function _applyMonitorEnableds() {
+        const base = enabled;
+        monitorOffMonitor.enabled = base && monitorTimeout > 0 && !postLockMonitorActive;
+        postLockMonitorOffMonitor.enabled = base && postLockMonitorActive;
+        lockMonitor.enabled = base && lockTimeout > 0;
+        suspendMonitor.enabled = base && suspendTimeout > 0;
+    }
+
     function _rearmIdleMonitors() {
-        _enableGate = false;
-        Qt.callLater(() => {
-            _enableGate = true;
-        });
+        monitorOffMonitor.enabled = false;
+        postLockMonitorOffMonitor.enabled = false;
+        lockMonitor.enabled = false;
+        suspendMonitor.enabled = false;
+        Qt.callLater(_applyMonitorEnableds);
     }
 
     signal lockRequested
@@ -65,10 +59,6 @@ Singleton {
     signal requestMonitorOn
     signal requestSuspend
 
-    property var monitorOffMonitor: null
-    property var postLockMonitorOffMonitor: null
-    property var lockMonitor: null
-    property var suspendMonitor: null
     property var lockComponent: null
     property bool monitorsOff: false
     property bool isShellLocked: false
@@ -82,84 +72,69 @@ Singleton {
             CompositorService.powerOffMonitors();
     }
 
-    function createIdleMonitors() {
-        if (!idleMonitorAvailable) {
-            log.info("IdleMonitor not available, skipping creation");
-            return;
-        }
-
-        try {
-            const qmlString = `
-                import QtQuick
-                import Quickshell.Wayland
-
-                IdleMonitor {
-                    enabled: false
-                    respectInhibitors: true
-                    timeout: 0
-                }
-            `;
-
-            monitorOffMonitor = Qt.createQmlObject(qmlString, root, "IdleService.MonitorOffMonitor");
-            monitorOffMonitor.timeout = Qt.binding(() => root.monitorTimeout > 0 ? root.monitorTimeout : 86400);
-            monitorOffMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            monitorOffMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.monitorTimeout > 0 && !root.postLockMonitorActive);
-            monitorOffMonitor.isIdleChanged.connect(function () {
-                if (monitorOffMonitor.isIdle) {
-                    if (SettingsData.fadeToDpmsEnabled) {
-                        root.fadeToDpmsRequested();
-                    } else {
-                        root.requestMonitorOff();
-                    }
+    IdleMonitor {
+        id: monitorOffMonitor
+        timeout: root.monitorTimeout > 0 ? root.monitorTimeout : 86400
+        respectInhibitors: root.respectInhibitors
+        enabled: false
+        onIsIdleChanged: {
+            if (isIdle) {
+                if (SettingsData.fadeToDpmsEnabled) {
+                    root.fadeToDpmsRequested();
                 } else {
-                    if (SettingsData.fadeToDpmsEnabled) {
-                        root.cancelFadeToDpms();
-                    }
-                    root.requestMonitorOn();
-                }
-            });
-
-            postLockMonitorOffMonitor = Qt.createQmlObject(qmlString, root, "IdleService.PostLockMonitorOffMonitor");
-            postLockMonitorOffMonitor.timeout = Qt.binding(() => root.postLockMonitorTimeout > 0 ? root.postLockMonitorTimeout : 86400);
-            postLockMonitorOffMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            postLockMonitorOffMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.postLockMonitorActive);
-            postLockMonitorOffMonitor.isIdleChanged.connect(function () {
-                if (postLockMonitorOffMonitor.isIdle) {
                     root.requestMonitorOff();
-                } else {
-                    root.requestMonitorOn();
                 }
-            });
+            } else {
+                if (SettingsData.fadeToDpmsEnabled) {
+                    root.cancelFadeToDpms();
+                }
+                root.requestMonitorOn();
+            }
+        }
+    }
 
-            lockMonitor = Qt.createQmlObject(qmlString, root, "IdleService.LockMonitor");
-            lockMonitor.timeout = Qt.binding(() => root.lockTimeout > 0 ? root.lockTimeout : 86400);
-            lockMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            lockMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.lockTimeout > 0);
-            lockMonitor.isIdleChanged.connect(function () {
-                if (lockMonitor.isIdle) {
-                    if (SettingsData.fadeToLockEnabled) {
-                        root.fadeToLockRequested();
-                    } else {
-                        root.lockRequested();
-                    }
-                } else {
-                    if (SettingsData.fadeToLockEnabled) {
-                        root.cancelFadeToLock();
-                    }
-                }
-            });
+    IdleMonitor {
+        id: postLockMonitorOffMonitor
+        timeout: root.postLockMonitorTimeout > 0 ? root.postLockMonitorTimeout : 86400
+        respectInhibitors: root.respectInhibitors
+        enabled: false
+        onIsIdleChanged: {
+            if (isIdle) {
+                root.requestMonitorOff();
+            } else {
+                root.requestMonitorOn();
+            }
+        }
+    }
 
-            suspendMonitor = Qt.createQmlObject(qmlString, root, "IdleService.SuspendMonitor");
-            suspendMonitor.timeout = Qt.binding(() => root.suspendTimeout > 0 ? root.suspendTimeout : 86400);
-            suspendMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors);
-            suspendMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.suspendTimeout > 0);
-            suspendMonitor.isIdleChanged.connect(function () {
-                if (suspendMonitor.isIdle) {
-                    root.requestSuspend();
+    IdleMonitor {
+        id: lockMonitor
+        timeout: root.lockTimeout > 0 ? root.lockTimeout : 86400
+        respectInhibitors: root.respectInhibitors
+        enabled: false
+        onIsIdleChanged: {
+            if (isIdle) {
+                if (SettingsData.fadeToLockEnabled) {
+                    root.fadeToLockRequested();
+                } else {
+                    root.lockRequested();
                 }
-            });
-        } catch (e) {
-            log.warn("Error creating IdleMonitors:", e);
+            } else {
+                if (SettingsData.fadeToLockEnabled) {
+                    root.cancelFadeToLock();
+                }
+            }
+        }
+    }
+
+    IdleMonitor {
+        id: suspendMonitor
+        timeout: root.suspendTimeout > 0 ? root.suspendTimeout : 86400
+        respectInhibitors: root.respectInhibitors
+        enabled: false
+        onIsIdleChanged: {
+            if (isIdle)
+                root.requestSuspend();
         }
     }
 
@@ -194,13 +169,7 @@ Singleton {
     }
 
     Component.onCompleted: {
-        if (!idleMonitorAvailable) {
-            log.warn("IdleMonitor not available - power management disabled. This requires a newer version of Quickshell.");
-        } else {
-            log.info("Initialized with idle monitoring support");
-            createIdleMonitors();
-        }
-
+        _applyMonitorEnableds();
         if (externalInhibitActive) {
             const apps = DMSService.screensaverInhibitors.map(i => i.appName).join(", ");
             SessionService.idleInhibited = true;

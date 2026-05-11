@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -97,7 +96,7 @@ FloatingWindow {
                     spacing: Theme.spacingXS
 
                     DankActionButton {
-                        visible: windowControls.supported && windowControls.canMaximize
+                        visible: windowControls.canMaximize
                         iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
@@ -213,5 +212,4 @@ FloatingWindow {
         id: windowControls
         targetWindow: root
     }
-
 }

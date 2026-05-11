@@ -152,6 +152,20 @@ PanelWindow {
         onTriggered: barBlur.rebuild()
     }
 
+    Component {
+        id: blurRegionComp
+        Region {}
+    }
+
+    Component {
+        id: blurSubRegionComp
+        Region {
+            property Item w
+            item: w
+            radius: Theme.cornerRadius
+        }
+    }
+
     Item {
         id: barBlur
         visible: false
@@ -173,33 +187,32 @@ PanelWindow {
             if (!hasBar && widgets.length === 0)
                 return;
 
-            const cr = Theme.cornerRadius;
-            let qml = 'import QtQuick; import Quickshell; Region {';
+            const region = blurRegionComp.createObject(barWindow);
+            if (!region) {
+                log.warn("BarBlur: Failed to create blur region");
+                return;
+            }
+
+            if (hasBar) {
+                region.x = Qt.binding(() => topBarMouseArea.x + barUnitInset.x + topBarSlide.x);
+                region.y = Qt.binding(() => topBarMouseArea.y + barUnitInset.y + topBarSlide.y);
+                region.width = Qt.binding(() => barUnitInset.width);
+                region.height = Qt.binding(() => barUnitInset.height);
+                region.radius = Qt.binding(() => barBackground.rt);
+            }
+
+            const subRegions = [];
             for (let i = 0; i < widgets.length; i++) {
-                qml += ` property Item w${i}; Region { item: w${i}; radius: ${cr} }`;
+                const sub = blurSubRegionComp.createObject(region, {
+                    w: widgets[i]
+                });
+                if (sub)
+                    subRegions.push(sub);
             }
-            qml += '}';
+            region.regions = subRegions;
 
-            try {
-                const region = Qt.createQmlObject(qml, barWindow, "BarBlurRegion");
-
-                if (hasBar) {
-                    region.x = Qt.binding(() => topBarMouseArea.x + barUnitInset.x + topBarSlide.x);
-                    region.y = Qt.binding(() => topBarMouseArea.y + barUnitInset.y + topBarSlide.y);
-                    region.width = Qt.binding(() => barUnitInset.width);
-                    region.height = Qt.binding(() => barUnitInset.height);
-                    region.radius = Qt.binding(() => barBackground.rt);
-                }
-
-                for (let i = 0; i < widgets.length; i++) {
-                    region[`w${i}`] = widgets[i];
-                }
-
-                barWindow.BackgroundEffect.blurRegion = region;
-                barWindow.blurRegion = region;
-            } catch (e) {
-                log.warn("BarBlur: Failed to create blur region:", e);
-            }
+            barWindow.BackgroundEffect.blurRegion = region;
+            barWindow.blurRegion = region;
         }
 
         function teardown() {
@@ -529,27 +542,17 @@ PanelWindow {
     implicitWidth: isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
     color: "transparent"
 
-    property var nativeInhibitor: null
-
     Component.onCompleted: {
         updateGpuTempConfig();
         _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
         _updateHasFullscreenToplevel();
         _updateShouldHideForWindows();
-
-        inhibitorInitTimer.start();
     }
 
-    Timer {
-        id: inhibitorInitTimer
-        interval: 300
-        repeat: false
-        onTriggered: {
-            if (SessionService.nativeInhibitorAvailable) {
-                createNativeInhibitor();
-            }
-        }
+    IdleInhibitor {
+        window: barWindow
+        enabled: SessionService.idleInhibited
     }
 
     Connections {
@@ -579,35 +582,6 @@ PanelWindow {
         DgopService.gpuTempEnabled = hasGpuTempWidget || SessionData.nvidiaGpuTempEnabled || SessionData.nonNvidiaGpuTempEnabled;
         DgopService.nvidiaGpuTempEnabled = hasGpuTempWidget || SessionData.nvidiaGpuTempEnabled;
         DgopService.nonNvidiaGpuTempEnabled = hasGpuTempWidget || SessionData.nonNvidiaGpuTempEnabled;
-    }
-
-    function createNativeInhibitor() {
-        if (!SessionService.nativeInhibitorAvailable) {
-            return;
-        }
-
-        try {
-            const qmlString = `
-            import QtQuick
-            import Quickshell.Wayland
-
-            IdleInhibitor {
-            enabled: false
-            }
-            `;
-
-            nativeInhibitor = Qt.createQmlObject(qmlString, barWindow, "DankBar.NativeInhibitor");
-            nativeInhibitor.window = barWindow;
-            nativeInhibitor.enabled = Qt.binding(() => SessionService.idleInhibited);
-            nativeInhibitor.enabledChanged.connect(function () {
-                if (SessionService.idleInhibited !== nativeInhibitor.enabled) {
-                    SessionService.idleInhibited = nativeInhibitor.enabled;
-                    SessionService.inhibitorChanged();
-                }
-            });
-        } catch (e) {
-            nativeInhibitor = null;
-        }
     }
 
     Connections {

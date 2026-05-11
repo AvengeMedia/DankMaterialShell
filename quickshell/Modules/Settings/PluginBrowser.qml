@@ -17,6 +17,7 @@ FloatingWindow {
     property bool keyboardNavigationActive: false
     property bool isLoading: false
     property var parentModal: null
+    parentWindow: parentModal
     property bool pendingInstallHandled: false
     property string typeFilter: ""
 
@@ -295,7 +296,7 @@ FloatingWindow {
                     }
 
                     DankActionButton {
-                        visible: windowControls.supported
+                        visible: windowControls.canMaximize
                         iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
                         iconSize: Theme.iconSize - 2
                         iconColor: Theme.outline
@@ -723,6 +724,7 @@ FloatingWindow {
             id: thirdPartyConfirmModal
 
             property bool disablePopupTransparency: true
+            parentWindow: root
 
             function show() {
                 visible = true;

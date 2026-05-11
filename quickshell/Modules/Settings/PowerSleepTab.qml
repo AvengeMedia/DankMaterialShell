@@ -370,14 +370,6 @@ Item {
                         }
                     }
                 }
-
-                StyledText {
-                    text: I18n.tr("Idle monitoring not supported - requires newer Quickshell version")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.error
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: !IdleService.idleMonitorAvailable
-                }
             }
 
             SettingsCard {

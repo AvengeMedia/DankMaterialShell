@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Wayland
 import qs.Common
+import qs.Modals
 import qs.Services
 import qs.Widgets
 
@@ -18,8 +19,22 @@ DankPopout {
 
     property bool _reopenAfterUpgrade: false
 
-    readonly property bool polkitModalOpen: PopoutService.polkitAuthModal?.visible ?? false
+    readonly property bool polkitModalOpen: polkitAuthSurfaceModal.shouldBeVisible
     readonly property bool anyModalOpen: polkitModalOpen
+
+    Connections {
+        target: PolkitService.agent
+        enabled: PolkitService.polkitAvailable && systemUpdatePopout.shouldBeVisible
+
+        function onAuthenticationRequestStarted() {
+            polkitAuthSurfaceModal.open();
+        }
+    }
+
+    PolkitAuthSurfaceModal {
+        id: polkitAuthSurfaceModal
+        parentPopout: systemUpdatePopout
+    }
 
     backgroundInteractive: !anyModalOpen
 
@@ -31,16 +46,6 @@ DankPopout {
         if (CompositorService.useHyprlandFocusGrab)
             return WlrKeyboardFocus.OnDemand;
         return WlrKeyboardFocus.Exclusive;
-    }
-
-    Connections {
-        target: PolkitService.agent
-        enabled: PolkitService.polkitAvailable && triggerScreen !== null
-
-        function onAuthenticationRequestStarted() {
-            if (PopoutService.polkitAuthModal && triggerScreen)
-                PopoutService.polkitAuthModal.screen = triggerScreen;
-        }
     }
 
     Connections {

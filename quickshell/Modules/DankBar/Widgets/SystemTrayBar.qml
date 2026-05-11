@@ -1397,6 +1397,13 @@ BasePill {
                 close();
             }
 
+            Timer {
+                id: pendingActionCloseTimer
+                interval: 80
+                repeat: false
+                onTriggered: menuRoot.closeWithAction()
+            }
+
             function showSubMenu(entry) {
                 if (!entry || !entry.hasChildren)
                     return;
@@ -1853,7 +1860,7 @@ BasePill {
                                         } else if (typeof menuEntry.triggered === "function") {
                                             menuEntry.triggered();
                                         }
-                                        Qt.createQmlObject('import QtQuick; Timer { interval: 80; running: true; repeat: false; onTriggered: menuRoot.closeWithAction() }', menuRoot);
+                                        pendingActionCloseTimer.restart();
                                     }
                                 }
 

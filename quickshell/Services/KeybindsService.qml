@@ -5,8 +5,6 @@ import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
-// ! Even though qmlls says this is unused, it is wrong
 import qs.Common
 import qs.Services
 import "../Common/KeybindActions.js" as Actions
@@ -15,21 +13,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("KeybindsService")
 
-    Component.onCompleted: {
-        if (!shortcutInhibitorAvailable) {
-            log.warn("ShortcutInhibitor is not available in this environment, keybinds editor disabled.");
-        }
-    }
-
-    readonly property bool shortcutInhibitorAvailable: {
-        try {
-            return typeof ShortcutInhibitor !== "undefined";
-        } catch (e) {
-            return false;
-        }
-    }
-
-    property bool available: (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl) && shortcutInhibitorAvailable
+    property bool available: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl
     property string currentProvider: {
         if (CompositorService.isNiri)
             return "niri";

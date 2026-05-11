@@ -14,6 +14,7 @@ FloatingWindow {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property var parentModal: null
+    parentWindow: parentModal
     readonly property bool blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
     readonly property real surfaceAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.36 : 0.78) : 1.0
     readonly property real fieldAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.18 : 0.62) : 1.0
@@ -238,7 +239,7 @@ FloatingWindow {
                     spacing: Theme.spacingXS
 
                     DankActionButton {
-                        visible: windowControls.supported
+                        visible: windowControls.canMaximize
                         circular: false
                         iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
                         iconSize: Theme.iconSize - 4

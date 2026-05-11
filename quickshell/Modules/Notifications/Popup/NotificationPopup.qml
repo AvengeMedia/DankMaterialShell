@@ -586,10 +586,11 @@ PanelWindow {
         width: alignedWidth
         height: alignedHeight
         visible: !win._finalized && !chromeOnlyExit
-        scale: (!win.inlineHeightAnimating && cardHoverHandler.hovered) ? 1.01 : 1.0
         transformOrigin: Item.Center
 
-        Behavior on scale {
+        property real chromeScale: (!win.inlineHeightAnimating && cardHoverHandler.hovered) ? 1.01 : 1.0
+
+        Behavior on chromeScale {
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
@@ -650,6 +651,8 @@ PanelWindow {
             id: bgShadowLayer
             anchors.fill: parent
             anchors.margins: -content.shadowRenderPadding
+            scale: content.chromeScale
+            transformOrigin: Item.Center
             level: content.elevLevel
             fallbackOffset: 6
             shadowBlurPx: content.shadowBlurPx
@@ -684,6 +687,8 @@ PanelWindow {
             visible: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical
             opacity: 1
             clip: true
+            scale: content.chromeScale
+            transformOrigin: Item.Center
 
             gradient: Gradient {
                 orientation: Gradient.Horizontal
@@ -713,6 +718,8 @@ PanelWindow {
             border.color: win.connectedFrameMode ? "transparent" : BlurService.borderColor
             border.width: win.connectedFrameMode ? 0 : BlurService.borderWidth
             z: 100
+            scale: content.chromeScale
+            transformOrigin: Item.Center
         }
 
         Item {

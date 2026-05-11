@@ -222,8 +222,7 @@ Variants {
             }
 
             Component.onCompleted: {
-                if (typeof wallpaperWindow.updatesEnabled !== "undefined")
-                    wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || root.pendingWallpaper !== "" || root._deferredSource !== "" || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+                wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || root.pendingWallpaper !== "" || root._deferredSource !== "" || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
 
                 if (!source) {
                     root._renderSettling = false;
