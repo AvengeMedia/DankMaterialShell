@@ -176,7 +176,7 @@ Item {
         }
 
         function open(tab: string): string {
-            const bar = root.getPreferredBar("clockButtonRef");
+            const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
             if (!bar)
                 return "DASH_OPEN_FAILED";
 
@@ -209,7 +209,7 @@ Item {
                 return "DASH_TOGGLE_SUCCESS";
             }
 
-            const bar = root.getPreferredBar("clockButtonRef");
+            const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
             if (bar) {
                 if (!bar.triggerDashTab(resolveTabIndex(tab)))
                     return "DASH_TOGGLE_FAILED";
@@ -582,7 +582,7 @@ Item {
 
     IpcHandler {
         function wallpaper(): string {
-            const bar = root.getPreferredBar("clockButtonRef");
+            const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
             if (bar) {
                 bar.triggerWallpaperBrowser();
                 return "SUCCESS: Toggled wallpaper browser";
