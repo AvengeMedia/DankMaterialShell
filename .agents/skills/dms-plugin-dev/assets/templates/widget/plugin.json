@@ -1,0 +1,13 @@
+{
+    "id": "myWidget",
+    "name": "My Widget",
+    "description": "A custom bar widget",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "type": "widget",
+    "capabilities": ["dankbar-widget"],
+    "component": "./Widget.qml",
+    "icon": "extension",
+    "settings": "./Settings.qml",
+    "permissions": ["settings_read", "settings_write"]
+}
