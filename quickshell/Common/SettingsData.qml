@@ -759,6 +759,7 @@ Singleton {
             "fontScale": 1.0,
             "iconScale": 1.0,
             "autoHide": false,
+            "autoHideStrict": false,
             "autoHideDelay": 250,
             "showOnWindowsOpen": false,
             "openOnOverview": false,

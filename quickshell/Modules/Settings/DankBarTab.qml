@@ -129,6 +129,7 @@ Item {
             fontScale: defaultBar.fontScale ?? 1.0,
             iconScale: defaultBar.iconScale ?? 1.0,
             autoHide: defaultBar.autoHide ?? false,
+            autoHideStrict: defaultBar.autoHideStrict ?? false,
             autoHideDelay: defaultBar.autoHideDelay ?? 250,
             showOnWindowsOpen: defaultBar.showOnWindowsOpen ?? false,
             openOnOverview: defaultBar.openOnOverview ?? false,
@@ -638,6 +639,18 @@ Item {
                             property: "value"
                             value: selectedBarConfig?.autoHideDelay ?? 250
                             restoreMode: Binding.RestoreBinding
+                        }
+                    }
+
+                    SettingsToggleRow {
+                        width: parent.width - parent.leftPadding
+                        text: I18n.tr("Strict auto-hide", "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open")
+                        checked: selectedBarConfig?.autoHideStrict ?? false
+                        onToggled: toggled => {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                autoHideStrict: toggled
+                            });
+                            notifyHorizontalBarChange();
                         }
                     }
 

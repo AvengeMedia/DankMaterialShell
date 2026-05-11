@@ -933,9 +933,12 @@
       "dank",
       "hidden",
       "hide",
+      "menu",
       "panel",
+      "popover",
       "show",
       "statusbar",
+      "strict",
       "topbar",
       "visibility",
       "visible"
