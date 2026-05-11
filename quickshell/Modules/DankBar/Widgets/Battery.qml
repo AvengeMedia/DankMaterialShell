@@ -3,16 +3,15 @@ import qs.Common
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
-import Qt5Compat.GraphicalEffects
-import Quickshell.Services.UPower
-// Import QtQuick Controls to get access to standard Icon rendering
-import QtQuick.Controls
 
 BasePill {
     id: battery
 
     property bool batteryPopupVisible: false
     property var popoutTarget: null
+
+    // THE TOGGLE: Defaults to false so the maintainer's original design is untouched!
+    property bool useExpressiveStyle: battery.barConfig?.expressiveBatteryStyle ?? false
 
     readonly property int barPosition: {
         switch (axis?.edge) {
@@ -35,34 +34,29 @@ BasePill {
         return Theme.widgetIconColor;
     }
 
-    // Modern Android 16 "Expressive" Battery Component
+    // Modern Android 16 "Expressive" Battery Component (Pure Qt6 Rectangles!)
     Component {
         id: pixelBattery
         Item {
             property int baseSize: Theme.barIconSize(battery.barThickness, -2, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
             
-            // The Pixel battery is naturally a wide pill shape
             width: battery.isVerticalOrientation ? baseSize * 0.6 : baseSize * 1.2
             height: battery.isVerticalOrientation ? baseSize * 1.2 : baseSize * 0.6
-
-            // Automatically rotate for vertical bars
             rotation: battery.isVerticalOrientation ? -90 : 0
             
             property color iconColor: battery.getBatteryColor()
 
-            // 1. Battery Body (The thick outline)
             Rectangle {
                 id: body
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.88
                 height: parent.height
-                radius: height / 2 // Perfect pill rounding
+                radius: height / 2
                 color: "transparent"
                 border.color: parent.iconColor
                 border.width: Math.max(1.5, parent.height * 0.12)
 
-                // 2. Inner Fill (Dynamic level)
                 Rectangle {
                     anchors.left: parent.left
                     anchors.top: parent.top
@@ -72,13 +66,11 @@ BasePill {
                     property real fillPercentage: BatteryService.batteryLevel / 100
                     property real maxWidth: parent.width - (anchors.margins * 2)
                     
-                    // Keep minimum width equal to height to maintain the inner pill shape
                     width: Math.max(height, maxWidth * fillPercentage)
                     radius: height / 2
                     color: parent.iconColor
                     visible: BatteryService.batteryAvailable
 
-                    // Smooth, aesthetic pulse effect for charging
                     SequentialAnimation on opacity {
                         running: BatteryService.isCharging || BatteryService.isPluggedIn
                         loops: Animation.Infinite
@@ -88,7 +80,6 @@ BasePill {
                 }
             }
 
-            // 3. Battery Terminal (The cap on the right side)
             Rectangle {
                 anchors.left: body.right
                 anchors.verticalCenter: parent.verticalCenter
@@ -111,9 +102,20 @@ BasePill {
                 id: batteryColumn
                 visible: battery.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: 4
+                spacing: battery.useExpressiveStyle ? 4 : 1
 
+                // ORIGINAL DESIGN
+                DankIcon {
+                    visible: !battery.useExpressiveStyle
+                    name: BatteryService.getBatteryIcon()
+                    size: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    color: battery.getBatteryColor()
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // NEW DESIGN
                 Loader {
+                    visible: battery.useExpressiveStyle
                     sourceComponent: pixelBattery
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -132,9 +134,20 @@ BasePill {
                 id: batteryContent
                 visible: !battery.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: (barConfig?.noBackground ?? false) ? 4 : 6
+                spacing: battery.useExpressiveStyle ? ((barConfig?.noBackground ?? false) ? 4 : 6) : ((barConfig?.noBackground ?? false) ? 1 : 2)
 
+                // ORIGINAL DESIGN
+                DankIcon {
+                    visible: !battery.useExpressiveStyle
+                    name: BatteryService.getBatteryIcon()
+                    size: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    color: battery.getBatteryColor()
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                // NEW DESIGN
                 Loader {
+                    visible: battery.useExpressiveStyle
                     sourceComponent: pixelBattery
                     anchors.verticalCenter: parent.verticalCenter
                 }
