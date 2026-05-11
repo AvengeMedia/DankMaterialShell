@@ -266,8 +266,7 @@ Singleton {
         const fp = outputSetFingerprint(outputIdentifiers);
         let hash = 0;
         for (let i = 0; i < fp.length; i++) {
-            const char = fp.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
+            hash = ((hash << 5) - hash) + fp.charCodeAt(i);
         }
         const hashStr = (hash >>> 0).toString(16);
         return "auto_" + hashStr;
@@ -1034,7 +1033,12 @@ Singleton {
                 result[name] = {
                     "name": name,
                     "disabled": true,
-                    "logical": { "x": 0, "y": 0, "scale": 1.0, "transform": "Normal" }
+                    "logical": {
+                        "x": 0,
+                        "y": 0,
+                        "scale": 1.0,
+                        "transform": "Normal"
+                    }
                 };
                 continue;
             }
@@ -2022,7 +2026,9 @@ Singleton {
 
     function confirmChanges(profileId) {
         const outputConfigs = buildCurrentOutputConfigs();
-        lastAppliedEntry = { outputs: outputConfigs };
+        lastAppliedEntry = {
+            outputs: outputConfigs
+        };
 
         if (profileId) {
             readMonitorsJson(data => {
