@@ -100,7 +100,6 @@ func runningStatus() *ipnstate.Status {
 
 func TestWatchLoop_StateChange(t *testing.T) {
 	stateVal := ipn.Running
-	statusCalled := make(chan struct{}, 4)
 	var watchCount int32
 
 	client := &mockClient{
@@ -115,10 +114,6 @@ func TestWatchLoop_StateChange(t *testing.T) {
 			return newMockWatcher(ctx, nil, nil), nil
 		},
 		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
-			select {
-			case statusCalled <- struct{}{}:
-			default:
-			}
 			return runningStatus(), nil
 		},
 	}
@@ -127,13 +122,9 @@ func TestWatchLoop_StateChange(t *testing.T) {
 	defer m.Close()
 
 	require.Eventually(t, func() bool {
-		return len(statusCalled) > 0
+		s := m.GetState()
+		return s.Connected && s.BackendState == "Running" && s.Self.Hostname == "cachyos"
 	}, 2*time.Second, 10*time.Millisecond)
-
-	state := m.GetState()
-	assert.True(t, state.Connected)
-	assert.Equal(t, "Running", state.BackendState)
-	assert.Equal(t, "cachyos", state.Self.Hostname)
 }
 
 func TestWatchLoop_CoalescesNotifies(t *testing.T) {
