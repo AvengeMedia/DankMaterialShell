@@ -27,20 +27,30 @@ override_dh_auto_build:
 	# Verify core directory exists (native package format has source at root)
 	test -d core || (echo "ERROR: core directory not found!" && exit 1)
 
-	# Pin go.mod and vendor/modules.txt to the installed Go toolchain version
-	GO_INSTALLED=$$(go version | grep -oP 'go\K[0-9]+\.[0-9]+'); \
-	sed -i "s/^go [0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$$/go $${GO_INSTALLED}/" core/go.mod; \
-	sed -i "s/^\(## explicit; go \)[0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$$/\1$${GO_INSTALLED}/" core/vendor/modules.txt
-
-	# Build dms-cli (single shell to preserve variables; arch: Debian amd64/arm64 -> Makefile amd64/arm64)
+	# Bundled Go at repo root (go$$VER.linux-{amd64,arm64}.tar.gz); packaged via obs-upload.sh
+	GO_TOOLCHAIN_VERSION=$$(grep -m1 '^go ' core/go.mod | awk '{print $$2}'); \
+	case "$(DEB_HOST_ARCH)" in \
+	amd64) GO_LINUX_ARCH=amd64 ;; \
+	arm64) GO_LINUX_ARCH=arm64 ;; \
+	*) echo "ERROR: Unsupported architecture: $(DEB_HOST_ARCH)" && exit 1 ;; \
+	esac; \
+	GO_TARBALL="$(CURDIR)/go$$GO_TOOLCHAIN_VERSION.linux-$$GO_LINUX_ARCH.tar.gz"; \
+	test -f "$$GO_TARBALL" || (echo "ERROR: Missing bundled Go toolchain $$GO_TARBALL" && exit 1); \
+	rm -rf "$(CURDIR)/go-bootstrap" "$(CURDIR)/.go-toolchain"; \
+	mkdir -p "$(CURDIR)/go-bootstrap"; \
+	tar -xzf "$$GO_TARBALL" -C "$(CURDIR)/go-bootstrap"; \
+	mv "$(CURDIR)/go-bootstrap/go" "$(CURDIR)/.go-toolchain"; \
+	export PATH="$(CURDIR)/.go-toolchain/bin:$$PATH"; \
+	export GOROOT="$(CURDIR)/.go-toolchain"; \
+	go version; \
+	sed -i "s/^go [0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$$/go $$GO_TOOLCHAIN_VERSION/" core/go.mod; \
+	sed -i "s/^\(## explicit; go \)[0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$$/\1$$GO_TOOLCHAIN_VERSION/" core/vendor/modules.txt; \
 	VERSION="$(UPSTREAM_VERSION)"; \
 	COMMIT=$$(echo "$(UPSTREAM_VERSION)" | grep -oP '(?<=git)[0-9]+\.[a-f0-9]+' | cut -d. -f2 | head -c8 || echo "unknown"); \
 	if [ "$(DEB_HOST_ARCH)" = "amd64" ]; then \
 		MAKE_ARCH=amd64; \
-		BINARY_NAME=dms-linux-amd64; \
 	elif [ "$(DEB_HOST_ARCH)" = "arm64" ]; then \
 		MAKE_ARCH=arm64; \
-		BINARY_NAME=dms-linux-arm64; \
 	else \
 		echo "ERROR: Unsupported architecture: $(DEB_HOST_ARCH)" && exit 1; \
 	fi; \
@@ -80,4 +90,5 @@ override_dh_auto_clean:
 	rm -f dms
 	rm -rf core/bin
 	rm -rf debian/tmp-home
+	rm -rf go-bootstrap .go-toolchain
 	dh_auto_clean

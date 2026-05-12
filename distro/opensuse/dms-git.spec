@@ -1,7 +1,8 @@
 %global debug_package %{nil}
+%global go_toolchain_version 1.26.1
 
 Name:           dms-git
-Version:        1.0.2+git2528.d336866f
+Version:        1.4.0+git2528.d336866f
 Release:        1%{?dist}
 Epoch:          2
 Summary:        DankMaterialShell - Material 3 inspired shell (git nightly)
@@ -9,9 +10,9 @@ Summary:        DankMaterialShell - Material 3 inspired shell (git nightly)
 License:        MIT
 URL:            https://github.com/AvengeMedia/DankMaterialShell
 Source0:        dms-git-source.tar.gz
+Source1:        go%{go_toolchain_version}.linux-amd64.tar.gz
+Source2:        go%{go_toolchain_version}.linux-arm64.tar.gz
 
-BuildRequires:  golang >= 1.22
-BuildRequires:  golang-packaging
 BuildRequires:  git-core
 BuildRequires:  systemd-rpm-macros
 
@@ -47,6 +48,28 @@ and fixes. Includes pre-built dms CLI binary and QML shell files.
 test -d core/vendor || (echo "ERROR: Go vendor directory missing!" && exit 1)
 
 %build
+# Bundled Go toolchain
+case "%{_arch}" in
+  x86_64)
+    GO_TARBALL="%{_sourcedir}/go%{go_toolchain_version}.linux-amd64.tar.gz"
+    ;;
+  aarch64)
+    GO_TARBALL="%{_sourcedir}/go%{go_toolchain_version}.linux-arm64.tar.gz"
+    ;;
+  *)
+    echo "Unsupported architecture for bundled Go: %{_arch}"
+    exit 1
+    ;;
+esac
+
+rm -rf "%{_builddir}/go-bootstrap" "%{_builddir}/.go-toolchain"
+mkdir -p "%{_builddir}/go-bootstrap"
+tar -xzf "$GO_TARBALL" -C "%{_builddir}/go-bootstrap"
+mv "%{_builddir}/go-bootstrap/go" "%{_builddir}/.go-toolchain"
+
+export GOROOT="%{_builddir}/.go-toolchain"
+export PATH="$GOROOT/bin:$PATH"
+
 # Create Go cache directories (OBS build env may have restricted HOME)
 export HOME=%{_builddir}/go-home
 export GOCACHE=%{_builddir}/go-cache
@@ -56,10 +79,11 @@ mkdir -p $HOME $GOCACHE $GOMODCACHE
 # OBS has no network access, so use local toolchain only
 export GOTOOLCHAIN=local
 
-# Pin go.mod and vendor/modules.txt to the installed Go toolchain version
-GO_INSTALLED=$(go version | grep -oP 'go\K[0-9]+\.[0-9]+')
-sed -i "s/^go [0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/go ${GO_INSTALLED}/" core/go.mod
-sed -i "s/^\(## explicit; go \)[0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/\1${GO_INSTALLED}/" core/vendor/modules.txt
+go version
+
+# Pin go.mod and vendor/modules.txt to the bundled Go toolchain version
+sed -i "s/^go [0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/go %{go_toolchain_version}/" core/go.mod
+sed -i "s/^\(## explicit; go \)[0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/\1%{go_toolchain_version}/" core/vendor/modules.txt
 
 # Extract version info for embedding in binary
 VERSION="%{version}"

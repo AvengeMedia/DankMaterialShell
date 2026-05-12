@@ -115,6 +115,40 @@ osc_retry() {
     done
 }
 
+# Bundled Go for dms-git OBS builds (offline VM); filenames must match distro/opensuse/dms-git.spec Source1/2.
+GO_TOOLCHAIN_CACHE="${GO_TOOLCHAIN_CACHE:-$HOME/.cache/dms-obs-go-toolchain}"
+
+dms_git_go_toolchain_version() {
+    grep -m1 '^go ' "$REPO_ROOT/core/go.mod" 2>/dev/null | awk '{print $2}'
+}
+
+ensure_dms_git_go_tarballs() {
+    local dest="$1"
+    local ver arch url cached
+    ver="$(dms_git_go_toolchain_version)"
+    if [[ -z "$ver" ]]; then
+        echo "ERROR: Could not read Go version from core/go.mod"
+        exit 1
+    fi
+    mkdir -p "$GO_TOOLCHAIN_CACHE/$ver"
+    for arch in amd64 arm64; do
+        url="https://go.dev/dl/go${ver}.linux-${arch}.tar.gz"
+        cached="$GO_TOOLCHAIN_CACHE/$ver/go${ver}.linux-${arch}.tar.gz"
+        if [[ ! -f "$cached" ]]; then
+            echo "    Downloading Go ${ver} (${arch})…"
+            if wget -q -O "${cached}.tmp" "$url" 2>/dev/null || curl -L -f -s -o "${cached}.tmp" "$url"; then
+                mv "${cached}.tmp" "$cached"
+            else
+                rm -f "${cached}.tmp"
+                echo "ERROR: Failed to download $url"
+                exit 1
+            fi
+        fi
+        cp -f "$cached" "$dest/go${ver}.linux-${arch}.tar.gz"
+        echo "    ✓ Go toolchain ready: $dest/go${ver}.linux-${arch}.tar.gz"
+    done
+}
+
 # Parameters:
 #   $1 = PROJECT
 #   $2 = PACKAGE
@@ -205,8 +239,14 @@ update_debian_dms_greeter_service() {
 
 update_opensuse_git_spec() {
     local spec_path="$1"
+    local go_ver
     if [[ -z "$spec_path" || ! -f "$spec_path" ]]; then
         return 0
+    fi
+    go_ver="$(dms_git_go_toolchain_version)"
+    if [[ -n "$go_ver" ]] && grep -q '^%global go_toolchain_version' "$spec_path"; then
+        sed -i "s/^%global go_toolchain_version .*/%global go_toolchain_version ${go_ver}/" "$spec_path"
+        echo "    Synced %global go_toolchain_version to ${go_ver} (core/go.mod)"
     fi
     if [[ -n "$CHANGELOG_VERSION" ]]; then
         echo "    Updating OpenSUSE spec to version $CHANGELOG_VERSION"
@@ -438,7 +478,7 @@ if [[ "$UPLOAD_OPENSUSE" == true ]] && [[ -f "distro/opensuse/$PACKAGE.spec" ]];
     echo "  - Copying $PACKAGE.spec for OpenSUSE"
     cp "distro/opensuse/$PACKAGE.spec" "$WORK_DIR/"
 
-    if [[ "$PACKAGE" == *"-git" ]] && [[ -n "$CHANGELOG_VERSION" ]]; then
+    if [[ "$PACKAGE" == *"-git" ]]; then
         update_opensuse_git_spec "$WORK_DIR/$PACKAGE.spec"
     elif [[ "$PACKAGE" == "dms-greeter" ]] && [[ -n "$CHANGELOG_VERSION" ]]; then
         DMS_GREETER_BASE_VERSION=$(echo "$CHANGELOG_VERSION" | sed -E 's/^([0-9]+(\.[0-9]+)*).*/\1/')
@@ -570,6 +610,11 @@ if [[ "$UPLOAD_OPENSUSE" == true ]] && [[ "$UPLOAD_DEBIAN" == false ]] && [[ -f 
 
             cd "$REPO_ROOT"
             rm -rf "$OBS_TARBALL_DIR"
+
+            if [[ "$PACKAGE" == "dms-git" ]]; then
+                echo "  - Staging bundled Go toolchains for RPM (Source1/Source2)"
+                ensure_dms_git_go_tarballs "$WORK_DIR"
+            fi
         fi
     else
         echo "  - Warning: Could not obtain source for OpenSUSE tarball"
@@ -830,12 +875,18 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                 esac
                 cd "$REPO_ROOT"
                 rm -rf "$OBS_TARBALL_DIR"
+
+                if [[ "$PACKAGE" == "dms-git" ]]; then
+                    echo "  - Staging bundled Go toolchains for RPM (Source1/Source2)"
+                    ensure_dms_git_go_tarballs "$WORK_DIR"
+                fi
+
                 echo "  - OpenSUSE source tarballs created"
             fi
 
             # Copy and update OpenSUSE spec file with the correct version
             cp "distro/opensuse/$PACKAGE.spec" "$WORK_DIR/"
-            if [[ "$PACKAGE" == *"-git" ]] && [[ -n "$CHANGELOG_VERSION" ]]; then
+            if [[ "$PACKAGE" == *"-git" ]]; then
                 update_opensuse_git_spec "$WORK_DIR/$PACKAGE.spec"
             elif [[ "$PACKAGE" == "dms-greeter" ]] && [[ -n "$CHANGELOG_VERSION" ]]; then
                 DMS_GREETER_BASE_VERSION=$(echo "$CHANGELOG_VERSION" | sed -E 's/^([0-9]+(\.[0-9]+)*).*/\1/')
@@ -889,6 +940,11 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                         cd "$REPO_ROOT"
                     fi
                 fi
+            fi
+
+            if [[ "$PACKAGE" == "dms-git" ]]; then
+                echo "    Bundling Go toolchains into Debian source tree (offline build)"
+                ensure_dms_git_go_tarballs "$SOURCE_DIR"
             fi
 
             rm -f "$WORK_DIR/$COMBINED_TARBALL"
@@ -1055,6 +1111,12 @@ if [[ -n "$OBS_FILES" ]]; then
             continue
         fi
 
+        # Keep pinned Go toolchain archives (bundled for dms-git offline builds)
+        if [[ "$old_file" =~ ^go[0-9].+\.linux-(amd64|arm64)\.tar\.gz$ ]]; then
+            echo "  - Keeping Go toolchain tarball: $old_file"
+            continue
+        fi
+
         # Keep current orig tarball for dms-greeter (Debian 3.0 quilt needs it)
         UPSTREAM_VER_CLEAN=$(echo "$CHANGELOG_VERSION" | sed 's/-[^-]*$//' 2>/dev/null)
         if [[ "$PACKAGE" == "dms-greeter" ]] && [[ "$old_file" == "${PACKAGE}_${UPSTREAM_VER_CLEAN}.orig.tar.gz" ]]; then
@@ -1130,11 +1192,11 @@ ls -la 2>&1 | head -20
 echo "==> Staging changes"
 echo "Files to upload:"
 if [[ "$UPLOAD_DEBIAN" == true ]] && [[ "$UPLOAD_OPENSUSE" == true ]]; then
-    ls -lh ./*.tar.gz ./*.tar.xz ./*.tar ./*.spec ./*.dsc _service 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+    ls -lh ./*.tar.gz ./*.tar.xz ./*.tar ./*.spec ./*.dsc _service ./go*.linux-*.tar.gz 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
 elif [[ "$UPLOAD_DEBIAN" == true ]]; then
-    ls -lh ./*.tar.gz ./*.dsc _service 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+    ls -lh ./*.tar.gz ./*.dsc _service ./go*.linux-*.tar.gz 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
 elif [[ "$UPLOAD_OPENSUSE" == true ]]; then
-    ls -lh ./*.tar.gz ./*.tar.xz ./*.tar ./*.spec _service 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+    ls -lh ./*.tar.gz ./*.tar.xz ./*.tar ./*.spec _service ./go*.linux-*.tar.gz 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
 fi
 echo ""
 
