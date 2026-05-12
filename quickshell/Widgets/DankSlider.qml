@@ -18,6 +18,8 @@ Item {
     property bool centerMinimum: false
     property real valueOverride: -1
     property bool alwaysShowValue: false
+    property int defaultValue: -1
+    property bool showDefaultMarker: false
     readonly property bool containsMouse: sliderMouseArea.containsMouse
 
     property color thumbOutlineColor: Theme.surfaceContainer
@@ -34,6 +36,7 @@ Item {
         if (centerMinimum)
             ratio = Math.max(0, (ratio - 0.5) * 2);
         let rawValue = minimum + ratio * (maximum - minimum);
+
         let newValue = step > 1 ? Math.round(rawValue / step) * step : Math.round(rawValue);
         newValue = Math.max(minimum, Math.min(maximum, newValue));
         if (newValue !== value) {
@@ -84,6 +87,25 @@ Item {
                     return Math.max(0, Math.min(sliderTrack.width, endPoint));
                 }
                 color: slider.enabled ? Theme.primary : Theme.withAlpha(Theme.onSurface, 0.12)
+            }
+
+            StyledRect {
+                id: defaultValueMarker
+                width: 3
+                height: 16
+                radius: 1.5
+                color: Theme.surfaceText
+                opacity: 0.4
+                visible: slider.showDefaultMarker && slider.defaultValue >= slider.minimum && slider.defaultValue <= slider.maximum
+                x: {
+                    const range = slider.maximum - slider.minimum;
+                    const rawRatio = range === 0 ? 0 : (slider.defaultValue - slider.minimum) / range;
+                    const ratio = slider.centerMinimum ? (0.5 + rawRatio * 0.5) : rawRatio;
+                    const travel = sliderTrack.width - sliderHandle.width;
+                    return Math.max(0, Math.min(travel, travel * ratio)) + sliderHandle.width / 2 - width / 2;
+                }
+                anchors.verticalCenter: parent.verticalCenter
+                z: 0
             }
 
             StyledRect {

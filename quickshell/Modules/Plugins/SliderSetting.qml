@@ -69,6 +69,7 @@ Column {
         value: root.value
         minimum: root.minimum
         maximum: root.maximum
+        defaultValue: root.defaultValue
         leftIcon: root.leftIcon
         rightIcon: root.rightIcon
         unit: root.unit
