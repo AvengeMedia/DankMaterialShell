@@ -1093,7 +1093,7 @@ Item {
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: MicMuteOSD {
+                    delegate: MicVolumeOSD {
                         modelData: item
                     }
                 }

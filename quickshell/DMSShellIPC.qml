@@ -1760,6 +1760,36 @@ Item {
     }
 
     IpcHandler {
+        target: "mic"
+
+        function setvolume(percentage: string): string {
+            return AudioService.setMicVolume(parseInt(percentage));
+        }
+
+        function increment(step: string): string {
+            return AudioService.incrementMicVolume(step);
+        }
+
+        function decrement(step: string): string {
+            return AudioService.decrementMicVolume(step);
+        }
+
+        function mute(): string {
+            return AudioService.toggleMicMute();
+        }
+
+        function status(): string {
+            if (!AudioService.source || !AudioService.source.audio) {
+                return "No audio source available";
+            }
+
+            const volume = Math.round(AudioService.source.audio.volume * 100);
+            const muteStatus = AudioService.source.audio.muted ? " (muted)" : "";
+            return `Microphone: ${volume}%${muteStatus}`;
+        }
+    }
+
+    IpcHandler {
         function findTrayItem(itemId: string): var {
             if (!itemId)
                 return null;

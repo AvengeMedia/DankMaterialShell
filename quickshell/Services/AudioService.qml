@@ -15,6 +15,11 @@ Singleton {
 
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property PwNode source: Pipewire.defaultAudioSource
+    onSourceChanged: {
+        if (root.source?.audio) {
+            root.lastMicVolume = root.source.audio.volume;
+        }
+    }
 
     readonly property bool soundsAvailable: MultimediaService.available
     property bool gsettingsAvailable: false
@@ -31,6 +36,7 @@ Singleton {
     readonly property var mediaDevices: soundsLoader.item?.mediaDevices ?? null
     property real notificationsVolume: 1.0
     property bool notificationsAudioMuted: false
+    property real lastMicVolume: 1.0
 
     Loader {
         id: soundsLoader
@@ -394,6 +400,34 @@ EOFCONFIG
             if (SessionData.suppressOSD)
                 return;
             root.playVolumeChangeSoundIfEnabled();
+        }
+    }
+
+    Connections {
+        target: root.source?.audio ?? null
+
+        function onVolumeChanged() {
+            if (!root.source?.audio)
+                return;
+
+            // Track the last non-muted volume level
+            if (!root.source.audio.muted && root.source.audio.volume > 0.01) {
+                root.lastMicVolume = root.source.audio.volume;
+            }
+        }
+
+        function onMutedChanged() {
+            if (!root.source?.audio)
+                return;
+
+            if (!root.source.audio.muted) {
+                // Restore volume if it reset unexpectedly
+                if (root.lastMicVolume > 0 && Math.abs(root.source.audio.volume - root.lastMicVolume) > 0.01) {
+                    root.source.audio.volume = root.lastMicVolume;
+                }
+            }
+
+            root.micMuteChanged();
         }
     }
 
@@ -840,8 +874,42 @@ EOFCONFIG
             return "No audio source available";
         }
 
+        if (!root.source.audio.muted) {
+            root.lastMicVolume = root.source.audio.volume;
+        }
+
         root.source.audio.muted = !root.source.audio.muted;
         return root.source.audio.muted ? "Microphone muted" : "Microphone unmuted";
+    }
+
+    function incrementMicVolume(step) {
+        if (!root.source?.audio)
+            return "No audio source available";
+
+        if (root.source.audio.muted)
+            root.source.audio.muted = false;
+
+        const currentVolume = Math.round(root.source.audio.volume * 100);
+        const stepValue = parseInt(step || "5");
+        const newVolume = Math.max(0, Math.min(100, currentVolume + stepValue));
+
+        root.source.audio.volume = newVolume / 100;
+        return `Microphone volume increased to ${newVolume}%`;
+    }
+
+    function decrementMicVolume(step) {
+        if (!root.source?.audio)
+            return "No audio source available";
+
+        if (root.source.audio.muted)
+            root.source.audio.muted = false;
+
+        const currentVolume = Math.round(root.source.audio.volume * 100);
+        const stepValue = parseInt(step || "5");
+        const newVolume = Math.max(0, Math.min(100, currentVolume - stepValue));
+
+        root.source.audio.volume = newVolume / 100;
+        return `Microphone volume decreased to ${newVolume}%`;
     }
 
     IpcHandler {
@@ -888,13 +956,13 @@ EOFCONFIG
         }
 
         function setmic(percentage: string): string {
+            // Deprecated: use mic.setvolume
             return root.setMicVolume(parseInt(percentage));
         }
 
         function micmute(): string {
-            const result = root.toggleMicMute();
-            root.micMuteChanged();
-            return result;
+            // Deprecated: use mic.mute
+            return root.toggleMicMute();
         }
 
         function status(): string {
@@ -958,6 +1026,8 @@ EOFCONFIG
         }
     }
 
+
+
     Connections {
         target: SettingsData
         function onUseSystemSoundThemeChanged() {
@@ -972,5 +1042,9 @@ EOFCONFIG
             checkGsettings();
 
         loadDeviceAliases();
+
+        if (root.source?.audio) {
+            root.lastMicVolume = root.source.audio.volume;
+        }
     }
 }
