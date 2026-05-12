@@ -15,11 +15,6 @@ Singleton {
 
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property PwNode source: Pipewire.defaultAudioSource
-    onSourceChanged: {
-        if (root.source?.audio) {
-            root.lastMicVolume = root.source.audio.volume;
-        }
-    }
 
     readonly property bool soundsAvailable: MultimediaService.available
     property bool gsettingsAvailable: false
@@ -36,7 +31,6 @@ Singleton {
     readonly property var mediaDevices: soundsLoader.item?.mediaDevices ?? null
     property real notificationsVolume: 1.0
     property bool notificationsAudioMuted: false
-    property real lastMicVolume: 1.0
 
     Loader {
         id: soundsLoader
@@ -406,27 +400,7 @@ EOFCONFIG
     Connections {
         target: root.source?.audio ?? null
 
-        function onVolumeChanged() {
-            if (!root.source?.audio)
-                return;
-
-            // Track the last non-muted volume level
-            if (!root.source.audio.muted && root.source.audio.volume > 0.01) {
-                root.lastMicVolume = root.source.audio.volume;
-            }
-        }
-
         function onMutedChanged() {
-            if (!root.source?.audio)
-                return;
-
-            if (!root.source.audio.muted) {
-                // Restore volume if it reset unexpectedly
-                if (root.lastMicVolume > 0 && Math.abs(root.source.audio.volume - root.lastMicVolume) > 0.01) {
-                    root.source.audio.volume = root.lastMicVolume;
-                }
-            }
-
             root.micMuteChanged();
         }
     }
@@ -874,10 +848,6 @@ EOFCONFIG
             return "No audio source available";
         }
 
-        if (!root.source.audio.muted) {
-            root.lastMicVolume = root.source.audio.volume;
-        }
-
         root.source.audio.muted = !root.source.audio.muted;
         return root.source.audio.muted ? "Microphone muted" : "Microphone unmuted";
     }
@@ -956,12 +926,10 @@ EOFCONFIG
         }
 
         function setmic(percentage: string): string {
-            // Deprecated: use mic.setvolume
             return root.setMicVolume(parseInt(percentage));
         }
 
         function micmute(): string {
-            // Deprecated: use mic.mute
             return root.toggleMicMute();
         }
 
@@ -1025,9 +993,6 @@ EOFCONFIG
             return `Switched to: ${result}`;
         }
     }
-
-
-
     Connections {
         target: SettingsData
         function onUseSystemSoundThemeChanged() {
@@ -1042,9 +1007,5 @@ EOFCONFIG
             checkGsettings();
 
         loadDeviceAliases();
-
-        if (root.source?.audio) {
-            root.lastMicVolume = root.source.audio.volume;
-        }
     }
 }
