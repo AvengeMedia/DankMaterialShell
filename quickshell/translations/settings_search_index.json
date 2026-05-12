@@ -933,12 +933,9 @@
       "dank",
       "hidden",
       "hide",
-      "menu",
       "panel",
-      "popover",
       "show",
       "statusbar",
-      "strict",
       "topbar",
       "visibility",
       "visible"
@@ -1489,6 +1486,22 @@
       "windows"
     ],
     "description": "Group multiple windows of the same app together with a window count indicator"
+  },
+  {
+    "section": "dockHideOnFullscreen",
+    "label": "Hide When Fullscreen",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "fullscreen",
+      "hide",
+      "launcher bar",
+      "panel",
+      "taskbar",
+      "window"
+    ],
+    "description": "Hide the dock when a window is fullscreen"
   },
   {
     "section": "dockIconSize",
@@ -5290,6 +5303,27 @@
       "typography"
     ],
     "description": "Popouts and Modals follow global Animation Speed (disable to customize independently)"
+  },
+  {
+    "section": "textRenderType",
+    "label": "Text Rendering",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "anti-aliasing",
+      "distance",
+      "field",
+      "fonts",
+      "freetype",
+      "motion",
+      "quality",
+      "render",
+      "rendering",
+      "text",
+      "typography"
+    ],
+    "icon": "text_format"
   },
   {
     "section": "typography",

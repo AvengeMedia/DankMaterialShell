@@ -72,7 +72,7 @@
     "%1 notifications": "%1 Benachrichtigungen"
   },
   "%1 online": {
-    "%1 online": ""
+    "%1 online": "%1 online"
   },
   "%1 update": {
     "%1 update": "%1 Update"
@@ -357,7 +357,7 @@
     "Active Lock Screen Monitor": "Aktiver Sperrbildschirm-Monitor"
   },
   "Active VPN": {
-    "Active VPN": ""
+    "Active VPN": "Aktives VPN"
   },
   "Active tile background and icon color": {
     "Active tile background and icon color": "Hintergrund und Symbolfarbe der aktiven Kachel"
@@ -489,7 +489,7 @@
     "Animation Speed": "Animationsgeschwindigkeit"
   },
   "Animation Style": {
-    "Animation Style": ""
+    "Animation Style": "Animationsstil"
   },
   "Anonymous Identity": {
     "Anonymous Identity": "Anonyme Identität"
@@ -537,7 +537,7 @@
     "Apply Qt Colors": "Qt Farben anwenden"
   },
   "Apply compositor blur behind the frame border": {
-    "Apply compositor blur behind the frame border": ""
+    "Apply compositor blur behind the frame border": "Compositor-Unschärfe hinter dem Rahmenrand anwenden"
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Warmes Farbschema für weniger Augenbelastung. Automatisierungseinstellungen unten zur Aktivierung."
@@ -567,7 +567,7 @@
     "Apps with notification popups muted. Unmute or delete to remove.": "Apps mit stummgeschalteten Benachrichtigungs-Popups. Stummschaltung aufheben oder löschen zum Entfernen."
   },
   "Arc Extender": {
-    "Arc Extender": ""
+    "Arc Extender": "Bogen-Erweiterung"
   },
   "Architecture": {
     "Architecture": "Architektur"
@@ -579,7 +579,7 @@
     "Arrange displays and configure resolution, refresh rate, and VRR": "Anzeigen anordnen und Auflösung, Bildwiederholfrequenz und VRR konfigurieren"
   },
   "At least one output must remain enabled": {
-    "At least one output must remain enabled": ""
+    "At least one output must remain enabled": "Mindestens ein Ausgang muss aktiviert bleiben"
   },
   "Attach": {
     "Attach": "Verbinden"
@@ -813,16 +813,16 @@
     "Bar Transparency": "Leistentransparenz"
   },
   "Bar corners and background": {
-    "Bar corners and background": ""
+    "Bar corners and background": "Leistenecken und Hintergrund"
   },
   "Bar shadow, border, and corners": {
-    "Bar shadow, border, and corners": ""
+    "Bar shadow, border, and corners": "Leistenschatten, Rand und Ecken"
   },
   "Bar spacing and size": {
-    "Bar spacing and size": ""
+    "Bar spacing and size": "Leistenabstand und -größe"
   },
   "Bar transparency": {
-    "Bar transparency": ""
+    "Bar transparency": "Leistentransparenz"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Basisfarbe für Schatten (Deckkraft wird automatisch angewendet)"
@@ -915,7 +915,7 @@
     "Border Opacity": "Transparenz des Rahmens"
   },
   "Border Radius": {
-    "Border Radius": ""
+    "Border Radius": "Eckenradius"
   },
   "Border Size": {
     "Border Size": "Rahmengröße"
@@ -924,7 +924,7 @@
     "Border Thickness": "Rahmenstärke"
   },
   "Border Width": {
-    "Border Width": ""
+    "Border Width": "Randbreite"
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": "Rahmenfarbe um weichgezeichnete Oberflächen"
@@ -1026,7 +1026,7 @@
     "Canceled": "Abgebrochen"
   },
   "Cannot disable the only output": {
-    "Cannot disable the only output": ""
+    "Cannot disable the only output": "Der einzige Ausgang kann nicht deaktiviert werden"
   },
   "Cannot open trash: '%1' is not installed": {
     "Cannot open trash: '%1' is not installed": "Papierkorb kann nicht geöffnet werden: „%1“ ist nicht installiert"
@@ -1446,7 +1446,10 @@
     "Connected Displays": "Verbundene Bildschirme"
   },
   "Connected Options": {
-    "Connected Options": ""
+    "Connected Options": "Verbundene Optionen"
+  },
+  "Connected to %1": {
+    "Connected to %1": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "Verbinde Gerät"
@@ -1667,6 +1670,9 @@
   "Cursor Theme": {
     "Cursor Theme": "Cursor-Design"
   },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
+  },
   "Custom": {
     "Custom": "Individuell"
   },
@@ -1884,10 +1890,10 @@
     "Dependencies & documentation": "Abhängigkeiten & Dokumentation"
   },
   "Depth": {
-    "Depth": ""
+    "Depth": "Tiefe"
   },
   "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Tiefe: Panels vergrößern sich beim Einblenden – ein dramatischer Pop-Forward-Tiefeneffekt."
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Leitet Farben ab, die eng mit dem darunter liegenden Bild übereinstimmen."
@@ -1947,10 +1953,10 @@
     "Direction Source": "Richtungsquelle"
   },
   "Directional": {
-    "Directional": ""
+    "Directional": "Gerichtet"
   },
   "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Gerichtet: Panels gleiten aus größerer Entfernung in voller Größe herein – keine Größenänderung, reine, klare Bewegung."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Automatische Verbindung deaktivieren"
@@ -1966,6 +1972,9 @@
   },
   "Disabled": {
     "Disabled": "Deaktiviert"
+  },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "deaktiviere WLAN..."
@@ -2096,8 +2105,11 @@
   "Dock Visibility": {
     "Dock Visibility": "Dock-Sichtbarkeit"
   },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
+  },
   "Dock spacing, transparency, and border": {
-    "Dock spacing, transparency, and border": ""
+    "Dock spacing, transparency, and border": "Dock-Abstand, Transparenz und Rand"
   },
   "Docs": {
     "Docs": "Dokumentation"
@@ -2130,7 +2142,7 @@
     "Drag workspace indicators to reorder them": "Arbeitsbereich-Indikatoren ziehen, um sie neu anzuordnen"
   },
   "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": ""
+    "Draw a connected picture-frame border around the entire display": "Einen verbundenen Bilderrahmen-Rand um das gesamte Display zeichnen"
   },
   "Driver": {
     "Driver": "Treiber"
@@ -2172,13 +2184,13 @@
     "Dynamic colors, presets": "Dynamische Farben, Voreinstellungen"
   },
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dynamisch: Feder-Bezier mit Überschwingen – der Eintrag überschreitet kurz sein Ziel und pendelt sich dann ein. Ausdrucksstark und lebendig."
   },
   "Edge Spacing": {
     "Edge Spacing": "Randabstand"
   },
   "Edge the launcher slides from": {
-    "Edge the launcher slides from": ""
+    "Edge the launcher slides from": "Kante, von der der Launcher hereingleitet"
   },
   "Edit App": {
     "Edit App": "App bearbeiten"
@@ -2214,7 +2226,7 @@
     "Enable Do Not Disturb": "\"Bitte nicht stören\" aktivieren"
   },
   "Enable Frame": {
-    "Enable Frame": ""
+    "Enable Frame": "Rahmen aktivieren"
   },
   "Enable History": {
     "Enable History": "Verlauf aktivieren"
@@ -2409,7 +2421,7 @@
     "Exponential": "Exponentiell"
   },
   "Expose the Arcs": {
-    "Expose the Arcs": ""
+    "Expose the Arcs": "Bögen freilegen"
   },
   "Expressive": {
     "Expressive": "Expressiv"
@@ -2454,7 +2466,7 @@
     "Failed to add printer to class": "Drucker konnte der Klasse nicht hinzugefügt werden"
   },
   "Failed to apply profile": {
-    "Failed to apply profile": ""
+    "Failed to apply profile": "Profil konnte nicht angewendet werden"
   },
   "Failed to browse device": {
     "Failed to browse device": "Gerät konnte nicht durchsucht werden"
@@ -2601,7 +2613,7 @@
     "Failed to save keybind": "Tastenkürzel konnte nicht gespeichert werden"
   },
   "Failed to save profile": {
-    "Failed to save profile": ""
+    "Failed to save profile": "Profil konnte nicht gespeichert werden"
   },
   "Failed to save profile file": {
     "Failed to save profile file": "Profildatei konnte nicht gespeichert werden"
@@ -2772,10 +2784,10 @@
     "Float": "Schwebend"
   },
   "Fluent": {
-    "Fluent": ""
+    "Fluent": "Fließend"
   },
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fließend: Sanfte kubische Verzögerung beim Hineinkommen, schnelles Einrasten beim Herausgehen – saubere, elegante Kurven."
   },
   "Focus": {
     "Focus": "Fokus"
@@ -2901,16 +2913,16 @@
     "Found %1 packages to update:": "%1 Pakete zum Aktualisieren gefunden:"
   },
   "Frame": {
-    "Frame": ""
+    "Frame": "Rahmen"
   },
   "Frame Blur": {
-    "Frame Blur": ""
+    "Frame Blur": "Rahmen-Unschärfe"
   },
   "Frame Blur follows Background Blur in Theme & Colors": {
-    "Frame Blur follows Background Blur in Theme & Colors": ""
+    "Frame Blur follows Background Blur in Theme & Colors": "Rahmen-Unschärfe folgt der Hintergrund-Unschärfe in Design & Farben"
   },
   "Frame Border Color": {
-    "Frame Border Color": ""
+    "Frame Border Color": "Rahmenrandfarbe"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "VRAM/Speicher freigeben, wenn der Launcher geschlossen wird. Kann beim erneuten Öffnen zu einer leichten Verzögerung führen."
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "Updater-Widget ausblenden"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "Beim Tippen ausblenden"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "Bei Berührung ausblenden"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "High-Fidelity-Palette, die Quellfarbtöne bewahrt."
@@ -3213,7 +3231,7 @@
     "Home": "Zuhause"
   },
   "Horizontal and vertical bar thickness": {
-    "Horizontal and vertical bar thickness": ""
+    "Horizontal and vertical bar thickness": "Horizontale und vertikale Leistendicke"
   },
   "Host": {
     "Host": "Host"
@@ -3435,7 +3453,7 @@
     "Installing: %1": "Installiere: %1"
   },
   "Integrations": {
-    "Integrations": ""
+    "Integrations": "Integrationen"
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "Intelligentes automatisches Ausblenden"
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "Invalide Konfiguration"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "Invertieren bei Moduswechsel"
@@ -3588,7 +3609,7 @@
     "Launcher Button Logo": "Launcher Button Logo"
   },
   "Launcher Emerge Side": {
-    "Launcher Emerge Side": ""
+    "Launcher Emerge Side": "Launcher-Erscheinungsseite"
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": "Deckkraft der Ebenenumrisse"
@@ -3756,10 +3777,10 @@
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Verwalten Sie bis zu 4 unabhängige Leistenkonfigurationen. Jede Leiste hat ihre eigene Position, Widgets, Styling und Display-Zuweisung."
   },
   "Managed by Frame": {
-    "Managed by Frame": ""
+    "Managed by Frame": "Vom Rahmen verwaltet"
   },
   "Managed by Frame in Connected Mode": {
-    "Managed by Frame in Connected Mode": ""
+    "Managed by Frame in Connected Mode": "Vom Rahmen im verbundenen Modus verwaltet"
   },
   "Management": {
     "Management": "Verwaltung"
@@ -3807,7 +3828,7 @@
     "Matches profile: %1": "Entspricht Profil: %1"
   },
   "Material": {
-    "Material": ""
+    "Material": "Material"
   },
   "Material Colors": {
     "Material Colors": "Material Farben"
@@ -3822,7 +3843,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Von Material Design inspirierte Schatten und Erhöhungen auf Modalen, Popouts und Dialogen"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Material Design 3 Ausdrucksstarke Bezier-Kurven. Das DMS-Standardgefühl."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen-Kontrast"
@@ -4044,7 +4065,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "Monitor mit Hintergrundbild für dynamische Farbton-Bestimmung"
   },
   "Monitors in \"%1\":": {
-    "Monitors in \"%1\":": ""
+    "Monitors in \"%1\":": "Monitore in \"%1\":"
   },
   "Monochrome": {
     "Monochrome": "Monochrom"
@@ -4062,7 +4083,7 @@
     "Morning": "Morgen"
   },
   "Motion Effects": {
-    "Motion Effects": ""
+    "Motion Effects": "Bewegungseffekte"
   },
   "Mount Points": {
     "Mount Points": "Einhängepunkte"
@@ -4116,7 +4137,7 @@
     "Muted palette with subdued, calming tones.": "Gedämpfte Palette mit beruhigenden, dezenten Farben."
   },
   "My Online": {
-    "My Online": ""
+    "My Online": "Mein Online-Status"
   },
   "NM not supported": {
     "NM not supported": "NM nicht unterstützt"
@@ -4126,6 +4147,9 @@
   },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Benannte Arbeitsfächen-Symbole"
+  },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
   },
   "Navigate": {
     "Navigate": "Navigieren"
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Anzeige Netzwerk-Download- und -Upload-Geschwindigkeit"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "Neutral"
@@ -4386,7 +4413,7 @@
     "No matches": "Keine Übereinstimmungen"
   },
   "No matching devices": {
-    "No matching devices": ""
+    "No matching devices": "Keine passenden Geräte"
   },
   "No matching processes": {
     "No matching processes": "Keine passenden Prozesse"
@@ -4407,7 +4434,7 @@
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "Kein Paketmanager gefunden. Bitte installieren Sie 'paru' oder 'yay' auf Arch-basierten Systemen, um nach Updates zu suchen."
   },
   "No peers found": {
-    "No peers found": ""
+    "No peers found": "Keine Peers gefunden"
   },
   "No plugin results": {
     "No plugin results": "Keine Plugin-Ergebnisse"
@@ -4626,7 +4653,7 @@
     "Once a day": "Einmal am Tag"
   },
   "Online": {
-    "Online": ""
+    "Online": "Online"
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Nur die Gamma-Einstellung basierend auf Zeit- oder Ortsregeln anpassen."
@@ -4652,8 +4679,11 @@
   "Open App": {
     "Open App": "App öffnen"
   },
+  "Open Dir": {
+    "Open Dir": ""
+  },
   "Open Frame": {
-    "Open Frame": ""
+    "Open Frame": "Offener Rahmen"
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "Öffnen Sie KDE Connect auf Ihrem Telefon"
@@ -4788,7 +4818,7 @@
     "Overwrite": "Überschreiben"
   },
   "Owner: %1": {
-    "Owner: %1": ""
+    "Owner: %1": "Besitzer: %1"
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM bietet bereits Fingerabdruck-Authentifizierung. Aktiviere dies, um sie beim Login anzuzeigen."
@@ -5226,7 +5256,7 @@
     "Profile not found": "Profil nicht gefunden"
   },
   "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": ""
+    "Profile not found in monitors.json": "Profil nicht in monitors.json gefunden"
   },
   "Profile saved: %1": {
     "Profile saved: %1": "Profil gespeichert: %1"
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "Protokoll"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia ist nicht verfügbar"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": "QtMultimedia ist nicht verfügbar – Video-Bildschirmschoner erfordert Qt-Multimedia-Dienste"
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "Schnellzugriff"
@@ -5427,7 +5463,7 @@
     "Resume": "Fortsetzen"
   },
   "Reveal the arcs where surfaces meet the frame": {
-    "Reveal the arcs where surfaces meet the frame": ""
+    "Reveal the arcs where surfaces meet the frame": "Bögen dort anzeigen, wo Oberflächen auf den Rahmen treffen"
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Scrollrichtung umkehren"
@@ -5637,10 +5673,13 @@
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Suchen Sie nach Tastenkombination, Beschreibung oder Aktionsname.\n\nDie Standardaktion kopiert die Tastenkombination in die Zwischenablage.\nRechtsklick oder Rechts-Pfeil drücken, um häufig verwendete Tastenkombinationen anzuheften – diese erscheinen oben, wenn nicht gesucht wird."
   },
   "Search devices...": {
-    "Search devices...": ""
+    "Search devices...": "Geräte suchen..."
   },
   "Search for a location...": {
     "Search for a location...": "Suche nach Ort..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "Suche Tastenbelegung..."
@@ -5805,7 +5844,7 @@
     "Sending": "Senden"
   },
   "Separate": {
-    "Separate": ""
+    "Separate": "Getrennt"
   },
   "Separator": {
     "Separator": "Trenner"
@@ -6105,7 +6144,7 @@
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Schlagschatten auf Benachrichtigungs-Popups anzeigen. Erfordert die Aktivierung von M3 Elevation unter Theme & Farben."
   },
   "Show during Niri overview": {
-    "Show during Niri overview": ""
+    "Show during Niri overview": "Während der Niri-Übersicht anzeigen"
   },
   "Show foreground surfaces on blurred panels for stronger contrast": {
     "Show foreground surfaces on blurred panels for stronger contrast": "Vordergrundflächen auf weichgezeichneten Panels für stärkeren Kontrast anzeigen"
@@ -6306,7 +6345,7 @@
     "Standard": "Standard"
   },
   "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Standard: Klassisches Material Design 3 – Panels steigen von unten mit einer subtilen Skalierung auf. Der DMS-Standard."
   },
   "Start": {
     "Start": "Start"
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "Strecken"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "Streifen"
   },
@@ -6357,19 +6399,19 @@
     "Surface": "Oberfläche"
   },
   "Surface Behavior": {
-    "Surface Behavior": ""
+    "Surface Behavior": "Oberflächenverhalten"
   },
   "Surface Opacity": {
-    "Surface Opacity": ""
+    "Surface Opacity": "Oberflächen-Deckkraft"
   },
   "Surface Variant": {
     "Surface Variant": "Oberflächenvariante"
   },
   "Surfaces emerge flush from the bar": {
-    "Surfaces emerge flush from the bar": ""
+    "Surfaces emerge flush from the bar": "Oberflächen erscheinen bündig aus der Leiste"
   },
   "Surfaces float independently of the frame": {
-    "Surfaces float independently of the frame": ""
+    "Surfaces float independently of the frame": "Oberflächen schweben unabhängig vom Rahmen"
   },
   "Suspend": {
     "Suspend": "Ruhemodus"
@@ -6477,16 +6519,16 @@
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Navigation • ←→↑↓: Grid Nav • Enter/Leertaste: Auswählen"
   },
   "Tags: %1": {
-    "Tags: %1": ""
+    "Tags: %1": "Tags: %1"
   },
   "Tailscale": {
-    "Tailscale": ""
+    "Tailscale": "Tailscale"
   },
   "Tailscale Network": {
-    "Tailscale Network": ""
+    "Tailscale Network": "Tailscale-Netzwerk"
   },
   "Tailscale not available": {
-    "Tailscale not available": ""
+    "Tailscale not available": "Tailscale nicht verfügbar"
   },
   "Terminal": {
     "Terminal": "Terminal"
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": "Textfarbe"
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Das Tool 'dgop' ist für die Systemüberwachung erforderlich.\nBitte installieren Sie dgop, um diese Funktion zu nutzen."
   },
@@ -6579,10 +6624,13 @@
     "This bind is overridden by config.kdl": "Diese Bindung wird durch config.kdl überschrieben"
   },
   "This device": {
-    "This device": ""
+    "This device": "Dieses Gerät"
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Dies kann einige Sekunden dauern"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Dieses Plugin hat keine 'settings_write'-Berechtigung.\n\nFügen Sie \"permissions\": [\"settings_read\", \"settings_write\"] zur plugin.json hinzu"
@@ -7038,7 +7086,7 @@
     "Use sound theme from system settings": "Nutze Systemklang Thema von den System Einstellungen"
   },
   "Use the extended surface for launcher content": {
-    "Use the extended surface for launcher content": ""
+    "Use the extended surface for launcher content": "Erweiterte Oberfläche für Launcher-Inhalte verwenden"
   },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Dieselbe Position und Größe auf allen Displays verwenden"
@@ -7437,7 +7485,7 @@
     "dgop not available": "dgop nicht verfügbar"
   },
   "direct": {
-    "direct": ""
+    "direct": "direkt"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms ist eine hochgradig anpassbare, moderne Desktop-Shell mit einem <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3 inspirierten</a> Design.<br /><br/>Sie wurde mit <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a> entwickelt, einem QT6-Framework zum Erstellen von Desktop-Shells, und <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, einer statisch typisierten, kompilierten Programmiersprache."
@@ -7470,7 +7518,7 @@
     "featured": "Hervorgehoben"
   },
   "last seen %1": {
-    "last seen %1": ""
+    "last seen %1": "zuletzt gesehen %1"
   },
   "leave empty for default": {
     "leave empty for default": "leer lassen für Standardwert"
@@ -7548,7 +7596,7 @@
     "r/niri Subreddit": "r/niri Subreddit"
   },
   "relay: %1": {
-    "relay: %1": ""
+    "relay: %1": "Relay: %1"
   },
   "seconds": {
     "seconds": "sekunden"

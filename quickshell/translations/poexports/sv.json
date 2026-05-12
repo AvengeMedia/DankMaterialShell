@@ -1448,6 +1448,9 @@
   "Connected Options": {
     "Connected Options": ""
   },
+  "Connected to %1": {
+    "Connected to %1": ""
+  },
   "Connecting to Device": {
     "Connecting to Device": "Ansluter till enhet"
   },
@@ -1666,6 +1669,9 @@
   },
   "Cursor Theme": {
     "Cursor Theme": "Markörtemat"
+  },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
   },
   "Custom": {
     "Custom": "Anpassad"
@@ -1967,6 +1973,9 @@
   "Disabled": {
     "Disabled": "Avaktiverat"
   },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
+  },
   "Disabling WiFi...": {
     "Disabling WiFi...": "Avaktiverar Wi-Fi..."
   },
@@ -2095,6 +2104,9 @@
   },
   "Dock Visibility": {
     "Dock Visibility": "Docksynlighet"
+  },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
   },
   "Dock spacing, transparency, and border": {
     "Dock spacing, transparency, and border": ""
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "Dölj uppdateringswidget"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "Dölj vid skrivning"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "Dölj vid beröring"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Högtrogen palett som bevarar källfärgerna."
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "Ogiltig konfiguration"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "Invertera vid växling av ljust och mörkt läge"
@@ -4127,6 +4148,9 @@
   "Named Workspace Icons": {
     "Named Workspace Icons": "Ikoner för arbetsytor med namn"
   },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
+  },
   "Navigate": {
     "Navigate": "Navigera"
   },
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Visa upp- och nedladdningshastighet"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "Neutral"
@@ -4651,6 +4678,9 @@
   },
   "Open App": {
     "Open App": "Öppna app"
+  },
+  "Open Dir": {
+    "Open Dir": ""
   },
   "Open Frame": {
     "Open Frame": ""
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "Protokoll"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia är inte tillgängligt"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": "QtMultimedia är inte tillgängligt – videoskärmsläckaren kräver qt multimediatjänster"
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "Snabbåtkomst"
@@ -5641,6 +5677,9 @@
   },
   "Search for a location...": {
     "Search for a location...": "Sök efter en plats..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "Sök kortkommandon..."
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "Sträck ut"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "Ränder"
   },
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": "Textfärg"
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Verktyget 'dgop' krävs för systemövervakning.\nInstallera dgop för att använda den här funktionen."
   },
@@ -6583,6 +6628,9 @@
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Detta kan ta några sekunder"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Detta tillägg saknar behörigheten 'settings_write'.\n\nLägg till \"permissions\": [\"settings_read\", \"settings_write\"] i plugin.json"

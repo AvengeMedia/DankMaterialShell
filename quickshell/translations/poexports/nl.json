@@ -72,7 +72,7 @@
     "%1 notifications": "%1 meldingen"
   },
   "%1 online": {
-    "%1 online": ""
+    "%1 online": "%1 online"
   },
   "%1 update": {
     "%1 update": "%1 update"
@@ -357,7 +357,7 @@
     "Active Lock Screen Monitor": "Actief vergrendelscherm-beeldscherm"
   },
   "Active VPN": {
-    "Active VPN": ""
+    "Active VPN": "Actieve VPN"
   },
   "Active tile background and icon color": {
     "Active tile background and icon color": "Achtergrond- en pictogramkleur van actieve tegel"
@@ -489,7 +489,7 @@
     "Animation Speed": "Animatiesnelheid"
   },
   "Animation Style": {
-    "Animation Style": ""
+    "Animation Style": "Animatiestijl"
   },
   "Anonymous Identity": {
     "Anonymous Identity": "Anonieme identiteit"
@@ -537,7 +537,7 @@
     "Apply Qt Colors": "Qt-kleuren toepassen"
   },
   "Apply compositor blur behind the frame border": {
-    "Apply compositor blur behind the frame border": ""
+    "Apply compositor blur behind the frame border": "Compositor-vervaging toepassen achter de framerand"
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Warme kleurtemperatuur toepassen om oogvermoeidheid te verminderen. Gebruik de automatiseringsinstellingen hieronder om te bepalen wanneer dit activeert."
@@ -567,7 +567,7 @@
     "Apps with notification popups muted. Unmute or delete to remove.": "Apps met gedempte meldingspop-ups. Dempen opheffen of verwijderen om te wissen."
   },
   "Arc Extender": {
-    "Arc Extender": ""
+    "Arc Extender": "Boogverlenger"
   },
   "Architecture": {
     "Architecture": "Architectuur"
@@ -579,7 +579,7 @@
     "Arrange displays and configure resolution, refresh rate, and VRR": "Beeldschermen rangschikken en resolutie, verversingssnelheid en VRR configureren"
   },
   "At least one output must remain enabled": {
-    "At least one output must remain enabled": ""
+    "At least one output must remain enabled": "Er moet ten minste één beeldscherm ingeschakeld blijven"
   },
   "Attach": {
     "Attach": "Koppelen"
@@ -813,16 +813,16 @@
     "Bar Transparency": "Balktransparantie"
   },
   "Bar corners and background": {
-    "Bar corners and background": ""
+    "Bar corners and background": "Hoeken en achtergrond van de balk"
   },
   "Bar shadow, border, and corners": {
-    "Bar shadow, border, and corners": ""
+    "Bar shadow, border, and corners": "Schaduw, rand en hoeken van de balk"
   },
   "Bar spacing and size": {
-    "Bar spacing and size": ""
+    "Bar spacing and size": "Afstand en grootte van de balk"
   },
   "Bar transparency": {
-    "Bar transparency": ""
+    "Bar transparency": "Transparantie van de balk"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Basiskleur voor schaduwen (dekking wordt automatisch toegepast)"
@@ -915,7 +915,7 @@
     "Border Opacity": "Randdekking"
   },
   "Border Radius": {
-    "Border Radius": ""
+    "Border Radius": "Randradius"
   },
   "Border Size": {
     "Border Size": "Randgrootte"
@@ -924,7 +924,7 @@
     "Border Thickness": "Randdikte"
   },
   "Border Width": {
-    "Border Width": ""
+    "Border Width": "Randdikte"
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": "Randkleur rondom vervaagde oppervlakken"
@@ -1026,7 +1026,7 @@
     "Canceled": "Geannuleerd"
   },
   "Cannot disable the only output": {
-    "Cannot disable the only output": ""
+    "Cannot disable the only output": "Kan het enige beeldscherm niet uitschakelen"
   },
   "Cannot open trash: '%1' is not installed": {
     "Cannot open trash: '%1' is not installed": "Kan prullenbak niet openen: '%1' is niet geïnstalleerd"
@@ -1446,7 +1446,10 @@
     "Connected Displays": "Aangesloten beeldschermen"
   },
   "Connected Options": {
-    "Connected Options": ""
+    "Connected Options": "Verbonden opties"
+  },
+  "Connected to %1": {
+    "Connected to %1": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "Verbinden met apparaat"
@@ -1667,6 +1670,9 @@
   "Cursor Theme": {
     "Cursor Theme": "Cursorthema"
   },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
+  },
   "Custom": {
     "Custom": "Aangepast"
   },
@@ -1884,10 +1890,10 @@
     "Dependencies & documentation": "Afhankelijkheden & documentatie"
   },
   "Depth": {
-    "Depth": ""
+    "Depth": "Diepte"
   },
   "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Diepte: Panelen schalen op van klein terwijl ze binnenglijden — een dramatisch pop-forward diepte-effect."
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Leidt kleuren af die nauw aansluiten bij de onderliggende afbeelding."
@@ -1947,10 +1953,10 @@
     "Direction Source": "Richtingsbron"
   },
   "Directional": {
-    "Directional": ""
+    "Directional": "Directioneel"
   },
   "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Directioneel: Panelen glijden over een grotere afstand op ware grootte naar binnen — geen verandering van schaal, pure en vloeiende beweging."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Automatisch verbinden uitschakelen"
@@ -1966,6 +1972,9 @@
   },
   "Disabled": {
     "Disabled": "Uitgeschakeld"
+  },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "Wifi uitschakelen..."
@@ -2096,8 +2105,11 @@
   "Dock Visibility": {
     "Dock Visibility": "Zichtbaarheid dock"
   },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
+  },
   "Dock spacing, transparency, and border": {
-    "Dock spacing, transparency, and border": ""
+    "Dock spacing, transparency, and border": "Afstand, transparantie en rand van het dock"
   },
   "Docs": {
     "Docs": "Documentatie"
@@ -2130,7 +2142,7 @@
     "Drag workspace indicators to reorder them": "Sleep werkbladindicatoren om ze te rangschikken"
   },
   "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": ""
+    "Draw a connected picture-frame border around the entire display": "Teken een aaneengesloten rand als een schilderijlijst rond het hele scherm"
   },
   "Driver": {
     "Driver": "Stuurprogramma"
@@ -2172,13 +2184,13 @@
     "Dynamic colors, presets": "Dynamische kleuren, voorinstellingen"
   },
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dynamisch: Verende bézier met doorschieten — de binnenkomst gaat kort voorbij het doel en komt dan tot rust. Expressief en levendig."
   },
   "Edge Spacing": {
     "Edge Spacing": "Randafstand"
   },
   "Edge the launcher slides from": {
-    "Edge the launcher slides from": ""
+    "Edge the launcher slides from": "Rand waaruit de launcher schuift"
   },
   "Edit App": {
     "Edit App": "App bewerken"
@@ -2214,7 +2226,7 @@
     "Enable Do Not Disturb": "Niet storen inschakelen"
   },
   "Enable Frame": {
-    "Enable Frame": ""
+    "Enable Frame": "Frame inschakelen"
   },
   "Enable History": {
     "Enable History": "Geschiedenis inschakelen"
@@ -2409,7 +2421,7 @@
     "Exponential": "Exponentieel"
   },
   "Expose the Arcs": {
-    "Expose the Arcs": ""
+    "Expose the Arcs": "Bogen zichtbaar maken"
   },
   "Expressive": {
     "Expressive": "Expressief"
@@ -2454,7 +2466,7 @@
     "Failed to add printer to class": "Toevoegen van printer aan klasse mislukt"
   },
   "Failed to apply profile": {
-    "Failed to apply profile": ""
+    "Failed to apply profile": "Profiel toepassen mislukt"
   },
   "Failed to browse device": {
     "Failed to browse device": "Bladeren op apparaat mislukt"
@@ -2601,7 +2613,7 @@
     "Failed to save keybind": "Opslaan van sneltoets mislukt"
   },
   "Failed to save profile": {
-    "Failed to save profile": ""
+    "Failed to save profile": "Profiel opslaan mislukt"
   },
   "Failed to save profile file": {
     "Failed to save profile file": "Kon profielbestand niet opslaan"
@@ -2772,10 +2784,10 @@
     "Float": "Zweven"
   },
   "Fluent": {
-    "Fluent": ""
+    "Fluent": "Fluent"
   },
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: Vloeiende kubische vertraging bij binnenkomst, snelle verdwijning — strakke, elegante rondingen."
   },
   "Focus": {
     "Focus": "Focus"
@@ -2901,16 +2913,16 @@
     "Found %1 packages to update:": "%1 pakketten gevonden om bij te werken:"
   },
   "Frame": {
-    "Frame": ""
+    "Frame": "Frame"
   },
   "Frame Blur": {
-    "Frame Blur": ""
+    "Frame Blur": "Framevervaging"
   },
   "Frame Blur follows Background Blur in Theme & Colors": {
-    "Frame Blur follows Background Blur in Theme & Colors": ""
+    "Frame Blur follows Background Blur in Theme & Colors": "Framevervaging volgt Achtergrondvervaging in Thema & Kleuren"
   },
   "Frame Border Color": {
-    "Frame Border Color": ""
+    "Frame Border Color": "Kleur van framerand"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "VRAM/geheugen vrijmaken wanneer het startmenu gesloten is. Dit kan een lichte vertraging veroorzaken bij het heropenen."
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "Updater-widget verbergen"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "Verbergen tijdens typen"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "Verbergen bij aanraking"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Natuurgetrouw palet dat de oorspronkelijke tinten behoudt."
@@ -3213,7 +3231,7 @@
     "Home": "Persoonlijke map"
   },
   "Horizontal and vertical bar thickness": {
-    "Horizontal and vertical bar thickness": ""
+    "Horizontal and vertical bar thickness": "Horizontale en verticale balkdikte"
   },
   "Host": {
     "Host": "Host"
@@ -3435,7 +3453,7 @@
     "Installing: %1": "Installeren: %1"
   },
   "Integrations": {
-    "Integrations": ""
+    "Integrations": "Integraties"
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "Intelligent automatisch verbergen"
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "Ongeldige configuratie"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "Omkeren bij moduswisseling"
@@ -3588,7 +3609,7 @@
     "Launcher Button Logo": "Logo startknop"
   },
   "Launcher Emerge Side": {
-    "Launcher Emerge Side": ""
+    "Launcher Emerge Side": "Zijde waar de launcher verschijnt"
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": "Dekking laagomlijning"
@@ -3756,10 +3777,10 @@
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Beheer tot 4 onafhankelijke balkconfiguraties. Elke balk heeft zijn eigen positie, widgets, stijl en beeldschermtoewijzing."
   },
   "Managed by Frame": {
-    "Managed by Frame": ""
+    "Managed by Frame": "Beheerd door Frame"
   },
   "Managed by Frame in Connected Mode": {
-    "Managed by Frame in Connected Mode": ""
+    "Managed by Frame in Connected Mode": "Beheerd door Frame in Verbonden Modus"
   },
   "Management": {
     "Management": "Beheer"
@@ -3807,7 +3828,7 @@
     "Matches profile: %1": "Komt overeen met profiel: %1"
   },
   "Material": {
-    "Material": ""
+    "Material": "Material"
   },
   "Material Colors": {
     "Material Colors": "Material-kleuren"
@@ -3822,7 +3843,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Op Material Design geïnspireerde schaduwen en diepte (elevation) op modale vensters, pop-outs en dialoogvensters"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Material Design 3 expressieve bézier-curven. De standaard DMS-ervaring."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen Contrast"
@@ -4044,7 +4065,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "Beeldscherm waarvan de achtergrond de dynamische themakleuren bepaalt"
   },
   "Monitors in \"%1\":": {
-    "Monitors in \"%1\":": ""
+    "Monitors in \"%1\":": "Beeldschermen in \"%1\":"
   },
   "Monochrome": {
     "Monochrome": "Monochroom"
@@ -4062,7 +4083,7 @@
     "Morning": "Ochtend"
   },
   "Motion Effects": {
-    "Motion Effects": ""
+    "Motion Effects": "Bewegingseffecten"
   },
   "Mount Points": {
     "Mount Points": "Aankoppelpunten"
@@ -4116,7 +4137,7 @@
     "Muted palette with subdued, calming tones.": "Gedempt palet met ingetogen, rustgevende tinten."
   },
   "My Online": {
-    "My Online": ""
+    "My Online": "Mijn online"
   },
   "NM not supported": {
     "NM not supported": "NM niet ondersteund"
@@ -4126,6 +4147,9 @@
   },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Pictogrammen voor benoemde werkbladen"
+  },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
   },
   "Navigate": {
     "Navigate": "Navigeren"
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Weergave van download- en uploadsnelheid"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "Neutraal"
@@ -4386,7 +4413,7 @@
     "No matches": "Geen overeenkomsten"
   },
   "No matching devices": {
-    "No matching devices": ""
+    "No matching devices": "Geen overeenkomende apparaten"
   },
   "No matching processes": {
     "No matching processes": "Geen overeenkomende processen"
@@ -4407,7 +4434,7 @@
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "Geen pakketbeheerder gevonden. Installeer 'paru' of 'yay' op Arch-gebaseerde systemen om op updates te controleren."
   },
   "No peers found": {
-    "No peers found": ""
+    "No peers found": "Geen peers gevonden"
   },
   "No plugin results": {
     "No plugin results": "Geen plug-in resultaten"
@@ -4626,7 +4653,7 @@
     "Once a day": "Eenmaal per dag"
   },
   "Online": {
-    "Online": ""
+    "Online": "Online"
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Gamma alleen aanpassen op basis van tijd- of locatieregels."
@@ -4652,8 +4679,11 @@
   "Open App": {
     "Open App": "App openen"
   },
+  "Open Dir": {
+    "Open Dir": ""
+  },
   "Open Frame": {
-    "Open Frame": ""
+    "Open Frame": "Frame openen"
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "Open KDE Connect op uw telefoon"
@@ -4788,7 +4818,7 @@
     "Overwrite": "Overschrijven"
   },
   "Owner: %1": {
-    "Owner: %1": ""
+    "Owner: %1": "Eigenaar: %1"
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM biedt al vingerafdrukauthenticatie. Schakel dit in om het te tonen bij het inloggen."
@@ -5226,7 +5256,7 @@
     "Profile not found": "Profiel niet gevonden"
   },
   "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": ""
+    "Profile not found in monitors.json": "Profiel niet gevonden in monitors.json"
   },
   "Profile saved: %1": {
     "Profile saved: %1": "Profiel opgeslagen: %1"
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "Protocol"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia is niet beschikbaar"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": "QtMultimedia is niet beschikbaar - video-screensaver vereist Qt multimedia-services"
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "Snelle toegang"
@@ -5427,7 +5463,7 @@
     "Resume": "Hervatten"
   },
   "Reveal the arcs where surfaces meet the frame": {
-    "Reveal the arcs where surfaces meet the frame": ""
+    "Reveal the arcs where surfaces meet the frame": "Onthul de bogen waar oppervlakken het frame raken"
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Scrollrichting omkeren"
@@ -5637,10 +5673,13 @@
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Zoek op toetsencombinatie, beschrijving of actienaam.\n\nDe standaardactie kopieert de sneltoets naar het klembord.\nKlik met rechts of druk op Pijl-rechts om veelgebruikte sneltoetsen vast te pinnen - ze verschijnen bovenaan als u niet zoekt."
   },
   "Search devices...": {
-    "Search devices...": ""
+    "Search devices...": "Apparaten zoeken..."
   },
   "Search for a location...": {
     "Search for a location...": "Zoeken naar een locatie..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "Sneltoetsen zoeken..."
@@ -5805,7 +5844,7 @@
     "Sending": "Verzenden"
   },
   "Separate": {
-    "Separate": ""
+    "Separate": "Gescheiden"
   },
   "Separator": {
     "Separator": "Scheidingsteken"
@@ -6105,7 +6144,7 @@
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Toon slagschaduw op meldingspop-ups. Vereist dat M3 Elevation is ingeschakeld in Thema & kleuren."
   },
   "Show during Niri overview": {
-    "Show during Niri overview": ""
+    "Show during Niri overview": "Weergeven tijdens Niri-overzicht"
   },
   "Show foreground surfaces on blurred panels for stronger contrast": {
     "Show foreground surfaces on blurred panels for stronger contrast": "Toon voorgrondoppervlakken op vervaagde panelen voor een sterker contrast"
@@ -6306,7 +6345,7 @@
     "Standard": "Standaard"
   },
   "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Standaard: Klassiek Material Design 3 — panelen komen van onderaf omhoog met een subtiele schaalvergroting. De DMS-standaard."
   },
   "Start": {
     "Start": "Start"
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "Uitrekken"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "Strepen"
   },
@@ -6357,19 +6399,19 @@
     "Surface": "Oppervlak"
   },
   "Surface Behavior": {
-    "Surface Behavior": ""
+    "Surface Behavior": "Oppervlaktegedrag"
   },
   "Surface Opacity": {
-    "Surface Opacity": ""
+    "Surface Opacity": "Oppervlaktedekking"
   },
   "Surface Variant": {
     "Surface Variant": "Oppervlakvariant"
   },
   "Surfaces emerge flush from the bar": {
-    "Surfaces emerge flush from the bar": ""
+    "Surfaces emerge flush from the bar": "Oppervlakken verschijnen naadloos uit de balk"
   },
   "Surfaces float independently of the frame": {
-    "Surfaces float independently of the frame": ""
+    "Surfaces float independently of the frame": "Oppervlakken zweven onafhankelijk van het frame"
   },
   "Suspend": {
     "Suspend": "Slaapstand"
@@ -6477,16 +6519,16 @@
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Nav • ←→↑↓: Raster Nav • Enter/Spatie: Selecteren"
   },
   "Tags: %1": {
-    "Tags: %1": ""
+    "Tags: %1": "Tags: %1"
   },
   "Tailscale": {
-    "Tailscale": ""
+    "Tailscale": "Tailscale"
   },
   "Tailscale Network": {
-    "Tailscale Network": ""
+    "Tailscale Network": "Tailscale-netwerk"
   },
   "Tailscale not available": {
-    "Tailscale not available": ""
+    "Tailscale not available": "Tailscale niet beschikbaar"
   },
   "Terminal": {
     "Terminal": "Terminal"
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": "Tekstkleur"
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "De tool 'dgop' is vereist voor systeembewaking.\nInstalleer dgop om deze functie te gebruiken."
   },
@@ -6579,10 +6624,13 @@
     "This bind is overridden by config.kdl": "Deze bind wordt overschreven door config.kdl"
   },
   "This device": {
-    "This device": ""
+    "This device": "Dit apparaat"
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Dit kan enkele seconden duren"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Deze plugin heeft geen 'settings_write' rechten.\n\nVoeg \"permissions\": [\"settings_read\", \"settings_write\"] toe aan plugin.json"
@@ -7038,7 +7086,7 @@
     "Use sound theme from system settings": "Geluidsthema van systeeminstellingen gebruiken"
   },
   "Use the extended surface for launcher content": {
-    "Use the extended surface for launcher content": ""
+    "Use the extended surface for launcher content": "Het uitgebreide oppervlak gebruiken voor launcher-inhoud"
   },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Dezelfde positie en grootte gebruiken op alle beeldschermen"
@@ -7437,7 +7485,7 @@
     "dgop not available": "dgop niet beschikbaar"
   },
   "direct": {
-    "direct": ""
+    "direct": "direct"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms is een zeer aanpasbare, moderne desktop-shell met een op <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3 geïnspireerd</a> ontwerp.<br /><br/>Het is gebouwd met <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, een QT6-framework voor het bouwen van desktop-shells, en <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, een statisch getypeerde, gecompileerde programmeertaal."
@@ -7470,7 +7518,7 @@
     "featured": "uitgelicht"
   },
   "last seen %1": {
-    "last seen %1": ""
+    "last seen %1": "laatst gezien %1"
   },
   "leave empty for default": {
     "leave empty for default": "laat leeg voor standaard"
@@ -7548,7 +7596,7 @@
     "r/niri Subreddit": "r/niri Subreddit"
   },
   "relay: %1": {
-    "relay: %1": ""
+    "relay: %1": "relay: %1"
   },
   "seconds": {
     "seconds": "seconden"

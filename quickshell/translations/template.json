@@ -3367,6 +3367,13 @@
     "comment": ""
   },
   {
+    "term": "Connected to %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Connecting to Device",
     "translation": "",
     "context": "",
@@ -3872,6 +3879,13 @@
   },
   {
     "term": "Cursor Theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Curve: curve rasterizer.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4578,6 +4592,13 @@
     "comment": ""
   },
   {
+    "term": "Disabled by Frame Mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Disabling WiFi...",
     "translation": "",
     "context": "network status",
@@ -4879,7 +4900,7 @@
     "comment": ""
   },
   {
-    "term": "Dock spacing, transparency, and border",
+    "term": "Dock margin, transparency, and border",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7273,6 +7294,13 @@
     "comment": ""
   },
   {
+    "term": "Hide When Fullscreen",
+    "translation": "",
+    "context": "bar visibility toggle: hide the bar when a window is fullscreen | dock visibility toggle: hide the dock when a window is fullscreen",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Hide When Typing",
     "translation": "",
     "context": "",
@@ -7332,6 +7360,13 @@
     "term": "Hide on Touch",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Hide the dock when a window is fullscreen",
+    "translation": "",
+    "context": "dock visibility toggle description",
     "reference": "",
     "comment": ""
   },
@@ -7624,13 +7659,6 @@
   },
   {
     "term": "Idle Settings",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Idle monitoring not supported - requires newer Quickshell version",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7995,6 +8023,13 @@
   },
   {
     "term": "Invalid configuration",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Invalid password for %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9548,6 +9583,13 @@
     "comment": ""
   },
   {
+    "term": "Native: platform renderer (FreeType).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Navigate",
     "translation": "",
     "context": "",
@@ -9612,6 +9654,13 @@
   },
   {
     "term": "Network download and upload speed display",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Network not found",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10762,6 +10811,13 @@
     "term": "Open App",
     "translation": "",
     "context": "KDE Connect open SMS app button",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open Dir",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -12117,6 +12173,13 @@
     "comment": ""
   },
   {
+    "term": "Qt: distance-field renderer.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "QtMultimedia is not available",
     "translation": "",
     "context": "",
@@ -12125,6 +12188,13 @@
   },
   {
     "term": "QtMultimedia is not available - video screensaver requires qt multimedia services",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Quality",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13063,6 +13133,13 @@
   },
   {
     "term": "Search for a location...",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Search installed plugins...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14672,6 +14749,13 @@
     "comment": ""
   },
   {
+    "term": "Strict auto-hide",
+    "translation": "",
+    "context": "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Stripes",
     "translation": "",
     "context": "wallpaper transition option",
@@ -15127,6 +15211,13 @@
     "comment": ""
   },
   {
+    "term": "Text Rendering",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.",
     "translation": "",
     "context": "dgop unavailable error message",
@@ -15228,6 +15319,13 @@
     "term": "This may take a few seconds",
     "translation": "",
     "context": "Loading overlay subtitle",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This output is disabled in the current profile",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -17637,13 +17735,6 @@
     "translation": "",
     "context": "Keyboard hints when enter-to-paste is enabled",
     "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "This output is disabled in the current profile",
-    "translation": "",
-    "context": "This output is disabled in the current profile",
-    "reference": "Modules/Settings/DisplayConfig/OutputCard.qml",
     "comment": ""
   }
 ]

@@ -36,10 +36,10 @@
     "%1 disconnected (hidden)": "%1 غیرمتصل (پنهان)"
   },
   "%1 display": {
-    "%1 display": ""
+    "%1 display": "%1 نمایشگر"
   },
   "%1 displays": {
-    "%1 displays": ""
+    "%1 displays": "%1 نمایشگر"
   },
   "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": {
     "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": "%1 وجود دارد اما در فایل پیکربندی شامل نشده است. نگاشت‌کلیدهای سفارشی تا زمانی که این مشکل برطرف نشده باشد کار نخواهند کرد."
@@ -189,7 +189,7 @@
     "24-Hour Format": "قالب ۲۴ ساعته"
   },
   "24-hour clock": {
-    "24-hour clock": ""
+    "24-hour clock": "24 ساعته"
   },
   "24-hour format": {
     "24-hour format": "قالب ۲۴ ساعته"
@@ -408,7 +408,7 @@
     "Add and configure widgets that appear on your desktop": "افزودن و پیکربندی ابزارک‌هایی که در دسکتاپ شما نمایان می‌شوند"
   },
   "Add by Address": {
-    "Add by Address": ""
+    "Add by Address": "افزودن با آدرس"
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "تعداد ستون‌ها در حالت نمای جدولی را تنظیم کنید."
@@ -777,7 +777,7 @@
     "Backends: %1": ""
   },
   "Background": {
-    "Background": ""
+    "Background": "پس‌زمینه"
   },
   "Background Blur": {
     "Background Blur": ""
@@ -1107,7 +1107,7 @@
     "Checking...": ""
   },
   "Checking…": {
-    "Checking…": ""
+    "Checking…": "درحال بررسی..."
   },
   "Choose Color": {
     "Choose Color": "انتخاب رنگ"
@@ -1448,6 +1448,9 @@
   "Connected Options": {
     "Connected Options": ""
   },
+  "Connected to %1": {
+    "Connected to %1": ""
+  },
   "Connecting to Device": {
     "Connecting to Device": "درحال اتصال به دستگاه"
   },
@@ -1667,6 +1670,9 @@
   "Cursor Theme": {
     "Cursor Theme": "تم اشاره‌گر موس"
   },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
+  },
   "Custom": {
     "Custom": "سفارشی"
   },
@@ -1806,10 +1812,10 @@
     "Date Format": "قالب تاریخ"
   },
   "Date format": {
-    "Date format": ""
+    "Date format": "قالب تاریخ"
   },
   "Date format on greeter": {
-    "Date format on greeter": ""
+    "Date format on greeter": "قالب تاریخ در greeter"
   },
   "Dawn (Astronomical Twilight)": {
     "Dawn (Astronomical Twilight)": "سپیده دم (گرگ و میش نجومی)"
@@ -1839,7 +1845,7 @@
     "Default": "پیش‌فرض"
   },
   "Default (Black)": {
-    "Default (Black)": ""
+    "Default (Black)": "پیش‌فرض (سیاه)"
   },
   "Default Width (%)": {
     "Default Width (%)": "طول پیش‌فرض (%)"
@@ -1966,6 +1972,9 @@
   },
   "Disabled": {
     "Disabled": "غیرفعال"
+  },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "غیرفعال‌سازی وای‌فای..."
@@ -2095,6 +2104,9 @@
   },
   "Dock Visibility": {
     "Dock Visibility": "وضعیت نمایش داک"
+  },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
   },
   "Dock spacing, transparency, and border": {
     "Dock spacing, transparency, and border": ""
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "پنهان‌کردن ابزارک بروزرسان"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "هنگام تایپ پنهان کن"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "هنگام لمس پنهان کن"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "پالت رنگی با دقت بالا که رنگ‌های اصلی را حفظ می‌کند."
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "پیکربندی نامعتبر"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "معکوس هنگام تغییر حالت"
@@ -4127,6 +4148,9 @@
   "Named Workspace Icons": {
     "Named Workspace Icons": "آیکون محیط‌کارهای نام‌دار"
   },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
+  },
   "Navigate": {
     "Navigate": ""
   },
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "نمایش سرعت بارگیری و بارگذاری شبکه"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "خنثی"
@@ -4651,6 +4678,9 @@
   },
   "Open App": {
     "Open App": "باز کردن برنامه"
+  },
+  "Open Dir": {
+    "Open Dir": ""
   },
   "Open Frame": {
     "Open Frame": ""
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "پروتکل"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": ""
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": ""
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "دسترسی سریع"
@@ -5641,6 +5677,9 @@
   },
   "Search for a location...": {
     "Search for a location...": "جستجو برای موقعیت مکانی..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "جستجو در نگاشت‌کلیدها..."
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "کشیده"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "راه راه"
   },
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": ""
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "ابزار «dgop» برای نظارت سیستم نیاز است.\nلطفا برای استفاده از این قابلیت dgop را نصب کنید."
   },
@@ -6583,6 +6628,9 @@
   },
   "This may take a few seconds": {
     "This may take a few seconds": "این ممکن است چند ثانیه طول بکشد"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "این افزونه اجازه «settings_write» را ندارد.\n\nبه plugins.json خط \"permissions\": [\"settings_read\", \"settings_write\"] را اضافه کنید"

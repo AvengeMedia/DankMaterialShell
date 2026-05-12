@@ -1448,6 +1448,9 @@
   "Connected Options": {
     "Connected Options": ""
   },
+  "Connected to %1": {
+    "Connected to %1": ""
+  },
   "Connecting to Device": {
     "Connecting to Device": "Connexion au périphérique"
   },
@@ -1666,6 +1669,9 @@
   },
   "Cursor Theme": {
     "Cursor Theme": "Thème du curseur"
+  },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
   },
   "Custom": {
     "Custom": "Personnalisé"
@@ -1967,6 +1973,9 @@
   "Disabled": {
     "Disabled": "Désactivé"
   },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
+  },
   "Disabling WiFi...": {
     "Disabling WiFi...": "Désactivation du Wi-Fi..."
   },
@@ -2095,6 +2104,9 @@
   },
   "Dock Visibility": {
     "Dock Visibility": "Visibilité du dock"
+  },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
   },
   "Dock spacing, transparency, and border": {
     "Dock spacing, transparency, and border": ""
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "Masquer le widget de mise à jour"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "Masquer lors de la saisie"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "Masquer au toucher"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Palette fidèle qui préserve les teintes d'origine."
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "Configuration invalide"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "Inverser lors du changement de mode"
@@ -4127,6 +4148,9 @@
   "Named Workspace Icons": {
     "Named Workspace Icons": "Icônes d’espaces de travail nommés"
   },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
+  },
   "Navigate": {
     "Navigate": "Naviguer"
   },
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Affichage des vitesses de téléchargement et d’envoi du réseau"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "Neutre"
@@ -4651,6 +4678,9 @@
   },
   "Open App": {
     "Open App": "Ouvrir appli"
+  },
+  "Open Dir": {
+    "Open Dir": ""
   },
   "Open Frame": {
     "Open Frame": ""
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "Protocole"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia n'est pas disponible"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": "QtMultimedia n'est pas disponible - l'économiseur d'écran vidéo requiert les services qt multimedia"
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "Accès rapide"
@@ -5641,6 +5677,9 @@
   },
   "Search for a location...": {
     "Search for a location...": "Rechercher un emplacement..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "Rechercher des raccourcis..."
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "Étendre"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "Rayures"
   },
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": "Couleur du texte"
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "L'outil 'dgop' est requis pour la surveillance du système.\nVeuillez installer dgop pour utiliser cette fonctionnalité."
   },
@@ -6583,6 +6628,9 @@
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Cela peut prendre quelques secondes"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Ce plugin n’a pas la permission 'settings_write'.\n\nAjoutez \"permissions\": [\"settings_read\", \"settings_write\"] dans le fichier plugin.json"

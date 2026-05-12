@@ -72,7 +72,7 @@
     "%1 notifications": "%1 notifiche"
   },
   "%1 online": {
-    "%1 online": ""
+    "%1 online": "%1 online"
   },
   "%1 update": {
     "%1 update": "%1 aggiornamento"
@@ -189,7 +189,7 @@
     "24-Hour Format": "Formato 24 Ore"
   },
   "24-hour clock": {
-    "24-hour clock": "Orologio 24 ore"
+    "24-hour clock": "orologio 24 ore"
   },
   "24-hour format": {
     "24-hour format": "formato 24 ore"
@@ -357,7 +357,7 @@
     "Active Lock Screen Monitor": "Schermo Attivo per la Schermata di Blocco"
   },
   "Active VPN": {
-    "Active VPN": ""
+    "Active VPN": "VPN Attiva"
   },
   "Active tile background and icon color": {
     "Active tile background and icon color": "Colore sfondo e icona dei riquadri attivi"
@@ -489,7 +489,7 @@
     "Animation Speed": "Velocità Animazione"
   },
   "Animation Style": {
-    "Animation Style": ""
+    "Animation Style": "Stile Animazione"
   },
   "Anonymous Identity": {
     "Anonymous Identity": "Identità Anonima"
@@ -537,7 +537,7 @@
     "Apply Qt Colors": "Applica Colori Qt"
   },
   "Apply compositor blur behind the frame border": {
-    "Apply compositor blur behind the frame border": ""
+    "Apply compositor blur behind the frame border": "Applica sfocatura del compositore dietro il bordo della cornice"
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Applica una temperatura colore più calda per ridurre l'affaticamento visivo. Usa le impostazioni di automazione qui sotto per controllare quando attivarla."
@@ -567,7 +567,7 @@
     "Apps with notification popups muted. Unmute or delete to remove.": "App con popup di notifica silenziati. Riattiva o elimina per rimuovere."
   },
   "Arc Extender": {
-    "Arc Extender": ""
+    "Arc Extender": "Estensore degli Archi"
   },
   "Architecture": {
     "Architecture": "Architettura"
@@ -579,7 +579,7 @@
     "Arrange displays and configure resolution, refresh rate, and VRR": "Disponi gli schermi e configura risoluzione, frequenza di aggiornamento e VRR"
   },
   "At least one output must remain enabled": {
-    "At least one output must remain enabled": ""
+    "At least one output must remain enabled": "Almeno un output deve rimanere abilitato"
   },
   "Attach": {
     "Attach": "Aggancia"
@@ -813,16 +813,16 @@
     "Bar Transparency": "Trasparenza Barra"
   },
   "Bar corners and background": {
-    "Bar corners and background": ""
+    "Bar corners and background": "Angoli e Sfondo della Barra"
   },
   "Bar shadow, border, and corners": {
-    "Bar shadow, border, and corners": ""
+    "Bar shadow, border, and corners": "Ombra, bordo e angoli della barra"
   },
   "Bar spacing and size": {
-    "Bar spacing and size": ""
+    "Bar spacing and size": "Spaziatura e dimensioni della barra"
   },
   "Bar transparency": {
-    "Bar transparency": ""
+    "Bar transparency": "Trasparenza della barra"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Colore base per le ombre (l'opacità è applicata automaticamente)"
@@ -864,7 +864,7 @@
     "Block Out": "Escludi"
   },
   "Block Out From": {
-    "Block Out From": "Escludi Da"
+    "Block Out From": "Escludi da"
   },
   "Block notifications": {
     "Block notifications": "Blocca notifiche"
@@ -915,7 +915,7 @@
     "Border Opacity": "Opacità Bordo"
   },
   "Border Radius": {
-    "Border Radius": ""
+    "Border Radius": "Raggio del Bordo"
   },
   "Border Size": {
     "Border Size": "Spessore Bordo"
@@ -924,7 +924,7 @@
     "Border Thickness": "Spessore Bordo"
   },
   "Border Width": {
-    "Border Width": ""
+    "Border Width": "Larghezza del Bordo"
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": "Colore del bordo attorno alle superfici sfocate"
@@ -1026,7 +1026,7 @@
     "Canceled": "Annullato"
   },
   "Cannot disable the only output": {
-    "Cannot disable the only output": ""
+    "Cannot disable the only output": "Impossibile disabilitare l'unico output"
   },
   "Cannot open trash: '%1' is not installed": {
     "Cannot open trash: '%1' is not installed": "Impossibile aprire il cestino: \"%1\" non è installato"
@@ -1446,7 +1446,10 @@
     "Connected Displays": "Schermi Connessi"
   },
   "Connected Options": {
-    "Connected Options": ""
+    "Connected Options": "Opzioni di Connessione"
+  },
+  "Connected to %1": {
+    "Connected to %1": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "Connessione al Dispositivo"
@@ -1656,7 +1659,7 @@
     "Current: %1": "Attuale: %1"
   },
   "Cursor Config Not Configured": {
-    "Cursor Config Not Configured": "Configurazione Cursore Non Impostata"
+    "Cursor Config Not Configured": "Configurazione Cursore non Impostata"
   },
   "Cursor Include Missing": {
     "Cursor Include Missing": "Inclusione Cursore Mancante"
@@ -1666,6 +1669,9 @@
   },
   "Cursor Theme": {
     "Cursor Theme": "Tema Cursore"
+  },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
   },
   "Custom": {
     "Custom": "Personalizzata"
@@ -1884,10 +1890,10 @@
     "Dependencies & documentation": "Dipendenze e documentazione"
   },
   "Depth": {
-    "Depth": ""
+    "Depth": "Profondità"
   },
   "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Profondità: i pannelli crescono di dimensione mentre scorrono in entrata — un effetto di profondità drammatico."
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Deriva colori che si avvicinano all'immagine sottostante."
@@ -1947,10 +1953,10 @@
     "Direction Source": "Origine della Direzione"
   },
   "Directional": {
-    "Directional": ""
+    "Directional": "Direzionale"
   },
   "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Direzionale: i pannelli scivolano da una distanza maggiore a dimensione piena — nessuna variazione di scala, movimento pulito."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Disattiva Autoconn."
@@ -1966,6 +1972,9 @@
   },
   "Disabled": {
     "Disabled": "Disattivato"
+  },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "Disattivazione Wi-Fi..."
@@ -2096,8 +2105,11 @@
   "Dock Visibility": {
     "Dock Visibility": "Visibilità Dock"
   },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
+  },
   "Dock spacing, transparency, and border": {
-    "Dock spacing, transparency, and border": ""
+    "Dock spacing, transparency, and border": "Spaziatura, trasparenza e bordo della dock"
   },
   "Docs": {
     "Docs": "Documentazione"
@@ -2130,7 +2142,7 @@
     "Drag workspace indicators to reorder them": "Trascina gli indicatori degli spazi di lavoro per riordinarli"
   },
   "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": ""
+    "Draw a connected picture-frame border around the entire display": "Disegna un bordo a cornice continuo attorno all'intero display"
   },
   "Driver": {
     "Driver": "Driver"
@@ -2172,13 +2184,13 @@
     "Dynamic colors, presets": "Colori dinamici, preimpostazioni"
   },
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dinamico: bezier a molla con overshooting — l'entrata supera brevemente il bersaglio poi si stabilizza. Espressivo e vitale."
   },
   "Edge Spacing": {
     "Edge Spacing": "Spaziatura del Bordo"
   },
   "Edge the launcher slides from": {
-    "Edge the launcher slides from": ""
+    "Edge the launcher slides from": "Lato da cui scorre il launcher"
   },
   "Edit App": {
     "Edit App": "Modifica App"
@@ -2211,10 +2223,10 @@
     "Enable Bar": "Abilita Barra"
   },
   "Enable Do Not Disturb": {
-    "Enable Do Not Disturb": "Abilita Non Disturbare"
+    "Enable Do Not Disturb": "Abilita non Disturbare"
   },
   "Enable Frame": {
-    "Enable Frame": ""
+    "Enable Frame": "Abilita Cornice"
   },
   "Enable History": {
     "Enable History": "Abilita Cronologia"
@@ -2409,7 +2421,7 @@
     "Exponential": "Esponenziale"
   },
   "Expose the Arcs": {
-    "Expose the Arcs": ""
+    "Expose the Arcs": "Mostra gli Archi"
   },
   "Expressive": {
     "Expressive": "Espressivo"
@@ -2454,7 +2466,7 @@
     "Failed to add printer to class": "Impossibile aggiungere la stampante alla classe"
   },
   "Failed to apply profile": {
-    "Failed to apply profile": ""
+    "Failed to apply profile": "Impossibile applicare il profilo"
   },
   "Failed to browse device": {
     "Failed to browse device": "Impossibile esplorare il dispositivo"
@@ -2601,7 +2613,7 @@
     "Failed to save keybind": "Impossibile salvare la scorciatoia"
   },
   "Failed to save profile": {
-    "Failed to save profile": ""
+    "Failed to save profile": "Impossibile salvare il profilo"
   },
   "Failed to save profile file": {
     "Failed to save profile file": "Impossibile salvare il file del profilo"
@@ -2688,7 +2700,7 @@
     "File": "File"
   },
   "File Already Exists": {
-    "File Already Exists": "File già esistente"
+    "File Already Exists": "File Già Esistente"
   },
   "File Information": {
     "File Information": "Informazioni File"
@@ -2772,10 +2784,10 @@
     "Float": "Fluttuante"
   },
   "Fluent": {
-    "Fluent": ""
+    "Fluent": "Fluente"
   },
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluente: decelerazione cubica in entrata, uscita rapida — curve pulite ed eleganti."
   },
   "Focus": {
     "Focus": "Focus"
@@ -2868,10 +2880,10 @@
     "Forecast Days": "Giorni di Previsione"
   },
   "Forecast Not Available": {
-    "Forecast Not Available": "Previsioni Non Disponibili"
+    "Forecast Not Available": "Previsioni non Disponibili"
   },
   "Foreground Layers": {
-    "Foreground Layers": "Livelli in primo piano"
+    "Foreground Layers": "Livelli in Primo Piano"
   },
   "Forever": {
     "Forever": "Per Sempre"
@@ -2901,16 +2913,16 @@
     "Found %1 packages to update:": "Trovati %1 pacchetti da aggiornare:"
   },
   "Frame": {
-    "Frame": ""
+    "Frame": "Cornice"
   },
   "Frame Blur": {
-    "Frame Blur": ""
+    "Frame Blur": "Sfocatura Cornice"
   },
   "Frame Blur follows Background Blur in Theme & Colors": {
-    "Frame Blur follows Background Blur in Theme & Colors": ""
+    "Frame Blur follows Background Blur in Theme & Colors": "La sfocatura cornice segue la sfocatura sfondo in Tema e Colori"
   },
   "Frame Border Color": {
-    "Frame Border Color": ""
+    "Frame Border Color": "Colore Bordo Cornice"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Libera VRAM/memoria alla chiusura del launcher. Potrebbe causare un leggero ritardo alla riapertura."
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "Nascondi Widget di Aggiornamento"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "Nascondi Durante la Digitazione"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "Nascondi al Tocco"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Tavolozza ad alta fedeltà che preserva le tonalità della sorgente."
@@ -3213,7 +3231,7 @@
     "Home": "Home"
   },
   "Horizontal and vertical bar thickness": {
-    "Horizontal and vertical bar thickness": ""
+    "Horizontal and vertical bar thickness": "Spessore orizzontale e verticale della barra"
   },
   "Host": {
     "Host": "Host"
@@ -3324,13 +3342,13 @@
     "Inactive Monitor Color": "Colore dello Schermo Inattivo"
   },
   "Include AUR updates": {
-    "Include AUR updates": "Includi gli aggiornamenti AUR"
+    "Include AUR updates": "Includi gli Aggiornamenti AUR"
   },
   "Include Files in All Tab": {
     "Include Files in All Tab": "Includi File nella Scheda Tutti"
   },
   "Include Flatpak updates": {
-    "Include Flatpak updates": "Includi gli aggiornamenti Flatpak"
+    "Include Flatpak updates": "Includi gli Aggiornamenti Flatpak"
   },
   "Include Folders in All Tab": {
     "Include Folders in All Tab": "Includi Cartelle nella Scheda Tutti"
@@ -3435,10 +3453,10 @@
     "Installing: %1": "Installando: %1"
   },
   "Integrations": {
-    "Integrations": ""
+    "Integrations": "Integrazioni"
   },
   "Intelligent Auto-hide": {
-    "Intelligent Auto-hide": "Nascondimento automatico intelligente"
+    "Intelligent Auto-hide": "Nascondimento Automatico Intelligente"
   },
   "Intensity": {
     "Intensity": "Intensità"
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "Configurazione non valida"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "Inverti al cambio di modalità"
@@ -3588,10 +3609,10 @@
     "Launcher Button Logo": "Logo Pulsante Launcher"
   },
   "Launcher Emerge Side": {
-    "Launcher Emerge Side": ""
+    "Launcher Emerge Side": "Lato di Comparsa del Launcher"
   },
   "Layer Outline Opacity": {
-    "Layer Outline Opacity": "Opacità contorno livello"
+    "Layer Outline Opacity": "Opacità Contorno Livello"
   },
   "Layout": {
     "Layout": "Layout"
@@ -3756,10 +3777,10 @@
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Gestisci fino a 4 configurazioni di barre indipendenti. Ogni barra ha la propria posizione, widget, stile e assegnazione schermo."
   },
   "Managed by Frame": {
-    "Managed by Frame": ""
+    "Managed by Frame": "Gestito dalla Cornice"
   },
   "Managed by Frame in Connected Mode": {
-    "Managed by Frame in Connected Mode": ""
+    "Managed by Frame in Connected Mode": "Gestito dalla Cornice in Modalità Connessa"
   },
   "Management": {
     "Management": "Gestione"
@@ -3807,7 +3828,7 @@
     "Matches profile: %1": "Corrisponde al profilo: %1"
   },
   "Material": {
-    "Material": ""
+    "Material": "Material"
   },
   "Material Colors": {
     "Material Colors": "Colori Material"
@@ -3822,7 +3843,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Ombre e rilievi ispirati al Material Design su modali, popup e finestre di dialogo"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: curve bezier espressive di Material Design 3. Il feel predefinito di DMS."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Contrasto Matugen"
@@ -4044,7 +4065,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "Monitor il cui sfondo determina i colori del tema dinamico"
   },
   "Monitors in \"%1\":": {
-    "Monitors in \"%1\":": ""
+    "Monitors in \"%1\":": "Monitor in \"%1\":"
   },
   "Monochrome": {
     "Monochrome": "Monocromatico"
@@ -4062,7 +4083,7 @@
     "Morning": "Mattina"
   },
   "Motion Effects": {
-    "Motion Effects": ""
+    "Motion Effects": "Effetti di Movimento"
   },
   "Mount Points": {
     "Mount Points": "Punti di Montaggio"
@@ -4116,7 +4137,7 @@
     "Muted palette with subdued, calming tones.": "Tavolozza sobria con toni sommessi e calmanti."
   },
   "My Online": {
-    "My Online": ""
+    "My Online": "Il Mio Online"
   },
   "NM not supported": {
     "NM not supported": "NM non supportato"
@@ -4126,6 +4147,9 @@
   },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Icone Spazi di Lavoro con Nome"
+  },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
   },
   "Navigate": {
     "Navigate": "Naviga"
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Mostra velocità di download e upload della rete"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "Neutro"
@@ -4386,7 +4413,7 @@
     "No matches": "Nessun risultato"
   },
   "No matching devices": {
-    "No matching devices": ""
+    "No matching devices": "Nessun dispositivo corrispondente"
   },
   "No matching processes": {
     "No matching processes": "Nessun processo corrispondente"
@@ -4407,7 +4434,7 @@
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "Nessun gestore pacchetti trovato. Installa \"paru\" o \"yay\" su sistemi basati su Arch per verificare gli aggiornamenti."
   },
   "No peers found": {
-    "No peers found": ""
+    "No peers found": "Nessun peer trovato"
   },
   "No plugin results": {
     "No plugin results": "Nessun risultato plugin"
@@ -4626,7 +4653,7 @@
     "Once a day": "Una volta al giorno"
   },
   "Online": {
-    "Online": ""
+    "Online": "Online"
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Regola la gamma solo in base alle regole di tempo o di posizione."
@@ -4652,8 +4679,11 @@
   "Open App": {
     "Open App": "Apri l'App"
   },
+  "Open Dir": {
+    "Open Dir": ""
+  },
   "Open Frame": {
-    "Open Frame": ""
+    "Open Frame": "Apri Cornice"
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "Apri KDE Connect sul tuo telefono"
@@ -4788,7 +4818,7 @@
     "Overwrite": "Sovrascrivi"
   },
   "Owner: %1": {
-    "Owner: %1": ""
+    "Owner: %1": "Proprietario: %1"
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM fornisce già l'autenticazione tramite impronta digitale. Abilita questa opzione per mostrarla al login."
@@ -4908,7 +4938,7 @@
     "Personalization": "Personalizzazione"
   },
   "Phone Connect Not Available": {
-    "Phone Connect Not Available": "Phone Connect Non Disponibile"
+    "Phone Connect Not Available": "Phone Connect non Disponibile"
   },
   "Phone Connect unavailable": {
     "Phone Connect unavailable": "Phone Connect non disponibile"
@@ -5226,7 +5256,7 @@
     "Profile not found": "Profilo non trovato"
   },
   "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": ""
+    "Profile not found in monitors.json": "Profilo non trovato in monitors.json"
   },
   "Profile saved: %1": {
     "Profile saved: %1": "Profilo salvato: %1"
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "Protocollo"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia non è disponibile"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": "QtMultimedia non è disponibile - il salvaschermo video richiede i servizi multimediali qt"
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "Accesso Rapido"
@@ -5427,7 +5463,7 @@
     "Resume": "Riprendi"
   },
   "Reveal the arcs where surfaces meet the frame": {
-    "Reveal the arcs where surfaces meet the frame": ""
+    "Reveal the arcs where surfaces meet the frame": "Mostra gli archi dove le superfici incontrano la cornice"
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Inverti Direzione Scorrimento"
@@ -5637,10 +5673,13 @@
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Cerca per combinazione di tasti, descrizione o nome azione.\n\nL'azione predefinita copia la scorciatoia negli appunti.\nFai clic destro o Freccia Destra per fissare le scorciatoie frequenti - appariranno in cima quando non si cerca."
   },
   "Search devices...": {
-    "Search devices...": ""
+    "Search devices...": "Cerca dispositivi..."
   },
   "Search for a location...": {
     "Search for a location...": "Cerca una posizione..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "Cerca scorciatoie..."
@@ -5805,7 +5844,7 @@
     "Sending": "Invio in Corso"
   },
   "Separate": {
-    "Separate": ""
+    "Separate": "Separato"
   },
   "Separator": {
     "Separator": "Separatore"
@@ -6105,7 +6144,7 @@
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Mostra ombra esterna sui popup di notifica. Richiede che M3 Elevation sia attivato in Tema e Colori."
   },
   "Show during Niri overview": {
-    "Show during Niri overview": ""
+    "Show during Niri overview": "Mostra durante la panoramica di Niri"
   },
   "Show foreground surfaces on blurred panels for stronger contrast": {
     "Show foreground surfaces on blurred panels for stronger contrast": "Mostra le superfici in primo piano sui pannelli sfocati per ottenere un contrasto più marcato"
@@ -6261,7 +6300,7 @@
     "Sort Alphabetically": "Ordina Alfabeticamente"
   },
   "Sort By": {
-    "Sort By": "Ordina Per"
+    "Sort By": "Ordina per"
   },
   "Sorting & Layout": {
     "Sorting & Layout": "Ordinamento e Layout"
@@ -6306,7 +6345,7 @@
     "Standard": "Standard"
   },
   "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Standard: Material Design 3 classico — i pannelli emergono dal basso con una scala sottile. Il predefinito di DMS."
   },
   "Start": {
     "Start": "Avvia"
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "Estendi"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "Strisce"
   },
@@ -6357,19 +6399,19 @@
     "Surface": "Superficie"
   },
   "Surface Behavior": {
-    "Surface Behavior": ""
+    "Surface Behavior": "Comportamento delle Superfici"
   },
   "Surface Opacity": {
-    "Surface Opacity": ""
+    "Surface Opacity": "Opacità delle Superfici"
   },
   "Surface Variant": {
     "Surface Variant": "Variante Superficie"
   },
   "Surfaces emerge flush from the bar": {
-    "Surfaces emerge flush from the bar": ""
+    "Surfaces emerge flush from the bar": "Le superfici emergono a filo con la barra"
   },
   "Surfaces float independently of the frame": {
-    "Surfaces float independently of the frame": ""
+    "Surfaces float independently of the frame": "Le superfici fluttuano indipendentemente dalla cornice"
   },
   "Suspend": {
     "Suspend": "Sospendi"
@@ -6444,7 +6486,7 @@
     "System Tray": "Area di Notifica"
   },
   "System Tray Icon Tint": {
-    "System Tray Icon Tint": "Tonalità icona nella barra applicazioni"
+    "System Tray Icon Tint": "Tonalità Icona nella Barra Applicazioni"
   },
   "System Update": {
     "System Update": "Aggiornamento di Sistema"
@@ -6477,16 +6519,16 @@
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Nav • ←→↑↓: Nav Griglia • Invio/Spazio: Seleziona"
   },
   "Tags: %1": {
-    "Tags: %1": ""
+    "Tags: %1": "Tag: %1"
   },
   "Tailscale": {
-    "Tailscale": ""
+    "Tailscale": "Tailscale"
   },
   "Tailscale Network": {
-    "Tailscale Network": ""
+    "Tailscale Network": "Rete Tailscale"
   },
   "Tailscale not available": {
-    "Tailscale not available": ""
+    "Tailscale not available": "Tailscale non disponibile"
   },
   "Terminal": {
     "Terminal": "Terminale"
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": "Colore Testo"
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Lo strumento \"dgop\" è necessario per il monitoraggio del sistema.\nInstalla dgop per utilizzare questa funzionalità."
   },
@@ -6579,10 +6624,13 @@
     "This bind is overridden by config.kdl": "Questa scorciatoia è stata sovrascritta da config.kdl"
   },
   "This device": {
-    "This device": ""
+    "This device": "Questo dispositivo"
   },
   "This may take a few seconds": {
     "This may take a few seconds": "L'operazione potrebbe richiedere alcuni secondi"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Questo plugin non ha il permesso \"settings_write\".\n\nAggiungi \"permissions\": [\"settings_read\", \"settings_write\"] al plugin.json"
@@ -6657,10 +6705,10 @@
     "Timeout for normal priority notifications": "Timeout per le notifiche di priorità normale"
   },
   "Tint Saturation": {
-    "Tint Saturation": "Saturazione del colore"
+    "Tint Saturation": "Saturazione del Colore"
   },
   "Tint Strength": {
-    "Tint Strength": "Intensità del colore"
+    "Tint Strength": "Intensità del Colore"
   },
   "Title": {
     "Title": "Titolo"
@@ -6903,7 +6951,7 @@
     "Unpin from Dock": "Rimuovi dalla Dock"
   },
   "Unsaved Changes": {
-    "Unsaved Changes": "Modifiche Non Salvate"
+    "Unsaved Changes": "Modifiche non Salvate"
   },
   "Unsaved changes": {
     "Unsaved changes": "Modifiche non salvate"
@@ -7038,7 +7086,7 @@
     "Use sound theme from system settings": "Usa tema di suoni dalle impostazioni di sistema"
   },
   "Use the extended surface for launcher content": {
-    "Use the extended surface for launcher content": ""
+    "Use the extended surface for launcher content": "Usa la superficie estesa per il contenuto del launcher"
   },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Usa la stessa posizione e dimensione su tutti gli schermi"
@@ -7317,7 +7365,7 @@
     "Window Corner Radius": "Raggio Angoli Finestra"
   },
   "Window Gaps": {
-    "Window Gaps": "Distanza tra Finestre"
+    "Window Gaps": "Spaziatura tra Finestre"
   },
   "Window Gaps (px)": {
     "Window Gaps (px)": "Spaziatura tra Finestre (px)"
@@ -7338,7 +7386,7 @@
     "Window Rules Include Missing": "Inclusione Regole Finestra Mancanti"
   },
   "Window Rules Not Configured": {
-    "Window Rules Not Configured": "Regole Finestra Non Configurate"
+    "Window Rules Not Configured": "Regole Finestra non Configurate"
   },
   "Wipe": {
     "Wipe": "Tendina"
@@ -7437,7 +7485,7 @@
     "dgop not available": "dgop non disponibile"
   },
   "direct": {
-    "direct": ""
+    "direct": "diretto"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms è una shell desktop moderna e altamente personalizzabile con un design ispirato a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3</a>.<br /><br/>È costruita con <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, un framework QT6 per la creazione di shell desktop, e <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, un linguaggio di programmazione compilato e staticamente tipizzato."
@@ -7470,7 +7518,7 @@
     "featured": "in primo piano"
   },
   "last seen %1": {
-    "last seen %1": ""
+    "last seen %1": "visto l'ultima volta %1"
   },
   "leave empty for default": {
     "leave empty for default": "lascia vuoto per il valore predefinito"
@@ -7479,10 +7527,10 @@
     "loginctl not available - lock integration requires DMS socket connection": "loginctl non disponibile - integrazione blocco richiede connessione socket DMS"
   },
   "mangowc Discord Server": {
-    "mangowc Discord Server": "Server Discord di MangoWC"
+    "mangowc Discord Server": "Server Discord di mangowc"
   },
   "mangowc GitHub": {
-    "mangowc GitHub": "GitHub di MangoWC"
+    "mangowc GitHub": "GitHub di mangowc"
   },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen non trovato - installa il pacchetto matugen per il theming dinamico"
@@ -7548,7 +7596,7 @@
     "r/niri Subreddit": "Subreddit r/niri"
   },
   "relay: %1": {
-    "relay: %1": ""
+    "relay: %1": "relay: %1"
   },
   "seconds": {
     "seconds": "secondi"

@@ -72,7 +72,7 @@
     "%1 notifications": "%1 התראות"
   },
   "%1 online": {
-    "%1 online": ""
+    "%1 online": "%1 מקוונים"
   },
   "%1 update": {
     "%1 update": "%1 עדכון"
@@ -357,7 +357,7 @@
     "Active Lock Screen Monitor": "המסך הפעיל שבו מוצג מסך הנעילה"
   },
   "Active VPN": {
-    "Active VPN": ""
+    "Active VPN": "VPN פעיל"
   },
   "Active tile background and icon color": {
     "Active tile background and icon color": "צבע רקע וסמל של האריח הפעיל"
@@ -489,7 +489,7 @@
     "Animation Speed": "מהירות האנימציה"
   },
   "Animation Style": {
-    "Animation Style": ""
+    "Animation Style": "סגנון אנימציה"
   },
   "Anonymous Identity": {
     "Anonymous Identity": "זהות אנונימית"
@@ -537,7 +537,7 @@
     "Apply Qt Colors": "החלת צבעים על Qt"
   },
   "Apply compositor blur behind the frame border": {
-    "Apply compositor blur behind the frame border": ""
+    "Apply compositor blur behind the frame border": "החל/י טשטוש של הקומפוזיטור מאחורי גבול המסגרת"
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "הגדרת טמפרטורת צבע חמה כדי להפחית מאמץ בעיניים. השתמש/י בהגדרות האוטומציה למטה כדי לשלוט מתי ההגדרה מופעלת."
@@ -567,7 +567,7 @@
     "Apps with notification popups muted. Unmute or delete to remove.": "אפליקציות עם חלונות קופצים של התראות מושתקות. בטל/י השתקה או מחק/י להסרה."
   },
   "Arc Extender": {
-    "Arc Extender": ""
+    "Arc Extender": "מרחיב הקשתות"
   },
   "Architecture": {
     "Architecture": "ארכיטקטורה"
@@ -579,7 +579,7 @@
     "Arrange displays and configure resolution, refresh rate, and VRR": "סדר/י מסכים והגדר/י רזולוציה, קצב רענון וVRR"
   },
   "At least one output must remain enabled": {
-    "At least one output must remain enabled": ""
+    "At least one output must remain enabled": "לפחות פלט אחד חייב להישאר מופעל"
   },
   "Attach": {
     "Attach": "חבר/י"
@@ -813,16 +813,16 @@
     "Bar Transparency": "שקיפות סרגל"
   },
   "Bar corners and background": {
-    "Bar corners and background": ""
+    "Bar corners and background": "פינות ורקע הסרגל"
   },
   "Bar shadow, border, and corners": {
-    "Bar shadow, border, and corners": ""
+    "Bar shadow, border, and corners": "צל, מסגרת ופינות של הסרגל"
   },
   "Bar spacing and size": {
-    "Bar spacing and size": ""
+    "Bar spacing and size": "ריווח וגודל הסרגל"
   },
   "Bar transparency": {
-    "Bar transparency": ""
+    "Bar transparency": "שקיפות הסרגל"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "צבע בסיס לצללים (שקיפות מוחלת אוטומטית)"
@@ -915,7 +915,7 @@
     "Border Opacity": "שקיפות המסגרת"
   },
   "Border Radius": {
-    "Border Radius": ""
+    "Border Radius": "רדיוס המסגרת"
   },
   "Border Size": {
     "Border Size": "גודל מסגרת"
@@ -924,7 +924,7 @@
     "Border Thickness": "עובי המסגרת"
   },
   "Border Width": {
-    "Border Width": ""
+    "Border Width": "רוחב המסגרת"
   },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": "צבע המסגרת סביב משטחים מטושטשים"
@@ -1026,7 +1026,7 @@
     "Canceled": "בוטל"
   },
   "Cannot disable the only output": {
-    "Cannot disable the only output": ""
+    "Cannot disable the only output": "לא ניתן להשבית את הפלט היחיד"
   },
   "Cannot open trash: '%1' is not installed": {
     "Cannot open trash: '%1' is not installed": "לא ניתן לפתוח את האשפה: '%1' אינו מותקן"
@@ -1446,7 +1446,10 @@
     "Connected Displays": "מסכים מחוברים"
   },
   "Connected Options": {
-    "Connected Options": ""
+    "Connected Options": "אפשרויות מצב מחובר"
+  },
+  "Connected to %1": {
+    "Connected to %1": ""
   },
   "Connecting to Device": {
     "Connecting to Device": "מתחבר להתקן"
@@ -1667,6 +1670,9 @@
   "Cursor Theme": {
     "Cursor Theme": "ערכת נושא לסמן העכבר"
   },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
+  },
   "Custom": {
     "Custom": "מותאם אישית"
   },
@@ -1884,10 +1890,10 @@
     "Dependencies & documentation": "חבילות נדרשות ודוקיומנטציה"
   },
   "Depth": {
-    "Depth": ""
+    "Depth": "עומק"
   },
   "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "עומק: הפאנלים גדלים תוך כדי החלקה פנימה - אפקט עומק דרמטי שבולט קדימה."
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "גוזר צבעים התואמים באופן הדוק לתמונה שמתחת."
@@ -1947,10 +1953,10 @@
     "Direction Source": "מקור כיוון"
   },
   "Directional": {
-    "Directional": ""
+    "Directional": "כיווני"
   },
   "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "כיווני: הפאנלים מחליקים פנימה ממרחק גדול יותר בגודל מלא - ללא שינוי קנה מידה, תנועה חלקה ונקייה."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "השבת/י התחברות אוטומטית"
@@ -1966,6 +1972,9 @@
   },
   "Disabled": {
     "Disabled": "מושבת"
+  },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "משבית WiFi..."
@@ -2096,8 +2105,11 @@
   "Dock Visibility": {
     "Dock Visibility": "נראות הDock"
   },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
+  },
   "Dock spacing, transparency, and border": {
-    "Dock spacing, transparency, and border": ""
+    "Dock spacing, transparency, and border": "ריווח, שקיפות ומסגרת הDock"
   },
   "Docs": {
     "Docs": "דוקיומנטציה"
@@ -2130,7 +2142,7 @@
     "Drag workspace indicators to reorder them": "גרור/גררי את מחווני סביבות העבודה כדי לסדר אותם מחדש"
   },
   "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": ""
+    "Draw a connected picture-frame border around the entire display": "צייר/י מסגרת תמונה מחוברת סביב כל התצוגה"
   },
   "Driver": {
     "Driver": "מנהל התקן"
@@ -2172,13 +2184,13 @@
     "Dynamic colors, presets": "צבעים דינמיים, הגדרות מוכנות"
   },
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "דינמי: עקומת Spring Bezier עם חריגה - הכניסה חורגת לרגע מהיעד ואז מתייצבת. אקספרסיבי ומלא חיים."
   },
   "Edge Spacing": {
     "Edge Spacing": "ריווח קצוות"
   },
   "Edge the launcher slides from": {
-    "Edge the launcher slides from": ""
+    "Edge the launcher slides from": "הקצה שממנו המשגר מחליק"
   },
   "Edit App": {
     "Edit App": "ערוך/ערכי אפליקציה"
@@ -2214,7 +2226,7 @@
     "Enable Do Not Disturb": "הפעלה של מצב ״נא לא להפריע״"
   },
   "Enable Frame": {
-    "Enable Frame": ""
+    "Enable Frame": "הפעל/י מסגרת"
   },
   "Enable History": {
     "Enable History": "הפעלת ההיסטוריה"
@@ -2409,7 +2421,7 @@
     "Exponential": "אקספוננציאלי"
   },
   "Expose the Arcs": {
-    "Expose the Arcs": ""
+    "Expose the Arcs": "חשוף/חשפי את הקשתות"
   },
   "Expressive": {
     "Expressive": "אקספרסיבי"
@@ -2454,7 +2466,7 @@
     "Failed to add printer to class": "הוספת המדפסת לסוג נכשלה"
   },
   "Failed to apply profile": {
-    "Failed to apply profile": ""
+    "Failed to apply profile": "החלת הפרופיל נכשלה"
   },
   "Failed to browse device": {
     "Failed to browse device": "הניסיון לעיין בהתקן נכשל"
@@ -2601,7 +2613,7 @@
     "Failed to save keybind": "שמירת קיצור המקלדת נכשלה"
   },
   "Failed to save profile": {
-    "Failed to save profile": ""
+    "Failed to save profile": "שמירת הפרופיל נכשלה"
   },
   "Failed to save profile file": {
     "Failed to save profile file": "שמירת קובץ פרופיל נכשלה"
@@ -2772,10 +2784,10 @@
     "Float": "צף"
   },
   "Fluent": {
-    "Fluent": ""
+    "Fluent": "Fluent"
   },
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: האטה חלקה פנימה, יציאה מהירה - עקומות נקיות ואלגנטיות."
   },
   "Focus": {
     "Focus": "מיקוד"
@@ -2901,16 +2913,16 @@
     "Found %1 packages to update:": "נמצאו %1 חבילות לעדכון:"
   },
   "Frame": {
-    "Frame": ""
+    "Frame": "מסגרת"
   },
   "Frame Blur": {
-    "Frame Blur": ""
+    "Frame Blur": "טשטוש המסגרת"
   },
   "Frame Blur follows Background Blur in Theme & Colors": {
-    "Frame Blur follows Background Blur in Theme & Colors": ""
+    "Frame Blur follows Background Blur in Theme & Colors": "טשטוש המסגרת עוקב אחר ההגדרה של ׳טשטוש רקע׳ ב׳ערכת נושא וצבעים׳"
   },
   "Frame Border Color": {
-    "Frame Border Color": ""
+    "Frame Border Color": "צבע הגבול של המסגרת"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "שחרר/י את הזיכרון (VRAM) כאשר המשגר נסגר. עלול לגרום לעיכוב קל בפתיחה מחדש."
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "הסתרת הווידג׳ט של מעדכן המערכת"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "הסתרה בעת ההקלדה"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "הסתר/י במגע"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "פלטת צבעים בנאמנות גבוהה המשמרת את גווני המקור."
@@ -3213,7 +3231,7 @@
     "Home": "בית"
   },
   "Horizontal and vertical bar thickness": {
-    "Horizontal and vertical bar thickness": ""
+    "Horizontal and vertical bar thickness": "עובי סרגל אופקי ואנכי"
   },
   "Host": {
     "Host": "מארח"
@@ -3435,7 +3453,7 @@
     "Installing: %1": "מתקין: %1"
   },
   "Integrations": {
-    "Integrations": ""
+    "Integrations": "אינטגרציות"
   },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "הסתרה אוטומטית חכמה"
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "הגדרה לא חוקית"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "היפוך בעת שינוי מצב"
@@ -3588,7 +3609,7 @@
     "Launcher Button Logo": "סמל כפתור המשגר"
   },
   "Launcher Emerge Side": {
-    "Launcher Emerge Side": ""
+    "Launcher Emerge Side": "צד הופעת המשגר"
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": "שקיפות קווי המתאר של השכבה"
@@ -3756,10 +3777,10 @@
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "נהל/י עד 4 תצורות סרגל עצמאיות. לכל סרגל יש מיקום, ווידג׳טים, סגנון והקצאת תצוגה משלו."
   },
   "Managed by Frame": {
-    "Managed by Frame": ""
+    "Managed by Frame": "מנוהל על ידי המסגרת"
   },
   "Managed by Frame in Connected Mode": {
-    "Managed by Frame in Connected Mode": ""
+    "Managed by Frame in Connected Mode": "מנוהל על ידי המסגרת במצב ״מחובר״"
   },
   "Management": {
     "Management": "ניהול"
@@ -3807,7 +3828,7 @@
     "Matches profile: %1": "תואם לפרופיל: %1"
   },
   "Material": {
-    "Material": ""
+    "Material": "Material"
   },
   "Material Colors": {
     "Material Colors": "צבעי Material"
@@ -3822,7 +3843,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "הצללות והגבהה בהשראת Material Design על חלוניות, חלונות קופצים ותיבות דו-שיח"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "חומרי: עקומות Bezier אקספרסיביות של Material Design 3. תחושת ברירת המחדל של DMS."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "ניגודיות Matugen"
@@ -4044,7 +4065,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "המסך שהרקע שלו קובע את צבעי ערכת הנושא הדינמית"
   },
   "Monitors in \"%1\":": {
-    "Monitors in \"%1\":": ""
+    "Monitors in \"%1\":": "מסכים ב\"%1\":"
   },
   "Monochrome": {
     "Monochrome": "מונוכרומטי"
@@ -4062,7 +4083,7 @@
     "Morning": "בוקר"
   },
   "Motion Effects": {
-    "Motion Effects": ""
+    "Motion Effects": "אפקטי תנועה"
   },
   "Mount Points": {
     "Mount Points": "נקודות עגינה"
@@ -4116,7 +4137,7 @@
     "Muted palette with subdued, calming tones.": "פלטת צבעים מעודנת עם גוונים רגועים ושקטים."
   },
   "My Online": {
-    "My Online": ""
+    "My Online": "המחוברים שלי"
   },
   "NM not supported": {
     "NM not supported": "NM אינו נתמך"
@@ -4126,6 +4147,9 @@
   },
   "Named Workspace Icons": {
     "Named Workspace Icons": "סמלים לסביבות עבודה בעלות שם"
+  },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
   },
   "Navigate": {
     "Navigate": "ניווט"
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "תצוגת מהירות הורדה והעלאה ברשת"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "נייטרלי"
@@ -4386,7 +4413,7 @@
     "No matches": "אין התאמות"
   },
   "No matching devices": {
-    "No matching devices": ""
+    "No matching devices": "אין התקנים תואמים"
   },
   "No matching processes": {
     "No matching processes": "אין תהליכים תואמים"
@@ -4407,7 +4434,7 @@
     "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "לא נמצא מנהל חבילות. אנא התקן/י את 'paru' או 'yay' כדי לבדוק עדכונים במערכות מבוססות Arch."
   },
   "No peers found": {
-    "No peers found": ""
+    "No peers found": "לא נמצאו עמיתים"
   },
   "No plugin results": {
     "No plugin results": "לא נמצאו תוספים"
@@ -4626,7 +4653,7 @@
     "Once a day": "פעם ביום"
   },
   "Online": {
-    "Online": ""
+    "Online": "מקוון"
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "כוונן/י את הגאמה רק לפי כללי זמן או מיקום."
@@ -4652,8 +4679,11 @@
   "Open App": {
     "Open App": "פתח/י אפליקציה"
   },
+  "Open Dir": {
+    "Open Dir": ""
+  },
   "Open Frame": {
-    "Open Frame": ""
+    "Open Frame": "פתח/י מסגרת"
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "פתח/י את KDE Connect בטלפון שלך"
@@ -4788,7 +4818,7 @@
     "Overwrite": "דריסה"
   },
   "Owner: %1": {
-    "Owner: %1": ""
+    "Owner: %1": "בעלים: %1"
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM כבר מספק אימות באמצעות טביעת אצבע. הפעל/י את ההזדהות כדי להציג אותה בכניסה."
@@ -5226,7 +5256,7 @@
     "Profile not found": "הפרופיל לא נמצא"
   },
   "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": ""
+    "Profile not found in monitors.json": "הפרופיל לא נמצא בקובץ monitors.json"
   },
   "Profile saved: %1": {
     "Profile saved: %1": "פרופיל נשמר: %1"
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "פרוטוקול"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia אינו זמין"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": "QtMultimedia אינו זמין - שומר מסך וידאו דורש שירותי מולטימדיה של Qt"
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "גישה מהירה"
@@ -5427,7 +5463,7 @@
     "Resume": "המשך"
   },
   "Reveal the arcs where surfaces meet the frame": {
-    "Reveal the arcs where surfaces meet the frame": ""
+    "Reveal the arcs where surfaces meet the frame": "חשוף/חשפי את הקשתות שבהן המשטחים פוגשים את המסגרת"
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "היפוך של כיוון הגלילה"
@@ -5637,10 +5673,13 @@
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "חפש/י לפי צירוף מקשים, תיאור או שם פעולה.\n\nפעולת ברירת מחדל מעתיקה את קיצור המקלדת ללוח ההעתקה.\nלחץ/י לחיצה ימנית או לחץ/י על חץ ימינה כדי להצמיד קיצורי מקלדת בשימוש תכוף - הם יופיעו בראש כשלא מחפשים."
   },
   "Search devices...": {
-    "Search devices...": ""
+    "Search devices...": "חפש/י התקנים..."
   },
   "Search for a location...": {
     "Search for a location...": "חפש/י מיקום..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "חפש/י קיצורי מקלדת..."
@@ -5805,7 +5844,7 @@
     "Sending": "שולח"
   },
   "Separate": {
-    "Separate": ""
+    "Separate": "נפרד"
   },
   "Separator": {
     "Separator": "מפריד"
@@ -6105,7 +6144,7 @@
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "הצג/י צל נופל על חלונות קופצים של התראות. דורש הפעלה של M3 Elevation (הגבהה) בערכת נושא וצבעים."
   },
   "Show during Niri overview": {
-    "Show during Niri overview": ""
+    "Show during Niri overview": "הצג/י במהלך הסקירה של Niri"
   },
   "Show foreground surfaces on blurred panels for stronger contrast": {
     "Show foreground surfaces on blurred panels for stronger contrast": "הצג/י משטחים קדמיים על פאנלים מטושטשים לניגודיות חזקה יותר"
@@ -6306,7 +6345,7 @@
     "Standard": "רגיל"
   },
   "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "סטנדרטי: עיצוב Material Design 3 קלאסי - הפאנלים עולים מלמטה עם שינוי גודל עדין. ברירת המחדל של DMS."
   },
   "Start": {
     "Start": "התחל/י"
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "מתיחה"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "פסים"
   },
@@ -6357,19 +6399,19 @@
     "Surface": "משטח"
   },
   "Surface Behavior": {
-    "Surface Behavior": ""
+    "Surface Behavior": "התנהגות המשטח"
   },
   "Surface Opacity": {
-    "Surface Opacity": ""
+    "Surface Opacity": "שקיפות המשטח"
   },
   "Surface Variant": {
     "Surface Variant": "גרסת משטח"
   },
   "Surfaces emerge flush from the bar": {
-    "Surfaces emerge flush from the bar": ""
+    "Surfaces emerge flush from the bar": "משטחים מופיעים בצמוד לסרגל"
   },
   "Surfaces float independently of the frame": {
-    "Surfaces float independently of the frame": ""
+    "Surfaces float independently of the frame": "משטחים צפים באופן עצמאי מהמסגרת"
   },
   "Suspend": {
     "Suspend": "השהיה"
@@ -6477,16 +6519,16 @@
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: ניווט • ←→↑↓: ניווט ברשת • Enter/Space: בחירה"
   },
   "Tags: %1": {
-    "Tags: %1": ""
+    "Tags: %1": "תגיות: %1"
   },
   "Tailscale": {
-    "Tailscale": ""
+    "Tailscale": "Tailscale"
   },
   "Tailscale Network": {
-    "Tailscale Network": ""
+    "Tailscale Network": "רשת Tailscale"
   },
   "Tailscale not available": {
-    "Tailscale not available": ""
+    "Tailscale not available": "Tailscale אינו זמין"
   },
   "Terminal": {
     "Terminal": "מסוף"
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": "צבע טקסט"
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "כלי 'dgop' נדרש לניטור מערכת.\nאנא התקן/י dgop כדי להשתמש בתכונה זו."
   },
@@ -6579,10 +6624,13 @@
     "This bind is overridden by config.kdl": "קיצור זה נדרס על ידי config.kdl"
   },
   "This device": {
-    "This device": ""
+    "This device": "התקן זה"
   },
   "This may take a few seconds": {
     "This may take a few seconds": "זה עשוי לקחת מספר שניות"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "לתוסף זה אין הרשאת 'settings_write'.\n\nהוסף/י \"permissions\": [\"settings_read\", \"settings_write\"] ל-plugin.json"
@@ -7038,7 +7086,7 @@
     "Use sound theme from system settings": "השתמש/י בערכת הצלילים מהגדרות המערכת"
   },
   "Use the extended surface for launcher content": {
-    "Use the extended surface for launcher content": ""
+    "Use the extended surface for launcher content": "השתמש/י במשטח המורחב עבור תוכן המשגר"
   },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "השתמש/י באותו מיקום וגודל בכל המסכים"
@@ -7437,7 +7485,7 @@
     "dgop not available": "dgop אינו זמין"
   },
   "direct": {
-    "direct": ""
+    "direct": "ישיר"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "הפרויקט DMS הוא מעטפת שולחן עבודה מודרנית וניתנת להתאמה אישית עם עיצוב בהשראת <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material Design 3</a> של גוגל.<br /><br/>היא נבנתה עם שפת התכנות <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a> ו<a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, ספריית QT6 לבניית מעטפות לשולחן העבודה."
@@ -7470,7 +7518,7 @@
     "featured": "מומלץ"
   },
   "last seen %1": {
-    "last seen %1": ""
+    "last seen %1": "נראה/תה לאחרונה %1"
   },
   "leave empty for default": {
     "leave empty for default": "השאר/י ריק לברירת מחדל"
@@ -7548,7 +7596,7 @@
     "r/niri Subreddit": "r/niri בReddit"
   },
   "relay: %1": {
-    "relay: %1": ""
+    "relay: %1": "ממסר: %1"
   },
   "seconds": {
     "seconds": "שניות"

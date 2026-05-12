@@ -1448,6 +1448,9 @@
   "Connected Options": {
     "Connected Options": ""
   },
+  "Connected to %1": {
+    "Connected to %1": ""
+  },
   "Connecting to Device": {
     "Connecting to Device": "デバイスに接続中"
   },
@@ -1666,6 +1669,9 @@
   },
   "Cursor Theme": {
     "Cursor Theme": "カーソルテーマ"
+  },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
   },
   "Custom": {
     "Custom": "カスタム"
@@ -1967,6 +1973,9 @@
   "Disabled": {
     "Disabled": "無効化されました"
   },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
+  },
   "Disabling WiFi...": {
     "Disabling WiFi...": "WiFi を無効化中..."
   },
@@ -2095,6 +2104,9 @@
   },
   "Dock Visibility": {
     "Dock Visibility": "ドックの表示"
+  },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
   },
   "Dock spacing, transparency, and border": {
     "Dock spacing, transparency, and border": ""
@@ -3146,6 +3158,9 @@
   "Hide Updater Widget": {
     "Hide Updater Widget": "アップデーターウィジェットを非表示"
   },
+  "Hide When Fullscreen": {
+    "Hide When Fullscreen": ""
+  },
   "Hide When Typing": {
     "Hide When Typing": "入力中は非表示"
   },
@@ -3172,6 +3187,9 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "タッチ時に非表示"
+  },
+  "Hide the dock when a window is fullscreen": {
+    "Hide the dock when a window is fullscreen": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "ソースの色相を保持する忠実度の高いパレット。"
@@ -3457,6 +3475,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "無効な設定"
+  },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "モード変更時に反転"
@@ -4127,6 +4148,9 @@
   "Named Workspace Icons": {
     "Named Workspace Icons": "名前付きワークスペースアイコン"
   },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
+  },
   "Navigate": {
     "Navigate": "移動"
   },
@@ -4156,6 +4180,9 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "ネットワークのダウンロードおよびアップロード速度を表示"
+  },
+  "Network not found": {
+    "Network not found": ""
   },
   "Neutral": {
     "Neutral": "中立"
@@ -4651,6 +4678,9 @@
   },
   "Open App": {
     "Open App": "アプリを開く"
+  },
+  "Open Dir": {
+    "Open Dir": ""
   },
   "Open Frame": {
     "Open Frame": ""
@@ -5234,11 +5264,17 @@
   "Protocol": {
     "Protocol": "プロトコル"
   },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia は利用できません"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": "QtMultimedia は利用できません - 動画スクリーンセーバーには Qt Multimedia サービスが必要です"
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "クイックアクセス"
@@ -5641,6 +5677,9 @@
   },
   "Search for a location...": {
     "Search for a location...": "ロケーションを検索..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "キーバインドを検索..."
@@ -6338,6 +6377,9 @@
   "Stretch": {
     "Stretch": "引き伸ばし"
   },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "ストライプ"
   },
@@ -6539,6 +6581,9 @@
   "Text Color": {
     "Text Color": "テキスト色"
   },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "システム監視には 'dgop' ツールが必要です。\nこの機能を使うには dgop をインストールしてください。"
   },
@@ -6583,6 +6628,9 @@
   },
   "This may take a few seconds": {
     "This may take a few seconds": "これには数秒かかる場合があります"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "このプラグインには 'settings_write' 権限がありません。\n\nplugin.json に \"permissions\": [\"settings_read\", \"settings_write\"] を追加してください"
