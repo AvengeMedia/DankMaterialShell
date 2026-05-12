@@ -23,6 +23,13 @@ const (
 	agentIdentifier     = "com.danklinux.NMAgent"
 )
 
+const (
+	nmSecretAgentFlagAllowInteraction = 0x1
+	nmSecretAgentFlagRequestNew       = 0x2
+	nmSecretAgentFlagUserRequested    = 0x4
+	nmSecretAgentFlagOnlySystem       = 0x80000000
+)
+
 type SecretAgent struct {
 	conn    *dbus.Conn
 	objPath dbus.ObjectPath
@@ -129,6 +136,21 @@ func (a *SecretAgent) GetSecrets(
 
 	log.Infof("[SecretAgent] connType=%s, name=%s, vpnSvc=%s, fields=%v, flags=%d, vpnPasswordFlags=%d", connType, displayName, vpnSvc, fields, flags, vpnPasswordFlags)
 
+	if flags&nmSecretAgentFlagOnlySystem != 0 {
+		log.Infof("[SecretAgent] ONLY_SYSTEM flag set, deferring to system secret storage")
+		return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
+	}
+
+	var connUuid string
+	if c, ok := conn["connection"]; ok {
+		if v, ok := c["uuid"]; ok {
+			if s, ok2 := v.Value().(string); ok2 {
+				connUuid = s
+			}
+		}
+	}
+
+	// Phase 1: Determine if this connection is ours and what fields we need.
 	if a.backend != nil {
 		a.backend.stateMutex.RLock()
 		isConnecting := a.backend.state.IsConnecting
@@ -145,15 +167,6 @@ func (a *SecretAgent) GetSecrets(
 				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 			}
 		case "vpn", "wireguard":
-			var connUuid string
-			if c, ok := conn["connection"]; ok {
-				if v, ok := c["uuid"]; ok {
-					if s, ok2 := v.Value().(string); ok2 {
-						connUuid = s
-					}
-				}
-			}
-
 			// If we're connecting to a VPN, only respond if it's the one we're connecting to
 			// This prevents interfering with nmcli/other tools when our app isn't connecting
 			if isConnectingVPN && connUuid != connectingVPNUUID {
@@ -163,6 +176,7 @@ func (a *SecretAgent) GetSecrets(
 		}
 	}
 
+	// Phase 2: Resolve fields from hints or password-flags.
 	if len(fields) == 0 {
 		if settingName == "vpn" {
 			if a.backend != nil {
@@ -230,41 +244,19 @@ func (a *SecretAgent) GetSecrets(
 					return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 				}
 				log.Infof("[SecretAgent] Agent-owned secrets, inferred fields: %v", fields)
+			} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_SAVED != 0 {
+				log.Infof("[SecretAgent] Secrets not saved, will need to prompt (flags=%d)", passwordFlags)
+				// Fall through — fields remain empty, prompt will be required.
 			} else {
-				log.Infof("[SecretAgent] No secrets needed, using system stored secrets (flags=%d)", passwordFlags)
-				out := nmSettingMap{}
-				out[settingName] = nmVariantMap{}
-				return out, nil
+				log.Infof("[SecretAgent] Secrets stored in NM config (flags=%d), deferring to system", passwordFlags)
+				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 			}
 		}
 	}
 
-	reason := reasonFromFlags(flags)
-	if a.manager != nil && connType == "802-11-wireless" && a.manager.WasRecentlyFailed(ssid) {
-		reason = "wrong-password"
-	}
-	if settingName == "vpn" && isPKCS11Auth(conn, vpnSvc) {
-		reason = "pkcs11"
-	}
-
-	var connId, connUuid string
-	if c, ok := conn["connection"]; ok {
-		if v, ok := c["id"]; ok {
-			if s, ok2 := v.Value().(string); ok2 {
-				connId = s
-			}
-		}
-		if v, ok := c["uuid"]; ok {
-			if s, ok2 := v.Value().(string); ok2 {
-				connUuid = s
-			}
-		}
-	}
-
+	// Phase 3: Cached VPN credentials — user-provided, take priority.
 	if settingName == "vpn" && a.backend != nil {
-		// Check for cached PKCS11 PIN first
-		isPKCS11Request := len(fields) == 1 && fields[0] == "key_pass"
-		if isPKCS11Request {
+		if isPKCS11Request := len(fields) == 1 && fields[0] == "key_pass"; isPKCS11Request {
 			a.backend.cachedPKCS11Mu.Lock()
 			cached := a.backend.cachedPKCS11PIN
 			if cached != nil && cached.ConnectionUUID == connUuid {
@@ -283,7 +275,6 @@ func (a *SecretAgent) GetSecrets(
 			a.backend.cachedPKCS11Mu.Unlock()
 		}
 
-		// Check for cached VPN password
 		a.backend.cachedVPNCredsMu.Lock()
 		cached := a.backend.cachedVPNCreds
 		if cached != nil && cached.ConnectionUUID == connUuid {
@@ -314,6 +305,7 @@ func (a *SecretAgent) GetSecrets(
 		a.backend.cachedGPSamlMu.Lock()
 		cachedGPSaml := a.backend.cachedGPSamlCookie
 		if cachedGPSaml != nil && cachedGPSaml.ConnectionUUID == connUuid {
+			a.backend.cachedGPSamlCookie = nil
 			a.backend.cachedGPSamlMu.Unlock()
 
 			log.Infof("[SecretAgent] Using cached GlobalProtect SAML cookie for %s", connUuid)
@@ -369,6 +361,37 @@ func (a *SecretAgent) GetSecrets(
 		}
 	}
 
+	// Phase 4: Non-interactive secret retrieval (keyring).
+	// Always try the keyring even when REQUEST_NEW is set — the vault may have
+	// been unlocked by a prior call's Prompt flow, making the lookup non-interactive.
+	if secretOut := a.trySecretService(connUuid, settingName, fields); secretOut != nil {
+		return secretOut, nil
+	}
+
+	// Phase 5: If interaction is not allowed, we're done.
+	if flags&nmSecretAgentFlagAllowInteraction == 0 {
+		log.Infof("[SecretAgent] ALLOW_INTERACTION not set, cannot prompt user")
+		return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
+	}
+
+	// Phase 6: Prepare prompt.
+	reason := reasonFromFlags(flags)
+	if a.manager != nil && connType == "802-11-wireless" && a.manager.WasRecentlyFailed(ssid) {
+		reason = "wrong-password"
+	}
+	if settingName == "vpn" && isPKCS11Auth(conn, vpnSvc) {
+		reason = "pkcs11"
+	}
+
+	var connId string
+	if c, ok := conn["connection"]; ok {
+		if v, ok := c["id"]; ok {
+			if s, ok2 := v.Value().(string); ok2 {
+				connId = s
+			}
+		}
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
@@ -403,6 +426,7 @@ func (a *SecretAgent) GetSecrets(
 			wasConnectingVPN := a.backend.state.IsConnectingVPN
 			cancelledSSID := a.backend.state.ConnectingSSID
 			cancelledVPNUUID := a.backend.state.ConnectingVPNUUID
+			connPreExisting := a.backend.state.ConnectingPreExisting
 			if wasConnecting || wasConnectingVPN {
 				log.Infof("[SecretAgent] Clearing connecting state due to cancelled prompt")
 				a.backend.state.IsConnecting = false
@@ -414,7 +438,8 @@ func (a *SecretAgent) GetSecrets(
 
 			// If this was a WiFi connection that was just cancelled, remove the connection profile
 			// (it was created with AddConnection but activation was cancelled)
-			if wasConnecting && cancelledSSID != "" && connType == "802-11-wireless" {
+			// Only do this for newly created connections, not pre-existing ones.
+			if wasConnecting && cancelledSSID != "" && connType == "802-11-wireless" && !connPreExisting {
 				log.Infof("[SecretAgent] Removing connection profile for cancelled WiFi connection: %s", cancelledSSID)
 				if err := a.backend.ForgetWiFiNetwork(cancelledSSID); err != nil {
 					log.Warnf("[SecretAgent] Failed to remove cancelled connection profile: %v", err)
@@ -623,7 +648,7 @@ func fieldsNeeded(setting string, hints []string, conn map[string]nmVariantMap) 
 			return hints
 		}
 		return infer8021xFields(conn)
-	case "vpn":
+	case "vpn", "wireguard":
 		return hints
 	default:
 		return []string{}

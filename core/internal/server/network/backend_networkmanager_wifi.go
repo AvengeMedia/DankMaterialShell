@@ -245,18 +245,34 @@ func (b *NetworkManagerBackend) GetWiFiQRCodeContent(ssid string) (string, error
 		return "", fmt.Errorf("QR code generation only supports WPA connections, `%s` uses %s", ssid, securityType)
 	}
 
+	var psk string
+
 	secrets, err := conn.GetSecrets("802-11-wireless-security")
 	if err != nil {
-		return "", fmt.Errorf("failed to retrieve connection secrets for `%s`: %w", ssid, err)
+		log.Debugf("[GetWiFiQRCodeContent] conn.GetSecrets failed: %v, falling back to secret service", err)
+	} else if secSecrets, ok := secrets["802-11-wireless-security"]; ok {
+		if s, ok := secSecrets["psk"].(string); ok {
+			psk = s
+		}
 	}
 
-	secSecrets, ok := secrets["802-11-wireless-security"]
-	if !ok {
-		return "", fmt.Errorf("failed to retrieve password for `%s`", ssid)
+	if psk == "" {
+		uuid := ""
+		if connMeta, ok := connSettings["connection"]; ok {
+			if u, ok := connMeta["uuid"].(string); ok {
+				uuid = u
+			}
+		}
+		if uuid != "" {
+			sess, err := openSecretService()
+			if err == nil {
+				psk = sess.lookup(uuid, "802-11-wireless-security", "psk")
+				sess.close()
+			}
+		}
 	}
 
-	psk, ok := secSecrets["psk"].(string)
-	if !ok {
+	if psk == "" {
 		return "", fmt.Errorf("failed to retrieve password for `%s`", ssid)
 	}
 
@@ -611,6 +627,7 @@ func (b *NetworkManagerBackend) findConnection(ssid string) (gonetworkmanager.Co
 						if bytes.Equal(candidateSSID, ssidBytes) {
 							return conn, nil
 						}
+						log.Debugf("[findConnection] SSID mismatch: stored=%q, request=%q", string(candidateSSID), ssid)
 					}
 				}
 			}
