@@ -54,14 +54,6 @@ Item {
         }
 
         DankActionButton {
-            iconName: "history"
-            iconSize: Theme.iconSize - 4
-            iconColor: header.activeTab === "recents" ? Theme.primary : Theme.surfaceText
-            tooltipText: I18n.tr("History")
-            onClicked: tabChanged("recents")
-        }
-
-        DankActionButton {
             iconName: "info"
             iconSize: Theme.iconSize - 4
             iconColor: showKeyboardHints ? Theme.primary : Theme.surfaceText
