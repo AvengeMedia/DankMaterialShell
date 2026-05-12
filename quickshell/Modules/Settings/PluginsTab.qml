@@ -250,11 +250,15 @@ FocusScope {
                         }
 
                         DankButton {
-                            text: I18n.tr("Create Dir")
-                            iconName: "create_new_folder"
+                            text: PluginService.pluginDirectoryExists ? I18n.tr("Open Dir") : I18n.tr("Create Dir")
+                            iconName: PluginService.pluginDirectoryExists ? "folder_open" : "create_new_folder"
                             onClicked: {
-                                PluginService.createPluginDirectory();
-                                ToastService.showInfo("Created plugin directory: " + PluginService.pluginDirectory);
+                                if (PluginService.pluginDirectoryExists) {
+                                    PluginService.openPluginDirectory();
+                                } else {
+                                    PluginService.createPluginDirectory();
+                                    ToastService.showInfo("Created plugin directory: " + PluginService.pluginDirectory);
+                                }
                             }
                         }
                     }

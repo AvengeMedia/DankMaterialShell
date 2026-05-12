@@ -20,14 +20,9 @@ Singleton {
     property var pluginLauncherComponents: ({})
     property var pluginDesktopComponents: ({})
     property var availablePluginsList: []
-    property string pluginDirectory: {
-        var configDir = StandardPaths.writableLocation(StandardPaths.ConfigLocation);
-        var configDirStr = configDir.toString();
-        if (configDirStr.startsWith("file://")) {
-            configDirStr = configDirStr.substring(7);
-        }
-        return configDirStr + "/DankMaterialShell/plugins";
-    }
+    readonly property string pluginDirectory: Paths.strip(Paths.config) + "/plugins"
+
+    property bool pluginDirectoryExists: false
     property string systemPluginDirectory: "/etc/xdg/quickshell/dms-plugins"
 
     property var knownManifests: ({})
@@ -64,10 +59,23 @@ Singleton {
         onTriggered: root._flushDirtyStates()
     }
 
+    Process {
+        id: directoryCheckProcess
+        command: ["test", "-d", root.pluginDirectory]
+        onExited: (exitCode) => {
+            root.pluginDirectoryExists = (exitCode === 0);
+        }
+    }
+
+    function checkPluginDirectoryExists() {
+        directoryCheckProcess.running = true;
+    }
+
     Component.onCompleted: {
         userWatcher.folder = Paths.toFileUrl(root.pluginDirectory);
         systemWatcher.folder = Paths.toFileUrl(root.systemPluginDirectory);
         Qt.callLater(resyncAll);
+        Qt.callLater(checkPluginDirectoryExists);
     }
 
     FolderListModel {
@@ -758,6 +766,7 @@ Singleton {
         systemWatcher.folder = "";
         systemWatcher.folder = systemUrl;
         resyncDebounce.restart();
+        checkPluginDirectoryExists();
     }
 
     function forceRescanPlugin(pluginId) {
@@ -775,6 +784,12 @@ Singleton {
 
     function createPluginDirectory() {
         Quickshell.execDetached(["mkdir", "-p", pluginDirectory]);
+        Qt.callLater(checkPluginDirectoryExists);
+        return true;
+    }
+
+    function openPluginDirectory() {
+        Qt.openUrlExternally(Paths.toFileUrl(pluginDirectory));
         return true;
     }
 
