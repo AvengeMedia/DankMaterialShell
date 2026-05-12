@@ -49,8 +49,8 @@ Item {
             iconSize: Theme.iconSize - 4
             iconColor: header.activeTab === "saved" ? Theme.primary : Theme.surfaceText
             visible: header.pinnedCount > 0
-            tooltipText: I18n.tr("Saved")
-            onClicked: tabChanged("saved")
+            tooltipText: header.activeTab === "saved" ? I18n.tr("Recent") : I18n.tr("Saved")
+            onClicked: tabChanged(header.activeTab === "saved" ? "recents" : "saved")
         }
 
         DankActionButton {
