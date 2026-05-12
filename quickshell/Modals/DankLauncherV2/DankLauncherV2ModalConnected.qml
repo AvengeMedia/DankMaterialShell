@@ -802,14 +802,31 @@ Item {
                 id: directionalClipMask
                 readonly property bool shouldClip: Theme.isDirectionalEffect
                 readonly property real clipOversize: 2000
+                readonly property bool connectedClip: root.frameOwnsConnectedChrome
+                readonly property bool clipLeft: connectedClip ? root.resolvedConnectedBarSide === "left" : contentContainer.dockLeft
+                readonly property bool clipRight: connectedClip ? root.resolvedConnectedBarSide === "right" : contentContainer.dockRight
+                readonly property bool clipTop: connectedClip ? root.resolvedConnectedBarSide === "top" : contentContainer.dockTop
+                readonly property bool clipBottom: connectedClip ? root.resolvedConnectedBarSide === "bottom" : contentContainer.dockBottom
 
                 clip: shouldClip
 
-                x: shouldClip ? (contentContainer.dockRight ? -clipOversize : (contentContainer.dockLeft ? contentContainer.dockThickness - root._ccX : -clipOversize)) : 0
-                y: shouldClip ? (contentContainer.dockBottom ? -clipOversize : (contentContainer.dockTop ? contentContainer.dockThickness - root._ccY : -clipOversize)) : 0
+                x: shouldClip ? (clipLeft ? (connectedClip ? 0 : contentContainer.dockThickness - root._ccX) : -clipOversize) : 0
+                y: shouldClip ? (clipTop ? (connectedClip ? 0 : contentContainer.dockThickness - root._ccY) : -clipOversize) : 0
 
-                width: shouldClip ? parent.width + clipOversize + (contentContainer.dockRight ? (root.screenWidth - contentContainer.dockThickness - root._ccX - parent.width) : (contentContainer.dockLeft ? clipOversize : clipOversize)) : parent.width
-                height: shouldClip ? parent.height + clipOversize + (contentContainer.dockBottom ? (root.screenHeight - contentContainer.dockThickness - root._ccY - parent.height) : (contentContainer.dockTop ? clipOversize : clipOversize)) : parent.height
+                width: {
+                    if (!shouldClip)
+                        return parent.width;
+                    if (connectedClip && (clipLeft || clipRight))
+                        return parent.width + clipOversize;
+                    return parent.width + clipOversize + (clipRight ? (root.screenWidth - contentContainer.dockThickness - root._ccX - parent.width) : clipOversize);
+                }
+                height: {
+                    if (!shouldClip)
+                        return parent.height;
+                    if (connectedClip && (clipTop || clipBottom))
+                        return parent.height + clipOversize;
+                    return parent.height + clipOversize + (clipBottom ? (root.screenHeight - contentContainer.dockThickness - root._ccY - parent.height) : clipOversize);
+                }
 
                 Item {
                     id: aligner
