@@ -281,6 +281,7 @@ func (b *NetworkManagerBackend) ConnectWiFi(req ConnectionRequest) error {
 	b.state.IsConnecting = true
 	b.state.ConnectingSSID = req.SSID
 	b.state.ConnectingDevice = req.Device
+	b.state.ConnectingPreExisting = false
 	b.state.LastError = ""
 	b.stateMutex.Unlock()
 
@@ -292,6 +293,9 @@ func (b *NetworkManagerBackend) ConnectWiFi(req ConnectionRequest) error {
 
 	existingConn, err := b.findConnection(req.SSID)
 	if err == nil && existingConn != nil {
+		b.stateMutex.Lock()
+		b.state.ConnectingPreExisting = true
+		b.stateMutex.Unlock()
 		_, err := nm.ActivateConnection(existingConn, devInfo.device, nil)
 		if err != nil {
 			log.Warnf("[ConnectWiFi] Failed to activate existing connection: %v", err)
