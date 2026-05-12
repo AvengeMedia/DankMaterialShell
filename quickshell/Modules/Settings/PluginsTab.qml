@@ -257,6 +257,14 @@ FocusScope {
                                 ToastService.showInfo("Created plugin directory: " + PluginService.pluginDirectory);
                             }
                         }
+
+                        DankButton {
+                            text: I18n.tr("Open Dir")
+                            iconName: "folder_open"
+                            onClicked: {
+                                PluginService.openPluginDirectory();
+                            }
+                        }
                     }
                 }
             }

@@ -778,6 +778,11 @@ Singleton {
         return true;
     }
 
+    function openPluginDirectory() {
+        Quickshell.execDetached(["xdg-open", pluginDirectory]);
+        return true;
+    }
+
     // Launcher plugin helper functions
     function getLauncherPlugins() {
         const launchers = {};
