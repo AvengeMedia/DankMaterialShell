@@ -1,0 +1,14 @@
+{
+    "id": "myLauncher",
+    "name": "My Launcher",
+    "description": "Custom launcher plugin with searchable items",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "type": "launcher",
+    "capabilities": ["launcher"],
+    "component": "./Launcher.qml",
+    "trigger": "#",
+    "icon": "search",
+    "settings": "./Settings.qml",
+    "permissions": ["settings_read", "settings_write"]
+}

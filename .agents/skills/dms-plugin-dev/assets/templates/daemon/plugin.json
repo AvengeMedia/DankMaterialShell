@@ -1,0 +1,13 @@
+{
+    "id": "myDaemon",
+    "name": "My Daemon",
+    "description": "A background service that reacts to events",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "type": "daemon",
+    "capabilities": ["background-service"],
+    "component": "./Daemon.qml",
+    "icon": "settings",
+    "settings": "./Settings.qml",
+    "permissions": ["settings_read", "settings_write", "process"]
+}
