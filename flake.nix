@@ -192,6 +192,8 @@
         }
       );
 
+      lib = { inherit mkDmsShell buildDmsPkgs; };
+
       homeModules.dank-material-shell = mkModuleWithDmsPkgs ./distro/nix/home.nix;
 
       homeModules.default = self.homeModules.dank-material-shell;
