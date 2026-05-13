@@ -135,6 +135,12 @@ Item {
                 }
                 builtinInstance = widgetModel.tailscaleBuiltinInstance;
             }
+            if (builtinId === "builtin_display_profiles") {
+                if (widgetModel?.displayProfilesLoader) {
+                    widgetModel.displayProfilesLoader.active = true;
+                }
+                builtinInstance = widgetModel.displayProfilesBuiltinInstance;
+            }
 
             if (!builtinInstance || !builtinInstance.ccDetailContent) {
                 return;

@@ -924,6 +924,12 @@ Column {
                     }
                     builtinInstance = Qt.binding(() => root.model?.tailscaleBuiltinInstance);
                 }
+                if (id === "builtin_display_profiles") {
+                    if (root.model?.displayProfilesLoader) {
+                        root.model.displayProfilesLoader.active = true;
+                    }
+                    builtinInstance = Qt.binding(() => root.model?.displayProfilesBuiltinInstance);
+                }
             }
 
             sourceComponent: {
