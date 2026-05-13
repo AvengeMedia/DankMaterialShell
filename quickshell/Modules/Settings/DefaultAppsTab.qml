@@ -201,7 +201,9 @@ Item {
     Component {
         id: xdgGetDefaultTerminal
         Process {
-            command: ["sh", "-c", "xdg-terminal-exec --print-id | head -1"]
+			property string configPath: Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")
+
+            command: ["sh", "-c", `cat '${configPath}/xdg-terminals.list'`]
             stdout: StdioCollector {
                 onStreamFinished: {
                     const defaultTerminal = text.trim();
