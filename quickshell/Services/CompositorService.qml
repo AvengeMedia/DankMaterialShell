@@ -422,8 +422,7 @@ Singleton {
 
             const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
             for (let i = 0; i < filtered.length; i++) {
-                const toplevel = filtered[i];
-                if (toplevel?.fullscreen && toplevel?.activated)
+                if (filtered[i]?.fullscreen)
                     return true;
             }
             return false;

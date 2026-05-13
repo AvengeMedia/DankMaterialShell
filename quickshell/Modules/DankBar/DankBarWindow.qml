@@ -317,7 +317,15 @@ PanelWindow {
     property string screenName: modelData.name
 
     property bool hasMaximizedToplevel: false
-    property bool hasFullscreenToplevel: false
+    readonly property bool hasFullscreenToplevel: {
+        if (!(barConfig?.fullscreenDetection ?? true))
+            return false;
+        CompositorService.sortedToplevels;
+        ToplevelManager.activeToplevel;
+        if (CompositorService.isNiri)
+            NiriService.allWorkspaces;
+        return CompositorService.hasFullscreenToplevelOnScreen(screenName);
+    }
     property bool shouldHideForWindows: false
 
     function _updateHasMaximizedToplevel() {
@@ -338,14 +346,6 @@ PanelWindow {
             }
         }
         hasMaximizedToplevel = false;
-    }
-
-    function _updateHasFullscreenToplevel() {
-        if (!(barConfig?.fullscreenDetection ?? true)) {
-            hasFullscreenToplevel = false;
-            return;
-        }
-        hasFullscreenToplevel = CompositorService.hasFullscreenToplevelOnScreen(screenName);
     }
 
     function _updateShouldHideForWindows() {
@@ -546,7 +546,6 @@ PanelWindow {
         updateGpuTempConfig();
         _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
-        _updateHasFullscreenToplevel();
         _updateShouldHideForWindows();
     }
 
@@ -589,7 +588,6 @@ PanelWindow {
             barWindow.updateGpuTempConfig();
             barWindow._updateBackgroundAlpha();
             barWindow._updateHasMaximizedToplevel();
-            barWindow._updateHasFullscreenToplevel();
             barWindow._updateShouldHideForWindows();
         }
 
@@ -607,7 +605,6 @@ PanelWindow {
         target: CompositorService
         function onToplevelsChanged() {
             barWindow._updateHasMaximizedToplevel();
-            barWindow._updateHasFullscreenToplevel();
             barWindow._updateShouldHideForWindows();
         }
     }
@@ -616,15 +613,7 @@ PanelWindow {
         target: NiriService
         function onAllWorkspacesChanged() {
             barWindow._updateHasMaximizedToplevel();
-            barWindow._updateHasFullscreenToplevel();
             barWindow._updateShouldHideForWindows();
-        }
-    }
-
-    Connections {
-        target: ToplevelManager
-        function onActiveToplevelChanged() {
-            barWindow._updateHasFullscreenToplevel();
         }
     }
 
