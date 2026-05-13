@@ -1324,6 +1324,10 @@ Item {
                                                         NetworkService.disconnectWifi();
                                                         return;
                                                     }
+                                                    if (modelData.secured && !modelData.saved && (DMSService.apiVersion < 7 || modelData.enterprise)) {
+                                                        PopoutService.showWifiPasswordModal(modelData.ssid);
+                                                        return;
+                                                    }
                                                     NetworkService.connectToWifi(modelData.ssid);
                                                 }
                                             }
