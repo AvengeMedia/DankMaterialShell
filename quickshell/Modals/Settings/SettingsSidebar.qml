@@ -160,13 +160,6 @@ Rectangle {
                     "tabIndex": 18
                 },
                 {
-                    "id": "running_apps",
-                    "text": I18n.tr("Running Apps"),
-                    "icon": "app_registration",
-                    "tabIndex": 19,
-                    "hyprlandNiriOnly": true
-                },
-                {
                     "id": "updater",
                     "text": I18n.tr("System Updater"),
                     "icon": "refresh",
@@ -184,7 +177,7 @@ Rectangle {
         {
             "id": "dock_launcher",
             "text": I18n.tr("Dock & Launcher"),
-            "icon": "apps",
+            "icon": "shelf_auto_hide",
             "collapsedByDefault": true,
             "children": [
                 {
@@ -240,6 +233,28 @@ Rectangle {
             "icon": "wifi",
             "tabIndex": 7,
             "dmsOnly": true
+        },
+        {
+            "id": "applications",
+            "text": I18n.tr("Applications"),
+            "icon": "apps",
+            "collapsedByDefault": true,
+            "children": [
+                {
+                    "id": "default_apps",
+                    "text": I18n.tr("Default Apps"),
+                    "icon": "star",
+                    "tabIndex": 34,
+					"gioOnly": true
+                },
+                {
+                    "id": "running_apps",
+                    "text": I18n.tr("Running Apps"),
+                    "icon": "app_registration",
+                    "tabIndex": 19,
+                    "hyprlandNiriOnly": true
+                }
+            ]
         },
         {
             "id": "system",
@@ -349,6 +364,8 @@ Rectangle {
             return false;
         if (item.updaterOnly && !SystemUpdateService.sysupdateAvailable)
             return false;
+		if (item.gioOnly && !DesktopService.gioAvailable)
+			return false;
         return true;
     }
 
