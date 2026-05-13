@@ -4,7 +4,9 @@ import (
 	"testing"
 
 	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
+	gonetworkmanager "github.com/Wifx/gonetworkmanager/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNetworkManagerBackend_GetWiFiEnabled(t *testing.T) {
@@ -199,4 +201,102 @@ func TestNetworkManagerBackend_CreateAndConnectWiFi_NoDevice(t *testing.T) {
 	err = backend.createAndConnectWiFi(req)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "no WiFi device available")
+}
+
+func TestNetworkManagerBackend_EnterpriseInteractive_PasswordFlagsAgentOwned(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockDev := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	mockAP := mock_gonetworkmanager.NewMockAccessPoint(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+	mockActiveConn := mock_gonetworkmanager.NewMockActiveConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
+
+	const iface = "wlan0"
+	backend.wifiDevice = mockDev
+	backend.wifiDev = mockDev
+	backend.wifiDevices = map[string]*wifiDeviceInfo{
+		iface: {device: mockDev, wireless: mockDev, name: iface, hwAddress: "00:11:22:33:44:55"},
+	}
+	backend.settings = mockSettings
+
+	const KeyMgmt8021x = 512
+
+	mockDev.EXPECT().GetPropertyInterface().Return(iface, nil)
+	mockDev.EXPECT().GetAccessPoints().Return([]gonetworkmanager.AccessPoint{mockAP}, nil)
+	mockAP.EXPECT().GetPropertySSID().Return("EnterpriseNet", nil)
+	mockAP.EXPECT().GetPropertyFlags().Return(uint32(0), nil)
+	mockAP.EXPECT().GetPropertyWPAFlags().Return(uint32(KeyMgmt8021x), nil)
+	mockAP.EXPECT().GetPropertyRSNFlags().Return(uint32(0), nil)
+
+	var captured map[string]map[string]any
+	mockSettings.EXPECT().
+		AddConnection(mock.Anything).
+		Run(func(s gonetworkmanager.ConnectionSettings) { captured = map[string]map[string]any(s) }).
+		Return(mockConn, nil)
+
+	mockNM.EXPECT().
+		ActivateWirelessConnection(mockConn, mock.Anything, mockAP).
+		Return(mockActiveConn, nil)
+
+	req := ConnectionRequest{SSID: "EnterpriseNet", Interactive: true}
+	err = backend.createAndConnectWiFi(req)
+	assert.NoError(t, err)
+
+	dot1x, ok := captured["802-1x"]
+	if !ok {
+		t.Fatal("expected 802-1x settings")
+	}
+	assert.Equal(t, uint32(1), dot1x["password-flags"], "interactive enterprise should use AgentOwned password-flags")
+}
+
+func TestNetworkManagerBackend_EnterpriseNonInteractive_PasswordFlagsNone(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockDev := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	mockAP := mock_gonetworkmanager.NewMockAccessPoint(t)
+	mockActiveConn := mock_gonetworkmanager.NewMockActiveConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
+
+	const iface = "wlan0"
+	backend.wifiDevice = mockDev
+	backend.wifiDev = mockDev
+	backend.wifiDevices = map[string]*wifiDeviceInfo{
+		iface: {device: mockDev, wireless: mockDev, name: iface, hwAddress: "00:11:22:33:44:55"},
+	}
+
+	const KeyMgmt8021x = 512
+
+	mockDev.EXPECT().GetPropertyInterface().Return(iface, nil)
+	mockDev.EXPECT().GetAccessPoints().Return([]gonetworkmanager.AccessPoint{mockAP}, nil)
+	mockAP.EXPECT().GetPropertySSID().Return("EnterpriseNet", nil)
+	mockAP.EXPECT().GetPropertyFlags().Return(uint32(0), nil)
+	mockAP.EXPECT().GetPropertyWPAFlags().Return(uint32(KeyMgmt8021x), nil)
+	mockAP.EXPECT().GetPropertyRSNFlags().Return(uint32(0), nil)
+
+	var captured map[string]map[string]any
+	mockNM.EXPECT().
+		AddAndActivateWirelessConnection(mock.Anything, mockDev, mockAP).
+		Run(func(s map[string]map[string]any, _ gonetworkmanager.Device, _ gonetworkmanager.AccessPoint) {
+			captured = s
+		}).
+		Return(mockActiveConn, nil)
+
+	req := ConnectionRequest{
+		SSID: "EnterpriseNet", Password: "pass123", Username: "user@e.com",
+		Interactive: false,
+	}
+	err = backend.createAndConnectWiFi(req)
+	assert.NoError(t, err)
+
+	dot1x, ok := captured["802-1x"]
+	if !ok {
+		t.Fatal("expected 802-1x settings")
+	}
+	assert.Equal(t, uint32(0), dot1x["password-flags"], "non-interactive enterprise should use None password-flags")
+	assert.Equal(t, "pass123", dot1x["password"])
+	assert.Equal(t, "user@e.com", dot1x["identity"])
 }
