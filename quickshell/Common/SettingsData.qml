@@ -259,7 +259,7 @@ Singleton {
     property bool frameLauncherArcExtender: false
     onFrameLauncherArcExtenderChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
-    property string frameMode: "separate"
+    property string frameMode: "connected"
     onFrameModeChanged: saveSettings()
     property var connectedFrameBarStyleBackups: ({})
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
