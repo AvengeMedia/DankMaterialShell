@@ -1726,6 +1726,22 @@ Item {
             return `PROFILE_SET_SUCCESS: ${profileName}`;
         }
 
+        function cycleProfile(): string {
+            if (SettingsData.displayProfileAutoSelect)
+                return "ERROR: Auto profile selection is enabled. Use toggleAuto first";
+
+            const profiles = DisplayConfigState.validatedProfiles;
+            const ids = Object.keys(profiles).filter(id => profiles[id].name);
+            if (ids.length === 0)
+                return "ERROR: No profiles configured";
+
+            const activeId = SettingsData.getActiveDisplayProfile(CompositorService.compositor);
+            const idx = ids.indexOf(activeId);
+            const nextId = ids[(idx + 1) % ids.length];
+            DisplayConfigState.activateProfile(nextId);
+            return `PROFILE_SET_SUCCESS: ${profiles[nextId].name}`;
+        }
+
         function toggleAuto(): string {
             SettingsData.displayProfileAutoSelect = !SettingsData.displayProfileAutoSelect;
             SettingsData.saveSettings();
