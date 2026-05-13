@@ -107,6 +107,9 @@ vim/
 
 bin/
 
+# Core dumps
+core.*
+
 # direnv
 .envrc
 .direnv/

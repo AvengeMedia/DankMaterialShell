@@ -339,6 +339,41 @@ func TestInferVPNFields_GPSaml(t *testing.T) {
 	}
 }
 
+func TestSecretAgent_GetSecrets_OnlySystemFlag(t *testing.T) {
+	agent := &SecretAgent{}
+	conn := map[string]nmVariantMap{
+		"connection": {
+			"id":   dbus.MakeVariant("TestWiFi"),
+			"type": dbus.MakeVariant("802-11-wireless"),
+		},
+		"802-11-wireless": {
+			"ssid": dbus.MakeVariant("TestSSID"),
+		},
+	}
+
+	_, err := agent.GetSecrets(conn, "/test/path", "802-11-wireless-security", nil, 0x80000000)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "NoSecrets")
+}
+
+func TestSecretAgent_GetSecrets_NoInteractionFlag(t *testing.T) {
+	agent := &SecretAgent{}
+	conn := map[string]nmVariantMap{
+		"connection": {
+			"id":   dbus.MakeVariant("TestWiFi"),
+			"type": dbus.MakeVariant("802-11-wireless"),
+		},
+		"802-11-wireless": {
+			"ssid": dbus.MakeVariant("TestSSID"),
+		},
+	}
+
+	// flags=0 means ALLOW_INTERACTION is not set
+	_, err := agent.GetSecrets(conn, "/test/path", "802-11-wireless-security", nil, 0x0)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "NoSecrets")
+}
+
 func TestNmVariantMap(t *testing.T) {
 	// Test that nmVariantMap and nmSettingMap work correctly
 	settingMap := make(nmSettingMap)
