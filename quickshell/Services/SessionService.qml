@@ -116,7 +116,7 @@ Singleton {
                 errorOutput = "";
                 return;
             }
-            ToastService.showError("Hibernate failed", errorOutput);
+            ToastService.showError(I18n.tr("Hibernate failed"), errorOutput);
             errorOutput = "";
         }
     }

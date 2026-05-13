@@ -373,7 +373,7 @@ Singleton {
             if (wifiConnected && currentWifiSSID === pendingConnectionSSID && wifiIP) {
                 const elapsed = Date.now() - pendingConnectionStartTime;
                 log.info("Successfully connected to", pendingConnectionSSID, "in", elapsed, "ms");
-                ToastService.showInfo(`Connected to ${pendingConnectionSSID}`);
+                ToastService.showInfo(I18n.tr("Connected to %1").arg(pendingConnectionSSID));
 
                 if (userPreference === "wifi" || userPreference === "auto") {
                     setConnectionPriority("wifi");

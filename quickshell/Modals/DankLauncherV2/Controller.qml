@@ -125,7 +125,7 @@ Item {
         if (!selectedItem)
             return;
         if (!SessionService.wtypeAvailable) {
-            ToastService.showError("wtype not available - install wtype for paste support");
+            ToastService.showError(I18n.tr("wtype not available - install wtype for paste support"));
             return;
         }
 

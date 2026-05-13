@@ -11,8 +11,8 @@ DankModal {
 
     property string confirmTitle: ""
     property string confirmMessage: ""
-    property string confirmButtonText: "Confirm"
-    property string cancelButtonText: "Cancel"
+    property string confirmButtonText: I18n.tr("Confirm")
+    property string cancelButtonText: I18n.tr("Cancel")
     property color confirmButtonColor: Theme.primary
     property var onConfirm: function () {}
     property var onCancel: function () {}
@@ -22,8 +22,8 @@ DankModal {
     function show(title, message, onConfirmCallback, onCancelCallback) {
         confirmTitle = title || "";
         confirmMessage = message || "";
-        confirmButtonText = "Confirm";
-        cancelButtonText = "Cancel";
+        confirmButtonText = I18n.tr("Confirm");
+        cancelButtonText = I18n.tr("Cancel");
         confirmButtonColor = Theme.primary;
         onConfirm = onConfirmCallback || (() => {});
         onCancel = onCancelCallback || (() => {});
@@ -35,8 +35,8 @@ DankModal {
     function showWithOptions(options) {
         confirmTitle = options.title || "";
         confirmMessage = options.message || "";
-        confirmButtonText = options.confirmText || "Confirm";
-        cancelButtonText = options.cancelText || "Cancel";
+        confirmButtonText = options.confirmText || I18n.tr("Confirm");
+        cancelButtonText = options.cancelText || I18n.tr("Cancel");
         confirmButtonColor = options.confirmColor || Theme.primary;
         onConfirm = options.onConfirm || (() => {});
         onCancel = options.onCancel || (() => {});

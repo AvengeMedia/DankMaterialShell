@@ -52,7 +52,7 @@ DankModal {
             ssid: ssid
         }, response => {
             if (response.error) {
-                ToastService.showError("Failed to fetch network QR code: ", JSON.stringify(response.error));
+                ToastService.showError(I18n.tr("Failed to fetch network QR code: %1").arg(JSON.stringify(response.error)));
             } else if (response.result) {
                 themedQrCodePath = response.result[0];
                 normalQrCodePath = response.result[1];
@@ -66,7 +66,7 @@ DankModal {
             path: path
         }, response => {
             if (response.error) {
-                ToastService.showError(`Failed to remove QR code at ${path}: `, JSON.stringify(response.error));
+                ToastService.showError(I18n.tr("Failed to remove QR code at %1: %2").arg(path).arg(JSON.stringify(response.error)));
             }
         })
     }

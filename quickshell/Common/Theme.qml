@@ -1859,7 +1859,7 @@ Singleton {
     function applyGtkColors() {
         if (!matugenAvailable) {
             if (typeof ToastService !== "undefined") {
-                ToastService.showError("matugen not available or disabled - cannot apply GTK colors");
+                ToastService.showError(I18n.tr("matugen not available or disabled - cannot apply GTK colors"));
             }
             return;
         }
@@ -1868,11 +1868,11 @@ Singleton {
         Proc.runCommand("gtkApplier", [shellDir + "/scripts/gtk.sh", configDir, isLight, shellDir], (output, exitCode) => {
             if (exitCode === 0) {
                 if (typeof ToastService !== "undefined" && typeof NiriService !== "undefined" && !NiriService.matugenSuppression) {
-                    ToastService.showInfo("GTK colors applied successfully");
+                    ToastService.showInfo(I18n.tr("GTK colors applied successfully"));
                 }
             } else {
                 if (typeof ToastService !== "undefined") {
-                    ToastService.showError("Failed to apply GTK colors");
+                    ToastService.showError(I18n.tr("Failed to apply GTK colors"));
                 }
             }
         });
@@ -1881,7 +1881,7 @@ Singleton {
     function applyQtColors() {
         if (!matugenAvailable) {
             if (typeof ToastService !== "undefined") {
-                ToastService.showError("matugen not available or disabled - cannot apply Qt colors");
+                ToastService.showError(I18n.tr("matugen not available or disabled - cannot apply Qt colors"));
             }
             return;
         }
@@ -1889,11 +1889,11 @@ Singleton {
         Proc.runCommand("qtApplier", [shellDir + "/scripts/qt.sh", configDir], (output, exitCode) => {
             if (exitCode === 0) {
                 if (typeof ToastService !== "undefined") {
-                    ToastService.showInfo("Qt colors applied successfully");
+                    ToastService.showInfo(I18n.tr("Qt colors applied successfully"));
                 }
             } else {
                 if (typeof ToastService !== "undefined") {
-                    ToastService.showError("Failed to apply Qt colors");
+                    ToastService.showError(I18n.tr("Failed to apply Qt colors"));
                 }
             }
         });
@@ -2034,7 +2034,7 @@ Singleton {
                 break;
             default:
                 if (typeof ToastService !== "undefined") {
-                    ToastService.showError("Theme worker failed (" + exitCode + ")");
+                    ToastService.showError(I18n.tr("Theme worker failed (%1)").arg(exitCode));
                 }
                 log.warn("Matugen worker failed with exit code:", exitCode);
                 root.matugenCompleted(currentMode, "error");
@@ -2060,7 +2060,7 @@ Singleton {
                 var themeData = JSON.parse(customThemeFileView.text());
                 loadCustomTheme(themeData);
             } catch (e) {
-                ToastService.showError("Invalid JSON format: " + e.message);
+                ToastService.showError(I18n.tr("Invalid JSON format: %1").arg(e.message));
             }
         }
 
@@ -2074,7 +2074,7 @@ Singleton {
 
         onLoadFailed: function (error) {
             if (typeof ToastService !== "undefined") {
-                ToastService.showError("Failed to read theme file: " + error);
+                ToastService.showError(I18n.tr("Failed to read theme file: %1").arg(error));
             }
         }
     }
@@ -2102,7 +2102,7 @@ Singleton {
                 log.error("Failed to parse dynamic colors:", e);
                 if (typeof ToastService !== "undefined") {
                     ToastService.wallpaperErrorStatus = "error";
-                    ToastService.showError("Dynamic colors parse error: " + e.message);
+                    ToastService.showError(I18n.tr("Dynamic colors parse error: %1").arg(e.message));
                 }
             }
         }

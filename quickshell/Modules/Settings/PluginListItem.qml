@@ -203,10 +203,10 @@ StyledRect {
                             const currentPluginId = root.pluginId;
                             DMSService.update(currentPluginName, response => {
                                 if (response.error) {
-                                    ToastService.showError("Update failed: " + response.error);
+                                    ToastService.showError(I18n.tr("Update failed: %1").arg(response.error));
                                     return;
                                 }
-                                ToastService.showInfo("Plugin updated: " + currentPluginName);
+                                ToastService.showInfo(I18n.tr("Plugin updated: %1").arg(currentPluginName));
                                 PluginService.forceRescanPlugin(currentPluginId);
                                 if (DMSService.apiVersion >= 8)
                                     DMSService.listInstalled();
@@ -246,10 +246,10 @@ StyledRect {
                             const currentPluginName = root.pluginName;
                             DMSService.uninstall(currentPluginName, response => {
                                 if (response.error) {
-                                    ToastService.showError("Uninstall failed: " + response.error);
+                                    ToastService.showError(I18n.tr("Uninstall failed: %1").arg(response.error));
                                     return;
                                 }
-                                ToastService.showInfo("Plugin uninstalled: " + currentPluginName);
+                                ToastService.showInfo(I18n.tr("Plugin uninstalled: %1").arg(currentPluginName));
                                 PluginService.scanPlugins();
                                 if (root.isExpanded)
                                     root.expandedPluginId = "";
@@ -290,10 +290,10 @@ StyledRect {
                             const currentPluginName = root.pluginName;
                             root.isReloading = true;
                             if (PluginService.reloadPlugin(currentPluginId)) {
-                                ToastService.showInfo("Plugin reloaded: " + currentPluginName);
+                                ToastService.showInfo(I18n.tr("Plugin reloaded: %1").arg(currentPluginName));
                                 return;
                             }
-                            ToastService.showError("Failed to reload plugin: " + currentPluginName);
+                            ToastService.showError(I18n.tr("Failed to reload plugin: %1").arg(currentPluginName));
                             root.isReloading = false;
                         }
                         onEntered: {
@@ -317,19 +317,19 @@ StyledRect {
 
                         if (isChecked) {
                             if (PluginService.enablePlugin(currentPluginId)) {
-                                ToastService.showInfo("Plugin enabled: " + currentPluginName);
+                                ToastService.showInfo(I18n.tr("Plugin enabled: %1").arg(currentPluginName));
                                 return;
                             }
-                            ToastService.showError("Failed to enable plugin: " + currentPluginName);
+                            ToastService.showError(I18n.tr("Failed to enable plugin: %1").arg(currentPluginName));
                             return;
                         }
                         if (PluginService.disablePlugin(currentPluginId)) {
-                            ToastService.showInfo("Plugin disabled: " + currentPluginName);
+                            ToastService.showInfo(I18n.tr("Plugin disabled: %1").arg(currentPluginName));
                             if (root.isExpanded)
                                 root.expandedPluginId = "";
                             return;
                         }
-                        ToastService.showError("Failed to disable plugin: " + currentPluginName);
+                        ToastService.showError(I18n.tr("Failed to disable plugin: %1").arg(currentPluginName));
                     }
                 }
             }

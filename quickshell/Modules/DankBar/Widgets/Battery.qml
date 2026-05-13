@@ -141,7 +141,7 @@ BasePill {
 
             // This is after the other delta checks so it only shows on valid Y scroll
             if (typeof PowerProfiles === "undefined") {
-                ToastService.showError("power-profiles-daemon not available");
+                ToastService.showError(I18n.tr("power-profiles-daemon not available"));
                 return;
             }
 
@@ -162,7 +162,7 @@ BasePill {
             // Set new profile
             PowerProfiles.profile = profiles[index];
             if (PowerProfiles.profile !== profiles[index]) {
-                ToastService.showError("Failed to set power profile");
+                ToastService.showError(I18n.tr("Failed to set power profile"));
             }
         }
     }

@@ -342,7 +342,7 @@ Singleton {
             log.info("Connected (API v" + apiVersion + ", CLI " + cliVersion + ") -", JSON.stringify(capabilities));
 
             if (apiVersion < expectedApiVersion) {
-                ToastService.showError("DMS server is outdated (API v" + apiVersion + ", expected v" + expectedApiVersion + ")");
+                ToastService.showError(I18n.tr("DMS server is outdated (API v%1, expected v%2)").arg(apiVersion).arg(expectedApiVersion));
             }
 
             capabilitiesReceived();

@@ -257,7 +257,7 @@ FocusScope {
                                     PluginService.openPluginDirectory();
                                 } else {
                                     PluginService.createPluginDirectory();
-                                    ToastService.showInfo("Created plugin directory: " + PluginService.pluginDirectory);
+                                    ToastService.showInfo(I18n.tr("Created plugin directory: %1").arg(PluginService.pluginDirectory));
                                 }
                             }
                         }

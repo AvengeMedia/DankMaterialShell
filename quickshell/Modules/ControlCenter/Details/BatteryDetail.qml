@@ -25,12 +25,12 @@ Rectangle {
 
     function setProfile(profile) {
         if (typeof PowerProfiles === "undefined") {
-            ToastService.showError("power-profiles-daemon not available");
+            ToastService.showError(I18n.tr("power-profiles-daemon not available"));
             return;
         }
         PowerProfiles.profile = profile;
         if (PowerProfiles.profile !== profile) {
-            ToastService.showError("Failed to set power profile");
+            ToastService.showError(I18n.tr("Failed to set power profile"));
         }
     }
 

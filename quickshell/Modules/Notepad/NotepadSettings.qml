@@ -128,7 +128,7 @@ Item {
                 anchors.leftMargin: -Theme.spacingM
                 width: parent.width + Theme.spacingM
                 text: I18n.tr("Use Monospace Font")
-                description: "Toggle fonts"
+                description: I18n.tr("Toggle fonts")
                 checked: SettingsData.notepadUseMonospace
                 onToggled: checked => {
                     SettingsData.notepadUseMonospace = checked;
@@ -140,7 +140,7 @@ Item {
                 anchors.leftMargin: -Theme.spacingM
                 width: parent.width + Theme.spacingM
                 text: I18n.tr("Show Line Numbers")
-                description: "Display line numbers in editor"
+                description: I18n.tr("Display line numbers in editor")
                 checked: SettingsData.notepadShowLineNumbers
                 onToggled: checked => {
                     SettingsData.notepadShowLineNumbers = checked;
@@ -212,7 +212,7 @@ Item {
                     options: cachedFontFamilies
                     currentValue: {
                         if (!SettingsData.notepadFontFamily || SettingsData.notepadFontFamily === "")
-                            return "Default (Global)";
+                            return I18n.tr("Default (Global)");
                         else
                             return SettingsData.notepadFontFamily;
                     }
@@ -322,7 +322,7 @@ Item {
                         anchors.leftMargin: -Theme.spacingM
                         width: parent.width + Theme.spacingM
                         text: I18n.tr("Custom Transparency")
-                        description: "Override global transparency for Notepad"
+                        description: I18n.tr("Override global transparency for Notepad")
                         checked: SettingsData.notepadTransparencyOverride >= 0
                         onToggled: checked => {
                             if (checked) {
@@ -356,7 +356,7 @@ Item {
 
             StyledText {
                 width: parent.width
-                text: SettingsData.notepadUseMonospace ? "Using global monospace font from Settings → Personalization" : "Global fonts can be configured in Settings → Personalization"
+                text: SettingsData.notepadUseMonospace ? I18n.tr("Using global monospace font from Settings → Personalization") : I18n.tr("Global fonts can be configured in Settings → Personalization")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 wrapMode: Text.WordWrap

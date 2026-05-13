@@ -444,7 +444,7 @@ Singleton {
     // Night Mode Functions - Simplified
     function enableNightMode() {
         if (!gammaControlAvailable) {
-            ToastService.showWarning("Night mode failed: DMS gamma control not available");
+            ToastService.showWarning(I18n.tr("Night mode failed: DMS gamma control not available"));
             return;
         }
 
