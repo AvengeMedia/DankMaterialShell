@@ -745,10 +745,14 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 				useSystemCACerts = *req.UseSystemCACerts
 			}
 
+			passwordFlags := uint32(0)
+			if req.Interactive {
+				passwordFlags = uint32(1)
+			}
 			x := map[string]any{
 				"eap":             []string{eapMethod},
 				"system-ca-certs": useSystemCACerts,
-				"password-flags":  uint32(0),
+				"password-flags":  passwordFlags,
 			}
 
 			switch eapMethod {
