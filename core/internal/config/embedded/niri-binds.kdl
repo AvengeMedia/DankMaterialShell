@@ -215,6 +215,11 @@ binds {
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
+    // === Display Profiles ===
+    Mod+P hotkey-overlay-title="Cycle Display Profile" {
+        spawn "dms" "ipc" "outputs" "cycleProfile";
+    }
+
     // === System Controls ===
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
     Mod+Shift+P { power-off-monitors; }
