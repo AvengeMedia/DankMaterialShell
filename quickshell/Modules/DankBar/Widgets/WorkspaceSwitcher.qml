@@ -1928,12 +1928,10 @@ Item {
                         delegateRoot.updateAllData();
                     }
                 }
-                Connections {
-                    target: WindowManager
-                    enabled: root.useExtWorkspace
-                    function onWindowsetsChanged() {
+                property var _extWindowsetsTrigger: root.useExtWorkspace ? WindowManager.windowsets : null
+                on_ExtWindowsetsTriggerChanged: {
+                    if (root.useExtWorkspace)
                         delegateRoot.updateAllData();
-                    }
                 }
             }
         }
