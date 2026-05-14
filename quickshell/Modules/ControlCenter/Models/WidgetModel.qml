@@ -11,6 +11,7 @@ QtObject {
     property var vpnBuiltinInstance: null
     property var cupsBuiltinInstance: null
     property var tailscaleBuiltinInstance: null
+    property var displayProfilesBuiltinInstance: null
 
     property var vpnLoader: Loader {
         active: false
@@ -88,6 +89,34 @@ QtObject {
                 if (!hasTailscaleWidget && tailscaleLoader.active) {
                     root.log.debug("No Tailscale widget in control center, deactivating loader");
                     tailscaleLoader.active = false;
+                }
+            }
+        }
+    }
+
+    property var displayProfilesLoader: Loader {
+        active: false
+        sourceComponent: Component {
+            DisplayProfilesWidget {}
+        }
+
+        onItemChanged: {
+            root.displayProfilesBuiltinInstance = item;
+        }
+
+        onActiveChanged: {
+            if (!active)
+                root.displayProfilesBuiltinInstance = null;
+        }
+
+        Connections {
+            target: SettingsData
+            function onControlCenterWidgetsChanged() {
+                const widgets = SettingsData.controlCenterWidgets || [];
+                const hasWidget = widgets.some(w => w.id === "builtin_display_profiles");
+                if (!hasWidget && displayProfilesLoader.active) {
+                    root.log.debug("No Display Profiles widget in control center, deactivating loader");
+                    displayProfilesLoader.active = false;
                 }
             }
         }
@@ -241,6 +270,15 @@ QtObject {
             "type": "builtin_plugin",
             "enabled": TailscaleService.available,
             "warning": !TailscaleService.available ? I18n.tr("Tailscale not available", "Warning when Tailscale service is not running") : undefined,
+            "isBuiltinPlugin": true
+        },
+        {
+            "id": "builtin_display_profiles",
+            "text": I18n.tr("Display Profiles"),
+            "description": I18n.tr("Switch between display configurations"),
+            "icon": "monitor",
+            "type": "builtin_plugin",
+            "enabled": true,
             "isBuiltinPlugin": true
         }
     ]
