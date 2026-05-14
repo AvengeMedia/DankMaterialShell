@@ -734,12 +734,12 @@ Singleton {
         });
     }
 
-    function switchToWorkspace(workspaceIndex) {
+    function switchToWorkspace(workspaceId) {
         return send({
             "Action": {
                 "FocusWorkspace": {
                     "reference": {
-                        "Index": workspaceIndex
+                        "Id": workspaceId
                     }
                 }
             }
@@ -1449,13 +1449,13 @@ Singleton {
         });
     }
 
-    function moveWorkspaceToIndex(workspaceIdx, targetIndex) {
+    function moveWorkspaceToIndex(workspaceId, targetIndex) {
         return send({
             "Action": {
                 "MoveWorkspaceToIndex": {
                     "index": targetIndex,
                     "reference": {
-                        "Index": workspaceIdx
+                        "Id": workspaceId
                     }
                 }
             }

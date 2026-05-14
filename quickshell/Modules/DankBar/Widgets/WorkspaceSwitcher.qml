@@ -590,8 +590,8 @@ Item {
 
         switch (CompositorService.compositor) {
         case "niri":
-            if (data.idx !== undefined)
-                NiriService.switchToWorkspace(data.idx);
+            if (data.id !== undefined)
+                NiriService.switchToWorkspace(data.id);
             break;
         case "hyprland":
             if (data.id)
@@ -665,10 +665,10 @@ Item {
             }
 
             const nextWorkspace = realWorkspaces[nextIndex];
-            if (!nextWorkspace || nextWorkspace.idx === undefined) {
+            if (!nextWorkspace || nextWorkspace.id === undefined) {
                 return;
             }
-            NiriService.switchToWorkspace(nextWorkspace.idx);
+            NiriService.switchToWorkspace(nextWorkspace.id);
         } else if (CompositorService.isHyprland) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
@@ -1296,9 +1296,9 @@ Item {
                             const sourceWs = root.workspaceList[root.dragSourceIndex];
                             const targetWs = root.workspaceList[root.dragTargetIndex];
 
-                            if (sourceWs && targetWs && sourceWs.idx !== undefined && targetWs.idx !== undefined) {
+                            if (sourceWs && targetWs && sourceWs.id !== undefined && targetWs.idx !== undefined) {
                                 root.suppressShiftAnimation = true;
-                                NiriService.moveWorkspaceToIndex(sourceWs.idx, targetWs.idx);
+                                NiriService.moveWorkspaceToIndex(sourceWs.id, targetWs.idx);
                                 Qt.callLater(() => root.suppressShiftAnimation = false);
                             }
                         }
@@ -1316,8 +1316,8 @@ Item {
                             if (root.useExtWorkspace && (modelData?.id || modelData?.name)) {
                                 ExtWorkspaceService.activateWorkspace(modelData.id || modelData.name, modelData.groupID || "");
                             } else if (CompositorService.isNiri) {
-                                if (modelData && modelData.idx !== undefined) {
-                                    NiriService.switchToWorkspace(modelData.idx);
+                                if (modelData && modelData.id !== undefined) {
+                                    NiriService.switchToWorkspace(modelData.id);
                                 }
                             } else if (CompositorService.isHyprland && modelData?.id) {
                                 Hyprland.dispatch(`workspace ${modelData.id}`);
