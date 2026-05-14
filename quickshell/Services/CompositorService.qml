@@ -682,7 +682,7 @@ Singleton {
         if (isNiri)
             return NiriService.powerOffMonitors();
         if (isHyprland)
-            return Hyprland.dispatch("dpms off");
+            return HyprlandService.dpmsOff();
         if (isDwl)
             return _dwlPowerOffMonitors();
         if (isSway || isScroll || isMiracle) {
@@ -701,7 +701,7 @@ Singleton {
         if (isNiri)
             return NiriService.powerOnMonitors();
         if (isHyprland)
-            return Hyprland.dispatch("dpms on");
+            return HyprlandService.dpmsOn();
         if (isDwl)
             return _dwlPowerOnMonitors();
         if (isSway || isScroll || isMiracle) {

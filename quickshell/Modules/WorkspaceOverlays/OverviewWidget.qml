@@ -223,7 +223,7 @@ Item {
                                 onClicked: {
                                     if (root.draggingTargetWorkspace === -1) {
                                         root.overviewOpen = false;
-                                        Hyprland.dispatch(`workspace ${workspaceValue}`);
+                                        HyplandService.focusWorkspace(workspaceValue)
                                     }
                                 }
                             }
@@ -352,7 +352,7 @@ Item {
                             root.draggingTargetWorkspace = -1;
 
                             if (targetWorkspace !== -1 && targetWorkspace !== windowData?.workspace.id) {
-                                Hyprland.dispatch(`movetoworkspacesilent ${targetWorkspace},address:${windowData?.address}`);
+                                HyprlandService.moveToWorkspace(targetWorkspace, windowData?.address, false)
                                 Qt.callLater(() => {
                                     Hyprland.refreshToplevels();
                                     Hyprland.refreshWorkspaces();
@@ -372,10 +372,10 @@ Item {
                                 return;
                             if (event.button === Qt.LeftButton) {
                                 root.overviewOpen = false;
-                                Hyprland.dispatch(`focuswindow address:${windowData.address}`);
+                                HyprlandService.focusWindow(windowData.address);
                                 event.accepted = true;
                             } else if (event.button === Qt.MiddleButton) {
-                                Hyprland.dispatch(`closewindow address:${windowData.address}`);
+                                HyprlandService.closeWindow(windowData.address);
                                 event.accepted = true;
                             }
                         }

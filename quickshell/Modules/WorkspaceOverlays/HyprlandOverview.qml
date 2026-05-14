@@ -255,7 +255,8 @@ Scope {
                             }
 
                             const targetId = thisMonitorWorkspaceIds[targetIndex];
-                            Hyprland.dispatch("workspace " + targetId);
+
+                            HyprlandService.focusWorkspace(targetId);
                             event.accepted = true;
                         }
                     }

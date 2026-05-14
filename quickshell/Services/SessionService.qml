@@ -327,7 +327,7 @@ Singleton {
                 return;
             }
 
-            Hyprland.dispatch("exit");
+            HyprlandService.exit();
         } else {
             Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLogout]);
         }
