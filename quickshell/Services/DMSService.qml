@@ -23,7 +23,6 @@ Singleton {
     property bool isConnected: false
     property bool isConnecting: false
     property bool subscribeConnected: false
-    readonly property bool forceExtWorkspace: false
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -53,7 +52,6 @@ Singleton {
     signal dwlStateUpdate(var data)
     signal brightnessStateUpdate(var data)
     signal brightnessDeviceUpdate(var device)
-    signal extWorkspaceStateUpdate(var data)
     signal wlrOutputStateUpdate(var data)
     signal evdevStateUpdate(var data)
     signal gammaStateUpdate(var data)
@@ -288,7 +286,7 @@ Singleton {
 
     function removeSubscription(service) {
         if (activeSubscriptions.includes("all")) {
-            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "extworkspace", "browser", "location"];
+            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "browser", "location"];
             const filtered = allServices.filter(s => s !== service);
             subscribe(filtered);
         } else {
@@ -310,7 +308,7 @@ Singleton {
             excludeServices = [excludeServices];
         }
 
-        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "dwl", "brightness", "extworkspace", "browser", "dbus", "location"];
+        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "dwl", "brightness", "browser", "dbus", "location"];
         const filtered = allServices.filter(s => !excludeServices.includes(s));
         subscribe(filtered);
     }
@@ -364,8 +362,6 @@ Singleton {
             if (data.device) {
                 brightnessDeviceUpdate(data.device);
             }
-        } else if (service === "extworkspace") {
-            extWorkspaceStateUpdate(data);
         } else if (service === "wlroutput") {
             wlrOutputStateUpdate(data);
         } else if (service === "evdev") {
@@ -750,12 +746,6 @@ Singleton {
             if (callback)
                 callback(response);
         });
-    }
-
-    function renameWorkspace(name, callback) {
-        sendRequest("extworkspace.renameWorkspace", {
-            "name": name
-        }, callback);
     }
 
     function sysupdateGetState(callback) {

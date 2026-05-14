@@ -13,7 +13,6 @@ import (
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
@@ -135,27 +134,6 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		brightness.HandleRequest(conn, req, brightnessManager)
-		return
-	}
-
-	if strings.HasPrefix(req.Method, "extworkspace.") {
-		if extWorkspaceManager == nil {
-			if extWorkspaceAvailable.Load() {
-				extWorkspaceInitMutex.Lock()
-				if extWorkspaceManager == nil {
-					if err := InitializeExtWorkspaceManager(); err != nil {
-						extWorkspaceInitMutex.Unlock()
-						models.RespondError(conn, req.ID, "extworkspace manager not available")
-						return
-					}
-				}
-				extWorkspaceInitMutex.Unlock()
-			} else {
-				models.RespondError(conn, req.ID, "extworkspace manager not initialized")
-				return
-			}
-		}
-		extworkspace.HandleRequest(conn, req, extWorkspaceManager)
 		return
 	}
 

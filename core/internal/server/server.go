@@ -24,7 +24,6 @@ import (
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
@@ -68,7 +67,6 @@ var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
 var tailscaleManager *tailscale.Manager
 var dwlManager *dwl.Manager
-var extWorkspaceManager *extworkspace.Manager
 var brightnessManager *brightness.Manager
 var wlrOutputManager *wlroutput.Manager
 var evdevManager *evdev.Manager
@@ -86,8 +84,6 @@ const dbusClientID = "dms-dbus-client"
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsSubscribers syncmap.Map[string, bool]
 var cupsSubscriberCount atomic.Int32
-var extWorkspaceAvailable atomic.Bool
-var extWorkspaceInitMutex sync.Mutex
 
 func getSocketDir() string {
 	if runtime := os.Getenv("XDG_RUNTIME_DIR"); runtime != "" {
@@ -293,30 +289,6 @@ func InitializeBrightnessManager() error {
 	return nil
 }
 
-func InitializeExtWorkspaceManager() error {
-	log.Info("Attempting to initialize ExtWorkspace...")
-
-	if wlContext == nil {
-		ctx, err := wlcontext.New()
-		if err != nil {
-			log.Errorf("Failed to create shared Wayland context: %v", err)
-			return err
-		}
-		wlContext = ctx
-	}
-
-	manager, err := extworkspace.NewManager(wlContext.Display())
-	if err != nil {
-		log.Debug("Failed to initialize extworkspace manager: %v", err)
-		return err
-	}
-
-	extWorkspaceManager = manager
-
-	log.Info("ExtWorkspace initialized successfully")
-	return nil
-}
-
 func InitializeWlrOutputManager() error {
 	log.Info("Attempting to initialize WlrOutput management...")
 
@@ -499,10 +471,6 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "dwl")
 	}
 
-	if extWorkspaceAvailable.Load() {
-		caps = append(caps, "extworkspace")
-	}
-
 	if brightnessManager != nil {
 		caps = append(caps, "brightness")
 	}
@@ -571,10 +539,6 @@ func getServerInfo() ServerInfo {
 
 	if dwlManager != nil {
 		caps = append(caps, "dwl")
-	}
-
-	if extWorkspaceAvailable.Load() {
-		caps = append(caps, "extworkspace")
 	}
 
 	if brightnessManager != nil {
@@ -1113,50 +1077,6 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}()
 	}
 
-	if shouldSubscribe("extworkspace") {
-		if extWorkspaceManager == nil && extWorkspaceAvailable.Load() {
-			extWorkspaceInitMutex.Lock()
-			if extWorkspaceManager == nil {
-				if err := InitializeExtWorkspaceManager(); err != nil {
-					log.Warnf("Failed to initialize ExtWorkspace manager for subscription: %v", err)
-				}
-			}
-			extWorkspaceInitMutex.Unlock()
-		}
-
-		if extWorkspaceManager != nil {
-			wg.Add(1)
-			extWorkspaceChan := extWorkspaceManager.Subscribe(clientID + "-extworkspace")
-			go func() {
-				defer wg.Done()
-				defer extWorkspaceManager.Unsubscribe(clientID + "-extworkspace")
-
-				initialState := extWorkspaceManager.GetState()
-				select {
-				case eventChan <- ServiceEvent{Service: "extworkspace", Data: initialState}:
-				case <-stopChan:
-					return
-				}
-
-				for {
-					select {
-					case state, ok := <-extWorkspaceChan:
-						if !ok {
-							return
-						}
-						select {
-						case eventChan <- ServiceEvent{Service: "extworkspace", Data: state}:
-						case <-stopChan:
-							return
-						}
-					case <-stopChan:
-						return
-					}
-				}
-			}()
-		}
-	}
-
 	if shouldSubscribe("brightness") && brightnessManager != nil {
 		wg.Add(2)
 		brightnessStateChan := brightnessManager.Subscribe(clientID + "-brightness-state")
@@ -1415,9 +1335,6 @@ func cleanupManagers() {
 	if dwlManager != nil {
 		dwlManager.Close()
 	}
-	if extWorkspaceManager != nil {
-		extWorkspaceManager.Close()
-	}
 	if brightnessManager != nil {
 		brightnessManager.Close()
 	}
@@ -1597,13 +1514,6 @@ func Start(printDocs bool) error {
 		log.Info("     - appId        : Focused window app ID")
 		log.Info("     - kbLayout     : Current keyboard layout")
 		log.Info("     - keymode      : Current keybind mode")
-		log.Info("ExtWorkspace:")
-		log.Info(" extworkspace.getState                 - Get current workspace state (groups, workspaces)")
-		log.Info(" extworkspace.activateWorkspace        - Activate workspace (params: groupID, workspaceID)")
-		log.Info(" extworkspace.deactivateWorkspace      - Deactivate workspace (params: groupID, workspaceID)")
-		log.Info(" extworkspace.removeWorkspace          - Remove workspace (params: groupID, workspaceID)")
-		log.Info(" extworkspace.createWorkspace          - Create workspace (params: groupID, name)")
-		log.Info(" extworkspace.subscribe                - Subscribe to workspace state changes (streaming)")
 		log.Info("Brightness:")
 		log.Info(" brightness.getState                   - Get current brightness state for all devices")
 		log.Info(" brightness.setBrightness              - Set device brightness (params: device, percent)")
@@ -1782,14 +1692,6 @@ func Start(printDocs bool) error {
 
 	if err := InitializeDwlManager(); err != nil {
 		log.Debugf("DWL manager unavailable: %v", err)
-	}
-
-	if extworkspace.CheckCapability() {
-		extWorkspaceAvailable.Store(true)
-		log.Info("ExtWorkspace capability detected and will be available on subscription")
-	} else {
-		log.Debug("ExtWorkspace capability not available")
-		extWorkspaceAvailable.Store(false)
 	}
 
 	if err := InitializeWlrOutputManager(); err != nil {
