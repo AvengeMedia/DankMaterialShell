@@ -116,6 +116,20 @@ func (g *GentooDistribution) detectXDGPortal() deps.Dependency {
 	return g.detectPackage("xdg-desktop-portal-gtk", "Desktop integration portal for GTK", g.packageInstalled("sys-apps/xdg-desktop-portal-gtk"))
 }
 
+func (g *GentooDistribution) detectDMS() deps.Dependency {
+	dep := deps.Dependency{
+		Name:        "dms (DankMaterialShell)",
+		Status:      deps.StatusMissing,
+		Description: "Desktop Management System configuration",
+		Required:    true,
+		CanToggle:   false,
+	}
+	if g.packageInstalled("gui-apps/dankmaterialshell") {
+		dep.Status = deps.StatusInstalled
+	}
+	return dep
+}
+
 func (g *GentooDistribution) detectXwaylandSatellite() deps.Dependency {
 	return g.detectPackage("xwayland-satellite", "Xwayland support", g.packageInstalled("gui-apps/xwayland-satellite"))
 }
@@ -150,8 +164,8 @@ func (g *GentooDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 
 		"quickshell":              g.getQuickshellMapping(variants["quickshell"]),
 		"matugen":                 {Name: "x11-misc/matugen", Repository: RepoTypeGURU, AcceptKeywords: archKeyword},
-		"dms (DankMaterialShell)": g.getDmsMapping(variants["dms (DankMaterialShell)"]),
-		"dgop":                    {Name: "dgop", Repository: RepoTypeManual, BuildFunc: "installDgop"},
+		"dms (DankMaterialShell)": g.getDmsMapping(),
+		"dgop":                    {Name: "gui-apps/dgop", Repository: RepoTypeGURU, AcceptKeywords: archKeyword},
 	}
 
 	switch wm {
@@ -171,8 +185,8 @@ func (g *GentooDistribution) getQuickshellMapping(_ deps.PackageVariant) Package
 	return PackageMapping{Name: "gui-apps/quickshell", Repository: RepoTypeGURU, UseFlags: "breakpad jemalloc sockets wayland layer-shell session-lock toplevel-management screencopy X pipewire tray mpris pam hyprland hyprland-global-shortcuts hyprland-focus-grab i3 i3-ipc bluetooth", AcceptKeywords: "**"}
 }
 
-func (g *GentooDistribution) getDmsMapping(_ deps.PackageVariant) PackageMapping {
-	return PackageMapping{Name: "dms", Repository: RepoTypeManual, BuildFunc: "installDankMaterialShell"}
+func (g *GentooDistribution) getDmsMapping() PackageMapping {
+	return PackageMapping{Name: "gui-apps/dankmaterialshell", Repository: RepoTypeGURU, AcceptKeywords: g.getArchKeyword()}
 }
 
 func (g *GentooDistribution) getHyprlandMapping(_ deps.PackageVariant) PackageMapping {

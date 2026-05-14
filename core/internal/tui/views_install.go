@@ -156,7 +156,7 @@ func uninstallCommand(distroID string, dependencies []deps.Dependency) string {
 		return ""
 	}
 	if config.Family == distros.FamilyGentoo {
-		return "rm -rf ~/.config/quickshell/dms && sudo rm /usr/local/bin/dms"
+		return "sudo emerge --deselect gui-apps/dankmaterialshell && sudo emerge --depclean gui-apps/dankmaterialshell"
 	}
 	pkg := dmsPackageName(distroID, dependencies)
 	switch config.Family {
