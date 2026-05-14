@@ -3,10 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    quickshell = {
-      url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=783c953987dc56ff0601abe6845ed96f1d00495a";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     flake-compat = {
       url = "github:NixOS/flake-compat";
       flake = false;
@@ -17,7 +13,6 @@
     {
       self,
       nixpkgs,
-      quickshell,
       ...
     }:
     let
@@ -180,15 +175,14 @@
 
       buildDmsPkgs = pkgs: {
         dms-shell = mkDmsShell pkgs;
-        quickshell = quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
       };
     in
     {
       packages = forEachSystem (
         system: pkgs: {
           dms-shell = mkDmsShell pkgs;
-          quickshell = quickshell.packages.${system}.default;
           default = self.packages.${system}.dms-shell;
+          quickshell = builtins.warn "dank-material-shell: the package Quickshell is not included in the DMS flake anymore. We recommend you to use the one from nixos-unstable branch of Nixpkgs or the upstream flake." pkgs.quickshell;
         }
       );
 
@@ -215,9 +209,10 @@
       devShells = forEachSystem (
         system: pkgs:
         let
-          devQmlPkgs = [
-            quickshell.packages.${system}.default
-            pkgs.kdePackages.qtdeclarative
+          devQmlPkgs = with pkgs;
+          [
+            quickshell
+            kdePackages.qtdeclarative
           ]
           ++ (qmlPkgs pkgs);
         in

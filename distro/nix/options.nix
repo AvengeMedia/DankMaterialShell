@@ -80,8 +80,8 @@ in
     };
 
     quickshell = {
-      package = lib.mkPackageOption dmsPkgs "quickshell" {
-        extraDescription = "The quickshell package to use (defaults to be built from source, due to unreleased features used by DMS).";
+      package = lib.mkPackageOption pkgs "quickshell" {
+        extraDescription = "(we recommend at least 0.3.0, currently available in nixos-unstable)";
       };
     };
 
