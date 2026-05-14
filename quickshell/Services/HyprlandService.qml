@@ -338,10 +338,74 @@ decoration {
         if (!wsId)
             return;
         const fullName = wsId + " " + newName;
-        Proc.runCommand("hyprland-rename-ws", ["hyprctl", "dispatch", "renameworkspace", String(wsId), fullName], (output, exitCode) => {
-            if (exitCode !== 0) {
-                log.warn("Failed to rename workspace:", output);
-            }
-        });
+        if (Hyprland.usingLua) {
+          Hyprland.dispatch(`hl.dsp.workspace.rename({workspace = "${wsId}", name = "${fullName}"})`)
+        } else {
+          Proc.runCommand("hyprland-rename-ws", ["hyprctl", "dispatch", "renameworkspace", String(wsId), fullName], (output, exitCode) => {
+              if (exitCode !== 0) {
+                  log.warn("Failed to rename workspace:", output);
+              }
+          });
+        }
+    }
+
+    function focusWorkspace(workspace) {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch(`hl.dsp.focus({workspace = "${workspace}"})`)
+      } else {
+        Hyprland.dispatch(`workspace ${workspace}`)
+      }
+    }
+
+    function focusWindow(windowAddress) {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch(`hl.dsp.focus({window = "address:${windowAddress}"})`);
+      } else  {
+        Hyprland.dispatch(`focuswindow address:${windowAddress}`);
+      }
+    }
+
+    function closeWindow(windowAddress) {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch(`hl.dsp.window.close("address:${windowAddress}")`);
+      } else {
+        Hyprland.dispatch(`closewindow address:${windowAddress}`);
+      }
+    }
+    function moveToWorkspace(workspace, windowAddress, follow = true) {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch(`hl.dsp.window.move({workspace = "${workspace}", window="address:${windowAddress}", follow = ${follow}})`)
+      } else {
+        const dispatcher = follow ? "movetoworkspace" : "movetoworkspacesilent"
+        Hyprland.dispatch(`${dispatcher} ${workspace},address:${windowAddress}`);
+      }
+    }
+    function toggleSpecial(specialName) {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${specialName})`)
+      } else {
+        Hyprland.dispatch("togglespecialworkspace " + specialName);
+      }
+    }
+    function exit() {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch("hl.dsp.exit()")
+      } else {
+        Hyprland.dispatch("exit");
+      }
+    }
+    function dpmsOff() {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch(`hl.dsp.dpms({action = "disable"})`)
+      } else {
+        Hyprland.dispatch("dpms off");
+      }
+    }
+    function dpmsOn() {
+      if (Hyprland.usingLua) {
+        Hyprland.dispatch(`hl.dsp.dpms({action = "enable"})`)
+      } else {
+        Hyprland.dispatch("dpms on");
+      }
     }
 }
