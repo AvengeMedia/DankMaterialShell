@@ -850,6 +850,8 @@ Item {
 
             filePickerModal.targetData = data.target;
             filePickerModal.targetDataLabel = data.requestType || "file";
+            filePickerModal.mimeType = data.mimeType || "";
+            filePickerModal.rememberMimeTypes = [];
 
             if (data.categories && data.categories.length > 0) {
                 filePickerModal.categoryFilter = data.categories;

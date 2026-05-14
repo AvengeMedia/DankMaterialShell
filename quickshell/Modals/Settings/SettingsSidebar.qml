@@ -244,8 +244,7 @@ Rectangle {
                     "id": "default_apps",
                     "text": I18n.tr("Default Apps"),
                     "icon": "star",
-                    "tabIndex": 34,
-					"gioOnly": true
+                    "tabIndex": 34
                 },
                 {
                     "id": "running_apps",
@@ -364,8 +363,6 @@ Rectangle {
             return false;
         if (item.updaterOnly && !SystemUpdateService.sysupdateAvailable)
             return false;
-		if (item.gioOnly && !DesktopService.gioAvailable)
-			return false;
         return true;
     }
 

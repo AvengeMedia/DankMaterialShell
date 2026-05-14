@@ -19,8 +19,18 @@ DankModal {
     property var categoryFilter: []
     property var usageHistoryKey: ""
     property bool showTargetData: true
+    property string mimeType: ""
+    property var rememberMimeTypes: []
+    property bool rememberChoice: false
+    property var mimeMatchedAppIds: []
 
     signal applicationSelected(var app, string targetData)
+
+    function _normAppId(id) {
+        if (!id)
+            return "";
+        return id.replace(/\.desktop$/, "").toLowerCase();
+    }
 
     shouldBeVisible: false
     allowStacking: true
@@ -37,6 +47,8 @@ DankModal {
 
     onOpened: {
         searchQuery = "";
+        rememberChoice = false;
+        fetchMimeMatches();
         updateApplicationList();
         selectedIndex = 0;
         Qt.callLater(() => {
@@ -47,22 +59,55 @@ DankModal {
         });
     }
 
+    function fetchMimeMatches() {
+        mimeMatchedAppIds = [];
+        const queriedMime = mimeType;
+        if (queriedMime.length === 0)
+            return;
+        DMSService.sendRequest("mime.appsForMime", {
+            "mimeType": queriedMime
+        }, response => {
+            if (queriedMime !== root.mimeType)
+                return;
+            if (response.error) {
+                log.warn("mime.appsForMime failed:", response.error);
+                return;
+            }
+            const ids = (response.result && response.result.desktopIds) || [];
+            mimeMatchedAppIds = ids.map(_normAppId);
+            updateApplicationList();
+        });
+    }
+
+    function _appMatchesMime(app, mime) {
+        const list = app && (app.mimeTypes || app.mimeType);
+        return !!list && !!list.includes && list.includes(mime);
+    }
+
     function updateApplicationList() {
         applicationsModel.clear();
         const apps = AppSearchService.applications;
         const usageHistory = usageHistoryKey && SettingsData[usageHistoryKey] ? SettingsData[usageHistoryKey] : {};
+        const hasCategoryFilter = categoryFilter.length > 0;
+        const hasMime = mimeType.length > 0;
+        const hasMimeMatches = mimeMatchedAppIds.length > 0;
+        const lowerQuery = searchQuery.toLowerCase();
         let filteredApps = [];
 
         for (const app of apps) {
-            if (!app || !app.categories)
+            if (!app)
                 continue;
-            let matchesCategory = categoryFilter.length === 0;
+            const appId = _normAppId(app.id || app.execString || app.exec || "");
+            const mimeIdMatch = hasMimeMatches && mimeMatchedAppIds.includes(appId);
+            const mimeFieldMatch = hasMime && _appMatchesMime(app, mimeType);
+            const mimeMatch = mimeIdMatch || mimeFieldMatch;
 
-            if (categoryFilter.length > 0) {
+            let categoryMatch = false;
+            if (hasCategoryFilter && app.categories) {
                 try {
                     for (const cat of app.categories) {
                         if (categoryFilter.includes(cat)) {
-                            matchesCategory = true;
+                            categoryMatch = true;
                             break;
                         }
                     }
@@ -72,24 +117,28 @@ DankModal {
                 }
             }
 
-            if (matchesCategory) {
-                const name = app.name || "";
-                const lowerName = name.toLowerCase();
-                const lowerQuery = searchQuery.toLowerCase();
+            const include = (!hasCategoryFilter && !hasMime) || mimeMatch || categoryMatch;
+            if (!include)
+                continue;
 
-                if (searchQuery === "" || lowerName.includes(lowerQuery)) {
-                    filteredApps.push({
-                        name: name,
-                        icon: app.icon || "application-x-executable",
-                        exec: app.exec || app.execString || "",
-                        startupClass: app.startupWMClass || "",
-                        appData: app
-                    });
-                }
-            }
+            const name = app.name || "";
+            if (searchQuery !== "" && !name.toLowerCase().includes(lowerQuery))
+                continue;
+
+            filteredApps.push({
+                name: name,
+                icon: app.icon || "application-x-executable",
+                exec: app.exec || app.execString || "",
+                startupClass: app.startupWMClass || "",
+                appData: app,
+                mimeMatch: mimeMatch
+            });
         }
 
         filteredApps.sort((a, b) => {
+            if (a.mimeMatch !== b.mimeMatch) {
+                return a.mimeMatch ? -1 : 1;
+            }
             const aId = a.appData.id || a.appData.execString || a.appData.exec || "";
             const bId = b.appData.id || b.appData.execString || b.appData.exec || "";
             const aUsage = usageHistory[aId] ? usageHistory[aId].count : 0;
@@ -134,15 +183,14 @@ DankModal {
             }
 
             Keys.onPressed: event => {
-                if (applicationsModel.count === 0)
-                    return;
-
-                // Toggle view mode with Tab key
-                if (event.key === Qt.Key_Tab) {
-                    root.viewMode = root.viewMode === "grid" ? "list" : "grid";
+                if (event.key === Qt.Key_Tab && root.mimeType.length > 0) {
+                    root.rememberChoice = !root.rememberChoice;
                     event.accepted = true;
                     return;
                 }
+
+                if (applicationsModel.count === 0)
+                    return;
 
                 if (root.viewMode === "grid") {
                     if (event.key === Qt.Key_Left) {
@@ -309,6 +357,9 @@ DankModal {
                         if (root.showTargetData) {
                             usedHeight += 36 + Theme.spacingS;
                         }
+                        if (root.mimeType && root.mimeType.length > 0) {
+                            usedHeight += 36 + Theme.spacingS;
+                        }
                         return parent.height - usedHeight;
                     }
                     radius: Theme.cornerRadius
@@ -447,11 +498,38 @@ DankModal {
                         maximumLineCount: 1
                     }
                 }
+
+                Item {
+                    width: parent.width
+                    height: 36
+                    visible: root.mimeType.length > 0
+
+                    DankToggle {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        checked: root.rememberChoice
+                        text: I18n.tr("Always use this app for %1").arg(root.mimeType)
+                        onToggled: checked => {
+                            root.rememberChoice = checked;
+                        }
+                    }
+                }
             }
 
             function launchApplication(app) {
                 if (!app)
                     return;
+
+                if (root.rememberChoice && app.appId) {
+                    const targets = (root.rememberMimeTypes && root.rememberMimeTypes.length > 0) ? root.rememberMimeTypes : (root.mimeType ? [root.mimeType] : []);
+                    if (targets.length > 0) {
+                        DesktopService.setDefaultAppForMimes(targets, app.appId);
+                    }
+                }
+
                 root.applicationSelected(app, root.targetData);
 
                 if (usageHistoryKey && app.appId) {

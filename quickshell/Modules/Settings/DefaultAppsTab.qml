@@ -19,7 +19,7 @@ Item {
             PDFReader: 6,
             Mail: 7,
             Terminal: 8,
-			Calendar: 9
+            Calendar: 9
         })
 
     property string currentWebBrowserAppId: ""
@@ -35,63 +35,17 @@ Item {
 
     property var categoryModels: ({})
 
-	// A curated list of MIME types for each category.
-	// The first one is used for fetching the apps list and current default,
-	// the rest are for setting the default app.
+    // A curated list of MIME types for each category.
+    // The first one is used for fetching the apps list and current default,
+    // the rest are for setting the default app.
     readonly property var mimeMapping: ({
-            [root.appCategory.WebBrowser]: [
-				"x-scheme-handler/https",
-				"x-scheme-handler/http",
-				"text/html",
-				"application/xhtml+xml"
-			],
-            [root.appCategory.FileManager]: [
-				"inode/directory",
-				"x-scheme-handler/file"
-			],
-            [root.appCategory.TextEditor]: [
-				"text/plain",
-				"application/x-zerosize",
-				"text/x-c++src",
-				"text/x-csrc",
-				"text/x-python",
-				"text/x-shellscript",
-				"application/json"
-			],
-            [root.appCategory.ImageViewer]: [
-				"image/png",
-				"image/jpeg",
-				"image/gif",
-				"image/bmp",
-				"image/webp",
-				"image/avif",
-				"image/svg+xml"
-			],
-            [root.appCategory.VideoPlayer]: [
-				"video/mp4",
-				"video/x-matroska",
-				"video/webm",
-				"video/avi",
-				"video/mpeg",
-				"video/quicktime",
-				"video/x-msvideo"
-			],
-            [root.appCategory.MusicPlayer]: [
-				"audio/mpeg",
-				"audio/x-flac",
-				"audio/wav",
-				"audio/ogg",
-				"audio/aac",
-				"audio/webm"
-			],
-            [root.appCategory.PDFReader]: [
-				"application/pdf",
-				"application/x-ext-pdf",
-				"application/x-bzpdf",
-				"application/x-gzpdf",
-				"application/vnd.comicbook-rar",
-				"application/vnd.comicbook+zip"
-			],
+            [root.appCategory.WebBrowser]: ["x-scheme-handler/https", "x-scheme-handler/http", "text/html", "application/xhtml+xml"],
+            [root.appCategory.FileManager]: ["inode/directory", "x-scheme-handler/file"],
+            [root.appCategory.TextEditor]: ["text/plain", "application/x-zerosize", "text/x-c++src", "text/x-csrc", "text/x-python", "text/x-shellscript", "application/json"],
+            [root.appCategory.ImageViewer]: ["image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp", "image/avif", "image/svg+xml"],
+            [root.appCategory.VideoPlayer]: ["video/mp4", "video/x-matroska", "video/webm", "video/avi", "video/mpeg", "video/quicktime", "video/x-msvideo"],
+            [root.appCategory.MusicPlayer]: ["audio/mpeg", "audio/x-flac", "audio/wav", "audio/ogg", "audio/aac", "audio/webm"],
+            [root.appCategory.PDFReader]: ["application/pdf", "application/x-ext-pdf", "application/x-bzpdf", "application/x-gzpdf", "application/vnd.comicbook-rar", "application/vnd.comicbook+zip"],
             [root.appCategory.Mail]: ["x-scheme-handler/mailto"],
             [root.appCategory.Calendar]: ["x-scheme-handler/calendar"],
             [root.appCategory.Terminal]: ["terminal"] // Special
@@ -111,11 +65,13 @@ Item {
     }
 
     function getAppDisplayName(appId) {
+        if (appId === root.dmsChooserId || appId === "dms-open") {
+            return root.dmsChooserLabel;
+        }
         let entry = DesktopEntries.heuristicLookup(appId);
         if (entry && entry.name) {
             return entry.name;
         }
-        // If the appname can't be found, show the appID
         const withoutSuffix = appId.replace(/\.desktop$/, "");
         if (withoutSuffix !== appId) {
             entry = DesktopEntries.heuristicLookup(withoutSuffix);
@@ -126,14 +82,28 @@ Item {
         return appId;
     }
 
+    readonly property string dmsChooserId: "dms-open.desktop"
+    readonly property string dmsChooserLabel: I18n.tr("DMS Chooser")
+
+    function withDmsChooser(entries) {
+        const filtered = (entries || []).filter(e => e.value !== root.dmsChooserId && e.value !== "dms-open");
+        return [
+            {
+                text: root.dmsChooserLabel,
+                value: root.dmsChooserId
+            }
+        ].concat(filtered);
+    }
+
     function loadCategoryModel(categoryKey, categorySearchName) {
         const apps = loadAppSearchCategory(categorySearchName);
         const appIds = apps.map(app => app.id || app.execString || "").filter(id => id);
         let models = Object.assign({}, root.categoryModels);
-        models[categoryKey] = appIds.map(id => ({
-            text: root.getAppDisplayName(id),
-            value: id
-        }));
+        const entries = appIds.map(id => ({
+                    text: root.getAppDisplayName(id),
+                    value: id
+                }));
+        models[categoryKey] = categoryKey === root.appCategory.Terminal ? entries : root.withDmsChooser(entries);
         root.categoryModels = models;
     }
 
@@ -147,9 +117,9 @@ Item {
                 loadCategoryModel(root.appCategory.Terminal, "TerminalEmulator");
                 getDefaultTerminal();
                 break;
-			case root.appCategory.WebBrowser:
+            case root.appCategory.WebBrowser:
                 // When using the MIME type, stuff like dms-run shows up.
-				// It's probably better to use the category.
+                // It's probably better to use the category.
                 loadCategoryModel(root.appCategory.WebBrowser, "WebBrowser");
                 DesktopService.getDefaultApp(mimeMapping[category][0], category.toString());
                 break;
@@ -201,7 +171,7 @@ Item {
     Component {
         id: xdgGetDefaultTerminal
         Process {
-			property string configPath: Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")
+            property string configPath: Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")
 
             command: ["sh", "-c", `cat '${configPath}/xdg-terminals.list'`]
             stdout: StdioCollector {
@@ -231,30 +201,24 @@ Item {
         target: DesktopService
 
         function onGetAppsForMimeResult(mimeType, appIds, callbackId) {
-            if (!appIds || appIds.length === 0) {
-                log.info("No apps found for MIME type:", mimeType);
-                return;
-            }
-
             let categoryIndex = parseInt(callbackId);
             let models = Object.assign({}, root.categoryModels);
 
-            models[categoryIndex] = appIds.map(id => {
-                return {
-                    text: root.getAppDisplayName(id),
-                    value: id
-                };
-            });
+            const entries = (appIds || []).map(id => ({
+                        text: root.getAppDisplayName(id),
+                        value: id
+                    }));
 
+            models[categoryIndex] = root.withDmsChooser(entries);
             root.categoryModels = models;
         }
 
         function onGetDefaultAppResult(mimeType, desktopFileId, callbackId) {
             if (!desktopFileId) {
                 log.info("No default app found for MIME type:", mimeType);
-				return
+                return;
             }
-			root[propertyName(parseInt(callbackId))] = desktopFileId;
+            root[propertyName(parseInt(callbackId))] = desktopFileId;
         }
     }
 
@@ -263,11 +227,11 @@ Item {
         options: (root.categoryModels[category] || []).map(opt => opt.text)
         enabled: options.length > 0
         emptyText: options.length > 0 ? I18n.tr("Unset", "Unset") : ""
-		opacity: options.length > 0 ? 1 : 0.5
+        opacity: options.length > 0 ? 1 : 0.5
         currentValue: {
             let id = root[propertyName(category)];
             if (!id || id.length === 0) {
-				return ""
+                return "";
             }
             return root.getAppDisplayName(id);
         }
@@ -278,11 +242,7 @@ Item {
                 if (category === root.appCategory.Terminal) {
                     root.setDefaultTerminal(found.value);
                 } else {
-					// Set the default app for all MIME types in the category
-					// If the app doesn't support a MIME type, it will be ignored
-					root.mimeMapping[category].forEach(mimeType => {
-                    	DesktopService.setDefaultApp(mimeType, found.value, category.toString());
-					});
+                    DesktopService.setDefaultAppForMimes(root.mimeMapping[category], found.value, category.toString());
                 }
             }
         }
@@ -309,16 +269,16 @@ Item {
 
                 AppSelector {
                     text: I18n.tr("Web Browser", "Web Browser")
-					tags: ["web", "browser", "internet"]
+                    tags: ["web", "browser", "internet"]
                     category: root.appCategory.WebBrowser
-					description: I18n.tr("Handles links and opens HTML files", "Handles links and opens HTML files")
+                    description: I18n.tr("Handles links and opens HTML files", "Handles links and opens HTML files")
                 }
 
                 AppSelector {
                     text: I18n.tr("Mail", "Mail")
                     category: root.appCategory.Mail
-					tags: ["mail", "email"]
-					description: I18n.tr("Handles mailto links", "Handles mailto links")
+                    tags: ["mail", "email"]
+                    description: I18n.tr("Handles mailto links", "Handles mailto links")
                 }
             }
 
@@ -328,21 +288,21 @@ Item {
 
                 AppSelector {
                     text: I18n.tr("File Manager", "File Manager")
-					tags: ["file", "manager"]
+                    tags: ["file", "manager"]
                     category: root.appCategory.FileManager
-					description: I18n.tr("Manages files and directories", "Manages files and directories")
+                    description: I18n.tr("Manages files and directories", "Manages files and directories")
                 }
                 AppSelector {
                     text: I18n.tr("Terminal", "Terminal")
                     category: root.appCategory.Terminal
-					tags: ["terminal", "console"]
-					description: I18n.tr("Used for xdg-terminal-exec", "Used for xdg-terminal-exec")
+                    tags: ["terminal", "console"]
+                    description: I18n.tr("Used for xdg-terminal-exec", "Used for xdg-terminal-exec")
                 }
-				AppSelector {
+                AppSelector {
                     text: I18n.tr("Calendar", "Calendar")
                     category: root.appCategory.Calendar
-					tags: ["calendar", "events"]
-					description: I18n.tr("Manages calendar events", "Manages calendar events")
+                    tags: ["calendar", "events"]
+                    description: I18n.tr("Manages calendar events", "Manages calendar events")
                 }
             }
 
@@ -353,14 +313,14 @@ Item {
                 AppSelector {
                     text: I18n.tr("Text Editor", "Text Editor")
                     category: root.appCategory.TextEditor
-					tags: ["text", "editor"]
-					description: I18n.tr("For editing plain text files", "For editing plain text files")
+                    tags: ["text", "editor"]
+                    description: I18n.tr("For editing plain text files", "For editing plain text files")
                 }
                 AppSelector {
                     text: I18n.tr("PDF Reader", "PDF Reader")
                     category: root.appCategory.PDFReader
-					tags: ["pdf", "reader"]
-					description: I18n.tr("For reading PDF files", "For reading PDF files")
+                    tags: ["pdf", "reader"]
+                    description: I18n.tr("For reading PDF files", "For reading PDF files")
                 }
             }
 
@@ -370,20 +330,20 @@ Item {
                 AppSelector {
                     text: I18n.tr("Image Viewer", "Image Viewer")
                     category: root.appCategory.ImageViewer
-					tags: ["image", "viewer"]
-					description: I18n.tr("Opens image files", "Opens image files")
+                    tags: ["image", "viewer"]
+                    description: I18n.tr("Opens image files", "Opens image files")
                 }
                 AppSelector {
                     text: I18n.tr("Video Player", "Video Player")
                     category: root.appCategory.VideoPlayer
-					tags: ["video", "player"]
-					description: I18n.tr("Plays video files", "Plays video files")
+                    tags: ["video", "player"]
+                    description: I18n.tr("Plays video files", "Plays video files")
                 }
                 AppSelector {
                     text: I18n.tr("Music Player", "Music Player")
                     category: root.appCategory.MusicPlayer
-					tags: ["music", "player"]
-					description: I18n.tr("Plays audio files", "Plays audio files")
+                    tags: ["music", "player"]
+                    description: I18n.tr("Plays audio files", "Plays audio files")
                 }
             }
         }

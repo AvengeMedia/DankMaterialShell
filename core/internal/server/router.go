@@ -16,6 +16,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/mime"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	serverPlugins "github.com/AvengeMedia/DankMaterialShell/core/internal/server/plugins"
@@ -89,6 +90,11 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		bluez.HandleRequest(conn, req, bluezManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "mime.") {
+		mime.HandleRequest(conn, req)
 		return
 	}
 

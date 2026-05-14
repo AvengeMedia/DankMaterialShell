@@ -28,9 +28,9 @@ with flags to handle different MIME types or application categories.
 
 Examples:
   dms open https://example.com                    # Open URL with browser picker
-  dms open file.pdf --mime application/pdf        # Open PDF with compatible apps
-  dms open document.odt --category Office         # Open with office applications
-  dms open --mime image/png image.png             # Open image with image viewers`,
+  dms open file.pdf                               # Open file (MIME auto-detected)
+  dms open file.pdf --mime application/pdf        # Override MIME detection
+  dms open document.odt --category Office         # Open with office applications`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		runOpen(args[0])
@@ -47,123 +47,58 @@ func init() {
 	})
 }
 
-// mimeTypeToCategories maps MIME types to desktop file categories
-func mimeTypeToCategories(mimeType string) []string {
-	// Split MIME type to get the main type
-	parts := strings.Split(mimeType, "/")
-	if len(parts) < 1 {
-		return nil
+func detectMimeFromPath(path string) string {
+	ext := filepath.Ext(path)
+	if ext == "" {
+		return ""
 	}
-
-	mainType := parts[0]
-
-	switch mainType {
-	case "image":
-		return []string{"Graphics", "Viewer"}
-	case "video":
-		return []string{"Video", "AudioVideo"}
-	case "audio":
-		return []string{"Audio", "AudioVideo"}
-	case "text":
-		if strings.Contains(mimeType, "html") {
-			return []string{"WebBrowser"}
-		}
-		return []string{"TextEditor", "Office"}
-	case "application":
-		if strings.Contains(mimeType, "pdf") {
-			return []string{"Office", "Viewer"}
-		}
-		if strings.Contains(mimeType, "document") || strings.Contains(mimeType, "spreadsheet") ||
-			strings.Contains(mimeType, "presentation") || strings.Contains(mimeType, "msword") ||
-			strings.Contains(mimeType, "ms-excel") || strings.Contains(mimeType, "ms-powerpoint") ||
-			strings.Contains(mimeType, "opendocument") {
-			return []string{"Office"}
-		}
-		if strings.Contains(mimeType, "zip") || strings.Contains(mimeType, "tar") ||
-			strings.Contains(mimeType, "gzip") || strings.Contains(mimeType, "compress") {
-			return []string{"Archiving", "Utility"}
-		}
-		return []string{"Office", "Viewer"}
-	}
-
-	return nil
+	return mime.TypeByExtension(ext)
 }
 
 func runOpen(target string) {
-	// Parse file:// URIs to extract the actual file path
 	actualTarget := target
 	detectedMimeType := openMimeType
-	detectedCategories := openCategories
 	detectedRequestType := openRequestType
 
 	log.Infof("Processing target: %s", target)
 
-	if parsedURL, err := url.Parse(target); err == nil && parsedURL.Scheme == "file" {
-		// Extract file path from file:// URI and convert to absolute path
-		actualTarget = parsedURL.Path
-		if absPath, err := filepath.Abs(actualTarget); err == nil {
-			actualTarget = absPath
+	switch {
+	case isScheme(target, "file://"):
+		parsedURL, err := url.Parse(target)
+		if err == nil {
+			actualTarget = parsedURL.Path
 		}
-
+		if abs, err := filepath.Abs(actualTarget); err == nil {
+			actualTarget = abs
+		}
 		if detectedRequestType == "url" || detectedRequestType == "" {
 			detectedRequestType = "file"
 		}
-
-		log.Infof("Detected file:// URI, extracted absolute path: %s", actualTarget)
-
-		// Auto-detect MIME type if not provided
 		if detectedMimeType == "" {
-			ext := filepath.Ext(actualTarget)
-			if ext != "" {
-				detectedMimeType = mime.TypeByExtension(ext)
-				log.Infof("Detected MIME type from extension %s: %s", ext, detectedMimeType)
-			}
+			detectedMimeType = detectMimeFromPath(actualTarget)
 		}
+		log.Infof("Detected file:// URI, absolute path: %s", actualTarget)
 
-		// Auto-detect categories based on MIME type if not provided
-		if len(detectedCategories) == 0 && detectedMimeType != "" {
-			detectedCategories = mimeTypeToCategories(detectedMimeType)
-			log.Infof("Detected categories from MIME type: %v", detectedCategories)
-		}
-	} else if strings.HasPrefix(target, "http://") || strings.HasPrefix(target, "https://") {
-		// Handle HTTP(S) URLs
+	case isScheme(target, "http://"), isScheme(target, "https://"), isScheme(target, "dms://"):
 		if detectedRequestType == "" {
 			detectedRequestType = "url"
 		}
-		log.Infof("Detected HTTP(S) URL")
-	} else if strings.HasPrefix(target, "dms://") {
-		// Handle DMS internal URLs (theme/plugin install, etc.)
-		if detectedRequestType == "" {
-			detectedRequestType = "url"
-		}
-		log.Infof("Detected DMS internal URL")
-	} else if _, err := os.Stat(target); err == nil {
-		// Handle local file paths directly (not file:// URIs)
-		// Convert to absolute path
-		if absPath, err := filepath.Abs(target); err == nil {
-			actualTarget = absPath
-		}
+		log.Infof("Detected URL: %s", target)
 
+	default:
+		if _, err := os.Stat(target); err != nil {
+			break
+		}
+		if abs, err := filepath.Abs(target); err == nil {
+			actualTarget = abs
+		}
 		if detectedRequestType == "url" || detectedRequestType == "" {
 			detectedRequestType = "file"
 		}
-
-		log.Infof("Detected local file path, converted to absolute: %s", actualTarget)
-
-		// Auto-detect MIME type if not provided
 		if detectedMimeType == "" {
-			ext := filepath.Ext(actualTarget)
-			if ext != "" {
-				detectedMimeType = mime.TypeByExtension(ext)
-				log.Infof("Detected MIME type from extension %s: %s", ext, detectedMimeType)
-			}
+			detectedMimeType = detectMimeFromPath(actualTarget)
 		}
-
-		// Auto-detect categories based on MIME type if not provided
-		if len(detectedCategories) == 0 && detectedMimeType != "" {
-			detectedCategories = mimeTypeToCategories(detectedMimeType)
-			log.Infof("Detected categories from MIME type: %v", detectedCategories)
-		}
+		log.Infof("Detected local file path: %s", actualTarget)
 	}
 
 	params := map[string]any{
@@ -174,8 +109,8 @@ func runOpen(target string) {
 		params["mimeType"] = detectedMimeType
 	}
 
-	if len(detectedCategories) > 0 {
-		params["categories"] = detectedCategories
+	if len(openCategories) > 0 {
+		params["categories"] = openCategories
 	}
 
 	if detectedRequestType != "" {
@@ -183,7 +118,7 @@ func runOpen(target string) {
 	}
 
 	method := "apppicker.open"
-	if detectedMimeType == "" && len(detectedCategories) == 0 && (strings.HasPrefix(target, "http://") || strings.HasPrefix(target, "https://") || strings.HasPrefix(target, "dms://")) {
+	if detectedMimeType == "" && len(openCategories) == 0 && (isScheme(target, "http://") || isScheme(target, "https://") || isScheme(target, "dms://")) {
 		method = "browser.open"
 		params["url"] = target
 	}
@@ -202,4 +137,8 @@ func runOpen(target string) {
 	}
 
 	log.Infof("Request sent successfully")
+}
+
+func isScheme(target, prefix string) bool {
+	return strings.HasPrefix(target, prefix)
 }

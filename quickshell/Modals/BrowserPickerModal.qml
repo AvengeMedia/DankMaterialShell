@@ -17,6 +17,8 @@ AppPickerModal {
     viewMode: SettingsData.browserPickerViewMode || "grid"
     usageHistoryKey: "browserUsageHistory"
     showTargetData: true
+    mimeType: url.startsWith("https://") ? "x-scheme-handler/https" : (url.startsWith("http://") ? "x-scheme-handler/http" : "")
+    rememberMimeTypes: ["x-scheme-handler/http", "x-scheme-handler/https", "text/html", "application/xhtml+xml"]
 
     function shellEscape(str) {
         return "'" + str.replace(/'/g, "'\\''") + "'";

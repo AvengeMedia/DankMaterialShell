@@ -3,6 +3,7 @@ package apppicker
 import (
 	"net"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/desktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 )
@@ -32,7 +33,7 @@ func handleOpen(conn net.Conn, req models.Request, manager *Manager) {
 	event := OpenEvent{
 		Target:      target,
 		RequestType: models.GetOr(req, "requestType", "url"),
-		MimeType:    models.GetOr(req, "mimeType", ""),
+		MimeType:    desktop.StripMimeParams(models.GetOr(req, "mimeType", "")),
 	}
 
 	if categories, ok := models.Get[[]any](req, "categories"); ok {
