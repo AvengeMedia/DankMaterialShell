@@ -367,6 +367,21 @@ FocusScope {
             }
         }
 
+		Loader {
+            id: defaultAppsLoader
+            anchors.fill: parent
+            active: root.currentIndex === 34
+            visible: active
+            focus: active
+
+            sourceComponent: DefaultAppsTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
         Loader {
             id: runningAppsLoader
             anchors.fill: parent
