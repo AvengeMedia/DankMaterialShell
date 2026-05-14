@@ -341,11 +341,7 @@ decoration {
         if (Hyprland.usingLua) {
           Hyprland.dispatch(`hl.dsp.workspace.rename({workspace = "${wsId}", name = "${fullName}"})`)
         } else {
-          Proc.runCommand("hyprland-rename-ws", ["hyprctl", "dispatch", "renameworkspace", String(wsId), fullName], (output, exitCode) => {
-              if (exitCode !== 0) {
-                  log.warn("Failed to rename workspace:", output);
-              }
-          });
+          Hyprland.dispatch(`renameworkspace ${wsId} ${fullName}`)
         }
     }
 

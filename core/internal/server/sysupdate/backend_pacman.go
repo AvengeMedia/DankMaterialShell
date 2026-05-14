@@ -185,15 +185,30 @@ func copyFile(src, dst string) error {
 		return err
 	}
 	defer in.Close()
+	fi, err := in.Stat()
+	if err != nil {
+		return err
+	}
 	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}
-	defer out.Close()
 	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
 		return err
 	}
-	return out.Sync()
+	if err := out.Sync(); err != nil {
+		out.Close()
+		return err
+	}
+	if err := out.Close(); err != nil {
+		return err
+	}
+	// Preserve mtime so libalpm's If-Modified-Since against --dbpath actually
+	// refetches when the mirror has newer content; otherwise the seeded copy's
+	// fresh mtime always beats the server's Last-Modified and the private DB
+	// stays stuck at whatever /var/lib/pacman/sync contained at seed time.
+	return os.Chtimes(dst, fi.ModTime(), fi.ModTime())
 }
 
 func pacmanPrivateDB() (string, error) {
