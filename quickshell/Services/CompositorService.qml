@@ -358,8 +358,12 @@ Singleton {
 
             ordered.push.apply(ordered, arr);
         }
-
-        return ordered.map(x => x.wayland).filter(w => w !== null && w !== undefined);
+        return ordered.map(x => {
+            if (!x.wayland)
+                return null;
+            x.wayland.address = x.address;
+            return x.wayland;
+        }).filter(w => w !== null && w !== undefined);
     }
 
     function filterCurrentWorkspace(toplevels, screen) {
