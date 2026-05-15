@@ -272,6 +272,7 @@ var SPEC = {
     batteryProfileName: { def: "" },
     batteryPostLockMonitorTimeout: { def: 0 },
     batteryChargeLimit: { def: 100 },
+    lowerDisplayRefreshRateOnBattery: { def: false },
     lockBeforeSuspend: { def: false },
     loginctlLockIntegration: { def: true },
     fadeToLockEnabled: { def: true },

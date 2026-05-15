@@ -19,7 +19,10 @@ Singleton {
         interval: 500
         repeat: false
         running: true
-        onTriggered: root.suppressSound = false
+        onTriggered: {
+            root.suppressSound = false;
+            DisplayService.syncRefreshRates(root.isPluggedIn, "startup");
+        }
     }
 
     readonly property string preferredBatteryOverride: Quickshell.env("DMS_PREFERRED_BATTERY")
@@ -83,7 +86,38 @@ Singleton {
             }
         }
 
+        DisplayService.syncRefreshRates(root.isPluggedIn, "power-change");
+
         previousPluggedState = isPluggedIn;
+    }
+
+    Connections {
+        target: SettingsData
+        function onLowerDisplayRefreshRateOnBatteryChanged() {
+            DisplayService.syncRefreshRates(root.isPluggedIn, "setting-change");
+        }
+
+        function onActiveDisplayProfileChanged() {
+            DisplayService.syncRefreshRates(root.isPluggedIn, "profile-change");
+        }
+
+        function onActiveDisplayProfileModesChanged() {
+            DisplayService.syncRefreshRates(root.isPluggedIn, "profile-change");
+        }
+    }
+
+    Connections {
+        target: NiriService
+        function onOutputsChanged() {
+            DisplayService.syncRefreshRates(root.isPluggedIn, "output-change");
+        }
+    }
+
+    Connections {
+        target: WlrOutputService
+        function onStateChanged() {
+            DisplayService.syncRefreshRates(root.isPluggedIn, "output-change");
+        }
     }
 
     // Aggregated charge/discharge rate
