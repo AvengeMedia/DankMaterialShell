@@ -757,6 +757,7 @@ Singleton {
     property int batteryLowNotificationType: 0
     property int batteryCriticalNotificationType: 1
     property bool batteryAutoPowerSaver: false
+    property bool lowerDisplayRefreshRateOnBattery: false
     property bool showBatteryPercent: true
     property bool showBatteryPercentOnlyOnBattery: false
     property bool showBatteryTime: false
@@ -963,6 +964,7 @@ Singleton {
     property var hyprlandOutputSettings: ({})
     property var displayProfiles: ({})
     property var activeDisplayProfile: ({})
+    property var activeDisplayProfileModes: ({})
     property bool displayProfileAutoSelect: false
     property bool displayShowDisconnected: false
     property bool displaySnapToEdge: true

@@ -187,6 +187,16 @@ Item {
                     }
                 }
 
+                SettingsToggleRow {
+                    settingKey: "lowerDisplayRefreshRateOnBattery"
+                    tags: ["power", "battery", "display", "refresh", "rate", "60hz", "hz"]
+                    text: I18n.tr("Lower display refresh rate on battery")
+                    description: I18n.tr("Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.")
+                    checked: SettingsData.lowerDisplayRefreshRateOnBattery
+                    visible: BatteryService.batteryAvailable
+                    onToggled: checked => SettingsData.set("lowerDisplayRefreshRateOnBattery", checked)
+                }
+
                 Rectangle {
                     width: parent.width
                     height: 1
