@@ -79,8 +79,6 @@ func NewManager() (*Manager, error) {
 	m.schedulerWG.Add(1)
 	go m.scheduler()
 
-	go m.runRefresh(context.Background())
-
 	return m, nil
 }
 
@@ -183,13 +181,10 @@ func (m *Manager) Cancel() {
 }
 
 func (m *Manager) Acquire() {
-	first := atomic.AddInt32(&m.acquireCount, 1) == 1
+	atomic.AddInt32(&m.acquireCount, 1)
 	select {
 	case m.wakeSched <- struct{}{}:
 	default:
-	}
-	if first {
-		go m.runRefresh(context.Background())
 	}
 }
 
@@ -415,7 +410,6 @@ func (m *Manager) finishSuccessfulUpgrade(clearPackages bool) {
 	}
 	m.mu.Unlock()
 	m.markDirty()
-	go m.runRefresh(context.Background())
 }
 
 func upgradeBackends(sel Selection, opts UpgradeOptions) []Backend {

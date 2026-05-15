@@ -43,10 +43,22 @@ Singleton {
                 root.checkCapabilities();
             } else {
                 root.sysupdateAvailable = false;
+                root._startupCheckDone = false;
             }
+            Qt.callLater(() => root._maybeStartupCheck());
         }
         function onSysupdateStateUpdate(data) {
             root._applyState(data);
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onUpdaterCheckOnStartChanged() {
+            Qt.callLater(() => root._maybeStartupCheck());
+        }
+        function on_HasLoadedChanged() {
+            Qt.callLater(() => root._maybeStartupCheck());
         }
     }
 
@@ -54,11 +66,13 @@ Singleton {
         if (DMSService.dmsAvailable) {
             checkCapabilities();
         }
+        Qt.callLater(() => root._maybeStartupCheck());
     }
 
     function checkCapabilities() {
         if (!DMSService.capabilities || !Array.isArray(DMSService.capabilities)) {
             sysupdateAvailable = false;
+            Qt.callLater(() => root._maybeStartupCheck());
             return;
         }
         const has = DMSService.capabilities.includes("sysupdate");
@@ -68,6 +82,7 @@ Singleton {
         } else if (!has) {
             sysupdateAvailable = false;
         }
+        Qt.callLater(() => root._maybeStartupCheck());
     }
 
     function requestState() {
@@ -171,10 +186,31 @@ Singleton {
 
     Process {
         id: customRunner
-        onExited: root.checkForUpdates()
     }
 
-    onRefCountChanged: _syncAcquire()
+    property bool _startupCheckDone: false
+
+    function _maybeStartupCheck() {
+        if (refCount <= 0) {
+            _startupCheckDone = false;
+            return;
+        }
+        if (!SettingsData.updaterCheckOnStart)
+            return;
+        if (_startupCheckDone)
+            return;
+        if (!DMSService.isConnected || !sysupdateAvailable)
+            return;
+        _startupCheckDone = true;
+        Qt.callLater(() => root.checkForUpdates());
+    }
+
+    onRefCountChanged: {
+        if (refCount <= 0)
+            _startupCheckDone = false;
+        _syncAcquire();
+        Qt.callLater(() => root._maybeStartupCheck());
+    }
     onSysupdateAvailableChanged: _syncAcquire()
 
     property bool _acquired: false

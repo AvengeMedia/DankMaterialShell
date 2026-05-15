@@ -720,6 +720,7 @@ Singleton {
     property string customPowerActionPowerOff: ""
 
     property bool updaterHideWidget: false
+    property bool updaterCheckOnStart: false
     property bool updaterUseCustomCommand: false
     property string updaterCustomCommand: ""
     property string updaterTerminalAdditionalParams: ""

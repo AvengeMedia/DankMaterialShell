@@ -160,13 +160,6 @@ Rectangle {
                     "tabIndex": 18
                 },
                 {
-                    "id": "updater",
-                    "text": I18n.tr("System Updater"),
-                    "icon": "refresh",
-                    "tabIndex": 20,
-                    "updaterOnly": true
-                },
-                {
                     "id": "desktop_widgets",
                     "text": I18n.tr("Desktop Widgets"),
                     "icon": "widgets",
@@ -292,6 +285,13 @@ Rectangle {
                     "text": I18n.tr("Multiplexers"),
                     "icon": "terminal",
                     "tabIndex": 32
+                },
+                {
+                    "id": "updater",
+                    "text": I18n.tr("System Updater"),
+                    "icon": "refresh",
+                    "tabIndex": 20,
+                    "updaterOnly": true
                 },
                 {
                     "id": "window_rules",

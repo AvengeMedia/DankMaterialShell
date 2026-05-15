@@ -431,6 +431,7 @@ var SPEC = {
     customPowerActionPowerOff: { def: "" },
 
     updaterHideWidget: { def: false },
+    updaterCheckOnStart: { def: false },
     updaterUseCustomCommand: { def: false },
     updaterCustomCommand: { def: "" },
     updaterTerminalAdditionalParams: { def: "" },

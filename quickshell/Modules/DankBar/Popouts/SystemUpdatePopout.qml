@@ -75,16 +75,6 @@ DankPopout {
         close();
     }
 
-    onShouldBeVisibleChanged: {
-        if (!shouldBeVisible) {
-            return;
-        }
-        const stale = !SystemUpdateService.lastCheckUnix || (Date.now() / 1000 - SystemUpdateService.lastCheckUnix) > 300;
-        if (stale && !SystemUpdateService.isChecking && !SystemUpdateService.isUpgrading) {
-            SystemUpdateService.checkForUpdates();
-        }
-    }
-
     content: Component {
         Rectangle {
             id: updaterPanel

@@ -94,6 +94,13 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    text: I18n.tr("Check on startup")
+                    description: I18n.tr("When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.")
+                    checked: SettingsData.updaterCheckOnStart
+                    onToggled: checked => SettingsData.set("updaterCheckOnStart", checked)
+                }
+
+                SettingsToggleRow {
                     text: I18n.tr("Include Flatpak updates")
                     description: I18n.tr("Apply Flatpak updates alongside system updates when running 'Update All'.")
                     visible: (SystemUpdateService.backends || []).some(b => b.repo === "flatpak")
