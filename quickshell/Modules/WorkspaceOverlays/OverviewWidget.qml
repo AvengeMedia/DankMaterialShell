@@ -223,7 +223,7 @@ Item {
                                 onClicked: {
                                     if (root.draggingTargetWorkspace === -1) {
                                         root.overviewOpen = false;
-                                        HyplandService.focusWorkspace(workspaceValue)
+                                        HyplandService.focusWorkspace(workspaceValue);
                                     }
                                 }
                             }
@@ -352,7 +352,7 @@ Item {
                             root.draggingTargetWorkspace = -1;
 
                             if (targetWorkspace !== -1 && targetWorkspace !== windowData?.workspace.id) {
-                                HyprlandService.moveToWorkspace(targetWorkspace, windowData?.address, false)
+                                HyprlandService.moveToWorkspace(targetWorkspace, windowData?.address, false);
                                 Qt.callLater(() => {
                                     Hyprland.refreshToplevels();
                                     Hyprland.refreshWorkspaces();

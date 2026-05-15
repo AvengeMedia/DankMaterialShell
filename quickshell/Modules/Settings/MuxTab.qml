@@ -7,10 +7,7 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    readonly property var muxTypeOptions: [
-        "tmux",
-        "zellij"
-    ]
+    readonly property var muxTypeOptions: ["tmux", "zellij"]
 
     DankFlickable {
         anchors.fill: parent

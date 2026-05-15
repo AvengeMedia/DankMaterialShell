@@ -13,7 +13,7 @@ Row {
     property bool pathEditMode: false
     property bool pathInputHasFocus: false
 
-    signal navigateUp()
+    signal navigateUp
     signal navigateTo(string path)
     signal pathInputFocusChanged(bool hasFocus)
 
@@ -80,9 +80,9 @@ Row {
                 anchors.fill: parent
                 cursorShape: Qt.IBeamCursor
                 onClicked: {
-                    pathEditMode = true
-                    pathInput.text = currentPath.replace("file://", "")
-                    Qt.callLater(() => pathInput.forceActiveFocus())
+                    pathEditMode = true;
+                    pathInput.text = currentPath.replace("file://", "");
+                    Qt.callLater(() => pathInput.forceActiveFocus());
                 }
             }
         }
@@ -94,22 +94,22 @@ Row {
             topPadding: Theme.spacingXS
             bottomPadding: Theme.spacingXS
             onAccepted: {
-                const newPath = text.trim()
+                const newPath = text.trim();
                 if (newPath !== "") {
-                    navigation.navigateTo(newPath)
+                    navigation.navigateTo(newPath);
                 }
-                pathEditMode = false
+                pathEditMode = false;
             }
             Keys.onEscapePressed: {
-                pathEditMode = false
+                pathEditMode = false;
             }
             Keys.onDownPressed: {
-                pathEditMode = false
+                pathEditMode = false;
             }
             onActiveFocusChanged: {
-                navigation.pathInputFocusChanged(activeFocus)
+                navigation.pathInputFocusChanged(activeFocus);
                 if (!activeFocus && pathEditMode) {
-                    pathEditMode = false
+                    pathEditMode = false;
                 }
             }
         }

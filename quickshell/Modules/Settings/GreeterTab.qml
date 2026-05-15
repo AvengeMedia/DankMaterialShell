@@ -2,12 +2,10 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
-import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 

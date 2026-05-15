@@ -316,7 +316,7 @@ BasePill {
                             visible: !iconImg.visible && Paths.isSteamApp(effectiveAppId)
                         }
 
-                        Text {
+                        StyledText {
                             anchors.centerIn: parent
                             visible: !iconImg.visible && !Paths.isSteamApp(effectiveAppId)
                             text: {
@@ -570,7 +570,7 @@ BasePill {
                             visible: !iconImg.visible && Paths.isSteamApp(effectiveAppId)
                         }
 
-                        Text {
+                        StyledText {
                             anchors.centerIn: parent
                             visible: !iconImg.visible && !Paths.isSteamApp(effectiveAppId)
                             text: {

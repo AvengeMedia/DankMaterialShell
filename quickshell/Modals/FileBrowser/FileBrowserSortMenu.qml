@@ -36,19 +36,24 @@ StyledRect {
         }
 
         Repeater {
-            model: [{
+            model: [
+                {
                     "name": "Name",
                     "value": "name"
-                }, {
+                },
+                {
                     "name": "Size",
                     "value": "size"
-                }, {
+                },
+                {
                     "name": "Modified",
                     "value": "modified"
-                }, {
+                },
+                {
                     "name": "Type",
                     "value": "type"
-                }]
+                }
+            ]
 
             StyledRect {
                 width: sortColumn?.width ?? 0
@@ -83,8 +88,8 @@ StyledRect {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        sortMenu.sortBySelected(modelData?.value ?? "name")
-                        sortMenu.visible = false
+                        sortMenu.sortBySelected(modelData?.value ?? "name");
+                        sortMenu.visible = false;
                     }
                 }
             }
@@ -136,8 +141,8 @@ StyledRect {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    sortMenu.sortOrderSelected(true)
-                    sortMenu.visible = false
+                    sortMenu.sortOrderSelected(true);
+                    sortMenu.visible = false;
                 }
             }
         }
@@ -174,8 +179,8 @@ StyledRect {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    sortMenu.sortOrderSelected(false)
-                    sortMenu.visible = false
+                    sortMenu.sortOrderSelected(false);
+                    sortMenu.visible = false;
                 }
             }
         }

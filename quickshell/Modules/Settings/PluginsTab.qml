@@ -23,14 +23,14 @@ FocusScope {
     function updateFilteredPlugins() {
         var query = searchQuery.toLowerCase();
         filteredPlugins = PluginService.availablePluginsList.filter(plugin => {
-            if (!query) return true;
+            if (!query)
+                return true;
             var name = (plugin.name || "").toLowerCase();
             var desc = (plugin.description || "").toLowerCase();
             var author = (plugin.author || "").toLowerCase();
             return name.includes(query) || desc.includes(query) || author.includes(query);
         });
     }
-
 
     Connections {
         target: PluginService

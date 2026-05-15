@@ -1,6 +1,5 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -29,7 +28,9 @@ PanelWindow {
 
     function show() {
         mappedVisible = true;
-        Qt.callLater(() => { isVisible = true; });
+        Qt.callLater(() => {
+            isVisible = true;
+        });
     }
 
     function hide() {

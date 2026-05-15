@@ -95,7 +95,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         height: nameText.implicitHeight + (subText.visible ? subText.height + 2 : 0)
 
-        Text {
+        StyledText {
             id: nameText
             anchors.left: parent.left
             anchors.right: parent.right
@@ -128,7 +128,7 @@ Rectangle {
             return e.endsWith("…") ? e.length - 1 : e.length;
         }
 
-        Text {
+        StyledText {
             id: subText
             anchors.left: parent.left
             anchors.right: parent.right

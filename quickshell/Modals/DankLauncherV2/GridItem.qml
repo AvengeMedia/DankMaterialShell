@@ -70,7 +70,7 @@ Rectangle {
             materialIconSizeAdjustment: root.computedIconSize * 0.3
         }
 
-        Text {
+        StyledText {
             width: parent.width
             text: root.item?._hName ?? root.item?.name ?? ""
             textFormat: root.item?._hRich ? Text.RichText : Text.PlainText

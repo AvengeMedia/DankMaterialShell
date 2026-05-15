@@ -465,7 +465,7 @@ Column {
                                 width: 32
                                 height: measuringText.contentHeight
 
-                                Text {
+                                StyledText {
                                     id: measuringText
                                     width: textArea.width - textArea.leftPadding - textArea.rightPadding
                                     text: modelData || " "
@@ -719,7 +719,7 @@ Column {
                     contentWidth: width - 11
                     contentHeight: previewText.paintedHeight + Theme.spacingM * 2
 
-                    Text {
+                    StyledText {
                         id: previewText
                         width: parent.width - Theme.spacingM
                         padding: Theme.spacingM

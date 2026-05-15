@@ -1,8 +1,6 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modules.Plugins
-import qs.Modules.ProcessList
 import qs.Services
 import qs.Widgets
 
@@ -11,21 +9,21 @@ BasePill {
 
     function formatNetworkSpeed(bytesPerSec) {
         if (bytesPerSec < 1024) {
-            return bytesPerSec.toFixed(0) + " B/s"
+            return bytesPerSec.toFixed(0) + " B/s";
         } else if (bytesPerSec < 1024 * 1024) {
-            return (bytesPerSec / 1024).toFixed(1) + " KB/s"
+            return (bytesPerSec / 1024).toFixed(1) + " KB/s";
         } else if (bytesPerSec < 1024 * 1024 * 1024) {
-            return (bytesPerSec / (1024 * 1024)).toFixed(1) + " MB/s"
+            return (bytesPerSec / (1024 * 1024)).toFixed(1) + " MB/s";
         } else {
-            return (bytesPerSec / (1024 * 1024 * 1024)).toFixed(1) + " GB/s"
+            return (bytesPerSec / (1024 * 1024 * 1024)).toFixed(1) + " GB/s";
         }
     }
 
     Component.onCompleted: {
-        DgopService.addRef(["network"])
+        DgopService.addRef(["network"]);
     }
     Component.onDestruction: {
-        DgopService.removeRef(["network"])
+        DgopService.removeRef(["network"]);
     }
 
     content: Component {
@@ -48,10 +46,12 @@ BasePill {
 
                 StyledText {
                     text: {
-                        const rate = DgopService.networkRxRate
-                        if (rate < 1024) return rate.toFixed(0)
-                        if (rate < 1024 * 1024) return (rate / 1024).toFixed(0) + "K"
-                        return (rate / (1024 * 1024)).toFixed(0) + "M"
+                        const rate = DgopService.networkRxRate;
+                        if (rate < 1024)
+                            return rate.toFixed(0);
+                        if (rate < 1024 * 1024)
+                            return (rate / 1024).toFixed(0) + "K";
+                        return (rate / (1024 * 1024)).toFixed(0) + "M";
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.info
@@ -60,10 +60,12 @@ BasePill {
 
                 StyledText {
                     text: {
-                        const rate = DgopService.networkTxRate
-                        if (rate < 1024) return rate.toFixed(0)
-                        if (rate < 1024 * 1024) return (rate / 1024).toFixed(0) + "K"
-                        return (rate / (1024 * 1024)).toFixed(0) + "M"
+                        const rate = DgopService.networkTxRate;
+                        if (rate < 1024)
+                            return rate.toFixed(0);
+                        if (rate < 1024 * 1024)
+                            return (rate / 1024).toFixed(0) + "K";
+                        return (rate / (1024 * 1024)).toFixed(0) + "M";
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.error

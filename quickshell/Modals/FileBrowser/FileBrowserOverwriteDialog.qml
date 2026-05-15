@@ -9,17 +9,17 @@ Item {
     property string pendingFilePath: ""
 
     signal confirmed(string filePath)
-    signal cancelled()
+    signal cancelled
 
     visible: showDialog
     focus: showDialog
 
     Keys.onEscapePressed: {
-        cancelled()
+        cancelled();
     }
 
     Keys.onReturnPressed: {
-        confirmed(pendingFilePath)
+        confirmed(pendingFilePath);
     }
 
     Rectangle {
@@ -30,7 +30,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                cancelled()
+                cancelled();
             }
         }
     }
@@ -92,7 +92,7 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            cancelled()
+                            cancelled();
                         }
                     }
                 }
@@ -117,7 +117,7 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            confirmed(pendingFilePath)
+                            confirmed(pendingFilePath);
                         }
                     }
                 }

@@ -34,7 +34,7 @@ Item {
         target: slideout
         enabled: slideout !== null
         function onAboutToHide() {
-            textEditor.autoSaveToSession()
+            textEditor.autoSaveToSession();
         }
     }
 
@@ -213,8 +213,8 @@ Item {
             }
 
             onEscapePressed: {
-                textEditor.autoSaveToSession()
-                root.hideRequested()
+                textEditor.autoSaveToSession();
+                root.hideRequested();
             }
 
             onSettingsRequested: {

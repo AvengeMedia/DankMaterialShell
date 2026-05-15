@@ -428,7 +428,7 @@ BasePill {
                             }
                         }
 
-                        Text {
+                        StyledText {
                             anchors.centerIn: parent
                             visible: !iconImg.visible
                             text: {
@@ -649,7 +649,7 @@ BasePill {
                     }
                 }
 
-                Text {
+                StyledText {
                     anchors.centerIn: parent
                     visible: !inlineIconImg.visible
                     text: {
@@ -783,7 +783,7 @@ BasePill {
                     }
                 }
 
-                Text {
+                StyledText {
                     anchors.centerIn: parent
                     visible: !iconImg.visible
                     text: {
@@ -1290,7 +1290,7 @@ BasePill {
                             }
                         }
 
-                        Text {
+                        StyledText {
                             anchors.centerIn: parent
                             visible: !menuIconImg.visible
                             text: {

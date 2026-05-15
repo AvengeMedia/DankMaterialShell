@@ -19,10 +19,13 @@ DankActionButton {
     DankIcon {
         anchors.centerIn: parent
         name: {
-            if (parent.text === "keyboard_hide") return "keyboard_hide"
-            if (parent.text === "Backspace") return "backspace"
-            if (parent.text === "Enter") return "keyboard_return"
-            return ""
+            if (parent.text === "keyboard_hide")
+                return "keyboard_hide";
+            if (parent.text === "Backspace")
+                return "backspace";
+            if (parent.text === "Enter")
+                return "keyboard_return";
+            return "";
         }
         size: 20
         color: Theme.surfaceText

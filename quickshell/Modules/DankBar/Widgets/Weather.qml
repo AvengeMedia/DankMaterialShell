@@ -16,9 +16,11 @@ BasePill {
     content: Component {
         Item {
             implicitWidth: {
-                if (!SettingsData.weatherEnabled) return 0
-                if (root.isVerticalOrientation) return root.widgetThickness - root.horizontalPadding * 2
-                return Math.min(100 - root.horizontalPadding * 2, weatherRow.implicitWidth)
+                if (!SettingsData.weatherEnabled)
+                    return 0;
+                if (root.isVerticalOrientation)
+                    return root.widgetThickness - root.horizontalPadding * 2;
+                return Math.min(100 - root.horizontalPadding * 2, weatherRow.implicitWidth);
             }
             implicitHeight: root.isVerticalOrientation ? weatherColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
 

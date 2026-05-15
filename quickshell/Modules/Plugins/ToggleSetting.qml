@@ -17,35 +17,36 @@ Row {
     property bool isInitialized: false
 
     function loadValue() {
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings && settings.pluginService) {
-            const loadedValue = settings.loadValue(settingKey, defaultValue)
-            value = loadedValue
-            isInitialized = true
+            const loadedValue = settings.loadValue(settingKey, defaultValue);
+            value = loadedValue;
+            isInitialized = true;
         }
     }
 
     Component.onCompleted: {
-        Qt.callLater(loadValue)
+        Qt.callLater(loadValue);
     }
 
     onValueChanged: {
-        if (!isInitialized) return
-        const settings = findSettings()
+        if (!isInitialized)
+            return;
+        const settings = findSettings();
         if (settings) {
-            settings.saveValue(settingKey, value)
+            settings.saveValue(settingKey, value);
         }
     }
 
     function findSettings() {
-        let item = parent
+        let item = parent;
         while (item) {
             if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item
+                return item;
             }
-            item = item.parent
+            item = item.parent;
         }
-        return null
+        return null;
     }
 
     Column {
@@ -75,7 +76,7 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         checked: root.value
         onToggled: isChecked => {
-            root.value = isChecked
+            root.value = isChecked;
         }
     }
 }

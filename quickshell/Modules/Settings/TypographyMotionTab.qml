@@ -251,17 +251,7 @@ Item {
                     settingKey: "fontWeight"
                     text: I18n.tr("Font Weight")
                     description: I18n.tr("Select font weight for UI text")
-                    options: [
-                        I18n.tr("Thin"),
-                        I18n.tr("Extra Light"),
-                        I18n.tr("Light"),
-                        I18n.tr("Regular"),
-                        I18n.tr("Medium"),
-                        I18n.tr("Demi Bold"),
-                        I18n.tr("Bold"),
-                        I18n.tr("Extra Bold"),
-                        I18n.tr("Black")
-                    ]
+                    options: [I18n.tr("Thin"), I18n.tr("Extra Light"), I18n.tr("Light"), I18n.tr("Regular"), I18n.tr("Medium"), I18n.tr("Demi Bold"), I18n.tr("Bold"), I18n.tr("Extra Bold"), I18n.tr("Black")]
                     currentValue: {
                         switch (SettingsData.fontWeight) {
                         case Font.Thin:
@@ -441,13 +431,11 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
-                    visible: SettingsData.textRenderType === SettingsData.TextRenderType.Qt
                 }
 
                 Item {
                     width: parent.width
-                    height: visible ? qualityGroup.implicitHeight + qualityLabel.implicitHeight + Theme.spacingS : 0
-                    visible: SettingsData.textRenderType === SettingsData.TextRenderType.Qt
+                    height: qualityGroup.implicitHeight + qualityLabel.implicitHeight + Theme.spacingS
                     clip: true
 
                     StyledText {

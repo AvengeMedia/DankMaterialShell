@@ -50,21 +50,21 @@ PanelWindow {
 
     margins {
         left: {
-            const screenWidth = targetScreen?.width ?? Screen.width
+            const screenWidth = targetScreen?.width ?? Screen.width;
             if (alignLeft) {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX)));
             } else if (alignRight) {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth)));
             } else {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth / 2)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth / 2)));
             }
         }
         top: {
-            const screenHeight = targetScreen?.height ?? Screen.height
+            const screenHeight = targetScreen?.height ?? Screen.height;
             if (alignLeft || alignRight) {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY - implicitHeight / 2)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY - implicitHeight / 2)));
             } else {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY)));
             }
         }
     }
@@ -76,7 +76,7 @@ PanelWindow {
         border.width: 1
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
 
-        Text {
+        StyledText {
             id: textContent
 
             anchors.centerIn: parent

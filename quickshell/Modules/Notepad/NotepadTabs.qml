@@ -71,27 +71,27 @@ Column {
                             repeat: false
                             onTriggered: {
                                 if (NotepadStorageService.tabs.length > 1) {
-                                    delegateItem.longPressing = true
+                                    delegateItem.longPressing = true;
                                 }
                             }
                         }
 
                         readonly property real shiftOffset: {
                             if (root.draggedIndex < 0)
-                                return 0
+                                return 0;
                             if (index === root.draggedIndex)
-                                return 0
-                            var dragIdx = root.draggedIndex
-                            var dropIdx = root.dropTargetIndex
-                            var myIdx = index
-                            var shiftAmount = root.tabItemSize
+                                return 0;
+                            var dragIdx = root.draggedIndex;
+                            var dropIdx = root.dropTargetIndex;
+                            var myIdx = index;
+                            var shiftAmount = root.tabItemSize;
                             if (dropIdx < 0)
-                                return 0
+                                return 0;
                             if (dragIdx < dropIdx && myIdx > dragIdx && myIdx <= dropIdx)
-                                return -shiftAmount
+                                return -shiftAmount;
                             if (dragIdx > dropIdx && myIdx >= dropIdx && myIdx < dragIdx)
-                                return shiftAmount
-                            return 0
+                                return shiftAmount;
+                            return 0;
                         }
 
                         width: tabWidth
@@ -140,11 +140,11 @@ Column {
                                         id: tabText
                                         width: parent.width - (tabCloseButton.visible ? tabCloseButton.width + Theme.spacingXS : 0)
                                         text: {
-                                            var prefix = ""
+                                            var prefix = "";
                                             if (hasUnsavedChangesForTab(modelData)) {
-                                                prefix = "● "
+                                                prefix = "● ";
                                             }
-                                            return prefix + (modelData.title || "Untitled")
+                                            return prefix + (modelData.title || "Untitled");
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: isActive ? Theme.primary : Theme.surfaceText
@@ -202,68 +202,65 @@ Column {
 
                             onPressed: mouse => {
                                 if (mouse.button === Qt.LeftButton && NotepadStorageService.tabs.length > 1) {
-                                    delegateItem.dragStartPos = Qt.point(mouse.x, mouse.y)
-                                    longPressTimer.start()
+                                    delegateItem.dragStartPos = Qt.point(mouse.x, mouse.y);
+                                    longPressTimer.start();
                                 }
                             }
 
                             onReleased: mouse => {
-                                longPressTimer.stop()
-                                var wasDragging = delegateItem.dragging
-                                var didReorder = wasDragging && delegateItem.targetIndex >= 0 && delegateItem.targetIndex !== delegateItem.originalIndex
+                                longPressTimer.stop();
+                                var wasDragging = delegateItem.dragging;
+                                var didReorder = wasDragging && delegateItem.targetIndex >= 0 && delegateItem.targetIndex !== delegateItem.originalIndex;
 
                                 if (didReorder) {
-                                    root.suppressShiftAnimation = true
-                                    NotepadStorageService.reorderTab(delegateItem.originalIndex, delegateItem.targetIndex)
+                                    root.suppressShiftAnimation = true;
+                                    NotepadStorageService.reorderTab(delegateItem.originalIndex, delegateItem.targetIndex);
                                 }
 
-                                delegateItem.longPressing = false
-                                delegateItem.dragging = false
-                                delegateItem.dragAxisOffset = 0
-                                delegateItem.targetIndex = -1
-                                delegateItem.originalIndex = -1
-                                root.draggedIndex = -1
-                                root.dropTargetIndex = -1
+                                delegateItem.longPressing = false;
+                                delegateItem.dragging = false;
+                                delegateItem.dragAxisOffset = 0;
+                                delegateItem.targetIndex = -1;
+                                delegateItem.originalIndex = -1;
+                                root.draggedIndex = -1;
+                                root.dropTargetIndex = -1;
                                 if (didReorder) {
                                     Qt.callLater(() => {
-                                        root.suppressShiftAnimation = false
-                                    })
+                                        root.suppressShiftAnimation = false;
+                                    });
                                 }
 
                                 if (wasDragging || mouse.button !== Qt.LeftButton)
-                                    return
-                                root.tabSwitched(index)
+                                    return;
+                                root.tabSwitched(index);
                             }
 
                             onPositionChanged: mouse => {
                                 if (delegateItem.longPressing && !delegateItem.dragging) {
-                                    var distance = Math.sqrt(Math.pow(mouse.x - delegateItem.dragStartPos.x, 2) + Math.pow(mouse.y - delegateItem.dragStartPos.y, 2))
+                                    var distance = Math.sqrt(Math.pow(mouse.x - delegateItem.dragStartPos.x, 2) + Math.pow(mouse.y - delegateItem.dragStartPos.y, 2));
                                     if (distance > 5) {
-                                        delegateItem.dragging = true
-                                        delegateItem.targetIndex = index
-                                        delegateItem.originalIndex = index
-                                        root.draggedIndex = index
-                                        root.dropTargetIndex = index
+                                        delegateItem.dragging = true;
+                                        delegateItem.targetIndex = index;
+                                        delegateItem.originalIndex = index;
+                                        root.draggedIndex = index;
+                                        root.dropTargetIndex = index;
                                     }
                                 }
 
                                 if (!delegateItem.dragging)
-                                    return
+                                    return;
+                                var axisOffset = mouse.x - delegateItem.dragStartPos.x;
+                                delegateItem.dragAxisOffset = axisOffset;
 
-                                var axisOffset = mouse.x - delegateItem.dragStartPos.x
-                                delegateItem.dragAxisOffset = axisOffset
-
-                                var itemSize = root.tabItemSize
-                                var rawSlot = axisOffset / itemSize
-                                var slotOffset = rawSlot >= 0
-                                    ? Math.floor(rawSlot + 0.4)
-                                    : Math.ceil(rawSlot - 0.4)
-                                var tabCount = NotepadStorageService.tabs.length
-                                var newTargetIndex = Math.max(0, Math.min(tabCount - 1, delegateItem.originalIndex + slotOffset))
+                                var itemSize = root.tabItemSize;
+                                var rawSlot = axisOffset / itemSize;
+                                var slotOffset = rawSlot >= 0 ? Math.floor(rawSlot + 0.4) : Math.ceil(rawSlot - 0.4);
+                                var tabCount = NotepadStorageService.tabs.length;
+                                var newTargetIndex = Math.max(0, Math.min(tabCount - 1, delegateItem.originalIndex + slotOffset));
 
                                 if (newTargetIndex !== delegateItem.targetIndex) {
-                                    delegateItem.targetIndex = newTargetIndex
-                                    root.dropTargetIndex = newTargetIndex
+                                    delegateItem.targetIndex = newTargetIndex;
+                                    root.dropTargetIndex = newTargetIndex;
                                 }
                             }
                         }

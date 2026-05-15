@@ -390,11 +390,9 @@ Item {
                                         }
 
                                         StyledText {
-                                            text: DisplayConfigState.allOutputs[modelData]?.connected
-                                                ? I18n.tr("Connected") : I18n.tr("Disconnected")
+                                            text: DisplayConfigState.allOutputs[modelData]?.connected ? I18n.tr("Connected") : I18n.tr("Disconnected")
                                             font.pixelSize: Theme.fontSizeSmall
-                                            color: DisplayConfigState.allOutputs[modelData]?.connected
-                                                ? Theme.success : Theme.surfaceVariantText
+                                            color: DisplayConfigState.allOutputs[modelData]?.connected ? Theme.success : Theme.surfaceVariantText
                                         }
                                     }
                                 }

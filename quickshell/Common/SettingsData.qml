@@ -497,7 +497,7 @@ Singleton {
     property int fontWeight: Font.Normal
     property real fontScale: 1.0
     property real dankBarFontScale: 1.0
-    property int textRenderType: SettingsData.TextRenderType.Native
+    property int textRenderType: SettingsData.TextRenderType.Qt
     property int textRenderQuality: SettingsData.TextRenderQuality.Default
 
     property bool notepadUseMonospace: true

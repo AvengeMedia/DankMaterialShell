@@ -1,4 +1,3 @@
-import QtCore
 import QtQuick
 import qs.Common
 
@@ -27,7 +26,6 @@ Column {
     readonly property bool effectiveIncrementEnabled: root.onIncrement ? root.incrementEnabled : false
     readonly property bool effectiveDecrementEnabled: root.onDecrement ? root.decrementEnabled : false
 
-
     width: Math.max(buttonSize * 2, root.implicitWidth + horizontalPadding * 2)
     spacing: 4
 
@@ -38,20 +36,27 @@ Column {
         iconSize: root.iconSize
         buttonSize: root.buttonSize
         iconName: root.incrementIconName
-        onClicked: if (typeof root.onIncrement === 'function') root.onIncrement()
+        onClicked: if (typeof root.onIncrement === 'function')
+            root.onIncrement()
         tooltipText: root.incrementTooltipText
     }
 
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        Item { width: 5; height: 1 }
+        Item {
+            width: 5
+            height: 1
+        }
         StyledText {
             isMonospace: true
             text: root.text
             font.pixelSize: root.textSize
             color: root.textColor
         }
-        Item { width: 5; height: 1 }
+        Item {
+            width: 5
+            height: 1
+        }
     }
 
     DankActionButton {
@@ -61,7 +66,8 @@ Column {
         iconSize: root.iconSize
         buttonSize: root.buttonSize
         iconName: root.decrementIconName
-        onClicked: if (typeof root.onDecrement === 'function')  root.onDecrement()
+        onClicked: if (typeof root.onDecrement === 'function')
+            root.onDecrement()
         tooltipText: root.decrementTooltipText
     }
 }

@@ -18,47 +18,47 @@ Column {
     property bool isLoading: false
 
     Component.onCompleted: {
-        loadValue()
+        loadValue();
     }
 
     function loadValue() {
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings) {
-            isLoading = true
-            items = settings.loadValue(settingKey, defaultValue)
-            isLoading = false
+            isLoading = true;
+            items = settings.loadValue(settingKey, defaultValue);
+            isLoading = false;
         }
     }
 
     onItemsChanged: {
         if (isLoading) {
-            return
+            return;
         }
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings) {
-            settings.saveValue(settingKey, items)
+            settings.saveValue(settingKey, items);
         }
     }
 
     function findSettings() {
-        let item = parent
+        let item = parent;
         while (item) {
             if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item
+                return item;
             }
-            item = item.parent
+            item = item.parent;
         }
-        return null
+        return null;
     }
 
     function addItem(item) {
-        items = items.concat([item])
+        items = items.concat([item]);
     }
 
     function removeItem(index) {
-        const newItems = items.slice()
-        newItems.splice(index, 1)
-        items = newItems
+        const newItems = items.slice();
+        newItems.splice(index, 1);
+        items = newItems;
     }
 
     StyledText {
@@ -110,11 +110,11 @@ Column {
                 placeholderText: modelData.placeholder || ""
 
                 Component.onCompleted: {
-                    inputRow.inputFields.push(this)
+                    inputRow.inputFields.push(this);
                 }
 
                 Keys.onReturnPressed: {
-                    addButton.clicked()
+                    addButton.clicked();
                 }
             }
         }
@@ -126,32 +126,32 @@ Column {
             text: I18n.tr("Add")
 
             onClicked: {
-                let newItem = {}
-                let hasValue = false
+                let newItem = {};
+                let hasValue = false;
 
                 for (let i = 0; i < root.fields.length; i++) {
-                    const field = root.fields[i]
-                    const input = inputRow.inputFields[i]
-                    const value = input.text.trim()
+                    const field = root.fields[i];
+                    const input = inputRow.inputFields[i];
+                    const value = input.text.trim();
 
                     if (value !== "") {
-                        hasValue = true
+                        hasValue = true;
                     }
 
                     if (field.required && value === "") {
-                        return
+                        return;
                     }
 
-                    newItem[field.id] = value || (field.default || "")
+                    newItem[field.id] = value || (field.default || "");
                 }
 
                 if (hasValue) {
-                    root.addItem(newItem)
+                    root.addItem(newItem);
                     for (let i = 0; i < inputRow.inputFields.length; i++) {
-                        inputRow.inputFields[i].text = ""
+                        inputRow.inputFields[i].text = "";
                     }
                     if (inputRow.inputFields.length > 0) {
-                        inputRow.inputFields[0].forceActiveFocus()
+                        inputRow.inputFields[0].forceActiveFocus();
                     }
                 }
             }
@@ -200,13 +200,13 @@ Column {
                             required property var modelData
 
                             text: {
-                                const field = modelData
-                                const item = itemRow.itemData
+                                const field = modelData;
+                                const item = itemRow.itemData;
                                 if (!field || !field.id || !item) {
-                                    return ""
+                                    return "";
                                 }
-                                const value = item[field.id]
-                                return value || ""
+                                const value = item[field.id];
+                                return value || "";
                             }
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeMedium
@@ -239,7 +239,7 @@ Column {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.removeItem(index)
+                            root.removeItem(index);
                         }
                     }
                 }

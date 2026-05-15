@@ -171,7 +171,7 @@ Item {
                             }
                         }
 
-                        Text {
+                        StyledText {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "DANK LINUX"
                             font.pixelSize: parent.compactLogo ? 32 : 48

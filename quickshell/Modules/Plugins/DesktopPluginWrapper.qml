@@ -718,7 +718,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    Text {
+                    StyledText {
                         text: root.gridEnabled ? I18n.tr("Grid: ON", "Widget grid snap status") : I18n.tr("Grid: OFF", "Widget grid snap status")
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: Theme.fontFamily
@@ -733,7 +733,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    Text {
+                    StyledText {
                         text: root.gridSize + "px"
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: Theme.fontFamily
@@ -748,7 +748,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    Text {
+                    StyledText {
                         text: I18n.tr("G: grid • Z/X: size", "Widget grid keyboard hints")
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: Theme.fontFamily

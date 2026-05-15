@@ -16,38 +16,38 @@ Column {
     spacing: Theme.spacingM
 
     Component.onCompleted: {
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings) {
-            items = settings.loadValue(settingKey, defaultValue)
+            items = settings.loadValue(settingKey, defaultValue);
         }
     }
 
     onItemsChanged: {
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings) {
-            settings.saveValue(settingKey, items)
+            settings.saveValue(settingKey, items);
         }
     }
 
     function findSettings() {
-        let item = parent
+        let item = parent;
         while (item) {
             if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item
+                return item;
             }
-            item = item.parent
+            item = item.parent;
         }
-        return null
+        return null;
     }
 
     function addItem(item) {
-        items = items.concat([item])
+        items = items.concat([item]);
     }
 
     function removeItem(index) {
-        const newItems = items.slice()
-        newItems.splice(index, 1)
-        items = newItems
+        const newItems = items.slice();
+        newItems.splice(index, 1);
+        items = newItems;
     }
 
     StyledText {
@@ -123,7 +123,7 @@ Column {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.removeItem(index)
+                        root.removeItem(index);
                     }
                 }
             }

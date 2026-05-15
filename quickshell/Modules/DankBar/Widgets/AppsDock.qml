@@ -741,7 +741,7 @@ BasePill {
                         }
                     }
 
-                    Text {
+                    StyledText {
                         anchors.centerIn: parent
                         visible: !iconImg.visible && !coreIcon.visible && !Paths.isSteamApp(appItem.appId)
                         text: {

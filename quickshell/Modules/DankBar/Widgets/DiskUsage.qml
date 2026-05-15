@@ -131,12 +131,17 @@ BasePill {
                         if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
                             return "--";
                         }
-                        if (!root.selectedMount) return "--";
+                        if (!root.selectedMount)
+                            return "--";
                         switch (root.diskUsageMode) {
-                            case 1: return root.selectedMount.size || "--";
-                            case 2: return root.selectedMount.avail || "--";
-                            case 3: return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
-                            default: return root.diskUsagePercent.toFixed(0);
+                        case 1:
+                            return root.selectedMount.size || "--";
+                        case 2:
+                            return root.selectedMount.avail || "--";
+                        case 3:
+                            return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
+                        default:
+                            return root.diskUsagePercent.toFixed(0);
                         }
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -185,12 +190,17 @@ BasePill {
                         if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
                             return "--%";
                         }
-                        if (!root.selectedMount) return "--%";
+                        if (!root.selectedMount)
+                            return "--%";
                         switch (root.diskUsageMode) {
-                            case 1: return root.selectedMount.size || "--";
-                            case 2: return root.selectedMount.avail || "--";
-                            case 3: return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
-                            default: return root.diskUsagePercent.toFixed(0) + "%";
+                        case 1:
+                            return root.selectedMount.size || "--";
+                        case 2:
+                            return root.selectedMount.avail || "--";
+                        case 3:
+                            return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
+                        default:
+                            return root.diskUsagePercent.toFixed(0) + "%";
                         }
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -204,10 +214,13 @@ BasePill {
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: {
                             switch (root.diskUsageMode) {
-                                case 3: return "888.8G / 888.8G";
-                                case 1:
-                                case 2: return "888.8G";
-                                default: return "100%";
+                            case 3:
+                                return "888.8G / 888.8G";
+                            case 1:
+                            case 2:
+                                return "888.8G";
+                            default:
+                                return "100%";
                             }
                         }
                     }

@@ -72,7 +72,9 @@ Rectangle {
             readonly property var iconMap: {
                 const cats = root.controller?.appCategories ?? [];
                 const m = {};
-                cats.forEach(c => { m[c] = AppSearchService.getCategoryIcon(c); });
+                cats.forEach(c => {
+                    m[c] = AppSearchService.getCategoryIcon(c);
+                });
                 return m;
             }
 
@@ -137,7 +139,9 @@ Rectangle {
                 dim: false
                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
-                background: Rectangle { color: "transparent" }
+                background: Rectangle {
+                    color: "transparent"
+                }
 
                 contentItem: Rectangle {
                     radius: Theme.cornerRadius

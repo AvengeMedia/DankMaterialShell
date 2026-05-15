@@ -1691,7 +1691,7 @@ Item {
                                                 anchors.bottom: parent.bottom
                                                 z: 2
 
-                                                Text {
+                                                StyledText {
                                                     anchors.centerIn: parent
                                                     text: modelData.count
                                                     font.pixelSize: root.appIconSize * 0.44
@@ -1860,7 +1860,7 @@ Item {
                                                 anchors.bottom: parent.bottom
                                                 z: 2
 
-                                                Text {
+                                                StyledText {
                                                     anchors.centerIn: parent
                                                     text: modelData.count
                                                     font.pixelSize: root.appIconSize * 0.44

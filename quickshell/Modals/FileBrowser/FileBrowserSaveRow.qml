@@ -29,15 +29,15 @@ Row {
         Component.onCompleted: {
             if (saveMode)
                 Qt.callLater(() => {
-                                 forceActiveFocus()
-                             })
+                    forceActiveFocus();
+                });
         }
         onAccepted: {
             if (text.trim() !== "") {
-                var basePath = currentPath.replace(/^file:\/\//, '')
-                var fullPath = basePath + "/" + text.trim()
-                fullPath = fullPath.replace(/\/+/g, '/')
-                saveRequested(fullPath)
+                var basePath = currentPath.replace(/^file:\/\//, '');
+                var fullPath = basePath + "/" + text.trim();
+                fullPath = fullPath.replace(/\/+/g, '/');
+                saveRequested(fullPath);
             }
         }
     }
@@ -63,10 +63,10 @@ Row {
             enabled: fileNameInput.text.trim() !== ""
             onClicked: {
                 if (fileNameInput.text.trim() !== "") {
-                    var basePath = currentPath.replace(/^file:\/\//, '')
-                    var fullPath = basePath + "/" + fileNameInput.text.trim()
-                    fullPath = fullPath.replace(/\/+/g, '/')
-                    saveRequested(fullPath)
+                    var basePath = currentPath.replace(/^file:\/\//, '');
+                    var fullPath = basePath + "/" + fileNameInput.text.trim();
+                    fullPath = fullPath.replace(/\/+/g, '/');
+                    saveRequested(fullPath);
                 }
             }
         }

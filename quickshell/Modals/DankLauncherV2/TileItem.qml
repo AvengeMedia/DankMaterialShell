@@ -114,7 +114,7 @@ Rectangle {
                 color: Theme.withAlpha(Theme.surfaceContainer, 0.85)
                 visible: root.item?.name?.length > 0
 
-                Text {
+                StyledText {
                     id: labelText
                     anchors.fill: parent
                     anchors.margins: Theme.spacingXS

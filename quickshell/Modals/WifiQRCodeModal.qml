@@ -68,7 +68,7 @@ DankModal {
             if (response.error) {
                 ToastService.showError(I18n.tr("Failed to remove QR code at %1: %2").arg(path).arg(JSON.stringify(response.error)));
             }
-        })
+        });
     }
 
     LazyLoader {
@@ -90,7 +90,7 @@ DankModal {
                 const fileName = cleanPath.split('/').pop();
                 const fileUrl = "file://" + cleanPath;
 
-                copyQrCodeProcess.exec(["cp", root.normalQrCodePath, cleanPath, "-f"])
+                copyQrCodeProcess.exec(["cp", root.normalQrCodePath, cleanPath, "-f"]);
             }
 
             Process {

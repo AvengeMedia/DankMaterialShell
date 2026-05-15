@@ -142,13 +142,7 @@ DankModal {
                                 let shouldContinue = false;
                                 for (let j = 0; j < lowerQueryWords.length; j++) {
                                     const word = lowerQueryWords[j];
-                                    if (!(
-                                        word.length === 0 ||
-                                        keyLower.includes(word) ||
-                                        descLower.includes(word) ||
-                                        catLower.includes(word) ||
-                                        actionLower.includes(word)
-                                    )) {
+                                    if (!(word.length === 0 || keyLower.includes(word) || descLower.includes(word) || catLower.includes(word) || actionLower.includes(word))) {
                                         shouldContinue = true;
                                         break;
                                     }
@@ -181,7 +175,7 @@ DankModal {
                         return processed;
                     }
 
-                    property var categories: generateCategories("");
+                    property var categories: generateCategories("")
 
                     function estimateCategoryHeight(catName) {
                         const catData = categories[catName];
@@ -196,7 +190,7 @@ DankModal {
                         return 40 + bindCount * 28;
                     }
 
-                    property var categoryKeys: Object.keys(categories);
+                    property var categoryKeys: Object.keys(categories)
 
                     function distributeCategories(cols) {
                         const columns = [];

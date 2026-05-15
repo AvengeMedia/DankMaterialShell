@@ -132,9 +132,7 @@ BasePill {
             const focusedWin = NiriService.windows.find(w => w.is_focused);
             if (!focusedWin)
                 return false;
-            const screenWsIds = new Set(
-                NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id)
-            );
+            const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id));
             return screenWsIds.has(focusedWin.workspace_id);
         }
 
@@ -211,7 +209,7 @@ BasePill {
                 visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
             }
 
-            Text {
+            StyledText {
                 anchors.centerIn: parent
                 visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && !Paths.isSteamApp(activeWindow.appId)
                 text: {

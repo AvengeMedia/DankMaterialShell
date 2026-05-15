@@ -13,7 +13,10 @@ PluginComponent {
         const result = [];
         for (const id in allProfiles) {
             if (allProfiles[id].name)
-                result.push({ id: id, name: allProfiles[id].name });
+                result.push({
+                    id: id,
+                    name: allProfiles[id].name
+                });
         }
         return result;
     }

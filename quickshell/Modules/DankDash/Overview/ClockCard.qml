@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import qs.Common
 import qs.Widgets
@@ -22,11 +21,11 @@ Card {
                 StyledText {
                     text: {
                         if (SettingsData.use24HourClock) {
-                            return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(0)
+                            return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(0);
                         } else {
-                            const hours = systemClock?.date?.getHours()
-                            const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
-                            return String(display).padStart(2, '0').charAt(0)
+                            const hours = systemClock?.date?.getHours();
+                            const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+                            return String(display).padStart(2, '0').charAt(0);
                         }
                     }
                     font.pixelSize: 48
@@ -39,11 +38,11 @@ Card {
                 StyledText {
                     text: {
                         if (SettingsData.use24HourClock) {
-                            return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(1)
+                            return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(1);
                         } else {
-                            const hours = systemClock?.date?.getHours()
-                            const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
-                            return String(display).padStart(2, '0').charAt(1)
+                            const hours = systemClock?.date?.getHours();
+                            const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+                            return String(display).padStart(2, '0').charAt(1);
                         }
                     }
                     font.pixelSize: 48
