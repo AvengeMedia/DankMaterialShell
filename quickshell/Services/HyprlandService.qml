@@ -355,7 +355,7 @@ decoration {
 
     function focusWindow(windowAddress) {
       if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.focus({window = "address:${windowAddress}"})`);
+        Hyprland.dispatch(`hl.dsp.focus({window = "address:0x${windowAddress}"})`);
       } else  {
         Hyprland.dispatch(`focuswindow address:${windowAddress}`);
       }
