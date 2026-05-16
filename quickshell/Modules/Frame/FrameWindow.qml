@@ -18,7 +18,7 @@ PanelWindow {
 
     screen: targetScreen
     visible: _frameActive
-    updatesEnabled: _connectedActive
+    updatesEnabled: _frameActive
 
     WlrLayershell.namespace: "dms:frame"
     WlrLayershell.layer: WlrLayer.Top
@@ -205,7 +205,7 @@ PanelWindow {
         id: _dockBodyBlurAnchor
         visible: false
 
-        readonly property bool _active: win._dockState.reveal && win._dockState.bodyW > 0 && win._dockState.bodyH > 0
+        readonly property bool _active: win._connectedActive && win._dockState.reveal && win._dockState.bodyW > 0 && win._dockState.bodyH > 0
 
         x: _active ? win._dockState.bodyX + (win._dockSlide.x || 0) : 0
         y: _active ? win._dockState.bodyY + (win._dockSlide.y || 0) : 0
@@ -1323,7 +1323,7 @@ PanelWindow {
         Item {
             id: _connectedChrome
             anchors.fill: parent
-            visible: true
+            visible: win._connectedActive
 
             Item {
                 id: _popoutChrome
