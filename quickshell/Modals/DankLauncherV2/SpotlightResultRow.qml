@@ -48,17 +48,24 @@ Rectangle {
             return "file://" + raw;
         return raw;
     }
-    readonly property bool hasMediaPreview: previewSource.length > 0
+    readonly property bool hasClipboardPreview: item?.type === "clipboard" && item?.data?.isImage === true && (item?.data?.mimeType ?? "").startsWith("image/")
+    readonly property bool hasMediaPreview: previewSource.length > 0 || hasClipboardPreview
     readonly property bool previewAnimated: previewSource.toLowerCase().indexOf(".gif") >= 0
 
     readonly property string typeLabel: {
         if (!item)
             return "";
+        if ((item.badgeLabel ?? "").length > 0)
+            return item.badgeLabel;
         switch (item.type) {
         case "plugin_browse":
             return I18n.tr("Browse");
         case "plugin":
             return I18n.tr("Plugin");
+        case "setting":
+            return I18n.tr("Setting");
+        case "clipboard":
+            return I18n.tr("Clipboard");
         case "file":
             return item.data?.is_dir ? I18n.tr("Folder") : I18n.tr("File");
         default:
@@ -278,7 +285,7 @@ Rectangle {
             source: root.previewSource
             asynchronous: true
             fillMode: Image.PreserveAspectCrop
-            visible: !root.previewAnimated
+            visible: !root.hasClipboardPreview && !root.previewAnimated
         }
 
         AnimatedImage {
@@ -286,7 +293,13 @@ Rectangle {
             source: root.previewSource
             fillMode: Image.PreserveAspectCrop
             playing: visible
-            visible: root.previewAnimated
+            visible: !root.hasClipboardPreview && root.previewAnimated
+        }
+
+        ClipboardLauncherPreview {
+            anchors.fill: parent
+            entry: root.item?.data ?? null
+            visible: root.hasClipboardPreview
         }
     }
 

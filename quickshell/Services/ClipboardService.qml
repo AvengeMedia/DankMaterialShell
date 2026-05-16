@@ -26,6 +26,7 @@ Singleton {
     property int selectedIndex: 0
     property bool keyboardNavigationActive: false
     property int refCount: 0
+    property real _launcherLastRefresh: 0
 
     signal historyCopied
     signal historyCleared
@@ -88,6 +89,68 @@ Singleton {
             pinnedCount = pinnedEntries.length;
             updateFilteredModel();
         });
+    }
+
+    function ensureLauncherHistory() {
+        if (!clipboardAvailable) {
+            return;
+        }
+
+        const now = Date.now();
+        if (internalEntries.length === 0 || now - _launcherLastRefresh > 5000) {
+            _launcherLastRefresh = now;
+            refresh();
+        }
+    }
+
+    function getLauncherEntries(query, limit, minLength) {
+        if (!clipboardAvailable) {
+            return [];
+        }
+
+        const trimmed = (query || "").toString().trim();
+        const requiredLength = minLength !== undefined ? minLength : 2;
+        if (trimmed.length < requiredLength) {
+            return [];
+        }
+
+        const lowerQuery = trimmed.toLowerCase();
+        const maxItems = limit > 0 ? limit : 8;
+        const matches = [];
+
+        for (var i = 0; i < internalEntries.length; i++) {
+            const entry = internalEntries[i];
+            const preview = getEntryPreview(entry).toString();
+            const typeText = entry.isImage ? "image picture screenshot clipboard" : "text clipboard";
+            const haystack = (preview + " " + typeText).toLowerCase();
+            if (haystack.indexOf(lowerQuery) === -1) {
+                continue;
+            }
+            matches.push(entry);
+        }
+
+        matches.sort((a, b) => {
+            if (a.pinned !== b.pinned)
+                return b.pinned ? 1 : -1;
+            return (b.id || 0) - (a.id || 0);
+        });
+
+        return matches.slice(0, maxItems);
+    }
+
+    function getRecentLauncherEntries(limit) {
+        if (!clipboardAvailable) {
+            return [];
+        }
+
+        const maxItems = limit > 0 ? limit : 20;
+        const entries = internalEntries.slice();
+        entries.sort((a, b) => {
+            if (a.pinned !== b.pinned)
+                return b.pinned ? 1 : -1;
+            return (b.id || 0) - (a.id || 0);
+        });
+        return entries.slice(0, maxItems);
     }
 
     function reset() {

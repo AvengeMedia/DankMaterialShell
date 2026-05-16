@@ -32,6 +32,8 @@ Popup {
             var actions = instance.getContextMenuActions(spotlightItem.data);
             return Array.isArray(actions) && actions.length > 0;
         }
+        if (spotlightItem.actions && spotlightItem.actions.length > 0)
+            return true;
         return false;
     }
 
@@ -80,6 +82,13 @@ Popup {
         hide();
     }
 
+    function executeLauncherAction(actionData) {
+        if (!controller || !item || !actionData)
+            return;
+        controller.executeAction(item, actionData);
+        hide();
+    }
+
     readonly property var menuItems: {
         var items = [];
 
@@ -92,6 +101,19 @@ Popup {
                     icon: act.icon || "play_arrow",
                     text: act.text || act.name || "",
                     pluginAction: act
+                });
+            }
+            return items;
+        }
+
+        if (item?.type !== "app" && item?.actions && item.actions.length > 0) {
+            for (var i = 0; i < item.actions.length; i++) {
+                var genericAct = item.actions[i];
+                items.push({
+                    type: "item",
+                    icon: genericAct.icon || "play_arrow",
+                    text: genericAct.name || "",
+                    launcherActionData: genericAct
                 });
             }
             return items;
@@ -293,6 +315,8 @@ Popup {
                     menuItem.action();
                 else if (menuItem.pluginAction)
                     executePluginAction(menuItem.pluginAction);
+                else if (menuItem.launcherActionData)
+                    executeLauncherAction(menuItem.launcherActionData);
                 else if (menuItem.actionData)
                     executeDesktopAction(menuItem.actionData);
                 return;
@@ -500,6 +524,8 @@ Popup {
                                         menuItem.action();
                                     else if (menuItem.pluginAction)
                                         root.executePluginAction(menuItem.pluginAction);
+                                    else if (menuItem.launcherActionData)
+                                        root.executeLauncherAction(menuItem.launcherActionData);
                                     else if (menuItem.actionData)
                                         root.executeDesktopAction(menuItem.actionData);
                                 }

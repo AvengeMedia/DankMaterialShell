@@ -44,7 +44,10 @@ Item {
     signal searchQueryRequested(string query)
 
     onActiveChanged: {
-        if (!active) {
+        if (active) {
+            if (clipboardSearchEnabledInAll())
+                ClipboardService.ensureLauncherHistory();
+        } else {
             SessionData.addLauncherHistory(searchQuery);
 
             sections = [];
@@ -68,6 +71,28 @@ Item {
         function onSortAppsAlphabeticallyChanged() {
             AppSearchService.invalidateLauncherCache();
             _clearModeCache();
+        }
+        function onLauncherPluginVisibilityChanged() {
+            AppSearchService.invalidateLauncherCache();
+            _clearModeCache();
+            if (active)
+                performSearch();
+        }
+        function onBuiltInPluginSettingsChanged() {
+            AppSearchService.invalidateLauncherCache();
+            _clearModeCache();
+            if (active)
+                performSearch();
+        }
+    }
+
+    Connections {
+        target: ClipboardService
+        function onInternalEntriesChanged() {
+            if (!active || !clipboardSearchEnabledInAll())
+                return;
+            if (searchMode === "all" && searchQuery.length >= 2)
+                performSearch();
         }
     }
 
@@ -124,6 +149,18 @@ Item {
     function pasteSelected() {
         if (!selectedItem)
             return;
+        if (selectedItem.type === "clipboard") {
+            if (SettingsData.clipboardEnterToPaste) {
+                ClipboardService.copyEntry(selectedItem.data, function () {
+                    root.itemExecuted();
+                });
+            } else {
+                ClipboardService.pasteEntry(selectedItem.data, function () {
+                    root.itemExecuted();
+                });
+            }
+            return;
+        }
         if (!SessionService.wtypeAvailable) {
             ToastService.showError(I18n.tr("wtype not available - install wtype for paste support"));
             return;
@@ -153,6 +190,20 @@ Item {
             title: I18n.tr("Applications"),
             icon: "apps",
             priority: 2,
+            defaultViewMode: "list"
+        },
+        {
+            id: "settings",
+            title: I18n.tr("Settings", "settings window title"),
+            icon: "settings",
+            priority: 2.35,
+            defaultViewMode: "list"
+        },
+        {
+            id: "clipboard",
+            title: I18n.tr("Clipboard"),
+            icon: "content_paste",
+            priority: 2.45,
             defaultViewMode: "list"
         },
         {
@@ -352,6 +403,9 @@ Item {
         searchQuery = query;
         searchDebounce.restart();
 
+        if (searchMode === "all" && clipboardSearchEnabledInAll() && query.length >= 2)
+            ClipboardService.ensureLauncherHistory();
+
         var filesInAll = searchMode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll);
         if (searchMode !== "plugins" && (searchMode === "files" || query.startsWith("/") || filesInAll) && query.length > 0) {
             fileSearchDebounce.restart();
@@ -370,6 +424,8 @@ Item {
         searchMode = mode;
         modeChanged(mode);
         performSearch();
+        if (mode === "all" && clipboardSearchEnabledInAll() && searchQuery.length >= 2)
+            ClipboardService.ensureLauncherHistory();
         var filesInAll = mode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll) && searchQuery.length > 0;
         if (mode === "files" || filesInAll) {
             fileSearchDebounce.restart();
@@ -612,7 +668,7 @@ Item {
             if (triggerMatch.isBuiltIn) {
                 var builtInItems = AppSearchService.getBuiltInLauncherItems(triggerMatch.pluginId, triggerMatch.query);
                 for (var j = 0; j < builtInItems.length; j++) {
-                    allItems.push(transformBuiltInLauncherItem(builtInItems[j], triggerMatch.pluginId));
+                    allItems.push(transformBuiltInSearchItem(builtInItems[j], triggerMatch.pluginId));
                 }
             }
 
@@ -748,7 +804,7 @@ Item {
 
                 var builtInItems = AppSearchService.getBuiltInLauncherItems(pluginFilter, searchQuery);
                 for (var j = 0; j < builtInItems.length; j++) {
-                    allItems.push(transformBuiltInLauncherItem(builtInItems[j], pluginFilter));
+                    allItems.push(transformBuiltInSearchItem(builtInItems[j], pluginFilter));
                 }
             } else {
                 var emptyTriggerPlugins = getEmptyTriggerPlugins();
@@ -764,7 +820,7 @@ Item {
                     var pluginId = builtInLauncherPlugins[i];
                     var blItems = AppSearchService.getBuiltInLauncherItems(pluginId, searchQuery);
                     for (var j = 0; j < blItems.length; j++) {
-                        allItems.push(transformBuiltInLauncherItem(blItems[j], pluginId));
+                        allItems.push(transformBuiltInSearchItem(blItems[j], pluginId));
                     }
                 }
             }
@@ -799,6 +855,7 @@ Item {
         }
 
         if (searchMode === "all") {
+            appendSharedAllResults(allItems, searchQuery);
             if (searchQuery && searchQuery.length >= 2) {
                 _pluginPhasePending = true;
                 _phase1Items = allItems.slice();
@@ -814,7 +871,7 @@ Item {
                     if (plugin.isBuiltIn) {
                         var blItems = AppSearchService.getBuiltInLauncherItems(plugin.id, searchQuery);
                         for (var j = 0; j < blItems.length; j++)
-                            allItems.push(transformBuiltInLauncherItem(blItems[j], plugin.id));
+                            allItems.push(transformBuiltInSearchItem(blItems[j], plugin.id));
                     } else {
                         var pItems = getPluginItems(plugin.id, searchQuery);
                         for (var j = 0; j < pItems.length; j++)
@@ -883,11 +940,13 @@ Item {
             if (currentVersion !== _searchVersion)
                 return;
             var plugin = allPluginsOrdered[i];
+            if (plugin.isBuiltIn && (plugin.id === "dms_settings_search" || plugin.id === "dms_clipboard_search"))
+                continue;
             if (plugin.isBuiltIn) {
                 var blItems = AppSearchService.getBuiltInLauncherItems(plugin.id, searchQuery);
                 var blLimit = Math.min(blItems.length, maxPerPlugin);
                 for (var j = 0; j < blLimit; j++) {
-                    var item = transformBuiltInLauncherItem(blItems[j], plugin.id);
+                    var item = transformBuiltInSearchItem(blItems[j], plugin.id);
                     item._preScored = 900 - j;
                     allItems.push(item);
                 }
@@ -1110,8 +1169,54 @@ Item {
         return Transform.transformBuiltInLauncherItem(item, pluginId, I18n.tr("Open"));
     }
 
+    function transformBuiltInSearchItem(item, pluginId) {
+        if (pluginId === "dms_clipboard_search" || item.type === "clipboard")
+            return transformClipboardEntry(item.data || item);
+        return transformBuiltInLauncherItem(item, pluginId);
+    }
+
     function transformFileResult(file) {
         return Transform.transformFileResult(file, I18n.tr("Open"), I18n.tr("Open folder"), I18n.tr("Copy path"), I18n.tr("Open in terminal"));
+    }
+
+    function transformClipboardEntry(entry) {
+        var copyLabel = I18n.tr("Copy");
+        var pasteLabel = I18n.tr("Paste");
+        var primaryLabel = SettingsData.clipboardEnterToPaste ? pasteLabel : copyLabel;
+        var pasteHintLabel = SettingsData.clipboardEnterToPaste ? I18n.tr("Shift+Enter to copy") : I18n.tr("Shift+Enter to paste");
+        return Transform.transformClipboardItem(entry, copyLabel, pasteLabel, primaryLabel, I18n.tr("Image"), I18n.tr("Text"), I18n.tr("Pinned"), pasteHintLabel, "", I18n.tr("Clipboard"));
+    }
+
+    function builtInLauncherVisibleInAll(pluginId) {
+        return SettingsData.getBuiltInPluginSetting(pluginId, "enabled", true) && SettingsData.getPluginAllowWithoutTrigger(pluginId);
+    }
+
+    function clipboardSearchEnabledInAll() {
+        return builtInLauncherVisibleInAll("dms_clipboard_search") && ClipboardService.clipboardAvailable;
+    }
+
+    function appendSharedAllResults(allItems, query) {
+        if (!query || query.length < 2)
+            return;
+
+        if (builtInLauncherVisibleInAll("dms_settings_search")) {
+            var settingsItems = AppSearchService.getBuiltInLauncherItems("dms_settings_search", query);
+            var settingsLimit = Math.min(settingsItems.length, 8);
+            for (var i = 0; i < settingsLimit; i++) {
+                settingsItems[i]._preScored = 890 - i;
+                allItems.push(transformBuiltInSearchItem(settingsItems[i], "dms_settings_search"));
+            }
+        }
+
+        if (clipboardSearchEnabledInAll()) {
+            ClipboardService.ensureLauncherHistory();
+            var clipboardItems = AppSearchService.getBuiltInLauncherItems("dms_clipboard_search", query);
+            var clipboardLimit = Math.min(clipboardItems.length, 8);
+            for (var j = 0; j < clipboardLimit; j++) {
+                clipboardItems[j]._preScored = 840 - j;
+                allItems.push(transformBuiltInSearchItem(clipboardItems[j], "dms_clipboard_search"));
+            }
+        }
     }
 
     function detectTrigger(query) {
@@ -1308,13 +1413,21 @@ Item {
     }
 
     function buildDynamicSectionDefs(items) {
-        var baseDefs = sectionDefinitions.slice();
+        var baseDefs = sectionDefinitions.map(function (def) {
+            return Object.assign({}, def);
+        });
         var pluginSections = {};
         var order = SettingsData.launcherPluginOrder || [];
         var orderMap = {};
         for (var k = 0; k < order.length; k++)
             orderMap[order[k]] = k;
         var unorderedPriority = 2.6 + order.length * 0.01;
+
+        for (var d = 0; d < baseDefs.length; d++) {
+            var virtualId = baseDefs[d].id === "settings" ? "dms_settings_search" : baseDefs[d].id === "clipboard" ? "dms_clipboard_search" : "";
+            if (virtualId && orderMap[virtualId] !== undefined)
+                baseDefs[d].priority = 2.6 + orderMap[virtualId] * 0.01;
+        }
 
         for (var i = 0; i < items.length; i++) {
             var section = items[i].section;
@@ -1768,6 +1881,20 @@ Item {
                 AppSearchService.executePluginItem(item.data, item.pluginId);
             }
             break;
+        case "setting":
+            AppSearchService.executeBuiltInLauncherItem(item.data);
+            break;
+        case "clipboard":
+            if (SettingsData.clipboardEnterToPaste) {
+                ClipboardService.pasteEntry(item.data, function () {
+                    root.itemExecuted();
+                });
+            } else {
+                ClipboardService.copyEntry(item.data, function () {
+                    root.itemExecuted();
+                });
+            }
+            return;
         case "file":
             openFile(item.data?.path);
             break;
@@ -1803,6 +1930,16 @@ Item {
         case "execute":
             executeItem(item);
             break;
+        case "clipboard_copy":
+            ClipboardService.copyEntry(item.data, function () {
+                root.itemExecuted();
+            });
+            return;
+        case "clipboard_paste":
+            ClipboardService.pasteEntry(item.data, function () {
+                root.itemExecuted();
+            });
+            return;
         case "launch_dgpu":
             if (item.type === "app" && item.data) {
                 launchAppWithNvidia(item.data);
