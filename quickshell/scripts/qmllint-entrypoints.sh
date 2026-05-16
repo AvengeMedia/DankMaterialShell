@@ -119,7 +119,10 @@ for path in "${import_paths[@]}"; do
     fi
 done
 
+printf 'lint-qml: checking %d entrypoints with %s\n' "${#targets[@]}" "${qmllint_bin}"
+
 if ! output="$("${qmllint_bin}" "${qmllint_args[@]}" "${targets[@]}" 2>&1)"; then
+    printf 'lint-qml: FAIL\n' >&2
     printf '%s\n' "${output}" >&2
     exit 1
 fi
@@ -127,3 +130,5 @@ fi
 if [[ -n "${output}" ]]; then
     printf '%s\n' "${output}"
 fi
+
+printf 'lint-qml: PASS (%d entrypoints)\n' "${#targets[@]}"
