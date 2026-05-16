@@ -111,7 +111,7 @@
     "(Unnamed)": "(Senza nome)"
   },
   "+ %1 more": {
-    "+ %1 more": "+ %1 altre"
+    "+ %1 more": "+ %1 altri/e"
   },
   "/path/to/videos": {
     "/path/to/videos": "/percorso/dei/video"
@@ -342,7 +342,7 @@
     "Activate Greeter": "Attiva Greeter"
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
-    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Attivare il greeter DMS? Si aprirà un terminale per l'autenticazione sudo. Esegui Sincronizza dopo l'attivazione per applicare le tue impostazioni."
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Attivare il greeter DMS? Si aprirà un terminale per l'autenticazione sudo. Esegui \"sync\" dopo l'attivazione per applicare le tue impostazioni."
   },
   "Activation": {
     "Activation": "Attivazione"
@@ -384,7 +384,7 @@
     "Add Bar": "Aggiungi Barra"
   },
   "Add Desktop Widget": {
-    "Add Desktop Widget": "Aggiungi Widget Desktop"
+    "Add Desktop Widget": "Aggiungi Widget sul Desktop"
   },
   "Add Printer": {
     "Add Printer": "Aggiungi Stampante"
@@ -399,7 +399,7 @@
     "Add Widget to %1 Section": "Aggiungi Widget alla Sezione %1"
   },
   "Add a border around the dock": {
-    "Add a border around the dock": "Aggiungi un bordo alla dock"
+    "Add a border around the dock": "Aggiungi un bordo al dock"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
     "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Aggiungi un prefisso personalizzato all'avvio di tutte le applicazioni. Può essere utilizzato per strumenti come \"uwsm-app\", \"systemd-run\" o altri wrapper di comandi."
@@ -456,16 +456,16 @@
     "Always Show Percentage": "Mostra Sempre Percentuale"
   },
   "Always hide the dock and reveal it when hovering near the dock area": {
-    "Always hide the dock and reveal it when hovering near the dock area": "Nascondi sempre la dock e mostrala passando il cursore vicino all’area della dock"
+    "Always hide the dock and reveal it when hovering near the dock area": "Nascondi sempre il dock e mostralo passando il cursore vicino all’area del dock"
   },
   "Always on icons": {
     "Always on icons": "Icone sempre attive"
   },
   "Always show a minimum of 3 workspaces, even if fewer are available": {
-    "Always show a minimum of 3 workspaces, even if fewer are available": "Mostra sempre almeno 3 spazi di lavoro, anche se ne sono disponibili meno"
+    "Always show a minimum of 3 workspaces, even if fewer are available": "Mostra sempre almeno 3 spazi di lavoro, anche se ce ne sono disponibili meno"
   },
   "Always show the dock when niri's overview is open": {
-    "Always show the dock when niri's overview is open": "Mostra sempre la dock quando la vista panoramica di niri è aperta"
+    "Always show the dock when niri's overview is open": "Mostra sempre il dock quando la vista panoramica di niri è aperta"
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Mostra sempre quando è presente un solo schermo connesso"
@@ -513,7 +513,7 @@
     "App Names": "Nomi App"
   },
   "App Theming": {
-    "App Theming": "Theming Applicazioni"
+    "App Theming": "Gestione temi Applicazioni"
   },
   "Appearance": {
     "Appearance": "Aspetto"
@@ -567,7 +567,7 @@
     "Apps with notification popups muted. Unmute or delete to remove.": "App con popup di notifica silenziati. Riattiva o elimina per rimuovere."
   },
   "Arc Extender": {
-    "Arc Extender": "Estensore degli Archi"
+    "Arc Extender": "Estensore ARC"
   },
   "Architecture": {
     "Architecture": "Architettura"
@@ -645,7 +645,7 @@
     "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.": "Le modifiche di autenticazione vengono applicate automaticamente. L'accesso solo con impronta digitale potrebbe non sbloccare il Portachiavi."
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
-    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Le modifiche di autenticazione richiedono sudo. Apertura del terminale per consentirti l'uso della password o dell'impronta digitale."
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Le modifiche di autenticazione richiedono sudo. Verrà aperto un terminale per consentirti l'uso della password o dell'impronta digitale."
   },
   "Authentication error - try again": {
     "Authentication error - try again": "Errore di autenticazione - riprova"
@@ -688,12 +688,12 @@
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "Elimina automaticamente le notifiche più vecchie di questo periodo"
-  },
+  }, 
   "Auto-hide": {
     "Auto-hide": "Nascondi Automaticamente"
   },
   "Auto-hide Dock": {
-    "Auto-hide Dock": "Nascondi Automaticamente la Dock"
+    "Auto-hide Dock": "Nascondi Automaticamente il Dock"
   },
   "Auto-saving...": {
     "Auto-saving...": "Salvataggio in corso..."
@@ -2037,7 +2037,7 @@
     "Display Settings": "Impostazioni Schermo"
   },
   "Display a dock with pinned and running applications": {
-    "Display a dock with pinned and running applications": "Mostra una dock con applicazioni fissate e in esecuzione"
+    "Display a dock with pinned and running applications": "Mostra un dock con applicazioni fissate e in esecuzione"
   },
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "Mostra priorità sopra app a schermo intero"
@@ -2109,7 +2109,7 @@
     "Dock margin, transparency, and border": ""
   },
   "Dock spacing, transparency, and border": {
-    "Dock spacing, transparency, and border": "Spaziatura, trasparenza e bordo della dock"
+    "Dock spacing, transparency, and border": "Spaziatura, trasparenza e bordo del dock"
   },
   "Docs": {
     "Docs": "Documentazione"
@@ -3159,7 +3159,7 @@
     "Hide Updater Widget": "Nascondi Widget di Aggiornamento"
   },
   "Hide When Fullscreen": {
-    "Hide When Fullscreen": ""
+    "Hide When Fullscreen": "Nascondi quando a schermo intero"
   },
   "Hide When Typing": {
     "Hide When Typing": "Nascondi Durante la Digitazione"
@@ -3189,7 +3189,7 @@
     "Hide on Touch": "Nascondi al Tocco"
   },
   "Hide the dock when a window is fullscreen": {
-    "Hide the dock when a window is fullscreen": ""
+    "Hide the dock when a window is fullscreen": "Nascondi il dock quando una finestra è a schemo intero"
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Tavolozza ad alta fedeltà che preserva le tonalità della sorgente."
@@ -4965,7 +4965,7 @@
     "Pin": "Fissa"
   },
   "Pin to Dock": {
-    "Pin to Dock": "Fissa sulla Dock"
+    "Pin to Dock": "Fissa sul Dock"
   },
   "Ping": {
     "Ping": "Ping"
@@ -5745,7 +5745,7 @@
     "Select Custom Theme": "Seleziona Tema Personalizzato"
   },
   "Select Dock Launcher Logo": {
-    "Select Dock Launcher Logo": "Seleziona Logo Launcher della Dock"
+    "Select Dock Launcher Logo": "Seleziona Logo Launcher del Dock"
   },
   "Select File to Send": {
     "Select File to Send": "Seleziona File da Inviare"
@@ -5982,7 +5982,7 @@
     "Show Disk": "Mostra Disco"
   },
   "Show Dock": {
-    "Show Dock": "Mostra la Dock"
+    "Show Dock": "Mostra il Dock"
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Mostra Temperatura Percepita"
@@ -6138,7 +6138,7 @@
     "Show device": "Mostra dispositivo"
   },
   "Show dock when floating windows don't overlap its area": {
-    "Show dock when floating windows don't overlap its area": "Mostra la dock quando le finestre fluttuanti non ne sovrappongono l’area"
+    "Show dock when floating windows don't overlap its area": "Mostra il dock quando le finestre fluttuanti non ne sovrappongono l’area"
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Mostra ombra esterna sui popup di notifica. Richiede che M3 Elevation sia attivato in Tema e Colori."
@@ -6948,7 +6948,7 @@
     "Unpin": "Rimuovi"
   },
   "Unpin from Dock": {
-    "Unpin from Dock": "Rimuovi dalla Dock"
+    "Unpin from Dock": "Rimuovi dal Dock"
   },
   "Unsaved Changes": {
     "Unsaved Changes": "Modifiche non Salvate"
@@ -7266,7 +7266,7 @@
     "Welcome to DankMaterialShell": "Benvenuto in DankMaterialShell"
   },
   "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": {
-    "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": "Facendo clic su una finestra nella dock in uno spazio di lavoro speciale di Hyprland, ripristina lo spazio di lavoro speciale prima di portare in primo piano la finestra"
+    "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": "Facendo clic su una finestra nel dock in uno spazio di lavoro speciale di Hyprland, ripristina lo spazio di lavoro speciale prima di portare in primo piano la finestra"
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Quando attivato, le applicazioni sono ordinate alfabeticamente. Quando disattivato, le applicazioni sono ordinate per frequenza d'uso."
