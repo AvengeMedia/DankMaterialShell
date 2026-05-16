@@ -61,7 +61,8 @@ Item {
             impl.item.toggleWithMode(mode);
     }
 
-    readonly property var _desiredBackend: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+    readonly property bool useSpotlightBackend: SettingsData.connectedFrameModeActive ? SettingsData.frameUseSpotlightLauncher : SettingsData.launcherStyle === "spotlight"
+    readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp)
     property var _resolvedBackend: null
 
     Component.onCompleted: _resolvedBackend = _desiredBackend
@@ -69,6 +70,12 @@ Item {
     Connections {
         target: SettingsData
         function onConnectedFrameModeActiveChanged() {
+            root._maybeResolveBackend();
+        }
+        function onFrameUseSpotlightLauncherChanged() {
+            root._maybeResolveBackend();
+        }
+        function onLauncherStyleChanged() {
             root._maybeResolveBackend();
         }
     }
@@ -98,6 +105,11 @@ Item {
     Component {
         id: connectedComp
         DankLauncherV2ModalConnected {}
+    }
+
+    Component {
+        id: spotlightComp
+        DankLauncherV2ModalSpotlight {}
     }
 
     function _wireBackend(it) {

@@ -258,6 +258,8 @@ Singleton {
     onFrameLauncherEmergeSideChanged: saveSettings()
     property bool frameLauncherArcExtender: false
     onFrameLauncherArcExtenderChanged: saveSettings()
+    property bool frameUseSpotlightLauncher: false
+    onFrameUseSpotlightLauncherChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property string frameMode: "connected"
     onFrameModeChanged: saveSettings()
@@ -447,6 +449,7 @@ Singleton {
     property bool dankLauncherV2UnloadOnClose: false
     property bool dankLauncherV2IncludeFilesInAll: false
     property bool dankLauncherV2IncludeFoldersInAll: false
+    property string launcherStyle: "full"
 
     property string _legacyWeatherLocation: "New York, NY"
     property string _legacyWeatherCoordinates: "40.7128,-74.0060"

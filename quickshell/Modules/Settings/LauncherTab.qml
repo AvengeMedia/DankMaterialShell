@@ -8,6 +8,8 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    property var parentModal: null
+
     FileBrowserModal {
         id: logoFileBrowser
         browserTitle: I18n.tr("Select Launcher Logo")
@@ -29,6 +31,43 @@ Item {
             width: Math.min(550, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
+
+            SettingsCard {
+                width: parent.width
+                iconName: "search"
+                title: I18n.tr("Launcher Style")
+                settingKey: "launcherStyle"
+
+                SettingsControlledByFrame {
+                    visible: SettingsData.connectedFrameModeActive
+                    parentModal: root.parentModal
+                    settingLabel: I18n.tr("Launcher Style")
+                    reason: I18n.tr("Managed by Frame Mode")
+                }
+
+                StyledText {
+                    width: parent.width
+                    visible: !SettingsData.connectedFrameModeActive
+                    text: SettingsData.launcherStyle === "spotlight" ? I18n.tr("Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.") : I18n.tr("Full-featured launcher with mode tabs, grid view, and action panel.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+
+                SettingsButtonGroupRow {
+                    visible: !SettingsData.connectedFrameModeActive
+                    settingKey: "launcherStyleSelector"
+                    tags: ["launcher", "style", "spotlight", "full", "minimal"]
+                    text: I18n.tr("Style")
+                    model: [I18n.tr("Full"), I18n.tr("Spotlight")]
+                    currentIndex: SettingsData.launcherStyle === "spotlight" ? 1 : 0
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("launcherStyle", index === 1 ? "spotlight" : "full");
+                    }
+                }
+            }
 
             SettingsCard {
                 width: parent.width

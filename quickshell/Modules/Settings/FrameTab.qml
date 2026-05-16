@@ -308,6 +308,15 @@ Item {
                     onToggled: checked => SettingsData.set("frameCloseGaps", !checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "frameUseSpotlightLauncher"
+                    tags: ["frame", "connected", "launcher", "spotlight", "search", "minimal"]
+                    text: I18n.tr("Use Spotlight Launcher")
+                    description: I18n.tr("Use the centered minimal launcher instead of the connected V2 launcher")
+                    checked: SettingsData.frameUseSpotlightLauncher
+                    onToggled: checked => SettingsData.set("frameUseSpotlightLauncher", checked)
+                }
+
                 SettingsButtonGroupRow {
                     settingKey: "frameLauncherEmergeSide"
                     tags: ["frame", "connected", "launcher", "modal", "emerge", "direction", "bottom", "top"]

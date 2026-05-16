@@ -205,7 +205,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: LauncherTab {}
+            sourceComponent: LauncherTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)

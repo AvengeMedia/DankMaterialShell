@@ -13,6 +13,7 @@ Popup {
     property var controller: null
     property var searchField: null
     property var parentHandler: null
+    property bool allowEditActions: true
 
     signal hideRequested
     signal editAppRequested(var app)
@@ -112,12 +113,14 @@ Popup {
                 text: I18n.tr("Hide App"),
                 action: hideCurrentApp
             });
-            items.push({
-                type: "item",
-                icon: "edit",
-                text: I18n.tr("Edit App"),
-                action: editCurrentApp
-            });
+            if (allowEditActions) {
+                items.push({
+                    type: "item",
+                    icon: "edit",
+                    text: I18n.tr("Edit App"),
+                    action: editCurrentApp
+                });
+            }
         }
 
         if (item?.actions && item.actions.length > 0) {

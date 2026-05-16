@@ -213,6 +213,7 @@ var SPEC = {
     dankLauncherV2UnloadOnClose: { def: false },
     dankLauncherV2IncludeFilesInAll: { def: false },
     dankLauncherV2IncludeFoldersInAll: { def: false },
+    launcherStyle: { def: "full" },
 
     useAutoLocation: { def: false },
     weatherEnabled: { def: true },
@@ -572,6 +573,7 @@ var SPEC = {
     frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
+    frameUseSpotlightLauncher: { def: false },
     frameMode: { def: "connected" }
 };
 
