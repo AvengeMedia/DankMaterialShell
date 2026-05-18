@@ -26,6 +26,9 @@
   "%1 connected": {
     "%1 connected": "%1 bağlı"
   },
+  "%1 copied": {
+    "%1 copied": ""
+  },
   "%1 custom animation duration": {
     "%1 custom animation duration": ""
   },
@@ -470,6 +473,9 @@
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Yalnızca bir ekran bağlı olduğunda her zaman göster"
   },
+  "Always use this app for %1": {
+    "Always use this app for %1": ""
+  },
   "Amount": {
     "Amount": "Miktar"
   },
@@ -677,6 +683,9 @@
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "Otomatik Açılır Pencere Boşlukları"
   },
+  "Auto mode is on. Manual profile selection is disabled.": {
+    "Auto mode is on. Manual profile selection is disabled.": ""
+  },
   "Auto-Clear After": {
     "Auto-Clear After": "Sonra Otomatik Sil"
   },
@@ -860,6 +869,9 @@
   "Bit Depth": {
     "Bit Depth": "Bit Derinliği"
   },
+  "Black": {
+    "Black": ""
+  },
   "Block Out": {
     "Block Out": ""
   },
@@ -904,6 +916,9 @@
   },
   "Body": {
     "Body": ""
+  },
+  "Bold": {
+    "Bold": ""
   },
   "Border": {
     "Border": "Kenarlık"
@@ -1013,6 +1028,9 @@
   "CUPS not available": {
     "CUPS not available": "CUPS kullanılamıyor"
   },
+  "Calendar": {
+    "Calendar": ""
+  },
   "Camera": {
     "Camera": "Kamera"
   },
@@ -1090,6 +1108,9 @@
   },
   "Check interval": {
     "Check interval": ""
+  },
+  "Check on startup": {
+    "Check on startup": ""
   },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
@@ -1273,6 +1294,9 @@
   },
   "Color": {
     "Color": "Renk"
+  },
+  "Color %1 copied": {
+    "Color %1 copied": ""
   },
   "Color Gamut": {
     "Color Gamut": "Renk Gamı"
@@ -1604,6 +1628,9 @@
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
     "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": ""
   },
+  "Created plugin directory: %1": {
+    "Created plugin directory: %1": ""
+  },
   "Creating...": {
     "Creating...": "Oluşturuluyor..."
   },
@@ -1751,8 +1778,14 @@
   "DEMO MODE - Click anywhere to exit": {
     "DEMO MODE - Click anywhere to exit": "DEMO MODU - Çıkmak için herhangi bir yere tıklayın"
   },
+  "DMS Chooser": {
+    "DMS Chooser": ""
+  },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "DMS Eklenti Yöneticisi Kullanılamıyor"
+  },
+  "DMS Settings": {
+    "DMS Settings": ""
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": ""
@@ -1762,6 +1795,9 @@
   },
   "DMS out of date": {
     "DMS out of date": "DMS güncel değil"
+  },
+  "DMS server is outdated (API v%1, expected v%2)": {
+    "DMS server is outdated (API v%1, expected v%2)": ""
   },
   "DMS service is not connected. Clipboard settings are unavailable.": {
     "DMS service is not connected. Clipboard settings are unavailable.": "DMS hizmeti bağlı değil. Pano ayarları kullanılamıyor."
@@ -1847,6 +1883,12 @@
   "Default (Black)": {
     "Default (Black)": ""
   },
+  "Default (Global)": {
+    "Default (Global)": ""
+  },
+  "Default Apps": {
+    "Default Apps": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Varsayılan Genişlik (%)"
   },
@@ -1885,6 +1927,9 @@
   },
   "Delete profile \"%1\"?": {
     "Delete profile \"%1\"?": ""
+  },
+  "Demi Bold": {
+    "Demi Bold": ""
   },
   "Dependencies & documentation": {
     "Dependencies & documentation": ""
@@ -2060,6 +2105,9 @@
   "Display hourly weather predictions": {
     "Display hourly weather predictions": ""
   },
+  "Display line numbers in editor": {
+    "Display line numbers in editor": ""
+  },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "Yalnızca pencere içeren çalışma alanlarını göster"
   },
@@ -2179,6 +2227,9 @@
   },
   "Dynamic colors from wallpaper": {
     "Dynamic colors from wallpaper": "Duvar kağıdından dinamik renkler"
+  },
+  "Dynamic colors parse error: %1": {
+    "Dynamic colors parse error: %1": ""
   },
   "Dynamic colors, presets": {
     "Dynamic colors, presets": ""
@@ -2438,6 +2489,12 @@
   "Extra Arguments": {
     "Extra Arguments": ""
   },
+  "Extra Bold": {
+    "Extra Bold": ""
+  },
+  "Extra Light": {
+    "Extra Light": ""
+  },
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: Değiştir • F10: Yardım"
   },
@@ -2464,6 +2521,12 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "Yazıcı sınıfa eklenemedi"
+  },
+  "Failed to apply GTK colors": {
+    "Failed to apply GTK colors": ""
+  },
+  "Failed to apply Qt colors": {
+    "Failed to apply Qt colors": ""
   },
   "Failed to apply profile": {
     "Failed to apply profile": ""
@@ -2513,6 +2576,9 @@
   "Failed to disable night mode": {
     "Failed to disable night mode": "Gece modu devre dışı bırakılamadı"
   },
+  "Failed to disable plugin: %1": {
+    "Failed to disable plugin: %1": ""
+  },
   "Failed to disconnect VPN": {
     "Failed to disconnect VPN": "VPN bağlantısı kesilemedi"
   },
@@ -2536,6 +2602,12 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Gece modu etkinleştiremedi"
+  },
+  "Failed to enable plugin: %1": {
+    "Failed to enable plugin: %1": ""
+  },
+  "Failed to fetch network QR code: %1": {
+    "Failed to fetch network QR code: %1": ""
   },
   "Failed to hold job": {
     "Failed to hold job": "İş bekletilemedi"
@@ -2576,8 +2648,17 @@
   "Failed to print test page": {
     "Failed to print test page": "Test sayfası yazdırılamadı"
   },
+  "Failed to read theme file: %1": {
+    "Failed to read theme file: %1": ""
+  },
   "Failed to reject pairing": {
     "Failed to reject pairing": ""
+  },
+  "Failed to reload plugin: %1": {
+    "Failed to reload plugin: %1": ""
+  },
+  "Failed to remove QR code at %1: %2": {
+    "Failed to remove QR code at %1: %2": ""
   },
   "Failed to remove device": {
     "Failed to remove device": "Cihaz kaldırılamadı"
@@ -2705,6 +2786,9 @@
   "File Information": {
     "File Information": "Dosya Bilgisi"
   },
+  "File Manager": {
+    "File Manager": ""
+  },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
   },
@@ -2713,6 +2797,9 @@
   },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": ""
+  },
+  "File search unavailable": {
+    "File search unavailable": ""
   },
   "Files": {
     "Files": "Dosyalar"
@@ -2861,6 +2948,12 @@
   "For 8 hours": {
     "For 8 hours": ""
   },
+  "For editing plain text files": {
+    "For editing plain text files": ""
+  },
+  "For reading PDF files": {
+    "For reading PDF files": ""
+  },
   "Force HDR": {
     "Force HDR": "Zorla HDR"
   },
@@ -2936,6 +3029,9 @@
   "Fruit Salad": {
     "Fruit Salad": ""
   },
+  "Full": {
+    "Full": ""
+  },
   "Full Command:": {
     "Full Command:": ""
   },
@@ -2947,6 +3043,9 @@
   },
   "Full with Year": {
     "Full with Year": ""
+  },
+  "Full-featured launcher with mode tabs, grid view, and action panel.": {
+    "Full-featured launcher with mode tabs, grid view, and action panel.": ""
   },
   "Fullscreen": {
     "Fullscreen": ""
@@ -2975,6 +3074,9 @@
   "GPU temperature display": {
     "GPU temperature display": ""
   },
+  "GTK colors applied successfully": {
+    "GTK colors applied successfully": ""
+  },
   "GTK, Qt, IDEs, more": {
     "GTK, Qt, IDEs, more": ""
   },
@@ -2998,6 +3100,9 @@
   },
   "GitHub": {
     "GitHub": "GitHub"
+  },
+  "Global fonts can be configured in Settings → Personalization": {
+    "Global fonts can be configured in Settings → Personalization": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": ""
@@ -3095,8 +3200,17 @@
   "HSV": {
     "HSV": "HSV"
   },
+  "HSV %1 copied": {
+    "HSV %1 copied": ""
+  },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": ""
+  },
+  "Handles links and opens HTML files": {
+    "Handles links and opens HTML files": ""
+  },
+  "Handles mailto links": {
+    "Handles mailto links": ""
   },
   "Health": {
     "Health": "Sağlık"
@@ -3124,6 +3238,9 @@
   },
   "Hibernate": {
     "Hibernate": "Hazırda Beklet"
+  },
+  "Hibernate failed": {
+    "Hibernate failed": ""
   },
   "Hidden": {
     "Hidden": ""
@@ -3329,6 +3446,9 @@
   "Image": {
     "Image": "Resim"
   },
+  "Image Viewer": {
+    "Image Viewer": ""
+  },
   "Image copied to clipboard": {
     "Image copied to clipboard": "Görüntü panoya kopyalandı"
   },
@@ -3422,6 +3542,9 @@
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": ""
   },
+  "Install dsearch to search files.": {
+    "Install dsearch to search files.": ""
+  },
   "Install failed: %1": {
     "Install failed: %1": "Yüklenemedi: %1"
   },
@@ -3473,6 +3596,9 @@
   "Interval": {
     "Interval": "Aralık"
   },
+  "Invalid JSON format: %1": {
+    "Invalid JSON format: %1": ""
+  },
   "Invalid configuration": {
     "Invalid configuration": "Geçersiz yapılandırma"
   },
@@ -3499,6 +3625,9 @@
   },
   "Keep Changes": {
     "Keep Changes": "Değişiklikleri Tut"
+  },
+  "Keep typing": {
+    "Keep typing": ""
   },
   "Keeping Awake": {
     "Keeping Awake": "Uyanık Tutuluyor"
@@ -3611,6 +3740,9 @@
   "Launcher Emerge Side": {
     "Launcher Emerge Side": ""
   },
+  "Launcher Style": {
+    "Launcher Style": ""
+  },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": ""
   },
@@ -3631,6 +3763,9 @@
   },
   "Left Section": {
     "Left Section": "Sol Bölüm"
+  },
+  "Light": {
+    "Light": ""
   },
   "Light Direction": {
     "Light Direction": ""
@@ -3767,6 +3902,9 @@
   "MTU": {
     "MTU": "MTU"
   },
+  "Mail": {
+    "Mail": ""
+  },
   "Make sure KDE Connect or Valent is running on your other devices": {
     "Make sure KDE Connect or Valent is running on your other devices": ""
   },
@@ -3779,11 +3917,20 @@
   "Managed by Frame": {
     "Managed by Frame": ""
   },
+  "Managed by Frame Mode": {
+    "Managed by Frame Mode": ""
+  },
   "Managed by Frame in Connected Mode": {
     "Managed by Frame in Connected Mode": ""
   },
   "Management": {
     "Management": "Yönetim"
+  },
+  "Manages calendar events": {
+    "Manages calendar events": ""
+  },
+  "Manages files and directories": {
+    "Manages files and directories": ""
   },
   "MangoWC Layout Overrides": {
     "MangoWC Layout Overrides": ""
@@ -4016,6 +4163,9 @@
   "Min W": {
     "Min W": ""
   },
+  "Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.": {
+    "Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.": ""
+  },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Tek bir renk tonu etrafında oluşturulmuş minimal palet."
   },
@@ -4109,6 +4259,9 @@
   "Multi-Monitor": {
     "Multi-Monitor": ""
   },
+  "Multimedia": {
+    "Multimedia": ""
+  },
   "Multiplexer": {
     "Multiplexer": ""
   },
@@ -4120,6 +4273,9 @@
   },
   "Music": {
     "Music": ""
+  },
+  "Music Player": {
+    "Music Player": ""
   },
   "Mute Popups": {
     "Mute Popups": ""
@@ -4234,6 +4390,9 @@
   },
   "Night mode & gamma": {
     "Night mode & gamma": "Gece modu & gamma"
+  },
+  "Night mode failed: DMS gamma control not available": {
+    "Night mode failed: DMS gamma control not available": ""
   },
   "Niri Integration": {
     "Niri Integration": "Niri Entegrasyonu"
@@ -4364,6 +4523,9 @@
   "No disk data available": {
     "No disk data available": "Disk verisi mevcut değil"
   },
+  "No display profiles found. Create them in Settings > Displays.": {
+    "No display profiles found. Create them in Settings > Displays.": ""
+  },
   "No drivers found": {
     "No drivers found": "Sürücü bulunamadı"
   },
@@ -4460,6 +4622,9 @@
   "No recent clipboard entries found": {
     "No recent clipboard entries found": ""
   },
+  "No results": {
+    "No results": ""
+  },
   "No results found": {
     "No results found": ""
   },
@@ -4516,6 +4681,9 @@
   },
   "None": {
     "None": "Hiçbiri"
+  },
+  "None active": {
+    "None active": ""
   },
   "Normal": {
     "Normal": "Normal"
@@ -4733,6 +4901,9 @@
   "Opening terminal: ": {
     "Opening terminal: ": ""
   },
+  "Opens image files": {
+    "Opens image files": ""
+  },
   "Optional description": {
     "Optional description": "Opsiyonel tanım"
   },
@@ -4799,6 +4970,9 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Bu çıkış için genel düzen ayarlarını geçersiz kıl"
   },
+  "Override global transparency for Notepad": {
+    "Override global transparency for Notepad": ""
+  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": ""
   },
@@ -4834,6 +5008,9 @@
   },
   "PAM provides fingerprint auth, but no reader was detected.": {
     "PAM provides fingerprint auth, but no reader was detected.": ""
+  },
+  "PDF Reader": {
+    "PDF Reader": ""
   },
   "PIN": {
     "PIN": "PİN"
@@ -5018,6 +5195,12 @@
   "Playback error: ": {
     "Playback error: ": ""
   },
+  "Plays audio files": {
+    "Plays audio files": ""
+  },
+  "Plays video files": {
+    "Plays video files": ""
+  },
   "Please wait...": {
     "Please wait...": ""
   },
@@ -5042,8 +5225,23 @@
   "Plugin Visibility": {
     "Plugin Visibility": ""
   },
+  "Plugin disabled: %1": {
+    "Plugin disabled: %1": ""
+  },
+  "Plugin enabled: %1": {
+    "Plugin enabled: %1": ""
+  },
   "Plugin is disabled - enable in Plugins settings to use": {
     "Plugin is disabled - enable in Plugins settings to use": "Eklenti devre dışı - kullanmak için Eklenti ayarlarından etkinleştirin"
+  },
+  "Plugin reloaded: %1": {
+    "Plugin reloaded: %1": ""
+  },
+  "Plugin uninstalled: %1": {
+    "Plugin uninstalled: %1": ""
+  },
+  "Plugin updated: %1": {
+    "Plugin updated: %1": ""
   },
   "Plugins": {
     "Plugins": "Eklentiler"
@@ -5264,6 +5462,9 @@
   "Protocol": {
     "Protocol": "Protokol"
   },
+  "Qt colors applied successfully": {
+    "Qt colors applied successfully": ""
+  },
   "Qt: distance-field renderer.": {
     "Qt: distance-field renderer.": ""
   },
@@ -5324,6 +5525,9 @@
   "Reboot": {
     "Reboot": "Yeniden Başlat"
   },
+  "Recent": {
+    "Recent": ""
+  },
   "Recent Colors": {
     "Recent Colors": "Son Renkler"
   },
@@ -5341,6 +5545,9 @@
   },
   "Regex": {
     "Regex": ""
+  },
+  "Regular": {
+    "Regular": ""
   },
   "Reject": {
     "Reject": ""
@@ -5705,6 +5912,9 @@
   "Search...": {
     "Search...": "Ara..."
   },
+  "Searching": {
+    "Searching": ""
+  },
   "Searching...": {
     "Searching...": "Arıyor..."
   },
@@ -5879,8 +6089,14 @@
   "Set notification rules": {
     "Set notification rules": ""
   },
+  "Setting": {
+    "Setting": ""
+  },
   "Settings": {
     "Settings": "Ayarlar"
+  },
+  "Settings Search": {
+    "Settings Search": ""
   },
   "Settings are read-only. Changes will not persist.": {
     "Settings are read-only. Changes will not persist.": ""
@@ -5932,6 +6148,9 @@
   },
   "Shift+Del: Clear All • Esc: Close": {
     "Shift+Del: Clear All • Esc: Close": "Shift+Del: Tümünü Temizle • Esc: Kapat"
+  },
+  "Shift+Enter to copy": {
+    "Shift+Enter to copy": ""
   },
   "Shift+Enter to paste": {
     "Shift+Enter to paste": ""
@@ -6335,6 +6554,12 @@
   "Spool Area Full": {
     "Spool Area Full": "Aktarım Alanı Dolu"
   },
+  "Spotlight": {
+    "Spotlight": ""
+  },
+  "Spotlight Search": {
+    "Spotlight Search": ""
+  },
   "Square Corners": {
     "Square Corners": "Kare Köşeler"
   },
@@ -6383,6 +6608,9 @@
   "Stripes": {
     "Stripes": ""
   },
+  "Style": {
+    "Style": ""
+  },
   "Summary": {
     "Summary": ""
   },
@@ -6430,6 +6658,9 @@
   },
   "Switch User": {
     "Switch User": "Kullanıcı Değiştir"
+  },
+  "Switch between display configurations": {
+    "Switch between display configurations": ""
   },
   "Switch to power profile": {
     "Switch to power profile": "Güç profiline geç"
@@ -6581,6 +6812,9 @@
   "Text Color": {
     "Text Color": ""
   },
+  "Text Editor": {
+    "Text Editor": ""
+  },
   "Text Rendering": {
     "Text Rendering": ""
   },
@@ -6608,11 +6842,17 @@
   "Theme Registry": {
     "Theme Registry": ""
   },
+  "Theme worker failed (%1)": {
+    "Theme worker failed (%1)": ""
+  },
   "Themes": {
     "Themes": ""
   },
   "Thickness": {
     "Thickness": "Kalınlık"
+  },
+  "Thin": {
+    "Thin": ""
   },
   "Third-Party Plugin Warning": {
     "Third-Party Plugin Warning": "Üçüncü Taraf Eklenti Uyarısı"
@@ -6731,6 +6971,9 @@
   "Today": {
     "Today": "Bugün"
   },
+  "Toggle fonts": {
+    "Toggle fonts": ""
+  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Bu bar yapılandırmasının görünürlüğünü değiştir"
   },
@@ -6827,6 +7070,9 @@
   "Try a different search": {
     "Try a different search": ""
   },
+  "Try a different search or switch filters.": {
+    "Try a different search or switch filters.": ""
+  },
   "Turn off": {
     "Turn off": ""
   },
@@ -6850,6 +7096,9 @@
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": ""
+  },
+  "Type at least 2 characters to search files.": {
+    "Type at least 2 characters to search files.": ""
   },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": ""
@@ -6959,6 +7208,9 @@
   "Unsaved note...": {
     "Unsaved note...": "Kaydedilmemiş not..."
   },
+  "Unset": {
+    "Unset": ""
+  },
   "Until %1": {
     "Until %1": ""
   },
@@ -6988,6 +7240,9 @@
   },
   "Update Plugin": {
     "Update Plugin": "Eklentiyi Güncelle"
+  },
+  "Update failed: %1": {
+    "Update failed: %1": ""
   },
   "Upgrading...": {
     "Upgrading...": ""
@@ -7027,6 +7282,9 @@
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Sabit Aralıklı Yazı Tipi Kullan"
+  },
+  "Use Spotlight Launcher": {
+    "Use Spotlight Launcher": ""
   },
   "Use System Theme": {
     "Use System Theme": "Sistem Temasını Kullan"
@@ -7085,6 +7343,9 @@
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "Sistem ayarlarındaki ses temasını kullan"
   },
+  "Use the centered minimal launcher instead of the connected V2 launcher": {
+    "Use the centered minimal launcher instead of the connected V2 launcher": ""
+  },
   "Use the extended surface for launcher content": {
     "Use the extended surface for launcher content": ""
   },
@@ -7093,6 +7354,9 @@
   },
   "Use trigger prefix to activate": {
     "Use trigger prefix to activate": ""
+  },
+  "Used for xdg-terminal-exec": {
+    "Used for xdg-terminal-exec": ""
   },
   "Used when accent color is set to Custom": {
     "Used when accent color is set to Custom": ""
@@ -7111,6 +7375,9 @@
   },
   "Uses sunrise/sunset times to automatically adjust night mode based on your location.": {
     "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "Gün doğumu/batımı saatlerini kullanarak konumunuza göre gece modunu otomatik olarak ayarlar."
+  },
+  "Using global monospace font from Settings → Personalization": {
+    "Using global monospace font from Settings → Personalization": ""
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": ""
@@ -7183,6 +7450,9 @@
   },
   "Video Path": {
     "Video Path": ""
+  },
+  "Video Player": {
+    "Video Player": ""
   },
   "Video Screensaver": {
     "Video Screensaver": ""
@@ -7259,6 +7529,9 @@
   "Weather Widget": {
     "Weather Widget": "Hava Durumu Widget'ı"
   },
+  "Web Browser": {
+    "Web Browser": ""
+  },
   "Welcome": {
     "Welcome": ""
   },
@@ -7270,6 +7543,9 @@
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Etkinleştirildiğinde, uygulamalar alfabetik olarak sıralanır. Devre dışı bırakıldığında, uygulamalar kullanım sıklığına göre sıralanır."
+  },
+  "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
+    "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": ""
   },
   "When locked": {
     "When locked": ""
@@ -7532,6 +7808,12 @@
   "mangowc GitHub": {
     "mangowc GitHub": ""
   },
+  "matugen not available or disabled - cannot apply GTK colors": {
+    "matugen not available or disabled - cannot apply GTK colors": ""
+  },
+  "matugen not available or disabled - cannot apply Qt colors": {
+    "matugen not available or disabled - cannot apply Qt colors": ""
+  },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen bulunamadı - dinamik tema için matugen paketini yükleyin"
   },
@@ -7555,6 +7837,12 @@
   },
   "niri/dms Discord": {
     "niri/dms Discord": ""
+  },
+  "niri: config reloaded": {
+    "niri: config reloaded": ""
+  },
+  "niri: failed to load config": {
+    "niri: failed to load config": ""
   },
   "now": {
     "now": ""

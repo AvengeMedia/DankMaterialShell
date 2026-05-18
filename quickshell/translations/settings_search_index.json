@@ -1431,7 +1431,7 @@
       "start menu",
       "taskbar"
     ],
-    "icon": "apps"
+    "icon": "shelf_auto_hide"
   },
   {
     "section": "dockVisibility",
@@ -2200,6 +2200,27 @@
     "icon": "apps"
   },
   {
+    "section": "launcherStyle",
+    "label": "Launcher Style",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "drawer",
+      "full",
+      "launcher",
+      "menu",
+      "minimal",
+      "spotlight",
+      "start",
+      "start menu",
+      "style"
+    ],
+    "icon": "search"
+  },
+  {
     "section": "spotlightCloseNiriOverview",
     "label": "Niri Integration",
     "tabIndex": 9,
@@ -2402,6 +2423,22 @@
     ],
     "icon": "sort_by_alpha",
     "description": "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency."
+  },
+  {
+    "section": "launcherStyleSelector",
+    "label": "Style",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "drawer",
+      "full",
+      "launcher",
+      "menu",
+      "minimal",
+      "spotlight",
+      "start",
+      "style"
+    ]
   },
   {
     "section": "dankLauncherV2BorderThickness",
@@ -7499,5 +7536,20 @@
       "settings"
     ],
     "icon": "frame_source"
+  },
+  {
+    "section": "_tab_34",
+    "label": "Applications",
+    "tabIndex": 34,
+    "category": "Settings",
+    "keywords": [
+      "app",
+      "applications",
+      "apps",
+      "program",
+      "programs",
+      "settings"
+    ],
+    "icon": "apps"
   }
 ]

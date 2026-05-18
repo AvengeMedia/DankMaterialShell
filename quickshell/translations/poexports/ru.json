@@ -26,6 +26,9 @@
   "%1 connected": {
     "%1 connected": "%1 подключен(о)"
   },
+  "%1 copied": {
+    "%1 copied": ""
+  },
   "%1 custom animation duration": {
     "%1 custom animation duration": "Пользовательская длительность анимации %1"
   },
@@ -470,6 +473,9 @@
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Всегда показывать, если подключен только один дисплей"
   },
+  "Always use this app for %1": {
+    "Always use this app for %1": ""
+  },
   "Amount": {
     "Amount": "Количество"
   },
@@ -677,6 +683,9 @@
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "Авто Всплывающее Отступы"
   },
+  "Auto mode is on. Manual profile selection is disabled.": {
+    "Auto mode is on. Manual profile selection is disabled.": ""
+  },
   "Auto-Clear After": {
     "Auto-Clear After": "Автоочистка через"
   },
@@ -860,6 +869,9 @@
   "Bit Depth": {
     "Bit Depth": "Глубина цвета"
   },
+  "Black": {
+    "Black": ""
+  },
   "Block Out": {
     "Block Out": "Блокировать с"
   },
@@ -904,6 +916,9 @@
   },
   "Body": {
     "Body": "Заголовок"
+  },
+  "Bold": {
+    "Bold": ""
   },
   "Border": {
     "Border": "Рамка"
@@ -1013,6 +1028,9 @@
   "CUPS not available": {
     "CUPS not available": "CUPS недоступен"
   },
+  "Calendar": {
+    "Calendar": ""
+  },
   "Camera": {
     "Camera": "Камера"
   },
@@ -1090,6 +1108,9 @@
   },
   "Check interval": {
     "Check interval": ""
+  },
+  "Check on startup": {
+    "Check on startup": ""
   },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
@@ -1273,6 +1294,9 @@
   },
   "Color": {
     "Color": "Цвет"
+  },
+  "Color %1 copied": {
+    "Color %1 copied": ""
   },
   "Color Gamut": {
     "Color Gamut": "Цветовой охват"
@@ -1604,6 +1628,9 @@
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
     "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Создать правила для отключения звука, игнорирования, скрытия из истории или переопределения приоритета уведомлений. По умолчанию переопределяется только приоритет; уведомления всё равно показываются нормально."
   },
+  "Created plugin directory: %1": {
+    "Created plugin directory: %1": ""
+  },
   "Creating...": {
     "Creating...": "Создание..."
   },
@@ -1751,8 +1778,14 @@
   "DEMO MODE - Click anywhere to exit": {
     "DEMO MODE - Click anywhere to exit": "ДЕМОНСТРАЦИОННЫЙ РЕЖИМ - Нажмите в любом месте, чтобы выйти"
   },
+  "DMS Chooser": {
+    "DMS Chooser": ""
+  },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "Менеджер Дополнений DMS Недоступен"
+  },
+  "DMS Settings": {
+    "DMS Settings": ""
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Комбинации клавиш DMS"
@@ -1762,6 +1795,9 @@
   },
   "DMS out of date": {
     "DMS out of date": "DMS устарел"
+  },
+  "DMS server is outdated (API v%1, expected v%2)": {
+    "DMS server is outdated (API v%1, expected v%2)": ""
   },
   "DMS service is not connected. Clipboard settings are unavailable.": {
     "DMS service is not connected. Clipboard settings are unavailable.": "Служба DMS не подключена. Настройки буфера обмена недоступны."
@@ -1847,6 +1883,12 @@
   "Default (Black)": {
     "Default (Black)": ""
   },
+  "Default (Global)": {
+    "Default (Global)": ""
+  },
+  "Default Apps": {
+    "Default Apps": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Ширина по умолчанию (%)"
   },
@@ -1885,6 +1927,9 @@
   },
   "Delete profile \"%1\"?": {
     "Delete profile \"%1\"?": "Удалить профиль \"%1\"?"
+  },
+  "Demi Bold": {
+    "Demi Bold": ""
   },
   "Dependencies & documentation": {
     "Dependencies & documentation": ""
@@ -2060,6 +2105,9 @@
   "Display hourly weather predictions": {
     "Display hourly weather predictions": "Отображать почасовые прогнозы погоды"
   },
+  "Display line numbers in editor": {
+    "Display line numbers in editor": ""
+  },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "Отображать только рабочие пространства, содержащие окна"
   },
@@ -2179,6 +2227,9 @@
   },
   "Dynamic colors from wallpaper": {
     "Dynamic colors from wallpaper": "Динамические цвета из обоев"
+  },
+  "Dynamic colors parse error: %1": {
+    "Dynamic colors parse error: %1": ""
   },
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Динамические цвета, предустановки"
@@ -2438,6 +2489,12 @@
   "Extra Arguments": {
     "Extra Arguments": "Дополнительные аргументы"
   },
+  "Extra Bold": {
+    "Extra Bold": ""
+  },
+  "Extra Light": {
+    "Extra Light": ""
+  },
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: Переключить • F10: Справка"
   },
@@ -2464,6 +2521,12 @@
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "Не удалось добавить принтер в класс"
+  },
+  "Failed to apply GTK colors": {
+    "Failed to apply GTK colors": ""
+  },
+  "Failed to apply Qt colors": {
+    "Failed to apply Qt colors": ""
   },
   "Failed to apply profile": {
     "Failed to apply profile": ""
@@ -2513,6 +2576,9 @@
   "Failed to disable night mode": {
     "Failed to disable night mode": "Не удалось отключить ночной режим"
   },
+  "Failed to disable plugin: %1": {
+    "Failed to disable plugin: %1": ""
+  },
   "Failed to disconnect VPN": {
     "Failed to disconnect VPN": "Не удалось отключить VPN"
   },
@@ -2536,6 +2602,12 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Не удалось включить ночной режим"
+  },
+  "Failed to enable plugin: %1": {
+    "Failed to enable plugin: %1": ""
+  },
+  "Failed to fetch network QR code: %1": {
+    "Failed to fetch network QR code: %1": ""
   },
   "Failed to hold job": {
     "Failed to hold job": "Не удалось удержать задание"
@@ -2576,8 +2648,17 @@
   "Failed to print test page": {
     "Failed to print test page": "Не удалось напечатать тестовую страницу"
   },
+  "Failed to read theme file: %1": {
+    "Failed to read theme file: %1": ""
+  },
   "Failed to reject pairing": {
     "Failed to reject pairing": "Не удалось отклонить сопряжение"
+  },
+  "Failed to reload plugin: %1": {
+    "Failed to reload plugin: %1": ""
+  },
+  "Failed to remove QR code at %1: %2": {
+    "Failed to remove QR code at %1: %2": ""
   },
   "Failed to remove device": {
     "Failed to remove device": "Не удалось удалить устройство"
@@ -2705,6 +2786,9 @@
   "File Information": {
     "File Information": "Информация о Файле"
   },
+  "File Manager": {
+    "File Manager": ""
+  },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
   },
@@ -2713,6 +2797,9 @@
   },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "Поиск файлов требует dsearch. Установите с github.com/morelazers/dsearch"
+  },
+  "File search unavailable": {
+    "File search unavailable": ""
   },
   "Files": {
     "Files": "Файлы"
@@ -2861,6 +2948,12 @@
   "For 8 hours": {
     "For 8 hours": ""
   },
+  "For editing plain text files": {
+    "For editing plain text files": ""
+  },
+  "For reading PDF files": {
+    "For reading PDF files": ""
+  },
   "Force HDR": {
     "Force HDR": "Принудительный HDR"
   },
@@ -2936,6 +3029,9 @@
   "Fruit Salad": {
     "Fruit Salad": "Яркий"
   },
+  "Full": {
+    "Full": ""
+  },
   "Full Command:": {
     "Full Command:": "Полная комманда:"
   },
@@ -2947,6 +3043,9 @@
   },
   "Full with Year": {
     "Full with Year": "Системный по умолчанию"
+  },
+  "Full-featured launcher with mode tabs, grid view, and action panel.": {
+    "Full-featured launcher with mode tabs, grid view, and action panel.": ""
   },
   "Fullscreen": {
     "Fullscreen": "Полноэкранный"
@@ -2975,6 +3074,9 @@
   "GPU temperature display": {
     "GPU temperature display": ""
   },
+  "GTK colors applied successfully": {
+    "GTK colors applied successfully": ""
+  },
   "GTK, Qt, IDEs, more": {
     "GTK, Qt, IDEs, more": "GTK, Qt, IDEs, и далее"
   },
@@ -2998,6 +3100,9 @@
   },
   "GitHub": {
     "GitHub": "GitHub"
+  },
+  "Global fonts can be configured in Settings → Personalization": {
+    "Global fonts can be configured in Settings → Personalization": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Глобально масштабировать все длительности анимаций"
@@ -3095,8 +3200,17 @@
   "HSV": {
     "HSV": "HSV"
   },
+  "HSV %1 copied": {
+    "HSV %1 copied": ""
+  },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML скопирован в буфера обмена"
+  },
+  "Handles links and opens HTML files": {
+    "Handles links and opens HTML files": ""
+  },
+  "Handles mailto links": {
+    "Handles mailto links": ""
   },
   "Health": {
     "Health": "Здоровье"
@@ -3124,6 +3238,9 @@
   },
   "Hibernate": {
     "Hibernate": "Гибернация"
+  },
+  "Hibernate failed": {
+    "Hibernate failed": ""
   },
   "Hidden": {
     "Hidden": "Скрытый"
@@ -3329,6 +3446,9 @@
   "Image": {
     "Image": "Изображение"
   },
+  "Image Viewer": {
+    "Image Viewer": ""
+  },
   "Image copied to clipboard": {
     "Image copied to clipboard": "Изображение скопировано в буфера обмена"
   },
@@ -3422,6 +3542,9 @@
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": ""
   },
+  "Install dsearch to search files.": {
+    "Install dsearch to search files.": ""
+  },
   "Install failed: %1": {
     "Install failed: %1": "Ошибка установки: %1"
   },
@@ -3473,6 +3596,9 @@
   "Interval": {
     "Interval": "Интервал"
   },
+  "Invalid JSON format: %1": {
+    "Invalid JSON format: %1": ""
+  },
   "Invalid configuration": {
     "Invalid configuration": "Недействительная конфигурация"
   },
@@ -3499,6 +3625,9 @@
   },
   "Keep Changes": {
     "Keep Changes": "Сохранить изменения"
+  },
+  "Keep typing": {
+    "Keep typing": ""
   },
   "Keeping Awake": {
     "Keeping Awake": "Не спит"
@@ -3611,6 +3740,9 @@
   "Launcher Emerge Side": {
     "Launcher Emerge Side": ""
   },
+  "Launcher Style": {
+    "Launcher Style": ""
+  },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": ""
   },
@@ -3631,6 +3763,9 @@
   },
   "Left Section": {
     "Left Section": "Левая секция"
+  },
+  "Light": {
+    "Light": ""
   },
   "Light Direction": {
     "Light Direction": ""
@@ -3767,6 +3902,9 @@
   "MTU": {
     "MTU": "MTU"
   },
+  "Mail": {
+    "Mail": ""
+  },
   "Make sure KDE Connect or Valent is running on your other devices": {
     "Make sure KDE Connect or Valent is running on your other devices": "Убедитесь, что KDE Connect или Valent запущены на других устройствах"
   },
@@ -3779,11 +3917,20 @@
   "Managed by Frame": {
     "Managed by Frame": ""
   },
+  "Managed by Frame Mode": {
+    "Managed by Frame Mode": ""
+  },
   "Managed by Frame in Connected Mode": {
     "Managed by Frame in Connected Mode": ""
   },
   "Management": {
     "Management": "Управление"
+  },
+  "Manages calendar events": {
+    "Manages calendar events": ""
+  },
+  "Manages files and directories": {
+    "Manages files and directories": ""
   },
   "MangoWC Layout Overrides": {
     "MangoWC Layout Overrides": "Переопределения макета MangoWC"
@@ -4016,6 +4163,9 @@
   "Min W": {
     "Min W": "Мин Ш"
   },
+  "Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.": {
+    "Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.": ""
+  },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Минимальная палитра, встроенная вокруг одного оттенка."
   },
@@ -4109,6 +4259,9 @@
   "Multi-Monitor": {
     "Multi-Monitor": "Мульти-мониторы"
   },
+  "Multimedia": {
+    "Multimedia": ""
+  },
   "Multiplexer": {
     "Multiplexer": ""
   },
@@ -4120,6 +4273,9 @@
   },
   "Music": {
     "Music": "Музыка"
+  },
+  "Music Player": {
+    "Music Player": ""
   },
   "Mute Popups": {
     "Mute Popups": "Только всплывающее"
@@ -4234,6 +4390,9 @@
   },
   "Night mode & gamma": {
     "Night mode & gamma": "Безопасность и конфиденциальность"
+  },
+  "Night mode failed: DMS gamma control not available": {
+    "Night mode failed: DMS gamma control not available": ""
   },
   "Niri Integration": {
     "Niri Integration": "Интеграция Niri"
@@ -4364,6 +4523,9 @@
   "No disk data available": {
     "No disk data available": "Данные о диске недоступны"
   },
+  "No display profiles found. Create them in Settings > Displays.": {
+    "No display profiles found. Create them in Settings > Displays.": ""
+  },
   "No drivers found": {
     "No drivers found": "Драйверы не найдены"
   },
@@ -4460,6 +4622,9 @@
   "No recent clipboard entries found": {
     "No recent clipboard entries found": "Недавние записи буфера обмена не найдены"
   },
+  "No results": {
+    "No results": ""
+  },
   "No results found": {
     "No results found": "Ничего не найдено"
   },
@@ -4516,6 +4681,9 @@
   },
   "None": {
     "None": "Нет"
+  },
+  "None active": {
+    "None active": ""
   },
   "Normal": {
     "Normal": "Нормальный"
@@ -4733,6 +4901,9 @@
   "Opening terminal: ": {
     "Opening terminal: ": ""
   },
+  "Opens image files": {
+    "Opens image files": ""
+  },
   "Optional description": {
     "Optional description": "Необязательное описание"
   },
@@ -4799,6 +4970,9 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Переопределить глобальные настройки макета для этого выхода"
   },
+  "Override global transparency for Notepad": {
+    "Override global transparency for Notepad": ""
+  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": ""
   },
@@ -4834,6 +5008,9 @@
   },
   "PAM provides fingerprint auth, but no reader was detected.": {
     "PAM provides fingerprint auth, but no reader was detected.": ""
+  },
+  "PDF Reader": {
+    "PDF Reader": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -5018,6 +5195,12 @@
   "Playback error: ": {
     "Playback error: ": ""
   },
+  "Plays audio files": {
+    "Plays audio files": ""
+  },
+  "Plays video files": {
+    "Plays video files": ""
+  },
   "Please wait...": {
     "Please wait...": "Пожалуйста, подождите…"
   },
@@ -5042,8 +5225,23 @@
   "Plugin Visibility": {
     "Plugin Visibility": "Видимость плагинов"
   },
+  "Plugin disabled: %1": {
+    "Plugin disabled: %1": ""
+  },
+  "Plugin enabled: %1": {
+    "Plugin enabled: %1": ""
+  },
   "Plugin is disabled - enable in Plugins settings to use": {
     "Plugin is disabled - enable in Plugins settings to use": "Дополнение отключено - для использования включите в настройках дополнений"
+  },
+  "Plugin reloaded: %1": {
+    "Plugin reloaded: %1": ""
+  },
+  "Plugin uninstalled: %1": {
+    "Plugin uninstalled: %1": ""
+  },
+  "Plugin updated: %1": {
+    "Plugin updated: %1": ""
   },
   "Plugins": {
     "Plugins": "Дополнения"
@@ -5264,6 +5462,9 @@
   "Protocol": {
     "Protocol": "Протокол"
   },
+  "Qt colors applied successfully": {
+    "Qt colors applied successfully": ""
+  },
   "Qt: distance-field renderer.": {
     "Qt: distance-field renderer.": ""
   },
@@ -5324,6 +5525,9 @@
   "Reboot": {
     "Reboot": "Перезагрузка"
   },
+  "Recent": {
+    "Recent": ""
+  },
   "Recent Colors": {
     "Recent Colors": "Недавние Цвета"
   },
@@ -5341,6 +5545,9 @@
   },
   "Regex": {
     "Regex": "Регулярное выражение"
+  },
+  "Regular": {
+    "Regular": ""
   },
   "Reject": {
     "Reject": "Отклонить"
@@ -5705,6 +5912,9 @@
   "Search...": {
     "Search...": "Поиск..."
   },
+  "Searching": {
+    "Searching": ""
+  },
   "Searching...": {
     "Searching...": "Поиск..."
   },
@@ -5879,8 +6089,14 @@
   "Set notification rules": {
     "Set notification rules": "Установить правила уведомлений"
   },
+  "Setting": {
+    "Setting": ""
+  },
   "Settings": {
     "Settings": "Настройки"
+  },
+  "Settings Search": {
+    "Settings Search": ""
   },
   "Settings are read-only. Changes will not persist.": {
     "Settings are read-only. Changes will not persist.": "Настройки доступны только для чтения. Изменения не будут сохранены."
@@ -5932,6 +6148,9 @@
   },
   "Shift+Del: Clear All • Esc: Close": {
     "Shift+Del: Clear All • Esc: Close": "Shift+Del: Очистить All • Esc: Закрыть"
+  },
+  "Shift+Enter to copy": {
+    "Shift+Enter to copy": ""
   },
   "Shift+Enter to paste": {
     "Shift+Enter to paste": "Shift+Enter для вставки"
@@ -6335,6 +6554,12 @@
   "Spool Area Full": {
     "Spool Area Full": "Область очереди заполнена"
   },
+  "Spotlight": {
+    "Spotlight": ""
+  },
+  "Spotlight Search": {
+    "Spotlight Search": ""
+  },
   "Square Corners": {
     "Square Corners": "Прямые углы"
   },
@@ -6383,6 +6608,9 @@
   "Stripes": {
     "Stripes": "Стирание"
   },
+  "Style": {
+    "Style": ""
+  },
   "Summary": {
     "Summary": "Заголовок"
   },
@@ -6430,6 +6658,9 @@
   },
   "Switch User": {
     "Switch User": "Переключить пользователя"
+  },
+  "Switch between display configurations": {
+    "Switch between display configurations": ""
   },
   "Switch to power profile": {
     "Switch to power profile": "Переключиться на профиль питания"
@@ -6581,6 +6812,9 @@
   "Text Color": {
     "Text Color": ""
   },
+  "Text Editor": {
+    "Text Editor": ""
+  },
   "Text Rendering": {
     "Text Rendering": ""
   },
@@ -6608,11 +6842,17 @@
   "Theme Registry": {
     "Theme Registry": "Реестр тем"
   },
+  "Theme worker failed (%1)": {
+    "Theme worker failed (%1)": ""
+  },
   "Themes": {
     "Themes": "Темы"
   },
   "Thickness": {
     "Thickness": "Толщина"
+  },
+  "Thin": {
+    "Thin": ""
   },
   "Third-Party Plugin Warning": {
     "Third-Party Plugin Warning": "Предупреждение о стороннем плагине"
@@ -6731,6 +6971,9 @@
   "Today": {
     "Today": "Сегодня"
   },
+  "Toggle fonts": {
+    "Toggle fonts": ""
+  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Переключить видимость этой конфигурации панели"
   },
@@ -6827,6 +7070,9 @@
   "Try a different search": {
     "Try a different search": "Попробуйте другой поиск"
   },
+  "Try a different search or switch filters.": {
+    "Try a different search or switch filters.": ""
+  },
   "Turn off": {
     "Turn off": ""
   },
@@ -6850,6 +7096,9 @@
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Введите не менее 2 символов"
+  },
+  "Type at least 2 characters to search files.": {
+    "Type at least 2 characters to search files.": ""
   },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": "Введите этот префикс для поиска комбинацию клавишs"
@@ -6959,6 +7208,9 @@
   "Unsaved note...": {
     "Unsaved note...": "Несохранённая заметка..."
   },
+  "Unset": {
+    "Unset": ""
+  },
   "Until %1": {
     "Until %1": ""
   },
@@ -6988,6 +7240,9 @@
   },
   "Update Plugin": {
     "Update Plugin": "Обновить плагин"
+  },
+  "Update failed: %1": {
+    "Update failed: %1": ""
   },
   "Upgrading...": {
     "Upgrading...": ""
@@ -7027,6 +7282,9 @@
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Использовать моноширинный шрифт"
+  },
+  "Use Spotlight Launcher": {
+    "Use Spotlight Launcher": ""
   },
   "Use System Theme": {
     "Use System Theme": "Использовать системную тему"
@@ -7085,6 +7343,9 @@
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "Использовать звуковую тему из системных настроек"
   },
+  "Use the centered minimal launcher instead of the connected V2 launcher": {
+    "Use the centered minimal launcher instead of the connected V2 launcher": ""
+  },
   "Use the extended surface for launcher content": {
     "Use the extended surface for launcher content": ""
   },
@@ -7093,6 +7354,9 @@
   },
   "Use trigger prefix to activate": {
     "Use trigger prefix to activate": "Использовать префикс триггера для активации"
+  },
+  "Used for xdg-terminal-exec": {
+    "Used for xdg-terminal-exec": ""
   },
   "Used when accent color is set to Custom": {
     "Used when accent color is set to Custom": "Используется, когда акцентный цвет установлен в Custom"
@@ -7111,6 +7375,9 @@
   },
   "Uses sunrise/sunset times to automatically adjust night mode based on your location.": {
     "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "Использует время восхода/заката солнца для автоматической настройки ночного режима на основе вашего местоположения."
+  },
+  "Using global monospace font from Settings → Personalization": {
+    "Using global monospace font from Settings → Personalization": ""
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": "Использование общих настроек из Gamma Control"
@@ -7183,6 +7450,9 @@
   },
   "Video Path": {
     "Video Path": ""
+  },
+  "Video Player": {
+    "Video Player": ""
   },
   "Video Screensaver": {
     "Video Screensaver": ""
@@ -7259,6 +7529,9 @@
   "Weather Widget": {
     "Weather Widget": "Виджет погоды"
   },
+  "Web Browser": {
+    "Web Browser": ""
+  },
   "Welcome": {
     "Welcome": "Добро пожаловать"
   },
@@ -7270,6 +7543,9 @@
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Когда включено, приложения сортируются по алфавиту. Когда отключено, приложения сортируются по частоте использования."
+  },
+  "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
+    "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": ""
   },
   "When locked": {
     "When locked": "Когда заблокировано"
@@ -7532,6 +7808,12 @@
   "mangowc GitHub": {
     "mangowc GitHub": ""
   },
+  "matugen not available or disabled - cannot apply GTK colors": {
+    "matugen not available or disabled - cannot apply GTK colors": ""
+  },
+  "matugen not available or disabled - cannot apply Qt colors": {
+    "matugen not available or disabled - cannot apply Qt colors": ""
+  },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen не найден - установите пакет matugen для динамической тематизации"
   },
@@ -7555,6 +7837,12 @@
   },
   "niri/dms Discord": {
     "niri/dms Discord": ""
+  },
+  "niri: config reloaded": {
+    "niri: config reloaded": ""
+  },
+  "niri: failed to load config": {
+    "niri: failed to load config": ""
   },
   "now": {
     "now": "сейчас"

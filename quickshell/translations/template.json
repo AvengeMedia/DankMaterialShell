@@ -63,6 +63,13 @@
     "comment": ""
   },
   {
+    "term": "%1 copied",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 custom animation duration",
     "translation": "",
     "context": "",
@@ -1099,6 +1106,13 @@
     "comment": ""
   },
   {
+    "term": "Always use this app for %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Amount",
     "translation": "",
     "context": "",
@@ -1582,6 +1596,13 @@
     "comment": ""
   },
   {
+    "term": "Auto mode is on. Manual profile selection is disabled.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Auto-Clear After",
     "translation": "",
     "context": "",
@@ -2009,6 +2030,13 @@
     "comment": ""
   },
   {
+    "term": "Black",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Block Out",
     "translation": "",
     "context": "",
@@ -2110,6 +2138,13 @@
     "term": "Body",
     "translation": "",
     "context": "notification rule match field option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bold",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -2366,6 +2401,13 @@
     "comment": ""
   },
   {
+    "term": "Calendar",
+    "translation": "",
+    "context": "Calendar",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Camera",
     "translation": "",
     "context": "",
@@ -2542,6 +2584,13 @@
   },
   {
     "term": "Check interval",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Check on startup",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2964,6 +3013,13 @@
     "term": "Color",
     "translation": "",
     "context": "border color",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Color %1 copied",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -3731,6 +3787,13 @@
     "comment": ""
   },
   {
+    "term": "Created plugin directory: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Creating...",
     "translation": "",
     "context": "",
@@ -4074,7 +4137,21 @@
     "comment": ""
   },
   {
+    "term": "DMS Chooser",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "DMS Plugin Manager Unavailable",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "DMS Settings",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4096,6 +4173,13 @@
   },
   {
     "term": "DMS out of date",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "DMS server is outdated (API v%1, expected v%2)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4298,6 +4382,20 @@
     "comment": ""
   },
   {
+    "term": "Default (Global)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Default Apps",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Default Width (%)",
     "translation": "",
     "context": "",
@@ -4383,6 +4481,13 @@
   },
   {
     "term": "Delete profile \"%1\"?",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Demi Bold",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4795,6 +4900,13 @@
     "comment": ""
   },
   {
+    "term": "Display line numbers in editor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Display only workspaces that contain windows",
     "translation": "",
     "context": "",
@@ -4916,7 +5028,7 @@
   {
     "term": "Documents",
     "translation": "",
-    "context": "",
+    "context": "Documents",
     "reference": "",
     "comment": ""
   },
@@ -5064,6 +5176,13 @@
     "term": "Dynamic colors from wallpaper",
     "translation": "",
     "context": "dynamic colors description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dynamic colors parse error: %1",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -5670,6 +5789,20 @@
     "comment": ""
   },
   {
+    "term": "Extra Bold",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Extra Light",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "F1/I: Toggle • F10: Help",
     "translation": "",
     "context": "",
@@ -5720,6 +5853,20 @@
   },
   {
     "term": "Failed to add printer to class",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to apply GTK colors",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to apply Qt colors",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5824,6 +5971,13 @@
     "comment": ""
   },
   {
+    "term": "Failed to disable plugin: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to disconnect VPN",
     "translation": "",
     "context": "",
@@ -5874,6 +6028,20 @@
   },
   {
     "term": "Failed to enable night mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to enable plugin: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to fetch network QR code: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5971,9 +6139,30 @@
     "comment": ""
   },
   {
+    "term": "Failed to read theme file: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to reject pairing",
     "translation": "",
     "context": "Phone Connect error",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to reload plugin: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to remove QR code at %1: %2",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -6265,6 +6454,13 @@
     "comment": ""
   },
   {
+    "term": "File Manager",
+    "translation": "",
+    "context": "File Manager",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "File manager used to open the trash. Pick \"custom\" to enter your own command.",
     "translation": "",
     "context": "",
@@ -6280,6 +6476,13 @@
   },
   {
     "term": "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "File search unavailable",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6622,6 +6825,20 @@
     "comment": ""
   },
   {
+    "term": "For editing plain text files",
+    "translation": "",
+    "context": "For editing plain text files",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "For reading PDF files",
+    "translation": "",
+    "context": "For reading PDF files",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Force HDR",
     "translation": "",
     "context": "",
@@ -6783,6 +7000,13 @@
     "comment": ""
   },
   {
+    "term": "Full",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Full Command:",
     "translation": "",
     "context": "process detail label",
@@ -6807,6 +7031,13 @@
     "term": "Full with Year",
     "translation": "",
     "context": "date format option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Full-featured launcher with mode tabs, grid view, and action panel.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -6874,6 +7105,13 @@
     "comment": ""
   },
   {
+    "term": "GTK colors applied successfully",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "GTK, Qt, IDEs, more",
     "translation": "",
     "context": "greeter feature card description",
@@ -6924,6 +7162,13 @@
   },
   {
     "term": "GitHub",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Global fonts can be configured in Settings → Personalization",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7154,9 +7399,30 @@
     "comment": ""
   },
   {
+    "term": "HSV %1 copied",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "HTML copied to clipboard",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Handles links and opens HTML files",
+    "translation": "",
+    "context": "Handles links and opens HTML files",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Handles mailto links",
+    "translation": "",
+    "context": "Handles mailto links",
     "reference": "",
     "comment": ""
   },
@@ -7218,6 +7484,13 @@
   },
   {
     "term": "Hibernate",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Hibernate failed",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7686,6 +7959,13 @@
     "comment": ""
   },
   {
+    "term": "Image Viewer",
+    "translation": "",
+    "context": "Image Viewer",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Image copied to clipboard",
     "translation": "",
     "context": "",
@@ -7903,6 +8183,13 @@
     "comment": ""
   },
   {
+    "term": "Install dsearch to search files.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Install failed: %1",
     "translation": "",
     "context": "installation error",
@@ -8010,7 +8297,7 @@
   {
     "term": "Internet",
     "translation": "",
-    "context": "",
+    "context": "Internet",
     "reference": "",
     "comment": ""
   },
@@ -8018,6 +8305,13 @@
     "term": "Interval",
     "translation": "",
     "context": "wallpaper cycling mode tab",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Invalid JSON format: %1",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -8079,6 +8373,13 @@
   },
   {
     "term": "Keep Changes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keep typing",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8337,6 +8638,13 @@
     "comment": ""
   },
   {
+    "term": "Launcher Style",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Layer Outline Opacity",
     "translation": "",
     "context": "",
@@ -8380,6 +8688,13 @@
   },
   {
     "term": "Left Section",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Light",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8701,6 +9016,13 @@
     "comment": ""
   },
   {
+    "term": "Mail",
+    "translation": "",
+    "context": "Mail",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Make sure KDE Connect or Valent is running on your other devices",
     "translation": "",
     "context": "Phone Connect hint message",
@@ -8729,6 +9051,13 @@
     "comment": ""
   },
   {
+    "term": "Managed by Frame Mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Managed by Frame in Connected Mode",
     "translation": "",
     "context": "",
@@ -8739,6 +9068,20 @@
     "term": "Management",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Manages calendar events",
+    "translation": "",
+    "context": "Manages calendar events",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Manages files and directories",
+    "translation": "",
+    "context": "Manages files and directories",
     "reference": "",
     "comment": ""
   },
@@ -9275,6 +9618,13 @@
     "comment": ""
   },
   {
+    "term": "Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Minimal palette built around a single hue.",
     "translation": "",
     "context": "",
@@ -9492,6 +9842,13 @@
     "comment": ""
   },
   {
+    "term": "Multimedia",
+    "translation": "",
+    "context": "Multimedia",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Multiplexer",
     "translation": "",
     "context": "",
@@ -9516,6 +9873,13 @@
     "term": "Music",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Music Player",
+    "translation": "",
+    "context": "Music Player",
     "reference": "",
     "comment": ""
   },
@@ -9782,6 +10146,13 @@
     "term": "Night mode & gamma",
     "translation": "",
     "context": "greeter feature card description",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Night mode failed: DMS gamma control not available",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -10087,6 +10458,13 @@
     "comment": ""
   },
   {
+    "term": "No display profiles found. Create them in Settings > Displays.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No drivers found",
     "translation": "",
     "context": "",
@@ -10304,6 +10682,13 @@
     "comment": ""
   },
   {
+    "term": "No results",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No results found",
     "translation": "",
     "context": "",
@@ -10433,6 +10818,13 @@
     "term": "None",
     "translation": "",
     "context": "wallpaper transition option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "None active",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -10941,6 +11333,13 @@
     "comment": ""
   },
   {
+    "term": "Opens image files",
+    "translation": "",
+    "context": "Opens image files",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Optional description",
     "translation": "",
     "context": "",
@@ -11095,6 +11494,13 @@
     "comment": ""
   },
   {
+    "term": "Override global transparency for Notepad",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Override terminal with a custom command or script",
     "translation": "",
     "context": "",
@@ -11175,6 +11581,13 @@
     "term": "PAM provides fingerprint auth, but no reader was detected.",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "PDF Reader",
+    "translation": "",
+    "context": "PDF Reader",
     "reference": "",
     "comment": ""
   },
@@ -11606,6 +12019,20 @@
     "comment": ""
   },
   {
+    "term": "Plays audio files",
+    "translation": "",
+    "context": "Plays audio files",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Plays video files",
+    "translation": "",
+    "context": "Plays video files",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Please wait...",
     "translation": "",
     "context": "network status",
@@ -11662,7 +12089,42 @@
     "comment": ""
   },
   {
+    "term": "Plugin disabled: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Plugin enabled: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Plugin is disabled - enable in Plugins settings to use",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Plugin reloaded: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Plugin uninstalled: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Plugin updated: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12173,6 +12635,13 @@
     "comment": ""
   },
   {
+    "term": "Qt colors applied successfully",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Qt: distance-field renderer.",
     "translation": "",
     "context": "",
@@ -12313,6 +12782,13 @@
     "comment": ""
   },
   {
+    "term": "Recent",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Recent Colors",
     "translation": "",
     "context": "",
@@ -12351,6 +12827,13 @@
     "term": "Regex",
     "translation": "",
     "context": "notification rule match type option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Regular",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -13202,6 +13685,13 @@
     "comment": ""
   },
   {
+    "term": "Searching",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Searching...",
     "translation": "",
     "context": "",
@@ -13608,9 +14098,23 @@
     "comment": ""
   },
   {
+    "term": "Setting",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Settings",
     "translation": "",
     "context": "settings window title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Settings Search",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -13721,6 +14225,13 @@
   },
   {
     "term": "Shell",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shift+Enter to copy",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14651,6 +15162,20 @@
     "comment": ""
   },
   {
+    "term": "Spotlight",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Spotlight Search",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Square Corners",
     "translation": "",
     "context": "",
@@ -14763,6 +15288,13 @@
     "comment": ""
   },
   {
+    "term": "Style",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Summary",
     "translation": "",
     "context": "notification rule match field option",
@@ -14869,6 +15401,13 @@
   },
   {
     "term": "Switch User",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Switch between display configurations",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15101,7 +15640,7 @@
   {
     "term": "Terminal",
     "translation": "",
-    "context": "",
+    "context": "Terminal",
     "reference": "",
     "comment": ""
   },
@@ -15211,6 +15750,13 @@
     "comment": ""
   },
   {
+    "term": "Text Editor",
+    "translation": "",
+    "context": "Text Editor",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Text Rendering",
     "translation": "",
     "context": "",
@@ -15274,6 +15820,13 @@
     "comment": ""
   },
   {
+    "term": "Theme worker failed (%1)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Themes",
     "translation": "",
     "context": "greeter themes link",
@@ -15284,6 +15837,13 @@
     "term": "Thickness",
     "translation": "",
     "context": "border thickness",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Thin",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -15561,6 +16121,13 @@
     "comment": ""
   },
   {
+    "term": "Toggle fonts",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Toggle visibility of this bar configuration",
     "translation": "",
     "context": "",
@@ -15785,6 +16352,13 @@
     "comment": ""
   },
   {
+    "term": "Try a different search or switch filters.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Turn off",
     "translation": "",
     "context": "",
@@ -15835,6 +16409,13 @@
   },
   {
     "term": "Type at least 2 characters",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Type at least 2 characters to search files.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16093,6 +16674,13 @@
     "comment": ""
   },
   {
+    "term": "Unset",
+    "translation": "",
+    "context": "Unset",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Until %1",
     "translation": "",
     "context": "",
@@ -16157,6 +16745,13 @@
   },
   {
     "term": "Update Plugin",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Update failed: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16248,6 +16843,13 @@
   },
   {
     "term": "Use Monospace Font",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use Spotlight Launcher",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16380,6 +16982,13 @@
     "comment": ""
   },
   {
+    "term": "Use the centered minimal launcher instead of the connected V2 launcher",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use the extended surface for launcher content",
     "translation": "",
     "context": "",
@@ -16397,6 +17006,13 @@
     "term": "Use trigger prefix to activate",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Used for xdg-terminal-exec",
+    "translation": "",
+    "context": "Used for xdg-terminal-exec",
     "reference": "",
     "comment": ""
   },
@@ -16443,6 +17059,13 @@
     "comment": ""
   },
   {
+    "term": "Using global monospace font from Settings → Personalization",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Using shared settings from Gamma Control",
     "translation": "",
     "context": "",
@@ -16452,7 +17075,7 @@
   {
     "term": "Utilities",
     "translation": "",
-    "context": "",
+    "context": "Utilities",
     "reference": "",
     "comment": ""
   },
@@ -16607,6 +17230,13 @@
     "term": "Video Path",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Video Player",
+    "translation": "",
+    "context": "Video Player",
     "reference": "",
     "comment": ""
   },
@@ -16786,6 +17416,13 @@
     "comment": ""
   },
   {
+    "term": "Web Browser",
+    "translation": "",
+    "context": "Web Browser",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Welcome",
     "translation": "",
     "context": "greeter modal window title",
@@ -16808,6 +17445,13 @@
   },
   {
     "term": "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17416,6 +18060,20 @@
     "comment": ""
   },
   {
+    "term": "matugen not available or disabled - cannot apply GTK colors",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "matugen not available or disabled - cannot apply Qt colors",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "matugen not found - install matugen package for dynamic theming",
     "translation": "",
     "context": "matugen error",
@@ -17466,6 +18124,20 @@
   },
   {
     "term": "niri/dms Discord",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "niri: config reloaded",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "niri: failed to load config",
     "translation": "",
     "context": "",
     "reference": "",
