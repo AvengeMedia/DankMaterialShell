@@ -27,15 +27,32 @@ Singleton {
     // List of laptop batteries
     readonly property var batteries: UPower.devices.values.filter(dev => dev.isLaptopBattery)
 
+    readonly property var readyBatteries: batteries.filter(b => b.ready)
+    readonly property var stateKnownBatteries: batteries.filter(b => b.ready && b.state !== UPowerDeviceState.Unknown)
+
+    property real _lastBatteryLevel: 0
+    property bool _lastIsCharging: false
+    property real _lastChangeRate: 0
+    property real _lastBatteryEnergy: 0
+    property real _lastBatteryCapacity: 0
+
     readonly property bool usePreferred: preferredBatteryOverride && preferredBatteryOverride.length > 0
+    readonly property UPowerDevice preferredDevice: {
+        if (!usePreferred)
+            return null;
+        const override = preferredBatteryOverride.toLowerCase();
+        return batteries.find(dev => dev.nativePath.toLowerCase().includes(override)) || null;
+    }
+    readonly property bool preferredDeviceKnown: preferredDevice && preferredDevice.ready && preferredDevice.state !== UPowerDeviceState.Unknown
 
     // Main battery (for backward compatibility)
     readonly property UPowerDevice device: {
-        var preferredDev;
         if (usePreferred) {
-            preferredDev = batteries.find(dev => dev.nativePath.toLowerCase().includes(preferredBatteryOverride.toLowerCase()));
+            if (preferredDeviceKnown)
+                return preferredDevice;
+            return stateKnownBatteries[0] || null;
         }
-        return preferredDev || batteries[0] || null;
+        return stateKnownBatteries[0] || readyBatteries[0] || batteries[0] || null;
     }
     // Whether at least one battery is available
     readonly property bool batteryAvailable: batteries.length > 0
@@ -44,17 +61,44 @@ Singleton {
         if (!batteryAvailable)
             return 0;
         if (batteryCapacity === 0) {
-            if (usePreferred && device && device.ready)
-                return Math.round(device.percentage * 100 * scale);
-            const validBatteries = batteries.filter(b => b.ready && b.percentage >= 0);
+            if (usePreferred && preferredDeviceKnown) {
+                const val = Math.round(preferredDevice.percentage * 100 * scale);
+                _lastBatteryLevel = val;
+                return val;
+            }
+            if (usePreferred && preferredDevice)
+                return _lastBatteryLevel;
+            const validBatteries = stateKnownBatteries.filter(b => b.ready && b.percentage >= 0);
             if (validBatteries.length === 0)
-                return 0;
+                return _lastBatteryLevel;
             const avgPercentage = validBatteries.reduce((sum, b) => sum + b.percentage, 0) / validBatteries.length;
-            return Math.round(avgPercentage * 100 * scale);
+            const val = Math.round(avgPercentage * 100 * scale);
+            _lastBatteryLevel = val;
+            return val;
         }
-        return Math.round((batteryEnergy * 100) / batteryCapacity * scale);
+        const energy = batteryEnergy;
+        const cap = batteryCapacity;
+        if (cap === 0)
+            return _lastBatteryLevel;
+        const val = Math.round((energy * 100) / cap * scale);
+        _lastBatteryLevel = val;
+        return val;
     }
-    readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging)
+    readonly property bool isCharging: {
+        if (!batteryAvailable)
+            return false;
+        if (usePreferred && preferredDeviceKnown) {
+            const preferredCharging = preferredDevice.state === UPowerDeviceState.Charging;
+            _lastIsCharging = preferredCharging;
+            return preferredCharging;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastIsCharging;
+        const val = stateKnownBatteries.some(b => b.state === UPowerDeviceState.Charging);
+        if (stateKnownBatteries.length > 0)
+            _lastIsCharging = val;
+        return stateKnownBatteries.length > 0 ? val : _lastIsCharging;
+    }
 
     // Is the system plugged in (Is not running on battery)
     readonly property bool isPluggedIn: !UPower.onBattery
@@ -90,9 +134,17 @@ Singleton {
     readonly property real changeRate: {
         if (!batteryAvailable)
             return 0;
-        if (usePreferred && device && device.ready)
-            return device.changeRate;
-        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.changeRate, 0) : 0;
+        if (usePreferred && preferredDeviceKnown) {
+            _lastChangeRate = preferredDevice.changeRate;
+            return _lastChangeRate;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastChangeRate;
+        if (stateKnownBatteries.length === 0)
+            return _lastChangeRate;
+        const val = stateKnownBatteries.reduce((sum, b) => sum + b.changeRate, 0);
+        _lastChangeRate = val;
+        return val;
     }
 
     // Aggregated battery health
@@ -100,12 +152,10 @@ Singleton {
         if (!batteryAvailable)
             return "N/A";
 
-        // If a preferred battery is selected and ready
-        if (usePreferred && device && device.ready && device.healthSupported)
-            return `${Math.round(device.healthPercentage)}%`;
+        if (usePreferred && preferredDeviceKnown && preferredDevice.healthSupported)
+            return `${Math.round(preferredDevice.healthPercentage)}%`;
 
-        // Otherwise, calculate the average health of all laptop batteries
-        const validBatteries = batteries.filter(b => b.healthSupported && b.healthPercentage > 0);
+        const validBatteries = stateKnownBatteries.filter(b => b.ready && b.healthSupported && b.healthPercentage > 0);
         if (validBatteries.length === 0)
             return "N/A";
 
@@ -116,18 +166,34 @@ Singleton {
     readonly property real batteryEnergy: {
         if (!batteryAvailable)
             return 0;
-        if (usePreferred && device && device.ready)
-            return device.energy;
-        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energy, 0) : 0;
+        if (usePreferred && preferredDeviceKnown) {
+            _lastBatteryEnergy = preferredDevice.energy;
+            return _lastBatteryEnergy;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastBatteryEnergy;
+        if (stateKnownBatteries.length === 0)
+            return _lastBatteryEnergy;
+        const val = stateKnownBatteries.reduce((sum, b) => sum + b.energy, 0);
+        _lastBatteryEnergy = val;
+        return val;
     }
 
     // Total battery capacity (Wh)
     readonly property real batteryCapacity: {
         if (!batteryAvailable)
             return 0;
-        if (usePreferred && device && device.ready)
-            return device.energyCapacity;
-        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energyCapacity, 0) : 0;
+        if (usePreferred && preferredDeviceKnown) {
+            _lastBatteryCapacity = preferredDevice.energyCapacity;
+            return _lastBatteryCapacity;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastBatteryCapacity;
+        if (stateKnownBatteries.length === 0)
+            return _lastBatteryCapacity;
+        const val = stateKnownBatteries.reduce((sum, b) => sum + b.energyCapacity, 0);
+        _lastBatteryCapacity = val;
+        return val;
     }
 
     function translateBatteryState(state) {
@@ -155,10 +221,12 @@ Singleton {
             return I18n.tr("No Battery", "battery status");
         }
 
-        if (isCharging && !batteries.some(b => b.changeRate > 0))
+        const targetBatteries = stateKnownBatteries.length > 0 ? stateKnownBatteries : batteries;
+
+        if (isCharging && !targetBatteries.some(b => b.changeRate > 0))
             return I18n.tr("Plugged In", "battery status");
 
-        const states = batteries.map(b => b.state);
+        const states = targetBatteries.map(b => b.state);
         if (states.every(s => s === states[0]))
             return translateBatteryState(states[0]);
 
