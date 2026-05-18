@@ -327,69 +327,106 @@ hl.config({
             return;
         const fullName = wsId + " " + newName;
         if (Hyprland.usingLua) {
-          Hyprland.dispatch(`hl.dsp.workspace.rename({workspace = "${wsId}", name = "${fullName}"})`)
+            Hyprland.dispatch(`hl.dsp.workspace.rename({ workspace = ${luaValue(wsId)}, name = ${luaString(fullName)} })`);
         } else {
-          Hyprland.dispatch(`renameworkspace ${wsId} ${fullName}`)
+            Hyprland.dispatch(`renameworkspace ${wsId} ${fullName}`);
         }
     }
 
     function focusWorkspace(workspace) {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.focus({workspace = "${workspace}"})`)
-      } else {
-        Hyprland.dispatch(`workspace ${workspace}`)
-      }
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch(`hl.dsp.focus({ workspace = ${luaValue(workspace)} })`);
+        } else {
+            Hyprland.dispatch(`workspace ${workspace}`);
+        }
+    }
+
+    function luaString(value) {
+        return `"${String(value ?? "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"")}"`;
+    }
+
+    function luaValue(value) {
+        const text = String(value ?? "");
+        return /^[-+]?\d+$/.test(text) ? text : luaString(text);
+    }
+
+    function windowSelector(windowAddress) {
+        if (!windowAddress)
+            return "";
+
+        const text = String(windowAddress);
+        if (text.startsWith("address:"))
+            return text;
+
+        return `address:${text.startsWith("0x") ? text : "0x" + text}`;
     }
 
     function focusWindow(windowAddress) {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.focus({window = "address:0x${windowAddress}"})`);
-      } else  {
-        Hyprland.dispatch(`focuswindow address:${windowAddress}`);
-      }
+        const selector = windowSelector(windowAddress);
+        if (!selector)
+            return;
+
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch(`hl.dsp.focus({ window = ${luaString(selector)} })`);
+        } else {
+            Hyprland.dispatch(`focuswindow ${selector}`);
+        }
     }
 
     function closeWindow(windowAddress) {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.window.close("address:${windowAddress}")`);
-      } else {
-        Hyprland.dispatch(`closewindow address:${windowAddress}`);
-      }
+        const selector = windowSelector(windowAddress);
+        if (!selector)
+            return;
+
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch(`hl.dsp.window.close(${luaString(selector)})`);
+        } else {
+            Hyprland.dispatch(`closewindow ${selector}`);
+        }
     }
+
     function moveToWorkspace(workspace, windowAddress, follow = true) {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.window.move({workspace = "${workspace}", window="address:${windowAddress}", follow = ${follow}})`)
-      } else {
-        const dispatcher = follow ? "movetoworkspace" : "movetoworkspacesilent"
-        Hyprland.dispatch(`${dispatcher} ${workspace},address:${windowAddress}`);
-      }
+        const selector = windowSelector(windowAddress);
+        if (!selector)
+            return;
+
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch(`hl.dsp.window.move({ workspace = ${luaValue(workspace)}, window = ${luaString(selector)}, follow = ${follow ? "true" : "false"} })`);
+        } else {
+            const dispatcher = follow ? "movetoworkspace" : "movetoworkspacesilent";
+            Hyprland.dispatch(`${dispatcher} ${workspace},${selector}`);
+        }
     }
+
     function toggleSpecial(specialName) {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${specialName})`)
-      } else {
-        Hyprland.dispatch("togglespecialworkspace " + specialName);
-      }
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${luaString(specialName)})`);
+        } else {
+            Hyprland.dispatch("togglespecialworkspace " + specialName);
+        }
     }
+
     function exit() {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch("hl.dsp.exit()")
-      } else {
-        Hyprland.dispatch("exit");
-      }
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch("hl.dsp.exit()");
+        } else {
+            Hyprland.dispatch("exit");
+        }
     }
+
     function dpmsOff() {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.dpms({action = "disable"})`)
-      } else {
-        Hyprland.dispatch("dpms off");
-      }
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch(`hl.dsp.dpms({ action = "disable" })`);
+        } else {
+            Hyprland.dispatch("dpms off");
+        }
     }
+
     function dpmsOn() {
-      if (Hyprland.usingLua) {
-        Hyprland.dispatch(`hl.dsp.dpms({action = "enable"})`)
-      } else {
-        Hyprland.dispatch("dpms on");
-      }
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch(`hl.dsp.dpms({ action = "enable" })`);
+        } else {
+            Hyprland.dispatch("dpms on");
+        }
     }
 }
