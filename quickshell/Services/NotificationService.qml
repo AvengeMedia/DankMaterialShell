@@ -656,7 +656,11 @@ Singleton {
                 }
             }
 
-            if (SettingsData.soundsEnabled && SettingsData.soundNewNotification) {
+            // Honor the freedesktop "suppress-sound" hint: the sender
+            // plays its own audio for this notification and asks the
+            // server not to double up.
+            const suppressSound = !!(notif.hints && notif.hints["suppress-sound"]);
+            if (SettingsData.soundsEnabled && SettingsData.soundNewNotification && !suppressSound) {
                 if (policy.urgency === NotificationUrgency.Critical) {
                     AudioService.playCriticalNotificationSound();
                 } else {
