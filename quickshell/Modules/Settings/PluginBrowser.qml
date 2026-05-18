@@ -570,7 +570,8 @@ FloatingWindow {
                                         return "available";
                                     }
 
-                                    width: buttonState === "incompatible" ? incompatRow.implicitWidth + Theme.spacingM * 2 : 80
+                                    implicitWidth: Math.max(80, incompatRow.implicitWidth + Theme.spacingM * 2)
+                                    width: implicitWidth
                                     height: 32
                                     radius: Theme.cornerRadius
                                     anchors.verticalCenter: parent.verticalCenter
@@ -638,6 +639,8 @@ FloatingWindow {
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             font.weight: Font.Medium
+                                            elide: Text.ElideNone
+                                            wrapMode: Text.NoWrap
                                             color: {
                                                 switch (installButton.buttonState) {
                                                 case "installed":
