@@ -3,7 +3,10 @@ package providers
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
 )
 
 func TestHyprlandAutogenerateComment(t *testing.T) {
@@ -57,6 +60,341 @@ func TestHyprlandAutogenerateComment(t *testing.T) {
 					tt.dispatcher, tt.params, result, tt.expected)
 			}
 		})
+	}
+}
+
+func TestHyprlandLuaBindRoundTripHelpers(t *testing.T) {
+	tests := []struct {
+		expr           string
+		wantDispatcher string
+		wantParams     string
+	}{
+		{`hl.dsp.exec_cmd([[dms ipc call brightness increment 5 ""]])`, "exec", `dms ipc call brightness increment 5 ""`},
+		{`hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })`, "fullscreen", "1"},
+		{`hl.dsp.focus({ workspace = "e+1" })`, "workspace", "e+1"},
+		{`hl.dsp.window.move({ monitor = "l" })`, "movewindow", "mon:l"},
+		{`hl.dsp.window.resize({ x = "-10%", y = 0, relative = true })`, "resizeactive", "-10% 0"},
+		{`hl.dsp.layout("togglesplit")`, "layoutmsg", "togglesplit"},
+		{`hl.dsp.dpms({ action = "toggle" })`, "dpms", "toggle"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.expr, func(t *testing.T) {
+			gotDispatcher, gotParams := luaExprToDispatcherParams(tt.expr)
+			if gotDispatcher != tt.wantDispatcher || gotParams != tt.wantParams {
+				t.Fatalf("luaExprToDispatcherParams() = %q, %q; want %q, %q", gotDispatcher, gotParams, tt.wantDispatcher, tt.wantParams)
+			}
+		})
+	}
+}
+
+func TestWriteLuaBindLineOptionsInsideCall(t *testing.T) {
+	var sb strings.Builder
+	writeLuaBindLine(&sb, &hyprlandOverrideBind{
+		Key:         "Super+k",
+		Action:      "exec kitty",
+		Description: "Open terminal",
+		Flags:       "led",
+	})
+
+	want := `hl.unbind("SUPER + K")
+hl.bind("SUPER + K", hl.dsp.exec_cmd("kitty"), { locked = true, repeating = true, description = "Open terminal" })`
+	if got := strings.TrimSpace(sb.String()); got != want {
+		t.Fatalf("writeLuaBindLine() = %q, want %q", got, want)
+	}
+}
+
+func TestWriteLuaBindLineMapsSpawnActionForHyprland(t *testing.T) {
+	var sb strings.Builder
+	writeLuaBindLine(&sb, &hyprlandOverrideBind{
+		Key:         "Super+n",
+		Action:      "spawn dms ipc call notepad toggle",
+		Description: "Notepad: Toggle",
+	})
+
+	want := `hl.unbind("SUPER + N")
+hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle")) -- Notepad: Toggle`
+	if got := strings.TrimSpace(sb.String()); got != want {
+		t.Fatalf("writeLuaBindLine() = %q, want %q", got, want)
+	}
+}
+
+func TestHyprlandLuaBindsUserOverridesDefaults(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(`
+require("dms.binds")
+require("dms.binds-user")
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds.lua"), []byte(`hl.bind("SUPER + T", hl.dsp.exec_cmd("kitty"))`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(`hl.bind("SUPER + T", hl.dsp.exec_cmd("foot"), { description = "User terminal" })`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	result, err := ParseHyprlandKeysWithDMS(tmpDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var found []HyprlandKeyBinding
+	var walk func(HyprlandSection)
+	walk = func(section HyprlandSection) {
+		for _, kb := range section.Keybinds {
+			if strings.EqualFold(strings.Join(append(kb.Mods, kb.Key), "+"), "SUPER+T") {
+				found = append(found, kb)
+			}
+		}
+		for _, child := range section.Children {
+			walk(child)
+		}
+	}
+	walk(*result.Section)
+
+	if len(found) != 1 {
+		t.Fatalf("expected one effective SUPER+T bind, got %d: %#v", len(found), found)
+	}
+	if found[0].Params != "foot" || found[0].Comment != "User terminal" {
+		t.Fatalf("expected user override bind, got %#v", found[0])
+	}
+}
+
+func TestWriteLuaBindLineEmitsUnbindOnlyForNegativeOverride(t *testing.T) {
+	var sb strings.Builder
+	writeLuaBindLine(&sb, &hyprlandOverrideBind{Key: "Super+i", Unbind: true})
+
+	want := `hl.unbind("SUPER + I")`
+	if got := strings.TrimSpace(sb.String()); got != want {
+		t.Fatalf("writeLuaBindLine() = %q, want %q", got, want)
+	}
+}
+
+func TestReadLuaOverrideRecognizesLoneUnbindAsNegativeOverride(t *testing.T) {
+	tmpDir := t.TempDir()
+	overridePath := filepath.Join(tmpDir, "binds-user.lua")
+	contents := `-- DMS user keybind overrides
+hl.unbind("SUPER + I")
+hl.unbind("SUPER + N")
+hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle"))
+`
+	if err := os.WriteFile(overridePath, []byte(contents), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	binds, err := readLuaOrHyprlangOverride(overridePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, ok := binds["super+i"]
+	if !ok {
+		t.Fatalf("expected SUPER+I entry in override map, got: %#v", binds)
+	}
+	if !got.Unbind {
+		t.Fatalf("expected SUPER+I to be marked Unbind, got: %#v", got)
+	}
+	if rebind, ok := binds["super+n"]; !ok || rebind.Unbind {
+		t.Fatalf("expected SUPER+N to be a normal rebind override, got: %#v", rebind)
+	}
+}
+
+func TestParserDropsDMSDefaultsSuppressedByBindsUserUnbind(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(`
+require("dms.binds")
+require("dms.binds-user")
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds.lua"), []byte(
+		`hl.bind("SUPER + I", hl.dsp.focus({ workspace = "e-1" }))
+hl.bind("SUPER + T", hl.dsp.exec_cmd("kitty"))`,
+	), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(`hl.unbind("SUPER + I")`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	result, err := ParseHyprlandKeysWithDMS(tmpDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var keys []string
+	var walk func(HyprlandSection)
+	walk = func(section HyprlandSection) {
+		for _, kb := range section.Keybinds {
+			keys = append(keys, strings.ToUpper(strings.Join(append(kb.Mods, kb.Key), "+")))
+		}
+		for _, child := range section.Children {
+			walk(child)
+		}
+	}
+	walk(*result.Section)
+
+	for _, k := range keys {
+		if k == "SUPER+I" {
+			t.Fatalf("expected SUPER+I to be suppressed by binds-user.lua unbind, got: %v", keys)
+		}
+	}
+	foundT := false
+	for _, k := range keys {
+		if k == "SUPER+T" {
+			foundT = true
+		}
+	}
+	if !foundT {
+		t.Fatalf("expected SUPER+T to remain (only SUPER+I was unbound), got: %v", keys)
+	}
+}
+
+func TestHyprlandRemoveBindWritesNegativeOverrideForDefault(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	provider := NewHyprlandProvider(tmpDir)
+	if err := provider.RemoveBind("SUPER+I"); err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(dmsDir, "binds-user.lua"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `hl.unbind("SUPER + I")`) {
+		t.Fatalf("expected negative override hl.unbind line, got:\n%s", string(data))
+	}
+	if strings.Contains(string(data), `hl.bind("SUPER + I"`) {
+		t.Fatalf("expected NO hl.bind for SUPER+I, got:\n%s", string(data))
+	}
+}
+
+func TestHyprlandRemoveBindReplacesExistingOverrideWithNegativeOverride(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	override := `hl.unbind("SUPER + N")
+hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle"))
+`
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(override), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	provider := NewHyprlandProvider(tmpDir)
+	if err := provider.RemoveBind("SUPER+N"); err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(dmsDir, "binds-user.lua"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `hl.unbind("SUPER + N")`) {
+		t.Fatalf("expected negative override hl.unbind line, got:\n%s", string(data))
+	}
+	if strings.Contains(string(data), `hl.bind("SUPER + N"`) {
+		t.Fatalf("expected NO hl.bind for SUPER+N after remove, got:\n%s", string(data))
+	}
+}
+
+func TestHyprlandResetBindRevertsExistingOverrideToDefault(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	override := `hl.unbind("SUPER + N")
+hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle"))
+`
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(override), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	provider := NewHyprlandProvider(tmpDir)
+	if err := provider.ResetBind("SUPER+N"); err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(dmsDir, "binds-user.lua"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), `SUPER + N`) {
+		t.Fatalf("expected SUPER+N to be fully removed (revert to default), got:\n%s", string(data))
+	}
+}
+
+func TestHyprlandHasDefaultSetForOverrideOfDefaultKey(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(`
+require("dms.binds")
+require("dms.binds-user")
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds.lua"), []byte(
+		`hl.bind("SUPER + T", hl.dsp.exec_cmd("kitty"))`,
+	), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(
+		`hl.unbind("SUPER + T")
+hl.bind("SUPER + T", hl.dsp.exec_cmd("foot"))
+hl.bind("SUPER + Z", hl.dsp.exec_cmd("custom"))`,
+	), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	provider := NewHyprlandProvider(tmpDir)
+	sheet, err := provider.GetCheatSheet()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var foundT, foundZ *keybinds.Keybind
+	for _, group := range sheet.Binds {
+		for i := range group {
+			kb := group[i]
+			keyUpper := strings.ToUpper(kb.Key)
+			if keyUpper == "SUPER+T" {
+				foundT = &group[i]
+			}
+			if keyUpper == "SUPER+Z" {
+				foundZ = &group[i]
+			}
+		}
+	}
+	if foundT == nil {
+		t.Fatalf("expected SUPER+T override in cheatsheet")
+	}
+	if !foundT.HasDefault {
+		t.Fatalf("expected SUPER+T HasDefault=true (default exists in binds.lua), got %+v", foundT)
+	}
+	if foundZ == nil {
+		t.Fatalf("expected SUPER+Z (user-only) in cheatsheet")
+	}
+	if foundZ.HasDefault {
+		t.Fatalf("expected SUPER+Z HasDefault=false (no default), got %+v", foundZ)
 	}
 }
 

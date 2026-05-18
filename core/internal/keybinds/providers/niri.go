@@ -149,7 +149,7 @@ func (n *NiriProvider) convertKeybind(kb *NiriKeyBinding, subcategory string, co
 
 	source := "config"
 	if strings.Contains(kb.Source, "dms/binds.kdl") {
-		source = "dms"
+		source = "dms-default"
 	}
 
 	bind := keybinds.Keybind{
@@ -165,7 +165,7 @@ func (n *NiriProvider) convertKeybind(kb *NiriKeyBinding, subcategory string, co
 		Repeat:          kb.Repeat,
 	}
 
-	if source == "dms" && conflicts != nil {
+	if source == "dms-default" && conflicts != nil {
 		if conflictKb, ok := conflicts[keyStr]; ok {
 			bind.Conflict = &keybinds.Keybind{
 				Key:         keyStr,
@@ -267,6 +267,10 @@ func (n *NiriProvider) RemoveBind(key string) error {
 
 	delete(existingBinds, key)
 	return n.writeOverrideBinds(existingBinds)
+}
+
+func (n *NiriProvider) ResetBind(key string) error {
+	return n.RemoveBind(key)
 }
 
 type overrideBind struct {

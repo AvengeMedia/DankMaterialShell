@@ -109,25 +109,25 @@ type dmsConfigSpec struct {
 var dmsConfigSpecs = map[string]dmsConfigSpec{
 	"binds": {
 		niriFile: "binds.kdl",
-		hyprFile: "binds.conf",
+		hyprFile: "binds.lua",
 		niriContent: func(t string) string {
 			return strings.ReplaceAll(config.NiriBindsConfig, "{{TERMINAL_COMMAND}}", t)
 		},
 		hyprContent: func(t string) string {
-			return strings.ReplaceAll(config.HyprBindsConfig, "{{TERMINAL_COMMAND}}", t)
+			return strings.ReplaceAll(config.DMSBindsLuaConfig, "{{TERMINAL_COMMAND}}", t)
 		},
 	},
 	"layout": {
 		niriFile:    "layout.kdl",
-		hyprFile:    "layout.conf",
+		hyprFile:    "layout.lua",
 		niriContent: func(_ string) string { return config.NiriLayoutConfig },
-		hyprContent: func(_ string) string { return config.HyprLayoutConfig },
+		hyprContent: func(_ string) string { return config.DMSLayoutLuaConfig },
 	},
 	"colors": {
 		niriFile:    "colors.kdl",
-		hyprFile:    "colors.conf",
+		hyprFile:    "colors.lua",
 		niriContent: func(_ string) string { return config.NiriColorsConfig },
-		hyprContent: func(_ string) string { return config.HyprColorsConfig },
+		hyprContent: func(_ string) string { return config.DMSColorsLuaConfig },
 	},
 	"alttab": {
 		niriFile:    "alttab.kdl",
@@ -135,21 +135,21 @@ var dmsConfigSpecs = map[string]dmsConfigSpec{
 	},
 	"outputs": {
 		niriFile:    "outputs.kdl",
-		hyprFile:    "outputs.conf",
+		hyprFile:    "outputs.lua",
 		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return "" },
+		hyprContent: func(_ string) string { return config.DMSOutputsLuaConfig },
 	},
 	"cursor": {
 		niriFile:    "cursor.kdl",
-		hyprFile:    "cursor.conf",
+		hyprFile:    "cursor.lua",
 		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return "" },
+		hyprContent: func(_ string) string { return config.DMSCursorLuaConfig },
 	},
 	"windowrules": {
 		niriFile:    "windowrules.kdl",
-		hyprFile:    "windowrules.conf",
+		hyprFile:    "windowrules.lua",
 		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return "" },
+		hyprContent: func(_ string) string { return config.DMSWindowRulesLuaConfig },
 	},
 }
 
@@ -438,16 +438,22 @@ func checkExistingConfigs(wm deps.WindowManager, wmSelected bool, terminal deps.
 	willBackup := false
 
 	if wmSelected {
-		var configPath string
+		var configPaths []string
 		switch wm {
 		case deps.WindowManagerNiri:
-			configPath = filepath.Join(homeDir, ".config", "niri", "config.kdl")
+			configPaths = []string{filepath.Join(homeDir, ".config", "niri", "config.kdl")}
 		case deps.WindowManagerHyprland:
-			configPath = filepath.Join(homeDir, ".config", "hypr", "hyprland.conf")
+			configPaths = []string{
+				filepath.Join(homeDir, ".config", "hypr", "hyprland.lua"),
+				filepath.Join(homeDir, ".config", "hypr", "hyprland.conf"),
+			}
 		}
 
-		if _, err := os.Stat(configPath); err == nil {
-			willBackup = true
+		for _, configPath := range configPaths {
+			if _, err := os.Stat(configPath); err == nil {
+				willBackup = true
+				break
+			}
 		}
 	}
 

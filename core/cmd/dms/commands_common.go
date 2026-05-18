@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
@@ -37,6 +38,7 @@ var runCmd = &cobra.Command{
 			}
 		}
 		log.ApplyEnvOverrides()
+		config.CleanupStrayHyprlandConfFile(log.Infof)
 		if daemon {
 			runShellDaemon(session)
 		} else {

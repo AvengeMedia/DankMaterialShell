@@ -141,7 +141,7 @@ func (m *MangoWCProvider) convertKeybind(kb *MangoWCKeyBinding, conflicts map[st
 
 	source := "config"
 	if strings.Contains(kb.Source, "dms/binds.conf") || strings.Contains(kb.Source, "dms"+string(filepath.Separator)+"binds.conf") {
-		source = "dms"
+		source = "dms-default"
 	}
 
 	bind := keybinds.Keybind{
@@ -151,7 +151,7 @@ func (m *MangoWCProvider) convertKeybind(kb *MangoWCKeyBinding, conflicts map[st
 		Source:      source,
 	}
 
-	if source == "dms" && conflicts != nil {
+	if source == "dms-default" && conflicts != nil {
 		normalizedKey := strings.ToLower(keyStr)
 		if conflictKb, ok := conflicts[normalizedKey]; ok {
 			bind.Conflict = &keybinds.Keybind{
@@ -247,6 +247,10 @@ func (m *MangoWCProvider) RemoveBind(key string) error {
 	normalizedKey := strings.ToLower(key)
 	delete(existingBinds, normalizedKey)
 	return m.writeOverrideBinds(existingBinds)
+}
+
+func (m *MangoWCProvider) ResetBind(key string) error {
+	return m.RemoveBind(key)
 }
 
 type mangowcOverrideBind struct {

@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 
 Singleton {
     id: root
@@ -1074,10 +1075,86 @@ Singleton {
         return result;
     }
 
+    function hyprLuaField(line, field) {
+        const re = new RegExp("\\b" + field + "\\s*=\\s*(\\\"(?:\\\\\\\\.|[^\\\"])*\\\"|'(?:\\\\\\\\.|[^'])*'|\\[\\[.*?\\]\\]|[^,}\\s]+)");
+        const match = line.match(re);
+        if (!match)
+            return undefined;
+        const raw = match[1].trim();
+        if (raw.startsWith("[[") && raw.endsWith("]]"))
+            return raw.slice(2, -2);
+        if (raw.startsWith("\"")) {
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return raw.slice(1, -1);
+            }
+        }
+        if (raw.startsWith("'") && raw.endsWith("'"))
+            return raw.slice(1, -1).replace(/\\'/g, "'");
+        if (raw === "true")
+            return true;
+        if (raw === "false")
+            return false;
+        const num = Number(raw);
+        return isNaN(num) ? raw : num;
+    }
+
+    function parseHyprlandLuaMonitorLine(line) {
+        if (!line.match(/^\s*hl\.monitor\s*\(/))
+            return null;
+        const name = hyprLuaField(line, "output");
+        if (name === undefined)
+            return null;
+        const disabled = hyprLuaField(line, "disabled") === true;
+        const mode = hyprLuaField(line, "mode") || "preferred";
+        const position = hyprLuaField(line, "position") || "0x0";
+        const scaleValue = hyprLuaField(line, "scale");
+        const transform = Number(hyprLuaField(line, "transform") ?? 0);
+        const vrrMode = Number(hyprLuaField(line, "vrr") ?? 0);
+        const posMatch = String(position).match(/^(-?\d+)x(-?\d+)$/);
+        const modeMatch = String(mode).match(/^(\d+)x(\d+)@([\d.]+)/);
+        const settings = {
+            "disabled": disabled || undefined,
+            "bitdepth": hyprLuaField(line, "bitdepth"),
+            "colorManagement": hyprLuaField(line, "cm"),
+            "sdrBrightness": hyprLuaField(line, "sdrbrightness"),
+            "sdrSaturation": hyprLuaField(line, "sdrsaturation"),
+            "supportsWideColor": hyprLuaField(line, "supports_wide_color"),
+            "supportsHdr": hyprLuaField(line, "supports_hdr"),
+            "vrrFullscreenOnly": vrrMode === 2 ? true : undefined
+        };
+        return {
+            "name": String(name),
+            "logical": {
+                "x": posMatch ? parseInt(posMatch[1]) : 0,
+                "y": posMatch ? parseInt(posMatch[2]) : 0,
+                "scale": typeof scaleValue === "number" ? scaleValue : 1.0,
+                "transform": hyprlandToTransform(transform)
+            },
+            "modes": modeMatch ? [{
+                        "width": parseInt(modeMatch[1]),
+                        "height": parseInt(modeMatch[2]),
+                        "refresh_rate": Math.round(parseFloat(modeMatch[3]) * 1000)
+                    }] : [],
+            "current_mode": modeMatch ? 0 : -1,
+            "vrr_enabled": vrrMode >= 1,
+            "vrr_supported": vrrMode > 0,
+            "hyprlandSettings": settings,
+            "mirror": hyprLuaField(line, "mirror") || ""
+        };
+    }
+
     function parseHyprlandOutputs(content) {
         const result = {};
         const lines = content.split("\n");
         for (const line of lines) {
+            const luaMonitor = parseHyprlandLuaMonitorLine(line);
+            if (luaMonitor) {
+                result[luaMonitor.name] = luaMonitor;
+                continue;
+            }
+
             const disableMatch = line.match(/^\s*monitor\s*=\s*([^,]+),\s*disable\s*$/);
             if (disableMatch) {
                 const name = disableMatch[1].trim();
@@ -1269,10 +1346,10 @@ Singleton {
             };
         case "hyprland":
             return {
-                "configFile": configDir + "/hypr/hyprland.conf",
-                "outputsFile": configDir + "/hypr/dms/outputs.conf",
-                "grepPattern": 'source.*dms/outputs.conf',
-                "includeLine": "source = ./dms/outputs.conf"
+                "configFile": configDir + "/hypr/hyprland.lua",
+                "outputsFile": configDir + "/hypr/dms/outputs.lua",
+                "grepPattern": "dms.outputs",
+                "includeLine": "require(\"dms.outputs\")"
             };
         case "dwl":
             return {
@@ -1296,7 +1373,7 @@ Singleton {
             return;
         }
 
-        const filename = (compositor === "niri") ? "outputs.kdl" : "outputs.conf";
+        const filename = (compositor === "niri") ? "outputs.kdl" : ((compositor === "hyprland") ? "outputs.lua" : "outputs.conf");
         const compositorArg = (compositor === "dwl") ? "mangowc" : compositor;
 
         checkingInclude = true;
@@ -1326,11 +1403,17 @@ Singleton {
             return;
 
         fixingInclude = true;
-        const outputsDir = paths.outputsFile.substring(0, paths.outputsFile.lastIndexOf("/"));
         const unixTime = Math.floor(Date.now() / 1000);
         const backupFile = paths.configFile + ".backup" + unixTime;
+        const script = ConfigIncludeResolve.buildRepairScript({
+            configFile: paths.configFile,
+            backupFile: backupFile,
+            fragmentFile: paths.outputsFile,
+            grepPattern: paths.grepPattern,
+            includeLine: paths.includeLine
+        });
 
-        Proc.runCommand("fix-outputs-include", ["sh", "-c", `cp "${paths.configFile}" "${backupFile}" 2>/dev/null; ` + `mkdir -p "${outputsDir}" && ` + `touch "${paths.outputsFile}" && ` + `if ! grep -v '^[[:space:]]*\\(//\\|#\\)' "${paths.configFile}" 2>/dev/null | grep -q '${paths.grepPattern}'; then ` + `echo '' >> "${paths.configFile}" && ` + `echo '${paths.includeLine}' >> "${paths.configFile}"; fi`], (output, exitCode) => {
+        Proc.runCommand("fix-outputs-include", ["sh", "-c", script], (output, exitCode) => {
             fixingInclude = false;
             if (exitCode !== 0)
                 return;

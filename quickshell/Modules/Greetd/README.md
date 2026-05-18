@@ -178,7 +178,7 @@ sudo systemctl enable greetd
 #### Legacy installation (deprecated)
 
 If you prefer the old method with separate shell scripts and config files:
-1. Copy `assets/dms-niri.kdl` or `assets/dms-hypr.conf` to `/etc/greetd`
+1. Copy `assets/dms-niri.kdl` or `assets/dms-hypr.lua` (legacy: `assets/dms-hypr.conf`) to `/etc/greetd`
 2. Copy `assets/greet-niri.sh` or `assets/greet-hyprland.sh` to `/usr/local/bin/start-dms-greetd.sh`
 3. Edit the config file and replace `_DMS_PATH_` with your DMS installation path
 4. Configure greetd to use `/usr/local/bin/start-dms-greetd.sh`

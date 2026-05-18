@@ -8,6 +8,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 
 Item {
     id: root
@@ -54,10 +55,10 @@ Item {
             };
         case "hyprland":
             return {
-                "configFile": configDir + "/hypr/hyprland.conf",
-                "rulesFile": configDir + "/hypr/dms/windowrules.conf",
-                "grepPattern": 'source.*dms/windowrules.conf',
-                "includeLine": "source = ./dms/windowrules.conf"
+                "configFile": configDir + "/hypr/hyprland.lua",
+                "rulesFile": configDir + "/hypr/dms/windowrules.lua",
+                "grepPattern": "dms.windowrules",
+                "includeLine": "require(\"dms.windowrules\")"
             };
         default:
             return null;
@@ -135,7 +136,7 @@ Item {
             return;
         }
 
-        const filename = (compositor === "niri") ? "windowrules.kdl" : "windowrules.conf";
+        const filename = (compositor === "niri") ? "windowrules.kdl" : "windowrules.lua";
         checkingInclude = true;
         Proc.runCommand("check-windowrules-include", ["dms", "config", "resolve-include", compositor, filename], (output, exitCode) => {
             checkingInclude = false;
@@ -162,10 +163,16 @@ Item {
         if (!paths)
             return;
         fixingInclude = true;
-        const rulesDir = paths.rulesFile.substring(0, paths.rulesFile.lastIndexOf("/"));
         const unixTime = Math.floor(Date.now() / 1000);
         const backupFile = paths.configFile + ".backup" + unixTime;
-        Proc.runCommand("fix-windowrules-include", ["sh", "-c", `cp "${paths.configFile}" "${backupFile}" 2>/dev/null; ` + `mkdir -p "${rulesDir}" && ` + `touch "${paths.rulesFile}" && ` + `if ! grep -v '^[[:space:]]*\\(//\\|#\\)' "${paths.configFile}" 2>/dev/null | grep -q '${paths.grepPattern}'; then ` + `echo '' >> "${paths.configFile}" && ` + `echo '${paths.includeLine}' >> "${paths.configFile}"; fi`], (output, exitCode) => {
+        const script = ConfigIncludeResolve.buildRepairScript({
+            configFile: paths.configFile,
+            backupFile: backupFile,
+            fragmentFile: paths.rulesFile,
+            grepPattern: paths.grepPattern,
+            includeLine: paths.includeLine
+        });
+        Proc.runCommand("fix-windowrules-include", ["sh", "-c", script], (output, exitCode) => {
             fixingInclude = false;
             if (exitCode !== 0)
                 return;
@@ -252,7 +259,7 @@ Item {
                             }
 
                             StyledText {
-                                text: I18n.tr("Define rules for window behavior. Saves to %1").arg(CompositorService.isNiri ? "dms/windowrules.kdl" : "dms/windowrules.conf")
+                                text: I18n.tr("Define rules for window behavior. Saves to %1").arg(CompositorService.isNiri ? "dms/windowrules.kdl" : "dms/windowrules.lua")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -351,7 +358,7 @@ Item {
                         }
 
                         StyledText {
-                            readonly property string rulesFile: CompositorService.isNiri ? "dms/windowrules.kdl" : "dms/windowrules.conf"
+                            readonly property string rulesFile: CompositorService.isNiri ? "dms/windowrules.kdl" : "dms/windowrules.lua"
                             text: warningBox.showSetup ? I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(rulesFile) : I18n.tr("%1 exists but is not included. Window rules won't apply.").arg(rulesFile)
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText

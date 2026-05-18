@@ -300,9 +300,14 @@ func (m Model) checkExistingConfigurations() tea.Cmd {
 				Exists:     niriExists,
 			})
 		} else {
-			hyprlandPath := filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.conf")
+			hyprlandLuaPath := filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.lua")
+			hyprlandConfPath := filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.conf")
+			hyprlandPath := hyprlandLuaPath
 			hyprlandExists := false
-			if _, err := os.Stat(hyprlandPath); err == nil {
+			if _, err := os.Stat(hyprlandLuaPath); err == nil {
+				hyprlandExists = true
+			} else if _, err := os.Stat(hyprlandConfPath); err == nil {
+				hyprlandPath = hyprlandConfPath
 				hyprlandExists = true
 			}
 			configs = append(configs, ExistingConfigInfo{

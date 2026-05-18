@@ -7,6 +7,7 @@ import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 
 Item {
     id: themeColorsTab
@@ -39,10 +40,10 @@ Item {
             };
         case "hyprland":
             return {
-                "configFile": configDir + "/hypr/hyprland.conf",
-                "cursorFile": configDir + "/hypr/dms/cursor.conf",
-                "grepPattern": 'source.*dms/cursor.conf',
-                "includeLine": "source = ./dms/cursor.conf"
+                "configFile": configDir + "/hypr/hyprland.lua",
+                "cursorFile": configDir + "/hypr/dms/cursor.lua",
+                "grepPattern": "dms.cursor",
+                "includeLine": "require(\"dms.cursor\")"
             };
         case "dwl":
             return {
@@ -66,7 +67,7 @@ Item {
             return;
         }
 
-        const filename = (compositor === "niri") ? "cursor.kdl" : "cursor.conf";
+        const filename = (compositor === "niri") ? "cursor.kdl" : ((compositor === "hyprland") ? "cursor.lua" : "cursor.conf");
         const compositorArg = (compositor === "dwl") ? "mangowc" : compositor;
 
         checkingCursorInclude = true;
@@ -95,10 +96,16 @@ Item {
         if (!paths)
             return;
         fixingCursorInclude = true;
-        const cursorDir = paths.cursorFile.substring(0, paths.cursorFile.lastIndexOf("/"));
         const unixTime = Math.floor(Date.now() / 1000);
         const backupFile = paths.configFile + ".backup" + unixTime;
-        Proc.runCommand("fix-cursor-include", ["sh", "-c", `cp "${paths.configFile}" "${backupFile}" 2>/dev/null; ` + `mkdir -p "${cursorDir}" && ` + `touch "${paths.cursorFile}" && ` + `if ! grep -v '^[[:space:]]*\\(//\\|#\\)' "${paths.configFile}" 2>/dev/null | grep -q '${paths.grepPattern}'; then ` + `echo '' >> "${paths.configFile}" && ` + `echo '${paths.includeLine}' >> "${paths.configFile}"; fi`], (output, exitCode) => {
+        const script = ConfigIncludeResolve.buildRepairScript({
+            configFile: paths.configFile,
+            backupFile: backupFile,
+            fragmentFile: paths.cursorFile,
+            grepPattern: paths.grepPattern,
+            includeLine: paths.includeLine
+        });
+        Proc.runCommand("fix-cursor-include", ["sh", "-c", script], (output, exitCode) => {
             fixingCursorInclude = false;
             if (exitCode !== 0)
                 return;

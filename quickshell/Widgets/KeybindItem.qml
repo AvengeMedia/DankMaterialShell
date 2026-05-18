@@ -66,12 +66,11 @@ Item {
     signal toggleExpand
     signal saveBind(string originalKey, var newData)
     signal removeBind(string key)
+    signal resetBind(string key)
     signal cancelEdit
 
     implicitHeight: contentColumn.implicitHeight
     height: implicitHeight
-
-    Component.onDestruction: _destroyShortcutInhibitor()
 
     Component.onCompleted: {
         if (isNew && isExpanded)
@@ -831,9 +830,12 @@ Item {
                                 color: root._actionType === modelData.id ? Theme.surfaceContainerHighest : Theme.surfaceContainer
                                 border.color: root._actionType === modelData.id ? Theme.outline : (typeArea.containsMouse ? Theme.outlineVariant : "transparent")
                                 border.width: 1
+                                clip: true
 
                                 RowLayout {
-                                    anchors.centerIn: parent
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Theme.spacingS
+                                    anchors.rightMargin: Theme.spacingS
                                     spacing: Theme.spacingXS
 
                                     DankIcon {
@@ -843,10 +845,13 @@ Item {
                                     }
 
                                     StyledText {
+                                        Layout.fillWidth: true
                                         text: typeDelegate.modelData.label
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: root._actionType === typeDelegate.modelData.id ? Theme.surfaceText : Theme.surfaceVariantText
                                         visible: typeDelegate.width > 100
+                                        elide: Text.ElideRight
+                                        horizontalAlignment: Text.AlignHCenter
                                     }
                                 }
 
@@ -1763,8 +1768,17 @@ Item {
                         iconName: "delete"
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.error
-                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride && !root.isNew
+                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && (root.keys[root.editingKeyIndex].isDMSManaged || root.keys[root.editingKeyIndex].isOverride) && !root.isNew
                         onClicked: root.removeBind(root._originalKey)
+                    }
+
+                    DankButton {
+                        text: I18n.tr("Reset to default")
+                        buttonHeight: root._buttonHeight
+                        backgroundColor: Theme.surfaceContainer
+                        textColor: Theme.primary
+                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride === true && root.keys[root.editingKeyIndex].hasDefault === true && !root.isNew
+                        onClicked: root.resetBind(root._originalKey)
                     }
 
                     Item {
