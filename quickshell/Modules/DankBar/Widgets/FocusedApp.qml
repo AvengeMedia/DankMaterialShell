@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -171,8 +172,7 @@ BasePill {
                     return 0;
                 if (root.isVerticalOrientation)
                     return root.widgetThickness - root.horizontalPadding * 2;
-                const baseWidth = contentRow.implicitWidth;
-                return compactMode ? Math.min(baseWidth, maxCompactWidth - root.horizontalPadding * 2) : Math.min(baseWidth, maxNormalWidth - root.horizontalPadding * 2);
+                return contentRow.implicitWidth;
             }
             implicitHeight: root.widgetThickness - root.horizontalPadding * 2
             clip: false
@@ -222,7 +222,7 @@ BasePill {
                 color: Theme.widgetTextColor
             }
 
-            Row {
+            RowLayout {
                 id: contentRow
                 anchors.centerIn: parent
                 spacing: Theme.spacingS
@@ -231,7 +231,7 @@ BasePill {
                 StyledText {
                     id: appText
                     text: {
-                        if (!activeWindow || !activeWindow.appId)
+                        if (compactMode || !activeWindow || !activeWindow.appId)
                             return "";
                         return Paths.getAppName(activeWindow.appId, activeDesktopEntry);
                     }
@@ -240,12 +240,13 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
-                    width: Math.min(implicitWidth, compactMode ? 80 : 180)
-                    visible: !compactMode && text.length > 0
+                    Layout.maximumWidth: compactMode ? 80 : 180
+                    visible: text.length > 0
                 }
 
                 StyledText {
-                    text: "•"
+                    id: appSeparator
+                    text: compactMode ? "" : "•"
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.outlineButton
                     anchors.verticalCenter: parent.verticalCenter
@@ -279,7 +280,7 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
-                    width: Math.min(implicitWidth, compactMode ? 280 : 250)
+                    Layout.maximumWidth: (compactMode ? maxCompactWidth : maxNormalWidth) - appText.implicitWidth - appSeparator.implicitWidth
                     visible: text.length > 0
                 }
             }
