@@ -139,9 +139,10 @@ func readExistingHyprlandConfig(configDir string) (data string, sourcePath strin
 }
 
 // CleanupStrayHyprlandConfFile moves a stray ~/.config/hypr/hyprland.conf
-// into .dms-backups/<timestamp>/ when running under Hyprland. Hyprland 0.55
-// auto-generates hyprland.conf when launched without -c, so this is invoked
-// from dms run startup to keep the active config tree single-file.
+// into .dms-backups/<timestamp>/ only when hyprland.lua also exists, which
+// proves Lua is the live config and the .conf is an autogen Hyprland 0.55
+// produced when launched without -c. If only hyprland.conf exists, the user
+// has not migrated and we must leave their config alone.
 func CleanupStrayHyprlandConfFile(logFn func(format string, v ...any)) {
 	if os.Getenv("HYPRLAND_INSTANCE_SIGNATURE") == "" {
 		return
@@ -151,6 +152,10 @@ func CleanupStrayHyprlandConfFile(logFn func(format string, v ...any)) {
 		return
 	}
 	configDir := filepath.Join(home, ".config", "hypr")
+	luaPath := filepath.Join(configDir, "hyprland.lua")
+	if _, err := os.Stat(luaPath); err != nil {
+		return
+	}
 	confPath := filepath.Join(configDir, "hyprland.conf")
 	if _, err := os.Stat(confPath); err != nil {
 		return

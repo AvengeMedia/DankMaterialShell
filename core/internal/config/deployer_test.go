@@ -11,6 +11,46 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestCleanupStrayHyprlandConfFile(t *testing.T) {
+	if os.Getenv("HYPRLAND_INSTANCE_SIGNATURE") == "" {
+		t.Setenv("HYPRLAND_INSTANCE_SIGNATURE", "test-signature")
+	}
+
+	t.Run("leaves conf alone when no hyprland.lua present", func(t *testing.T) {
+		td := t.TempDir()
+		t.Setenv("HOME", td)
+		configDir := filepath.Join(td, ".config", "hypr")
+		require.NoError(t, os.MkdirAll(configDir, 0o755))
+		confPath := filepath.Join(configDir, "hyprland.conf")
+		require.NoError(t, os.WriteFile(confPath, []byte("# legacy user config\n"), 0o644))
+
+		CleanupStrayHyprlandConfFile(nil)
+
+		assert.FileExists(t, confPath, "must not touch hyprland.conf when user has not migrated")
+		assert.NoDirExists(t, filepath.Join(configDir, hyprlandBackupDirName))
+	})
+
+	t.Run("moves stray conf into backup when hyprland.lua exists", func(t *testing.T) {
+		td := t.TempDir()
+		t.Setenv("HOME", td)
+		configDir := filepath.Join(td, ".config", "hypr")
+		require.NoError(t, os.MkdirAll(configDir, 0o755))
+		luaPath := filepath.Join(configDir, "hyprland.lua")
+		require.NoError(t, os.WriteFile(luaPath, []byte("-- dms managed\n"), 0o644))
+		confPath := filepath.Join(configDir, "hyprland.conf")
+		require.NoError(t, os.WriteFile(confPath, []byte("# autogen\n"), 0o644))
+
+		CleanupStrayHyprlandConfFile(nil)
+
+		assert.NoFileExists(t, confPath)
+		assert.FileExists(t, luaPath)
+		entries, err := os.ReadDir(filepath.Join(configDir, hyprlandBackupDirName))
+		require.NoError(t, err)
+		require.Len(t, entries, 1)
+		assert.FileExists(t, filepath.Join(configDir, hyprlandBackupDirName, entries[0].Name(), "hyprland.conf"))
+	})
+}
+
 func TestMergeNiriOutputSections(t *testing.T) {
 	cd := &ConfigDeployer{}
 
