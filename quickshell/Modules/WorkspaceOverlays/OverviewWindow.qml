@@ -14,20 +14,34 @@ Item {
     property var availableWorkspaceHeight
     property bool restrictToWorkspace: true
     property real monitorDpr: 1
+    property real contentOriginX: 0
+    property real contentOriginY: 0
+    property real contentScale: 0
 
     readonly property var windowData: toplevel?.lastIpcObject || null
     readonly property var monitorObj: toplevel?.monitor
     readonly property var monitorData: monitorObj?.lastIpcObject || null
     readonly property real effectiveScale: root.scale / root.monitorDpr
+    readonly property real overviewScale: root.contentScale > 0 ? root.contentScale : root.effectiveScale
 
-    property real initX: Math.max(((windowData?.at?.[0] ?? 0) - (monitorData?.x ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * effectiveScale, 0) + xOffset
-    property real initY: Math.max(((windowData?.at?.[1] ?? 0) - (monitorData?.y ?? 0) - (monitorData?.reserved?.[1] ?? 0)) * effectiveScale, 0) + yOffset
+    readonly property real rawX: ((windowData?.at?.[0] ?? 0) - contentOriginX) * overviewScale
+    readonly property real rawY: ((windowData?.at?.[1] ?? 0) - contentOriginY) * overviewScale
+    readonly property real rawWidth: (windowData?.size?.[0] ?? 100) * overviewScale
+    readonly property real rawHeight: (windowData?.size?.[1] ?? 100) * overviewScale
+    readonly property real clipLeft: Math.max(0, rawX)
+    readonly property real clipTop: Math.max(0, rawY)
+    readonly property real clipRight: Math.min(availableWorkspaceWidth, rawX + rawWidth)
+    readonly property real clipBottom: Math.min(availableWorkspaceHeight, rawY + rawHeight)
+    readonly property bool intersectsViewport: clipRight > clipLeft && clipBottom > clipTop
+
+    property real initX: clipLeft + xOffset
+    property real initY: clipTop + yOffset
     property real xOffset: 0
     property real yOffset: 0
     property int widgetMonitorId: 0
 
-    property var targetWindowWidth: (windowData?.size?.[0] ?? 100) * effectiveScale
-    property var targetWindowHeight: (windowData?.size?.[1] ?? 100) * effectiveScale
+    property var targetWindowWidth: Math.max(clipRight - clipLeft, 0)
+    property var targetWindowHeight: Math.max(clipBottom - clipTop, 0)
     property bool hovered: false
     property bool pressed: false
 
@@ -39,8 +53,9 @@ Item {
 
     x: initX
     y: initY
-    width: Math.min((windowData?.size?.[0] ?? 100) * effectiveScale, availableWorkspaceWidth)
-    height: Math.min((windowData?.size?.[1] ?? 100) * effectiveScale, availableWorkspaceHeight)
+    width: targetWindowWidth
+    height: targetWindowHeight
+    visible: intersectsViewport
     opacity: (monitorObj?.id ?? -1) == widgetMonitorId ? 1 : 0.4
 
     Rectangle {
