@@ -15,9 +15,20 @@ BasePill {
 
     property var widgetData: null
     property bool compactMode: widgetData?.focusedWindowCompactMode !== undefined ? widgetData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode
-    property int availableWidth: 400
-    readonly property int maxNormalWidth: 456
-    readonly property int maxCompactWidth: 288
+    readonly property int maxWidth: {
+        const size = widgetData?.focusedWindowSize !== undefined ? widgetData.focusedWindowSize : SettingsData.focusedWindowSize;
+        switch (size) {
+        case 0:
+            return 288;
+        case 2:
+            return 656;
+        case 3:
+            return 856;
+        default:
+            return 456;
+        }
+    }
+    property int availableWidth: maxWidth
     property Toplevel activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
@@ -237,7 +248,6 @@ BasePill {
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
                     Layout.maximumWidth: compactMode ? 80 : 180
@@ -249,7 +259,6 @@ BasePill {
                     text: compactMode ? "" : "•"
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.outlineButton
-                    anchors.verticalCenter: parent.verticalCenter
                     visible: !compactMode && appText.text && titleText.text
                 }
 
@@ -277,10 +286,9 @@ BasePill {
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
-                    Layout.maximumWidth: (compactMode ? maxCompactWidth : maxNormalWidth) - appText.implicitWidth - appSeparator.implicitWidth
+                    Layout.maximumWidth: maxWidth - appText.implicitWidth - appSeparator.implicitWidth
                     visible: text.length > 0
                 }
             }

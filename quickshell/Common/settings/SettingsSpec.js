@@ -153,6 +153,7 @@ var SPEC = {
     audioWheelScrollAmount: { def: 5 },
     clockCompactMode: { def: false },
     focusedWindowCompactMode: { def: false },
+    focusedWindowSize: { def: 1 },
     runningAppsCompactMode: { def: true },
     barMaxVisibleApps: { def: 0 },
     barMaxVisibleRunningApps: { def: 0 },

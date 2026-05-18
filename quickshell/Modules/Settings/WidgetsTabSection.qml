@@ -24,6 +24,7 @@ Column {
     signal removeWidget(string sectionId, int widgetIndex)
     signal spacerSizeChanged(string sectionId, int widgetIndex, int newSize)
     signal compactModeChanged(string widgetId, var value)
+    signal widgetSizeChanged(string widgetId, var value)
     signal gpuSelectionChanged(string sectionId, int widgetIndex, int selectedIndex)
     signal diskMountSelectionChanged(string sectionId, int widgetIndex, string mountPath)
     signal controlCenterSettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
@@ -41,7 +42,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -391,6 +392,39 @@ Column {
                         }
 
                         DankActionButton {
+                            id: focusedWindowMenuButton
+                            buttonSize: 32
+                            visible: modelData.id === "focusedWindow"
+                            iconName: "more_vert"
+                            iconSize: 18
+                            iconColor: Theme.outline
+                            onClicked: {
+                                focusedWindowContextMenu.widgetData = modelData;
+                                focusedWindowContextMenu.sectionId = root.sectionId;
+                                focusedWindowContextMenu.widgetIndex = index;
+
+                                var buttonPos = focusedWindowMenuButton.mapToItem(root, 0, 0);
+                                var popupWidth = focusedWindowContextMenu.width;
+                                var popupHeight = focusedWindowContextMenu.height;
+
+                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
+                                if (xPos < 0)
+                                xPos = buttonPos.x + focusedWindowMenuButton.width + Theme.spacingS;
+
+                                var yPos = buttonPos.y - popupHeight / 2 + focusedWindowMenuButton.height / 2;
+                                if (yPos < 0) {
+                                    yPos = Theme.spacingS;
+                                } else if (yPos + popupHeight > root.height) {
+                                    yPos = root.height - popupHeight - Theme.spacingS;
+                                }
+
+                                focusedWindowContextMenu.x = xPos;
+                                focusedWindowContextMenu.y = yPos;
+                                focusedWindowContextMenu.open();
+                            }
+                        }
+
+                        DankActionButton {
                             id: musicMenuButton
                             visible: modelData.id === "music"
                             buttonSize: 32
@@ -458,19 +492,17 @@ Column {
 
                         Row {
                             spacing: Theme.spacingXS
-                            visible: modelData.id === "clock" || modelData.id === "focusedWindow" || modelData.id === "keyboard_layout_name" || modelData.id === "appsDock" || modelData.id === "systemTray"
+                            visible: modelData.id === "clock" || modelData.id === "keyboard_layout_name" || modelData.id === "appsDock" || modelData.id === "systemTray"
 
                             DankActionButton {
                                 id: compactModeButton
                                 buttonSize: 28
-                                visible: modelData.id === "clock" || modelData.id === "focusedWindow" || modelData.id === "keyboard_layout_name"
+                                visible: modelData.id === "clock" || modelData.id === "keyboard_layout_name"
                                 iconName: {
                                     const isCompact = (() => {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
-                                            case "focusedWindow":
-                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -485,8 +517,6 @@ Column {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
-                                            case "focusedWindow":
-                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -500,8 +530,6 @@ Column {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
-                                            case "focusedWindow":
-                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -515,8 +543,6 @@ Column {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
-                                            case "focusedWindow":
-                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -1060,6 +1086,174 @@ Column {
                         onClicked: {
                             const newValue = !(trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false);
                             root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayUseInlineExpansion", newValue);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Popup {
+        id: focusedWindowContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+
+        width: 180
+        height: focusedWindowMenuColumn.implicitHeight + Theme.spacingS * 2
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+            Column {
+                id: focusedWindowMenuColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: fwCompactArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "zoom_in"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Compact")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: fwCompactToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: focusedWindowContextMenu.currentWidgetData?.focusedWindowCompactMode ?? SettingsData.focusedWindowCompactMode
+                        onToggled: {
+                            root.overflowSettingChanged(focusedWindowContextMenu.sectionId, focusedWindowContextMenu.widgetIndex, "focuswedWindowCompactMode", toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: fwCompactArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            fwCompactToggle.checked = !fwCompactToggle.checked;
+                            root.overflowSettingChanged(focusedWindowContextMenu.sectionId, focusedWindowContextMenu.widgetIndex, "focusedWindowCompactMode", fwCompactToggle.checked);
+                        }
+                    }
+                }
+
+                Repeater {
+                    model: [
+                        {
+                            icon: "photo_size_select_small",
+                            label: I18n.tr("Small"),
+                            sizeValue: 0
+                        },
+                        {
+                            icon: "photo_size_select_actual",
+                            label: I18n.tr("Medium"),
+                            sizeValue: 1
+                        },
+                        {
+                            icon: "photo_size_select_large",
+                            label: I18n.tr("Large"),
+                            sizeValue: 2
+                        },
+                        {
+                            icon: "fit_screen",
+                            label: I18n.tr("Largest"),
+                            sizeValue: 3
+                        }
+                    ]
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
+
+                        function isSelected() {
+                            var wd = focusedWindowContextMenu.widgetData;
+                            var currentSize = wd?.focusedWindowSize ?? SettingsData.focusedWindowSize;
+                            return currentSize === modelData.sizeValue;
+                        }
+
+                        width: focusedWindowMenuColumn.width
+                        height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
+                        radius: Theme.cornerRadius
+                        color: focusedWindowOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+
+                            DankIcon {
+                                name: modelData.icon
+                                size: 18
+                                color: isSelected() ? Theme.primary : Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: modelData.label
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: isSelected() ? Font.Medium : Font.Normal
+                                color: isSelected() ? Theme.primary : Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        DankIcon {
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: "check"
+                            size: 16
+                            color: Theme.primary
+                            visible: isSelected()
+                        }
+
+                        MouseArea {
+                            id: focusedWindowOptionArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.widgetSizeChanged("focusedWindow", modelData.sizeValue);
+                                focusedWindowContextMenu.close();
+                            }
                         }
                     }
                 }
@@ -2144,7 +2338,7 @@ Column {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.compactModeChanged("music", modelData.sizeValue);
+                                root.widgetSizeChanged("music", modelData.sizeValue);
                                 musicContextMenu.close();
                             }
                         }
