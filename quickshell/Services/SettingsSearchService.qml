@@ -159,17 +159,15 @@ Singleton {
         _translatedCache = cache;
     }
 
-    function search(text) {
-        query = text;
-        if (!text) {
-            results = [];
-            return;
-        }
+    function _searchEntries(text, maxResults) {
+        if (!text)
+            return [];
 
         var queryLower = text.toLowerCase().trim();
         var queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
         var scored = [];
         var cache = _translatedCache;
+        var limit = maxResults > 0 ? maxResults : 15;
 
         for (var i = 0; i < cache.length; i++) {
             var entry = cache[i];
@@ -234,7 +232,20 @@ Singleton {
         }
 
         scored.sort((a, b) => b.score - a.score);
-        results = scored.slice(0, 15).map(s => s.item);
+        return scored.slice(0, limit).map(s => s.item);
+    }
+
+    function searchForLauncher(text) {
+        return _searchEntries(text, 15);
+    }
+
+    function search(text) {
+        query = text;
+        if (!text) {
+            results = [];
+            return;
+        }
+        results = _searchEntries(text, 15);
     }
 
     function clear() {

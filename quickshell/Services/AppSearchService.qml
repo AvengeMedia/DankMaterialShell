@@ -296,9 +296,8 @@ Singleton {
 
     function getBuiltInLauncherItems(pluginId, query) {
         if (pluginId === "dms_clipboard_search") {
-            ClipboardService.ensureLauncherHistory();
             const trimmed = (query || "").toString().trim();
-            const entries = trimmed.length === 0 ? ClipboardService.getRecentLauncherEntries(20) : ClipboardService.getLauncherEntries(trimmed, 20, 1);
+            const entries = ClipboardService.getCachedLauncherSearchEntries(trimmed, 20);
             return entries.map(entry => ({
                 type: "clipboard",
                 data: entry
@@ -308,8 +307,7 @@ Singleton {
         if (pluginId !== "dms_settings_search")
             return [];
 
-        SettingsSearchService.search(query);
-        const results = SettingsSearchService.results;
+        const results = SettingsSearchService.searchForLauncher(query);
         const items = [];
         for (let i = 0; i < results.length; i++) {
             const r = results[i];

@@ -27,9 +27,14 @@ Singleton {
     property bool keyboardNavigationActive: false
     property int refCount: 0
     property real _launcherLastRefresh: 0
+    property bool _launcherCacheValid: false
+    property string _launcherCachedQuery: ""
+    property var _launcherCachedEntries: []
+    property int _launcherSearchSeq: 0
 
     signal historyCopied
     signal historyCleared
+    signal launcherSearchReady(string query)
 
     Process {
         id: wtypeProcess
@@ -101,6 +106,63 @@ Singleton {
             _launcherLastRefresh = now;
             refresh();
         }
+    }
+
+    function requestLauncherSearch(query, limit) {
+        if (!clipboardAvailable) {
+            return;
+        }
+
+        const trimmed = (query || "").toString().trim();
+        const maxItems = limit > 0 ? limit : 20;
+        if (_launcherCacheValid && _launcherCachedQuery === trimmed) {
+            return;
+        }
+
+        _launcherSearchSeq++;
+        const seq = _launcherSearchSeq;
+        DMSService.sendRequest("clipboard.search", {
+            "query": trimmed,
+            "limit": maxItems
+        }, function (response) {
+            if (seq !== _launcherSearchSeq) {
+                return;
+            }
+            if (response.error) {
+                log.warn("Launcher clipboard search failed:", response.error);
+                _launcherCacheValid = true;
+                _launcherCachedQuery = trimmed;
+                _launcherCachedEntries = [];
+                launcherSearchReady(trimmed);
+                return;
+            }
+            const result = response.result || {};
+            _launcherCacheValid = true;
+            _launcherCachedQuery = trimmed;
+            _launcherCachedEntries = result.entries || [];
+            launcherSearchReady(trimmed);
+        });
+    }
+
+    function getCachedLauncherSearchEntries(query, limit) {
+        if (!clipboardAvailable) {
+            return [];
+        }
+
+        const trimmed = (query || "").toString().trim();
+        const maxItems = limit > 0 ? limit : 20;
+        if (!_launcherCacheValid || _launcherCachedQuery !== trimmed) {
+            requestLauncherSearch(trimmed, maxItems);
+            return [];
+        }
+        return _launcherCachedEntries.slice(0, maxItems);
+    }
+
+    function invalidateLauncherSearchCache() {
+        _launcherCacheValid = false;
+        _launcherCachedQuery = "";
+        _launcherCachedEntries = [];
+        _launcherSearchSeq++;
     }
 
     function getLauncherEntries(query, limit, minLength) {

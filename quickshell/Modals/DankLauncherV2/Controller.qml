@@ -44,16 +44,14 @@ Item {
     signal searchQueryRequested(string query)
 
     onActiveChanged: {
-        if (active) {
-            if (clipboardSearchEnabledInAll())
-                ClipboardService.ensureLauncherHistory();
-        } else {
+        if (!active) {
             SessionData.addLauncherHistory(searchQuery);
 
             sections = [];
             flatModel = [];
             selectedItem = null;
             _clearModeCache();
+            ClipboardService.invalidateLauncherSearchCache();
         }
     }
 
@@ -88,11 +86,17 @@ Item {
 
     Connections {
         target: ClipboardService
-        function onInternalEntriesChanged() {
+        function onLauncherSearchReady(query) {
             if (!active || !clipboardSearchEnabledInAll())
                 return;
-            if (searchMode === "all" && searchQuery.length >= 2)
-                performSearch();
+            if (searchMode !== "all")
+                return;
+            const trimmed = (searchQuery || "").trim();
+            if (trimmed.length < 2 && query.length > 0)
+                return;
+            if (query !== trimmed)
+                return;
+            searchDebounce.restart();
         }
     }
 
@@ -403,9 +407,6 @@ Item {
         searchQuery = query;
         searchDebounce.restart();
 
-        if (searchMode === "all" && clipboardSearchEnabledInAll() && query.length >= 2)
-            ClipboardService.ensureLauncherHistory();
-
         var filesInAll = searchMode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll);
         if (searchMode !== "plugins" && (searchMode === "files" || query.startsWith("/") || filesInAll) && query.length > 0) {
             fileSearchDebounce.restart();
@@ -424,8 +425,6 @@ Item {
         searchMode = mode;
         modeChanged(mode);
         performSearch();
-        if (mode === "all" && clipboardSearchEnabledInAll() && searchQuery.length >= 2)
-            ClipboardService.ensureLauncherHistory();
         var filesInAll = mode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll) && searchQuery.length > 0;
         if (mode === "files" || filesInAll) {
             fileSearchDebounce.restart();
@@ -1209,7 +1208,6 @@ Item {
         }
 
         if (clipboardSearchEnabledInAll()) {
-            ClipboardService.ensureLauncherHistory();
             var clipboardItems = AppSearchService.getBuiltInLauncherItems("dms_clipboard_search", query);
             var clipboardLimit = Math.min(clipboardItems.length, 8);
             for (var j = 0; j < clipboardLimit; j++) {
