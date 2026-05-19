@@ -1,6 +1,7 @@
 package network
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
@@ -18,10 +19,41 @@ const (
 )
 
 type linkInfo struct {
-	ifindex int32
-	name    string
-	path    dbus.ObjectPath
-	opState string
+	ifindex  int32
+	name     string
+	path     dbus.ObjectPath
+	opState  string
+	linkType string
+}
+
+func (l *linkInfo) isWired() bool {
+	if l.linkType != "" {
+		return l.linkType == "ether"
+	}
+	if looksVirtual(l.name) || strings.HasPrefix(l.name, "wlan") || strings.HasPrefix(l.name, "wlp") {
+		return false
+	}
+	return true
+}
+
+func (l *linkInfo) isWireless() bool {
+	if l.linkType != "" {
+		return l.linkType == "wlan"
+	}
+	return strings.HasPrefix(l.name, "wlan") || strings.HasPrefix(l.name, "wlp")
+}
+
+func looksVirtual(name string) bool {
+	virtualPrefixes := []string{
+		"lo", "docker", "veth", "virbr", "br-", "vnet", "tun", "tap",
+		"vboxnet", "vmnet", "kube", "cni", "flannel", "cali",
+	}
+	for _, prefix := range virtualPrefixes {
+		if strings.HasPrefix(name, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 type SystemdNetworkdBackend struct {
@@ -95,15 +127,35 @@ func (b *SystemdNetworkdBackend) enumerateLinks() error {
 	defer b.linksMutex.Unlock()
 
 	for _, l := range links {
-		b.links[l.Name] = &linkInfo{
+		info := &linkInfo{
 			ifindex: l.Ifindex,
 			name:    l.Name,
 			path:    l.Path,
 		}
-		log.Debugf("networkd: enumerated link %s (ifindex=%d, path=%s)", l.Name, l.Ifindex, l.Path)
+		info.linkType = b.fetchLinkType(l.Path)
+		b.links[l.Name] = info
+		log.Debugf("networkd: enumerated link %s (ifindex=%d, path=%s, type=%q)", l.Name, l.Ifindex, l.Path, info.linkType)
 	}
 
 	return nil
+}
+
+// fetchLinkType queries networkd's Describe method and extracts the link Type
+// (e.g. "ether", "wlan", "loopback", "none"). Returns empty on failure; callers
+// fall back to name-prefix heuristics in that case.
+func (b *SystemdNetworkdBackend) fetchLinkType(path dbus.ObjectPath) string {
+	linkObj := b.conn.Object(networkdBusName, path)
+	var describeJSON string
+	if err := linkObj.Call(networkdLinkIface+".Describe", 0).Store(&describeJSON); err != nil {
+		return ""
+	}
+	var parsed struct {
+		Type string `json:"Type"`
+	}
+	if err := json.Unmarshal([]byte(describeJSON), &parsed); err != nil {
+		return ""
+	}
+	return parsed.Type
 }
 
 func (b *SystemdNetworkdBackend) updateState() error {
@@ -113,8 +165,8 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	var wiredIface *linkInfo
 	var wifiIface *linkInfo
 
-	for name, link := range b.links {
-		if b.isVirtualInterface(name) {
+	for _, link := range b.links {
+		if !link.isWired() && !link.isWireless() {
 			continue
 		}
 
@@ -126,11 +178,11 @@ func (b *SystemdNetworkdBackend) updateState() error {
 			}
 		}
 
-		if strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wlp") {
+		if link.isWireless() {
 			if wifiIface == nil || link.opState == "routable" || link.opState == "carrier" {
 				wifiIface = link
 			}
-		} else if !b.isVirtualInterface(name) {
+		} else if link.isWired() {
 			if wiredIface == nil || link.opState == "routable" || link.opState == "carrier" {
 				wiredIface = link
 			}
@@ -140,7 +192,7 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	var wiredConns []WiredConnection
 	var ethernetDevices []EthernetDevice
 	for name, link := range b.links {
-		if b.isVirtualInterface(name) || strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wlp") {
+		if !link.isWired() {
 			continue
 		}
 
@@ -227,19 +279,6 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	}
 
 	return nil
-}
-
-func (b *SystemdNetworkdBackend) isVirtualInterface(name string) bool {
-	virtualPrefixes := []string{
-		"lo", "docker", "veth", "virbr", "br-", "vnet", "tun", "tap",
-		"vboxnet", "vmnet", "kube", "cni", "flannel", "cali",
-	}
-	for _, prefix := range virtualPrefixes {
-		if strings.HasPrefix(name, prefix) {
-			return true
-		}
-	}
-	return false
 }
 
 func (b *SystemdNetworkdBackend) getAddresses(ifname string) []string {
