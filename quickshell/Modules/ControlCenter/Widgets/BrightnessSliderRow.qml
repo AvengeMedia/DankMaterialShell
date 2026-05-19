@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -31,8 +32,10 @@ Row {
         }
 
         if (screenName && screenName.length > 0) {
+            const screen = Quickshell.screens.find(s => s.name === screenName);
+            const pinKey = screen ? SettingsData.getScreenDisplayName(screen) : screenName;
             const pins = SettingsData.brightnessDevicePins || {};
-            const pinnedDevice = pins[screenName];
+            const pinnedDevice = pins[pinKey];
             if (pinnedDevice && pinnedDevice.length > 0) {
                 const found = DisplayService.devices.find(dev => dev.name === pinnedDevice);
                 if (found) {

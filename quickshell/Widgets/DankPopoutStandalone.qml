@@ -287,21 +287,43 @@ Item {
         _frozenMaskWidth = maskWidth;
         _frozenMaskHeight = maskHeight;
 
-        if (_lastOpenedScreen !== null && _lastOpenedScreen !== screen) {
+        const screenChanged = _lastOpenedScreen !== null && _lastOpenedScreen !== screen;
+        if (screenChanged) {
+            // Hide on this tick so Qt actually tears down the wl_surface; the show
+            // gets deferred below so the unmap is processed before the remap.
             contentWindow.visible = false;
             backgroundWindow.visible = false;
         }
         _lastOpenedScreen = screen;
 
-        if (contentContainer) {
-            // animationsEnabled is false here, so this snaps to closed without animating.
+        if (contentContainer && !shouldBeVisible) {
+            // Snap morph closed only on a fresh open; on screen-change re-open we stay at 1
+            // because shouldBeVisible doesn't change and won't drive morph back to 1.
             morph.openProgress = 0;
         }
 
         _setSurfaceGeometry(alignedX, alignedY, alignedWidth, alignedHeight);
-        if (backgroundWindowRequired)
-            backgroundWindow.visible = true;
-        contentWindow.visible = true;
+        if (screenChanged) {
+            // Defer the show one event-loop tick. Qt coalesces a synchronous
+            // false→true visibility flip into a no-op, leaving WindowBlur committed
+            // to the previous screen's wl_surface. Splitting the flip across ticks
+            // forces a real surface destroy+create so BackgroundEffect.surfaceCreated
+            // fires and the blur region republishes on the new surface.
+            Qt.callLater(() => {
+                if (!root.shouldBeVisible)
+                    return;
+                if (root.backgroundWindowRequired)
+                    backgroundWindow.visible = true;
+                contentWindow.visible = true;
+                popoutBlur.kick();
+                _bgCommitWindow = true;
+                bgCommitSettleTimer.restart();
+            });
+        } else {
+            if (backgroundWindowRequired)
+                backgroundWindow.visible = true;
+            contentWindow.visible = true;
+        }
 
         animationsEnabled = true;
         shouldBeVisible = true;
@@ -840,7 +862,9 @@ Item {
                         Connections {
                             target: contentWindow
                             function onVisibleChanged() {
-                                if (!contentWindow.visible)
+                                // open() flips contentWindow.visible to rebind the layer surface to
+                                // a new screen; don't deactivate the wrapper while still open.
+                                if (!contentWindow.visible && !root.shouldBeVisible)
                                     contentWrapper._renderActive = false;
                             }
                         }

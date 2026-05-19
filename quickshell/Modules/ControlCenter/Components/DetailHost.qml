@@ -59,21 +59,19 @@ Item {
         ignoreUnknownSignals: true
 
         function onDeviceNameChanged(newDeviceName) {
-            if (root.expandedWidgetData && root.expandedWidgetData.id === "brightnessSlider") {
-                const widgets = SettingsData.controlCenterWidgets || [];
-                const newWidgets = widgets.map(w => {
-                    if (w.id === "brightnessSlider" && w.instanceId === root.expandedWidgetData.instanceId) {
-                        const updatedWidget = Object.assign({}, w);
-                        updatedWidget.deviceName = newDeviceName;
-                        return updatedWidget;
-                    }
-                    return w;
-                });
-                SettingsData.set("controlCenterWidgets", newWidgets);
-                if (root.collapseCallback) {
-                    root.collapseCallback();
-                }
+            if (!root.expandedWidgetData || root.expandedWidgetData.id !== "brightnessSlider") {
+                return;
             }
+            const widgets = SettingsData.controlCenterWidgets || [];
+            const newWidgets = widgets.map(w => {
+                if (w.id === "brightnessSlider" && w.instanceId === root.expandedWidgetData.instanceId) {
+                    const updatedWidget = Object.assign({}, w);
+                    updatedWidget.deviceName = newDeviceName;
+                    return updatedWidget;
+                }
+                return w;
+            });
+            SettingsData.set("controlCenterWidgets", newWidgets);
         }
     }
 
