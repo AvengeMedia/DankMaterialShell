@@ -11,13 +11,14 @@ BasePill {
     id: root
 
     readonly property string focusedScreenName: (CompositorService.isHyprland && typeof Hyprland !== "undefined" && Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.monitor ? (Hyprland.focusedWorkspace.monitor.name || "") : CompositorService.isNiri && typeof NiriService !== "undefined" && NiriService.currentOutput ? NiriService.currentOutput : "")
+    readonly property string targetScreenName: parentScreen?.name || focusedScreenName
 
     function resolveNotepadInstance() {
         if (typeof notepadSlideoutVariants === "undefined" || !notepadSlideoutVariants || !notepadSlideoutVariants.instances) {
             return null;
         }
 
-        const targetScreen = focusedScreenName;
+        const targetScreen = targetScreenName;
         if (targetScreen) {
             for (var i = 0; i < notepadSlideoutVariants.instances.length; i++) {
                 var slideout = notepadSlideoutVariants.instances[i];
@@ -33,6 +34,12 @@ BasePill {
     readonly property var notepadInstance: resolveNotepadInstance()
     readonly property bool isActive: notepadInstance?.isVisible ?? false
     property bool isAutoHideBar: false
+
+    function prepareNotepadInstance(instance) {
+        if (instance)
+            instance.triggerUsesOverlayLayer = root.barUsesOverlayLayer;
+        return instance;
+    }
 
     readonly property real minTooltipY: {
         if (!parentScreen || !(axis?.isVertical ?? false)) {
@@ -68,8 +75,9 @@ BasePill {
     function openTabByIndex(tabIndex) {
         if (tabIndex < 0)
             return;
-        if (root.notepadInstance && typeof root.notepadInstance.show === "function") {
-            root.notepadInstance.show();
+        const instance = prepareNotepadInstance(root.notepadInstance);
+        if (instance && typeof instance.show === "function") {
+            instance.show();
         }
         Qt.callLater(() => {
             NotepadStorageService.switchToTab(tabIndex);
@@ -77,8 +85,9 @@ BasePill {
     }
 
     function openNewNote() {
-        if (root.notepadInstance && typeof root.notepadInstance.show === "function") {
-            root.notepadInstance.show();
+        const instance = prepareNotepadInstance(root.notepadInstance);
+        if (instance && typeof instance.show === "function") {
+            instance.show();
         }
         Qt.callLater(() => {
             NotepadStorageService.createNewTab();
@@ -138,7 +147,7 @@ BasePill {
                 openContextMenu();
                 return;
             }
-            const inst = root.notepadInstance;
+            const inst = prepareNotepadInstance(root.notepadInstance);
             if (inst) {
                 inst.toggle();
             }

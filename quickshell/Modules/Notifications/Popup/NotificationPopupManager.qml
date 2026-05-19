@@ -10,7 +10,7 @@ QtObject {
     property var modelData
     property int topMargin: 0
     readonly property bool compactMode: SettingsData.notificationCompactMode
-    readonly property bool notificationConnectedMode: SettingsData.frameEnabled && Theme.isConnectedEffect && SettingsData.isScreenInPreferences(manager.modelData, SettingsData.frameScreenPreferences)
+    readonly property bool notificationConnectedMode: CompositorService.usesConnectedFrameChromeForScreen(manager.modelData)
     readonly property bool closeGapNotifications: notificationConnectedMode && SettingsData.frameCloseGaps
     readonly property string notifBarSide: {
         const pos = SettingsData.notificationPopupPosition;

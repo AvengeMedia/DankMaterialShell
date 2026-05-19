@@ -52,6 +52,7 @@ Item {
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
     property var storedBarConfig: null
+    property bool triggerUsesOverlayLayer: false
     property var adjacentBarInfo: ({
             "topBar": 0,
             "bottomBar": 0,
@@ -59,11 +60,25 @@ Item {
             "rightBar": 0
         })
     property var screen: null
-    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+    readonly property bool frameGapStandaloneActive: CompositorService.frameConfiguredForScreen(screen) && !CompositorService.usesConnectedFrameChromeForScreen(screen)
     readonly property bool fluidStandaloneActive: Theme.isDirectionalEffect
     readonly property bool backgroundDismissWindowRequired: backgroundInteractive
     readonly property bool backgroundWindowRequired: backgroundDismissWindowRequired || root.overlayContent !== null
     readonly property bool _fullHeight: fullHeightSurface
+    readonly property var effectivePopoutLayer: {
+        switch (Quickshell.env("DMS_POPOUT_LAYER")) {
+        case "bottom":
+            root.log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "background":
+            root.log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "overlay":
+            return WlrLayershell.Overlay;
+        default:
+            return root.triggerUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top;
+        }
+    }
 
     function _frameEdgeInset(side) {
         if (!screen)
@@ -76,7 +91,7 @@ Item {
     }
 
     function _edgeClearance(side, popupGap, adjacentInset) {
-        if (frameOnlyNoConnected)
+        if (frameGapStandaloneActive)
             return Math.max(adjacentInset, _frameGapMargin(side));
         return adjacentInset > 0 ? adjacentInset : popupGap;
     }
@@ -524,7 +539,7 @@ Item {
         updatesEnabled: root.overlayContent !== null || root._bgCommitWindow
 
         WlrLayershell.namespace: root.layerNamespace + ":background"
-        WlrLayershell.layer: WlrLayershell.Top
+        WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -602,20 +617,7 @@ Item {
         }
 
         WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: {
-            switch (Quickshell.env("DMS_POPOUT_LAYER")) {
-            case "bottom":
-                root.log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                root.log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
             if (customKeyboardFocus !== null)

@@ -10,7 +10,7 @@ import qs.Widgets
 PanelWindow {
     id: win
 
-    readonly property bool connectedFrameMode: SettingsData.frameEnabled && Theme.isConnectedEffect && SettingsData.isScreenInPreferences(win.screen, SettingsData.frameScreenPreferences)
+    readonly property bool connectedFrameMode: CompositorService.usesConnectedFrameChromeForScreen(win.screen)
     readonly property string notifBarSide: {
         const pos = SettingsData.notificationPopupPosition;
         if (pos === -1)
@@ -370,9 +370,9 @@ PanelWindow {
         return Math.max(0, Math.round(Theme.px(raw, dpr)));
     }
 
-    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !connectedFrameMode && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+    readonly property bool frameVisibleWithoutConnectedChrome: CompositorService.frameWindowVisibleForScreen(screen) && !connectedFrameMode
 
-    // Frame ON + Connected OFF. frameEdgeInset is the full bar/frame inset
+    // Frame visible without connected chrome. frameEdgeInset is the full bar/frame inset.
     function _frameGapMargin(side) {
         return _frameEdgeInset(side) + Theme.popupDistance;
     }
@@ -387,7 +387,7 @@ PanelWindow {
             const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps) ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("top") + cornerClear + screenY;
         }
-        if (frameOnlyNoConnected)
+        if (frameVisibleWithoutConnectedChrome)
             return _frameGapMargin("top") + screenY;
         const barInfo = getBarInfo();
         const base = barInfo.topBar > 0 ? barInfo.topBar : Theme.popupDistance;
@@ -404,7 +404,7 @@ PanelWindow {
             const cornerClear = (isCenterPosition || SettingsData.frameCloseGaps) ? 0 : (Theme.px(SettingsData.frameRounding, dpr) + Theme.px(Theme.connectedCornerRadius, dpr));
             return _frameEdgeInset("bottom") + cornerClear + screenY;
         }
-        if (frameOnlyNoConnected)
+        if (frameVisibleWithoutConnectedChrome)
             return _frameGapMargin("bottom") + screenY;
         const barInfo = getBarInfo();
         const base = barInfo.bottomBar > 0 ? barInfo.bottomBar : Theme.popupDistance;
@@ -422,7 +422,7 @@ PanelWindow {
 
         if (connectedFrameMode)
             return _frameEdgeInset("left");
-        if (frameOnlyNoConnected)
+        if (frameVisibleWithoutConnectedChrome)
             return _frameGapMargin("left");
         const barInfo = getBarInfo();
         return barInfo.leftBar > 0 ? barInfo.leftBar : Theme.popupDistance;
@@ -439,7 +439,7 @@ PanelWindow {
 
         if (connectedFrameMode)
             return _frameEdgeInset("right");
-        if (frameOnlyNoConnected)
+        if (frameVisibleWithoutConnectedChrome)
             return _frameGapMargin("right");
         const barInfo = getBarInfo();
         return barInfo.rightBar > 0 ? barInfo.rightBar : Theme.popupDistance;

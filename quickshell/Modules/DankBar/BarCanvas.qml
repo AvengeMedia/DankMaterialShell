@@ -10,13 +10,15 @@ Item {
     required property var axis
     required property var barConfig
 
-    visible: !SettingsData.frameEnabled
+    readonly property bool frameShapesBar: SettingsData.frameEnabled && barWindow.usesConnectedFrameChrome
+
+    visible: !frameShapesBar
 
     anchors.fill: parent
 
     anchors.left: parent.left
     anchors.top: parent.top
-    readonly property bool gothEnabled: (barConfig?.gothCornersEnabled ?? false) && !barWindow.hasMaximizedToplevel
+    readonly property bool gothEnabled: (barConfig?.gothCornersEnabled ?? false) && !(barWindow.flattenForMaximizedWindow && barWindow.hasMaximizedToplevel)
     anchors.leftMargin: -(gothEnabled && axis.isVertical && axis.edge === "right" ? barWindow._wingR : 0)
     anchors.rightMargin: -(gothEnabled && axis.isVertical && axis.edge === "left" ? barWindow._wingR : 0)
     anchors.topMargin: -(gothEnabled && !axis.isVertical && axis.edge === "bottom" ? barWindow._wingR : 0)
@@ -39,11 +41,11 @@ Item {
     }
 
     property real rt: {
-        if (SettingsData.frameEnabled)
+        if (frameShapesBar)
             return SettingsData.frameRounding;
         if (barConfig?.squareCorners ?? false)
             return 0;
-        if (barWindow.hasMaximizedToplevel)
+        if (barWindow.flattenForMaximizedWindow && barWindow.hasMaximizedToplevel)
             return 0;
         return Theme.cornerRadius;
     }
@@ -113,9 +115,32 @@ Item {
     readonly property real shadowOffsetX: Theme.elevationOffsetXFor(hasPerBarOverride ? null : elevLevel, effectiveShadowDirection, shadowOffsetMagnitude)
     readonly property real shadowOffsetY: Theme.elevationOffsetYFor(hasPerBarOverride ? null : elevLevel, effectiveShadowDirection, shadowOffsetMagnitude)
 
-    readonly property string mainPath: generatePathForPosition(width, height)
-    readonly property string borderFullPath: generateBorderFullPath(width, height)
-    readonly property string borderEdgePath: generateBorderEdgePath(width, height)
+    readonly property string mainPath: {
+        frameShapesBar;
+        rt;
+        wing;
+        barWindow.flattenForMaximizedWindow;
+        barWindow.hasMaximizedToplevel;
+        width;
+        height;
+        return generatePathForPosition(width, height);
+    }
+    readonly property string borderFullPath: {
+        frameShapesBar;
+        rt;
+        wing;
+        width;
+        height;
+        return generateBorderFullPath(width, height);
+    }
+    readonly property string borderEdgePath: {
+        frameShapesBar;
+        rt;
+        wing;
+        width;
+        height;
+        return generateBorderEdgePath(width, height);
+    }
     property bool mainPathCorrectShape: false
     property bool borderFullPathCorrectShape: false
     property bool borderEdgePathCorrectShape: false
@@ -134,6 +159,12 @@ Item {
         if (width > 0 && height > 0) {
             root: borderEdgePathCorrectShape = true;
         }
+    }
+
+    onFrameShapesBarChanged: {
+        mainPathCorrectShape = false;
+        borderFullPathCorrectShape = false;
+        borderEdgePathCorrectShape = false;
     }
 
     MouseArea {
@@ -259,7 +290,7 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
-        const crE = SettingsData.frameEnabled ? 0 : cr;
+        const crE = frameShapesBar ? 0 : cr;
 
         let d = `M ${crE} 0`;
         d += ` L ${w - crE} 0`;
@@ -290,7 +321,7 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
-        const crE = SettingsData.frameEnabled ? 0 : cr;
+        const crE = frameShapesBar ? 0 : cr;
 
         let d = `M ${crE} ${fullH}`;
         d += ` L ${w - crE} ${fullH}`;
@@ -320,7 +351,7 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
-        const crE = SettingsData.frameEnabled ? 0 : cr;
+        const crE = frameShapesBar ? 0 : cr;
 
         let d = `M 0 ${crE}`;
         d += ` L 0 ${h - crE}`;
@@ -351,7 +382,7 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
-        const crE = SettingsData.frameEnabled ? 0 : cr;
+        const crE = frameShapesBar ? 0 : cr;
 
         let d = `M ${fullW} ${crE}`;
         d += ` L ${fullW} ${h - crE}`;

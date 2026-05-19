@@ -38,7 +38,7 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
 
     function _dockOccupiesSide(side) {
         if (!SettingsData.showDock)
@@ -58,7 +58,7 @@ Item {
 
     readonly property bool _dockBlocksEmergence: frameOwnsConnectedChrome && _dockOccupiesSide(resolvedConnectedBarSide)
 
-    readonly property bool connectedMotionParity: Theme.isConnectedEffect
+    readonly property bool connectedMotionParity: frameOwnsConnectedChrome
     property int animationDuration: connectedMotionParity ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
     property real animationScaleCollapsed: Theme.effectScaleCollapsed
     property real animationOffset: Theme.effectAnimOffset
@@ -68,7 +68,7 @@ Item {
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 0
     property real cornerRadius: Theme.cornerRadius
-    readonly property bool connectedSurfaceOverride: Theme.isConnectedEffect
+    readonly property bool connectedSurfaceOverride: frameOwnsConnectedChrome
     readonly property color effectiveBackgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : backgroundColor
     readonly property color effectiveBorderColor: connectedSurfaceOverride ? "transparent" : borderColor
     readonly property real effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
@@ -346,7 +346,7 @@ Item {
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (!frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
-        if (Theme.isConnectedEffect)
+        if (frameOwnsConnectedChrome)
             return 0;
         if (animationType === "slide")
             return 30;

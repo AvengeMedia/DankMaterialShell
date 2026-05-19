@@ -17,8 +17,9 @@ PanelWindow {
     required property var targetScreen
 
     screen: targetScreen
-    visible: _frameActive
-    updatesEnabled: _frameActive
+    readonly property bool _frameVisible: CompositorService.frameWindowVisibleForScreen(win.targetScreen)
+    visible: win._frameVisible
+    updatesEnabled: win._frameVisible
 
     WlrLayershell.namespace: "dms:frame"
     WlrLayershell.layer: WlrLayer.Top
@@ -52,7 +53,7 @@ PanelWindow {
     readonly property var _notifState: ConnectedModeState.notificationStates[win._screenName] || ConnectedModeState.emptyNotificationState
     readonly property var _modalState: ConnectedModeState.modalStates[win._screenName] || ConnectedModeState.emptyModalState
 
-    readonly property bool _connectedActive: win._frameActive && SettingsData.connectedFrameModeActive
+    readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
     readonly property string _barSide: {
         const edges = win.barEdges;
         if (edges.includes("top"))

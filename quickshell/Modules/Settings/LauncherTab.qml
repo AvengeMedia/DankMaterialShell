@@ -67,6 +67,15 @@ Item {
                         SettingsData.set("launcherStyle", index === 1 ? "spotlight" : "full");
                     }
                 }
+
+                SettingsToggleRow {
+                    settingKey: "launcherShowOverFullscreen"
+                    tags: ["launcher", "fullscreen", "overlay", "layer"]
+                    text: I18n.tr("Show Over Fullscreen", "launcher layer toggle: show the launcher over fullscreen windows")
+                    description: I18n.tr("Use the overlay layer when opening the launcher")
+                    checked: SettingsData.launcherShowOverFullscreen
+                    onToggled: checked => SettingsData.set("launcherShowOverFullscreen", checked)
+                }
             }
 
             SettingsCard {

@@ -978,7 +978,7 @@ BasePill {
 
         visible: root.useOverflowPopup && root.menuOpen
         screen: root.parentScreen
-        WlrLayershell.layer: WlrLayershell.Top
+        WlrLayershell.layer: root.barUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
             if (!root.menuOpen)
@@ -1446,7 +1446,7 @@ BasePill {
                 WlrLayershell.namespace: "dms:tray-menu-window"
                 visible: menuRoot.showMenu && (menuRoot.trayItem?.hasMenu ?? false)
                 screen: menuRoot.parentScreen
-                WlrLayershell.layer: WlrLayershell.Top
+                WlrLayershell.layer: root.barUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: {
                     if (!menuRoot.showMenu)

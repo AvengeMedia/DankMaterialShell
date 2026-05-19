@@ -90,13 +90,13 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "dockHideOnFullscreen"
-                    tags: ["dock", "fullscreen", "hide"]
-                    text: I18n.tr("Hide When Fullscreen", "dock visibility toggle: hide the dock when a window is fullscreen")
-                    description: I18n.tr("Hide the dock when a window is fullscreen", "dock visibility toggle description")
-                    checked: SettingsData.dockHideOnFullscreen
+                    settingKey: "dockShowOverFullscreen"
+                    tags: ["dock", "fullscreen", "overlay", "layer"]
+                    text: I18n.tr("Show Over Fullscreen", "dock layer toggle: show the dock over fullscreen windows")
+                    description: I18n.tr("Use the overlay layer so the dock appears above fullscreen windows")
+                    checked: SettingsData.dockShowOverFullscreen
                     visible: SettingsData.showDock
-                    onToggled: checked => SettingsData.set("dockHideOnFullscreen", checked)
+                    onToggled: checked => SettingsData.set("dockShowOverFullscreen", checked)
                 }
             }
 

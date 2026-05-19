@@ -855,6 +855,29 @@
     "description": "Override the global shadow with per-bar settings"
   },
   {
+    "section": "barShowOverFullscreen",
+    "label": "Show Over Fullscreen",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "above",
+      "appears",
+      "bar",
+      "dank",
+      "fullscreen",
+      "layer",
+      "over",
+      "overlay",
+      "panel",
+      "show",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "windows"
+    ],
+    "description": "Use the overlay layer so this bar appears above fullscreen windows"
+  },
+  {
     "section": "barSpacing",
     "label": "Spacing",
     "tabIndex": 3,
@@ -927,20 +950,28 @@
     "tabIndex": 3,
     "category": "Dank Bar",
     "keywords": [
+      "above",
+      "appears",
       "auto-hide",
       "autohide",
       "bar",
       "dank",
+      "fullscreen",
       "hidden",
       "hide",
+      "layer",
+      "overlay",
       "panel",
       "show",
       "statusbar",
+      "taskbar",
       "topbar",
       "visibility",
-      "visible"
+      "visible",
+      "windows"
     ],
-    "icon": "visibility_off"
+    "icon": "visibility_off",
+    "description": "Use the overlay layer so this bar appears above fullscreen windows"
   },
   {
     "section": "workspaceDragReorder",
@@ -1488,22 +1519,6 @@
     "description": "Group multiple windows of the same app together with a window count indicator"
   },
   {
-    "section": "dockHideOnFullscreen",
-    "label": "Hide When Fullscreen",
-    "tabIndex": 5,
-    "category": "Dock",
-    "keywords": [
-      "dock",
-      "fullscreen",
-      "hide",
-      "launcher bar",
-      "panel",
-      "taskbar",
-      "window"
-    ],
-    "description": "Hide the dock when a window is fullscreen"
-  },
-  {
     "section": "dockIconSize",
     "label": "Icon Size",
     "tabIndex": 5,
@@ -1741,6 +1756,27 @@
       "start menu",
       "taskbar"
     ]
+  },
+  {
+    "section": "dockShowOverFullscreen",
+    "label": "Show Over Fullscreen",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "above",
+      "appears",
+      "dock",
+      "fullscreen",
+      "launcher bar",
+      "layer",
+      "over",
+      "overlay",
+      "panel",
+      "show",
+      "taskbar",
+      "windows"
+    ],
+    "description": "Use the overlay layer so the dock appears above fullscreen windows"
   },
   {
     "section": "dockShowOverflowBadge",
@@ -2211,14 +2247,18 @@
       "drawer",
       "full",
       "launcher",
+      "layer",
       "menu",
       "minimal",
+      "opening",
+      "overlay",
       "spotlight",
       "start",
       "start menu",
       "style"
     ],
-    "icon": "search"
+    "icon": "search",
+    "description": "Use the overlay layer when opening the launcher"
   },
   {
     "section": "spotlightCloseNiriOverview",
@@ -2360,6 +2400,29 @@
       "tabs"
     ],
     "description": "Show mode tabs and keyboard hints at the bottom."
+  },
+  {
+    "section": "launcherShowOverFullscreen",
+    "label": "Show Over Fullscreen",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "drawer",
+      "fullscreen",
+      "launcher",
+      "layer",
+      "menu",
+      "opening",
+      "over",
+      "overlay",
+      "show",
+      "start",
+      "start menu"
+    ],
+    "description": "Use the overlay layer when opening the launcher"
   },
   {
     "section": "launcherLogoSizeOffset",
@@ -4739,6 +4802,27 @@
     "description": "Automatically lock the screen when DMS starts"
   },
   {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "automatic",
+      "automatically",
+      "before",
+      "lock",
+      "login",
+      "password",
+      "prepares",
+      "screen",
+      "security",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
+  },
+  {
     "section": "lockScreenNotificationMode",
     "label": "Notification Display",
     "tabIndex": 11,
@@ -6843,27 +6927,6 @@
     ],
     "icon": "schedule",
     "description": "Gradually fade the screen before locking with a configurable grace period"
-  },
-  {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "automatically",
-      "before",
-      "energy",
-      "lock",
-      "power",
-      "prepares",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "fadeToLockGracePeriod",

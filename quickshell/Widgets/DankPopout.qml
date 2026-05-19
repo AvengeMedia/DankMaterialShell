@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
 
@@ -32,6 +33,7 @@ Item {
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
     property var storedBarConfig: null
+    property bool triggerUsesOverlayLayer: false
     property var adjacentBarInfo: ({
             "topBar": 0,
             "bottomBar": 0,
@@ -97,13 +99,29 @@ Item {
         function onConnectedFrameModeActiveChanged() {
             root._maybeResolveBackend();
         }
+        function onFrameEnabledChanged() {
+            root._maybeResolveBackend();
+        }
         function onFrameScreenPreferencesChanged() {
+            root._maybeResolveBackend();
+        }
+        function onShowDockChanged() {
+            root._maybeResolveBackend();
+        }
+        function onBarConfigsChanged() {
+            root._maybeResolveBackend();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onToplevelsChanged() {
             root._maybeResolveBackend();
         }
     }
 
     function _usesConnectedBackendForScreen(targetScreen) {
-        return SettingsData.connectedFrameModeActive && !!targetScreen && SettingsData.isScreenInPreferences(targetScreen, SettingsData.frameScreenPreferences);
+        return CompositorService.usesConnectedFrameChromeForScreen(targetScreen);
     }
 
     function _backendForScreen(targetScreen) {
@@ -151,6 +169,19 @@ Item {
         effectiveBarBottomGap = bottomGap !== undefined ? bottomGap : 0;
     }
 
+    function _triggerBarUsesOverlayLayer(targetScreen, barConfig) {
+        switch (Quickshell.env("DMS_DANKBAR_LAYER")) {
+        case "overlay":
+            return true;
+        case "bottom":
+        case "background":
+        case "top":
+            return false;
+        default:
+            return (barConfig?.showOverFullscreen ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen);
+        }
+    }
+
     function setTriggerPosition(x, y, width, section, targetScreen, barPosition, barThickness, barSpacing, barConfig) {
         triggerX = x;
         triggerY = y;
@@ -161,6 +192,7 @@ Item {
         storedBarThickness = barThickness !== undefined ? barThickness : (Theme.barHeight - 4);
         storedBarSpacing = barSpacing !== undefined ? barSpacing : 4;
         storedBarConfig = barConfig;
+        triggerUsesOverlayLayer = _triggerBarUsesOverlayLayer(targetScreen, barConfig);
 
         const pos = barPosition !== undefined ? barPosition : 0;
         const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : 0) : 0;
@@ -221,6 +253,7 @@ Item {
         it.storedBarThickness = Qt.binding(() => root.storedBarThickness);
         it.storedBarSpacing = Qt.binding(() => root.storedBarSpacing);
         it.storedBarConfig = Qt.binding(() => root.storedBarConfig);
+        it.triggerUsesOverlayLayer = Qt.binding(() => root.triggerUsesOverlayLayer);
         it.adjacentBarInfo = Qt.binding(() => root.adjacentBarInfo);
         it.screen = Qt.binding(() => root.screen);
         it.effectiveBarPosition = Qt.binding(() => root.effectiveBarPosition);

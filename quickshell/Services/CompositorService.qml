@@ -36,6 +36,7 @@ Singleton {
     signal randrDataReady
 
     property var sortedToplevels: []
+    property var hyprlandVisibleSpecialWorkspaces: ({})
     property bool _sortScheduled: false
 
     signal toplevelsChanged
@@ -153,10 +154,14 @@ Singleton {
         enabled: isHyprland
 
         function onRawEvent(event) {
-            if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindow" || event.name === "movewindowv2" || event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activewindow" || event.name === "activewindowv2" || event.name === "changefloatingmode" || event.name === "fullscreen" || event.name === "moveintogroup" || event.name === "moveoutofgroup") {
+            if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindow" || event.name === "movewindowv2" || event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activewindow" || event.name === "activewindowv2" || event.name === "changefloatingmode" || event.name === "fullscreen" || event.name === "moveintogroup" || event.name === "moveoutofgroup" || event.name === "activespecial") {
                 try {
                     Hyprland.refreshToplevels();
+                    if (event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activespecial")
+                        Hyprland.refreshMonitors();
                 } catch (e) {}
+                if (event.name === "activespecial")
+                    root.updateHyprlandVisibleSpecialWorkspaces(event);
                 root.scheduleSort();
             }
         }
@@ -171,6 +176,7 @@ Singleton {
     Component.onCompleted: {
         fetchRandrData();
         detectCompositor();
+        updateHyprlandVisibleSpecialWorkspaces(null);
         scheduleSort();
         Qt.callLater(() => {
             NiriService.generateNiriLayoutConfig();
@@ -213,6 +219,81 @@ Singleton {
         } catch (e) {
             return fallback;
         }
+    }
+
+    function _normalizeSpecialWorkspaceName(name) {
+        const raw = String(name ?? "").trim();
+        if (raw.length === 0)
+            return "";
+        if (raw === "special")
+            return "special:special";
+        return raw.startsWith("special:") ? raw : `special:${raw}`;
+    }
+
+    function _hyprlandRawEventParts(event, argumentCount) {
+        if (!event)
+            return [];
+        try {
+            const parsed = event.parse(argumentCount);
+            if (parsed && parsed.length !== undefined)
+                return parsed;
+        } catch (e) {}
+        const data = String(event.data ?? "");
+        return data.length > 0 ? data.split(",") : [];
+    }
+
+    function _specialWorkspaceNameFromMonitor(monitor) {
+        if (!monitor)
+            return "";
+        const candidates = [
+            monitor.activeSpecialWorkspace?.name,
+            monitor.specialWorkspace?.name,
+            monitor.lastIpcObject?.specialWorkspace?.name,
+            monitor.lastIpcObject?.specialWorkspace,
+            monitor.lastIpcObject?.activeSpecialWorkspace?.name
+        ];
+        for (let i = 0; i < candidates.length; i++) {
+            const normalized = _normalizeSpecialWorkspaceName(candidates[i]);
+            if (normalized)
+                return normalized;
+        }
+        return "";
+    }
+
+    function updateHyprlandVisibleSpecialWorkspaces(event) {
+        if (!isHyprland) {
+            hyprlandVisibleSpecialWorkspaces = ({});
+            return;
+        }
+
+        const next = {};
+        try {
+            const monitors = Hyprland.monitors?.values || [];
+            for (const monitor of monitors) {
+                const monitorName = monitor?.name ?? monitor?.lastIpcObject?.name ?? "";
+                if (!monitorName)
+                    continue;
+                const specialName = _specialWorkspaceNameFromMonitor(monitor);
+                if (specialName)
+                    next[monitorName] = specialName;
+            }
+        } catch (e) {
+            log.warn("updateHyprlandVisibleSpecialWorkspaces monitor snapshot failed:", e);
+        }
+
+        if (event?.name === "activespecial") {
+            const parts = _hyprlandRawEventParts(event, 2);
+            const specialName = _normalizeSpecialWorkspaceName(parts[0]);
+            const monitorName = String(parts[1] ?? Hyprland.focusedMonitor?.name ?? Hyprland.focusedWorkspace?.monitor?.name ?? "");
+            if (monitorName) {
+                if (specialName)
+                    next[monitorName] = specialName;
+                else
+                    delete next[monitorName];
+            }
+        }
+
+        hyprlandVisibleSpecialWorkspaces = next;
     }
 
     function sortHyprlandToplevelsSafe() {
@@ -446,6 +527,171 @@ Singleton {
 
         for (const toplevel of ToplevelManager.toplevels.values) {
             if (toplevel?.fullscreen && _toplevelOnScreen(toplevel, screenName))
+                return true;
+        }
+        return false;
+    }
+
+    function _hyprlandToplevelMapped(hyprToplevel) {
+        if (!hyprToplevel)
+            return false;
+        if (hyprToplevel.mapped === false)
+            return false;
+        const ipcMapped = hyprToplevel.lastIpcObject?.mapped;
+        if (ipcMapped === false)
+            return false;
+        if (hyprToplevel.hidden === true)
+            return false;
+        const ipcHidden = hyprToplevel.lastIpcObject?.hidden;
+        if (ipcHidden === true)
+            return false;
+        return true;
+    }
+
+    function hyprlandVisibleSpecialWorkspaceOnScreen(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!isHyprland || !screenName)
+            return "";
+        hyprlandVisibleSpecialWorkspaces;
+        const trackedName = hyprlandVisibleSpecialWorkspaces[screenName] ?? "";
+        if (trackedName)
+            return trackedName;
+        try {
+            const monitor = Hyprland.monitors?.values?.find(m => m.name === screenName);
+            return _specialWorkspaceNameFromMonitor(monitor);
+        } catch (e) {
+            return "";
+        }
+    }
+
+    function hyprlandSpecialWorkspaceBlocksConnectedFrame(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!isHyprland || !screenName || !Hyprland.toplevels?.values)
+            return false;
+        const visibleSpecialWorkspace = hyprlandVisibleSpecialWorkspaceOnScreen(screenName);
+        if (!visibleSpecialWorkspace)
+            return false;
+
+        try {
+            for (const t of Hyprland.toplevels.values) {
+                const monName = t.monitor?.name ?? t.lastIpcObject?.monitor ?? "";
+                if (monName !== screenName)
+                    continue;
+                const wsName = _normalizeSpecialWorkspaceName(t.workspace?.name ?? t.lastIpcObject?.workspace?.name ?? "");
+                if (!wsName || wsName !== visibleSpecialWorkspace)
+                    continue;
+                if (_hyprlandToplevelMapped(t))
+                    return true;
+            }
+        } catch (e) {
+            log.warn("hyprlandSpecialWorkspaceBlocksConnectedFrame failed:", e);
+        }
+        return false;
+    }
+
+    function connectedFrameBlockedOnScreen(screenOrName) {
+        if (hasFullscreenToplevelOnScreen(screenOrName))
+            return true;
+        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenOrName);
+    }
+
+    function _screenForName(screenOrName) {
+        if (screenOrName && typeof screenOrName !== "string")
+            return screenOrName;
+        const screenName = _screenName(screenOrName);
+        if (!screenName)
+            return null;
+        const screens = Quickshell.screens || [];
+        for (let i = 0; i < screens.length; i++) {
+            if (screens[i]?.name === screenName)
+                return screens[i];
+        }
+        return null;
+    }
+
+    function frameConfiguredForScreen(screenOrName) {
+        if (!SettingsData.frameEnabled)
+            return false;
+        const screen = _screenForName(screenOrName);
+        if (!screen || !SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences))
+            return false;
+        return true;
+    }
+
+    function frameWindowVisibleForScreen(screenOrName) {
+        if (!frameConfiguredForScreen(screenOrName))
+            return false;
+        return !connectedFrameBlockedOnScreen(screenOrName);
+    }
+
+    function usesConnectedFrameChromeForScreen(screenOrName) {
+        return SettingsData.connectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
+    }
+
+    function framePeerSurfacesUseOverlayForScreen(screenOrName) {
+        return frameWindowVisibleForScreen(screenOrName);
+    }
+
+    function hyprlandToplevelOverlapsDockEdge(hyprToplevel, screenName, dockPosition, dockThickness, screenWidth, screenHeight) {
+        if (!hyprToplevel?.lastIpcObject || !screenName)
+            return false;
+        const monName = hyprToplevel.monitor?.name ?? hyprToplevel.lastIpcObject?.monitor ?? "";
+        if (monName && monName !== screenName)
+            return false;
+        const ipc = hyprToplevel.lastIpcObject;
+        const at = ipc.at;
+        const size = ipc.size;
+        if (!at || !size)
+            return false;
+        const monX = hyprToplevel.monitor?.x ?? 0;
+        const monY = hyprToplevel.monitor?.y ?? 0;
+        const winX = at[0] - monX;
+        const winY = at[1] - monY;
+        const winW = size[0];
+        const winH = size[1];
+        switch (dockPosition) {
+        case SettingsData.Position.Top:
+            return winY < dockThickness;
+        case SettingsData.Position.Bottom:
+            return winY + winH > screenHeight - dockThickness;
+        case SettingsData.Position.Left:
+            return winX < dockThickness;
+        case SettingsData.Position.Right:
+            return winX + winW > screenWidth - dockThickness;
+        default:
+            return false;
+        }
+    }
+
+    function hyprlandDockOverlapForSmartAutoHide(screenName, dockPosition, dockThickness, screenWidth, screenHeight) {
+        if (!isHyprland || !screenName || !Hyprland.toplevels?.values)
+            return false;
+
+        const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
+        for (let i = 0; i < filtered.length; i++) {
+            const toplevel = filtered[i];
+            let hyprToplevel = null;
+            for (const t of Hyprland.toplevels.values) {
+                if (t.wayland === toplevel) {
+                    hyprToplevel = t;
+                    break;
+                }
+            }
+            if (hyprlandToplevelOverlapsDockEdge(hyprToplevel, screenName, dockPosition, dockThickness, screenWidth, screenHeight))
+                return true;
+        }
+
+        const visibleSpecialWorkspace = hyprlandVisibleSpecialWorkspaceOnScreen(screenName);
+        if (!visibleSpecialWorkspace)
+            return false;
+
+        for (const hyprToplevel of Hyprland.toplevels.values) {
+            const wsName = _normalizeSpecialWorkspaceName(hyprToplevel.workspace?.name ?? hyprToplevel.lastIpcObject?.workspace?.name ?? "");
+            if (wsName !== visibleSpecialWorkspace)
+                continue;
+            if (!_hyprlandToplevelMapped(hyprToplevel))
+                continue;
+            if (hyprlandToplevelOverlapsDockEdge(hyprToplevel, screenName, dockPosition, dockThickness, screenWidth, screenHeight))
                 return true;
         }
         return false;

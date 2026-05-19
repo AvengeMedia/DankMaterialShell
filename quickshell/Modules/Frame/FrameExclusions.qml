@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
+import qs.Services
 
 Scope {
     id: root
@@ -18,7 +19,7 @@ Scope {
     // One thin invisible PanelWindow per edge.
     // Skips any edge where a bar already provides its own exclusiveZone.
 
-    readonly property bool screenEnabled: SettingsData.frameEnabled && SettingsData.isScreenInPreferences(root.screen, SettingsData.frameScreenPreferences)
+    readonly property bool screenEnabled: CompositorService.frameWindowVisibleForScreen(root.screen)
 
     Loader {
         active: root.screenEnabled && !root.barEdges.includes("top")

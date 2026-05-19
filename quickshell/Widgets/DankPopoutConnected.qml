@@ -47,6 +47,7 @@ Item {
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
     property var storedBarConfig: null
+    property bool triggerUsesOverlayLayer: false
     property var adjacentBarInfo: ({
             "topBar": 0,
             "bottomBar": 0,
@@ -56,9 +57,23 @@ Item {
     property var screen: null
     // Connected resize uses one full-screen surface; body-sized regions are masks.
     readonly property bool useBackgroundWindow: false
+    readonly property var effectivePopoutLayer: {
+        switch (Quickshell.env("DMS_POPOUT_LAYER")) {
+        case "bottom":
+            log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "background":
+            log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "overlay":
+            return WlrLayershell.Overlay;
+        default:
+            return root.triggerUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top;
+        }
+    }
 
     readonly property real effectiveBarThickness: {
-        if (Theme.isConnectedEffect)
+        if (root.usesConnectedSurfaceChrome)
             return Math.max(0, storedBarThickness);
         const padding = storedBarConfig ? (storedBarConfig.innerPadding !== undefined ? storedBarConfig.innerPadding : 4) : 4;
         return Math.max(26 + padding * 0.6, Theme.barHeight - 4 - (8 - padding)) + storedBarSpacing;
@@ -345,7 +360,10 @@ Item {
         }
     }
 
-    readonly property bool frameOwnsConnectedChrome: SettingsData.connectedFrameModeActive && !!root.screen && SettingsData.isScreenInPreferences(root.screen, SettingsData.frameScreenPreferences)
+    readonly property bool frameOwnsConnectedChrome: CompositorService.usesConnectedFrameChromeForScreen(root.screen)
+    readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect && !CompositorService.connectedFrameBlockedOnScreen(root.screen)
+    readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
+    onFrameOwnsConnectedChromeChanged: _syncPopoutChromeState()
 
     property bool animationsEnabled: true
 
@@ -455,28 +473,23 @@ Item {
     readonly property real dpr: screen ? screen.devicePixelRatio : 1
     readonly property bool closeFrameGapsActive: SettingsData.frameCloseGaps && frameOwnsConnectedChrome
     readonly property real frameInset: {
-        if (!SettingsData.frameEnabled)
+        if (!root.frameOwnsConnectedChrome)
             return 0;
         const ft = SettingsData.frameThickness;
         const fr = SettingsData.frameRounding;
         const ccr = Theme.connectedCornerRadius;
-        if (Theme.isConnectedEffect)
-            return Math.max(ft * 4, ft + ccr * 2);
-        const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
-        const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 6;
-        const gap = useAutoGaps ? Math.max(6, storedBarSpacing) : manualGapValue;
-        return Math.max(ft + gap, fr);
+        return Math.max(ft * 4, ft + ccr * 2, fr);
     }
 
     function _popupGapValue() {
         const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
         const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
         const rawPopupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue;
-        return Theme.isConnectedEffect ? 0 : rawPopupGap;
+        return root.usesConnectedSurfaceChrome ? 0 : rawPopupGap;
     }
 
     function _frameEdgeInset(side) {
-        if (!SettingsData.frameEnabled || !root.screen)
+        if (!root.frameOwnsConnectedChrome || !root.screen)
             return 0;
         const edges = SettingsData.getActiveBarEdgesForScreen(root.screen);
         const raw = edges.includes(side) ? SettingsData.frameBarSize : SettingsData.frameThickness;
@@ -549,7 +562,7 @@ Item {
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.popoutElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, effectiveShadowDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: {
-        if (Theme.isConnectedEffect)
+        if (root.usesConnectedSurfaceChrome)
             return Math.max(storedBarSpacing + Theme.connectedCornerRadius + 4, 40);
         if (Theme.isDirectionalEffect)
             return 16;
@@ -582,7 +595,7 @@ Item {
         }
     }
     readonly property real connectedAnchorX: {
-        if (!Theme.isConnectedEffect)
+        if (!root.usesConnectedSurfaceChrome)
             return triggerX;
         switch (effectiveBarPosition) {
         case SettingsData.Position.Left:
@@ -594,7 +607,7 @@ Item {
         }
     }
     readonly property real connectedAnchorY: {
-        if (!Theme.isConnectedEffect)
+        if (!root.usesConnectedSurfaceChrome)
             return triggerY;
         switch (effectiveBarPosition) {
         case SettingsData.Position.Top:
@@ -609,7 +622,7 @@ Item {
     function adjacentBarClearance(exclusion) {
         if (exclusion <= 0)
             return 0;
-        if (!Theme.isConnectedEffect)
+        if (!root.usesConnectedSurfaceChrome)
             return exclusion;
         // In a shared frame corner, the adjacent connected bar already occupies
         // one rounded-corner radius before the popout's own connector begins.
@@ -641,7 +654,7 @@ Item {
             const popupGap = _popupGapValue();
             const edgeGapLeft = _edgeGapFor("left", popupGap);
             const edgeGapRight = _edgeGapFor("right", popupGap);
-            const anchorX = Theme.isConnectedEffect ? connectedAnchorX : triggerX;
+            const anchorX = root.usesConnectedSurfaceChrome ? connectedAnchorX : triggerX;
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Left:
@@ -662,7 +675,7 @@ Item {
             const popupGap = _popupGapValue();
             const edgeGapTop = _edgeGapFor("top", popupGap);
             const edgeGapBottom = _edgeGapFor("bottom", popupGap);
-            const anchorY = Theme.isConnectedEffect ? connectedAnchorY : triggerY;
+            const anchorY = root.usesConnectedSurfaceChrome ? connectedAnchorY : triggerY;
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Bottom:
@@ -718,7 +731,7 @@ Item {
             blurEnabled: root.effectiveSurfaceBlurEnabled && !root.frameOwnsConnectedChrome
 
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: Theme.isConnectedEffect || Theme.isDirectionalEffect
+            readonly property bool trackBlurFromBarEdge: root.usesConnectedSurfaceChrome || Theme.isDirectionalEffect
 
             // Directional popouts clip to the bar edge, so the blur needs to grow from
             // that same edge instead of translating through the bar before settling.
@@ -729,24 +742,11 @@ Item {
             blurY: trackBlurFromBarEdge ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0) : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s
             blurWidth: shouldBeVisible ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.width - Math.abs(_dxClamp)) : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s) : 0
             blurHeight: shouldBeVisible ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) : 0
-            blurRadius: Theme.isConnectedEffect ? Theme.connectedCornerRadius : Theme.connectedSurfaceRadius
+            blurRadius: root.usesConnectedSurfaceChrome ? Theme.connectedCornerRadius : Theme.cornerRadius
         }
 
         WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: {
-            switch (Quickshell.env("DMS_POPOUT_LAYER")) {
-            case "bottom":
-                log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
             if (customKeyboardFocus !== null)
@@ -827,22 +827,22 @@ Item {
             readonly property bool barLeft: effectiveBarPosition === SettingsData.Position.Left
             readonly property bool barRight: effectiveBarPosition === SettingsData.Position.Right
             readonly property string connectedBarSide: barTop ? "top" : (barBottom ? "bottom" : (barLeft ? "left" : "right"))
-            readonly property real surfaceRadius: Theme.connectedSurfaceRadius
-            readonly property color surfaceColor: Theme.popupLayerColor(Theme.surfaceContainer)
-            readonly property color surfaceBorderColor: Theme.isConnectedEffect ? "transparent" : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
-            readonly property real surfaceBorderWidth: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
-            readonly property real surfaceTopLeftRadius: Theme.isConnectedEffect && (barTop || barLeft) ? 0 : surfaceRadius
-            readonly property real surfaceTopRightRadius: Theme.isConnectedEffect && (barTop || barRight) ? 0 : surfaceRadius
-            readonly property real surfaceBottomLeftRadius: Theme.isConnectedEffect && (barBottom || barLeft) ? 0 : surfaceRadius
-            readonly property real surfaceBottomRightRadius: Theme.isConnectedEffect && (barBottom || barRight) ? 0 : surfaceRadius
+            readonly property real surfaceRadius: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+            readonly property color surfaceColor: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            readonly property color surfaceBorderColor: root.usesConnectedSurfaceChrome ? "transparent" : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
+            readonly property real surfaceBorderWidth: root.usesConnectedSurfaceChrome ? 0 : BlurService.borderWidth
+            readonly property real surfaceTopLeftRadius: root.usesConnectedSurfaceChrome && (barTop || barLeft) ? 0 : surfaceRadius
+            readonly property real surfaceTopRightRadius: root.usesConnectedSurfaceChrome && (barTop || barRight) ? 0 : surfaceRadius
+            readonly property real surfaceBottomLeftRadius: root.usesConnectedSurfaceChrome && (barBottom || barLeft) ? 0 : surfaceRadius
+            readonly property real surfaceBottomRightRadius: root.usesConnectedSurfaceChrome && (barBottom || barRight) ? 0 : surfaceRadius
             readonly property bool directionalEffect: Theme.isDirectionalEffect
             readonly property bool depthEffect: Theme.isDepthEffect
             readonly property real directionalTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
             readonly property real directionalTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
             readonly property real depthTravel: Math.max(root.animationOffset * 0.7, 28)
             readonly property real sectionTilt: (triggerSection === "left" ? -1 : (triggerSection === "right" ? 1 : 0))
-            readonly property real horizontalConnectorExtent: Theme.isConnectedEffect && (barTop || barBottom) ? Theme.connectedCornerRadius : 0
-            readonly property real verticalConnectorExtent: Theme.isConnectedEffect && (barLeft || barRight) ? Theme.connectedCornerRadius : 0
+            readonly property real horizontalConnectorExtent: root.usesConnectedSurfaceChrome && (barTop || barBottom) ? Theme.connectedCornerRadius : 0
+            readonly property real verticalConnectorExtent: root.usesConnectedSurfaceChrome && (barLeft || barRight) ? Theme.connectedCornerRadius : 0
 
             readonly property real offsetX: {
                 if (directionalEffect) {
@@ -923,10 +923,10 @@ Item {
             Item {
                 id: directionalClipMask
 
-                readonly property bool shouldClip: Theme.isDirectionalEffect || Theme.isConnectedEffect
+                readonly property bool shouldClip: Theme.isDirectionalEffect || root.usesConnectedSurfaceChrome
                 readonly property real clipOversize: 1000
                 readonly property real connectedClipAllowance: {
-                    if (!Theme.isConnectedEffect)
+                    if (!root.usesConnectedSurfaceChrome)
                         return 0;
                     if (root.frameOwnsConnectedChrome)
                         return 0;
@@ -972,11 +972,11 @@ Item {
 
                     ElevationShadow {
                         id: shadowSource
-                        readonly property real connectorExtent: Theme.isConnectedEffect ? Theme.connectedCornerRadius : 0
-                        readonly property real extraLeft: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                        readonly property real extraRight: Theme.isConnectedEffect && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                        readonly property real extraTop: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
-                        readonly property real extraBottom: Theme.isConnectedEffect && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
+                        readonly property real connectorExtent: root.usesConnectedSurfaceChrome ? Theme.connectedCornerRadius : 0
+                        readonly property real extraLeft: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
+                        readonly property real extraRight: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
+                        readonly property real extraTop: root.usesConnectedSurfaceChrome && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
+                        readonly property real extraBottom: root.usesConnectedSurfaceChrome && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
                         readonly property real bodyX: extraLeft
                         readonly property real bodyY: extraTop
                         readonly property real bodyWidth: rollOutAdjuster.baseWidth
@@ -999,12 +999,12 @@ Item {
                         targetColor: contentContainer.surfaceColor
                         borderColor: contentContainer.surfaceBorderColor
                         borderWidth: contentContainer.surfaceBorderWidth
-                        useCustomSource: Theme.isConnectedEffect
+                        useCustomSource: root.usesConnectedSurfaceChrome
                         shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !root.frameOwnsConnectedChrome
 
                         Item {
                             anchors.fill: parent
-                            visible: Theme.isConnectedEffect && !root.frameOwnsConnectedChrome
+                            visible: root.usesLocalConnectedSurfaceChrome
                             clip: false
 
                             Rectangle {
@@ -1020,7 +1020,7 @@ Item {
                             }
 
                             ConnectedCorner {
-                                visible: Theme.isConnectedEffect
+                                visible: root.usesConnectedSurfaceChrome
                                 barSide: contentContainer.connectedBarSide
                                 placement: "left"
                                 spacing: 0
@@ -1032,7 +1032,7 @@ Item {
                             }
 
                             ConnectedCorner {
-                                visible: Theme.isConnectedEffect
+                                visible: root.usesConnectedSurfaceChrome
                                 barSide: contentContainer.connectedBarSide
                                 placement: "right"
                                 spacing: 0
@@ -1109,7 +1109,7 @@ Item {
                         Item {
                             anchors.fill: parent
                             clip: false
-                            visible: !Theme.isConnectedEffect
+                            visible: !root.usesConnectedSurfaceChrome
 
                             Rectangle {
                                 anchors.fill: parent

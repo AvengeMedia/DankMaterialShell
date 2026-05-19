@@ -13,13 +13,14 @@ Item {
     readonly property var log: Log.scoped("DankLauncherV2ModalConnected")
 
     property var modalHandle: root
+    property bool triggerUsesOverlayLayer: false
 
     visible: false
 
     property bool spotlightOpen: false
     property bool keyboardActive: false
     property bool contentVisible: false
-    readonly property bool launcherMotionVisible: Theme.isConnectedEffect ? _motionActive : (Theme.isDirectionalEffect ? spotlightOpen : _motionActive)
+    readonly property bool launcherMotionVisible: frameOwnsConnectedChrome ? _motionActive : (Theme.isDirectionalEffect ? spotlightOpen : _motionActive)
     property var spotlightContent: launcherContentLoader.item
     property bool openedFromOverview: false
     property bool isClosing: false
@@ -40,6 +41,21 @@ Item {
     readonly property real screenWidth: effectiveScreen?.width ?? 1920
     readonly property real screenHeight: effectiveScreen?.height ?? 1080
     readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
+    readonly property bool usesOverlayLayer: SettingsData.launcherShowOverFullscreen || triggerUsesOverlayLayer
+    readonly property var effectiveLauncherLayer: {
+        switch (Quickshell.env("DMS_MODAL_LAYER")) {
+        case "bottom":
+            log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "background":
+            log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "overlay":
+            return WlrLayershell.Overlay;
+        default:
+            return root.usesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top;
+        }
+    }
 
     readonly property int baseWidth: {
         switch (SettingsData.dankLauncherV2Size) {
@@ -74,7 +90,7 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== ""
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
     readonly property bool launcherArcExtenderActive: frameOwnsConnectedChrome && SettingsData.frameLauncherArcExtender && (resolvedConnectedBarSide === "top" || resolvedConnectedBarSide === "bottom")
 
     function _dockOccupiesSide(side) {
@@ -140,10 +156,10 @@ Item {
     readonly property real modalX: frameOwnsConnectedChrome ? _connectedModalPos.x : ((screenWidth - modalWidth) / 2)
     readonly property real modalY: frameOwnsConnectedChrome ? _connectedModalPos.y : ((screenHeight - modalHeight) / 2)
 
-    readonly property bool connectedSurfaceOverride: Theme.isConnectedEffect
-    readonly property int launcherAnimationDuration: Theme.isConnectedEffect ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
-    readonly property list<real> launcherEnterCurve: Theme.isConnectedEffect ? Theme.variantPopoutEnterCurve : Theme.variantModalEnterCurve
-    readonly property list<real> launcherExitCurve: Theme.isConnectedEffect ? Theme.variantPopoutExitCurve : Theme.variantModalExitCurve
+    readonly property bool connectedSurfaceOverride: frameOwnsConnectedChrome
+    readonly property int launcherAnimationDuration: frameOwnsConnectedChrome ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
+    readonly property list<real> launcherEnterCurve: frameOwnsConnectedChrome ? Theme.variantPopoutEnterCurve : Theme.variantModalEnterCurve
+    readonly property list<real> launcherExitCurve: frameOwnsConnectedChrome ? Theme.variantPopoutExitCurve : Theme.variantModalExitCurve
     readonly property color backgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     readonly property real cornerRadius: connectedSurfaceOverride ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     readonly property color borderColor: {
@@ -596,7 +612,7 @@ Item {
         readonly property real _rightMargin: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
 
         WlrLayershell.namespace: "dms:spotlight:bg"
-        WlrLayershell.layer: WlrLayershell.Top
+        WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -669,20 +685,7 @@ Item {
         }
 
         WlrLayershell.namespace: "dms:spotlight"
-        WlrLayershell.layer: {
-            switch (Quickshell.env("DMS_MODAL_LAYER")) {
-            case "bottom":
-                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
 

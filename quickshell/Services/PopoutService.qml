@@ -500,8 +500,16 @@ Singleton {
     property bool _dankLauncherV2WantsToggle: false
     property string _dankLauncherV2PendingQuery: ""
     property string _dankLauncherV2PendingMode: ""
+    property bool _dankLauncherV2TriggerUsesOverlayLayer: false
 
-    function openDankLauncherV2() {
+    function _setDankLauncherV2TriggerUsesOverlayLayer(value) {
+        _dankLauncherV2TriggerUsesOverlayLayer = value === true;
+        if (dankLauncherV2Modal)
+            dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
+    }
+
+    function openDankLauncherV2(triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.show();
         } else if (dankLauncherV2ModalLoader) {
@@ -511,7 +519,8 @@ Singleton {
         }
     }
 
-    function openDankLauncherV2WithQuery(query: string) {
+    function openDankLauncherV2WithQuery(query: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.showWithQuery(query);
         } else if (dankLauncherV2ModalLoader) {
@@ -522,7 +531,8 @@ Singleton {
         }
     }
 
-    function openDankLauncherV2WithMode(mode: string) {
+    function openDankLauncherV2WithMode(mode: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.showWithMode(mode);
         } else if (dankLauncherV2ModalLoader) {
@@ -544,7 +554,8 @@ Singleton {
         }
     }
 
-    function toggleDankLauncherV2() {
+    function toggleDankLauncherV2(triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggle();
         } else if (dankLauncherV2ModalLoader) {
@@ -554,7 +565,8 @@ Singleton {
         }
     }
 
-    function toggleDankLauncherV2WithMode(mode: string) {
+    function toggleDankLauncherV2WithMode(mode: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggleWithMode(mode);
         } else if (dankLauncherV2ModalLoader) {
@@ -565,7 +577,8 @@ Singleton {
         }
     }
 
-    function toggleDankLauncherV2WithQuery(query: string) {
+    function toggleDankLauncherV2WithQuery(query: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggleWithQuery(query);
         } else if (dankLauncherV2ModalLoader) {
@@ -577,6 +590,8 @@ Singleton {
     }
 
     function _onDankLauncherV2ModalLoaded() {
+        if (dankLauncherV2Modal)
+            dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
         if (_dankLauncherV2WantsOpen) {
             _dankLauncherV2WantsOpen = false;
             if (_dankLauncherV2PendingQuery) {

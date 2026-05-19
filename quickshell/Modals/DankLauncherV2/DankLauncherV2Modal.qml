@@ -23,6 +23,7 @@ Item {
     readonly property bool frameOwnsConnectedChrome: impl.item ? (impl.item.frameOwnsConnectedChrome ?? false) : false
     readonly property string resolvedConnectedBarSide: impl.item ? (impl.item.resolvedConnectedBarSide ?? "") : ""
     readonly property bool launcherArcExtenderActive: impl.item ? (impl.item.launcherArcExtenderActive ?? false) : false
+    property bool triggerUsesOverlayLayer: false
 
     signal dialogClosed
 
@@ -116,6 +117,7 @@ Item {
         if (!it)
             return;
         it.modalHandle = root;
+        it.triggerUsesOverlayLayer = Qt.binding(() => root.triggerUsesOverlayLayer);
     }
 
     Connections {

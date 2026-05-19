@@ -11,6 +11,7 @@ Item {
     readonly property var log: Log.scoped("DankLauncherV2ModalSpotlight")
 
     property var modalHandle: root
+    property bool triggerUsesOverlayLayer: false
 
     visible: false
 
@@ -29,13 +30,28 @@ Item {
     readonly property real screenWidth: effectiveScreen?.width ?? 1920
     readonly property real screenHeight: effectiveScreen?.height ?? 1080
     readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
+    readonly property bool usesOverlayLayer: SettingsData.launcherShowOverFullscreen || triggerUsesOverlayLayer
+    readonly property var effectiveLauncherLayer: {
+        switch (Quickshell.env("DMS_MODAL_LAYER")) {
+        case "bottom":
+            log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "background":
+            log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
+            return WlrLayershell.Top;
+        case "overlay":
+            return WlrLayershell.Overlay;
+        default:
+            return root.usesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top;
+        }
+    }
 
     readonly property int _openDuration: 80
     readonly property int _closeDuration: 70
     readonly property int _motionDuration: 90
 
     // Connected frame mode clamps the centered surface inside frame insets.
-    readonly property bool frameConnected: SettingsData.connectedFrameModeActive && !!effectiveScreen && SettingsData.isScreenInPreferences(effectiveScreen, SettingsData.frameScreenPreferences)
+    readonly property bool frameConnected: CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
 
     function _frameEdgeInset(side) {
         if (!effectiveScreen || !frameConnected)
@@ -263,7 +279,7 @@ Item {
         color: "transparent"
 
         WlrLayershell.namespace: "dms:spotlight:clickcatcher"
-        WlrLayershell.layer: WlrLayershell.Top
+        WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -324,14 +340,7 @@ Item {
         }
 
         WlrLayershell.namespace: "dms:spotlight"
-        WlrLayershell.layer: {
-            switch (Quickshell.env("DMS_MODAL_LAYER")) {
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
 
