@@ -1438,6 +1438,7 @@ Item {
                 }
 
                 DankIcon {
+                    id: lockNetworkIcon
                     name: {
                         if (NetworkService.wifiToggling)
                             return "sync";
@@ -1451,9 +1452,14 @@ Item {
                         }
                     }
                     size: Theme.iconSize - 2
-                    color: NetworkService.networkStatus !== "disconnected" ? "white" : Qt.rgba(255, 255, 255, 0.5)
+                    color: (NetworkService.networkStatus !== "disconnected" || NetworkService.isConnecting) ? "white" : Qt.rgba(255, 255, 255, 0.5)
                     anchors.verticalCenter: parent.verticalCenter
                     visible: NetworkService.networkAvailable
+
+                    DankBlink {
+                        target: lockNetworkIcon
+                        running: NetworkService.isWifiConnecting
+                    }
                 }
 
                 DankIcon {
@@ -1465,11 +1471,17 @@ Item {
                 }
 
                 DankIcon {
+                    id: lockBluetoothIcon
                     name: "bluetooth"
                     size: Theme.iconSize - 2
                     color: "white"
                     anchors.verticalCenter: parent.verticalCenter
                     visible: BluetoothService.available && BluetoothService.enabled
+
+                    DankBlink {
+                        target: lockBluetoothIcon
+                        running: BluetoothService.connecting
+                    }
                 }
 
                 DankIcon {

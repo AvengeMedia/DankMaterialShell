@@ -41,6 +41,9 @@ Singleton {
     property var savedConnections: []
     property var ssidToConnectionName: ({})
     property var wifiSignalIcon: {
+        if (isConnecting) {
+            return "wifi";
+        }
         if (!wifiConnected) {
             return "wifi_off";
         }
