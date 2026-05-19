@@ -177,6 +177,34 @@ func TestLinkInfo_Classify(t *testing.T) {
 	}
 }
 
+func TestParseDescribeType(t *testing.T) {
+	// parseDescribeType is the seam between networkd's Describe RPC and the
+	// classifier. On any failure path it must return "" so callers fall back
+	// to name-prefix heuristics rather than misclassifying the link.
+	cases := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"ether", `{"Type":"ether","Name":"enp141s0"}`, "ether"},
+		{"wlan", `{"Type":"wlan","Name":"wlan0"}`, "wlan"},
+		{"loopback", `{"Type":"loopback","Name":"lo"}`, "loopback"},
+		{"none with kind", `{"Type":"none","Kind":"tun","Name":"nebula.homelab"}`, "none"},
+		{"empty payload", ``, ""},
+		{"empty object", `{}`, ""},
+		{"missing Type field", `{"Name":"wlan0","Kind":""}`, ""},
+		{"explicit empty Type", `{"Type":"","Name":"wlan0"}`, ""},
+		{"malformed json", `{"Type":"ether"`, ""},
+		{"non-string Type", `{"Type":42}`, ""},
+		{"unrelated payload", `"just a string"`, ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, parseDescribeType(tc.in))
+		})
+	}
+}
+
 func TestLooksVirtual(t *testing.T) {
 	virtual := []string{"lo", "docker0", "veth123", "virbr0", "br-abc", "vnet0", "tun0", "tap0", "vboxnet0", "vmnet1", "kube-ipvs0", "cni0", "flannel.1", "cali-abc"}
 	for _, n := range virtual {

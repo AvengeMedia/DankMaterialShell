@@ -127,12 +127,16 @@ func (b *SystemdNetworkdBackend) enumerateLinks() error {
 	defer b.linksMutex.Unlock()
 
 	for _, l := range links {
-		info := &linkInfo{
-			ifindex: l.Ifindex,
-			name:    l.Name,
-			path:    l.Path,
+		if existing, ok := b.links[l.Name]; ok && existing.path == l.Path {
+			existing.ifindex = l.Ifindex
+			continue
 		}
-		info.linkType = b.fetchLinkType(l.Path)
+		info := &linkInfo{
+			ifindex:  l.Ifindex,
+			name:     l.Name,
+			path:     l.Path,
+			linkType: b.fetchLinkType(l.Path),
+		}
 		b.links[l.Name] = info
 		log.Debugf("networkd: enumerated link %s (ifindex=%d, path=%s, type=%q)", l.Name, l.Ifindex, l.Path, info.linkType)
 	}
@@ -142,13 +146,22 @@ func (b *SystemdNetworkdBackend) enumerateLinks() error {
 
 // fetchLinkType queries networkd's Describe method and extracts the link Type
 // (e.g. "ether", "wlan", "loopback", "none"). Returns empty on failure; callers
-// fall back to name-prefix heuristics in that case.
+// fall back to name-prefix heuristics in that case. The Type is fixed at link
+// creation by the kernel, so callers cache the result for the lifetime of the
+// linkInfo and only refetch when a link is re-created at a new D-Bus path.
 func (b *SystemdNetworkdBackend) fetchLinkType(path dbus.ObjectPath) string {
 	linkObj := b.conn.Object(networkdBusName, path)
 	var describeJSON string
 	if err := linkObj.Call(networkdLinkIface+".Describe", 0).Store(&describeJSON); err != nil {
 		return ""
 	}
+	return parseDescribeType(describeJSON)
+}
+
+// parseDescribeType extracts the top-level "Type" field from a networkd
+// Describe payload. Returns empty when the JSON is malformed or the field is
+// absent, signalling callers to fall back to name-prefix heuristics.
+func parseDescribeType(describeJSON string) string {
 	var parsed struct {
 		Type string `json:"Type"`
 	}
