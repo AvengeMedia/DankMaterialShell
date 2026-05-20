@@ -431,7 +431,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "hideWhenIdle"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "hideWhenIdle"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -625,9 +625,6 @@ Item {
 
             var newWidget = cloneWidgetData(widget);
             switch (widgetId) {
-            case "music":
-                newWidget.mediaSize = value;
-                break;
             case "clock":
                 newWidget.clockCompactMode = value;
                 break;
@@ -639,6 +636,29 @@ Item {
                 break;
             case "keyboard_layout_name":
                 newWidget.keyboardLayoutNameCompactMode = value;
+                break;
+            }
+            widgets[i] = newWidget;
+            break;
+        }
+        setWidgetsForSection(sectionId, widgets);
+    }
+
+    function handleWidgetSizeChanged(sectionId, widgetId, value) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        for (var i = 0; i < widgets.length; i++) {
+            var widget = widgets[i];
+            var currentId = typeof widget === "string" ? widget : widget.id;
+            if (currentId !== widgetId)
+                continue;
+
+            var newWidget = cloneWidgetData(widget);
+            switch (widgetId) {
+            case "music":
+                newWidget.mediaSize = value;
+                break;
+            case "focusedWindow":
+                newWidget.focusedWindowSize = value;
                 break;
             }
             widgets[i] = newWidget;
@@ -708,6 +728,8 @@ Item {
                     item.clockCompactMode = widget.clockCompactMode;
                 if (widget.focusedWindowCompactMode !== undefined)
                     item.focusedWindowCompactMode = widget.focusedWindowCompactMode;
+                if (widget.focusedWindowSize !== undefined)
+                    item.focusedWindowSize = widget.focusedWindowSize;
                 if (widget.runningAppsCompactMode !== undefined)
                     item.runningAppsCompactMode = widget.runningAppsCompactMode;
                 if (widget.runningAppsGroupByApp !== undefined)
@@ -1014,6 +1036,9 @@ Item {
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
+                        onWidgetSizeChanged: (widgetId, value) => {
+                            widgetsTab.handleWidgetSizeChanged(sectionId, widgetId, value);
+                        }
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
                         }
@@ -1084,6 +1109,9 @@ Item {
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
+                        onWidgetSizeChanged: (widgetId, value) => {
+                            widgetsTab.handleWidgetSizeChanged(sectionId, widgetId, value);
+                        }
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
                         }
@@ -1153,6 +1181,9 @@ Item {
                         }
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
+                        }
+                        onWidgetSizeChanged: (widgetId, value) => {
+                            widgetsTab.handleWidgetSizeChanged(sectionId, widgetId, value);
                         }
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
