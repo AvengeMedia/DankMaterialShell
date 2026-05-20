@@ -726,6 +726,25 @@ Item {
     }
 
     LazyLoader {
+        id: spotlightBarModalLoader
+
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.spotlightBarModalLoader = spotlightBarModalLoader;
+        }
+
+        DankLauncherV2ModalSpotlight {
+            id: spotlightBarModal
+
+            Component.onCompleted: {
+                PopoutService.spotlightBarModal = spotlightBarModal;
+                PopoutService._onSpotlightBarModalLoaded();
+            }
+        }
+    }
+
+    LazyLoader {
         id: clipboardHistoryPopoutLoader
 
         active: false

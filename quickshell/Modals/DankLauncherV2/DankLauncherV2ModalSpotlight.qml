@@ -75,7 +75,7 @@ Item {
         const searchBarH = 56;
         const usableH = Math.max(searchBarH, screenHeight - insetT - insetB);
         const preferred = insetT + Math.max(0, usableH * 0.33 - searchBarH / 2);
-        const maxY = Math.max(insetT, screenHeight - insetB - _contentImplicitH);
+        const maxY = Math.max(insetT, screenHeight - insetB - 56);
         return Math.max(insetT, Math.min(preferred, maxY));
     }
 

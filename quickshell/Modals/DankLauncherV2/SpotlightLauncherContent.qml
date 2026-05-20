@@ -15,8 +15,7 @@ FocusScope {
 
     readonly property bool _hasQuery: searchInput.text.length > 0
     readonly property real _searchBarH: 56
-    readonly property real _surfaceInset: BlurService.enabled ? (_hasQuery ? Theme.spacingS : Theme.spacingXS) : 0
-    readonly property real _searchAreaH: _searchBarH + _surfaceInset * 2
+    readonly property real _searchAreaH: _searchBarH
     readonly property real _statusH: 92
     readonly property real _rowH: 64
     readonly property real _maxResultsH: Math.min(430, (parentModal?.screenHeight ?? 900) * 0.55)
@@ -233,11 +232,8 @@ FocusScope {
         Rectangle {
             id: searchBarSurface
             anchors.fill: parent
-            anchors.margins: root._surfaceInset
-            radius: height / 2
+            radius: Theme.cornerRadius
             color: Theme.withAlpha(root._hasQuery ? Theme.surfaceContainerHigh : Theme.surfaceContainer, root._hasQuery ? Theme.popupTransparency : Math.max(0.68, Theme.popupTransparency * 0.9))
-            border.color: BlurService.enabled && !root._hasQuery ? Theme.withAlpha(Theme.outline, 0.08) : "transparent"
-            border.width: BlurService.enabled && !root._hasQuery ? 1 : 0
 
             Behavior on color {
                 ColorAnimation {
@@ -384,8 +380,6 @@ FocusScope {
         anchors.top: searchBarItem.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.leftMargin: root._surfaceInset
-        anchors.rightMargin: root._surfaceInset
         height: 1
         color: Theme.outlineMedium
         opacity: root._resultsH > 0 ? 0.55 : 0

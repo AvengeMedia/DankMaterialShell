@@ -575,7 +575,6 @@ var SPEC = {
     frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
-    frameUseSpotlightLauncher: { def: false },
     frameMode: { def: "connected" }
 };
 

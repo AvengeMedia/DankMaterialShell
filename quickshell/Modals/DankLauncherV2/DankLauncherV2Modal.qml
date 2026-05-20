@@ -62,7 +62,7 @@ Item {
             impl.item.toggleWithMode(mode);
     }
 
-    readonly property bool useSpotlightBackend: SettingsData.connectedFrameModeActive ? SettingsData.frameUseSpotlightLauncher : SettingsData.launcherStyle === "spotlight"
+    readonly property bool useSpotlightBackend: !SettingsData.connectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
     readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp)
     property var _resolvedBackend: null
 
@@ -71,9 +71,6 @@ Item {
     Connections {
         target: SettingsData
         function onConnectedFrameModeActiveChanged() {
-            root._maybeResolveBackend();
-        }
-        function onFrameUseSpotlightLauncherChanged() {
             root._maybeResolveBackend();
         }
         function onLauncherStyleChanged() {

@@ -1341,6 +1341,25 @@ Item {
     }
 
     IpcHandler {
+        function open(): string {
+            PopoutService.openSpotlightBar();
+            return "SPOTLIGHT_BAR_OPEN_SUCCESS";
+        }
+
+        function close(): string {
+            PopoutService.closeSpotlightBar();
+            return "SPOTLIGHT_BAR_CLOSE_SUCCESS";
+        }
+
+        function toggle(): string {
+            PopoutService.toggleSpotlightBar();
+            return "SPOTLIGHT_BAR_TOGGLE_SUCCESS";
+        }
+
+        target: "spotlight-bar"
+    }
+
+    IpcHandler {
         function info(message: string): string {
             if (!message)
                 return "ERROR: No message specified";
