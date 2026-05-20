@@ -83,6 +83,7 @@ Singleton {
         showDirs: true
         showFiles: false
         showDotAndDotDot: false
+        resolveSymlinks: false
 
         onCountChanged: resyncDebounce.restart()
         onStatusChanged: {
@@ -96,6 +97,7 @@ Singleton {
         showDirs: true
         showFiles: false
         showDotAndDotDot: false
+        resolveSymlinks: false
 
         onCountChanged: resyncDebounce.restart()
         onStatusChanged: {
