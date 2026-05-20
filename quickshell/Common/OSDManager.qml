@@ -9,9 +9,11 @@ Singleton {
 
     property var currentOSDsByScreen: ({})
 
-    Connections {
-        target: Quickshell
-        function onScreensChanged() {
+    Timer {
+        id: screensChangedDelayTimer
+        interval: 3000 // 3 seconds
+        repeat: false
+        onTriggered: {
             const activeNames = {};
             for (let i = 0; i < Quickshell.screens.length; i++)
                 activeNames[Quickshell.screens[i].name] = true;
@@ -20,6 +22,12 @@ Singleton {
                     continue;
                 osdManager.currentOSDsByScreen[screenName] = null;
             }
+        }
+    }
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            screensChangedDelayTimer.restart();
         }
     }
 
