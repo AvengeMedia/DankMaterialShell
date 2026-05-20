@@ -178,7 +178,7 @@ Item {
         case "top":
             return false;
         default:
-            return (barConfig?.showOverFullscreen ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen);
+            return (barConfig?.useOverlayLayer ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen);
         }
     }
 

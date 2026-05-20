@@ -176,7 +176,7 @@ Variants {
 
         readonly property string _dockScreenName: dock.modelData ? dock.modelData.name : (dock.screen ? dock.screen.name : "")
         readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(dock._dockScreenName)
-        readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(dock._dockScreenName) || SettingsData.dockShowOverFullscreen
+        readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(dock._dockScreenName) || SettingsData.dockUseOverlayLayer
 
         function _syncDockChromeState() {
             if (!dock._dockScreenName)

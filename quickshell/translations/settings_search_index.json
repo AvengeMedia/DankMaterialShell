@@ -855,29 +855,6 @@
     "description": "Override the global shadow with per-bar settings"
   },
   {
-    "section": "barShowOverFullscreen",
-    "label": "Show Over Fullscreen",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "above",
-      "appears",
-      "bar",
-      "dank",
-      "fullscreen",
-      "layer",
-      "over",
-      "overlay",
-      "panel",
-      "show",
-      "statusbar",
-      "taskbar",
-      "topbar",
-      "windows"
-    ],
-    "description": "Use the overlay layer so this bar appears above fullscreen windows"
-  },
-  {
     "section": "barSpacing",
     "label": "Spacing",
     "tabIndex": 3,
@@ -945,13 +922,31 @@
     "icon": "opacity"
   },
   {
+    "section": "barUseOverlayLayer",
+    "label": "Use Overlay Layer",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "fullscreen",
+      "layer",
+      "overlay",
+      "panel",
+      "place",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "wayland"
+    ],
+    "description": "Place this bar on the Wayland overlay layer"
+  },
+  {
     "section": "barVisibility",
     "label": "Visibility",
     "tabIndex": 3,
     "category": "Dank Bar",
     "keywords": [
-      "above",
-      "appears",
       "auto-hide",
       "autohide",
       "bar",
@@ -962,16 +957,17 @@
       "layer",
       "overlay",
       "panel",
+      "place",
       "show",
       "statusbar",
       "taskbar",
       "topbar",
       "visibility",
       "visible",
-      "windows"
+      "wayland"
     ],
     "icon": "visibility_off",
-    "description": "Use the overlay layer so this bar appears above fullscreen windows"
+    "description": "Place this bar on the Wayland overlay layer"
   },
   {
     "section": "workspaceDragReorder",
@@ -1758,27 +1754,6 @@
     ]
   },
   {
-    "section": "dockShowOverFullscreen",
-    "label": "Show Over Fullscreen",
-    "tabIndex": 5,
-    "category": "Dock",
-    "keywords": [
-      "above",
-      "appears",
-      "dock",
-      "fullscreen",
-      "launcher bar",
-      "layer",
-      "over",
-      "overlay",
-      "panel",
-      "show",
-      "taskbar",
-      "windows"
-    ],
-    "description": "Use the overlay layer so the dock appears above fullscreen windows"
-  },
-  {
     "section": "dockShowOverflowBadge",
     "label": "Show Overflow Badge Count",
     "tabIndex": 5,
@@ -1923,6 +1898,24 @@
     ],
     "icon": "delete",
     "description": "Place a trash bin at the end of the dock"
+  },
+  {
+    "section": "dockUseOverlayLayer",
+    "label": "Use Overlay Layer",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "fullscreen",
+      "launcher bar",
+      "layer",
+      "overlay",
+      "panel",
+      "place",
+      "taskbar",
+      "wayland"
+    ],
+    "description": "Place the dock on the Wayland overlay layer"
   },
   {
     "section": "_tab_7",
@@ -2402,29 +2395,6 @@
     "description": "Show mode tabs and keyboard hints at the bottom."
   },
   {
-    "section": "launcherShowOverFullscreen",
-    "label": "Show Over Fullscreen",
-    "tabIndex": 9,
-    "category": "Launcher",
-    "keywords": [
-      "app drawer",
-      "app menu",
-      "applications",
-      "drawer",
-      "fullscreen",
-      "launcher",
-      "layer",
-      "menu",
-      "opening",
-      "over",
-      "overlay",
-      "show",
-      "start",
-      "start menu"
-    ],
-    "description": "Use the overlay layer when opening the launcher"
-  },
-  {
     "section": "launcherLogoSizeOffset",
     "label": "Size Offset",
     "tabIndex": 9,
@@ -2545,6 +2515,27 @@
       "vram"
     ],
     "description": "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening."
+  },
+  {
+    "section": "launcherUseOverlayLayer",
+    "label": "Use Overlay Layer",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "drawer",
+      "fullscreen",
+      "launcher",
+      "layer",
+      "menu",
+      "opening",
+      "overlay",
+      "start",
+      "start menu"
+    ],
+    "description": "Use the overlay layer when opening the launcher"
   },
   {
     "section": "matugenTemplateAlacritty",

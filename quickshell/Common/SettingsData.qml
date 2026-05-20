@@ -449,7 +449,7 @@ Singleton {
     property bool dankLauncherV2UnloadOnClose: false
     property bool dankLauncherV2IncludeFilesInAll: false
     property bool dankLauncherV2IncludeFoldersInAll: false
-    property bool launcherShowOverFullscreen: false
+    property bool launcherUseOverlayLayer: false
     property string launcherStyle: "full"
 
     property string _legacyWeatherLocation: "New York, NY"
@@ -607,7 +607,7 @@ Singleton {
     property bool showDock: false
     property bool dockAutoHide: false
     property bool dockSmartAutoHide: false
-    property bool dockShowOverFullscreen: false
+    property bool dockUseOverlayLayer: false
     property bool dockGroupByApp: false
     property bool dockRestoreSpecialWorkspaceOnClick: false
     property bool dockOpenOnOverview: false
@@ -788,7 +788,7 @@ Singleton {
             "popupGapsAuto": true,
             "popupGapsManual": 4,
             "maximizeDetection": true,
-            "showOverFullscreen": false,
+            "useOverlayLayer": false,
             "scrollEnabled": true,
             "scrollXBehavior": "column",
             "scrollYBehavior": "workspace",

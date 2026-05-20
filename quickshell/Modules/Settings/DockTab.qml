@@ -90,13 +90,13 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "dockShowOverFullscreen"
+                    settingKey: "dockUseOverlayLayer"
                     tags: ["dock", "fullscreen", "overlay", "layer"]
-                    text: I18n.tr("Show Over Fullscreen", "dock layer toggle: show the dock over fullscreen windows")
-                    description: I18n.tr("Use the overlay layer so the dock appears above fullscreen windows")
-                    checked: SettingsData.dockShowOverFullscreen
+                    text: I18n.tr("Use Overlay Layer", "dock layer toggle: use Wayland overlay layer")
+                    description: I18n.tr("Place the dock on the Wayland overlay layer")
+                    checked: SettingsData.dockUseOverlayLayer
                     visible: SettingsData.showDock
-                    onToggled: checked => SettingsData.set("dockShowOverFullscreen", checked)
+                    onToggled: checked => SettingsData.set("dockUseOverlayLayer", checked)
                 }
             }
 

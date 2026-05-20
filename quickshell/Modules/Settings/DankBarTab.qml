@@ -137,7 +137,7 @@ Item {
             popupGapsAuto: defaultBar.popupGapsAuto ?? true,
             popupGapsManual: defaultBar.popupGapsManual ?? 4,
             maximizeDetection: defaultBar.maximizeDetection ?? true,
-            showOverFullscreen: defaultBar.showOverFullscreen ?? false,
+            useOverlayLayer: defaultBar.useOverlayLayer ?? false,
             scrollEnabled: defaultBar.scrollEnabled ?? true,
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
@@ -729,14 +729,14 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "barShowOverFullscreen"
+                    settingKey: "barUseOverlayLayer"
                     tags: ["bar", "fullscreen", "overlay", "layer"]
-                    text: I18n.tr("Show Over Fullscreen", "bar layer toggle: show the bar over fullscreen windows")
-                    description: I18n.tr("Use the overlay layer so this bar appears above fullscreen windows")
-                    checked: selectedBarConfig?.showOverFullscreen ?? false
+                    text: I18n.tr("Use Overlay Layer", "bar layer toggle: use Wayland overlay layer")
+                    description: I18n.tr("Place the bar on the Wayland overlay layer")
+                    checked: selectedBarConfig?.useOverlayLayer ?? false
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
-                            showOverFullscreen: toggled
+                            useOverlayLayer: toggled
                         });
                         notifyHorizontalBarChange();
                     }

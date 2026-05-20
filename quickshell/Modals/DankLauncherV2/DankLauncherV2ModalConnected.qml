@@ -41,7 +41,7 @@ Item {
     readonly property real screenWidth: effectiveScreen?.width ?? 1920
     readonly property real screenHeight: effectiveScreen?.height ?? 1080
     readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
-    readonly property bool usesOverlayLayer: SettingsData.launcherShowOverFullscreen || triggerUsesOverlayLayer
+    readonly property bool usesOverlayLayer: SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
     readonly property var effectiveLauncherLayer: {
         switch (Quickshell.env("DMS_MODAL_LAYER")) {
         case "bottom":

@@ -30,7 +30,8 @@ Item {
     readonly property real screenWidth: effectiveScreen?.width ?? 1920
     readonly property real screenHeight: effectiveScreen?.height ?? 1080
     readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
-    readonly property bool usesOverlayLayer: SettingsData.launcherShowOverFullscreen || triggerUsesOverlayLayer
+    readonly property bool useBackgroundDarken: !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
+    readonly property bool usesOverlayLayer: useBackgroundDarken || SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
     readonly property var effectiveLauncherLayer: {
         switch (Quickshell.env("DMS_MODAL_LAYER")) {
         case "bottom":
@@ -275,7 +276,7 @@ Item {
     PanelWindow {
         id: clickCatcher
         screen: launcherWindow.screen
-        visible: spotlightOpen || isClosing
+        visible: (spotlightOpen || isClosing) && !root.useBackgroundDarken
         color: "transparent"
 
         WlrLayershell.namespace: "dms:spotlight:clickcatcher"
@@ -347,17 +348,19 @@ Item {
         anchors {
             top: true
             left: true
+            right: root.useBackgroundDarken
+            bottom: root.useBackgroundDarken
         }
 
         WlrLayershell.margins {
-            left: root.windowX
-            top: root.windowY
+            left: root.useBackgroundDarken ? 0 : root.windowX
+            top: root.useBackgroundDarken ? 0 : root.windowY
             right: 0
             bottom: 0
         }
 
-        implicitWidth: root.windowWidth
-        implicitHeight: root.windowHeight
+        implicitWidth: root.useBackgroundDarken ? 0 : root.windowWidth
+        implicitHeight: root.useBackgroundDarken ? 0 : root.windowHeight
 
         mask: Region {
             item: inputMask
@@ -367,19 +370,44 @@ Item {
             id: inputMask
             visible: false
             color: "transparent"
-            x: modalContainer.x
-            y: modalContainer.y + modalContainer.slideOffset
-            width: root.alignedWidth
-            height: root._contentImplicitH
+            x: root.useBackgroundDarken ? 0 : modalContainer.x
+            y: root.useBackgroundDarken ? 0 : modalContainer.y + modalContainer.slideOffset
+            width: root.useBackgroundDarken ? launcherWindow.width : root.alignedWidth
+            height: root.useBackgroundDarken ? launcherWindow.height : root._contentImplicitH
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: root.useBackgroundDarken && spotlightOpen
+            z: -2
+            onClicked: root.hide()
+        }
+
+        Rectangle {
+            id: backgroundDarken
+            anchors.fill: parent
+            color: "black"
+            opacity: contentVisible && root.useBackgroundDarken ? 0.5 : 0
+            visible: (spotlightOpen || isClosing) && (root.useBackgroundDarken || opacity > 0)
+            z: -3
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: contentVisible ? root._openDuration : root._closeDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: contentVisible ? [0.0, 0.0, 0.2, 1.0, 1.0, 1.0] : [0.4, 0.0, 1.0, 1.0, 1.0, 1.0]
+                }
+            }
         }
 
         Item {
             id: modalContainer
-            x: root.contentX
-            y: root.contentY
+            x: root.useBackgroundDarken ? root.alignedX : root.contentX
+            y: root.useBackgroundDarken ? root.alignedY : root.contentY
             width: root.alignedWidth
             height: root._animatedContentH
             visible: _renderActive
+            z: 0
 
             property bool _renderActive: contentVisible
             property real slideOffset: contentVisible ? 0 : -root._animHeadroom

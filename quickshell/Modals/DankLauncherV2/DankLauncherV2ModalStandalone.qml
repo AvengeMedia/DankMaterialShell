@@ -80,7 +80,7 @@ Item {
 
     readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     readonly property bool useBackgroundDarken: !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
-    readonly property bool usesOverlayLayer: useBackgroundDarken || SettingsData.launcherShowOverFullscreen || triggerUsesOverlayLayer
+    readonly property bool usesOverlayLayer: useBackgroundDarken || SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
     readonly property var effectiveLauncherLayer: {
         switch (Quickshell.env("DMS_MODAL_LAYER")) {
         case "bottom":
@@ -312,9 +312,8 @@ Item {
     PanelWindow {
         id: clickCatcher
         screen: launcherWindow.screen
-        visible: spotlightOpen || isClosing
+        visible: (spotlightOpen || isClosing) && !root.useBackgroundDarken
         color: "transparent"
-        updatesEnabled: root.useBackgroundDarken && (spotlightOpen || isClosing)
 
         WlrLayershell.namespace: "dms:spotlight:clickcatcher"
         WlrLayershell.layer: root.effectiveLauncherLayer
@@ -358,22 +357,6 @@ Item {
             enabled: spotlightOpen
             onClicked: root.hide()
         }
-
-        Rectangle {
-            id: backgroundDarken
-            anchors.fill: parent
-            color: "black"
-            opacity: contentVisible && root.useBackgroundDarken ? 0.5 : 0
-            visible: (spotlightOpen || isClosing) && (root.useBackgroundDarken || opacity > 0)
-
-            Behavior on opacity {
-                NumberAnimation {
-                    easing.type: Easing.BezierSpline
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
-                }
-            }
-        }
     }
 
     PanelWindow {
@@ -401,17 +384,19 @@ Item {
         anchors {
             top: true
             left: true
+            right: root.useBackgroundDarken
+            bottom: root.useBackgroundDarken
         }
 
         WlrLayershell.margins {
-            left: root.windowX
-            top: root.windowY
+            left: root.useBackgroundDarken ? 0 : root.windowX
+            top: root.useBackgroundDarken ? 0 : root.windowY
             right: 0
             bottom: 0
         }
 
-        implicitWidth: root.windowWidth
-        implicitHeight: root.windowHeight
+        implicitWidth: root.useBackgroundDarken ? 0 : root.windowWidth
+        implicitHeight: root.useBackgroundDarken ? 0 : root.windowHeight
 
         mask: Region {
             item: launcherInputMask
@@ -421,19 +406,44 @@ Item {
             id: launcherInputMask
             visible: false
             color: "transparent"
-            x: modalContainer.x
-            y: modalContainer.y
-            width: modalContainer.width
-            height: modalContainer.height
+            x: root.useBackgroundDarken ? 0 : modalContainer.x
+            y: root.useBackgroundDarken ? 0 : modalContainer.y
+            width: root.useBackgroundDarken ? launcherWindow.width : modalContainer.width
+            height: root.useBackgroundDarken ? launcherWindow.height : modalContainer.height
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: root.useBackgroundDarken && spotlightOpen
+            z: -2
+            onClicked: root.hide()
+        }
+
+        Rectangle {
+            id: backgroundDarken
+            anchors.fill: parent
+            color: "black"
+            opacity: contentVisible && root.useBackgroundDarken ? 0.5 : 0
+            visible: (spotlightOpen || isClosing) && (root.useBackgroundDarken || opacity > 0)
+            z: -3
+
+            Behavior on opacity {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
+                    duration: Theme.modalAnimationDuration
+                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                }
+            }
         }
 
         Item {
             id: modalContainer
-            x: root.contentX
-            y: root.contentY
+            x: root.useBackgroundDarken ? root.alignedX : root.contentX
+            y: root.useBackgroundDarken ? root.alignedY : root.contentY
             width: root.alignedWidth
             height: root.alignedHeight
             visible: _renderActive
+            z: 0
 
             property bool _renderActive: contentVisible
             property real publishedScale: contentVisible ? 1 : 0.96

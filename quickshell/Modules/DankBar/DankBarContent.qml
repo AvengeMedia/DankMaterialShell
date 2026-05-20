@@ -25,8 +25,8 @@ Item {
     readonly property real outlineThickness: (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0
     readonly property real _edgeBaseMargin: Math.max(Theme.spacingXS, innerPadding * 0.8)
     readonly property bool _hasBarWindow: barWindow !== undefined && barWindow !== null
-    readonly property bool _usesConnectedFrameChrome: _hasBarWindow && (barWindow.usesConnectedFrameChrome ?? false)
-    readonly property real _frameEdgeFloorInset: (SettingsData.frameEnabled && _usesConnectedFrameChrome) ? Math.max(0, SettingsData.frameThickness - _edgeBaseMargin) : 0
+    readonly property bool _usesFrameBarChrome: _hasBarWindow && (barWindow.usesFrameBarChrome ?? false)
+    readonly property real _frameEdgeFloorInset: (SettingsData.frameEnabled && _usesFrameBarChrome) ? Math.max(0, SettingsData.frameThickness - _edgeBaseMargin) : 0
     readonly property bool _barIsVertical: _hasBarWindow ? barWindow.isVertical : false
     readonly property string _barScreenName: _hasBarWindow ? (barWindow.screenName || "") : ""
     readonly property bool hasAdjacentTopBarLive: _hasBarWindow && barWindow.hasAdjacentTopBar
@@ -48,22 +48,22 @@ Item {
         _hadAdjacentRightBar = true
 
     readonly property real _frameLeftInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesConnectedFrameChrome || _barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
             return 0;
         return hasAdjacentLeftBarLive ? SettingsData.frameBarSize : (_hadAdjacentLeftBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameRightInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesConnectedFrameChrome || _barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
             return 0;
         return hasAdjacentRightBarLive ? SettingsData.frameBarSize : (_hadAdjacentRightBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameTopInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesConnectedFrameChrome || !_barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
             return 0;
         return hasAdjacentTopBarLive ? SettingsData.frameThickness : (_hadAdjacentTopBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameBottomInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesConnectedFrameChrome || !_barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
             return 0;
         return hasAdjacentBottomBarLive ? SettingsData.frameThickness : (_hadAdjacentBottomBar ? _frameEdgeFloorInset : 0);
     }
@@ -96,7 +96,7 @@ Item {
     }
 
     Behavior on anchors.leftMargin {
-        enabled: _animateFrameInsets && _usesConnectedFrameChrome
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
@@ -104,7 +104,7 @@ Item {
     }
 
     Behavior on anchors.rightMargin {
-        enabled: _animateFrameInsets && _usesConnectedFrameChrome
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
@@ -112,7 +112,7 @@ Item {
     }
 
     Behavior on anchors.topMargin {
-        enabled: _animateFrameInsets && _usesConnectedFrameChrome
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
@@ -120,7 +120,7 @@ Item {
     }
 
     Behavior on anchors.bottomMargin {
-        enabled: _animateFrameInsets && _usesConnectedFrameChrome
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic

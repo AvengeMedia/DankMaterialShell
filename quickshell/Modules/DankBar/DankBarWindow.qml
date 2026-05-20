@@ -108,7 +108,7 @@ PanelWindow {
         triggerDashTab(2);
     }
 
-    readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.showOverFullscreen ?? false)
+    readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)
 
     readonly property var dBarLayer: {
         switch (Quickshell.env("DMS_DANKBAR_LAYER")) {
@@ -156,6 +156,9 @@ PanelWindow {
         function onUsesConnectedFrameChromeChanged() {
             _blurRebuildTimer.restart();
         }
+        function onUsesFrameBarChromeChanged() {
+            _blurRebuildTimer.restart();
+        }
     }
 
     Component {
@@ -185,7 +188,7 @@ PanelWindow {
             // In frame mode, FrameWindow owns the blur region for the entire screen edge
             // (including the bar area). The bar must not set its own competing blur region
             // so that frameBlurEnabled acts as the single control for all blur in frame mode.
-            if (SettingsData.frameEnabled && barWindow.usesConnectedFrameChrome)
+            if (SettingsData.frameEnabled && barWindow.usesFrameBarChrome)
                 return;
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
@@ -298,7 +301,7 @@ PanelWindow {
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: (SettingsData.frameEnabled && usesConnectedFrameChrome) ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: (SettingsData.frameEnabled && usesFrameBarChrome) ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -323,10 +326,11 @@ PanelWindow {
     property string screenName: modelData.name
 
     readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(screenName)
+    readonly property bool usesFrameBarChrome: CompositorService.frameWindowVisibleForScreen(screenName)
 
     // Flatten/spacing collapse for maximized windows is only for frame-integrated layout.
     // When the bar draws its own pill, keep rounded corners and spacing like the dock.
-    readonly property bool flattenForMaximizedWindow: !SettingsData.frameEnabled || usesConnectedFrameChrome
+    readonly property bool flattenForMaximizedWindow: !SettingsData.frameEnabled || usesFrameBarChrome
 
     property bool hasMaximizedToplevel: false
     property bool shouldHideForWindows: false
@@ -430,7 +434,7 @@ PanelWindow {
         shouldHideForWindows = filtered.length > 0;
     }
 
-    property real effectiveSpacing: (SettingsData.frameEnabled && usesConnectedFrameChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
+    property real effectiveSpacing: (SettingsData.frameEnabled && usesFrameBarChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
 
     Behavior on effectiveSpacing {
         enabled: barWindow.visible
@@ -441,7 +445,7 @@ PanelWindow {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: (SettingsData.frameEnabled && usesConnectedFrameChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property real effectiveBarThickness: (SettingsData.frameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
     readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
@@ -639,9 +643,9 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    readonly property bool reserveExclusiveWhenAutoHidden: SettingsData.connectedFrameModeActive && usesConnectedFrameChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
+    readonly property bool reserveExclusiveWhenAutoHidden: SettingsData.frameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
 
-    exclusiveZone: (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesConnectedFrameChrome ? 0 : (barConfig?.bottomGap ?? 0)))
+    exclusiveZone: (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
 
     Item {
         id: inputMask

@@ -69,12 +69,12 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "launcherShowOverFullscreen"
+                    settingKey: "launcherUseOverlayLayer"
                     tags: ["launcher", "fullscreen", "overlay", "layer"]
-                    text: I18n.tr("Show Over Fullscreen", "launcher layer toggle: show the launcher over fullscreen windows")
+                    text: I18n.tr("Use Overlay Layer", "launcher layer toggle: use Wayland overlay layer")
                     description: I18n.tr("Use the overlay layer when opening the launcher")
-                    checked: SettingsData.launcherShowOverFullscreen
-                    onToggled: checked => SettingsData.set("launcherShowOverFullscreen", checked)
+                    checked: SettingsData.launcherUseOverlayLayer
+                    onToggled: checked => SettingsData.set("launcherUseOverlayLayer", checked)
                 }
             }
 
