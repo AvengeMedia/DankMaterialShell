@@ -726,7 +726,7 @@ PanelWindow {
         item: clickThroughEnabled ? null : inputMask
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._leftSection, false, barWindow._revealProgress) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._leftSection, false, barWindow._revealProgress + barWindow.width * 0) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -739,7 +739,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._centerSection, true, barWindow._revealProgress) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._centerSection, true, barWindow._revealProgress + barWindow.width * 0) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -752,7 +752,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._rightSection, false, barWindow._revealProgress) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._rightSection, false, barWindow._revealProgress + barWindow.width * 0) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
