@@ -27,7 +27,7 @@
     "%1 connected": "已连接 %1"
   },
   "%1 copied": {
-    "%1 copied": ""
+    "%1 copied": "已复制 %1"
   },
   "%1 custom animation duration": {
     "%1 custom animation duration": "%1自定义动画持续时间"
@@ -111,7 +111,7 @@
     "(Default)": "（默认）"
   },
   "(Unnamed)": {
-    "(Unnamed)": "(未命名)"
+    "(Unnamed)": "（未命名）"
   },
   "+ %1 more": {
     "+ %1 more": "+%1更多"
@@ -138,19 +138,19 @@
     "1 hour 30 minutes": "1小时30分钟"
   },
   "1 minute": {
-    "1 minute": "1 分钟"
+    "1 minute": "1分钟"
   },
   "1 notification": {
     "1 notification": "1条通知"
   },
   "1 second": {
-    "1 second": "1 秒"
+    "1 second": "1秒"
   },
   "10 minutes": {
-    "10 minutes": "10 分钟"
+    "10 minutes": "10分钟"
   },
   "10 seconds": {
-    "10 seconds": "10 秒"
+    "10 seconds": "10秒"
   },
   "10-bit Color": {
     "10-bit Color": "10位色彩"
@@ -168,7 +168,7 @@
     "15 minutes": "15分钟"
   },
   "15 seconds": {
-    "15 seconds": "15 秒"
+    "15 seconds": "15秒"
   },
   "180°": {
     "180°": "180°"
@@ -177,7 +177,7 @@
     "2 hours": "2小时"
   },
   "2 minutes": {
-    "2 minutes": "2 分钟"
+    "2 minutes": "2分钟"
   },
   "2 seconds": {
     "2 seconds": "2秒"
@@ -216,7 +216,7 @@
     "3 minutes": "3分钟"
   },
   "3 seconds": {
-    "3 seconds": "3 秒"
+    "3 seconds": "3秒"
   },
   "30 days": {
     "30 days": "30天"
@@ -228,7 +228,7 @@
     "30 minutes": "30分钟"
   },
   "30 seconds": {
-    "30 seconds": "30 秒"
+    "30 seconds": "30秒"
   },
   "35 seconds": {
     "35 seconds": "35秒"
@@ -249,10 +249,10 @@
     "45 seconds": "45秒"
   },
   "5 minutes": {
-    "5 minutes": "5 分钟"
+    "5 minutes": "5分钟"
   },
   "5 seconds": {
-    "5 seconds": "5 秒"
+    "5 seconds": "5秒"
   },
   "50 seconds": {
     "50 seconds": "50秒"
@@ -276,7 +276,7 @@
     "8 hours": "8小时"
   },
   "8 seconds": {
-    "8 seconds": "8 秒"
+    "8 seconds": "8秒"
   },
   "90 days": {
     "90 days": "90天"
@@ -345,7 +345,7 @@
     "Activate Greeter": "激活 Greeter"
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
-    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "激活 DMS Greeter？将打开一个终端进行 sudo 身份验证。激活后运行“同步”以应用您的设置。"
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "激活 DMS Greeter？将打开一个终端进行sudo身份验证。激活后运行“同步”以应用您的设置。"
   },
   "Activation": {
     "Activation": "激活"
@@ -363,7 +363,7 @@
     "Active VPN": "激活VPN"
   },
   "Active tile background and icon color": {
-    "Active tile background and icon color": "激活平铺背景与图标颜色"
+    "Active tile background and icon color": "激活的磁贴背景与图标颜色"
   },
   "Active: %1": {
     "Active: %1": "激活：%1"
@@ -414,7 +414,7 @@
     "Add by Address": "通过地址添加"
   },
   "Adjust the number of columns in grid view mode.": {
-    "Adjust the number of columns in grid view mode.": "在网格模式中按需调整列的数量。"
+    "Adjust the number of columns in grid view mode.": "调整网格视图的列数。"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "每滚动一格调节音量"
@@ -534,19 +534,19 @@
     "Apply Changes": "应用更改"
   },
   "Apply Flatpak updates alongside system updates when running 'Update All'.": {
-    "Apply Flatpak updates alongside system updates when running 'Update All'.": "运行“全部更新”时，将 Flatpak 更新与系统更新同时应用。"
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": "运行“全部更新”时，将Flatpak更新与系统更新同时应用。"
   },
   "Apply GTK Colors": {
-    "Apply GTK Colors": "应用 GTK 配色"
+    "Apply GTK Colors": "应用GTK配色"
   },
   "Apply Qt Colors": {
-    "Apply Qt Colors": "应用 Qt 配色"
+    "Apply Qt Colors": "应用Qt配色"
   },
   "Apply compositor blur behind the frame border": {
-    "Apply compositor blur behind the frame border": "在帧框后面应用合成器模糊"
+    "Apply compositor blur behind the frame border": "在边框后面应用合成器模糊"
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
-    "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "应用暖色温以减轻眼睛疲劳，可通过下方设置配置按时间自动启用。"
+    "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "应用暖色温以减轻眼睛疲劳，可通过下方设置控制自动激活时机。"
   },
   "Applying authentication changes…": {
     "Applying authentication changes…": "正在应用认证变更……"
@@ -564,7 +564,7 @@
     "Apps Icon": "应用图标"
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
-    "Apps are ordered by usage frequency, then last used, then alphabetically.": "应用按使用频率、最近使用时间和字母顺序排序。"
+    "Apps are ordered by usage frequency, then last used, then alphabetically.": "应用依次按使用频率、最近使用时间和字母顺序排序。"
   },
   "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": {
     "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "程序会带有自定义名称、图标与启动选项。右键应用并选择“编辑应用”进行自定义。"
@@ -684,7 +684,7 @@
     "Auto Popup Gaps": "自动弹窗间距"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
-    "Auto mode is on. Manual profile selection is disabled.": ""
+    "Auto mode is on. Manual profile selection is disabled.": "自动模式已启用。手动配置项已禁用"
   },
   "Auto-Clear After": {
     "Auto-Clear After": "在此之后自动清除"
@@ -909,7 +909,7 @@
     "Blur on Overview": "在概览中模糊"
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
-    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "模糊状态栏、弹窗、模态以及通知的背景。需要合成器支持与配置。"
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "模糊状态栏、弹窗、模态框以及通知的背景。需要合成器支持与配置。"
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "当打开概览时模糊壁纸"
@@ -1029,7 +1029,7 @@
     "CUPS not available": "CUPS不可用"
   },
   "Calendar": {
-    "Calendar": ""
+    "Calendar": "日历"
   },
   "Camera": {
     "Camera": "摄像头"
@@ -1107,10 +1107,10 @@
     "Check for system updates": "检查系统更新"
   },
   "Check interval": {
-    "Check interval": "检查区间"
+    "Check interval": "检查间隔"
   },
   "Check on startup": {
-    "Check on startup": ""
+    "Check on startup": "启动时检查"
   },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "按需检查同步状态。同步会将你的主题、设置和壁纸配置复制到登录界面。认证变更会自动生效。"
@@ -1296,7 +1296,7 @@
     "Color": "颜色"
   },
   "Color %1 copied": {
-    "Color %1 copied": ""
+    "Color %1 copied": "已复制颜色 %1"
   },
   "Color Gamut": {
     "Color Gamut": "色域"
@@ -1503,7 +1503,7 @@
     "Control Center": "控制中心"
   },
   "Control Center Tile Color": {
-    "Control Center Tile Color": "控制中心平铺颜色"
+    "Control Center Tile Color": "控制中心磁贴颜色"
   },
   "Control animation duration for notification popups and history": {
     "Control animation duration for notification popups and history": "控制通知弹窗和历史记录的动画持续时间"
@@ -1527,13 +1527,13 @@
     "Controls how strongly the selected tint color is applied": "控制选定的色调颜色的应用强度"
   },
   "Controls opacity of all popouts, modals, and their content layers": {
-    "Controls opacity of all popouts, modals, and their content layers": "控制所有弹出窗口、模态框及其内容层的透明度"
+    "Controls opacity of all popouts, modals, and their content layers": "控制所有弹窗、模态框及其内容层的透明度"
   },
   "Controls outlines around blurred foreground cards, pills, and notification cards": {
     "Controls outlines around blurred foreground cards, pills, and notification cards": "控制模糊的前景卡片、按钮和通知卡的轮廓"
   },
   "Controls shadow cast direction for elevation layers": {
-    "Controls shadow cast direction for elevation layers": "控制提升图层的阴影投射方向"
+    "Controls shadow cast direction for elevation layers": "控制高程图层的阴影投射方向"
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": "控制阴影的基础模糊半径和偏移量"
@@ -1599,7 +1599,7 @@
     "Corner Radius Override": "圆角半径覆盖"
   },
   "Corners & Background": {
-    "Corners & Background": "角落与背景"
+    "Corners & Background": "边角与背景"
   },
   "Count Only": {
     "Count Only": "仅数量"
@@ -1629,7 +1629,7 @@
     "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "创建规则以静音、忽略、从历史记录中隐藏或覆盖通知优先级。默认设置仅覆盖优先级；通知仍会正常显示。"
   },
   "Created plugin directory: %1": {
-    "Created plugin directory: %1": ""
+    "Created plugin directory: %1": "已创建插件目录：%1"
   },
   "Creating...": {
     "Creating...": "正在创建..."
@@ -1779,13 +1779,13 @@
     "DEMO MODE - Click anywhere to exit": "演示模式 - 点击任意位置退出"
   },
   "DMS Chooser": {
-    "DMS Chooser": ""
+    "DMS Chooser": "DMS选择器"
   },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "DMS 插件管理器不可用"
   },
   "DMS Settings": {
-    "DMS Settings": ""
+    "DMS Settings": "DMS设置"
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "DMS快捷键"
@@ -1884,10 +1884,10 @@
     "Default (Black)": "默认（黑色）"
   },
   "Default (Global)": {
-    "Default (Global)": ""
+    "Default (Global)": "默认（全局）"
   },
   "Default Apps": {
-    "Default Apps": ""
+    "Default Apps": "默认应用"
   },
   "Default Width (%)": {
     "Default Width (%)": "默认宽度（%）"
@@ -2067,7 +2067,7 @@
     "Display": "显示"
   },
   "Display Assignment": {
-    "Display Assignment": "显示布局"
+    "Display Assignment": "显示器分配"
   },
   "Display Control": {
     "Display Control": "显示控制"
@@ -2106,7 +2106,7 @@
     "Display hourly weather predictions": "显示每小时天气预报"
   },
   "Display line numbers in editor": {
-    "Display line numbers in editor": ""
+    "Display line numbers in editor": "编辑器内显示行号"
   },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "只显示包含窗口的工作区"
@@ -2229,7 +2229,7 @@
     "Dynamic colors from wallpaper": "自壁纸选取动态色"
   },
   "Dynamic colors parse error: %1": {
-    "Dynamic colors parse error: %1": ""
+    "Dynamic colors parse error: %1": "动态颜色解析错误：%1"
   },
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "动态颜色与预设"
@@ -2421,7 +2421,7 @@
     "Enter this passkey on ": "在该处输入此通行密钥 "
   },
   "Enter to Paste": {
-    "Enter to Paste": "按回车以粘贴"
+    "Enter to Paste": "按下Enter粘贴"
   },
   "Enterprise": {
     "Enterprise": "企业"
@@ -2523,10 +2523,10 @@
     "Failed to add printer to class": "将打印机添加到类别失败"
   },
   "Failed to apply GTK colors": {
-    "Failed to apply GTK colors": ""
+    "Failed to apply GTK colors": "应用GTK配色失败"
   },
   "Failed to apply Qt colors": {
-    "Failed to apply Qt colors": ""
+    "Failed to apply Qt colors": "应用Qt配色失败"
   },
   "Failed to apply profile": {
     "Failed to apply profile": "应用档案失败"
@@ -2577,7 +2577,7 @@
     "Failed to disable night mode": "禁用夜间模式失败"
   },
   "Failed to disable plugin: %1": {
-    "Failed to disable plugin: %1": ""
+    "Failed to disable plugin: %1": "禁用插件失败：%1"
   },
   "Failed to disconnect VPN": {
     "Failed to disconnect VPN": "断开 VPN 失败"
@@ -2604,7 +2604,7 @@
     "Failed to enable night mode": "启用夜间模式失败"
   },
   "Failed to enable plugin: %1": {
-    "Failed to enable plugin: %1": ""
+    "Failed to enable plugin: %1": "启用插件失败：%1"
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": ""
@@ -2649,13 +2649,13 @@
     "Failed to print test page": "打印测试页失败"
   },
   "Failed to read theme file: %1": {
-    "Failed to read theme file: %1": ""
+    "Failed to read theme file: %1": "读取主题文件失败：%1"
   },
   "Failed to reject pairing": {
     "Failed to reject pairing": "拒绝配对失败"
   },
   "Failed to reload plugin: %1": {
-    "Failed to reload plugin: %1": ""
+    "Failed to reload plugin: %1": "重载插件失败：%1"
   },
   "Failed to remove QR code at %1: %2": {
     "Failed to remove QR code at %1: %2": ""
@@ -2787,7 +2787,7 @@
     "File Information": "文件信息"
   },
   "File Manager": {
-    "File Manager": ""
+    "File Manager": "文件管理器"
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "打开回收站的文件管理器。点击“自定义”以输入自定义命令。"
@@ -2799,7 +2799,7 @@
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "文件搜索需要dsearch\n请从此处安装：github.com/AvengeMedia/danksearch"
   },
   "File search unavailable": {
-    "File search unavailable": ""
+    "File search unavailable": "文件搜索不可用"
   },
   "Files": {
     "Files": "文件"
@@ -2964,7 +2964,7 @@
     "Force Wide Color": "强制广色域"
   },
   "Force terminal applications to always use dark color schemes": {
-    "Force terminal applications to always use dark color schemes": "强制终端应用使用暗色"
+    "Force terminal applications to always use dark color schemes": "强制终端应用始终使用深色配色方案"
   },
   "Forecast": {
     "Forecast": "预测"
@@ -3045,7 +3045,7 @@
     "Full with Year": "年份全写"
   },
   "Full-featured launcher with mode tabs, grid view, and action panel.": {
-    "Full-featured launcher with mode tabs, grid view, and action panel.": ""
+    "Full-featured launcher with mode tabs, grid view, and action panel.": "功能全面的启动器，包括模式栏、网格视图及动作面板"
   },
   "Fullscreen": {
     "Fullscreen": "全屏"
@@ -3075,7 +3075,7 @@
     "GPU temperature display": "显示显卡温度"
   },
   "GTK colors applied successfully": {
-    "GTK colors applied successfully": ""
+    "GTK colors applied successfully": "GTK配色应用成功"
   },
   "GTK, Qt, IDEs, more": {
     "GTK, Qt, IDEs, more": "GTK、Qt、IDEs等"
@@ -3201,7 +3201,7 @@
     "HSV": "色相、饱和度、明度"
   },
   "HSV %1 copied": {
-    "HSV %1 copied": ""
+    "HSV %1 copied": "HSV %1 已复制"
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML 已复制到剪切板"
@@ -3240,7 +3240,7 @@
     "Hibernate": "休眠"
   },
   "Hibernate failed": {
-    "Hibernate failed": ""
+    "Hibernate failed": "休眠失败"
   },
   "Hidden": {
     "Hidden": "已隐藏"
@@ -3447,7 +3447,7 @@
     "Image": "图像"
   },
   "Image Viewer": {
-    "Image Viewer": ""
+    "Image Viewer": "图像查看器"
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "已复制图像至剪切板"
@@ -3543,7 +3543,7 @@
     "Install complete. Greeter has been installed.": "安装完成。欢迎界面已安装。"
   },
   "Install dsearch to search files.": {
-    "Install dsearch to search files.": ""
+    "Install dsearch to search files.": "安装dsearch以搜索文件"
   },
   "Install failed: %1": {
     "Install failed: %1": "安装失败：%1"
@@ -3756,7 +3756,7 @@
     "Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.": "欢迎界面上的布局和模块位置已从你的壳同步（例如状态栏配置）。运行同步以应用。"
   },
   "Left": {
-    "Left": "左"
+    "Left": "左侧"
   },
   "Left Center": {
     "Left Center": "左侧中部"
@@ -3903,7 +3903,7 @@
     "MTU": "MTU"
   },
   "Mail": {
-    "Mail": ""
+    "Mail": "邮箱"
   },
   "Make sure KDE Connect or Valent is running on your other devices": {
     "Make sure KDE Connect or Valent is running on your other devices": "确保 KDE Connect 或 Valent 正在您的其他设备上运行"
@@ -3927,10 +3927,10 @@
     "Management": "管理"
   },
   "Manages calendar events": {
-    "Manages calendar events": ""
+    "Manages calendar events": "管理日历事务"
   },
   "Manages files and directories": {
-    "Manages files and directories": ""
+    "Manages files and directories": "管理文件和目录"
   },
   "MangoWC Layout Overrides": {
     "MangoWC Layout Overrides": "MangoWC布局覆盖"
@@ -3987,7 +3987,7 @@
     "Material colors generated from wallpaper": "从壁纸生成的Material色彩"
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
-    "Material inspired shadows and elevation on modals, popouts, and dialogs": "模态、弹窗与对话框上出现的阴影（受Material启发的）与提升"
+    "Material inspired shadows and elevation on modals, popouts, and dialogs": "受Material启发，模态框、弹窗及对话框的阴影与高程"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
     "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material：Material Design 3是富有设计感的贝塞尔曲线。也是DMS的默认风格。"
@@ -4179,13 +4179,13 @@
     "Missing Environment Variables": "缺失环境变量"
   },
   "Modal Background": {
-    "Modal Background": "模态背景"
+    "Modal Background": "模态框背景"
   },
   "Modal Shadows": {
-    "Modal Shadows": "模态阴影"
+    "Modal Shadows": "模态框阴影"
   },
   "Modals": {
-    "Modals": "模态"
+    "Modals": "模态框"
   },
   "Mode": {
     "Mode": "模式"
@@ -4260,22 +4260,22 @@
     "Multi-Monitor": "多显示器"
   },
   "Multimedia": {
-    "Multimedia": ""
+    "Multimedia": "多媒体"
   },
   "Multiplexer": {
-    "Multiplexer": "多路器"
+    "Multiplexer": "复用器"
   },
   "Multiplexer Type": {
-    "Multiplexer Type": "多路器类型"
+    "Multiplexer Type": "复用器类型"
   },
   "Multiplexers": {
-    "Multiplexers": "多路器"
+    "Multiplexers": "复用器"
   },
   "Music": {
     "Music": "音乐"
   },
   "Music Player": {
-    "Music Player": ""
+    "Music Player": "音乐播放器"
   },
   "Mute Popups": {
     "Mute Popups": "禁用弹窗"
@@ -4392,7 +4392,7 @@
     "Night mode & gamma": "夜间模式与伽玛"
   },
   "Night mode failed: DMS gamma control not available": {
-    "Night mode failed: DMS gamma control not available": ""
+    "Night mode failed: DMS gamma control not available": "夜间模式启动失败：DMS伽马控制不可用"
   },
   "Niri Integration": {
     "Niri Integration": "Niri 集成"
@@ -4407,7 +4407,7 @@
     "No": "否"
   },
   "No Active Players": {
-    "No Active Players": "没有正在播放的音频"
+    "No Active Players": "没有活动的播放器"
   },
   "No Anim": {
     "No Anim": "无动画"
@@ -4524,7 +4524,7 @@
     "No disk data available": "无可用磁盘数据"
   },
   "No display profiles found. Create them in Settings > Displays.": {
-    "No display profiles found. Create them in Settings > Displays.": ""
+    "No display profiles found. Create them in Settings > Displays.": "未找到显示器配置。在 设置 > 显示 创建显示器配置"
   },
   "No drivers found": {
     "No drivers found": "未找到驱动程序"
@@ -4623,7 +4623,7 @@
     "No recent clipboard entries found": "未找到近期剪切板项目"
   },
   "No results": {
-    "No results": ""
+    "No results": "无结果"
   },
   "No results found": {
     "No results found": "未找到结果"
@@ -4902,7 +4902,7 @@
     "Opening terminal: ": "正在打开终端： "
   },
   "Opens image files": {
-    "Opens image files": ""
+    "Opens image files": "打开图像文件"
   },
   "Optional description": {
     "Optional description": "可选描述"
@@ -4971,7 +4971,7 @@
     "Override global layout settings for this output": "为此输出覆盖全局布局设置"
   },
   "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": ""
+    "Override global transparency for Notepad": "为便签覆盖全局透明度"
   },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "以自定义命令或脚本覆盖终端"
@@ -5010,7 +5010,7 @@
     "PAM provides fingerprint auth, but no reader was detected.": "PAM提供了指纹认证，但无法检测到读取器。"
   },
   "PDF Reader": {
-    "PDF Reader": ""
+    "PDF Reader": "PDF阅读器"
   },
   "PIN": {
     "PIN": "PIN 码"
@@ -5196,10 +5196,10 @@
     "Playback error: ": "播放错误： "
   },
   "Plays audio files": {
-    "Plays audio files": ""
+    "Plays audio files": "播放音频文件"
   },
   "Plays video files": {
-    "Plays video files": ""
+    "Plays video files": "播放视频文件"
   },
   "Please wait...": {
     "Please wait...": "请稍候..."
@@ -5226,22 +5226,22 @@
     "Plugin Visibility": "插件可视化"
   },
   "Plugin disabled: %1": {
-    "Plugin disabled: %1": ""
+    "Plugin disabled: %1": "插件已禁用：%1"
   },
   "Plugin enabled: %1": {
-    "Plugin enabled: %1": ""
+    "Plugin enabled: %1": "插件已启用：%1"
   },
   "Plugin is disabled - enable in Plugins settings to use": {
     "Plugin is disabled - enable in Plugins settings to use": "插件已禁用 - 请在插件设置中启用以继续"
   },
   "Plugin reloaded: %1": {
-    "Plugin reloaded: %1": ""
+    "Plugin reloaded: %1": "插件已重载：%1"
   },
   "Plugin uninstalled: %1": {
-    "Plugin uninstalled: %1": ""
+    "Plugin uninstalled: %1": "插件已卸载：%1"
   },
   "Plugin updated: %1": {
-    "Plugin updated: %1": ""
+    "Plugin updated: %1": "插件已更新：%1"
   },
   "Plugins": {
     "Plugins": "插件"
@@ -5256,7 +5256,7 @@
     "Popouts": "弹窗"
   },
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
-    "Popouts and Modals follow global Animation Speed (disable to customize independently)": "弹窗与模态遵守全局动画速度（禁用以创建自定义独立规则）"
+    "Popouts and Modals follow global Animation Speed (disable to customize independently)": "弹窗与模态框遵循全局动画速度（禁用则可单独自定义）"
   },
   "Popup Only": {
     "Popup Only": "仅弹窗"
@@ -5355,7 +5355,7 @@
     "Press Enter and the audio system will restart to apply the change": "按回车键，音频系统会重启以应用更改"
   },
   "Press Enter to paste, Shift+Enter to copy": {
-    "Press Enter to paste, Shift+Enter to copy": "按回车以粘贴，按Shift+回车以复制"
+    "Press Enter to paste, Shift+Enter to copy": "按下Enter粘贴，按下Shift+Enter复制"
   },
   "Press key...": {
     "Press key...": "按键..."
@@ -5370,7 +5370,7 @@
     "Preview": "预览"
   },
   "Primary": {
-    "Primary": "主题色"
+    "Primary": "主要"
   },
   "Primary Container": {
     "Primary Container": "首选容器"
@@ -5463,7 +5463,7 @@
     "Protocol": "协议"
   },
   "Qt colors applied successfully": {
-    "Qt colors applied successfully": ""
+    "Qt colors applied successfully": "Qt配色已成功应用"
   },
   "Qt: distance-field renderer.": {
     "Qt: distance-field renderer.": "Qt：距离场渲染器。"
@@ -5526,7 +5526,7 @@
     "Reboot": "重启"
   },
   "Recent": {
-    "Recent": ""
+    "Recent": "最近"
   },
   "Recent Colors": {
     "Recent Colors": "最近拾取的颜色"
@@ -5862,7 +5862,7 @@
     "Scroll song title": "滚动歌曲标题"
   },
   "Scroll title if it doesn't fit in widget": {
-    "Scroll title if it doesn't fit in widget": "如果在部件中标题不适配，则可以滚动标题"
+    "Scroll title if it doesn't fit in widget": "如果在部件不能容纳标题，则可以滚动标题"
   },
   "Scroll wheel behavior on media widget": {
     "Scroll wheel behavior on media widget": "媒体部件上的滚轮行为"
@@ -5910,10 +5910,10 @@
     "Search widgets...": "搜索部件..."
   },
   "Search...": {
-    "Search...": "搜索中..."
+    "Search...": "搜索..."
   },
   "Searching": {
-    "Searching": ""
+    "Searching": "搜索中..."
   },
   "Searching...": {
     "Searching...": "检索中..."
@@ -6090,13 +6090,13 @@
     "Set notification rules": "设置通知规则"
   },
   "Setting": {
-    "Setting": ""
+    "Setting": "设置"
   },
   "Settings": {
     "Settings": "设置"
   },
   "Settings Search": {
-    "Settings Search": ""
+    "Settings Search": "设置搜索"
   },
   "Settings are read-only. Changes will not persist.": {
     "Settings are read-only. Changes will not persist.": "设置处于只读状态。更改将不会保存。"
@@ -6117,13 +6117,13 @@
     "Shadow Override": "阴影覆盖"
   },
   "Shadow elevation on bars and panels": {
-    "Shadow elevation on bars and panels": "在状态栏与面板上的阴影提升"
+    "Shadow elevation on bars and panels": "在状态栏与面板上的阴影高程"
   },
   "Shadow elevation on modals and dialogs": {
-    "Shadow elevation on modals and dialogs": "在模态与对话框上的阴影提升"
+    "Shadow elevation on modals and dialogs": "在模态框与对话框上的阴影高程"
   },
   "Shadow elevation on popouts, OSDs, and dropdowns": {
-    "Shadow elevation on popouts, OSDs, and dropdowns": "在弹窗、OSD与下拉框上的阴影提升"
+    "Shadow elevation on popouts, OSDs, and dropdowns": "在弹窗、OSD与下拉框上的阴影高程"
   },
   "Shadows": {
     "Shadows": "阴影"
@@ -6150,10 +6150,10 @@
     "Shift+Del: Clear All • Esc: Close": "Shift+Del: 清空 • Esc: 关闭"
   },
   "Shift+Enter to copy": {
-    "Shift+Enter to copy": ""
+    "Shift+Enter to copy": "按下Shift+Enter复制"
   },
   "Shift+Enter to paste": {
-    "Shift+Enter to paste": "按Shift+Enter以粘贴"
+    "Shift+Enter to paste": "按下Shift+Enter粘贴"
   },
   "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
     "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Shift+回车：复制 • Shift+Del：全部清除 • Esc：关闭"
@@ -6351,7 +6351,7 @@
     "Show cava audio visualizer in media widget": "在多媒体部件中显示cava音频可视化"
   },
   "Show darkened overlay behind modal dialogs": {
-    "Show darkened overlay behind modal dialogs": "在对话框后显示暗色遮罩"
+    "Show darkened overlay behind modal dialogs": "在模态框后显示暗化遮罩"
   },
   "Show device": {
     "Show device": "显示设备"
@@ -6360,7 +6360,7 @@
     "Show dock when floating windows don't overlap its area": "当浮动窗口不覆盖其区域时显示程序坞"
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
-    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "在通知弹窗上显示下拉阴影。需要在主题与颜色中启用M3提升。"
+    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "在通知弹窗上显示下拉阴影。需要在主题与配色中启用M3高程。"
   },
   "Show during Niri overview": {
     "Show during Niri overview": "在Niri概览中显示"
@@ -6402,16 +6402,16 @@
     "Show on screens:": "选择显示的屏幕："
   },
   "Show on-screen display when brightness changes": {
-    "Show on-screen display when brightness changes": "当亮度改变时显示 OSD"
+    "Show on-screen display when brightness changes": "当亮度改变时显示OSD"
   },
   "Show on-screen display when caps lock state changes": {
-    "Show on-screen display when caps lock state changes": "当大小写状态变化时显示 OSD"
+    "Show on-screen display when caps lock state changes": "当大小写状态变化时显示OSD"
   },
   "Show on-screen display when cycling audio output devices": {
-    "Show on-screen display when cycling audio output devices": "当循环切换音频输出设备时显示 OSD"
+    "Show on-screen display when cycling audio output devices": "当循环切换音频输出设备时显示OSD"
   },
   "Show on-screen display when idle inhibitor state changes": {
-    "Show on-screen display when idle inhibitor state changes": "当空闲抑制状态改变时显示 OSD"
+    "Show on-screen display when idle inhibitor state changes": "当空闲抑制状态改变时显示OSD"
   },
   "Show on-screen display when media player status changes": {
     "Show on-screen display when media player status changes": "当媒体播放器状态改变时显示OSD"
@@ -6420,13 +6420,13 @@
     "Show on-screen display when media player volume changes": "当媒体音量改变时显示OSD"
   },
   "Show on-screen display when microphone is muted/unmuted": {
-    "Show on-screen display when microphone is muted/unmuted": "当麦克风静音状态切换时显示 OSD"
+    "Show on-screen display when microphone is muted/unmuted": "当麦克风静音状态切换时显示OSD"
   },
   "Show on-screen display when power profile changes": {
-    "Show on-screen display when power profile changes": "当电源配置改变时显示 OSD"
+    "Show on-screen display when power profile changes": "当电源配置改变时显示OSD"
   },
   "Show on-screen display when volume changes": {
-    "Show on-screen display when volume changes": "当音量变化时显示 OSD"
+    "Show on-screen display when volume changes": "当音量变化时显示OSD"
   },
   "Show seconds": {
     "Show seconds": "显示秒"
@@ -6609,7 +6609,7 @@
     "Stripes": "条纹"
   },
   "Style": {
-    "Style": ""
+    "Style": "风格"
   },
   "Summary": {
     "Summary": "概要"
@@ -6624,7 +6624,7 @@
     "Suppress notification popups while enabled": "启用时抑制通知弹出窗口"
   },
   "Surface": {
-    "Surface": "表面色"
+    "Surface": "表面"
   },
   "Surface Behavior": {
     "Surface Behavior": "表面行为"
@@ -6660,7 +6660,7 @@
     "Switch User": "切换用户"
   },
   "Switch between display configurations": {
-    "Switch between display configurations": ""
+    "Switch between display configurations": "切换显示配置"
   },
   "Switch to power profile": {
     "Switch to power profile": "切换至电源配置"
@@ -6669,10 +6669,10 @@
     "Sync": "同步"
   },
   "Sync Mode with Portal": {
-    "Sync Mode with Portal": "同步系统深色模式"
+    "Sync Mode with Portal": "同步系统颜色模式"
   },
   "Sync Popouts & Modals": {
-    "Sync Popouts & Modals": "同步弹窗与模态"
+    "Sync Popouts & Modals": "同步弹窗与模态框"
   },
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "在显示器间同步位置"
@@ -6783,7 +6783,7 @@
     "Terminal fallback opened. Complete sync there; it will close automatically when done.": "终端回退已打开。同步将在该处完成；完成后将自动关闭。"
   },
   "Terminal multiplexer backend to use": {
-    "Terminal multiplexer backend to use": "要使用的终端多路器后端"
+    "Terminal multiplexer backend to use": "要使用的终端复用器后端"
   },
   "Terminal opened. Complete authentication setup there; it will close automatically when done.": {
     "Terminal opened. Complete authentication setup there; it will close automatically when done.": "终端已打开。请在那里完成认证配置，结束时会自动关闭。"
@@ -6792,7 +6792,7 @@
     "Terminal opened. Complete sync authentication there; it will close automatically when done.": "终端已打开。请在终端完成同步身份验证；完成后将自动关闭。"
   },
   "Terminals - Always use Dark Theme": {
-    "Terminals - Always use Dark Theme": "终端总使用暗色主题"
+    "Terminals - Always use Dark Theme": "终端总使用深色主题"
   },
   "Test Connection": {
     "Test Connection": "测试连接"
@@ -6813,7 +6813,7 @@
     "Text Color": "文本颜色"
   },
   "Text Editor": {
-    "Text Editor": ""
+    "Text Editor": "文本编辑器"
   },
   "Text Rendering": {
     "Text Rendering": "文本渲染"
@@ -6972,7 +6972,7 @@
     "Today": "今日"
   },
   "Toggle fonts": {
-    "Toggle fonts": ""
+    "Toggle fonts": "切换字体"
   },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "显示/隐藏当前状态栏配置"
@@ -7098,7 +7098,7 @@
     "Type at least 2 characters": "至少键入两个字符"
   },
   "Type at least 2 characters to search files.": {
-    "Type at least 2 characters to search files.": ""
+    "Type at least 2 characters to search files.": "至少键入两个字符才能搜索文件。"
   },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": "键入此前缀以搜索快捷键绑定"
@@ -7209,7 +7209,7 @@
     "Unsaved note...": "未保存的便签..."
   },
   "Unset": {
-    "Unset": ""
+    "Unset": "取消设置"
   },
   "Until %1": {
     "Until %1": "直到%1"
@@ -7242,7 +7242,7 @@
     "Update Plugin": "更新插件"
   },
   "Update failed: %1": {
-    "Update failed: %1": ""
+    "Update failed: %1": "更新失败：%1"
   },
   "Upgrading...": {
     "Upgrading...": "正在更新……"
@@ -7452,7 +7452,7 @@
     "Video Path": "视频路径"
   },
   "Video Player": {
-    "Video Player": ""
+    "Video Player": "视频播放器"
   },
   "Video Screensaver": {
     "Video Screensaver": "动态屏保"
@@ -7464,7 +7464,7 @@
     "View Mode": "查看模式"
   },
   "Visibility": {
-    "Visibility": "能见度"
+    "Visibility": "可见性"
   },
   "Visual Effects": {
     "Visual Effects": "视觉效果"
@@ -7530,7 +7530,7 @@
     "Weather Widget": "天气部件"
   },
   "Web Browser": {
-    "Web Browser": ""
+    "Web Browser": "网络浏览器"
   },
   "Welcome": {
     "Welcome": "欢迎"
@@ -7545,7 +7545,7 @@
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "启用后，应用按字母顺序排序；禁用则按使用频率排序"
   },
   "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
-    "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": ""
+    "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": "启用时，在启动时检查更新；禁用时，仅在超出间隔或手动刷新时检查更新。"
   },
   "When locked": {
     "When locked": "何时锁定"
@@ -7839,10 +7839,10 @@
     "niri/dms Discord": "niri/dms Discord"
   },
   "niri: config reloaded": {
-    "niri: config reloaded": ""
+    "niri: config reloaded": "niri：配置已重载"
   },
   "niri: failed to load config": {
-    "niri: failed to load config": ""
+    "niri: failed to load config": "niri：配置加载失败"
   },
   "now": {
     "now": "现在"
