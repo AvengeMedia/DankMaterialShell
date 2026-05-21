@@ -541,7 +541,11 @@ Rectangle {
                     return -1;
                 if (b.ssid === ssid)
                     return 1;
-                return b.signal - a.signal;
+                const aBucket = Math.floor((a.signal || 0) / 25);
+                const bBucket = Math.floor((b.signal || 0) / 25);
+                if (aBucket !== bBucket)
+                    return bBucket - aBucket;
+                return (a.ssid || "").localeCompare(b.ssid || "");
             });
             return sorted;
         }
