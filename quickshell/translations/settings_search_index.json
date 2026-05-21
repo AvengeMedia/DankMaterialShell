@@ -939,7 +939,7 @@
       "topbar",
       "wayland"
     ],
-    "description": "Place this bar on the Wayland overlay layer"
+    "description": "Place the bar on the Wayland overlay layer"
   },
   {
     "section": "barVisibility",
@@ -967,7 +967,7 @@
       "wayland"
     ],
     "icon": "visibility_off",
-    "description": "Place this bar on the Wayland overlay layer"
+    "description": "Place the bar on the Wayland overlay layer"
   },
   {
     "section": "workspaceDragReorder",
@@ -2053,6 +2053,50 @@
     "icon": "extension"
   },
   {
+    "section": "launcherStyle",
+    "label": "Default Launcher",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "default",
+      "drawer",
+      "full",
+      "launcher",
+      "layer",
+      "menu",
+      "minimal",
+      "opening",
+      "overlay",
+      "spotlight",
+      "start",
+      "start menu",
+      "style"
+    ],
+    "icon": "search",
+    "description": "Use the overlay layer when opening the launcher"
+  },
+  {
+    "section": "launcherStyleSelector",
+    "label": "Default Opens",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "default",
+      "drawer",
+      "full",
+      "launcher",
+      "menu",
+      "minimal",
+      "opens",
+      "spotlight",
+      "start",
+      "style"
+    ]
+  },
+  {
     "section": "niriOverviewOverlayEnabled",
     "label": "Enable Overview Overlay",
     "tabIndex": 9,
@@ -2229,31 +2273,6 @@
     "icon": "apps"
   },
   {
-    "section": "launcherStyle",
-    "label": "Launcher Style",
-    "tabIndex": 9,
-    "category": "Launcher",
-    "keywords": [
-      "app drawer",
-      "app menu",
-      "applications",
-      "drawer",
-      "full",
-      "launcher",
-      "layer",
-      "menu",
-      "minimal",
-      "opening",
-      "overlay",
-      "spotlight",
-      "start",
-      "start menu",
-      "style"
-    ],
-    "icon": "search",
-    "description": "Use the overlay layer when opening the launcher"
-  },
-  {
     "section": "spotlightCloseNiriOverview",
     "label": "Niri Integration",
     "tabIndex": 9,
@@ -2395,6 +2414,40 @@
     "description": "Show mode tabs and keyboard hints at the bottom."
   },
   {
+    "section": "spotlightBarShowModeChips",
+    "label": "Show Mode Chips",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "addons",
+      "apps",
+      "bar",
+      "beside",
+      "chips",
+      "day",
+      "drawer",
+      "extensions",
+      "files",
+      "input",
+      "launcher",
+      "light mode",
+      "menu",
+      "mode",
+      "modes",
+      "panel",
+      "plugins",
+      "show",
+      "spotlight",
+      "start",
+      "statusbar",
+      "tabs",
+      "taskbar",
+      "topbar",
+      "widgets"
+    ],
+    "description": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input."
+  },
+  {
     "section": "launcherLogoSizeOffset",
     "label": "Size Offset",
     "tabIndex": 9,
@@ -2458,20 +2511,38 @@
     "description": "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency."
   },
   {
-    "section": "launcherStyleSelector",
-    "label": "Style",
+    "section": "spotlightBarLauncher",
+    "label": "Spotlight Bar",
     "tabIndex": 9,
     "category": "Launcher",
     "keywords": [
+      "addons",
+      "apps",
+      "bar",
+      "beside",
+      "chips",
+      "day",
       "drawer",
-      "full",
+      "extensions",
+      "files",
+      "input",
       "launcher",
+      "light mode",
       "menu",
-      "minimal",
+      "modes",
+      "panel",
+      "plugins",
+      "show",
       "spotlight",
       "start",
-      "style"
-    ]
+      "statusbar",
+      "tabs",
+      "taskbar",
+      "topbar",
+      "widgets"
+    ],
+    "icon": "search",
+    "description": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input."
   },
   {
     "section": "dankLauncherV2BorderThickness",

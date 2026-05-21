@@ -216,6 +216,7 @@ var SPEC = {
     dankLauncherV2IncludeFoldersInAll: { def: false },
     launcherUseOverlayLayer: { def: false },
     launcherStyle: { def: "full" },
+    spotlightBarShowModeChips: { def: false },
 
     useAutoLocation: { def: false },
     weatherEnabled: { def: true },

@@ -10,10 +10,11 @@ Rectangle {
 
     property var entry: null
     property string cachedImageData: ""
+    property string cachedMimeType: ""
     property var _requestedEntryId: null
 
     readonly property bool canLoadImage: !!entry?.isImage && (entry?.mimeType ?? "").startsWith("image/")
-    readonly property string sourceUrl: cachedImageData.length > 0 ? "data:" + (entry?.mimeType ?? "image/png") + ";base64," + cachedImageData : ""
+    readonly property string sourceUrl: resolvedSourceUrl(cachedImageData, cachedMimeType || (entry?.mimeType ?? ""))
 
     radius: Math.max(6, Theme.cornerRadius - 2)
     clip: true
@@ -24,8 +25,24 @@ Rectangle {
     onEntryChanged: reloadPreview()
     Component.onCompleted: reloadPreview()
 
+    function isImageMimeType(mimeType) {
+        return (mimeType || "").toString().toLowerCase().startsWith("image/");
+    }
+
+    function resolvedSourceUrl(data, mimeType) {
+        const rawData = (data || "").toString();
+        if (rawData.length === 0)
+            return "";
+        if (rawData.startsWith("data:"))
+            return rawData.startsWith("data:image/") ? rawData : "";
+        if (!isImageMimeType(mimeType))
+            return "";
+        return "data:" + mimeType + ";base64," + rawData;
+    }
+
     function reloadPreview() {
         cachedImageData = "";
+        cachedMimeType = "";
         if (!canLoadImage || !entry?.id) {
             _requestedEntryId = null;
             return;
@@ -40,9 +57,13 @@ Rectangle {
                 return;
             if (response.error)
                 return;
-            const data = response.result?.data ?? "";
-            if (data.length > 0)
-                cachedImageData = data;
+            const result = response.result ?? {};
+            const mimeType = (result.mimeType ?? entry?.mimeType ?? "").toString();
+            const data = (result.data ?? "").toString();
+            if (data.length === 0 || !resolvedSourceUrl(data, mimeType))
+                return;
+            cachedMimeType = mimeType;
+            cachedImageData = data;
         });
     }
 

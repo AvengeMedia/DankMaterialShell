@@ -9,6 +9,7 @@ import qs.Services
 Singleton {
     id: root
     readonly property var log: Log.scoped("AppSearchService")
+    property int refCount: 0
 
     property var applications: []
     property var _cachedCategories: null
@@ -297,11 +298,11 @@ Singleton {
     function getBuiltInLauncherItems(pluginId, query) {
         if (pluginId === "dms_clipboard_search") {
             const trimmed = (query || "").toString().trim();
-            const entries = ClipboardService.getCachedLauncherSearchEntries(trimmed, 20);
+            const entries = ClipboardService.internalEntries.length > 0 ? ClipboardService.getLauncherEntries(trimmed, 20, 0) : ClipboardService.getCachedLauncherSearchEntries(trimmed, 20);
             return entries.map(entry => ({
-                type: "clipboard",
-                data: entry
-            }));
+                        type: "clipboard",
+                        data: entry
+                    }));
         }
 
         if (pluginId !== "dms_settings_search")

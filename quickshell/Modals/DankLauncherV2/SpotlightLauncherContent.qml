@@ -24,11 +24,32 @@ FocusScope {
     readonly property real _resultsH: _hasQuery ? Math.min(_resultsContentH, _maxResultsH) : 0
     readonly property int _fastDuration: 90
     readonly property int _resizeDuration: 110
+    readonly property bool _blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
+    readonly property real _searchSurfaceAlpha: {
+        if (Theme.transparentBlurLayers)
+            return _hasQuery ? 0.34 : 0.28;
+        if (Theme.blurForegroundLayers)
+            return Math.max(Theme.popupTransparency, _hasQuery ? 0.68 : 0.74);
+        return _hasQuery ? Theme.popupTransparency : Math.max(0.68, Theme.popupTransparency * 0.9);
+    }
+    readonly property color _searchSurfaceColor: Theme.withAlpha(_hasQuery ? Theme.surfaceContainerHigh : Theme.surfaceContainer, _searchSurfaceAlpha)
+    readonly property color _searchWellColor: {
+        if (searchInput.activeFocus)
+            return Theme.withAlpha(Theme.primaryContainer, Theme.transparentBlurLayers ? 0.42 : 1.0);
+        if (Theme.transparentBlurLayers)
+            return Theme.ccPillInactiveBg;
+        return Theme.surfaceContainer;
+    }
 
-    implicitHeight: _searchAreaH + (_resultsH > 0 ? 1 + _resultsH : 0)
+    implicitHeight: _searchAreaH + _resultsH
 
     function resetScroll() {
         resultsList.resetScroll();
+    }
+
+    function closeTransientUi() {
+        contextMenu.hide();
+        root.enabled = true;
     }
 
     function _buildRows() {
@@ -121,13 +142,11 @@ FocusScope {
             }
             break;
         case Qt.Key_Tab:
-            if (_hasQuery)
-                _cycleCategory(false);
+            _cycleCategory(false);
             event.accepted = true;
             return;
         case Qt.Key_Backtab:
-            if (_hasQuery)
-                _cycleCategory(true);
+            _cycleCategory(true);
             event.accepted = true;
             return;
         case Qt.Key_Return:
@@ -192,6 +211,7 @@ FocusScope {
         id: searchController
         active: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
         viewModeContext: "spotlight"
+        forceLinearNavigation: true
 
         onItemExecuted: {
             root.parentModal?.hide();
@@ -207,6 +227,21 @@ FocusScope {
         searchField: searchInput
         parentHandler: root
         allowEditActions: false
+    }
+
+    Connections {
+        target: root.parentModal
+        ignoreUnknownSignals: true
+
+        function onSpotlightOpenChanged() {
+            if (!root.parentModal?.spotlightOpen)
+                root.closeTransientUi();
+        }
+
+        function onContentVisibleChanged() {
+            if (!root.parentModal?.contentVisible)
+                root.closeTransientUi();
+        }
     }
 
     Connections {
@@ -233,7 +268,7 @@ FocusScope {
             id: searchBarSurface
             anchors.fill: parent
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(root._hasQuery ? Theme.surfaceContainerHigh : Theme.surfaceContainer, root._hasQuery ? Theme.popupTransparency : Math.max(0.68, Theme.popupTransparency * 0.9))
+            color: root._searchSurfaceColor
 
             Behavior on color {
                 ColorAnimation {
@@ -250,7 +285,7 @@ FocusScope {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
-                color: searchInput.activeFocus ? Theme.primaryContainer : Theme.surfaceContainer
+                color: root._searchWellColor
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -269,8 +304,8 @@ FocusScope {
 
                 Row {
                     id: categoryRow
+                    visible: SettingsData.spotlightBarShowModeChips || root._hasQuery
                     spacing: Theme.spacingXS
-                    visible: root._hasQuery
                     anchors.verticalCenter: parent.verticalCenter
 
                     Repeater {
@@ -376,26 +411,9 @@ FocusScope {
         }
     }
 
-    Rectangle {
-        anchors.top: searchBarItem.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 1
-        color: Theme.outlineMedium
-        opacity: root._resultsH > 0 ? 0.55 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: root._fastDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-    }
-
     Item {
         id: resultsContainer
         anchors.top: searchBarItem.bottom
-        anchors.topMargin: 1
         anchors.left: parent.left
         anchors.right: parent.right
         clip: true

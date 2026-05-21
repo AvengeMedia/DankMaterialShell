@@ -64,6 +64,7 @@ FocusScope {
 
             sourceComponent: KeybindsTab {
                 parentModal: root.parentModal
+                requestedSearchQuery: root.parentModal?.keybindSearchQuery ?? ""
             }
 
             onActiveChanged: {

@@ -16,6 +16,7 @@ Item {
     property var parentModal: null
     property string selectedCategory: ""
     property string searchQuery: ""
+    property string requestedSearchQuery: ""
     property string expandedKey: ""
     property bool showingNewBind: false
 
@@ -206,13 +207,34 @@ Item {
         }
     }
 
-    Component.onCompleted: _ensureCurrentProvider()
+    function _applyRequestedSearch() {
+        if (!requestedSearchQuery)
+            return;
+        const query = requestedSearchQuery;
+        selectedCategory = "";
+        searchField.text = query;
+        searchQuery = query;
+        _updateFiltered();
+        if (parentModal?.keybindSearchQuery === query)
+            parentModal.keybindSearchQuery = "";
+        Qt.callLater(scrollToTop);
+    }
+
+    Component.onCompleted: {
+        _ensureCurrentProvider();
+        Qt.callLater(_applyRequestedSearch);
+    }
+
+    onRequestedSearchQueryChanged: Qt.callLater(_applyRequestedSearch)
 
     onVisibleChanged: {
         if (!visible)
             return;
-        Qt.callLater(scrollToTop);
         _ensureCurrentProvider();
+        Qt.callLater(() => {
+            _applyRequestedSearch();
+            scrollToTop();
+        });
     }
 
     DankFlickable {

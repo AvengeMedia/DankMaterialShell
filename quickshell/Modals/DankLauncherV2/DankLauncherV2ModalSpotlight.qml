@@ -47,9 +47,9 @@ Item {
         }
     }
 
-    readonly property int _openDuration: 80
-    readonly property int _closeDuration: 70
-    readonly property int _motionDuration: 90
+    readonly property int _openDuration: 50
+    readonly property int _closeDuration: 40
+    readonly property int _motionDuration: 60
 
     // Connected frame mode clamps the centered surface inside frame insets.
     readonly property bool frameConnected: CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
@@ -142,6 +142,7 @@ Item {
         if (!spotlightContent)
             return;
         contentVisible = true;
+        spotlightContent.closeTransientUi?.();
 
         const targetQuery = query || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
         const targetMode = mode || SessionData.launcherLastMode || "all";
@@ -202,6 +203,7 @@ Item {
     function hide() {
         if (!spotlightOpen)
             return;
+        spotlightContent?.closeTransientUi?.();
         openedFromOverview = false;
         isClosing = true;
         contentVisible = false;

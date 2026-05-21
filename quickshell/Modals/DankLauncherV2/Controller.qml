@@ -35,6 +35,7 @@ Item {
     property int gridColumns: SettingsData.appLauncherGridColumns
     property int viewModeVersion: 0
     property string viewModeContext: "spotlight"
+    property bool forceLinearNavigation: false
 
     signal itemExecuted
     signal searchCompleted
@@ -42,6 +43,10 @@ Item {
     signal queryChanged(string query)
     signal viewModeChanged(string sectionId, string mode)
     signal searchQueryRequested(string query)
+
+    Ref {
+        service: AppSearchService
+    }
 
     onActiveChanged: {
         if (!active) {
@@ -87,15 +92,23 @@ Item {
     Connections {
         target: ClipboardService
         function onLauncherSearchReady(query) {
-            if (!active || !clipboardSearchEnabledInAll())
+            if (!active)
                 return;
-            if (searchMode !== "all")
+
+            const clipboardBuiltInActive = activePluginId === "dms_clipboard_search";
+            if (!clipboardBuiltInActive && !clipboardSearchEnabledInAll())
                 return;
+            if (!clipboardBuiltInActive && searchMode !== "all")
+                return;
+
             const trimmed = (searchQuery || "").trim();
             if (trimmed.length < 2 && query.length > 0)
                 return;
-            if (query !== trimmed)
+            const triggerMatch = detectTrigger(trimmed);
+            const effectiveQuery = clipboardBuiltInActive && triggerMatch.pluginId === "dms_clipboard_search" ? triggerMatch.query : trimmed;
+            if (query !== effectiveQuery)
                 return;
+
             searchDebounce.restart();
         }
     }
@@ -1711,7 +1724,9 @@ Item {
     function selectNext() {
         keyboardNavigationActive = true;
         _cancelPendingSelectionReset();
-        var newIndex = Nav.calculateNextIndex(flatModel, selectedFlatIndex, null, null, gridColumns, getSectionViewMode);
+        var newIndex = forceLinearNavigation ? Nav.findNextNonHeaderIndex(flatModel, selectedFlatIndex + 1) : Nav.calculateNextIndex(flatModel, selectedFlatIndex, null, null, gridColumns, getSectionViewMode);
+        if (newIndex === -1)
+            newIndex = selectedFlatIndex;
         if (newIndex !== selectedFlatIndex) {
             selectedFlatIndex = newIndex;
             updateSelectedItem();
@@ -1721,7 +1736,9 @@ Item {
     function selectPrevious() {
         keyboardNavigationActive = true;
         _cancelPendingSelectionReset();
-        var newIndex = Nav.calculatePrevIndex(flatModel, selectedFlatIndex, null, null, gridColumns, getSectionViewMode);
+        var newIndex = forceLinearNavigation ? Nav.findPrevNonHeaderIndex(flatModel, selectedFlatIndex - 1) : Nav.calculatePrevIndex(flatModel, selectedFlatIndex, null, null, gridColumns, getSectionViewMode);
+        if (newIndex === -1)
+            newIndex = selectedFlatIndex;
         if (newIndex !== selectedFlatIndex) {
             selectedFlatIndex = newIndex;
             updateSelectedItem();

@@ -8,9 +8,9 @@ const ACTION_TYPES = [
 ];
 
 const DMS_ACTIONS = [
-    { id: "spawn dms ipc call spotlight toggle", label: "App Launcher: Toggle" },
-    { id: "spawn dms ipc call spotlight open", label: "App Launcher: Open" },
-    { id: "spawn dms ipc call spotlight close", label: "App Launcher: Close" },
+    { id: "spawn dms ipc call spotlight toggle", label: "Default Launcher: Toggle" },
+    { id: "spawn dms ipc call spotlight open", label: "Default Launcher: Open" },
+    { id: "spawn dms ipc call spotlight close", label: "Default Launcher: Close" },
     { id: "spawn dms ipc call spotlight-bar toggle", label: "Spotlight Bar: Toggle" },
     { id: "spawn dms ipc call spotlight-bar open", label: "Spotlight Bar: Open" },
     { id: "spawn dms ipc call spotlight-bar close", label: "Spotlight Bar: Close" },

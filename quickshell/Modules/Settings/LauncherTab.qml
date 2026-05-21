@@ -9,6 +9,37 @@ Item {
     id: root
 
     property var parentModal: null
+    readonly property string defaultLauncherAction: "spawn dms ipc call spotlight toggle"
+    readonly property string spotlightBarAction: "spawn dms ipc call spotlight-bar toggle"
+    readonly property int keybindDataVersion: KeybindsService._dataVersion
+    readonly property bool keybindsAvailable: KeybindsService.available
+    readonly property string defaultLauncherKeybindSearch: "spotlight toggle"
+    readonly property string spotlightBarKeybindSearch: "spotlight-bar"
+
+    function openKeybindsSearch(query) {
+        if (!root.parentModal)
+            return;
+        if (typeof root.parentModal.showKeybindsSearch === "function") {
+            root.parentModal.showKeybindsSearch(query);
+        } else {
+            root.parentModal.showWithTabName("keybinds");
+        }
+    }
+
+    function keysLabel(actionId) {
+        void (keybindDataVersion);
+        if (!keybindsAvailable)
+            return I18n.tr("Manual config");
+        const keys = KeybindsService.keysForAction(actionId);
+        if (!keys || keys.length === 0)
+            return I18n.tr("Not bound");
+        return keys.join(", ");
+    }
+
+    Component.onCompleted: {
+        if (KeybindsService.available)
+            KeybindsService.loadBinds(false);
+    }
 
     FileBrowserModal {
         id: logoFileBrowser
@@ -35,20 +66,20 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "search"
-                title: I18n.tr("Launcher Style")
+                title: I18n.tr("Default Launcher")
                 settingKey: "launcherStyle"
 
                 SettingsControlledByFrame {
                     visible: SettingsData.connectedFrameModeActive
                     parentModal: root.parentModal
-                    settingLabel: I18n.tr("Launcher Style")
-                    reason: I18n.tr("Managed by Frame Mode")
+                    settingLabel: I18n.tr("Default Launcher")
+                    reason: I18n.tr("Connected Frame Mode uses the connected launcher for default launcher shortcuts.")
                 }
 
                 StyledText {
                     width: parent.width
                     visible: !SettingsData.connectedFrameModeActive
-                    text: SettingsData.launcherStyle === "spotlight" ? I18n.tr("Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.") : I18n.tr("Full-featured launcher with mode tabs, grid view, and action panel.")
+                    text: SettingsData.launcherStyle === "spotlight" ? I18n.tr("Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.") : I18n.tr("Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap
@@ -57,14 +88,84 @@ Item {
                 SettingsButtonGroupRow {
                     visible: !SettingsData.connectedFrameModeActive
                     settingKey: "launcherStyleSelector"
-                    tags: ["launcher", "style", "spotlight", "full", "minimal"]
-                    text: I18n.tr("Style")
+                    tags: ["launcher", "style", "default", "spotlight", "full", "minimal"]
+                    text: I18n.tr("Default Opens")
                     model: [I18n.tr("Full"), I18n.tr("Spotlight")]
                     currentIndex: SettingsData.launcherStyle === "spotlight" ? 1 : 0
                     onSelectionChanged: (index, selected) => {
                         if (!selected)
                             return;
                         SettingsData.set("launcherStyle", index === 1 ? "spotlight" : "full");
+                    }
+                }
+
+                StyledRect {
+                    id: defaultShortcutCard
+                    width: parent.width
+                    height: defaultShortcutRow.implicitHeight + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: defaultShortcutMouse.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, 0.48) : Theme.withAlpha(Theme.surfaceContainer, 0.35)
+                    border.color: Theme.outlineMedium
+                    border.width: 1
+
+                    Row {
+                        id: defaultShortcutRow
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.rightMargin: Theme.spacingM
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "keyboard"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            width: Math.max(0, parent.width - Theme.iconSize - defaultShortcutValue.width - Theme.spacingM * 2)
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+
+                            StyledText {
+                                text: I18n.tr("Default Launcher Shortcut")
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+
+                            StyledText {
+                                text: !root.keybindsAvailable ? I18n.tr("Bind the spotlight IPC action in your compositor config.") : SettingsData.connectedFrameModeActive ? I18n.tr("Opens the connected launcher in Connected Frame Mode.") : I18n.tr("Follows the default launcher choice selected above.")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+
+                        StyledText {
+                            id: defaultShortcutValue
+                            text: root.keysLabel(root.defaultLauncherAction)
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Medium
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignRight
+                            width: Math.min(170, implicitWidth)
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    MouseArea {
+                        id: defaultShortcutMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.openKeybindsSearch(root.defaultLauncherKeybindSearch)
                     }
                 }
 
@@ -75,6 +176,100 @@ Item {
                     description: I18n.tr("Use the overlay layer when opening the launcher")
                     checked: SettingsData.launcherUseOverlayLayer
                     onToggled: checked => SettingsData.set("launcherUseOverlayLayer", checked)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "search"
+                title: I18n.tr("Spotlight Bar")
+                settingKey: "spotlightBarLauncher"
+
+                StyledText {
+                    width: parent.width
+                    text: I18n.tr("A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+
+                StyledRect {
+                    id: spotlightShortcutCard
+                    width: parent.width
+                    height: spotlightShortcutRow.implicitHeight + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: spotlightShortcutMouse.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, 0.48) : Theme.withAlpha(Theme.surfaceContainer, 0.35)
+                    border.color: Theme.outlineMedium
+                    border.width: 1
+
+                    Row {
+                        id: spotlightShortcutRow
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.rightMargin: Theme.spacingM
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "keyboard"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            width: Math.max(0, parent.width - Theme.iconSize - spotlightShortcutValue.width - Theme.spacingM * 2)
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+
+                            StyledText {
+                                text: I18n.tr("Spotlight Bar Shortcut")
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+
+                            StyledText {
+                                text: !root.keybindsAvailable ? I18n.tr("Bind the spotlight-bar IPC action in your compositor config.") : I18n.tr("Uses the spotlight-bar IPC action and always opens the minimal bar.")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+
+                        StyledText {
+                            id: spotlightShortcutValue
+                            text: root.keysLabel(root.spotlightBarAction)
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Medium
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignRight
+                            width: Math.min(170, implicitWidth)
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    MouseArea {
+                        id: spotlightShortcutMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.openKeybindsSearch(root.spotlightBarKeybindSearch)
+                    }
+                }
+
+                SettingsToggleRow {
+                    settingKey: "spotlightBarShowModeChips"
+                    tags: ["launcher", "spotlight", "bar", "chips", "tabs", "modes"]
+                    text: I18n.tr("Show Mode Chips")
+                    description: I18n.tr("Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.")
+                    checked: SettingsData.spotlightBarShowModeChips
+                    onToggled: checked => SettingsData.set("spotlightBarShowModeChips", checked)
                 }
             }
 

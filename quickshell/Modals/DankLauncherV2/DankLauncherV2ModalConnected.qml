@@ -388,6 +388,7 @@ Item {
         if (!spotlightContent)
             return;
         contentVisible = true;
+        spotlightContent.closeTransientUi?.();
         // NOTE: forceActiveFocus() is deliberately NOT called here.
         // It is deferred to after animation starts to avoid compositor IPC stalls.
 
@@ -480,6 +481,7 @@ Item {
     function hide() {
         if (!spotlightOpen)
             return;
+        spotlightContent?.closeTransientUi?.();
         openedFromOverview = false;
         isClosing = true;
         // For directional effects, defer contentVisible=false so content stays rendered during exit slide

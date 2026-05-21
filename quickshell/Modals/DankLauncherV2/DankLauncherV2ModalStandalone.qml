@@ -133,6 +133,7 @@ Item {
         if (!spotlightContent)
             return;
         contentVisible = true;
+        spotlightContent.closeTransientUi?.();
         spotlightContent.searchField.forceActiveFocus();
 
         var targetQuery = "";
@@ -211,6 +212,7 @@ Item {
     function hide() {
         if (!spotlightOpen)
             return;
+        spotlightContent?.closeTransientUi?.();
         openedFromOverview = false;
         isClosing = true;
         contentVisible = false;
@@ -368,7 +370,7 @@ Item {
         WindowBlur {
             targetWindow: launcherWindow
             readonly property real s: Math.min(1, modalContainer.publishedScale)
-            readonly property real op: Math.max(0, Math.min(1, (modalContainer.opacity - 0.06) * 2))
+            readonly property real op: Math.max(0, Math.min(1, (modalContainer.publishedOpacity - 0.06) * 2))
             blurX: modalContainer.x + modalContainer.width * (1 - s * op) * 0.5
             blurY: modalContainer.y + modalContainer.height * (1 - s * op) * 0.5
             blurWidth: contentVisible ? modalContainer.width * s * op : 0
@@ -447,6 +449,7 @@ Item {
 
             property bool _renderActive: contentVisible
             property real publishedScale: contentVisible ? 1 : 0.96
+            property real publishedOpacity: contentVisible ? 1 : 0
 
             opacity: contentVisible ? 1 : 0
             scale: contentVisible ? 1 : 0.96
@@ -471,6 +474,14 @@ Item {
             }
 
             Behavior on publishedScale {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
+                    duration: Theme.modalAnimationDuration
+                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                }
+            }
+
+            Behavior on publishedOpacity {
                 NumberAnimation {
                     easing.type: Easing.BezierSpline
                     duration: Theme.modalAnimationDuration

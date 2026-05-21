@@ -450,6 +450,7 @@ Singleton {
     property bool dankLauncherV2IncludeFoldersInAll: false
     property bool launcherUseOverlayLayer: false
     property string launcherStyle: "full"
+    property bool spotlightBarShowModeChips: false
 
     property string _legacyWeatherLocation: "New York, NY"
     property string _legacyWeatherCoordinates: "40.7128,-74.0060"

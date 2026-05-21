@@ -37,6 +37,7 @@ FloatingWindow {
     property bool isCompactMode: width < 700
     property bool menuVisible: !isCompactMode
     property bool enableAnimations: true
+    property string keybindSearchQuery: ""
 
     signal closingModal
 
@@ -71,6 +72,11 @@ FloatingWindow {
 
     function resolveTabIndex(tabName: string): int {
         return sidebar.resolveTabIndex(tabName);
+    }
+
+    function showKeybindsSearch(query: string) {
+        keybindSearchQuery = query || "";
+        showWithTabName("keybinds");
     }
 
     function toggleMenu() {
