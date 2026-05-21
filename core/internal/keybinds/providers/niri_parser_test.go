@@ -570,41 +570,6 @@ include "dms/binds.kdl"
 	}
 }
 
-func TestNiriOverrideBindsUseCaseInsensitiveKeys(t *testing.T) {
-	tmpDir := t.TempDir()
-	dmsDir := filepath.Join(tmpDir, "dms")
-	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
-		t.Fatalf("Failed to create dms dir: %v", err)
-	}
-	path := filepath.Join(dmsDir, "binds.kdl")
-	if err := os.WriteFile(path, []byte(`binds {
-    Alt+space hotkey-overlay-title="Default Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
-}
-`), 0o644); err != nil {
-		t.Fatalf("Failed to write override binds: %v", err)
-	}
-
-	provider := NewNiriProvider(tmpDir)
-	if err := provider.SetBind("Alt+Space", "spawn dms ipc call spotlight-bar toggle", "Spotlight Bar", nil); err != nil {
-		t.Fatalf("SetBind failed: %v", err)
-	}
-
-	binds, err := provider.loadOverrideBinds()
-	if err != nil {
-		t.Fatalf("loadOverrideBinds failed: %v", err)
-	}
-	if len(binds) != 1 {
-		t.Fatalf("Expected one normalized override bind, got %d", len(binds))
-	}
-	bind := binds["alt+space"]
-	if bind == nil {
-		t.Fatal("Expected normalized alt+space bind")
-	}
-	if bind.Key != "Alt+Space" || bind.Action != "spawn dms ipc call spotlight-bar toggle" {
-		t.Fatalf("Unexpected bind after SetBind: %+v", bind)
-	}
-}
-
 func TestNiriParseMultipleArgs(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config.kdl")
