@@ -39,7 +39,7 @@ BasePill {
         if (!selectedMount || !selectedMount.percent) {
             return 0;
         }
-        const percentStr = selectedMount.percent.replace("%", "");
+        const percentStr = selectedMount.percent.replace("%", "").trim();
         return parseFloat(percentStr) || 0;
     }
 
