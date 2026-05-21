@@ -252,6 +252,8 @@ var SPEC = {
     notepadUseMonospace: { def: true },
     notepadFontFamily: { def: "" },
     notepadFontSize: { def: 14 },
+    notificationSummaryFontSize: { def: 16 }, // Default summary font size
+    notificationBodyFontSize: { def: 15 }, // Default body font size
     notepadShowLineNumbers: { def: false },
     notepadTransparencyOverride: { def: -1 },
     notepadLastCustomTransparency: { def: 0.7 },

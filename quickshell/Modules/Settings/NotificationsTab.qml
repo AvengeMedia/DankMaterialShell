@@ -200,11 +200,33 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
+
             SettingsCard {
                 width: parent.width
                 iconName: "notifications"
                 title: I18n.tr("Notification Popups")
                 settingKey: "notificationPopups"
+
+                // Font size selectors for summary and body
+                SettingsDropdownRow {
+                    settingKey: "notificationSummaryFontSize"
+                    tags: ["notification", "font", "summary", "size"]
+                    text: I18n.tr("Summary Font Size")
+                    description: I18n.tr("Set the font size for notification summary text")
+                    options: ["13", "14", "15", "16", "17", "18", "19", "20"]
+                    currentValue: SettingsData.notificationSummaryFontSize.toString()
+                    onValueChanged: value => SettingsData.set("notificationSummaryFontSize", Number(value))
+                }
+
+                SettingsDropdownRow {
+                    settingKey: "notificationBodyFontSize"
+                    tags: ["notification", "font", "body", "size"]
+                    text: I18n.tr("Body Font Size")
+                    description: I18n.tr("Set the font size for notification body text (htmlBody)")
+                    options: ["12", "13", "14", "15", "16", "17", "18", "19", "20"]
+                    currentValue: SettingsData.notificationBodyFontSize.toString()
+                    onValueChanged: value => SettingsData.set("notificationBodyFontSize", Number(value))
+                }
 
                 SettingsDropdownRow {
                     settingKey: "notificationPopupPosition"

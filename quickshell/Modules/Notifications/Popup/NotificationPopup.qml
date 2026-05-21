@@ -895,10 +895,11 @@ PanelWindow {
                         }
                     }
 
+
                     StyledText {
                         text: notificationData ? (notificationData.summary || "") : ""
                         color: Theme.surfaceText
-                        font.pixelSize: Theme.fontSizeMedium
+                        font.pixelSize: SettingsData.notificationSummaryFontSize
                         font.weight: Font.Medium
                         width: parent.width
                         elide: Text.ElideRight
@@ -913,7 +914,7 @@ PanelWindow {
 
                         text: notificationData ? (notificationData.htmlBody || "") : ""
                         color: Theme.surfaceVariantText
-                        font.pixelSize: Theme.fontSizeSmall
+                        font.pixelSize: SettingsData.notificationBodyFontSize
                         width: parent.width
                         elide: descriptionExpanded ? Text.ElideNone : Text.ElideRight
                         horizontalAlignment: Text.AlignLeft

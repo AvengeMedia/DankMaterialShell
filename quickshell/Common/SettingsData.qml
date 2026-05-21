@@ -507,6 +507,8 @@ Singleton {
     property bool notepadUseMonospace: true
     property string notepadFontFamily: ""
     property real notepadFontSize: 14
+    property real notificationSummaryFontSize: Spec.SPEC.notificationSummaryFontSize.def
+    property real notificationBodyFontSize: Spec.SPEC.notificationBodyFontSize.def
     property bool notepadShowLineNumbers: false
     property real notepadTransparencyOverride: -1
     property real notepadLastCustomTransparency: 0.7
