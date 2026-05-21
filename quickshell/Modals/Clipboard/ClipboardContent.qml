@@ -108,6 +108,11 @@ Item {
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
 
+            add: null
+            remove: null
+            displaced: null
+            move: null
+
             function ensureVisible(index) {
                 if (index < 0 || index >= count) {
                     return;
