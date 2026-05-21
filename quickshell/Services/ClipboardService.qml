@@ -68,15 +68,17 @@ Singleton {
 
         clipboardEntries = filtered;
         unpinnedEntries = filtered.filter(e => !e.pinned);
+        pinnedEntries = filtered.filter(e => e.pinned);
         totalCount = clipboardEntries.length;
 
-        if (unpinnedEntries.length === 0) {
+        const activeCount = Math.max(unpinnedEntries.length, pinnedEntries.length);
+        if (activeCount === 0) {
             keyboardNavigationActive = false;
             selectedIndex = 0;
             return;
         }
-        if (selectedIndex >= unpinnedEntries.length) {
-            selectedIndex = unpinnedEntries.length - 1;
+        if (selectedIndex >= activeCount) {
+            selectedIndex = activeCount - 1;
         }
     }
 

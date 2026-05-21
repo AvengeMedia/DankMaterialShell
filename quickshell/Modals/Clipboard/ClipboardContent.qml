@@ -26,7 +26,8 @@ Item {
         ClipboardHeader {
             id: header
             width: parent.width
-            totalCount: modal.totalCount
+            recentsCount: modal.unpinnedEntries.length
+            savedCount: modal.pinnedEntries.length
             showKeyboardHints: modal.showKeyboardHints
             activeTab: modal.activeTab
             pinnedCount: modal.pinnedCount
@@ -171,6 +172,11 @@ Item {
             boundsMovement: Flickable.FollowBoundsBehavior
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
+
+            add: null
+            remove: null
+            displaced: null
+            move: null
 
             function ensureVisible(index) {
                 if (index < 0 || index >= count) {
