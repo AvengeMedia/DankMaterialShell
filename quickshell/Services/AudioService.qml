@@ -397,6 +397,14 @@ EOFCONFIG
         }
     }
 
+    Connections {
+        target: root.source?.audio ?? null
+
+        function onMutedChanged() {
+            root.micMuteChanged();
+        }
+    }
+
     function checkGsettings() {
         Proc.runCommand("checkGsettings", ["sh", "-c", "gsettings get org.gnome.desktop.sound theme-name 2>/dev/null"], (output, exitCode) => {
             gsettingsAvailable = (exitCode === 0);
@@ -844,6 +852,36 @@ EOFCONFIG
         return root.source.audio.muted ? "Microphone muted" : "Microphone unmuted";
     }
 
+    function incrementMicVolume(step) {
+        if (!root.source?.audio)
+            return "No audio source available";
+
+        if (root.source.audio.muted)
+            root.source.audio.muted = false;
+
+        const currentVolume = Math.round(root.source.audio.volume * 100);
+        const stepValue = parseInt(step || "5");
+        const newVolume = Math.max(0, Math.min(100, currentVolume + stepValue));
+
+        root.source.audio.volume = newVolume / 100;
+        return `Microphone volume increased to ${newVolume}%`;
+    }
+
+    function decrementMicVolume(step) {
+        if (!root.source?.audio)
+            return "No audio source available";
+
+        if (root.source.audio.muted)
+            root.source.audio.muted = false;
+
+        const currentVolume = Math.round(root.source.audio.volume * 100);
+        const stepValue = parseInt(step || "5");
+        const newVolume = Math.max(0, Math.min(100, currentVolume - stepValue));
+
+        root.source.audio.volume = newVolume / 100;
+        return `Microphone volume decreased to ${newVolume}%`;
+    }
+
     IpcHandler {
         target: "audio"
 
@@ -892,9 +930,7 @@ EOFCONFIG
         }
 
         function micmute(): string {
-            const result = root.toggleMicMute();
-            root.micMuteChanged();
-            return result;
+            return root.toggleMicMute();
         }
 
         function status(): string {
@@ -957,7 +993,6 @@ EOFCONFIG
             return `Switched to: ${result}`;
         }
     }
-
     Connections {
         target: SettingsData
         function onUseSystemSoundThemeChanged() {

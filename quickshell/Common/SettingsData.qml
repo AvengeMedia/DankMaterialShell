@@ -708,6 +708,7 @@ Singleton {
     property bool osdBrightnessEnabled: true
     property bool osdIdleInhibitorEnabled: true
     property bool osdMicMuteEnabled: true
+    property bool osdMicVolumeEnabled: true
     property bool osdCapsLockEnabled: true
     property bool osdPowerProfileEnabled: true
     property bool osdAudioOutputEnabled: true

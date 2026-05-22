@@ -66,7 +66,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call mpris increment 5", label: "Player Volume Up (5%)" },
     { id: "spawn dms ipc call mpris decrement 5", label: "Player Volume Down (5%)" },
     { id: "spawn dms ipc call audio mute", label: "Volume Mute Toggle" },
-    { id: "spawn dms ipc call audio micmute", label: "Microphone Mute Toggle" },
+    { id: "spawn dms ipc call mic mute", label: "Microphone Mute Toggle" },
     { id: "spawn dms ipc call audio cycleoutput", label: "Audio Output: Cycle" },
     { id: "spawn dms ipc call brightness increment 5 \"\"", label: "Brightness Up" },
     { id: "spawn dms ipc call brightness increment 1 \"\"", label: "Brightness Up (1%)" },
