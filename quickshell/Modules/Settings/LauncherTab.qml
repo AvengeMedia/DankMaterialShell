@@ -1122,6 +1122,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "rememberLastMode"
+                    tags: ["launcher", "remember", "last", "mode", "tab"]
+                    text: I18n.tr("Remember Last Mode")
+                    description: I18n.tr("Restore the last selected mode (tab) when the launcher is opened")
+                    checked: SettingsData.rememberLastMode
+                    onToggled: checked => SettingsData.set("rememberLastMode", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "rememberLastQuery"
                     tags: ["launcher", "remember", "last", "search", "query"]
                     text: I18n.tr("Remember Last Query")
