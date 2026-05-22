@@ -241,7 +241,7 @@ FocusScope {
     Connections {
         target: searchController
         function onModeChanged(mode, userInitiated) {
-            if (!userInitiated)
+            if (!userInitiated || !SettingsData.rememberLastMode)
                 return;
             SessionData.setLauncherLastMode(mode);
         }

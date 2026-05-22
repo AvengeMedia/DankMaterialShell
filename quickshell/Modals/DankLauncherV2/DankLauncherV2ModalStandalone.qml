@@ -148,7 +148,7 @@ Item {
             spotlightContent.searchField.text = targetQuery;
         }
         if (spotlightContent.controller) {
-            var targetMode = mode || SessionData.launcherLastMode || "all";
+            var targetMode = mode || SessionData.getLauncherRestoreMode();
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
@@ -261,7 +261,7 @@ Item {
         target: spotlightContent?.controller ?? null
 
         function onModeChanged(mode, userInitiated) {
-            if (!userInitiated)
+            if (!userInitiated || !SettingsData.rememberLastMode || (mode !== "all" && mode !== "apps"))
                 return;
             SessionData.setLauncherLastMode(mode);
         }
