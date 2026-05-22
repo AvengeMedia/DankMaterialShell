@@ -28,6 +28,20 @@ Singleton {
         });
         return isConnected;
     }
+    readonly property bool connecting: {
+        if (!adapter || !adapter.devices) {
+            return false;
+        }
+
+        let busy = false;
+        adapter.devices.values.forEach(dev => {
+            if (!dev)
+                return;
+            if (dev.pairing || dev.state === BluetoothDeviceState.Connecting)
+                busy = true;
+        });
+        return busy;
+    }
     readonly property var pairedDevices: {
         if (!adapter || !adapter.devices) {
             return [];

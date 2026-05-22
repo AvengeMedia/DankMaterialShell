@@ -97,7 +97,8 @@ sudo rpm -ivh x86_64/dms-greeter-*.rpm
 ```
 
 The package automatically:
-- Creates the greeter user
+
+- Creates the greeter user (via `systemd-sysusers` from `/usr/lib/sysusers.d/dms-greeter.conf` for atomic/immutable compatibility, with package script fallback)
 - Sets up directories and permissions
 - Configures greetd with auto-detected compositor
 - Applies SELinux contexts

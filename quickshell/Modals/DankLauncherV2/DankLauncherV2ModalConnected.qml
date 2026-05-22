@@ -396,12 +396,12 @@ Item {
             spotlightContent.searchField.text = query;
         }
         if (spotlightContent.controller) {
-            var targetMode = mode || SessionData.launcherLastMode || "all";
+            var targetMode = mode || SessionData.getLauncherRestoreMode();
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
             spotlightContent.controller.pluginFilter = "";
-            spotlightContent.controller.fileSearchType = "all";
+            spotlightContent.controller.fileSearchType = SessionData.launcherLastFileSearchType || "all";
             spotlightContent.controller.fileSearchExt = "";
             spotlightContent.controller.fileSearchFolder = "";
             spotlightContent.controller.fileSearchSort = "score";
@@ -539,8 +539,8 @@ Item {
 
     Connections {
         target: spotlightContent?.controller ?? null
-        function onModeChanged(mode) {
-            if (spotlightContent.controller.autoSwitchedToFiles)
+        function onModeChanged(mode, userInitiated) {
+            if (!userInitiated || !SettingsData.rememberLastMode)
                 return;
             SessionData.setLauncherLastMode(mode);
         }
@@ -928,8 +928,12 @@ Item {
                                 }
                             }
 
+                            Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
                             Keys.onEscapePressed: event => {
-                                root.hide();
+                                root.spotlightContent?.activeContextMenu?.handleKey(event);
+                                if (!event.accepted)
+                                    root.hide();
                                 event.accepted = true;
                             }
                         }

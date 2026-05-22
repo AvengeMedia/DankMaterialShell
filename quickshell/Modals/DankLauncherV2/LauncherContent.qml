@@ -17,6 +17,7 @@ FocusScope {
     property alias controller: controller
     property alias resultsList: resultsList
     property alias actionPanel: actionPanel
+    readonly property alias activeContextMenu: contextMenu
 
     property bool editMode: false
     property var editingApp: null
@@ -285,13 +286,6 @@ FocusScope {
         case Qt.Key_4:
             if (hasCtrl || hasAlt) {
                 controller.setMode("plugins");
-                return;
-            }
-            event.accepted = false;
-            return;
-        case Qt.Key_Slash:
-            if (event.modifiers === Qt.NoModifier && searchField.text.length === 0) {
-                controller.setMode("files", true);
                 return;
             }
             event.accepted = false;
