@@ -705,11 +705,11 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
-                    visible: CompositorService.isNiri
+                    visible: CompositorService.isNiri || CompositorService.isTriad
                 }
 
                 SettingsToggleRow {
-                    visible: CompositorService.isNiri
+                    visible: CompositorService.isNiri || CompositorService.isTriad
                     enabled: !SettingsData.frameEnabled
                     opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     text: I18n.tr("Show on Overview")
@@ -1122,7 +1122,7 @@ Item {
                 iconName: "fit_screen"
                 title: I18n.tr("Maximize Detection")
                 description: I18n.tr("Remove gaps and border when windows are maximized")
-                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland)
+                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland)
                 checked: selectedBarConfig?.maximizeDetection ?? true
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         maximizeDetection: checked
@@ -1658,7 +1658,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Y Axis")
-                    model: CompositorService.isNiri ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")] : [I18n.tr("None"), I18n.tr("Workspace")]
+                    model: (CompositorService.isNiri || CompositorService.isTriad) ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")] : [I18n.tr("None"), I18n.tr("Workspace")]
                     currentIndex: {
                         switch (selectedBarConfig?.scrollYBehavior || "workspace") {
                         case "none":
@@ -1694,7 +1694,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("X Axis")
-                    visible: CompositorService.isNiri
+                    visible: CompositorService.isNiri || CompositorService.isTriad
                     model: [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")]
                     currentIndex: {
                         switch (selectedBarConfig?.scrollXBehavior || "column") {

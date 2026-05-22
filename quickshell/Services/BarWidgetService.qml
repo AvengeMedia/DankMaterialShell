@@ -73,8 +73,8 @@ Singleton {
     function getFocusedScreenName() {
         if (CompositorService.isHyprland && Hyprland.focusedWorkspace?.monitor)
             return Hyprland.focusedWorkspace.monitor.name;
-        if (CompositorService.isNiri && NiriService.currentOutput)
-            return NiriService.currentOutput;
+        if (CompositorService.focusedOutputName)
+            return CompositorService.focusedOutputName;
         if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             return focusedWs?.monitor?.name || "";

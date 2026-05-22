@@ -314,6 +314,11 @@ Singleton {
                 return;
             }
 
+            if (CompositorService.isTriad) {
+                TriadService.quit();
+                return;
+            }
+
             if (CompositorService.isDwl) {
                 DwlService.quit();
                 return;

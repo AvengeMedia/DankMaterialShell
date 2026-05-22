@@ -70,7 +70,7 @@ Item {
                     text: I18n.tr("Intelligent Auto-hide")
                     description: I18n.tr("Show dock when floating windows don't overlap its area")
                     checked: SettingsData.dockSmartAutoHide
-                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isHyprland)
+                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland)
                     onToggled: checked => {
                         if (checked && SettingsData.dockAutoHide) {
                             SettingsData.set("dockAutoHide", false);
@@ -81,11 +81,11 @@ Item {
 
                 SettingsToggleRow {
                     settingKey: "dockOpenOnOverview"
-                    tags: ["dock", "overview", "niri"]
+                    tags: ["dock", "overview", "niri", "triad"]
                     text: I18n.tr("Show on Overview")
-                    description: I18n.tr("Always show the dock when niri's overview is open")
+                    description: I18n.tr("Always show the dock when the compositor overview is open")
                     checked: SettingsData.dockOpenOnOverview
-                    visible: CompositorService.isNiri
+                    visible: CompositorService.isNiri || CompositorService.isTriad
                     onToggled: checked => SettingsData.set("dockOpenOnOverview", checked)
                 }
 
@@ -280,6 +280,8 @@ Item {
                                     const modes = [I18n.tr("Apps Icon"), I18n.tr("OS Logo"), I18n.tr("Dank")];
                                     if (CompositorService.isNiri) {
                                         modes.push("niri");
+                                    } else if (CompositorService.isTriad) {
+                                        modes.push("Triad");
                                     } else if (CompositorService.isHyprland) {
                                         modes.push("Hyprland");
                                     } else if (CompositorService.isDwl) {

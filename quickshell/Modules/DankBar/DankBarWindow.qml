@@ -340,14 +340,14 @@ PanelWindow {
             hasMaximizedToplevel = false;
             return;
         }
-        if (!CompositorService.isHyprland && !CompositorService.isNiri) {
+        if (!CompositorService.isHyprland && !CompositorService.isNiri && !CompositorService.isTriad) {
             hasMaximizedToplevel = false;
             return;
         }
 
         const filtered = CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
         for (let i = 0; i < filtered.length; i++) {
-            if (filtered[i]?.maximized) {
+            if (filtered[i]?.maximized || filtered[i]?.triadMaximized) {
                 hasMaximizedToplevel = true;
                 return;
             }
@@ -364,7 +364,7 @@ PanelWindow {
             shouldHideForWindows = false;
             return;
         }
-        if (!CompositorService.isNiri && !CompositorService.isHyprland) {
+        if (!CompositorService.isNiri && !CompositorService.isTriad && !CompositorService.isHyprland) {
             shouldHideForWindows = false;
             return;
         }
@@ -421,6 +421,66 @@ PanelWindow {
                 case SettingsData.Position.Right:
                     const screenWidth = barWindow.screen?.width ?? 0;
                     if (tilePos[0] + winSize[0] > screenWidth - barThickness)
+                        hasFloatingTouchingBar = true;
+                    break;
+                }
+            }
+
+            shouldHideForWindows = hasTiled || hasFloatingTouchingBar;
+            return;
+        }
+
+        if (CompositorService.isTriad) {
+            let currentWorkspaceId = null;
+            for (let i = 0; i < TriadService.allWorkspaces.length; i++) {
+                const ws = TriadService.allWorkspaces[i];
+                if (ws.output === screenName && ws.is_active) {
+                    currentWorkspaceId = ws.id;
+                    break;
+                }
+            }
+
+            if (currentWorkspaceId === null) {
+                shouldHideForWindows = false;
+                return;
+            }
+
+            let hasTiled = false;
+            let hasFloatingTouchingBar = false;
+            const pos = barConfig?.position ?? 0;
+            const barThickness = barWindow.effectiveBarThickness + (barConfig?.spacing ?? 4);
+
+            for (let i = 0; i < TriadService.windows.length; i++) {
+                const win = TriadService.windows[i];
+                if (win.workspace_id !== currentWorkspaceId)
+                    continue;
+
+                if (!win.is_floating) {
+                    hasTiled = true;
+                    continue;
+                }
+
+                const geom = win.floating_geometry;
+                if (!geom)
+                    continue;
+
+                switch (pos) {
+                case SettingsData.Position.Top:
+                    if (geom.y < barThickness)
+                        hasFloatingTouchingBar = true;
+                    break;
+                case SettingsData.Position.Bottom:
+                    const screenHeight = barWindow.screen?.height ?? 0;
+                    if (geom.y + geom.height > screenHeight - barThickness)
+                        hasFloatingTouchingBar = true;
+                    break;
+                case SettingsData.Position.Left:
+                    if (geom.x < barThickness)
+                        hasFloatingTouchingBar = true;
+                    break;
+                case SettingsData.Position.Right:
+                    const screenWidth = barWindow.screen?.width ?? 0;
+                    if (geom.x + geom.width > screenWidth - barThickness)
                         hasFloatingTouchingBar = true;
                     break;
                 }
@@ -617,7 +677,7 @@ PanelWindow {
     }
 
     Connections {
-        target: NiriService
+        target: CompositorService.isNiri ? NiriService : CompositorService.isTriad ? TriadService : null
         function onAllWorkspacesChanged() {
             barWindow._updateHasMaximizedToplevel();
             barWindow._updateShouldHideForWindows();
@@ -652,7 +712,7 @@ PanelWindow {
 
         readonly property int barThickness: Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr)
 
-        readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
+        readonly property bool inOverviewWithShow: CompositorService.inOverview && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
         readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
 
@@ -833,18 +893,18 @@ PanelWindow {
         }
 
         property bool reveal: {
-            const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview;
+            const inOverviewWithShow = CompositorService.inOverview && barWindow.effectiveOpenOnOverview;
             if (inOverviewWithShow)
                 return true;
 
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
-            if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland)) {
+            if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland)) {
                 if (barWindow.shouldHideForWindows)
                     return topBarMouseArea.containsMouse || popoutPinsReveal || revealSticky || ipcReveal;
                 return true;
             }
 
-            if (CompositorService.isNiri && NiriService.inOverview)
+            if (CompositorService.inOverview)
                 return topBarMouseArea.containsMouse || popoutPinsReveal || revealSticky || ipcReveal;
 
             return (barConfig?.visible ?? true) && (!autoHide || topBarMouseArea.containsMouse || popoutPinsReveal || revealSticky || ipcReveal);
@@ -900,7 +960,7 @@ PanelWindow {
                 top: barWindow.isVertical ? parent.top : undefined
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
-            readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
+            readonly property bool inOverview: CompositorService.inOverview && barWindow.effectiveOpenOnOverview
             hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.popoutPinsReveal
             acceptedButtons: Qt.NoButton
             enabled: (barConfig?.autoHide ?? false) && !inOverview
@@ -981,12 +1041,19 @@ PanelWindow {
                                 topBarContent.switchWorkspace(direction);
                                 return true;
                             case "column":
-                                if (!CompositorService.isNiri)
+                                if (!CompositorService.isNiri && !CompositorService.isTriad)
                                     return false;
-                                if (direction > 0)
-                                    NiriService.moveColumnRight();
-                                else
-                                    NiriService.moveColumnLeft();
+                                if (direction > 0) {
+                                    if (CompositorService.isTriad)
+                                        TriadService.moveColumnRight();
+                                    else
+                                        NiriService.moveColumnRight();
+                                } else {
+                                    if (CompositorService.isTriad)
+                                        TriadService.moveColumnLeft();
+                                    else
+                                        NiriService.moveColumnLeft();
+                                }
                                 return true;
                             default:
                                 return false;
@@ -1007,7 +1074,7 @@ PanelWindow {
                             const yBehavior = barConfig?.scrollYBehavior ?? "workspace";
                             const reverse = SettingsData.reverseScrolling ? -1 : 1;
 
-                            if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
+                            if ((CompositorService.isNiri || CompositorService.isTriad) && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
                                 if (isTouchpadX) {
                                     touchpadAccumulatorX += deltaX;
                                     if (Math.abs(touchpadAccumulatorX) >= 500) {

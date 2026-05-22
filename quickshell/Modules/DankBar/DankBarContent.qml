@@ -161,6 +161,20 @@ Item {
             }
             const workspaces = NiriService.allWorkspaces.filter(ws => ws.output === screenName);
             return workspaces.length > 0 ? workspaces : fallbackWorkspaces;
+        } else if (CompositorService.isTriad) {
+            const fallbackWorkspaces = [
+                {
+                    "id": 1,
+                    "idx": 1,
+                    "name": ""
+                }
+            ];
+            if (!screenName || SettingsData.workspaceFollowFocus) {
+                const currentWorkspaces = TriadService.getCurrentOutputWorkspaces();
+                return currentWorkspaces.length > 0 ? currentWorkspaces : fallbackWorkspaces;
+            }
+            const workspaces = TriadService.allWorkspaces.filter(ws => ws.output === screenName);
+            return workspaces.length > 0 ? workspaces : fallbackWorkspaces;
         } else if (CompositorService.isHyprland) {
             const workspaces = Hyprland.workspaces?.values || [];
 
@@ -230,6 +244,12 @@ Item {
             }
             const activeWs = NiriService.allWorkspaces.find(ws => ws.output === screenName && ws.is_active);
             return activeWs ? activeWs.idx : 1;
+        } else if (CompositorService.isTriad) {
+            if (!screenName || SettingsData.workspaceFollowFocus) {
+                return TriadService.getCurrentWorkspaceNumber();
+            }
+            const activeWs = TriadService.allWorkspaces.find(ws => ws.output === screenName && ws.is_active);
+            return activeWs ? activeWs.idx : 1;
         } else if (CompositorService.isHyprland) {
             const monitors = Hyprland.monitors?.values || [];
             const currentMonitor = monitors.find(monitor => monitor.name === screenName);
@@ -272,6 +292,19 @@ Item {
                     return;
                 }
                 NiriService.switchToWorkspace(nextWorkspace.id);
+            }
+        } else if (CompositorService.isTriad) {
+            const currentWs = getCurrentWorkspace();
+            const currentIndex = realWorkspaces.findIndex(ws => ws && ws.idx === currentWs);
+            const validIndex = currentIndex === -1 ? 0 : currentIndex;
+            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
+
+            if (nextIndex !== validIndex) {
+                const nextWorkspace = realWorkspaces[nextIndex];
+                if (!nextWorkspace || nextWorkspace.id === undefined) {
+                    return;
+                }
+                TriadService.switchToWorkspace(nextWorkspace.id);
             }
         } else if (CompositorService.isHyprland) {
             const currentWs = getCurrentWorkspace();

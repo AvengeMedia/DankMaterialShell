@@ -229,6 +229,9 @@ Item {
             if (CompositorService.isNiri && NiriService.currentOutput) {
                 return NiriService.currentOutput;
             }
+            if (CompositorService.isTriad && TriadService.currentOutput) {
+                return TriadService.currentOutput;
+            }
             if ((CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) && I3.workspaces?.values) {
                 const focusedWs = I3.workspaces.values.find(ws => ws.focused === true);
                 return focusedWs?.monitor?.name || "";
@@ -1614,6 +1617,8 @@ Item {
 
     IpcHandler {
         function open(): string {
+            if (!CompositorService.isNiri)
+                return "WORKSPACE_RENAME_NIRI_ONLY";
             root.workspaceRenameModalLoader.active = true;
             if (root.workspaceRenameModalLoader.item) {
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
@@ -1632,6 +1637,8 @@ Item {
         }
 
         function toggle(): string {
+            if (!CompositorService.isNiri)
+                return "WORKSPACE_RENAME_NIRI_ONLY";
             root.workspaceRenameModalLoader.active = true;
             if (root.workspaceRenameModalLoader.item) {
                 if (root.workspaceRenameModalLoader.item.visible) {

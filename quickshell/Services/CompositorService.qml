@@ -40,6 +40,16 @@ Singleton {
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
     property bool useNiriSorting: isNiri && NiriService
     property bool useTriadSorting: isTriad && TriadService
+    readonly property string focusedOutputName: {
+        if (isNiri && NiriService.currentOutput)
+            return NiriService.currentOutput;
+        if (isTriad && TriadService.currentOutput)
+            return TriadService.currentOutput;
+        if (isDwl && DwlService.activeOutput)
+            return DwlService.activeOutput;
+        return "";
+    }
+    readonly property bool inOverview: (isNiri && NiriService.inOverview) || (isTriad && TriadService.inOverview)
 
     property var randrScales: ({})
     property bool randrReady: false
@@ -541,7 +551,7 @@ Singleton {
 
             const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
             for (let i = 0; i < filtered.length; i++) {
-                if (filtered[i]?.fullscreen)
+                if (filtered[i]?.fullscreen || filtered[i]?.triadFullscreen)
                     return true;
             }
             return false;

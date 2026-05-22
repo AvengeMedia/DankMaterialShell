@@ -55,7 +55,7 @@ BasePill {
             }
 
             IconImage {
-                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
+                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
                 anchors.centerIn: parent
                 width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
@@ -64,6 +64,8 @@ BasePill {
                 source: {
                     if (CompositorService.isNiri) {
                         return "file://" + Theme.shellDir + "/assets/niri.svg";
+                    } else if (CompositorService.isTriad) {
+                        return "file://" + Theme.shellDir + "/assets/danklogo.svg";
                     } else if (CompositorService.isHyprland) {
                         return "file://" + Theme.shellDir + "/assets/hyprland.svg";
                     } else if (CompositorService.isDwl) {
@@ -116,6 +118,8 @@ BasePill {
     onRightClicked: {
         if (CompositorService.isNiri) {
             NiriService.toggleOverview();
+        } else if (CompositorService.isTriad) {
+            TriadService.toggleOverview();
         } else if (root.hyprlandOverviewLoader?.item) {
             root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
         }

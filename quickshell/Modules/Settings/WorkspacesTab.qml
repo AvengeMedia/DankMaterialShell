@@ -59,7 +59,7 @@ Item {
                     text: I18n.tr("Show Workspace Apps")
                     description: I18n.tr("Display application icons in workspace indicators")
                     checked: SettingsData.showWorkspaceApps
-                    visible: CompositorService.isNiri || CompositorService.isHyprland
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland
                     onToggled: checked => SettingsData.set("showWorkspaceApps", checked)
                 }
 
@@ -141,7 +141,7 @@ Item {
                     text: I18n.tr("Follow Monitor Focus")
                     description: I18n.tr("Show workspaces of the currently focused monitor")
                     checked: SettingsData.workspaceFollowFocus
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
                     onToggled: checked => SettingsData.set("workspaceFollowFocus", checked)
                 }
 
@@ -151,7 +151,7 @@ Item {
                     text: I18n.tr("Show Occupied Workspaces Only")
                     description: I18n.tr("Display only workspaces that contain windows")
                     checked: SettingsData.showOccupiedWorkspacesOnly
-                    visible: CompositorService.isNiri || CompositorService.isHyprland
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland
                     onToggled: checked => SettingsData.set("showOccupiedWorkspacesOnly", checked)
                 }
 
@@ -161,7 +161,7 @@ Item {
                     text: I18n.tr("Reverse Scrolling Direction")
                     description: I18n.tr("Reverse workspace switch direction when scrolling over the bar")
                     checked: SettingsData.reverseScrolling
-                    visible: CompositorService.isNiri || CompositorService.isHyprland
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland
                     onToggled: checked => SettingsData.set("reverseScrolling", checked)
                 }
 
@@ -233,7 +233,7 @@ Item {
                 SettingsButtonGroupRow {
                     text: I18n.tr("Occupied Color")
                     model: ["none", "sec", "s", "sc", "sch", "schh"]
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland || CompositorService.isDwl
                     buttonHeight: 22
                     minButtonWidth: 36
                     buttonPadding: Theme.spacingS
@@ -269,7 +269,7 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland || CompositorService.isDwl
                 }
 
                 SettingsButtonGroupRow {
@@ -306,12 +306,12 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
                 }
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Urgent Color")
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+                    visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
                     model: ["err", "pri", "sec", "s", "sc"]
                     buttonHeight: 22
                     minButtonWidth: 36

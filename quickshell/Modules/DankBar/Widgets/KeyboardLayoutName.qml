@@ -111,6 +111,8 @@ BasePill {
     property string currentLayout: {
         if (CompositorService.isNiri) {
             return NiriService.getCurrentKeyboardLayoutName();
+        } else if (CompositorService.isTriad) {
+            return TriadService.getCurrentKeyboardLayoutName();
         } else if (CompositorService.isDwl) {
             return DwlService.currentKeyboardLayout;
         }
@@ -195,6 +197,8 @@ BasePill {
         onClicked: {
             if (CompositorService.isNiri) {
                 NiriService.cycleKeyboardLayout();
+            } else if (CompositorService.isTriad) {
+                TriadService.cycleKeyboardLayout();
             } else if (CompositorService.isHyprland) {
                 Quickshell.execDetached(["hyprctl", "switchxkblayout", root.hyprlandKeyboard, "next"]);
             } else if (CompositorService.isDwl) {

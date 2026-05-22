@@ -136,6 +136,14 @@ Singleton {
         return action("toggle-overview");
     }
 
+    function moveColumnLeft() {
+        return action("move-column-left");
+    }
+
+    function moveColumnRight() {
+        return action("move-column-right");
+    }
+
     function powerOffMonitors() {
         return action("power-off-monitors");
     }
@@ -146,6 +154,19 @@ Singleton {
 
     function cycleKeyboardLayout() {
         return action("switch-keyboard-layout", {"layout": "next"});
+    }
+
+    function getCurrentKeyboardLayoutName() {
+        if (!keyboardLayoutNames || keyboardLayoutNames.length === 0)
+            return "";
+        const idx = currentKeyboardLayoutIndex;
+        if (idx >= 0 && idx < keyboardLayoutNames.length)
+            return keyboardLayoutNames[idx];
+        return keyboardLayoutNames[0] || "";
+    }
+
+    function quit() {
+        return action("exit-session");
     }
 
     function applyState(state) {
@@ -270,8 +291,10 @@ Singleton {
             "is_focused": windowData.is_focused === true,
             "activated": windowData.is_focused === true,
             "is_floating": windowData.is_floating === true,
+            "is_maximized": windowData.is_maximized === true,
             "is_fullscreen": windowData.is_fullscreen === true,
             "fullscreen": windowData.is_fullscreen === true,
+            "floating_geometry": windowData.floating_geometry || null,
             "is_urgent": false
         };
     }
@@ -338,6 +361,7 @@ Singleton {
                 toplevel.triadOutput = win.output;
                 toplevel.triadFocused = win.is_focused;
                 toplevel.triadFullscreen = win.is_fullscreen;
+                toplevel.triadMaximized = win.is_maximized;
             }
             enriched.push(toplevel);
         }

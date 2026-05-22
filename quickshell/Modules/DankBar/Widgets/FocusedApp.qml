@@ -58,6 +58,9 @@ BasePill {
                 if (CompositorService.isNiri) {
                     if (NiriService.currentOutput === (parentScreen?.name ?? ""))
                         activeWindow = null;
+                } else if (CompositorService.isTriad) {
+                    if (TriadService.currentOutput === (parentScreen?.name ?? ""))
+                        activeWindow = null;
                 } else {
                     const alive = ToplevelManager.toplevels?.values;
                     if (alive && !Array.from(alive).some(t => t === activeWindow))
@@ -84,7 +87,7 @@ BasePill {
     Connections {
         target: ToplevelManager
         function onActiveToplevelChanged() {
-            if (!CompositorService.isNiri)
+            if (!CompositorService.isNiri && !CompositorService.isTriad)
                 root.updateActiveWindow();
         }
     }
@@ -97,7 +100,7 @@ BasePill {
     }
 
     Connections {
-        target: CompositorService.isNiri ? NiriService : null
+        target: CompositorService.isNiri ? NiriService : CompositorService.isTriad ? TriadService : null
         function onWindowsChanged() {
             root.updateActiveWindow();
         }
@@ -145,6 +148,18 @@ BasePill {
             if (!focusedWin)
                 return false;
             const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id));
+            return screenWsIds.has(focusedWin.workspace_id);
+        }
+
+        if (CompositorService.isTriad) {
+            if (!activeWindow || !(activeWindow.title || activeWindow.appId))
+                return false;
+            if (TriadService.currentOutput !== (parentScreen?.name ?? ""))
+                return true;
+            const focusedWin = TriadService.windows.find(w => w.is_focused);
+            if (!focusedWin)
+                return false;
+            const screenWsIds = new Set(TriadService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id));
             return screenWsIds.has(focusedWin.workspace_id);
         }
 

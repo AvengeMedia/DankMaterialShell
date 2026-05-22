@@ -227,7 +227,7 @@ Variants {
         readonly property bool shouldHideForWindows: {
             if (!SettingsData.dockSmartAutoHide)
                 return false;
-            if (!CompositorService.isNiri && !CompositorService.isHyprland)
+            if (!CompositorService.isNiri && !CompositorService.isTriad && !CompositorService.isHyprland)
                 return false;
 
             const screenName = dock.modelData?.name ?? "";
@@ -291,6 +291,54 @@ Variants {
                 return false;
             }
 
+            if (CompositorService.isTriad) {
+                TriadService.windows;
+
+                let currentWorkspaceId = null;
+                for (let i = 0; i < TriadService.allWorkspaces.length; i++) {
+                    const ws = TriadService.allWorkspaces[i];
+                    if (ws.output === screenName && ws.is_active) {
+                        currentWorkspaceId = ws.id;
+                        break;
+                    }
+                }
+
+                if (currentWorkspaceId === null)
+                    return false;
+
+                for (let i = 0; i < TriadService.windows.length; i++) {
+                    const win = TriadService.windows[i];
+                    if (win.workspace_id !== currentWorkspaceId)
+                        continue;
+
+                    const geom = win.floating_geometry;
+                    if (geom) {
+                        switch (SettingsData.dockPosition) {
+                        case SettingsData.Position.Top:
+                            if (geom.y < dockThickness)
+                                return true;
+                            break;
+                        case SettingsData.Position.Bottom:
+                            if (geom.y + geom.height > screenHeight - dockThickness)
+                                return true;
+                            break;
+                        case SettingsData.Position.Left:
+                            if (geom.x < dockThickness)
+                                return true;
+                            break;
+                        case SettingsData.Position.Right:
+                            if (geom.x + geom.width > screenWidth - dockThickness)
+                                return true;
+                            break;
+                        }
+                    } else if (!win.is_floating) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             // Hyprland implementation (current workspace + visible special workspaces)
             Hyprland.focusedWorkspace;
             Hyprland.toplevels;
@@ -315,7 +363,7 @@ Variants {
             if (_modalRetractActive)
                 return false;
 
-            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview) {
+            if (CompositorService.inOverview && SettingsData.dockOpenOnOverview) {
                 return true;
             }
 
@@ -369,7 +417,7 @@ Variants {
 
         screen: modelData
         visible: {
-            if (CompositorService.isNiri && NiriService.inOverview) {
+            if (CompositorService.inOverview) {
                 return SettingsData.dockOpenOnOverview;
             }
             return SettingsData.showDock;

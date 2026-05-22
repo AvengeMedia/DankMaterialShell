@@ -25,7 +25,7 @@ Item {
     readonly property bool showOnOverlay: instanceData?.config?.showOnOverlay ?? false
     readonly property bool showOnOverview: instanceData?.config?.showOnOverview ?? false
     readonly property bool showOnOverviewOnly: instanceData?.config?.showOnOverviewOnly ?? false
-    readonly property bool overviewActive: CompositorService.isNiri && NiriService.inOverview
+    readonly property bool overviewActive: CompositorService.inOverview
     readonly property bool clickThrough: instanceData?.config?.clickThrough ?? false
     readonly property bool syncPositionAcrossScreens: instanceData?.config?.syncPositionAcrossScreens ?? false
 
