@@ -21,7 +21,7 @@ Singleton {
         running: true
         onTriggered: {
             root.suppressSound = false;
-            DisplayService.syncRefreshRates(root.isPluggedIn, "startup");
+            DisplayService.requestSync("startup");
         }
     }
 
@@ -86,7 +86,7 @@ Singleton {
             }
         }
 
-        DisplayService.syncRefreshRates(root.isPluggedIn, "power-change");
+        DisplayService.requestSync("power-change");
 
         previousPluggedState = isPluggedIn;
     }
@@ -94,29 +94,29 @@ Singleton {
     Connections {
         target: SettingsData
         function onLowerDisplayRefreshRateOnBatteryChanged() {
-            DisplayService.syncRefreshRates(root.isPluggedIn, "setting-change");
+            DisplayService.requestSync("setting-change");
         }
 
         function onActiveDisplayProfileChanged() {
-            DisplayService.syncRefreshRates(root.isPluggedIn, "profile-change");
+            DisplayService.requestSync("profile-change");
         }
 
         function onActiveDisplayProfileModesChanged() {
-            DisplayService.syncRefreshRates(root.isPluggedIn, "profile-change");
+            DisplayService.requestSync("profile-change");
         }
     }
 
     Connections {
         target: NiriService
         function onOutputsChanged() {
-            DisplayService.syncRefreshRates(root.isPluggedIn, "output-change");
+            DisplayService.requestSync("output-change");
         }
     }
 
     Connections {
         target: WlrOutputService
         function onStateChanged() {
-            DisplayService.syncRefreshRates(root.isPluggedIn, "output-change");
+            DisplayService.requestSync("output-change");
         }
     }
 
