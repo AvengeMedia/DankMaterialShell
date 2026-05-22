@@ -30,7 +30,7 @@ Singleton {
         id: cavaProcess
 
         running: root.cavaAvailable && root.refCount > 0
-        command: ["sh", "-c", `cat <<'CAVACONF' | cava -p /dev/stdin
+        command: ["sh", "-c", `cat <<'CAVACONF' > /tmp/dms-cava.conf
 [general]
 framerate=25
 bars=6
@@ -52,7 +52,8 @@ integral=90
 gravity=95
 ignore=2
 monstercat=1.5
-CAVACONF`]
+CAVACONF
+exec cava -p /tmp/dms-cava.conf < /dev/null`]
 
         onRunningChanged: {
             if (!running) {
