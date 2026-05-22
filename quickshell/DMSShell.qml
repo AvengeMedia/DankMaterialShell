@@ -63,15 +63,27 @@ Item {
         }
     }
 
+    property bool wallpaperSurfacesLoaded: true
+
     Loader {
         id: blurredWallpaperBackgroundLoader
-        active: SettingsData.blurredWallpaperLayer && CompositorService.isNiri
+        active: root.wallpaperSurfacesLoaded && SettingsData.blurredWallpaperLayer && CompositorService.isNiri
         asynchronous: false
 
         sourceComponent: BlurredWallpaperBackground {}
     }
 
-    WallpaperBackground {}
+    DeferredAction {
+        id: wallpaperSurfaceReloadAction
+        onTriggered: root.wallpaperSurfacesLoaded = true
+    }
+
+    Loader {
+        id: wallpaperBackgroundLoader
+        active: root.wallpaperSurfacesLoaded
+        asynchronous: false
+        sourceComponent: WallpaperBackground {}
+    }
 
     DesktopWidgetLayer {}
 
@@ -168,6 +180,8 @@ Item {
     property bool barSurfacesLoaded: true
 
     function recreateBarSurfaces() {
+        log.info("Recreating bar surfaces, screens:", Quickshell.screens.length,
+                 Quickshell.screens.map(s => s.name).join(","));
         if (barSurfacesLoaded)
             barSurfacesLoaded = false;
         barSurfaceReloadAction.schedule();
@@ -217,7 +231,18 @@ Item {
         }
     }
 
-    Frame {}
+    property bool frameSurfacesLoaded: true
+
+    Loader {
+        active: root.frameSurfacesLoaded
+        asynchronous: false
+        sourceComponent: Frame {}
+    }
+
+    DeferredAction {
+        id: frameSurfaceReloadAction
+        onTriggered: root.frameSurfacesLoaded = true
+    }
 
     Repeater {
         id: dankBarRepeater
@@ -299,6 +324,81 @@ Item {
         interval: 120
         repeat: false
         onTriggered: root.osdSurfacesLoaded = true
+    }
+
+    property bool hadRealScreen: true
+
+    function _hasRealScreen() {
+        for (let i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name.length > 0)
+                return true;
+        }
+        return false;
+    }
+
+    function triggerSurfaceRecovery(source) {
+        log.info("Surface recovery triggered by:", source,
+                 "screens:", Quickshell.screens.length,
+                 Quickshell.screens.map(s => s.name).join(","),
+                 "barLoaded:", root.barSurfacesLoaded,
+                 "frameLoaded:", root.frameSurfacesLoaded,
+                 "dockEnabled:", root.dockEnabled);
+        surfaceResumeRecoveryTimer.pass = 0;
+        surfaceResumeRecoveryTimer.interval = 800;
+        surfaceResumeRecoveryTimer.restart();
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            const hasReal = root._hasRealScreen();
+            log.info("Screens changed:", Quickshell.screens.length,
+                     Quickshell.screens.map(s => "'" + s.name + "'").join(","),
+                     "hasReal:", hasReal, "hadReal:", root.hadRealScreen);
+            if (!root.hadRealScreen && hasReal) {
+                log.info("Real screen reappeared after placeholder state, triggering surface recovery");
+                root.triggerSurfaceRecovery("screen-reconnect");
+            }
+            root.hadRealScreen = hasReal;
+        }
+    }
+
+    Timer {
+        id: surfaceResumeRecoveryTimer
+        interval: 800
+        repeat: false
+        property int pass: 0
+        onTriggered: {
+            pass++;
+            log.info("Surface recovery pass", pass,
+                     "screens:", Quickshell.screens.length,
+                     Quickshell.screens.map(s => s.name).join(","));
+
+            root.recreateBarSurfaces();
+
+            if (root.frameSurfacesLoaded) {
+                root.frameSurfacesLoaded = false;
+                frameSurfaceReloadAction.schedule();
+            }
+
+            if (root.wallpaperSurfacesLoaded) {
+                root.wallpaperSurfacesLoaded = false;
+                wallpaperSurfaceReloadAction.schedule();
+            }
+
+            root.dockEnabled = false;
+            Qt.callLater(() => {
+                root.dockEnabled = true;
+            });
+
+            if (pass < 2) {
+                interval = 2000;
+                restart();
+            } else {
+                pass = 0;
+                interval = 800;
+            }
+        }
     }
 
     Component.onCompleted: {
@@ -887,9 +987,17 @@ Item {
         target: SessionService
 
         function onSessionResumed() {
+            log.info("Session resumed: screens:", Quickshell.screens.length,
+                     Quickshell.screens.map(s => s.name).join(","),
+                     "barLoaded:", root.barSurfacesLoaded,
+                     "frameLoaded:", root.frameSurfacesLoaded,
+                     "dockEnabled:", root.dockEnabled);
+
             root.pendingOsdResumeReloads = 2;
             osdResumeRecreateTimer.interval = 400;
             osdResumeRecreateTimer.restart();
+
+            root.triggerSurfaceRecovery("sessionResumed");
         }
     }
 

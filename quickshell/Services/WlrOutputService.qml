@@ -345,4 +345,13 @@ Singleton {
             return 0;
         }
     }
+
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            log.info("Session resumed, re-requesting output state, current outputs:", outputs.length);
+            requestState();
+        }
+    }
 }
