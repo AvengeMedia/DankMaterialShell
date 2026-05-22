@@ -20,6 +20,7 @@ Scope {
     property string fprintState
     property string u2fState
     property bool u2fPending: false
+    property string u2fPendingMode
     property string buffer
 
     signal flashMsg
@@ -35,6 +36,7 @@ Scope {
         passwdActiveTimeout.running = false;
         unlockRequestTimeout.running = false;
         root.u2fPending = false;
+        root.u2fPendingMode = "";
         root.u2fState = "";
         root.unlockInProgress = false;
     }
@@ -58,6 +60,7 @@ Scope {
             u2fErrorRetry.running = false;
             u2fPendingTimeout.running = false;
             root.u2fPending = false;
+            root.u2fPendingMode = "";
             root.u2fState = "";
             unlockRequestTimeout.restart();
             unlockRequested();
@@ -79,6 +82,7 @@ Scope {
         u2fErrorRetry.running = false;
         u2fPendingTimeout.running = false;
         root.u2fPending = false;
+        root.u2fPendingMode = "";
         root.u2fState = "";
         fprint.checkAvail();
     }
@@ -142,6 +146,7 @@ Scope {
             unlockRequestTimeout.running = false;
             root.unlockInProgress = false;
             root.u2fPending = false;
+            root.u2fPendingMode = "";
             root.u2fState = "";
             u2fPendingTimeout.running = false;
             u2f.abort();
@@ -243,9 +248,8 @@ Scope {
                 return;
             }
 
-            if (SettingsData.u2fMode === "or") {
-                start();
-            }
+            if (SettingsData.u2fMode === "or")
+                abort();
         }
 
         function startForSecondFactor(): void {
@@ -255,6 +259,18 @@ Scope {
             }
             abort();
             root.u2fPending = true;
+            root.u2fPendingMode = "and";
+            root.u2fState = "";
+            u2fPendingTimeout.restart();
+            start();
+        }
+
+        function startForAlternativeAuth(): void {
+            if (!available || !SettingsData.enableU2f || SettingsData.u2fMode !== "or" || root.unlockInProgress || passwd.active || active)
+                return;
+            abort();
+            root.u2fPending = true;
+            root.u2fPendingMode = "or";
             root.u2fState = "";
             u2fPendingTimeout.restart();
             start();
@@ -281,9 +297,19 @@ Scope {
                 abort();
 
                 if (root.u2fPending) {
+                    if (root.u2fPendingMode === "or") {
+                        root.u2fPending = false;
+                        root.u2fPendingMode = "";
+                        root.u2fState = root.u2fState === "waiting" ? "" : "insert";
+                        u2fPendingTimeout.running = false;
+                        fprint.checkAvail();
+                        return;
+                    }
+
                     if (root.u2fState === "waiting") {
                         // AND mode: device was found but auth failed → back to password
                         root.u2fPending = false;
+                        root.u2fPendingMode = "";
                         root.u2fState = "";
                         fprint.checkAvail();
                     } else {
@@ -292,9 +318,7 @@ Scope {
                         u2fErrorRetry.restart();
                     }
                 } else {
-                    // OR mode: prompt to insert key, silently retry
                     root.u2fState = "insert";
-                    u2fErrorRetry.restart();
                 }
             }
         }
@@ -367,6 +391,7 @@ Scope {
         root.fprintState = "";
         root.u2fState = "";
         root.u2fPending = false;
+        root.u2fPendingMode = "";
         root.lockMessage = "";
         root.resetAuthFlows();
         fprint.checkAvail();
@@ -399,6 +424,7 @@ Scope {
                 u2fPendingTimeout.running = false;
                 unlockRequestTimeout.running = false;
                 root.u2fPending = false;
+                root.u2fPendingMode = "";
                 root.u2fState = "";
                 u2f.checkAvail();
             }
