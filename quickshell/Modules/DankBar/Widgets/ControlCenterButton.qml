@@ -131,7 +131,17 @@ BasePill {
     function getNetworkIconColor() {
         if (NetworkService.wifiToggling)
             return Theme.primary;
+        if (NetworkService.isConnecting && !NetworkService.ethernetConnected)
+            return Theme.primary;
         return NetworkService.networkStatus !== "disconnected" ? Theme.primary : Theme.surfaceText;
+    }
+
+    function getIconBlinking(id) {
+        if (id === "network")
+            return NetworkService.isWifiConnecting;
+        if (id === "bluetooth")
+            return BluetoothService.connecting;
+        return false;
     }
 
     function getVolumeIconName() {
@@ -485,6 +495,7 @@ BasePill {
                         }
 
                         DankIcon {
+                            id: vIconOnlyItem
                             anchors.centerIn: parent
                             visible: !verticalGroupItem.modelData.composite
                             name: {
@@ -515,7 +526,7 @@ BasePill {
                                 case "vpn":
                                     return NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText;
                                 case "bluetooth":
-                                    return BluetoothService.connected ? Theme.primary : Theme.surfaceText;
+                                    return (BluetoothService.connected || BluetoothService.connecting) ? Theme.primary : Theme.surfaceText;
                                 case "battery":
                                     return root.getBatteryIconColor();
                                 case "printer":
@@ -523,6 +534,11 @@ BasePill {
                                 default:
                                     return Theme.widgetIconColor;
                                 }
+                            }
+
+                            DankBlink {
+                                target: vIconOnlyItem
+                                running: root.getIconBlinking(verticalGroupItem.modelData.id)
                             }
                         }
 
@@ -687,7 +703,7 @@ BasePill {
                                 case "vpn":
                                     return NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText;
                                 case "bluetooth":
-                                    return BluetoothService.connected ? Theme.primary : Theme.surfaceText;
+                                    return (BluetoothService.connected || BluetoothService.connecting) ? Theme.primary : Theme.surfaceText;
                                 case "battery":
                                     return root.getBatteryIconColor();
                                 case "printer":
@@ -695,6 +711,11 @@ BasePill {
                                 default:
                                     return Theme.widgetIconColor;
                                 }
+                            }
+
+                            DankBlink {
+                                target: iconOnlyItem
+                                running: root.getIconBlinking(horizontalGroupItem.modelData.id)
                             }
                         }
 
