@@ -489,8 +489,39 @@ Item {
                         }
                     }
 
+                    Keys.onPressed: event => {
+                        const cm = root.spotlightContent?.activeContextMenu;
+                        if (!cm?.openState)
+                            return;
+                        switch (event.key) {
+                        case Qt.Key_Down:
+                            cm.selectNext();
+                            event.accepted = true;
+                            return;
+                        case Qt.Key_Up:
+                            cm.selectPrevious();
+                            event.accepted = true;
+                            return;
+                        case Qt.Key_Return:
+                        case Qt.Key_Enter:
+                            cm.activateSelected();
+                            event.accepted = true;
+                            return;
+                        case Qt.Key_Left:
+                        case Qt.Key_Escape:
+                            cm.hide();
+                            event.accepted = true;
+                            return;
+                        }
+                    }
+
                     Keys.onEscapePressed: event => {
-                        root.hide();
+                        const cm = root.spotlightContent?.activeContextMenu;
+                        if (cm?.openState) {
+                            cm.hide();
+                        } else {
+                            root.hide();
+                        }
                         event.accepted = true;
                     }
                 }

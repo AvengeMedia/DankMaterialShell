@@ -12,6 +12,7 @@ FocusScope {
     property var parentModal: null
     property alias searchField: searchInput
     property alias controller: searchController
+    readonly property alias activeContextMenu: contextMenu
 
     readonly property bool _hasQuery: searchInput.text.length > 0
     readonly property real _searchBarH: 56
