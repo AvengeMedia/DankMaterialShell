@@ -15,6 +15,7 @@ Singleton {
 
     property bool isHyprland: false
     property bool isNiri: false
+    property bool isTriad: false
     property bool isDwl: false
     property bool isSway: false
     property bool isScroll: false
@@ -25,11 +26,20 @@ Singleton {
 
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
     readonly property string niriSocket: Quickshell.env("NIRI_SOCKET")
+    readonly property string triadSocketEnv: Quickshell.env("TRIAD_SOCKET")
+    readonly property string triadSocket: {
+        if (triadSocketEnv && triadSocketEnv.length > 0)
+            return triadSocketEnv;
+        const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR");
+        return runtimeDir && runtimeDir.length > 0 ? `${runtimeDir}/triad.sock` : "";
+    }
+    readonly property string currentDesktop: `${Quickshell.env("XDG_CURRENT_DESKTOP")} ${Quickshell.env("XDG_SESSION_DESKTOP")} ${Quickshell.env("DESKTOP_SESSION")}`.toLowerCase()
     readonly property string swaySocket: Quickshell.env("SWAYSOCK")
     readonly property string scrollSocket: Quickshell.env("SWAYSOCK")
     readonly property string miracleSocket: Quickshell.env("MIRACLESOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
     property bool useNiriSorting: isNiri && NiriService
+    property bool useTriadSorting: isTriad && TriadService
 
     property var randrScales: ({})
     property bool randrReady: false
@@ -88,6 +98,12 @@ Singleton {
                 return niriScale;
         }
 
+        if (isTriad && screen) {
+            const triadScale = TriadService.displayScales[screen.name];
+            if (triadScale !== undefined)
+                return triadScale;
+        }
+
         if (isHyprland && screen) {
             const hyprlandMonitor = Hyprland.monitors.values.find(m => m.name === screen.name);
             if (hyprlandMonitor?.scale !== undefined)
@@ -109,6 +125,8 @@ Singleton {
             screenName = Hyprland.focusedWorkspace.monitor.name;
         else if (isNiri && NiriService.currentOutput)
             screenName = NiriService.currentOutput;
+        else if (isTriad && TriadService.currentOutput)
+            screenName = TriadService.currentOutput;
         else if (isSway || isScroll || isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             screenName = focusedWs?.monitor?.name || "";
@@ -172,6 +190,15 @@ Singleton {
             root.scheduleSort();
         }
     }
+    Connections {
+        target: TriadService
+        function onWindowsChanged() {
+            root.scheduleSort();
+        }
+        function onAllWorkspacesChanged() {
+            root.scheduleSort();
+        }
+    }
 
     Component.onCompleted: {
         fetchRandrData();
@@ -188,7 +215,7 @@ Singleton {
     Connections {
         target: DwlService
         function onStateChanged() {
-            if (isDwl && !isHyprland && !isNiri) {
+            if (isDwl && !isHyprland && !isNiri && !isTriad) {
                 scheduleSort();
             }
         }
@@ -200,6 +227,9 @@ Singleton {
 
         if (useNiriSorting)
             return NiriService.sortToplevels(ToplevelManager.toplevels.values);
+
+        if (useTriadSorting)
+            return TriadService.sortToplevels(ToplevelManager.toplevels.values);
 
         if (isHyprland)
             return sortHyprlandToplevelsSafe();
@@ -450,6 +480,8 @@ Singleton {
     function filterCurrentWorkspace(toplevels, screen) {
         if (useNiriSorting)
             return NiriService.filterCurrentWorkspace(toplevels, screen);
+        if (useTriadSorting)
+            return TriadService.filterCurrentWorkspace(toplevels, screen);
         if (isHyprland)
             return filterHyprlandCurrentWorkspaceSafe(toplevels, screen);
         return toplevels;
@@ -471,6 +503,8 @@ Singleton {
             }
             return NiriService.filterCurrentDisplay(toplevels, screenName);
         }
+        if (useTriadSorting)
+            return TriadService.filterCurrentDisplay(toplevels, screenName);
         if (isHyprland)
             return filterHyprlandCurrentDisplaySafe(toplevels, screenName);
         return toplevels;
@@ -500,7 +534,7 @@ Singleton {
         if (!screenName)
             return false;
 
-        if (isNiri) {
+        if (isNiri || isTriad) {
             const active = ToplevelManager.activeToplevel;
             if (active?.fullscreen && active?.activated && _toplevelOnScreen(active, screenName))
                 return true;
@@ -795,9 +829,29 @@ Singleton {
     }
 
     function detectCompositor() {
+        const desktopLooksTriad = currentDesktop.indexOf("triad") >= 0;
+        if ((triadSocketEnv && triadSocketEnv.length > 0) || desktopLooksTriad) {
+            Proc.runCommand("triadSocketCheck", ["test", "-S", triadSocket], (output, exitCode) => {
+                if (exitCode === 0 || desktopLooksTriad) {
+                    isTriad = true;
+                    isHyprland = false;
+                    isNiri = false;
+                    isDwl = false;
+                    isSway = false;
+                    isScroll = false;
+                    isMiracle = false;
+                    isLabwc = false;
+                    compositor = "triad";
+                    log.info("Detected Triad with socket:", triadSocket);
+                }
+            }, 0);
+            return;
+        }
+
         if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !miracleSocket && !labwcPid) {
             isHyprland = true;
             isNiri = false;
+            isTriad = false;
             isDwl = false;
             isSway = false;
             isScroll = false;
@@ -813,6 +867,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = true;
                     isHyprland = false;
+                    isTriad = false;
                     isDwl = false;
                     isSway = false;
                     isScroll = false;
@@ -831,6 +886,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
+                    isTriad = false;
                     isDwl = false;
                     isSway = true;
                     isScroll = false;
@@ -848,6 +904,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
+                    isTriad = false;
                     isDwl = false;
                     isSway = false;
                     isScroll = false;
@@ -865,6 +922,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
+                    isTriad = false;
                     isDwl = false;
                     isSway = false;
                     isScroll = true;
@@ -880,6 +938,7 @@ Singleton {
         if (labwcPid && labwcPid.length > 0) {
             isHyprland = false;
             isNiri = false;
+            isTriad = false;
             isDwl = false;
             isSway = false;
             isScroll = false;
@@ -895,6 +954,7 @@ Singleton {
         } else {
             isHyprland = false;
             isNiri = false;
+            isTriad = false;
             isDwl = false;
             isSway = false;
             isScroll = false;
@@ -908,7 +968,7 @@ Singleton {
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
-            if (!isHyprland && !isNiri && !isDwl && !isLabwc) {
+            if (!isHyprland && !isNiri && !isTriad && !isDwl && !isLabwc) {
                 checkForDwl();
             }
         }
@@ -918,6 +978,7 @@ Singleton {
         if (DMSService.apiVersion >= 12 && DMSService.capabilities.includes("dwl")) {
             isHyprland = false;
             isNiri = false;
+            isTriad = false;
             isDwl = true;
             isSway = false;
             isScroll = false;
@@ -931,6 +992,8 @@ Singleton {
     function powerOffMonitors() {
         if (isNiri)
             return NiriService.powerOffMonitors();
+        if (isTriad)
+            return TriadService.powerOffMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOff();
         if (isDwl)
@@ -950,6 +1013,8 @@ Singleton {
     function powerOnMonitors() {
         if (isNiri)
             return NiriService.powerOnMonitors();
+        if (isTriad)
+            return TriadService.powerOnMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOn();
         if (isDwl)

@@ -73,6 +73,8 @@ Item {
         switch (CompositorService.compositor) {
         case "niri":
             return NiriService.currentOutput || root.screenName;
+        case "triad":
+            return TriadService.currentOutput || root.screenName;
         case "hyprland":
             return Hyprland.focusedWorkspace?.monitor?.name || root.screenName;
         case "dwl":
@@ -93,6 +95,7 @@ Item {
             return (WindowManager.windowsets?.length ?? 0) > 0;
         switch (CompositorService.compositor) {
         case "niri":
+        case "triad":
         case "hyprland":
         case "dwl":
         case "sway":
@@ -118,6 +121,8 @@ Item {
         switch (CompositorService.compositor) {
         case "niri":
             return getNiriActiveWorkspace();
+        case "triad":
+            return getTriadActiveWorkspace();
         case "hyprland":
             return getHyprlandActiveWorkspace();
         case "dwl":
@@ -147,6 +152,9 @@ Item {
         switch (CompositorService.compositor) {
         case "niri":
             baseList = getNiriWorkspaces();
+            break;
+        case "triad":
+            baseList = getTriadWorkspaces();
             break;
         case "hyprland":
             baseList = getHyprlandWorkspaces();
@@ -286,6 +294,11 @@ Item {
                 }
                 targetWorkspaceId = ws.id;
             }
+        } else if (CompositorService.isTriad) {
+            if (!ws || typeof ws !== "object" || ws.id === undefined || ws.id === -1 || ws.idx === -1) {
+                return [];
+            }
+            targetWorkspaceId = ws.id;
         } else if (CompositorService.isHyprland) {
             targetWorkspaceId = ws.id !== undefined ? ws.id : ws;
         } else if (CompositorService.isDwl) {
@@ -299,12 +312,14 @@ Item {
             return [];
         }
 
-        const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.sortedToplevels;
+        const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.isTriad ? (TriadService.windows || []) : CompositorService.sortedToplevels;
 
         const byApp = {};
         let isActiveWs = false;
         if (CompositorService.isNiri) {
             isActiveWs = NiriService.allWorkspaces.some(ws => ws.id === targetWorkspaceId && ws.is_active);
+        } else if (CompositorService.isTriad) {
+            isActiveWs = TriadService.allWorkspaces.some(ws => ws.id === targetWorkspaceId && ws.is_active);
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             isActiveWs = focusedWs ? (focusedWs.num === targetWorkspaceId) : false;
@@ -325,6 +340,8 @@ Item {
 
             let winWs = null;
             if (CompositorService.isNiri) {
+                winWs = w.workspace_id;
+            } else if (CompositorService.isTriad) {
                 winWs = w.workspace_id;
             } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                 winWs = w.workspace?.num;
@@ -353,14 +370,14 @@ Item {
                     "icon": icon,
                     "isQuickshell": isQuickshell,
                     "isSteamApp": isSteamApp,
-                    "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
+                    "active": !!((w.activated || w.is_focused || w.triadFocused) || (CompositorService.isNiri && w.is_focused)),
                     "count": 1,
                     "windowId": w.address || w.id,
                     "fallbackText": appName || ""
                 };
             } else {
                 byApp[key].count++;
-                if ((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)) {
+                if ((w.activated || w.is_focused || w.triadFocused) || (CompositorService.isNiri && w.is_focused)) {
                     byApp[key].active = true;
                 }
             }
@@ -380,6 +397,12 @@ Item {
                 "_placeholder": true
             };
         } else if (CompositorService.isNiri) {
+            placeholder = {
+                "id": -1,
+                "idx": -1,
+                "name": ""
+            };
+        } else if (CompositorService.isTriad) {
             placeholder = {
                 "id": -1,
                 "idx": -1,
@@ -471,6 +494,56 @@ Item {
         return activeWs ? activeWs.idx : 1;
     }
 
+    function getTriadWorkspaces() {
+        if (TriadService.allWorkspaces.length === 0) {
+            return [
+                {
+                    "id": 1,
+                    "idx": 1,
+                    "name": ""
+                }
+            ];
+        }
+
+        const fallbackWorkspaces = [
+            {
+                "id": 1,
+                "idx": 1,
+                "name": ""
+            }
+        ];
+
+        let workspaces;
+        if (!root.screenName || SettingsData.workspaceFollowFocus) {
+            const currentWorkspaces = TriadService.getCurrentOutputWorkspaces();
+            workspaces = currentWorkspaces.length > 0 ? currentWorkspaces : fallbackWorkspaces;
+        } else {
+            const displayWorkspaces = TriadService.allWorkspaces.filter(ws => ws.output === root.screenName);
+            workspaces = displayWorkspaces.length > 0 ? displayWorkspaces : fallbackWorkspaces;
+        }
+
+        workspaces = workspaces.slice().sort((a, b) => a.idx - b.idx);
+
+        if (!SettingsData.showOccupiedWorkspacesOnly) {
+            return workspaces;
+        }
+
+        return workspaces.filter(ws => ws.is_active || ws.occupied || (TriadService.windows?.some(win => win.workspace_id === ws.id) ?? false));
+    }
+
+    function getTriadActiveWorkspace() {
+        if (TriadService.allWorkspaces.length === 0) {
+            return 1;
+        }
+
+        if (!root.screenName || SettingsData.workspaceFollowFocus) {
+            return TriadService.getCurrentWorkspaceNumber();
+        }
+
+        const activeWs = TriadService.allWorkspaces.find(ws => ws.output === root.screenName && ws.is_active);
+        return activeWs ? activeWs.idx : 1;
+    }
+
     function getDwlTags() {
         if (!DwlService.dwlAvailable)
             return [];
@@ -554,6 +627,8 @@ Item {
                 return ws && !ws._placeholder;
             if (CompositorService.isNiri)
                 return ws && ws.idx !== -1;
+            if (CompositorService.isTriad)
+                return ws && ws.idx !== -1;
             if (CompositorService.isHyprland)
                 return ws && ws.id !== -1;
             if (CompositorService.isDwl)
@@ -578,6 +653,10 @@ Item {
         case "niri":
             if (data.id !== undefined)
                 NiriService.switchToWorkspace(data.id);
+            break;
+        case "triad":
+            if (data.id !== undefined)
+                TriadService.switchToWorkspace(data.id);
             break;
         case "hyprland":
             if (data.id) {
@@ -657,6 +736,25 @@ Item {
                 return;
             }
             NiriService.switchToWorkspace(nextWorkspace.id);
+        } else if (CompositorService.isTriad) {
+            const realWorkspaces = getRealWorkspaces();
+            if (realWorkspaces.length < 2) {
+                return;
+            }
+
+            const currentIndex = realWorkspaces.findIndex(ws => ws && ws.idx === root.currentWorkspace);
+            const validIndex = currentIndex === -1 ? 0 : currentIndex;
+            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
+
+            if (nextIndex === validIndex) {
+                return;
+            }
+
+            const nextWorkspace = realWorkspaces[nextIndex];
+            if (!nextWorkspace || nextWorkspace.id === undefined) {
+                return;
+            }
+            TriadService.switchToWorkspace(nextWorkspace.id);
         } else if (CompositorService.isHyprland) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
@@ -712,6 +810,8 @@ Item {
             return index + 1;
         if (CompositorService.isNiri)
             return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
+        if (CompositorService.isTriad)
+            return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
         if (CompositorService.isHyprland)
             return modelData?.id || "";
         if (CompositorService.isDwl)
@@ -726,6 +826,8 @@ Item {
         if (root.useExtWorkspace) {
             isPlaceholder = modelData?.hidden === true;
         } else if (CompositorService.isNiri) {
+            isPlaceholder = modelData?.idx === -1;
+        } else if (CompositorService.isTriad) {
             isPlaceholder = modelData?.idx === -1;
         } else if (CompositorService.isHyprland) {
             isPlaceholder = modelData?.id === -1;
@@ -764,7 +866,7 @@ Item {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
     readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
 
@@ -860,6 +962,8 @@ Item {
             case Qt.RightButton:
                 if (CompositorService.isNiri) {
                     NiriService.toggleOverview();
+                } else if (CompositorService.isTriad) {
+                    TriadService.toggleOverview();
                 } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                     root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
                 }
@@ -980,6 +1084,8 @@ Item {
                         return (modelData?.id || modelData?.name) === root.currentWorkspace;
                     if (CompositorService.isNiri)
                         return !!(modelData && modelData.idx === root.currentWorkspace);
+                    if (CompositorService.isTriad)
+                        return !!(modelData && modelData.idx === root.currentWorkspace);
                     if (CompositorService.isHyprland)
                         return !!(modelData && modelData.id === root.currentWorkspace);
                     if (CompositorService.isDwl)
@@ -997,12 +1103,16 @@ Item {
                         const workspace = NiriService.allWorkspaces.find(ws => ws.idx + 1 === modelData && ws.output === root.effectiveScreenName);
                         return workspace ? (NiriService.windows?.some(win => win.workspace_id === workspace.id) ?? false) : false;
                     }
+                    if (CompositorService.isTriad)
+                        return modelData?.occupied ?? false;
                     return false;
                 }
                 property bool isPlaceholder: {
                     if (root.useExtWorkspace)
                         return !!(modelData && modelData._placeholder);
                     if (CompositorService.isNiri)
+                        return !!(modelData && modelData.idx === -1);
+                    if (CompositorService.isTriad)
                         return !!(modelData && modelData.idx === -1);
                     if (CompositorService.isHyprland)
                         return !!(modelData && modelData.id === -1);
@@ -1022,6 +1132,8 @@ Item {
                     if (CompositorService.isHyprland)
                         return modelData?.urgent ?? false;
                     if (CompositorService.isNiri)
+                        return loadedIsUrgent;
+                    if (CompositorService.isTriad)
                         return loadedIsUrgent;
                     if (CompositorService.isDwl)
                         return modelData?.state === 2;
@@ -1049,6 +1161,8 @@ Item {
                         targetWorkspaceId = modelData?.id || modelData?.name;
                     } else if (CompositorService.isNiri) {
                         targetWorkspaceId = modelData?.id;
+                    } else if (CompositorService.isTriad) {
+                        targetWorkspaceId = modelData?.id;
                     } else if (CompositorService.isHyprland) {
                         targetWorkspaceId = modelData?.id;
                     } else if (CompositorService.isDwl) {
@@ -1059,7 +1173,7 @@ Item {
                     if (targetWorkspaceId === undefined || targetWorkspaceId === null)
                         return 0;
 
-                    const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.sortedToplevels;
+                    const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.isTriad ? (TriadService.windows || []) : CompositorService.sortedToplevels;
                     const seen = {};
                     let groupedCount = 0;
                     let totalCount = 0;
@@ -1071,6 +1185,8 @@ Item {
 
                         let winWs = null;
                         if (CompositorService.isNiri) {
+                            winWs = w.workspace_id;
+                        } else if (CompositorService.isTriad) {
                             winWs = w.workspace_id;
                         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                             winWs = w.workspace?.num;
@@ -1097,7 +1213,7 @@ Item {
                 readonly property real baseWidth: root.isVertical ? (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5) : (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2))
                 readonly property real baseHeight: root.isVertical ? (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2)) : (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5)
                 readonly property bool hasWorkspaceName: SettingsData.showWorkspaceName && modelData?.name && modelData.name !== ""
-                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (CompositorService.isNiri || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
+                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (CompositorService.isNiri || CompositorService.isTriad || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                 readonly property real contentImplicitWidth: appIconsLoader.item?.contentWidth ?? 0
                 readonly property real contentImplicitHeight: appIconsLoader.item?.contentHeight ?? 0
 
@@ -1308,6 +1424,10 @@ Item {
                                 if (modelData && modelData.id !== undefined) {
                                     NiriService.switchToWorkspace(modelData.id);
                                 }
+                            } else if (CompositorService.isTriad) {
+                                if (modelData && modelData.id !== undefined) {
+                                    TriadService.switchToWorkspace(modelData.id);
+                                }
                             } else if (CompositorService.isHyprland && modelData?.id) {
                                 HyprlandService.focusWorkspace(modelData.id);
                             } else if (CompositorService.isDwl && modelData?.tag !== undefined) {
@@ -1320,6 +1440,8 @@ Item {
                         } else if (mouse.button === Qt.RightButton) {
                             if (CompositorService.isNiri) {
                                 NiriService.toggleOverview();
+                            } else if (CompositorService.isTriad) {
+                                TriadService.toggleOverview();
                             } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                                 root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
                             } else if (CompositorService.isDwl && modelData?.tag !== undefined) {
@@ -1345,6 +1467,8 @@ Item {
                             wsData = modelData;
                         } else if (CompositorService.isNiri) {
                             wsData = modelData || null;
+                        } else if (CompositorService.isTriad) {
+                            wsData = modelData || null;
                         } else if (CompositorService.isHyprland) {
                             wsData = modelData;
                         } else if (CompositorService.isDwl) {
@@ -1356,6 +1480,8 @@ Item {
                         if (CompositorService.isNiri) {
                             const workspaceId = wsData?.id;
                             delegateRoot.loadedIsUrgent = workspaceId ? NiriService.windows.some(w => w.workspace_id === workspaceId && w.is_urgent) : false;
+                        } else if (CompositorService.isTriad) {
+                            delegateRoot.loadedIsUrgent = wsData?.is_urgent ?? false;
                         } else {
                             delegateRoot.loadedIsUrgent = wsData?.urgent ?? false;
                         }
@@ -1364,6 +1490,8 @@ Item {
                             if (CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(modelData);
                             } else if (CompositorService.isNiri) {
+                                delegateRoot.loadedIcons = root.getWorkspaceIcons(isPlaceholder ? null : modelData);
+                            } else if (CompositorService.isTriad) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(isPlaceholder ? null : modelData);
                             } else {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(CompositorService.isHyprland ? modelData : (modelData === -1 ? null : modelData));
@@ -1675,6 +1803,8 @@ Item {
                                                         HyprlandService.focusWindow(winId);
                                                     } else if (CompositorService.isNiri) {
                                                         NiriService.focusWindow(winId);
+                                                    } else if (CompositorService.isTriad) {
+                                                        TriadService.focusWindow(winId);
                                                     }
                                                 }
                                             }
@@ -1844,6 +1974,8 @@ Item {
                                                         HyprlandService.focusWindow(winId);
                                                     } else if (CompositorService.isNiri) {
                                                         NiriService.focusWindow(winId);
+                                                    } else if (CompositorService.isTriad) {
+                                                        TriadService.focusWindow(winId);
                                                     }
                                                 }
                                             }
@@ -1886,6 +2018,19 @@ Item {
                 Connections {
                     target: NiriService
                     enabled: CompositorService.isNiri
+                    function onAllWorkspacesChanged() {
+                        delegateRoot.updateAllData();
+                    }
+                    function onWindowUrgentChanged() {
+                        delegateRoot.updateAllData();
+                    }
+                    function onWindowsChanged() {
+                        delegateRoot.updateAllData();
+                    }
+                }
+                Connections {
+                    target: TriadService
+                    enabled: CompositorService.isTriad
                     function onAllWorkspacesChanged() {
                         delegateRoot.updateAllData();
                     }
