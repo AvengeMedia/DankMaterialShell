@@ -25,14 +25,14 @@ DankPopout {
     property int __dropdownType: 0
     property point __dropdownAnchor: Qt.point(0, 0)
     property bool __dropdownRightEdge: false
-    property var __dropdownPlayer: null
-    property var __dropdownPlayers: []
+    property var __dropdownPlayer: MprisController.activePlayer
+    property var __dropdownPlayers: MprisController.availablePlayers
 
     function __showVolumeDropdown(pos, rightEdge, player, players) {
         __dropdownAnchor = pos;
         __dropdownRightEdge = rightEdge;
-        __dropdownPlayer = player;
-        __dropdownPlayers = players;
+        __dropdownPlayer = Qt.binding(() => MprisController.activePlayer);
+        __dropdownPlayers = Qt.binding(() => MprisController.availablePlayers);
         __dropdownType = 1;
     }
 
@@ -45,8 +45,8 @@ DankPopout {
     function __showPlayersDropdown(pos, rightEdge, player, players) {
         __dropdownAnchor = pos;
         __dropdownRightEdge = rightEdge;
-        __dropdownPlayer = player;
-        __dropdownPlayers = players;
+        __dropdownPlayer = Qt.binding(() => MprisController.activePlayer);
+        __dropdownPlayers = Qt.binding(() => MprisController.availablePlayers);
         __dropdownType = 3;
     }
 
@@ -69,7 +69,7 @@ DankPopout {
         id: __volumeCloseTimer
         interval: 400
         onTriggered: {
-            if (__dropdownType === 1) {
+            if (__dropdownType !== 0) {
                 __hideDropdowns();
             }
         }
@@ -394,7 +394,7 @@ DankPopout {
                                     root.__showPlayersDropdown(pos, rightEdge, player, players);
                                 }
                                 onHideDropdowns: root.__hideDropdowns()
-                                onVolumeButtonExited: root.__startCloseTimer()
+                                onDropdownButtonExited: root.__startCloseTimer()
                             }
                         }
                     }

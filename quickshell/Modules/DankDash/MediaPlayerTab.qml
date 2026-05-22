@@ -27,7 +27,7 @@ Item {
     signal showAudioDevicesDropdown(point pos, var screen, bool rightEdge)
     signal showPlayersDropdown(point pos, var screen, bool rightEdge, var player, var players)
     signal hideDropdowns
-    signal volumeButtonExited
+    signal dropdownButtonExited
 
     property bool volumeExpanded: false
     property bool devicesExpanded: false
@@ -39,9 +39,7 @@ Item {
         playersExpanded = false;
     }
 
-    DankTooltipV2 {
-        id: sharedTooltip
-    }
+
 
     readonly property bool isRightEdge: {
         if (barPosition === SettingsData.Position.Right)
@@ -647,7 +645,17 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (playersExpanded) {
-                    hideDropdowns();
+                    if (allPlayers && allPlayers.length > 1) {
+                        let currentIndex = -1;
+                        for (let i = 0; i < allPlayers.length; i++) {
+                            if (allPlayers[i] === activePlayer) {
+                                currentIndex = i;
+                                break;
+                            }
+                        }
+                        const nextIndex = (currentIndex + 1) % allPlayers.length;
+                        MprisController.setActivePlayer(allPlayers[nextIndex]);
+                    }
                     return;
                 }
                 hideDropdowns();
@@ -658,8 +666,21 @@ Item {
                 const screenY = popoutY + contentOffsetY + btnY;
                 showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
             }
-            onEntered: sharedTooltip.show(I18n.tr("Media Players"), playerSelectorButton, 0, 0, isRightEdge ? "right" : "left")
-            onExited: sharedTooltip.hide()
+            onEntered: {
+                if (playersExpanded)
+                    return;
+                hideDropdowns();
+                playersExpanded = true;
+                const buttonsOnRight = !isRightEdge;
+                const btnY = playerSelectorButton.y + playerSelectorButton.height / 2;
+                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
+                const screenY = popoutY + contentOffsetY + btnY;
+                showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+            }
+            onExited: {
+                if (playersExpanded)
+                    dropdownButtonExited();
+            }
         }
     }
 
@@ -703,7 +724,7 @@ Item {
             }
             onExited: {
                 if (volumeExpanded)
-                    volumeButtonExited();
+                    dropdownButtonExited();
             }
             onClicked: {
                 SessionData.suppressOSDTemporarily();
@@ -754,7 +775,7 @@ Item {
 
         DankIcon {
             anchors.centerIn: parent
-            name: devicesExpanded ? "expand_less" : "speaker"
+            name: "speaker"
             size: 18
             color: Theme.surfaceText
         }
@@ -766,7 +787,18 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (devicesExpanded) {
-                    hideDropdowns();
+                    const sinks = AudioService.getAvailableSinks();
+                    if (sinks && sinks.length > 1) {
+                        let currentIndex = -1;
+                        for (let i = 0; i < sinks.length; i++) {
+                            if (sinks[i]?.name === AudioService.sink?.name) {
+                                currentIndex = i;
+                                break;
+                            }
+                        }
+                        const nextIndex = (currentIndex + 1) % sinks.length;
+                        AudioService.setSink(sinks[nextIndex]);
+                    }
                     return;
                 }
                 hideDropdowns();
@@ -777,8 +809,21 @@ Item {
                 const screenY = popoutY + contentOffsetY + btnY;
                 showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
             }
-            onEntered: sharedTooltip.show(I18n.tr("Output Device"), audioDevicesButton, 0, 0, isRightEdge ? "right" : "left")
-            onExited: sharedTooltip.hide()
+            onEntered: {
+                if (devicesExpanded)
+                    return;
+                hideDropdowns();
+                devicesExpanded = true;
+                const buttonsOnRight = !isRightEdge;
+                const btnY = audioDevicesButton.y + audioDevicesButton.height / 2;
+                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
+                const screenY = popoutY + contentOffsetY + btnY;
+                showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
+            }
+            onExited: {
+                if (devicesExpanded)
+                    dropdownButtonExited();
+            }
         }
     }
 }

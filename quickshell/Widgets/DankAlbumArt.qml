@@ -15,6 +15,10 @@ Item {
     property bool showAnimation: true
     property real animationScale: 1.0
 
+    onActivePlayerChanged: {
+        lastValidArtUrl = "";
+    }
+
     onArtUrlChanged: {
         if (artUrl && albumArt.status !== Image.Error) {
             lastValidArtUrl = artUrl;

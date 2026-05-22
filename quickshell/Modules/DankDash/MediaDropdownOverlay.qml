@@ -42,16 +42,16 @@ Item {
     signal panelEntered
     signal panelExited
 
-    property int __volumeHoverCount: 0
+    property int __panelHoverCount: 0
 
-    function volumeAreaEntered() {
-        __volumeHoverCount++;
+    function panelAreaEntered() {
+        __panelHoverCount++;
         panelEntered();
     }
 
-    function volumeAreaExited() {
-        __volumeHoverCount = Math.max(0, __volumeHoverCount - 1);
-        if (__volumeHoverCount === 0)
+    function panelAreaExited() {
+        __panelHoverCount = Math.max(0, __panelHoverCount - 1);
+        if (__panelHoverCount === 0)
             panelExited();
     }
 
@@ -131,8 +131,8 @@ Item {
             anchors.fill: parent
             anchors.margins: -12
             hoverEnabled: true
-            onEntered: volumeAreaEntered()
-            onExited: volumeAreaExited()
+            onEntered: panelAreaEntered()
+            onExited: panelAreaExited()
         }
 
         Item {
@@ -190,8 +190,8 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     preventStealing: true
 
-                    onEntered: volumeAreaEntered()
-                    onExited: volumeAreaExited()
+                    onEntered: panelAreaEntered()
+                    onExited: panelAreaExited()
                     onPressed: mouse => updateVolume(mouse)
                     onPositionChanged: mouse => {
                         if (pressed)
@@ -267,6 +267,14 @@ Item {
             borderWidth: audioDevicesPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
             shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            anchors.margins: -12
+            hoverEnabled: true
+            onEntered: panelAreaEntered()
+            onExited: panelAreaExited()
         }
 
         Column {
@@ -369,6 +377,8 @@ Item {
                                         root.deviceSelected(modelData);
                                     }
                                 }
+                                onEntered: panelAreaEntered()
+                                onExited: panelAreaExited()
                             }
                         }
                     }
@@ -423,6 +433,14 @@ Item {
             borderWidth: playersPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
             shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            anchors.margins: -12
+            hoverEnabled: true
+            onEntered: panelAreaEntered()
+            onExited: panelAreaExited()
         }
 
         Column {
@@ -526,6 +544,8 @@ Item {
                                         root.playerSelected(modelData);
                                     }
                                 }
+                                onEntered: panelAreaEntered()
+                                onExited: panelAreaExited()
                             }
                         }
                     }
