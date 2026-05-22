@@ -539,8 +539,8 @@ Item {
 
     Connections {
         target: spotlightContent?.controller ?? null
-        function onModeChanged(mode) {
-            if (spotlightContent.controller.autoSwitchedToFiles)
+        function onModeChanged(mode, userInitiated) {
+            if (!userInitiated)
                 return;
             SessionData.setLauncherLastMode(mode);
         }

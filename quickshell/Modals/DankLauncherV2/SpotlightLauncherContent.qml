@@ -240,8 +240,8 @@ FocusScope {
 
     Connections {
         target: searchController
-        function onModeChanged(mode) {
-            if (searchController.autoSwitchedToFiles)
+        function onModeChanged(mode, userInitiated) {
+            if (!userInitiated)
                 return;
             SessionData.setLauncherLastMode(mode);
         }
