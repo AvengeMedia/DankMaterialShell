@@ -340,6 +340,31 @@ Item {
         return count;
     }
 
+    function handleKey(event) {
+        if (!openState)
+            return;
+        switch (event.key) {
+        case Qt.Key_Down:
+            selectNext();
+            event.accepted = true;
+            return;
+        case Qt.Key_Up:
+            selectPrevious();
+            event.accepted = true;
+            return;
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            activateSelected();
+            event.accepted = true;
+            return;
+        case Qt.Key_Left:
+        case Qt.Key_Escape:
+            hide();
+            event.accepted = true;
+            return;
+        }
+    }
+
     function selectNext() {
         if (visibleItemCount > 0) {
             keyboardNavigation = true;

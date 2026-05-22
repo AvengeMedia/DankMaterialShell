@@ -536,8 +536,12 @@ Item {
                     }
                 }
 
+                Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
                 Keys.onEscapePressed: event => {
-                    root.hide();
+                    root.spotlightContent?.activeContextMenu?.handleKey(event);
+                    if (!event.accepted)
+                        root.hide();
                     event.accepted = true;
                 }
             }
