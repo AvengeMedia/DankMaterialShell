@@ -53,6 +53,8 @@ install -Dm644 %{_builddir}/dms-qml/Modules/Greetd/README.md %{buildroot}%{_docd
 
 install -Dpm0644 %{_builddir}/dms-qml/systemd/tmpfiles-dms-greeter.conf %{buildroot}%{_tmpfilesdir}/dms-greeter.conf
 
+install -Dm644 %{_builddir}/dms-qml/systemd/sysusers-dms-greeter.conf %{buildroot}%{_sysusersdir}/dms-greeter.conf
+
 install -Dm644 %{_builddir}/dms-qml/LICENSE %{buildroot}%{_docdir}/dms-greeter/LICENSE
 
 install -dm755 %{buildroot}%{_sharedstatedir}/greeter
@@ -78,6 +80,7 @@ fi
 %{_bindir}/dms-greeter
 %{_datadir}/quickshell/dms-greeter/
 %{_tmpfilesdir}/%{name}.conf
+%{_sysusersdir}/dms-greeter.conf
 
 %pre
 # Create greeter user/group if they don't exist

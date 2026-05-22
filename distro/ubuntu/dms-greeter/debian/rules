@@ -40,6 +40,11 @@ override_dh_auto_install:
 	install -Dm644 DankMaterialShell-$(BASE_VERSION)/LICENSE \
 		debian/dms-greeter/usr/share/doc/dms-greeter/LICENSE
 
+	install -Dpm0644 DankMaterialShell-$(BASE_VERSION)/quickshell/systemd/tmpfiles-dms-greeter.conf \
+		debian/dms-greeter/usr/lib/tmpfiles.d/dms-greeter.conf
+	install -Dm644 DankMaterialShell-$(BASE_VERSION)/quickshell/systemd/sysusers-dms-greeter.conf \
+		debian/dms-greeter/usr/lib/sysusers.d/dms-greeter.conf
+
 	# Create cache directory structure (will be created by postinst)
 	mkdir -p debian/dms-greeter/var/cache/dms-greeter
 
