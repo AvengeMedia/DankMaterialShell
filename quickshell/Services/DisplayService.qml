@@ -46,6 +46,15 @@ Singleton {
         onTriggered: root._lastAppliedTargets = ({})
     }
 
+    property string _pendingReason: ""
+
+    Timer {
+        id: syncDebounce
+        interval: 300
+        repeat: false
+        onTriggered: root._runSync()
+    }
+
     signal brightnessChanged(bool showOsd)
     signal deviceSwitched
 
@@ -74,6 +83,16 @@ Singleton {
         } else if (SettingsData.lowerDisplayRefreshRateOnBattery) {
             applyBatteryTargets(reason);
         }
+    }
+
+    function requestSync(reason) {
+        _pendingReason = reason || _pendingReason;
+        syncDebounce.restart();
+    }
+
+    function _runSync() {
+        syncRefreshRates(BatteryService.isPluggedIn, _pendingReason || "sync");
+        _pendingReason = "";
     }
 
     function applyConfiguredTargets(context, reason) {
