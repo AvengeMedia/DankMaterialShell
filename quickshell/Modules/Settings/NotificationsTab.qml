@@ -213,9 +213,12 @@ Item {
                     tags: ["notification", "font", "summary", "size"]
                     text: I18n.tr("Summary Font Size")
                     description: I18n.tr("Set the font size for notification summary text")
-                    options: ["13", "14", "15", "16", "17", "18", "19", "20"]
-                    currentValue: SettingsData.notificationSummaryFontSize.toString()
-                    onValueChanged: value => SettingsData.set("notificationSummaryFontSize", Number(value))
+                    options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
+                    currentValue: (SettingsData.notificationSummaryFontSize || I18n.tr("Unset")).toString()
+                    onValueChanged: value => {
+                        SettingsData.set("notificationSummaryFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
+                        SettingsData.sendTestNotifications();
+                    }
                 }
 
                 SettingsDropdownRow {
@@ -223,9 +226,12 @@ Item {
                     tags: ["notification", "font", "body", "size"]
                     text: I18n.tr("Body Font Size")
                     description: I18n.tr("Set the font size for notification body text (htmlBody)")
-                    options: ["12", "13", "14", "15", "16", "17", "18", "19", "20"]
-                    currentValue: SettingsData.notificationBodyFontSize.toString()
-                    onValueChanged: value => SettingsData.set("notificationBodyFontSize", Number(value))
+                    options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
+                    currentValue: (SettingsData.notificationBodyFontSize || I18n.tr("Unset")).toString()
+                    onValueChanged: value => {
+                        SettingsData.set("notificationBodyFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
+                        SettingsData.sendTestNotifications();
+                    }
                 }
 
                 SettingsDropdownRow {
