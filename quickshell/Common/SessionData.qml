@@ -187,6 +187,7 @@ Singleton {
     property string timeLocale: ""
 
     property string launcherLastMode: "all"
+    property string launcherLastFileSearchType: "all"
     property string launcherLastQuery: ""
     property var launcherQueryHistory: []
     property string appDrawerLastMode: "apps"
@@ -1175,6 +1176,11 @@ Singleton {
 
     function setLauncherLastMode(mode) {
         launcherLastMode = mode;
+        saveSettings();
+    }
+
+    function setLauncherLastFileSearchType(type) {
+        launcherLastFileSearchType = type;
         saveSettings();
     }
 

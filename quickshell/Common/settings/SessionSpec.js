@@ -87,6 +87,7 @@ var SPEC = {
     timeLocale: { def: "" },
 
     launcherLastMode: { def: "all" },
+    launcherLastFileSearchType: { def: "all" },
     launcherLastQuery: { def: "" },
     launcherQueryHistory: { def: [] },
     appDrawerLastMode: { def: "apps" },

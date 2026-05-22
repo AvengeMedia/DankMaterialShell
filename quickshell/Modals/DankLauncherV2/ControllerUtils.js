@@ -159,3 +159,14 @@ function sortPluginsOrdered(plugins, order) {
         return aOrder - bOrder;
     });
 }
+
+function parseFileSearchPrefix(query) {
+    if (!query || !query.startsWith("/"))
+        return null;
+    var rest = query.substring(1);
+    if (rest === "d" || rest.startsWith("d ") || rest.startsWith("d\t"))
+        return { type: "dir", query: rest.substring(1).trim() };
+    if (rest === "f" || rest.startsWith("f ") || rest.startsWith("f\t"))
+        return { type: "file", query: rest.substring(1).trim() };
+    return { type: null, query: rest.trim() };
+}
