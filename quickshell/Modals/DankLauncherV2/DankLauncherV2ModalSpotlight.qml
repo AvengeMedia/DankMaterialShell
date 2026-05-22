@@ -145,7 +145,7 @@ Item {
         spotlightContent.closeTransientUi?.();
 
         const targetQuery = query || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
-        const targetMode = mode || SessionData.launcherLastMode || "all";
+        const targetMode = mode || SessionData.getLauncherRestoreMode();
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = targetQuery;
@@ -489,8 +489,12 @@ Item {
                         }
                     }
 
+                    Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
                     Keys.onEscapePressed: event => {
-                        root.hide();
+                        root.spotlightContent?.activeContextMenu?.handleKey(event);
+                        if (!event.accepted)
+                            root.hide();
                         event.accepted = true;
                     }
                 }

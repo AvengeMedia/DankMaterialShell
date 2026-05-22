@@ -39,7 +39,7 @@ Item {
 
     signal itemExecuted
     signal searchCompleted
-    signal modeChanged(string mode)
+    signal modeChanged(string mode, bool userInitiated)
     signal queryChanged(string query)
     signal viewModeChanged(string sectionId, string mode)
     signal searchQueryRequested(string query)
@@ -440,7 +440,7 @@ Item {
         }
     }
 
-    function setMode(mode, isAutoSwitch, fileTypeOverride) {
+    function setMode(mode, isAutoSwitch, fileTypeOverride, notPersist) {
         if (searchMode === mode) {
             if (mode === "files" && fileTypeOverride !== undefined && fileSearchType !== fileTypeOverride) {
                 fileSearchType = fileTypeOverride;
@@ -458,7 +458,7 @@ Item {
         if (mode === "files") {
             fileSearchType = fileTypeOverride !== undefined ? fileTypeOverride : (SessionData.launcherLastFileSearchType || "all");
         }
-        modeChanged(mode);
+        modeChanged(mode, !isAutoSwitch && notPersist !== true);
         performSearch();
         var filesInAll = mode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll) && searchQuery.length > 0;
         if (mode === "files" || filesInAll) {
@@ -471,7 +471,7 @@ Item {
             return;
         autoSwitchedToFiles = false;
         searchMode = previousSearchMode;
-        modeChanged(previousSearchMode);
+        modeChanged(previousSearchMode, false);
         performSearch();
     }
 
@@ -1897,7 +1897,7 @@ Item {
             if (browseTrigger && browseTrigger.length > 0) {
                 searchQueryRequested(browseTrigger);
             } else {
-                setMode("plugins");
+                setMode("plugins", false, undefined, true);
                 pluginFilter = browsePluginId;
                 performSearch();
             }

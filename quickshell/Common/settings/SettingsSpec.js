@@ -203,6 +203,7 @@ var SPEC = {
     appLauncherGridColumns: { def: 4 },
     spotlightCloseNiriOverview: { def: true },
     rememberLastQuery: { def: false },
+    rememberLastMode: { def: true },
     spotlightSectionViewModes: { def: {} },
     appDrawerSectionViewModes: { def: {} },
     niriOverviewOverlayEnabled: { def: true },

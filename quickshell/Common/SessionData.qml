@@ -1179,6 +1179,12 @@ Singleton {
         saveSettings();
     }
 
+    function getLauncherRestoreMode() {
+        if (!SettingsData.rememberLastMode)
+            return "all";
+        return launcherLastMode || "all";
+    }
+
     function setLauncherLastFileSearchType(type) {
         launcherLastFileSearchType = type;
         saveSettings();

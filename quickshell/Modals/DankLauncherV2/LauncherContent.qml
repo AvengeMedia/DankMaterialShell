@@ -17,6 +17,7 @@ FocusScope {
     property alias controller: controller
     property alias resultsList: resultsList
     property alias actionPanel: actionPanel
+    readonly property alias activeContextMenu: contextMenu
 
     property bool editMode: false
     property var editingApp: null

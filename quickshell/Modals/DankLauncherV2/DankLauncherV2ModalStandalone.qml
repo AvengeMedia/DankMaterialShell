@@ -148,7 +148,7 @@ Item {
             spotlightContent.searchField.text = targetQuery;
         }
         if (spotlightContent.controller) {
-            var targetMode = mode || SessionData.launcherLastMode || "all";
+            var targetMode = mode || SessionData.getLauncherRestoreMode();
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
@@ -260,8 +260,8 @@ Item {
     Connections {
         target: spotlightContent?.controller ?? null
 
-        function onModeChanged(mode) {
-            if (spotlightContent.controller.autoSwitchedToFiles)
+        function onModeChanged(mode, userInitiated) {
+            if (!userInitiated || !SettingsData.rememberLastMode || (mode !== "all" && mode !== "apps"))
                 return;
             SessionData.setLauncherLastMode(mode);
         }
@@ -536,8 +536,12 @@ Item {
                     }
                 }
 
+                Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
                 Keys.onEscapePressed: event => {
-                    root.hide();
+                    root.spotlightContent?.activeContextMenu?.handleKey(event);
+                    if (!event.accepted)
+                        root.hide();
                     event.accepted = true;
                 }
             }
