@@ -420,15 +420,34 @@ Item {
         searchQuery = query;
         searchDebounce.restart();
 
+        if (searchMode !== "plugins" && query.startsWith("/")) {
+            var prefix = Utils.parseFileSearchPrefix(query);
+            var explicitType = prefix && prefix.type !== null ? prefix.type : null;
+            var targetType = explicitType !== null ? explicitType : (SessionData.launcherLastFileSearchType || "all");
+            if (searchMode !== "files") {
+                setMode("files", true, targetType);
+            } else if (fileSearchType !== targetType) {
+                fileSearchType = targetType;
+            }
+            if (explicitType !== null && SessionData.launcherLastFileSearchType !== explicitType) {
+                SessionData.setLauncherLastFileSearchType(explicitType);
+            }
+        }
+
         var filesInAll = searchMode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll);
         if (searchMode !== "plugins" && (searchMode === "files" || query.startsWith("/") || filesInAll) && query.length > 0) {
             fileSearchDebounce.restart();
         }
     }
 
-    function setMode(mode, isAutoSwitch) {
-        if (searchMode === mode)
+    function setMode(mode, isAutoSwitch, fileTypeOverride) {
+        if (searchMode === mode) {
+            if (mode === "files" && fileTypeOverride !== undefined && fileSearchType !== fileTypeOverride) {
+                fileSearchType = fileTypeOverride;
+                performFileSearch();
+            }
             return;
+        }
         if (isAutoSwitch) {
             previousSearchMode = searchMode;
             autoSwitchedToFiles = true;
@@ -436,6 +455,9 @@ Item {
             autoSwitchedToFiles = false;
         }
         searchMode = mode;
+        if (mode === "files") {
+            fileSearchType = fileTypeOverride !== undefined ? fileTypeOverride : (SessionData.launcherLastFileSearchType || "all");
+        }
         modeChanged(mode);
         performSearch();
         var filesInAll = mode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll) && searchQuery.length > 0;
@@ -545,6 +567,7 @@ Item {
         if (fileSearchType === type)
             return;
         fileSearchType = type;
+        SessionData.setLauncherLastFileSearchType(type);
         performFileSearch();
     }
 
@@ -715,7 +738,8 @@ Item {
         clearActivePluginViewPreference();
 
         if (searchMode === "files") {
-            var fileQuery = searchQuery.startsWith("/") ? searchQuery.substring(1).trim() : searchQuery.trim();
+            var prefixInfo = Utils.parseFileSearchPrefix(searchQuery);
+            var fileQuery = prefixInfo ? prefixInfo.query : searchQuery.trim();
             isFileSearching = fileQuery.length >= 2 && DSearchService.dsearchAvailable;
             sections = [];
             flatModel = [];
@@ -1005,7 +1029,8 @@ Item {
         var includeFolders = SettingsData.dankLauncherV2IncludeFoldersInAll;
 
         if (searchQuery.startsWith("/")) {
-            fileQuery = searchQuery.substring(1).trim();
+            var prefixInfo = Utils.parseFileSearchPrefix(searchQuery);
+            fileQuery = prefixInfo ? prefixInfo.query : searchQuery.substring(1).trim();
         } else if (searchMode === "files") {
             fileQuery = searchQuery.trim();
         } else if (searchMode === "all" && (includeFiles || includeFolders)) {

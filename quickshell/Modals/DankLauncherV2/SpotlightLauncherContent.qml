@@ -195,13 +195,6 @@ FocusScope {
                 return;
             }
             break;
-        case Qt.Key_Slash:
-            if (event.modifiers === Qt.NoModifier && searchInput.text.length === 0) {
-                searchController.setMode("files", true);
-                event.accepted = true;
-                return;
-            }
-            break;
         }
 
         event.accepted = false;
