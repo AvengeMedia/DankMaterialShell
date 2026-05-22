@@ -301,12 +301,22 @@ Column {
             property var widgetDef: root.model?.getWidgetForId(widgetData.id || "")
             width: parent.width
             height: 60
+            iconBlinking: {
+                const id = widgetData.id || "";
+                if (id === "wifi")
+                    return NetworkService.isWifiConnecting;
+                if (id === "bluetooth")
+                    return BluetoothService.connecting;
+                return false;
+            }
             iconName: {
                 switch (widgetData.id || "") {
                 case "wifi":
                     {
                         if (NetworkService.wifiToggling)
                             return "sync";
+                        if (NetworkService.isConnecting && !NetworkService.ethernetConnected)
+                            return NetworkService.wifiSignalIcon;
 
                         const status = NetworkService.networkStatus;
                         if (status === "ethernet")
@@ -360,6 +370,8 @@ Column {
                     {
                         if (NetworkService.wifiToggling)
                             return NetworkService.wifiEnabled ? I18n.tr("Disabling WiFi...", "network status") : I18n.tr("Enabling WiFi...", "network status");
+                        if (NetworkService.isConnecting && !NetworkService.ethernetConnected)
+                            return NetworkService.connectingSSID || I18n.tr("Connecting...", "network status");
 
                         const status = NetworkService.networkStatus;
                         if (status === "ethernet")
@@ -400,6 +412,8 @@ Column {
                     {
                         if (NetworkService.wifiToggling)
                             return I18n.tr("Please wait...", "network status");
+                        if (NetworkService.isConnecting && !NetworkService.ethernetConnected)
+                            return I18n.tr("Connecting...", "network status");
 
                         const status = NetworkService.networkStatus;
                         if (status === "ethernet")
@@ -422,6 +436,8 @@ Column {
                             return I18n.tr("No adapters", "bluetooth status");
                         if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
                             return I18n.tr("Off", "bluetooth status");
+                        if (BluetoothService.connecting)
+                            return I18n.tr("Connecting...", "bluetooth status");
                         const primaryDevice = (() => {
                                 if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
                                     return null;

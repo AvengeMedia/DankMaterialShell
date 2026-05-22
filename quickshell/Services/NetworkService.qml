@@ -42,6 +42,7 @@ Singleton {
 
     property string userPreference: activeService?.userPreference ?? "auto"
     property bool isConnecting: activeService?.isConnecting ?? false
+    readonly property bool isWifiConnecting: isConnecting && !ethernetConnected && !wifiToggling
     property string connectingSSID: activeService?.connectingSSID ?? ""
     property string connectionError: activeService?.connectionError ?? ""
 

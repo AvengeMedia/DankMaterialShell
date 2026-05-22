@@ -99,6 +99,9 @@ Singleton {
     }
 
     readonly property string wifiSignalIcon: {
+        if (isConnecting) {
+            return "wifi";
+        }
         if (!wifiConnected || networkStatus !== "wifi") {
             return "wifi_off";
         }

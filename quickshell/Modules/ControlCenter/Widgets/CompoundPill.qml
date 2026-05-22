@@ -10,6 +10,7 @@ Rectangle {
 
     property string iconName: ""
     property color iconColor: Theme.surfaceText
+    property bool iconBlinking: false
     property string primaryText: ""
     property string secondaryText: ""
     property bool expanded: false
@@ -109,10 +110,16 @@ Rectangle {
             }
 
             DankIcon {
+                id: pillIcon
                 anchors.centerIn: parent
                 name: iconName
                 size: Theme.iconSize
                 color: isActive ? _tileIconActive : _tileIconInactive
+
+                DankBlink {
+                    target: pillIcon
+                    running: root.iconBlinking
+                }
             }
 
             DankRipple {
