@@ -123,7 +123,7 @@
     "0 = square corners": "0 = 直角"
   },
   "1 day": {
-    "1 day": "1天"
+    "1 day": "1 天"
   },
   "1 device connected": {
     "1 device connected": "已连接1个设备"
@@ -909,7 +909,7 @@
     "Blur on Overview": "在概览中模糊"
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
-    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "模糊状态栏、弹窗、模态框以及通知的背景。需要合成器支持与配置。"
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "模糊状态栏、弹窗、模态框以及通知的背景。需要合成器支持与配置"
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "当打开概览时模糊壁纸"
@@ -1173,7 +1173,7 @@
     "Choose the border accent color": "选择边框强调色"
   },
   "Choose the logo displayed on the launcher button in DankBar": {
-    "Choose the logo displayed on the launcher button in DankBar": "选择在 DankBar 启动器按钮上显示的 Logo"
+    "Choose the logo displayed on the launcher button in DankBar": "选择在 Dank 状态栏启动器按钮上显示的 Logo"
   },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "设置通知弹窗的出现位置"
@@ -1188,7 +1188,7 @@
     "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "选择哪个显示器显示锁屏界面。其他显示器将显示纯色以保护 OLED 屏幕防烧伤。"
   },
   "Chroma Style": {
-    "Chroma Style": "浓度风格"
+    "Chroma Style": "色度风格"
   },
   "Cipher": {
     "Cipher": "密码"
@@ -1236,7 +1236,7 @@
     "Click Import to add a .ovpn or .conf": "点击导入添加 .ovpn 或 .conf 文件"
   },
   "Click Refresh to check status.": {
-    "Click Refresh to check status.": "点击刷新查看状态"
+    "Click Refresh to check status.": "点击“刷新”查看状态"
   },
   "Click Through": {
     "Click Through": "鼠标穿透"
@@ -2445,13 +2445,13 @@
     "Ethernet": "以太网"
   },
   "Every 15 minutes": {
-    "Every 15 minutes": "每15分钟"
+    "Every 15 minutes": "每 15 分钟"
   },
   "Every 30 minutes": {
-    "Every 30 minutes": "每30分钟"
+    "Every 30 minutes": "每 30 分钟"
   },
   "Every 4 hours": {
-    "Every 4 hours": "每4小时"
+    "Every 4 hours": "每 4 小时"
   },
   "Every hour": {
     "Every hour": "每小时"
@@ -2934,19 +2934,19 @@
     "Font used on the login screen": "登录界面使用的字体"
   },
   "For 1 hour": {
-    "For 1 hour": "1小时"
+    "For 1 hour": "1 小时"
   },
   "For 15 minutes": {
-    "For 15 minutes": "15分钟"
+    "For 15 minutes": "15 分钟"
   },
   "For 3 hours": {
-    "For 3 hours": "3小时"
+    "For 3 hours": "3 小时"
   },
   "For 30 minutes": {
-    "For 30 minutes": "30分钟"
+    "For 30 minutes": "30 分钟"
   },
   "For 8 hours": {
-    "For 8 hours": "8小时"
+    "For 8 hours": "8 小时"
   },
   "For editing plain text files": {
     "For editing plain text files": "用于编辑纯文本文件"
@@ -3687,7 +3687,7 @@
     "Largest": "更大"
   },
   "Last hour": {
-    "Last hour": "上个小时"
+    "Last hour": "最近 1 小时"
   },
   "Last launched %1": {
     "Last launched %1": "上次启动于 %1"
@@ -5019,7 +5019,7 @@
     "Pad": "覆盖"
   },
   "Pad Hours": {
-    "Pad Hours": "摸鱼时间"
+    "Pad Hours": "休息时间"
   },
   "Pad hours (02:00 vs 2:00)": {
     "Pad hours (02:00 vs 2:00)": "休息时间（02:00 vs 2:00）"
@@ -6429,7 +6429,7 @@
     "Show on-screen display when volume changes": "当音量变化时显示 OSD"
   },
   "Show seconds": {
-    "Show seconds": "显示秒"
+    "Show seconds": "显示秒数"
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "在状态栏和控制中心显示天气信息"
@@ -7260,7 +7260,7 @@
     "Usage Tips": "使用提示"
   },
   "Use 24-hour time format instead of 12-hour AM/PM": {
-    "Use 24-hour time format instead of 12-hour AM/PM": "改用24小时制显示时间"
+    "Use 24-hour time format instead of 12-hour AM/PM": "改用 24 小时制显示时间"
   },
   "Use Custom Command": {
     "Use Custom Command": "使用自定义命令"
@@ -7824,7 +7824,7 @@
     "ms": "毫秒"
   },
   "nav": {
-    "nav": "向导"
+    "nav": "导航"
   },
   "niri GitHub": {
     "niri GitHub": "niri GitHub"
@@ -7887,7 +7887,7 @@
     "relay: %1": "转发：%`"
   },
   "seconds": {
-    "seconds": "秒"
+    "seconds": "秒钟"
   },
   "source": {
     "source": "源"
