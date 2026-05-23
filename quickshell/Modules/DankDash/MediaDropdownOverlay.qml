@@ -522,14 +522,7 @@ Item {
                                     }
 
                                     StyledText {
-                                        text: {
-                                            if (!modelData)
-                                                return "";
-                                            const artist = modelData.trackArtist || "";
-                                            if (artist.length > 0)
-                                                return artist;
-                                            return modelData === activePlayer ? I18n.tr("Active") : I18n.tr("Available");
-                                        }
+                                        text: modelData?.trackArtist || I18n.tr("Unknown Artist")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                         elide: Text.ElideRight
