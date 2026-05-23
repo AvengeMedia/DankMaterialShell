@@ -6,10 +6,10 @@
     "%1 Sessions": "%1 个会话"
   },
   "%1 active session": {
-    "%1 active session": "%1 个激活会话"
+    "%1 active session": "%1 个活动的会话"
   },
   "%1 active sessions": {
-    "%1 active sessions": "%1 个激活会话"
+    "%1 active sessions": "%1 个活动的会话"
   },
   "%1 adapter, none connected": {
     "%1 adapter, none connected": "1% 个适配器，未连接任何适配器"
@@ -18,10 +18,10 @@
     "%1 adapters, none connected": "1% 个适配器，未连接任何适配器"
   },
   "%1 character": {
-    "%1 character": "%1 个字母"
+    "%1 character": "%1 个字符"
   },
   "%1 characters": {
-    "%1 characters": "%1 个字符"
+    "%1 characters": "%1 个字符串"
   },
   "%1 connected": {
     "%1 connected": "已连接 %1"
@@ -300,7 +300,7 @@
     "API": "API"
   },
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
-    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "AUR 助手是交互式的——请查看终端窗口中的提示。当升级退出时，这个弹出窗口会恢复空闲。"
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "AUR 助手是交互式的——请查看终端窗口中的提示。当升级退出时，这个弹窗会恢复空闲。"
   },
   "Aborted": {
     "Aborted": "已中止"
@@ -342,10 +342,10 @@
     "Activate": "激活"
   },
   "Activate Greeter": {
-    "Activate Greeter": "激活 Greeter"
+    "Activate Greeter": "激活欢迎界面"
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
-    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "激活 DMS Greeter？将打开一个终端进行 sudo 身份验证。激活后运行“同步”以应用您的设置。"
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "激活 DMS 欢迎界面？将打开一个终端进行 sudo 身份验证。激活后运行“同步”以应用您的设置。"
   },
   "Activation": {
     "Activation": "激活"
@@ -354,7 +354,7 @@
     "Active": "活动"
   },
   "Active Color": {
-    "Active Color": "激活颜色"
+    "Active Color": "激活的颜色"
   },
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "活动锁屏显示器"
@@ -468,7 +468,7 @@
     "Always show a minimum of 3 workspaces, even if fewer are available": "即使不足也总是显示至少三个工作区"
   },
   "Always show the dock when niri's overview is open": {
-    "Always show the dock when niri's overview is open": "当 Niri 的概览打开时，也总是显示程序坞"
+    "Always show the dock when niri's overview is open": "打开 Niri 概览时，也总是显示程序坞"
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "当仅连接一个显示器时，总是显示"
@@ -579,7 +579,7 @@
     "Architecture": "架构"
   },
   "Are you sure you want to kill session \"%1\"?": {
-    "Are you sure you want to kill session \"%1\"?": "确认要结束会话\"%1\"吗？"
+    "Are you sure you want to kill session \"%1\"?": "确认要结束会话“%1”吗？"
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "排列显示器、配置分辨率、刷新率和可变刷新率"
@@ -741,7 +741,7 @@
     "Automatically determine your location using your IP address": "通过 IP 地址自动检测您的位置"
   },
   "Automatically lock after": {
-    "Automatically lock after": "在此时间后自动锁定"
+    "Automatically lock after": "锁定超时"
   },
   "Automatically lock the screen when DMS starts": {
     "Automatically lock the screen when DMS starts": "DMS 启动时自动锁定屏幕"
@@ -912,7 +912,7 @@
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "模糊状态栏、弹窗、模态框以及通知的背景。需要合成器支持与配置"
   },
   "Blur wallpaper when niri overview is open": {
-    "Blur wallpaper when niri overview is open": "当打开概览时模糊壁纸"
+    "Blur wallpaper when niri overview is open": "打开 Niri 概览时模糊壁纸"
   },
   "Body": {
     "Body": "主体"
@@ -1359,7 +1359,7 @@
     "Column Width": "列宽"
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
-    "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "要隐藏的会话名称的逗号分隔列表。使用正则表达式时用斜杠包裹（例如： /^_.*/）。"
+    "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "用逗号分隔的会话名称列表。使用正则表达式时用斜杠包裹（例如： /^_.*/）。"
   },
   "Command": {
     "Command": "命令"
@@ -1404,7 +1404,7 @@
     "Configuration": "配置"
   },
   "Configuration activated": {
-    "Configuration activated": "已应用配置"
+    "Configuration activated": "已激活配置"
   },
   "Configuration will be preserved when this display reconnects": {
     "Configuration will be preserved when this display reconnects": "当该显示器重新连接时，配置将被保留"
@@ -1428,7 +1428,7 @@
     "Configure one in Settings → Dock → Trash.": "在设置→程序坞→回收站中进行设置。"
   },
   "Configure which displays show \"%1": {
-    "Configure which displays show \"%1\"": "配置要显示的显示器\"%1\""
+    "Configure which displays show \"%1\"": "配置要显示的显示器“%1”"
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "配置哪些显示器显示各类部件"
@@ -1623,7 +1623,7 @@
     "Create a new %1 session (n)": "新建一个 %1 会话（n）"
   },
   "Create rule for:": {
-    "Create rule for:": "为此创建规则："
+    "Create rule for:": "为此窗口创建规则："
   },
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
     "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "创建规则以静音、忽略、从历史记录中隐藏或覆盖通知优先级。默认设置仅覆盖优先级；通知仍会正常显示。"
@@ -1908,7 +1908,7 @@
     "Delete": "删除"
   },
   "Delete \"%1\"?": {
-    "Delete \"%1\"?": "删除\"%1\"？"
+    "Delete \"%1\"?": "删除“%1”？"
   },
   "Delete Class": {
     "Delete Class": "删除类别"
@@ -1923,10 +1923,10 @@
     "Delete VPN": "删除 VPN"
   },
   "Delete class \"%1\"?": {
-    "Delete class \"%1\"?": "删除类别\"%1\"？"
+    "Delete class \"%1\"?": "删除类别“%1”？"
   },
   "Delete profile \"%1\"?": {
-    "Delete profile \"%1\"?": "删除配置\"%1\"？"
+    "Delete profile \"%1\"?": "删除配置“%1”？"
   },
   "Demi Bold": {
     "Demi Bold": "次粗"
@@ -1968,7 +1968,7 @@
     "Detailed": "详细"
   },
   "Details for \"%1": {
-    "Details for \"%1\"": "\"%1\"的详细信息"
+    "Details for \"%1\"": "“%1”的详细信息"
   },
   "Detected backends: %1": {
     "Detected backends: %1": "检测到后端：%1"
@@ -2133,7 +2133,7 @@
     "Displays the active keyboard layout and allows switching": "显示当前键盘布局并支持切换"
   },
   "Distribution": {
-    "Distribution": "发行"
+    "Distribution": "发行版"
   },
   "Diverse palette spanning the full spectrum.": {
     "Diverse palette spanning the full spectrum.": "绚丽多彩，覆盖全色系的配色。"
@@ -2304,7 +2304,7 @@
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "启用以下自定义覆盖，设置每个状态栏的阴影强度、透明度和颜色。"
   },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
-    "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "启用合成器可定位的模糊层（命名空间：dms:blurwallpaper），需要手动配置 niri"
+    "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "启用合成器可定位的模糊层（命名空间：dms:blurwallpaper），需要手动配置 Niri"
   },
   "Enable fingerprint at login": {
     "Enable fingerprint at login": "登录时启用指纹识别"
@@ -2382,7 +2382,7 @@
     "Enter URL or text to share": "请输入想要共享的网址或文本"
   },
   "Enter a new name for session \"%1": {
-    "Enter a new name for session \"%1\"": "为会话“%1”输入新名称"
+    "Enter a new name for session \"%1\"": "为会话“%1”设置新名称"
   },
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "设置工作区名称"
@@ -2502,16 +2502,16 @@
     "Fade": "淡入淡出"
   },
   "Fade to lock screen": {
-    "Fade to lock screen": "淡出至锁定屏幕"
+    "Fade to lock screen": "渐变至锁屏"
   },
   "Fade to monitor off": {
-    "Fade to monitor off": "淡出至显示器关闭"
+    "Fade to monitor off": "渐变至熄屏"
   },
   "Failed to accept pairing": {
     "Failed to accept pairing": "接受配对失败"
   },
   "Failed to activate configuration": {
-    "Failed to activate configuration": "无法应用配置"
+    "Failed to activate configuration": "无法激活配置"
   },
   "Failed to activate profile - file not found": {
     "Failed to activate profile - file not found": "无法激活配置——未找到文件"
@@ -2985,7 +2985,7 @@
     "Forget": "忽略"
   },
   "Forget \"%1\"?": {
-    "Forget \"%1\"?": "忘记\"%1\"？"
+    "Forget \"%1\"?": "忘记“%1”？"
   },
   "Forget Device": {
     "Forget Device": "取消配对"
@@ -3102,7 +3102,7 @@
     "GitHub": "GitHub"
   },
   "Global fonts can be configured in Settings → Personalization": {
-    "Global fonts can be configured in Settings → Personalization": ""
+    "Global fonts can be configured in Settings → Personalization": "全局字体可在 设置 → 个性化 中配置"
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "全局缩放所有动画持续时间"
@@ -3120,10 +3120,10 @@
     "Goth Corners": "哥特风格圆角"
   },
   "Gradually fade the screen before locking with a configurable grace period": {
-    "Gradually fade the screen before locking with a configurable grace period": "在锁定前通过可配置的宽限期逐渐淡出屏幕"
+    "Gradually fade the screen before locking with a configurable grace period": "通过配置的宽限期逐步过渡屏幕到锁屏"
   },
   "Gradually fade the screen before turning off monitors with a configurable grace period": {
-    "Gradually fade the screen before turning off monitors with a configurable grace period": "在关闭显示器前逐渐淡出屏幕，淡出时间可配置"
+    "Gradually fade the screen before turning off monitors with a configurable grace period": "通过配置的宽限期逐步过渡屏幕到熄屏"
   },
   "Graph Time Range": {
     "Graph Time Range": "图表时间范围"
@@ -3279,13 +3279,13 @@
     "Hide When Fullscreen": "全屏时隐藏"
   },
   "Hide When Typing": {
-    "Hide When Typing": "按键时隐藏"
+    "Hide When Typing": "键入时隐藏"
   },
   "Hide When Windows Open": {
     "Hide When Windows Open": "窗口打开时隐藏"
   },
   "Hide cursor after inactivity (0 = disabled)": {
-    "Hide cursor after inactivity (0 = disabled)": "在未激活超过此时间后隐藏光标（0为禁用）"
+    "Hide cursor after inactivity (0 = disabled)": "光标在未活动时隐藏（0 为禁用）"
   },
   "Hide cursor when pressing keyboard keys": {
     "Hide cursor when pressing keyboard keys": "使用键盘输入时隐藏光标"
@@ -3312,7 +3312,7 @@
     "High-fidelity palette that preserves source hues.": "高保真配色，保留原始色调。"
   },
   "Highlight Active Workspace App": {
-    "Highlight Active Workspace App": "高亮活动工作区应用"
+    "Highlight Active Workspace App": "高亮活动的工作区应用"
   },
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": "在工作区指示器中高亮当前聚焦的应用"
@@ -3345,7 +3345,7 @@
     "Hold to confirm (%1s)": "按住以确认（%1 s）"
   },
   "Home": {
-    "Home": "家"
+    "Home": "主目录"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "水平与垂直状态栏厚度"
@@ -3627,7 +3627,7 @@
     "Keep Changes": "保持更改"
   },
   "Keep typing": {
-    "Keep typing": ""
+    "Keep typing": "保持键入"
   },
   "Keeping Awake": {
     "Keeping Awake": "保持活动"
@@ -3741,7 +3741,7 @@
     "Launcher Emerge Side": "启动器出现侧"
   },
   "Launcher Style": {
-    "Launcher Style": ""
+    "Launcher Style": "启动器风格"
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": "图层轮廓不透明度"
@@ -3861,7 +3861,7 @@
     "Lock before suspend": "挂起前锁屏"
   },
   "Lock fade grace period": {
-    "Lock fade grace period": "锁定淡出时间"
+    "Lock fade grace period": "锁屏渐变周期"
   },
   "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
     "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": "锁屏认证变更会自动生效，当需要 sudo 认证时可能会打开终端。"
@@ -4209,7 +4209,7 @@
     "Monitor Configuration": "监视器配置"
   },
   "Monitor fade grace period": {
-    "Monitor fade grace period": "显示器淡出时间"
+    "Monitor fade grace period": "熄屏渐变周期"
   },
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "监视使用动态主题色的壁纸"
@@ -4377,7 +4377,7 @@
     "Next": "下一个"
   },
   "Next Transition": {
-    "Next Transition": "下一过渡"
+    "Next Transition": "下一次切换"
   },
   "Night": {
     "Night": "夜晚"
@@ -4407,7 +4407,7 @@
     "No": "否"
   },
   "No Active Players": {
-    "No Active Players": "没有活动的播放器"
+    "No Active Players": "无活动的播放器"
   },
   "No Anim": {
     "No Anim": "无动画"
@@ -4473,7 +4473,7 @@
     "No action": "无操作"
   },
   "No active %1 sessions": {
-    "No active %1 sessions": "无活动的 %1 个会话"
+    "No active %1 sessions": "无活动的 %1 会话"
   },
   "No adapter": {
     "No adapter": "无适配器"
@@ -4683,7 +4683,7 @@
     "None": "无"
   },
   "None active": {
-    "None active": ""
+    "None active": "无活动"
   },
   "Normal": {
     "Normal": "正常"
@@ -5205,7 +5205,7 @@
     "Please wait...": "请稍候..."
   },
   "Please write a name for your new %1 session": {
-    "Please write a name for your new %1 session": "请为您的新会话 %1 起名"
+    "Please write a name for your new %1 session": "请为您的新会话 %1 设置名称"
   },
   "Plugged In": {
     "Plugged In": "连接电源"
@@ -5436,7 +5436,7 @@
     "Profile Image Error": "用户头像错误"
   },
   "Profile activated: %1": {
-    "Profile activated: %1": "已激活配置：%1"
+    "Profile activated: %1": "配置已激活：%1"
   },
   "Profile deleted": {
     "Profile deleted": "配置已删除"
@@ -6372,7 +6372,7 @@
     "Show in GB": "以 GB 为单位"
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
-    "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "在 Niri 概览中键入时显示启动器叠加层。禁用该项以使用其他启动器"
+    "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "在 Niri 概览中键入时显示启动器叠加层。禁用该选项以使用其他启动器"
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "在底部显示模式切换与键盘提示"
@@ -6447,16 +6447,16 @@
     "Show workspaces of the currently focused monitor": "在当前聚焦的显示器显示工作区"
   },
   "Shows all running applications with focus indication": {
-    "Shows all running applications with focus indication": "显示所有正在运行应用程序，并标记焦点所在"
+    "Shows all running applications with focus indication": "显示所有正在运行的应用程序，并标记焦点所在"
   },
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "显示当前工作区并支持快速切换"
   },
   "Shows when caps lock is active": {
-    "Shows when caps lock is active": "大写锁定时显示"
+    "Shows when caps lock is active": "大写锁激活时显示"
   },
   "Shows when microphone, camera, or screen sharing is active": {
-    "Shows when microphone, camera, or screen sharing is active": "显示麦克风、摄像头或屏幕共享的使用状态"
+    "Shows when microphone, camera, or screen sharing is active": "麦克风、摄像头或屏幕共享激活时显示"
   },
   "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
     "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "将媒体小部件缩小以适应较短的歌曲标题，同时仍遵循配置的最大尺寸"
@@ -6582,7 +6582,7 @@
     "Start KDE Connect or Valent to use this plugin": "启动 KDE Connect 或 Valent 以使用此插件"
   },
   "Start typing your notes here...": {
-    "Start typing your notes here...": "请在这里记录你的笔记..."
+    "Start typing your notes here...": "在这里输入你的笔记..."
   },
   "State": {
     "State": "状态"
@@ -6648,7 +6648,7 @@
     "Suspend behavior": "挂起行为"
   },
   "Suspend system after": {
-    "Suspend system after": "在此时间后挂起系统"
+    "Suspend system after": "挂起超时"
   },
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "挂起后休眠"
@@ -6663,7 +6663,7 @@
     "Switch between display configurations": "切换显示配置"
   },
   "Switch to power profile": {
-    "Switch to power profile": "切换至电源配置"
+    "Switch to power profile": "切换电源配置"
   },
   "Sync": {
     "Sync": "同步"
@@ -6684,7 +6684,7 @@
     "Sync dark mode with settings portals for system-wide theme hints": "随系统设置开启深色模式，以适配全局主题"
   },
   "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": {
-    "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": "后台模式同步失败。正尝试终端模式以进行交互式认证。"
+    "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": "以后台模式同步失败。正尝试终端模式以确保进行交互式认证。"
   },
   "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
     "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": "同步需要 sudo 身份验证。正在打开终端，以便您可以使用密码或指纹。"
@@ -6873,7 +6873,7 @@
     "This output is disabled in the current profile": "在当前配置中此输出已被禁用"
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
-    "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "该插件没有 'settings_write' 权限。\n\n请在 plugin.json 中添加 \"permissions\": [\"settings_read\", \"settings_write\"]"
+    "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "该插件没有 'settings_write' 权限。\n\n请在 plugin.json 中添加 “permissions”: [\"settings_read\", \"settings_write\"]"
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
     "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "此部件会阻止 GPU 进入省电状态，可能会显著影响笔记本的电池续航。不建议在配备混合显卡的笔记本上使用。"
@@ -7068,10 +7068,10 @@
     "Trust": "信任"
   },
   "Try a different search": {
-    "Try a different search": "尝试不同的搜索"
+    "Try a different search": "尝试搜索其他关键词"
   },
   "Try a different search or switch filters.": {
-    "Try a different search or switch filters.": ""
+    "Try a different search or switch filters.": "尝试搜索其他关键词或切换筛选方式"
   },
   "Turn off": {
     "Turn off": "关闭"
@@ -7080,13 +7080,13 @@
     "Turn off Do Not Disturb": "关闭勿扰模式"
   },
   "Turn off all displays immediately when the lock screen activates": {
-    "Turn off all displays immediately when the lock screen activates": "当激活锁屏时将立即关闭所有显示器"
+    "Turn off all displays immediately when the lock screen activates": "激活锁屏时将立即关闭所有显示器"
   },
   "Turn off monitors after": {
-    "Turn off monitors after": "在此时间后关闭显示器"
+    "Turn off monitors after": "熄屏超时"
   },
   "Turn off monitors after lock": {
-    "Turn off monitors after lock": "在锁定后关闭显示器"
+    "Turn off monitors after lock": "锁定后熄屏超时"
   },
   "Turn off now": {
     "Turn off now": "立即关闭"
@@ -7377,7 +7377,7 @@
     "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "使用所在位置的日出/日落时间，自动调节夜间模式。"
   },
   "Using global monospace font from Settings → Personalization": {
-    "Using global monospace font from Settings → Personalization": ""
+    "Using global monospace font from Settings → Personalization": "在 设置 → 个性化 使用全局等宽字体"
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": "使用伽马控制的已共享设置"
@@ -7809,10 +7809,10 @@
     "mangowc GitHub": "mangowc GitHub"
   },
   "matugen not available or disabled - cannot apply GTK colors": {
-    "matugen not available or disabled - cannot apply GTK colors": ""
+    "matugen not available or disabled - cannot apply GTK colors": "matugen 不可用或已被禁用——无法应用 GTK 配色"
   },
   "matugen not available or disabled - cannot apply Qt colors": {
-    "matugen not available or disabled - cannot apply Qt colors": ""
+    "matugen not available or disabled - cannot apply Qt colors": "matugen 不可用或已被禁用——无法应用 QT 配色"
   },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "未找到 matugen——请为动态主题安装 matugen 包"
@@ -7827,22 +7827,22 @@
     "nav": "导航"
   },
   "niri GitHub": {
-    "niri GitHub": "niri GitHub"
+    "niri GitHub": "Niri GitHub"
   },
   "niri Matrix Chat": {
-    "niri Matrix Chat": "niri Matrix 聊天室"
+    "niri Matrix Chat": "Niri Matrix 聊天室"
   },
   "niri shortcuts config": {
-    "niri shortcuts config": "niri 快捷键设置"
+    "niri shortcuts config": "Niri 快捷键设置"
   },
   "niri/dms Discord": {
     "niri/dms Discord": "niri/dms Discord"
   },
   "niri: config reloaded": {
-    "niri: config reloaded": "niri：配置已重载"
+    "niri: config reloaded": "Niri：配置已重载"
   },
   "niri: failed to load config": {
-    "niri: failed to load config": "niri：配置加载失败"
+    "niri: failed to load config": "Niri：配置加载失败"
   },
   "now": {
     "now": "现在"
