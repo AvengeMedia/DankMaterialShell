@@ -230,6 +230,13 @@ DankPopout {
                     return;
                 }
 
+                if (root.currentTabIndex === 1 && mediaLoader.item?.handleKeyEvent) {
+                    if (mediaLoader.item.handleKeyEvent(event)) {
+                        event.accepted = true;
+                        return;
+                    }
+                }
+
                 if (root.currentTabIndex === 2 && wallpaperLoader.item?.handleKeyEvent) {
                     if (wallpaperLoader.item.handleKeyEvent(event)) {
                         event.accepted = true;

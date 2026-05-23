@@ -184,6 +184,59 @@ Item {
         }
     }
 
+    function handleKeyEvent(event) {
+        if (!activePlayer)
+            return false;
+
+        // 1. Number keys 0-9 to seek to 0%-90%
+        if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
+            if (activePlayer.canSeek && activePlayer.length > 0) {
+                const ratio = (event.key - Qt.Key_0) * 0.1;
+                const targetPosition = ratio * activePlayer.length;
+                activePlayer.position = Math.min(targetPosition, activePlayer.length * 0.99);
+                return true;
+            }
+        }
+
+        // 2. Left / Right arrows to seek backward / forward 5s
+        if (event.key === Qt.Key_Left) {
+            if (activePlayer.canSeek) {
+                activePlayer.position = Math.max(0, activePlayer.position - 5);
+                return true;
+            }
+        }
+        if (event.key === Qt.Key_Right) {
+            if (activePlayer.canSeek && activePlayer.length > 0) {
+                activePlayer.position = Math.min(activePlayer.length - 1, activePlayer.position + 5);
+                return true;
+            }
+        }
+
+        // 3. Up / Down arrows to play previous / next track
+        if (event.key === Qt.Key_Up) {
+            if (activePlayer.canGoPrevious) {
+                activePlayer.previous();
+                return true;
+            }
+        }
+        if (event.key === Qt.Key_Down) {
+            if (activePlayer.canGoNext) {
+                activePlayer.next();
+                return true;
+            }
+        }
+
+        // 4. Spacebar to play/pause
+        if (event.key === Qt.Key_Space) {
+            if (activePlayer.canTogglePlaying) {
+                activePlayer.togglePlaying();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     property bool isSeeking: false
 
     Timer {
