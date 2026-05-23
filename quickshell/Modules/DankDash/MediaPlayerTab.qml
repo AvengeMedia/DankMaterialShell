@@ -13,7 +13,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property MprisPlayer activePlayer: MprisController.activePlayer
-    property real stableLength: 0
+    readonly property real stableLength: MprisController.activePlayerStableLength
     property var allPlayers: MprisController.availablePlayers
     property var targetScreen: null
     property real popoutX: 0
@@ -76,7 +76,6 @@ Item {
     }
 
     onActivePlayerChanged: {
-        stableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
         if (!activePlayer) {
             isSwitching = false;
             _switchHold = false;
@@ -110,17 +109,11 @@ Item {
     Connections {
         target: activePlayer
         function onTrackTitleChanged() {
-            root.stableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
             _switchHoldTimer.restart();
             maybeFinishSwitch();
         }
         function onTrackArtUrlChanged() {
             TrackArtService.loadArtwork(activePlayer.trackArtUrl);
-        }
-        function onLengthChanged() {
-            if (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) {
-                root.stableLength = activePlayer.length;
-            }
         }
     }
 

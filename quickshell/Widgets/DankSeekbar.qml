@@ -8,23 +8,7 @@ Item {
     id: root
 
     property MprisPlayer activePlayer
-    property real stableLength: 0
-
-    Connections {
-        target: activePlayer
-        function onLengthChanged() {
-            if (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) {
-                root.stableLength = activePlayer.length;
-            }
-        }
-        function onTrackTitleChanged() {
-            root.stableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
-        }
-    }
-
-    onActivePlayerChanged: {
-        stableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
-    }
+    readonly property real stableLength: MprisController.activePlayerStableLength
 
     property real seekPreviewRatio: -1
     readonly property real playerValue: {
