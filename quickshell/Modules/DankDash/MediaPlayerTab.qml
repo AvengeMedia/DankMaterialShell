@@ -212,18 +212,14 @@ Item {
             }
         }
 
-        // 3. Up / Down arrows to play previous / next track
+        // 3. Up / Down arrows to adjust volume
         if (event.key === Qt.Key_Up) {
-            if (activePlayer.canGoPrevious) {
-                activePlayer.previous();
-                return true;
-            }
+            adjustVolume(5);
+            return true;
         }
         if (event.key === Qt.Key_Down) {
-            if (activePlayer.canGoNext) {
-                activePlayer.next();
-                return true;
-            }
+            adjustVolume(-5);
+            return true;
         }
 
         // 4. Spacebar to play/pause
