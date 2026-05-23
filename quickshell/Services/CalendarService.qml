@@ -9,7 +9,8 @@ import qs.Common
 Singleton {
     id: root
 
-    property bool khalAvailable: false
+    property bool khalAvailable: true // Always true to enable DMS calendar card UI
+    property bool khalInstalled: false // Tracks if khal is actually on the system
     property var eventsByDate: ({})
     property bool isLoading: false
     property string lastError: ""
@@ -19,69 +20,213 @@ Singleton {
 
     function checkKhalAvailability() {
         if (!khalCheckProcess.running)
-            khalCheckProcess.running = true;
+            khalCheckProcess.running = true
     }
 
     function detectKhalDateFormat() {
         if (!khalFormatProcess.running)
-            khalFormatProcess.running = true;
+            khalFormatProcess.running = true
     }
 
     function parseKhalDateFormat(formatExample) {
-        let qtFormat = formatExample.replace("12", "MM").replace("21", "dd").replace("2013", "yyyy");
-        return {
-            format: qtFormat,
-            parser: null
-        };
+        let qtFormat = formatExample.replace("12", "MM").replace("21", "dd").replace("2013", "yyyy")
+        return { format: qtFormat, parser: null }
     }
+
 
     function loadCurrentMonth() {
         if (!root.khalAvailable)
-            return;
-        let today = new Date();
-        let firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-        let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            return
+
+        let today = new Date()
+        let firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+        let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
         // Add padding
-        let startDate = new Date(firstDay);
-        startDate.setDate(startDate.getDate() - firstDay.getDay() - 7);
-        let endDate = new Date(lastDay);
-        endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()) + 7);
-        loadEvents(startDate, endDate);
+        let startDate = new Date(firstDay)
+        startDate.setDate(startDate.getDate() - firstDay.getDay() - 7)
+        let endDate = new Date(lastDay)
+        endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()) + 7)
+        loadEvents(startDate, endDate)
     }
 
     function loadEvents(startDate, endDate) {
-        if (!root.khalAvailable) {
-            return;
+        // Read local tasks from niri-calendar-todo
+        if (!localTasksProcess.running) {
+            localTasksProcess.running = true
+        }
+
+        if (!root.khalInstalled) {
+            // If khal isn't installed, trigger change notification for local tasks
+            root.eventsByDateChanged()
+            return
         }
         if (eventsProcess.running) {
-            return;
+            return
         }
         // Store last requested date range for refresh timer
-        root.lastStartDate = startDate;
-        root.lastEndDate = endDate;
-        root.isLoading = true;
+        root.lastStartDate = startDate
+        root.lastEndDate = endDate
+        root.isLoading = true
         // Format dates for khal using detected format
-        let startDateStr = Qt.formatDate(startDate, root.khalDateFormat);
-        let endDateStr = Qt.formatDate(endDate, root.khalDateFormat);
-        eventsProcess.requestStartDate = startDate;
-        eventsProcess.requestEndDate = endDate;
-        eventsProcess.command = ["khal", "list", "--json", "title", "--json", "description", "--json", "start-date", "--json", "start-time", "--json", "end-date", "--json", "end-time", "--json", "all-day", "--json", "location", "--json", "url", startDateStr, endDateStr];
-        eventsProcess.running = true;
+        let startDateStr = Qt.formatDate(startDate, root.khalDateFormat)
+        let endDateStr = Qt.formatDate(endDate, root.khalDateFormat)
+        eventsProcess.requestStartDate = startDate
+        eventsProcess.requestEndDate = endDate
+        eventsProcess.command = ["khal", "list", "--json", "title", "--json", "description", "--json", "start-date", "--json", "start-time", "--json", "end-date", "--json", "end-time", "--json", "all-day", "--json", "location", "--json", "url", startDateStr, endDateStr]
+        eventsProcess.running = true
     }
 
     function getEventsForDate(date) {
-        let dateKey = Qt.formatDate(date, "yyyy-MM-dd");
-        return root.eventsByDate[dateKey] || [];
+        let dateKey = Qt.formatDate(date, "yyyy-MM-dd")
+        return root.eventsByDate[dateKey] || []
     }
 
     function hasEventsForDate(date) {
-        let events = getEventsForDate(date);
-        return events.length > 0;
+        let events = getEventsForDate(date)
+        return events.length > 0
+    }
+
+    // Task editing methods using clean, single-line Python scripts (no indentation or external helper file needed!)
+    function addTaskForDate(date, text) {
+        let dateKey = Qt.formatDate(date, "yyyy-MM-dd")
+        addTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, time, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); os.makedirs(os.path.dirname(path), exist_ok=True); data = json.load(open(path)) if os.path.exists(path) else {}; date, text = sys.argv[1], sys.argv[2]; item = {'id': str(int(time.time()*1000)) + '-dms', 'text': text, 'completed': False}; data.setdefault(date, []).append(item); json.dump(data, open(path, 'w'), indent=2)",
+            dateKey, text
+        ]
+        addTaskProcess.running = true
+    }
+
+    function toggleTask(taskId) {
+        let cleanId = taskId.replace("task_", "")
+        toggleTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); [item.update({'completed': not item['completed']}) for v in data.values() for item in v if item['id'] == tid]; json.dump(data, open(path, 'w'), indent=2)",
+            cleanId
+        ]
+        toggleTaskProcess.running = true
+    }
+
+    function removeTask(taskId) {
+        let cleanId = taskId.replace("task_", "")
+        removeTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); data = {k: [i for i in v if i['id'] != tid] for k, v in data.items()}; data = {k: v for k, v in data.items() if len(v) > 0}; json.dump(data, open(path, 'w'), indent=2)",
+            cleanId
+        ]
+        removeTaskProcess.running = true
     }
 
     // Initialize on component completion
     Component.onCompleted: {
-        detectKhalDateFormat();
+        detectKhalDateFormat()
+    }
+
+    // Process for inserting tasks
+    Process {
+        id: addTaskProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true
+            }
+        }
+    }
+
+    // Process for toggling task state
+    Process {
+        id: toggleTaskProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true
+            }
+        }
+    }
+
+    // Process for deleting tasks
+    Process {
+        id: removeTaskProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true
+            }
+        }
+    }
+
+    // Process for detecting local tasks
+    Process {
+        id: localTasksProcess
+        command: ["cat", "/home/goatnath/.config/niri-calendar-todo/tasks.json"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let text = this.text.trim()
+                if (!text || text === "") {
+                    // Clear task events if file is empty
+                    let newEventsByDate = Object.assign({}, root.eventsByDate)
+                    for (let dateKey in newEventsByDate) {
+                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"))
+                    }
+                    root.eventsByDate = newEventsByDate
+                    return
+                }
+                try {
+                    let parsed = JSON.parse(text)
+                    let newEventsByDate = Object.assign({}, root.eventsByDate)
+
+                    // Clear any existing task events to prevent duplicates
+                    for (let dateKey in newEventsByDate) {
+                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"))
+                    }
+
+                    for (let dateKey in parsed) {
+                        let taskList = parsed[dateKey]
+                        if (!newEventsByDate[dateKey]) {
+                            newEventsByDate[dateKey] = []
+                        }
+
+                        for (let task of taskList) {
+                            let eventId = "task_" + task.id
+                            if (newEventsByDate[dateKey].some(e => e.id === eventId)) {
+                                continue
+                            }
+
+                            let parts = dateKey.split("-")
+                            let taskDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
+
+                            let eventObj = {
+                                "id": eventId,
+                                "title": (task.completed ? "✓ " : "☐ ") + task.text,
+                                "start": taskDate,
+                                "end": taskDate,
+                                "location": "",
+                                "description": "Task from your Planner",
+                                "url": "",
+                                "calendar": "Todo Planner",
+                                "color": "#10B981", // Pastel Green
+                                "allDay": true,
+                                "isMultiDay": false
+                            }
+                            newEventsByDate[dateKey].push(eventObj)
+                        }
+                    }
+
+                    // Re-sort within each date
+                    for (let dateKey in newEventsByDate) {
+                        newEventsByDate[dateKey].sort((a, b) => {
+                            return a.start.getTime() - b.start.getTime()
+                        })
+                    }
+
+                    root.eventsByDate = newEventsByDate
+                } catch (error) {
+                    console.warn("Failed to parse local tasks JSON: " + error.toString())
+                }
+            }
+        }
     }
 
     // Process for detecting khal date format
@@ -92,22 +237,22 @@ Singleton {
         running: false
         onExited: exitCode => {
             if (exitCode !== 0) {
-                checkKhalAvailability();
+                checkKhalAvailability()
             }
         }
 
         stdout: StdioCollector {
             onStreamFinished: {
-                let lines = text.split('\n');
+                let lines = text.split('\n')
                 for (let line of lines) {
                     if (line.startsWith('dateformat:')) {
-                        let formatExample = line.substring(line.indexOf(':') + 1).trim();
-                        let formatInfo = parseKhalDateFormat(formatExample);
-                        root.khalDateFormat = formatInfo.format;
-                        break;
+                        let formatExample = line.substring(line.indexOf(':') + 1).trim()
+                        let formatInfo = parseKhalDateFormat(formatExample)
+                        root.khalDateFormat = formatInfo.format
+                        break
                     }
                 }
-                checkKhalAvailability();
+                checkKhalAvailability()
             }
         }
     }
@@ -119,9 +264,12 @@ Singleton {
         command: ["khal", "list", "today"]
         running: false
         onExited: exitCode => {
-            root.khalAvailable = (exitCode === 0);
-            if (exitCode === 0) {
-                loadCurrentMonth();
+            root.khalInstalled = (exitCode === 0)
+            if (root.khalInstalled) {
+                loadCurrentMonth()
+            } else {
+                // If not installed, load local tasks anyway
+                loadEvents(root.lastStartDate || new Date(), root.lastEndDate || new Date())
             }
         }
     }
@@ -136,96 +284,100 @@ Singleton {
 
         running: false
         onExited: exitCode => {
-            root.isLoading = false;
+            root.isLoading = false
             if (exitCode !== 0) {
-                root.lastError = "Failed to load events (exit code: " + exitCode + ")";
-                return;
+                root.lastError = "Failed to load events (exit code: " + exitCode + ")"
+                return
             }
             try {
-                let newEventsByDate = {};
-                let lines = eventsProcess.rawOutput.split('\n');
+                let newEventsByDate = {}
+                let lines = eventsProcess.rawOutput.split('\n')
                 for (let line of lines) {
-                    line = line.trim();
+                    line = line.trim()
                     if (!line || line === "[]")
-                        continue;
+                        continue
 
                     // Parse JSON line
-                    let dayEvents = JSON.parse(line);
+                    let dayEvents = JSON.parse(line)
                     // Process each event in this day's array
                     for (let event of dayEvents) {
                         if (!event.title)
-                            continue;
+                            continue
 
                         // Parse start and end dates using detected format
-                        let startDate, endDate;
+                        let startDate, endDate
                         if (event['start-date']) {
-                            startDate = Date.fromLocaleString(I18n.locale(), event['start-date'], root.khalDateFormat);
+                            startDate = Date.fromLocaleString(Qt.locale(), event['start-date'], root.khalDateFormat)
                         } else {
-                            startDate = new Date();
+                            startDate = new Date()
                         }
                         if (event['end-date']) {
-                            endDate = Date.fromLocaleString(I18n.locale(), event['end-date'], root.khalDateFormat);
+                            endDate = Date.fromLocaleString(Qt.locale(), event['end-date'], root.khalDateFormat)
                         } else {
-                            endDate = new Date(startDate);
+                            endDate = new Date(startDate)
                         }
                         // Create start/end times
-                        let startTime = new Date(startDate);
-                        let endTime = new Date(endDate);
-                        if (event['start-time'] && event['all-day'] !== "True") {
+                        let startTime = new Date(startDate)
+                        let endTime = new Date(endDate)
+                        if (event['start-time']
+                            && event['all-day'] !== "True") {
                             // Parse time if available and not all-day
-                            let timeStr = event['start-time'];
+                            let timeStr = event['start-time']
                             if (timeStr) {
                                 // Match time with optional seconds and AM/PM
-                                let timeParts = timeStr.match(/(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i);
+                                let timeParts = timeStr.match(/(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i)
                                 if (timeParts) {
-                                    let hours = parseInt(timeParts[1]);
-                                    let minutes = parseInt(timeParts[2]);
+                                    let hours = parseInt(timeParts[1])
+                                    let minutes = parseInt(timeParts[2])
 
                                     // Handle AM/PM conversion if present
                                     if (timeParts[3]) {
-                                        let period = timeParts[3].toUpperCase();
+                                        let period = timeParts[3].toUpperCase()
                                         if (period === 'PM' && hours !== 12) {
-                                            hours += 12;
+                                            hours += 12
                                         } else if (period === 'AM' && hours === 12) {
-                                            hours = 0;
+                                            hours = 0
                                         }
                                     }
 
-                                    startTime.setHours(hours, minutes);
+                                    startTime.setHours(hours, minutes)
                                     if (event['end-time']) {
-                                        let endTimeParts = event['end-time'].match(/(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i);
+                                        let endTimeParts = event['end-time'].match(
+                                            /(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i)
                                         if (endTimeParts) {
-                                            let endHours = parseInt(endTimeParts[1]);
-                                            let endMinutes = parseInt(endTimeParts[2]);
+                                            let endHours = parseInt(endTimeParts[1])
+                                            let endMinutes = parseInt(endTimeParts[2])
 
                                             // Handle AM/PM conversion if present
                                             if (endTimeParts[3]) {
-                                                let endPeriod = endTimeParts[3].toUpperCase();
+                                                let endPeriod = endTimeParts[3].toUpperCase()
                                                 if (endPeriod === 'PM' && endHours !== 12) {
-                                                    endHours += 12;
+                                                    endHours += 12
                                                 } else if (endPeriod === 'AM' && endHours === 12) {
-                                                    endHours = 0;
+                                                    endHours = 0
                                                 }
                                             }
 
-                                            endTime.setHours(endHours, endMinutes);
+                                            endTime.setHours(endHours, endMinutes)
                                         }
                                     } else {
                                         // Default to 1 hour duration on same day
-                                        endTime = new Date(startTime);
-                                        endTime.setHours(startTime.getHours() + 1);
+                                        endTime = new Date(startTime)
+                                        endTime.setHours(
+                                            startTime.getHours() + 1)
                                     }
                                 }
                             }
                         }
                         // Create unique ID for this event (to track multi-day events)
-                        let eventId = event.title + "_" + event['start-date'] + "_" + (event['start-time'] || 'allday');
+                        let eventId = event.title + "_" + event['start-date']
+                            + "_" + (event['start-time'] || 'allday')
                         // Create event object template
-                        let extractedUrl = "";
+                        let extractedUrl = ""
                         if (!event.url && event.description) {
-                            let urlMatch = event.description.match(/https?:\/\/[^\s]+/);
+                            let urlMatch = event.description.match(/https?:\/\/[^\s]+/)
                             if (urlMatch) {
-                                extractedUrl = urlMatch[0];
+                                extractedUrl = urlMatch[0]
                             }
                         }
                         let eventTemplate = {
@@ -239,71 +391,75 @@ Singleton {
                             "calendar": "",
                             "color": "",
                             "allDay": event['all-day'] === "True",
-                            "isMultiDay": startDate.toDateString() !== endDate.toDateString()
-                        };
+                            "isMultiDay": startDate.toDateString(
+                            ) !== endDate.toDateString()
+                        }
                         // Add event to each day it spans
-                        let currentDate = new Date(startDate);
+                        let currentDate = new Date(startDate)
                         while (currentDate <= endDate) {
-                            let dateKey = Qt.formatDate(currentDate, "yyyy-MM-dd");
+                            let dateKey = Qt.formatDate(currentDate,
+                                                        "yyyy-MM-dd")
                             if (!newEventsByDate[dateKey])
-                                newEventsByDate[dateKey] = [];
+                                newEventsByDate[dateKey] = []
 
                             // Check if this exact event is already added to this date (prevent duplicates)
-                            let existingEvent = newEventsByDate[dateKey].find(e => {
-                                return e.id === eventId;
-                            });
+                            let existingEvent = newEventsByDate[dateKey].find(
+                                e => {
+                                    return e.id === eventId
+                                })
                             if (existingEvent) {
                                 // Move to next day without adding duplicate
-                                currentDate.setDate(currentDate.getDate() + 1);
-                                continue;
+                                currentDate.setDate(currentDate.getDate() + 1)
+                                continue
                             }
                             // Create a copy of the event for this date
-                            let dayEvent = Object.assign({}, eventTemplate);
+                            let dayEvent = Object.assign({}, eventTemplate)
                             // For multi-day events, adjust the display time for this specific day
                             if (currentDate.getTime() === startDate.getTime()) {
                                 // First day - use original start time
-                                dayEvent.start = new Date(startTime);
+                                dayEvent.start = new Date(startTime)
                             } else {
                                 // Subsequent days - start at beginning of day for all-day events
-                                dayEvent.start = new Date(currentDate);
+                                dayEvent.start = new Date(currentDate)
                                 if (!dayEvent.allDay)
-                                    dayEvent.start.setHours(0, 0, 0, 0);
+                                    dayEvent.start.setHours(0, 0, 0, 0)
                             }
                             if (currentDate.getTime() === endDate.getTime()) {
                                 // Last day - use original end time
-                                dayEvent.end = new Date(endTime);
+                                dayEvent.end = new Date(endTime)
                             } else {
                                 // Earlier days - end at end of day for all-day events
-                                dayEvent.end = new Date(currentDate);
+                                dayEvent.end = new Date(currentDate)
                                 if (!dayEvent.allDay)
-                                    dayEvent.end.setHours(23, 59, 59, 999);
+                                    dayEvent.end.setHours(23, 59, 59, 999)
                             }
-                            newEventsByDate[dateKey].push(dayEvent);
+                            newEventsByDate[dateKey].push(dayEvent)
                             // Move to next day
-                            currentDate.setDate(currentDate.getDate() + 1);
+                            currentDate.setDate(currentDate.getDate() + 1)
                         }
                     }
                 }
                 // Sort events by start time within each date
                 for (let dateKey in newEventsByDate) {
                     newEventsByDate[dateKey].sort((a, b) => {
-                        return a.start.getTime() - b.start.getTime();
-                    });
+                        return a.start.getTime(
+                        ) - b.start.getTime()
+                    })
                 }
-                root.eventsByDate = newEventsByDate;
-                root.lastError = "";
+                root.eventsByDate = newEventsByDate
+                root.lastError = ""
             } catch (error) {
-                root.lastError = "Failed to parse events JSON: " + error.toString();
-                root.eventsByDate = {};
+                root.lastError = "Failed to parse events JSON: " + error.toString()
+                root.eventsByDate = {}
             }
             // Reset for next run
-            eventsProcess.rawOutput = "";
+            eventsProcess.rawOutput = ""
         }
 
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                eventsProcess.rawOutput += data + "\n";
+                eventsProcess.rawOutput += data + "\n"
             }
         }
     }
