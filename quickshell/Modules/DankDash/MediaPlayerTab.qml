@@ -198,6 +198,27 @@ Item {
         showVolumeDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
     }
 
+    function toggleMute() {
+        if (!volumeAvailable)
+            return;
+        SessionData.suppressOSDTemporarily();
+        if (currentVolume > 0) {
+            volumeButton.previousVolume = currentVolume;
+            if (usePlayerVolume) {
+                activePlayer.volume = 0;
+            } else if (AudioService.sink?.audio) {
+                AudioService.sink.audio.volume = 0;
+            }
+        } else {
+            const restoreVolume = volumeButton.previousVolume > 0 ? volumeButton.previousVolume : 0.5;
+            if (usePlayerVolume) {
+                activePlayer.volume = restoreVolume;
+            } else if (AudioService.sink?.audio) {
+                AudioService.sink.audio.volume = restoreVolume;
+            }
+        }
+    }
+
     function handleKeyEvent(event) {
         if (!activePlayer)
             return false;
@@ -246,6 +267,14 @@ Item {
                 activePlayer.togglePlaying();
                 return true;
             }
+        }
+
+        // 5. M key to toggle mute
+        if (event.key === Qt.Key_M) {
+            toggleMute();
+            triggerVolumeDropdown();
+            dropdownButtonExited();
+            return true;
         }
 
         return false;
@@ -794,22 +823,7 @@ Item {
                     dropdownButtonExited();
             }
             onClicked: {
-                SessionData.suppressOSDTemporarily();
-                if (currentVolume > 0) {
-                    volumeButton.previousVolume = currentVolume;
-                    if (usePlayerVolume) {
-                        activePlayer.volume = 0;
-                    } else if (AudioService.sink?.audio) {
-                        AudioService.sink.audio.volume = 0;
-                    }
-                } else {
-                    const restoreVolume = volumeButton.previousVolume > 0 ? volumeButton.previousVolume : 0.5;
-                    if (usePlayerVolume) {
-                        activePlayer.volume = restoreVolume;
-                    } else if (AudioService.sink?.audio) {
-                        AudioService.sink.audio.volume = restoreVolume;
-                    }
-                }
+                toggleMute();
             }
             onWheel: wheelEvent => {
                 SessionData.suppressOSDTemporarily();
