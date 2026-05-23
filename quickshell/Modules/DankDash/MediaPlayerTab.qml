@@ -84,7 +84,6 @@ Item {
         isSwitching = true;
         _switchHold = true;
         _switchHoldTimer.restart();
-        TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(activePlayer));
     }
 
     function maybeFinishSwitch() {
@@ -112,12 +111,6 @@ Item {
         function onTrackTitleChanged() {
             _switchHoldTimer.restart();
             maybeFinishSwitch();
-        }
-        function onTrackArtUrlChanged() {
-            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(activePlayer));
-        }
-        function onMetadataChanged() {
-            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(activePlayer));
         }
     }
 
@@ -297,14 +290,14 @@ Item {
     Item {
         id: bgContainer
         anchors.fill: parent
-        visible: TrackArtService._bgArtSource !== ""
+        visible: TrackArtService.resolvedArtUrl !== ""
 
         Image {
             id: bgImage
             anchors.centerIn: parent
             width: Math.max(parent.width, parent.height) * 1.1
             height: width
-            source: TrackArtService._bgArtSource
+            source: TrackArtService.resolvedArtUrl
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             cache: true

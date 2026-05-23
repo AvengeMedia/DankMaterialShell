@@ -8,28 +8,15 @@ Item {
     id: root
 
     property MprisPlayer activePlayer
-    property string artUrl: ""
+    property string artUrl: TrackArtService.resolvedArtUrl
     property string lastValidArtUrl: ""
     property alias albumArtStatus: albumArt.imageStatus
     property real albumSize: Math.min(width, height) * 0.88
     property bool showAnimation: true
     property real animationScale: 1.0
 
-    function _updateArtUrl() {
-        artUrl = TrackArtService.getArtworkUrl(activePlayer);
-    }
-
     onActivePlayerChanged: {
         lastValidArtUrl = "";
-        _updateArtUrl();
-    }
-
-    Connections {
-        target: root.activePlayer
-        ignoreUnknownSignals: true
-        function onTrackTitleChanged() { root._updateArtUrl(); }
-        function onTrackArtUrlChanged() { root._updateArtUrl(); }
-        function onMetadataChanged() { root._updateArtUrl(); }
     }
 
     onArtUrlChanged: {

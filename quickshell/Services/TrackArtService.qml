@@ -10,9 +10,20 @@ Singleton {
     id: root
 
     property string _lastArtUrl: ""
-    property string _bgArtSource: ""
+    property string resolvedArtUrl: ""
+    property alias _bgArtSource: root.resolvedArtUrl
     property bool loading: false
     property string activePlayerArtUrl: ""
+
+    function djb2Hash(str) {
+        if (!str) return "";
+        let hash = 5381;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) + hash) + str.charCodeAt(i);
+            hash = hash & 0x7FFFFFFF;
+        }
+        return hash.toString(16).padStart(8, '0');
+    }
 
     function getArtworkUrl(player) {
         if (!player) return "";
@@ -46,7 +57,7 @@ Singleton {
 
     function loadArtwork(url) {
         if (!url || url === "") {
-            _bgArtSource = "";
+            resolvedArtUrl = "";
             _lastArtUrl = "";
             loading = false;
             return;
@@ -56,8 +67,67 @@ Singleton {
         _lastArtUrl = url;
 
         if (url.startsWith("http://") || url.startsWith("https://")) {
-            _bgArtSource = url;
-            loading = false;
+            loading = true;
+            const targetUrl = url;
+            const hash = djb2Hash(url);
+            const cacheDir = Paths.strip(Paths.imagecache);
+            const filePath = cacheDir + "/remote_" + hash;
+            const localFileUrl = "file://" + filePath;
+
+            // 1. First, check if the file already exists locally
+            Proc.runCommand("trackart_check_" + hash, ["test", "-f", filePath], (output, exitCode) => {
+                if (_lastArtUrl !== targetUrl)
+                    return;
+
+                if (exitCode === 0) {
+                    resolvedArtUrl = localFileUrl;
+                    loading = false;
+                } else {
+                    Paths.mkdir(Paths.imagecache);
+
+                    // 2. Check if this is a YouTube URL to do high quality 16:9 fallback
+                    if (targetUrl.includes("img.youtube.com/vi/")) {
+                        const videoId = targetUrl.split("/vi/")[1].split("/")[0];
+                        const maxresUrl = "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg";
+                        const mqUrl = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
+
+                        Proc.runCommand("trackart_dl_max_" + hash, ["curl", "-f", "-s", "-L", "-o", filePath, maxresUrl], (maxOutput, maxExitCode) => {
+                            if (_lastArtUrl !== targetUrl)
+                                return;
+
+                            if (maxExitCode === 0) {
+                                resolvedArtUrl = localFileUrl;
+                                loading = false;
+                            } else {
+                                Proc.runCommand("trackart_dl_mq_" + hash, ["curl", "-f", "-s", "-L", "-o", filePath, mqUrl], (mqOutput, mqExitCode) => {
+                                    if (_lastArtUrl !== targetUrl)
+                                        return;
+
+                                    if (mqExitCode === 0) {
+                                        resolvedArtUrl = localFileUrl;
+                                    } else {
+                                        resolvedArtUrl = targetUrl; // Ultimate fallback
+                                    }
+                                    loading = false;
+                                }, 50, 15000);
+                            }
+                        }, 50, 15000);
+                    } else {
+                        // Standard curl download for other remote URLs (e.g. SoundCloud)
+                        Proc.runCommand("trackart_dl_" + hash, ["curl", "-f", "-s", "-L", "-o", filePath, targetUrl], (dlOutput, dlExitCode) => {
+                            if (_lastArtUrl !== targetUrl)
+                                return;
+
+                            if (dlExitCode === 0) {
+                                resolvedArtUrl = localFileUrl;
+                            } else {
+                                resolvedArtUrl = targetUrl; // Fallback to raw URL
+                            }
+                            loading = false;
+                        }, 50, 15000);
+                    }
+                }
+            }, 50, 5000);
             return;
         }
 
@@ -67,7 +137,7 @@ Singleton {
         Proc.runCommand("trackart", ["test", "-f", filePath], (output, exitCode) => {
             if (_lastArtUrl !== localUrl)
                 return;
-            _bgArtSource = exitCode === 0 ? localUrl : "";
+            resolvedArtUrl = exitCode === 0 ? localUrl : "";
             loading = false;
         }, 200);
     }

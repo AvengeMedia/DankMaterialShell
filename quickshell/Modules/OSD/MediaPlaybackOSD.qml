@@ -60,7 +60,7 @@ DankOSD {
 
     Image {
         id: artPreloader
-        source: TrackArtService._bgArtSource
+        source: TrackArtService.resolvedArtUrl
         visible: false
         asynchronous: true
         cache: true
@@ -78,7 +78,7 @@ DankOSD {
         function onLoadingChanged() {
             if (TrackArtService.loading || !root._pendingShow)
                 return;
-            if (!TrackArtService._bgArtSource || artPreloader.status === Image.Ready) {
+            if (!TrackArtService.resolvedArtUrl || artPreloader.status === Image.Ready) {
                 root._pendingShow = false;
                 root.show();
             }
@@ -116,8 +116,7 @@ DankOSD {
             root._displayAlbum = player.trackAlbum || "";
 
             root.updatePlaybackIcon();
-            const resolvedArtUrl = TrackArtService.getArtworkUrl(player);
-            TrackArtService.loadArtwork(resolvedArtUrl);
+            const resolvedArtUrl = TrackArtService.resolvedArtUrl;
 
             if (!resolvedArtUrl || resolvedArtUrl === "") {
                 root.show();
@@ -127,7 +126,7 @@ DankOSD {
                 root._pendingShow = true;
                 return;
             }
-            if (!TrackArtService._bgArtSource || artPreloader.status === Image.Ready) {
+            if (!TrackArtService.resolvedArtUrl || artPreloader.status === Image.Ready) {
                 root.show();
                 return;
             }
@@ -135,10 +134,10 @@ DankOSD {
         }
 
         function onTrackArtUrlChanged() {
-            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(player));
+            handleUpdate();
         }
         function onMetadataChanged() {
-            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(player));
+            handleUpdate();
         }
         function onIsPlayingChanged() {
             handleUpdate();
@@ -172,14 +171,14 @@ DankOSD {
             Item {
                 id: bgContainer
                 anchors.fill: parent
-                visible: TrackArtService._bgArtSource !== ""
+                visible: TrackArtService.resolvedArtUrl !== ""
 
                 Image {
                     id: bgImage
                     anchors.centerIn: parent
                     width: Math.max(parent.width, parent.height)
                     height: width
-                    source: TrackArtService._bgArtSource
+                    source: TrackArtService.resolvedArtUrl
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     cache: true
