@@ -354,7 +354,7 @@
     "Active": "活动"
   },
   "Active Color": {
-    "Active Color": "激活的颜色"
+    "Active Color": "激活颜色"
   },
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "活动锁屏显示器"
@@ -945,7 +945,7 @@
     "Border color around blurred surfaces": "模糊表面周围的边框颜色"
   },
   "Border with BG": {
-    "Border with BG": "带 BG 的边框"
+    "Border with BG": "带背景的边框"
   },
   "Bottom": {
     "Bottom": "底部"
@@ -1164,7 +1164,7 @@
     "Choose icon": "选择图标"
   },
   "Choose monochrome or a theme color tint for system tray icons": {
-    "Choose monochrome or a theme color tint for system tray icons": "为系统托盘图标选择单色或主题色调"
+    "Choose monochrome or a theme color tint for system tray icons": "为系统托盘图标选择单色或主题色"
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "选择部件背景色"
@@ -1185,7 +1185,7 @@
     "Choose which displays show this widget": "选择要在哪个显示器显示该小部件"
   },
   "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
-    "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "选择哪个显示器显示锁屏界面。其他显示器将显示纯色以保护 OLED 屏幕防烧伤。"
+    "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "选择在哪个显示器显示锁屏界面。其他显示器将显示纯色以保护 OLED 屏幕防烧伤。"
   },
   "Chroma Style": {
     "Chroma Style": "色度风格"
@@ -1329,10 +1329,10 @@
     "Color temperature for night mode": "夜间模式色温"
   },
   "Color theme for syntax highlighting.": {
-    "Color theme for syntax highlighting.": "语法高亮的颜色主题。"
+    "Color theme for syntax highlighting.": "语法高亮颜色主题。"
   },
   "Color theme for syntax highlighting. %1 themes available.": {
-    "Color theme for syntax highlighting. %1 themes available.": "语法高亮的颜色主题。%1 个主题可供使用。"
+    "Color theme for syntax highlighting. %1 themes available.": "语法高亮颜色主题。%1 个主题可供使用。"
   },
   "Color theme from DMS registry": {
     "Color theme from DMS registry": "DMS 主题库的颜色主题"
@@ -1344,7 +1344,7 @@
     "Colorful mix of bright contrasting accents.": "色彩鲜明、对比强烈的配色。"
   },
   "Colorize Active": {
-    "Colorize Active": "激活上色"
+    "Colorize Active": "着色激活"
   },
   "Colors from wallpaper": {
     "Colors from wallpaper": "从壁纸选取颜色"
@@ -1521,10 +1521,10 @@
     "Control workspaces and columns by scrolling on the bar": "在状态栏上滚动时也会控制工作区和列"
   },
   "Controls how much original icon color is removed before applying tint": {
-    "Controls how much original icon color is removed before applying tint": "控制在加色前去除多少原始图标颜色"
+    "Controls how much original icon color is removed before applying tint": "控制在着色前去除多少原始图标颜色"
   },
   "Controls how strongly the selected tint color is applied": {
-    "Controls how strongly the selected tint color is applied": "控制选定的色调颜色的应用强度"
+    "Controls how strongly the selected tint color is applied": "控制选定的着色颜色的应用强度"
   },
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "控制所有弹窗、模态框及其内容层的透明度"
@@ -2226,7 +2226,7 @@
     "Dynamic Theming": "动态主题"
   },
   "Dynamic colors from wallpaper": {
-    "Dynamic colors from wallpaper": "自壁纸选取动态色"
+    "Dynamic colors from wallpaper": "自壁纸选取动态颜色"
   },
   "Dynamic colors parse error: %1": {
     "Dynamic colors parse error: %1": "动态颜色解析错误：%1"
@@ -2235,7 +2235,7 @@
     "Dynamic colors, presets": "动态颜色与预设"
   },
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "动态：带有过冲的弹簧贝塞尔——进场短暂超出目标后稳定。富有表现力，充满生命力。"
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "动态：带有过冲的弹簧贝塞尔——进场短暂超出目标后稳定。富有表现力，充满活力。"
   },
   "Edge Spacing": {
     "Edge Spacing": "边缘间距"
@@ -2892,7 +2892,7 @@
     "Focused Monitor Only": "仅聚焦的显示器"
   },
   "Focused Window": {
-    "Focused Window": "当前窗口"
+    "Focused Window": "聚焦窗口"
   },
   "Focused monitor only": {
     "Focused monitor only": "仅聚焦的显示器"
@@ -3090,7 +3090,7 @@
     "Gamma control not available. Requires DMS API v6+.": "伽玛控制不可用，需要 DMS API v6+。"
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "创建 GTK3/4 或 QT5/QT6 （需要 qt6ct-kde）的基线配置以遵循 DMS 颜色。仅需一次。<br /><br />建议在应用 GTK 主题之前配置使用 <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a>。"
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "创建 GTK3/4 或 QT5/QT6 （需要 qt6ct-kde）的基线配置以遵循 DMS 配色。仅需一次。<br /><br />建议在应用 GTK 主题之前配置使用 <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a>。"
   },
   "Generic": {
     "Generic": "通用"
@@ -3984,13 +3984,13 @@
     "Material Design inspired color themes": "受 Material 设计启发的色彩主题"
   },
   "Material colors generated from wallpaper": {
-    "Material colors generated from wallpaper": "从壁纸生成的 Material 色彩"
+    "Material colors generated from wallpaper": "从壁纸生成的 Material 配色"
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
-    "Material inspired shadows and elevation on modals, popouts, and dialogs": "受 Material 启发，模态框、弹窗及对话框的阴影与高程"
+    "Material inspired shadows and elevation on modals, popouts, and dialogs": "受 Material 启发的模态框、弹窗及对话框的阴影与高程"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material：Material Design 3 是富有设计感的贝塞尔曲线。也是 DMS 的默认风格。"
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material：Material Design 3 Expressive 贝塞尔曲线。也是 DMS 的默认风格。"
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen 对比度"
@@ -4212,7 +4212,7 @@
     "Monitor fade grace period": "熄屏渐变周期"
   },
   "Monitor whose wallpaper drives dynamic theming colors": {
-    "Monitor whose wallpaper drives dynamic theming colors": "监视使用动态主题色的壁纸"
+    "Monitor whose wallpaper drives dynamic theming colors": "监视主导动态主题色的壁纸"
   },
   "Monitors in \"%1\":": {
     "Monitors in \"%1\":": "在“%1”中的显示器："
@@ -5463,7 +5463,7 @@
     "Protocol": "协议"
   },
   "Qt colors applied successfully": {
-    "Qt colors applied successfully": "QT 配色已成功应用"
+    "Qt colors applied successfully": "QT 配色应用成功"
   },
   "Qt: distance-field renderer.": {
     "Qt: distance-field renderer.": "QT：距离场渲染器"
@@ -6024,7 +6024,7 @@
     "Select the font family for UI text": "选择 UI 文本的字体族"
   },
   "Select the palette algorithm used for wallpaper-based colors": {
-    "Select the palette algorithm used for wallpaper-based colors": "选择从壁纸取色的配色方案"
+    "Select the palette algorithm used for wallpaper-based colors": "选择基于壁纸取色的调色算法"
   },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "选择快捷键绑定提供源以导入"
@@ -6360,7 +6360,7 @@
     "Show dock when floating windows don't overlap its area": "当浮动窗口不覆盖其区域时显示程序坞"
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
-    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "在通知弹窗上显示下拉阴影。需要在主题与配色中启用 M3 高程"
+    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "在通知弹窗上显示下拉阴影。需要在“主题与配色”中启用 M3 高程"
   },
   "Show during Niri overview": {
     "Show during Niri overview": "在 Niri 概览中显示"
@@ -7359,7 +7359,7 @@
     "Used for xdg-terminal-exec": "用于 xdg-terminal-exec"
   },
   "Used when accent color is set to Custom": {
-    "Used when accent color is set to Custom": "当强调色为自定义时使用"
+    "Used when accent color is set to Custom": "强调色设为自定义时使用"
   },
   "User": {
     "User": "用户"
@@ -7512,7 +7512,7 @@
     "Wallpapers": "壁纸"
   },
   "Warm color temperature to apply": {
-    "Warm color temperature to apply": "温暖色温以应用"
+    "Warm color temperature to apply": "将要应用的暖色温"
   },
   "Warning": {
     "Warning": "警告"
