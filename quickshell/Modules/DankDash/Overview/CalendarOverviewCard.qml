@@ -6,9 +6,6 @@ import qs.Widgets
 
 Rectangle {
     id: root
-    readonly property var log: Log.scoped("CalendarOverviewCard")
-
-    implicitWidth: SettingsData.showWeekNumber ? 736 : 700
 
     property bool showEventDetails: false
     property date selectedDate: systemClock.date
@@ -17,15 +14,8 @@ Rectangle {
 
     signal closeDash
 
-    function weekStartQt() {
-        if (SettingsData.firstDayOfWeek >= 7 || SettingsData.firstDayOfWeek < 0) {
-            return Qt.locale().firstDayOfWeek;
-        }
-        return SettingsData.firstDayOfWeek;
-    }
-
     function weekStartJs() {
-        return weekStartQt() % 7;
+        return Qt.locale().firstDayOfWeek % 7;
     }
 
     function startOfWeek(dateObj) {
@@ -42,40 +32,6 @@ Rectangle {
         const add = (weekStartJs() + 6 - jsDow + 7) % 7;
         d.setDate(d.getDate() + add);
         return d;
-    }
-
-    function getWeekNumber(dateObj) {
-        // Set time to noon to avoid potential Daylight Saving Time related bugs
-        const weekStartDay = startOfWeek(dateObj);
-        weekStartDay.setHours(12, 0, 0, 0);
-
-        let week1Start;
-
-        if (weekStartJs() === 1) {
-            // ISO 8601 Standard, week start on Monday
-            // A week belongs to the year its Thursday falls in
-            // So we have to get the yearTarget from weekStartDay instead of dateObj
-            let yearTarget = weekStartDay;
-            yearTarget.setDate(yearTarget.getDate() + 3); // Monday + 3 = Thursday
-
-            // Week 1 is the week containing Jan 4th
-            const jan4 = new Date(yearTarget.getFullYear(), 0, 4);
-            week1Start = startOfWeek(jan4);
-        } else {
-            // Traditional / US Standard, week start on Sunday
-            // A week belongs to the year its Sunday falls in
-            let yearTarget = weekStartDay;
-            yearTarget.setDate(yearTarget.getDate() + 6); // Monday + 6 = Sunday
-
-            // Week 1 is the week containing Jan 1st
-            const jan1 = new Date(yearTarget.getFullYear(), 0, 1);
-            week1Start = startOfWeek(jan1);
-        }
-
-        week1Start.setHours(12, 0, 0, 0);
-
-        const diffDays = Math.round((weekStartDay.getTime() - week1Start.getTime()) / 86400000); // Number of miliseconds in a day
-        return Math.floor(diffDays / 7) + 1;
     }
 
     function updateSelectedDateEvents() {
@@ -176,7 +132,7 @@ Rectangle {
                 text: {
                     const dateStr = Qt.formatDate(selectedDate, "MMM d");
                     if (selectedDateEvents && selectedDateEvents.length > 0) {
-                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 event") : selectedDateEvents.length + " " + I18n.tr("events");
+                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 task") : selectedDateEvents.length + " " + I18n.tr("tasks");
                         return dateStr + " • " + eventCount;
                     }
                     return dateStr;
@@ -188,7 +144,6 @@ Rectangle {
                 elide: Text.ElideRight
             }
         }
-
         Row {
             width: parent.width
             height: 28
@@ -224,7 +179,7 @@ Rectangle {
             StyledText {
                 width: parent.width - 56
                 height: 28
-                text: calendarGrid.displayDate.toLocaleDateString(I18n.locale(), "MMMM yyyy")
+                text: calendarGrid.displayDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
                 font.weight: Font.Medium
@@ -262,175 +217,122 @@ Rectangle {
 
         Row {
             width: parent.width
-            height: parent.height - 28 - Theme.spacingS
+            height: 18
             visible: !showEventDetails
-            spacing: SettingsData.showWeekNumber ? Theme.spacingS : 0
 
-            Column {
-                id: weekNumberColumn
-                visible: SettingsData.showWeekNumber
-                width: SettingsData.showWeekNumber ? 28 : 0
-                height: parent.height
-                spacing: Theme.spacingS
+            Repeater {
+                model: {
+                    const days = [];
+                    const loc = Qt.locale();
+                    const qtFirst = loc.firstDayOfWeek;
+                    for (let i = 0; i < 7; ++i) {
+                        const qtDay = ((qtFirst - 1 + i) % 7) + 1;
+                        days.push(loc.dayName(qtDay, Locale.ShortFormat));
+                    }
+                    return days;
+                }
 
-                Item {
-                    width: parent.width
+                Rectangle {
+                    width: parent.width / 7
                     height: 18
-                }
+                    color: "transparent"
 
-                Grid {
-                    width: parent.width
-                    height: parent.height - 18 - Theme.spacingS
-                    columns: 1
-                    rows: 6
-
-                    Repeater {
-                        model: 6
-                        Rectangle {
-                            width: parent.width
-                            height: parent.height / 6
-                            color: "transparent"
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: {
-                                    const rowDate = new Date(calendarGrid.firstDay);
-                                    rowDate.setDate(rowDate.getDate() + index * 7);
-                                    return root.getWeekNumber(rowDate);
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
-                                font.weight: Font.Medium
-                            }
-                        }
-                    }
-                }
-            }
-
-            Column {
-                width: SettingsData.showWeekNumber ? (parent.width - weekNumberColumn.width - parent.spacing) : parent.width
-                height: parent.height
-                spacing: Theme.spacingS
-
-                Row {
-                    width: parent.width
-                    height: 18
-
-                    Repeater {
-                        model: {
-                            const days = [];
-                            const qtFirst = weekStartQt();
-                            for (let i = 0; i < 7; ++i) {
-                                const qtDay = ((qtFirst - 1 + i) % 7) + 1;
-                                days.push(I18n.locale().dayName(qtDay, Locale.ShortFormat));
-                            }
-                            return days;
-                        }
-
-                        Rectangle {
-                            width: parent.width / 7
-                            height: 18
-                            color: "transparent"
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: modelData
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
-                                font.weight: Font.Medium
-                            }
-                        }
-                    }
-                }
-
-                Grid {
-                    id: calendarGrid
-                    width: parent.width
-                    height: parent.height - 18 - Theme.spacingS
-                    columns: 7
-                    rows: 6
-
-                    property date displayDate: systemClock.date
-                    property date selectedDate: systemClock.date
-
-                    readonly property date firstDay: {
-                        const firstOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1);
-                        return startOfWeek(firstOfMonth);
-                    }
-
-                    Repeater {
-                        model: 42
-
-                        Rectangle {
-                            readonly property date dayDate: {
-                                const date = new Date(parent.firstDay);
-                                date.setDate(date.getDate() + index);
-                                return date;
-                            }
-                            readonly property bool isCurrentMonth: dayDate.getMonth() === calendarGrid.displayDate.getMonth()
-                            readonly property bool isToday: dayDate.toDateString() === new Date().toDateString()
-                            readonly property bool isSelected: dayDate.toDateString() === calendarGrid.selectedDate.toDateString()
-
-                            width: parent.width / 7
-                            height: parent.height / 6
-                            color: "transparent"
-
-                            Rectangle {
-                                anchors.centerIn: parent
-                                width: Math.min(parent.width - 4, parent.height - 4, 32)
-                                height: width
-                                color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : dayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
-                                radius: Theme.cornerRadius
-
-                                StyledText {
-                                    anchors.centerIn: parent
-                                    text: dayDate.getDate()
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
-                                    font.weight: isToday ? Font.Medium : Font.Normal
-                                }
-
-                                Rectangle {
-                                    anchors.bottom: parent.bottom
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    anchors.bottomMargin: 4
-                                    width: 12
-                                    height: 2
-                                    radius: Theme.cornerRadius
-                                    visible: CalendarService && CalendarService.khalAvailable && CalendarService.hasEventsForDate(dayDate)
-                                    color: isToday ? Qt.lighter(Theme.primary, 1.3) : Theme.primary
-                                    opacity: isToday ? 0.9 : 0.7
-
-                                    Behavior on opacity {
-                                        NumberAnimation {
-                                            duration: Theme.shortDuration
-                                            easing.type: Theme.standardEasing
-                                        }
-                                    }
-                                }
-                            }
-
-                            MouseArea {
-                                id: dayArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    if (CalendarService && CalendarService.khalAvailable && CalendarService.hasEventsForDate(dayDate)) {
-                                        root.selectedDate = dayDate;
-                                        root.showEventDetails = true;
-                                    }
-                                }
-                            }
-                        }
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: modelData
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                        font.weight: Font.Medium
                     }
                 }
             }
         }
 
+        Grid {
+            id: calendarGrid
+            visible: !showEventDetails
+
+            property date displayDate: systemClock.date
+            property date selectedDate: systemClock.date
+
+            readonly property date firstDay: {
+                const firstOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1);
+                return startOfWeek(firstOfMonth);
+            }
+
+            width: parent.width
+            height: parent.height - 28 - 18 - Theme.spacingS * 2
+            columns: 7
+            rows: 6
+
+            Repeater {
+                model: 42
+
+                Rectangle {
+                    readonly property date dayDate: {
+                        const date = new Date(parent.firstDay);
+                        date.setDate(date.getDate() + index);
+                        return date;
+                    }
+                    readonly property bool isCurrentMonth: dayDate.getMonth() === calendarGrid.displayDate.getMonth()
+                    readonly property bool isToday: dayDate.toDateString() === new Date().toDateString()
+                    readonly property bool isSelected: dayDate.toDateString() === calendarGrid.selectedDate.toDateString()
+
+                    width: parent.width / 7
+                    height: parent.height / 6
+                    color: "transparent"
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: Math.min(parent.width - 4, parent.height - 4, 32)
+                        height: width
+                        color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : dayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                        radius: Theme.cornerRadius
+
+                        StyledText {
+                            anchors.centerIn: parent
+                            text: dayDate.getDate()
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            font.weight: isToday ? Font.Medium : Font.Normal
+                        }
+
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottomMargin: 4
+                            width: 12
+                            height: 2
+                            radius: Theme.cornerRadius
+                            visible: CalendarService && CalendarService.khalAvailable && CalendarService.hasEventsForDate(dayDate)
+                            color: isToday ? Qt.lighter(Theme.primary, 1.3) : Theme.primary
+                            opacity: isToday ? 0.9 : 0.7
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: dayArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.selectedDate = dayDate;
+                            root.showEventDetails = true;
+                        }
+                    }
+                }
+            }
+        }
         DankListView {
             width: parent.width - Theme.spacingS * 2
-            height: parent.height - (showEventDetails ? 40 : 28 + 18) - Theme.spacingS
+            height: parent.height - (showEventDetails ? 40 + 42 : 28 + 18) - Theme.spacingS
             anchors.horizontalCenter: parent.horizontalCenter
             model: selectedDateEvents
             visible: showEventDetails
@@ -466,7 +368,7 @@ Rectangle {
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     radius: Theme.cornerRadius
-                    color: Theme.primary
+                    color: modelData.id.startsWith("task_") ? (modelData.title.startsWith("✓") ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
                     opacity: 0.8
                 }
 
@@ -477,14 +379,14 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: Theme.spacingS + 6
-                    anchors.rightMargin: Theme.spacingXS
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : Theme.spacingXS
                     spacing: 2
 
                     StyledText {
                         width: parent.width
                         text: modelData.title
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
+                        color: modelData.id.startsWith("task_") && modelData.title.startsWith("✓") ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                         maximumLineCount: 1
@@ -508,25 +410,100 @@ Rectangle {
                         font.pixelSize: Theme.fontSizeSmall
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                         font.weight: Font.Normal
-                        visible: text !== ""
+                        visible: text !== "" && !modelData.id.startsWith("task_")
                     }
                 }
 
+                // Main body MouseArea (declared before the delete button so delete sits on top)
                 MouseArea {
                     id: eventMouseArea
 
                     anchors.fill: parent
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : 0
                     hoverEnabled: true
-                    cursorShape: modelData.url ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    enabled: modelData.url !== ""
+                    cursorShape: (modelData.url || modelData.id.startsWith("task_")) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: modelData.url !== "" || modelData.id.startsWith("task_")
                     onClicked: {
-                        if (modelData.url && modelData.url !== "") {
+                        if (modelData.id.startsWith("task_")) {
+                            CalendarService.toggleTask(modelData.id);
+                        } else if (modelData.url && modelData.url !== "") {
                             if (Qt.openUrlExternally(modelData.url) === false) {
-                                log.warn("Failed to open URL: " + modelData.url);
+                                console.warn("Failed to open URL: " + modelData.url);
                             } else {
                                 root.closeDash();
                             }
                         }
+                    }
+                }
+
+                // Delete Button (declared after eventMouseArea to ensure it is rendered on top and captures clicks)
+                Rectangle {
+                    id: deleteButton
+                    width: 24
+                    height: 24
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingS
+                    anchors.verticalCenter: parent.verticalCenter
+                    radius: Theme.cornerRadius
+                    color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 0.15) : "transparent"
+                    visible: modelData.id.startsWith("task_")
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "delete"
+                        size: 14
+                        color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 1.0) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    }
+
+                    MouseArea {
+                        id: deleteMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            CalendarService.removeTask(modelData.id);
+                        }
+                    }
+                }
+            }
+        }
+        
+        Rectangle {
+            width: parent.width - Theme.spacingS * 2
+            height: 34
+            anchors.horizontalCenter: parent.horizontalCenter
+            radius: Theme.cornerRadius
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
+            border.width: 1
+            visible: showEventDetails
+
+            TextInput {
+                id: taskInput
+                anchors.fill: parent
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                verticalAlignment: TextInput.AlignVCenter
+                color: Theme.surfaceText
+                font.pixelSize: Theme.fontSizeSmall
+                selectByMouse: true
+                clip: true
+
+                // Hint placeholder text
+                Text {
+                    text: I18n.tr("Add a task...")
+                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    visible: !taskInput.text && !taskInput.activeFocus
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                onAccepted: {
+                    let txt = text.trim();
+                    if (txt !== "") {
+                        CalendarService.addTaskForDate(root.selectedDate, txt);
+                        text = "";
+                        taskInput.focus = false;
                     }
                 }
             }
