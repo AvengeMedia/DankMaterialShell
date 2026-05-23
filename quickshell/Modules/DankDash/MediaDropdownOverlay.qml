@@ -357,7 +357,13 @@ Item {
                                     }
 
                                     StyledText {
-                                        text: modelData === AudioService.sink ? "Active" : "Available"
+                                        text: {
+                                            if (!modelData?.audio)
+                                                return modelData === AudioService.sink ? I18n.tr("Active") : I18n.tr("Available");
+                                            if (modelData.audio.muted)
+                                                return I18n.tr("Muted", "audio status");
+                                            return Math.round(modelData.audio.volume * 100) + "%";
+                                        }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                         elide: Text.ElideRight
