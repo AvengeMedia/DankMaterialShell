@@ -84,7 +84,7 @@ Item {
         isSwitching = true;
         _switchHold = true;
         _switchHoldTimer.restart();
-        TrackArtService.loadArtwork(activePlayer.trackArtUrl);
+        TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(activePlayer));
     }
 
     function maybeFinishSwitch() {
@@ -108,12 +108,16 @@ Item {
 
     Connections {
         target: activePlayer
+        ignoreUnknownSignals: true
         function onTrackTitleChanged() {
             _switchHoldTimer.restart();
             maybeFinishSwitch();
         }
         function onTrackArtUrlChanged() {
-            TrackArtService.loadArtwork(activePlayer.trackArtUrl);
+            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(activePlayer));
+        }
+        function onMetadataChanged() {
+            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(activePlayer));
         }
     }
 

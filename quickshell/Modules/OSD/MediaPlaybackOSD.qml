@@ -116,9 +116,10 @@ DankOSD {
             root._displayAlbum = player.trackAlbum || "";
 
             root.updatePlaybackIcon();
-            TrackArtService.loadArtwork(player.trackArtUrl);
+            const resolvedArtUrl = TrackArtService.getArtworkUrl(player);
+            TrackArtService.loadArtwork(resolvedArtUrl);
 
-            if (!player.trackArtUrl || player.trackArtUrl === "") {
+            if (!resolvedArtUrl || resolvedArtUrl === "") {
                 root.show();
                 return;
             }
@@ -134,7 +135,10 @@ DankOSD {
         }
 
         function onTrackArtUrlChanged() {
-            TrackArtService.loadArtwork(player.trackArtUrl);
+            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(player));
+        }
+        function onMetadataChanged() {
+            TrackArtService.loadArtwork(TrackArtService.getArtworkUrl(player));
         }
         function onIsPlayingChanged() {
             handleUpdate();
