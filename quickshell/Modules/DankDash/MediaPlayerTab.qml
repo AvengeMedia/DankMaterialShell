@@ -184,6 +184,20 @@ Item {
         }
     }
 
+    function triggerVolumeDropdown() {
+        if (!volumeAvailable)
+            return;
+        if (volumeExpanded)
+            return;
+        hideDropdowns();
+        volumeExpanded = true;
+        const buttonsOnRight = !isRightEdge;
+        const btnY = volumeButton.y + volumeButton.height / 2;
+        const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
+        const screenY = popoutY + contentOffsetY + btnY;
+        showVolumeDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+    }
+
     function handleKeyEvent(event) {
         if (!activePlayer)
             return false;
@@ -215,10 +229,14 @@ Item {
         // 3. Up / Down arrows to adjust volume
         if (event.key === Qt.Key_Up) {
             adjustVolume(5);
+            triggerVolumeDropdown();
+            dropdownButtonExited();
             return true;
         }
         if (event.key === Qt.Key_Down) {
             adjustVolume(-5);
+            triggerVolumeDropdown();
+            dropdownButtonExited();
             return true;
         }
 
