@@ -27,7 +27,7 @@ Singleton {
 
     function getArtworkUrl(player) {
         if (!player) return "";
-        
+
         // 1. If native trackArtUrl is present and valid
         let artUrl = player.trackArtUrl || "";
         if (artUrl !== "") {
