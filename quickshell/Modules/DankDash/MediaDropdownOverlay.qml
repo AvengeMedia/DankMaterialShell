@@ -520,10 +520,9 @@ Item {
                                             if (!modelData)
                                                 return "";
                                             const artist = modelData.trackArtist || "";
-                                            const isActive = modelData === activePlayer;
                                             if (artist.length > 0)
-                                                return artist + (isActive ? " (Active)" : "");
-                                            return isActive ? "Active" : "Available";
+                                                return artist;
+                                            return modelData === activePlayer ? I18n.tr("Active") : I18n.tr("Available");
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
