@@ -771,16 +771,16 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.2
-                    visible: CompositorService.isNiri
+                    visible: CompositorService.isNiri || CompositorService.isTriad
                 }
 
                 SettingsToggleRow {
                     tab: "wallpaper"
-                    tags: ["blur", "overview", "niri"]
+                    tags: ["blur", "overview", "niri", "triad"]
                     settingKey: "blurWallpaperOnOverview"
-                    visible: CompositorService.isNiri
+                    visible: CompositorService.isNiri || CompositorService.isTriad
                     text: I18n.tr("Blur on Overview")
-                    description: I18n.tr("Blur wallpaper when niri overview is open")
+                    description: I18n.tr("Blur wallpaper when the compositor overview is open")
                     checked: SettingsData.blurWallpaperOnOverview
                     onToggled: checked => SettingsData.set("blurWallpaperOnOverview", checked)
                 }

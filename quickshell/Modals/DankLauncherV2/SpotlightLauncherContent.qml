@@ -211,6 +211,8 @@ FocusScope {
             root.parentModal?.hide();
             if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview)
                 NiriService.toggleOverview();
+            else if (SettingsData.spotlightCloseNiriOverview && TriadService.inOverview)
+                TriadService.toggleOverview();
         }
     }
 

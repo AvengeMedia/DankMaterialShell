@@ -89,7 +89,7 @@ Variants {
             property bool useNextForEffect: false
             property string pendingWallpaper: ""
             property string _deferredSource: ""
-            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
+            readonly property bool overviewBlurActive: CompositorService.inOverview && SettingsData.blurWallpaperOnOverview && currentWallpaper.source !== ""
 
             Connections {
                 target: currentWallpaper
@@ -148,7 +148,7 @@ Variants {
             }
 
             Connections {
-                target: NiriService
+                target: CompositorService
                 function onInOverviewChanged() {
                     root._overviewBlurSettling = true;
                     overviewBlurSettleTimer.restart();

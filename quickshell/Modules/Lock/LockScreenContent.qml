@@ -1169,6 +1169,8 @@ Item {
                 visible: {
                     if (CompositorService.isNiri) {
                         return NiriService.keyboardLayoutNames.length > 1;
+                    } else if (CompositorService.isTriad) {
+                        return TriadService.keyboardLayoutNames.length > 1;
                     } else if (CompositorService.isHyprland) {
                         return hyprlandLayoutCount > 1;
                     }
@@ -1206,6 +1208,15 @@ Item {
                                         return parts[0].substring(0, 2).toUpperCase();
                                     }
                                     return layout.substring(0, 2).toUpperCase();
+                                } else if (CompositorService.isTriad) {
+                                    const layout = TriadService.getCurrentKeyboardLayoutName();
+                                    if (!layout)
+                                        return "";
+                                    const parts = layout.split(" ");
+                                    if (parts.length > 0) {
+                                        return parts[0].substring(0, 2).toUpperCase();
+                                    }
+                                    return layout.substring(0, 2).toUpperCase();
                                 } else if (CompositorService.isHyprland) {
                                     return hyprlandCurrentLayout;
                                 }
@@ -1228,6 +1239,8 @@ Item {
                     onClicked: {
                         if (CompositorService.isNiri) {
                             NiriService.cycleKeyboardLayout();
+                        } else if (CompositorService.isTriad) {
+                            TriadService.cycleKeyboardLayout();
                         } else if (CompositorService.isHyprland) {
                             Quickshell.execDetached(["hyprctl", "switchxkblayout", hyprlandKeyboard, "next"]);
                             updateHyprlandLayout();

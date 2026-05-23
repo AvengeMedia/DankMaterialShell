@@ -735,14 +735,14 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "open_in_new"
-                title: I18n.tr("Niri Integration").replace("Niri", "niri")
-                visible: CompositorService.isNiri
+                title: I18n.tr("Overview Integration")
+                visible: CompositorService.isNiri || CompositorService.isTriad
 
                 SettingsToggleRow {
                     settingKey: "spotlightCloseNiriOverview"
-                    tags: ["launcher", "niri", "overview", "close", "launch"]
+                    tags: ["launcher", "niri", "triad", "overview", "close", "launch"]
                     text: I18n.tr("Close Overview on Launch")
-                    description: I18n.tr("Auto-close Niri overview when launching apps.")
+                    description: I18n.tr("Auto-close compositor overview when launching apps.")
                     checked: SettingsData.spotlightCloseNiriOverview
                     onToggled: checked => SettingsData.set("spotlightCloseNiriOverview", checked)
                 }
@@ -753,6 +753,7 @@ Item {
                     text: I18n.tr("Enable Overview Overlay")
                     description: I18n.tr("Show launcher overlay when typing in Niri overview. Disable to use another launcher.")
                     checked: SettingsData.niriOverviewOverlayEnabled
+                    visible: CompositorService.isNiri
                     onToggled: checked => SettingsData.set("niriOverviewOverlayEnabled", checked)
                 }
             }

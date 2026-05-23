@@ -656,7 +656,7 @@ Item {
 
                     SettingsToggleRow {
                         width: parent.width - parent.leftPadding
-                        visible: CompositorService.isNiri || CompositorService.isHyprland
+                        visible: CompositorService.isNiri || CompositorService.isTriad || CompositorService.isHyprland
                         text: I18n.tr("Hide When Windows Open")
                         checked: selectedBarConfig?.showOnWindowsOpen ?? false
                         onToggled: toggled => {
