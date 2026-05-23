@@ -236,19 +236,16 @@ Singleton {
     readonly property bool suggestPowerSaver: false
 
     readonly property var bluetoothDevices: {
-        const btDevices = [];
         const bluetoothTypes = [UPowerDeviceType.BluetoothGeneric, UPowerDeviceType.Headphones, UPowerDeviceType.Headset, UPowerDeviceType.Keyboard, UPowerDeviceType.Mouse, UPowerDeviceType.Speakers];
 
-        for (var i = 0; i < UPower.devices.count; i++) {
-            const dev = UPower.devices.get(i);
-            if (dev && dev.ready && bluetoothTypes.includes(dev.type)) {
-                btDevices.push({
-                    "name": dev.model || UPowerDeviceType.toString(dev.type),
-                    "percentage": Math.round(dev.percentage * 100),
-                    "type": dev.type
-                });
-            }
-        }
+        const btDevices = UPower.devices.values.filter(dev => dev && dev.ready && bluetoothTypes.includes(dev.type)).map(dev => {
+            return {
+                "name": dev.model || UPowerDeviceType.toString(dev.type),
+                "percentage": Math.round(dev.percentage * 100),
+                "type": dev.type
+            };
+        });
+
         return btDevices;
     }
 
