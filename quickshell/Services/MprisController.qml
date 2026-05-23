@@ -81,7 +81,7 @@ Singleton {
         if (!activePlayer)
             return;
         if (activePlayer.position > 8 && activePlayer.canSeek)
-            activePlayer.position = 0;
+            activePlayer.position = 0.1;
         else if (activePlayer.canGoPrevious)
             activePlayer.previous();
     }

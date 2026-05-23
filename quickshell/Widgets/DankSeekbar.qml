@@ -80,7 +80,7 @@ Item {
         isDraggingSeek = false;
         if (mouseArea.pendingSeekPosition >= 0 && activePlayer && activePlayer.canSeek && activePlayer.length > 0) {
             const clamped = Math.min(mouseArea.pendingSeekPosition, activePlayer.length * 0.99);
-            activePlayer.position = clamped;
+            activePlayer.position = Math.max(0.1, clamped);
             mouseArea.pendingSeekPosition = -1;
             beginCommittedSeekPreview(clamped);
         } else {

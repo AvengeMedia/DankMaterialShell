@@ -228,7 +228,7 @@ Item {
             if (activePlayer.canSeek && activePlayer.length > 0) {
                 const ratio = (event.key - Qt.Key_0) * 0.1;
                 const targetPosition = ratio * activePlayer.length;
-                activePlayer.position = Math.min(targetPosition, activePlayer.length * 0.99);
+                activePlayer.position = Math.max(0.1, Math.min(targetPosition, activePlayer.length * 0.99));
                 return true;
             }
         }
@@ -236,13 +236,13 @@ Item {
         // 2. Left / Right arrows to seek backward / forward 5s
         if (event.key === Qt.Key_Left) {
             if (activePlayer.canSeek) {
-                activePlayer.position = Math.max(0, activePlayer.position - 5);
+                activePlayer.position = Math.max(0.1, activePlayer.position - 5);
                 return true;
             }
         }
         if (event.key === Qt.Key_Right) {
             if (activePlayer.canSeek && activePlayer.length > 0) {
-                activePlayer.position = Math.min(activePlayer.length - 1, activePlayer.position + 5);
+                activePlayer.position = Math.max(0.1, Math.min(activePlayer.length - 1, activePlayer.position + 5));
                 return true;
             }
         }
