@@ -13,6 +13,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property MprisPlayer activePlayer: MprisController.activePlayer
+    property real stableLength: 0
     property var allPlayers: MprisController.availablePlayers
     property var targetScreen: null
     property real popoutX: 0
@@ -75,6 +76,7 @@ Item {
     }
 
     onActivePlayerChanged: {
+        stableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
         if (!activePlayer) {
             isSwitching = false;
             _switchHold = false;
@@ -94,11 +96,11 @@ Item {
     }
 
     readonly property real ratio: {
-        if (!activePlayer || !activePlayer.length || activePlayer.length <= 0) {
+        if (!activePlayer || stableLength <= 0) {
             return 0;
         }
-        const pos = (activePlayer.position || 0) % Math.max(1, activePlayer.length);
-        const calculatedRatio = pos / activePlayer.length;
+        const pos = (activePlayer.position || 0) % Math.max(1, stableLength);
+        const calculatedRatio = pos / stableLength;
         return Math.max(0, Math.min(1, calculatedRatio));
     }
 
@@ -108,11 +110,17 @@ Item {
     Connections {
         target: activePlayer
         function onTrackTitleChanged() {
+            root.stableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
             _switchHoldTimer.restart();
             maybeFinishSwitch();
         }
         function onTrackArtUrlChanged() {
             TrackArtService.loadArtwork(activePlayer.trackArtUrl);
+        }
+        function onLengthChanged() {
+            if (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) {
+                root.stableLength = activePlayer.length;
+            }
         }
     }
 
@@ -225,10 +233,10 @@ Item {
 
         // 1. Number keys 0-9 to seek to 0%-90%
         if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
-            if (activePlayer.canSeek && activePlayer.length > 0) {
+            if (activePlayer.canSeek && stableLength > 0) {
                 const ratio = (event.key - Qt.Key_0) * 0.1;
-                const targetPosition = ratio * activePlayer.length;
-                activePlayer.position = Math.max(0.1, Math.min(targetPosition, activePlayer.length * 0.99));
+                const targetPosition = ratio * stableLength;
+                activePlayer.position = Math.max(0.1, Math.min(targetPosition, stableLength * 0.99));
                 return true;
             }
         }
@@ -241,8 +249,8 @@ Item {
             }
         }
         if (event.key === Qt.Key_Right) {
-            if (activePlayer.canSeek && activePlayer.length > 0) {
-                activePlayer.position = Math.max(0.1, Math.min(activePlayer.length - 1, activePlayer.position + 5));
+            if (activePlayer.canSeek && stableLength > 0) {
+                activePlayer.position = Math.max(0.1, Math.min(stableLength - 1, activePlayer.position + 5));
                 return true;
             }
         }
@@ -483,7 +491,7 @@ Item {
                                     if (!activePlayer)
                                         return "0:00";
                                     const rawPos = Math.max(0, activePlayer.position || 0);
-                                    const pos = activePlayer.length ? rawPos % Math.max(1, activePlayer.length) : rawPos;
+                                    const pos = stableLength ? rawPos % Math.max(1, stableLength) : rawPos;
                                     const minutes = Math.floor(pos / 60);
                                     const seconds = Math.floor(pos % 60);
                                     const timeStr = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
@@ -497,9 +505,9 @@ Item {
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: {
-                                    if (!activePlayer || !activePlayer.length)
-                                        return "0:00";
-                                    const dur = Math.max(0, activePlayer.length || 0);
+                                    if (!activePlayer || stableLength <= 0)
+                                        return "--:--";
+                                    const dur = stableLength;
                                     const minutes = Math.floor(dur / 60);
                                     const seconds = Math.floor(dur % 60);
                                     return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
