@@ -1,466 +1,517 @@
-pragma Singleton
-pragma ComponentBehavior: Bound
-
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Common
+import qs.Services
+import qs.Widgets
 
-Singleton {
+Rectangle {
     id: root
 
-    property bool khalAvailable: true // Always true to enable DMS calendar card UI
-    property bool khalInstalled: false // Tracks if khal is actually on the system
-    property var eventsByDate: ({})
-    property bool isLoading: false
-    property string lastError: ""
-    property date lastStartDate
-    property date lastEndDate
-    property string khalDateFormat: "MM/dd/yyyy"
+    property bool showEventDetails: false
+    property date selectedDate: systemClock.date
+    property var selectedDateEvents: []
+    property bool hasEvents: selectedDateEvents && selectedDateEvents.length > 0
 
-    function checkKhalAvailability() {
-        if (!khalCheckProcess.running)
-            khalCheckProcess.running = true
+    signal closeDash
+
+    function weekStartJs() {
+        return Qt.locale().firstDayOfWeek % 7;
     }
 
-    function detectKhalDateFormat() {
-        if (!khalFormatProcess.running)
-            khalFormatProcess.running = true
+    function startOfWeek(dateObj) {
+        const d = new Date(dateObj);
+        const jsDow = d.getDay();
+        const diff = (jsDow - weekStartJs() + 7) % 7;
+        d.setDate(d.getDate() - diff);
+        return d;
     }
 
-    function parseKhalDateFormat(formatExample) {
-        let qtFormat = formatExample.replace("12", "MM").replace("21", "dd").replace("2013", "yyyy")
-        return { format: qtFormat, parser: null }
+    function endOfWeek(dateObj) {
+        const d = new Date(dateObj);
+        const jsDow = d.getDay();
+        const add = (weekStartJs() + 6 - jsDow + 7) % 7;
+        d.setDate(d.getDate() + add);
+        return d;
     }
 
-
-    function loadCurrentMonth() {
-        if (!root.khalAvailable)
-            return
-
-        let today = new Date()
-        let firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-        let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-        // Add padding
-        let startDate = new Date(firstDay)
-        startDate.setDate(startDate.getDate() - firstDay.getDay() - 7)
-        let endDate = new Date(lastDay)
-        endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()) + 7)
-        loadEvents(startDate, endDate)
+    function updateSelectedDateEvents() {
+        if (CalendarService && CalendarService.khalAvailable) {
+            const events = CalendarService.getEventsForDate(selectedDate);
+            selectedDateEvents = events;
+        } else {
+            selectedDateEvents = [];
+        }
     }
 
-    function loadEvents(startDate, endDate) {
-        // Read local tasks from niri-calendar-todo
-        if (!localTasksProcess.running) {
-            localTasksProcess.running = true
+    function loadEventsForMonth() {
+        if (!CalendarService || !CalendarService.khalAvailable) {
+            return;
         }
 
-        if (!root.khalInstalled) {
-            // If khal isn't installed, trigger change notification for local tasks
-            root.eventsByDateChanged()
-            return
-        }
-        if (eventsProcess.running) {
-            return
-        }
-        // Store last requested date range for refresh timer
-        root.lastStartDate = startDate
-        root.lastEndDate = endDate
-        root.isLoading = true
-        // Format dates for khal using detected format
-        let startDateStr = Qt.formatDate(startDate, root.khalDateFormat)
-        let endDateStr = Qt.formatDate(endDate, root.khalDateFormat)
-        eventsProcess.requestStartDate = startDate
-        eventsProcess.requestEndDate = endDate
-        eventsProcess.command = ["khal", "list", "--json", "title", "--json", "description", "--json", "start-date", "--json", "start-time", "--json", "end-date", "--json", "end-time", "--json", "all-day", "--json", "location", "--json", "url", startDateStr, endDateStr]
-        eventsProcess.running = true
+        const firstOfMonth = new Date(calendarGrid.displayDate.getFullYear(), calendarGrid.displayDate.getMonth(), 1);
+        const lastOfMonth = new Date(calendarGrid.displayDate.getFullYear(), calendarGrid.displayDate.getMonth() + 1, 0);
+
+        const startDate = startOfWeek(firstOfMonth);
+        startDate.setDate(startDate.getDate() - 7);
+
+        const endDate = endOfWeek(lastOfMonth);
+        endDate.setDate(endDate.getDate() + 7);
+
+        CalendarService.loadEvents(startDate, endDate);
     }
 
-    function getEventsForDate(date) {
-        let dateKey = Qt.formatDate(date, "yyyy-MM-dd")
-        return root.eventsByDate[dateKey] || []
-    }
-
-    function hasEventsForDate(date) {
-        let events = getEventsForDate(date)
-        return events.length > 0
-    }
-
-    // Task editing methods using clean, single-line Python scripts (no indentation or external helper file needed!)
-    function addTaskForDate(date, text) {
-        let dateKey = Qt.formatDate(date, "yyyy-MM-dd")
-        addTaskProcess.command = [
-            "python", "-c",
-            "import json, sys, time, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); os.makedirs(os.path.dirname(path), exist_ok=True); data = json.load(open(path)) if os.path.exists(path) else {}; date, text = sys.argv[1], sys.argv[2]; item = {'id': str(int(time.time()*1000)) + '-dms', 'text': text, 'completed': False}; data.setdefault(date, []).append(item); json.dump(data, open(path, 'w'), indent=2)",
-            dateKey, text
-        ]
-        addTaskProcess.running = true
-    }
-
-    function toggleTask(taskId) {
-        let cleanId = taskId.replace("task_", "")
-        toggleTaskProcess.command = [
-            "python", "-c",
-            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); [item.update({'completed': not item['completed']}) for v in data.values() for item in v if item['id'] == tid]; json.dump(data, open(path, 'w'), indent=2)",
-            cleanId
-        ]
-        toggleTaskProcess.running = true
-    }
-
-    function removeTask(taskId) {
-        let cleanId = taskId.replace("task_", "")
-        removeTaskProcess.command = [
-            "python", "-c",
-            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); data = {k: [i for i in v if i['id'] != tid] for k, v in data.items()}; data = {k: v for k, v in data.items() if len(v) > 0}; json.dump(data, open(path, 'w'), indent=2)",
-            cleanId
-        ]
-        removeTaskProcess.running = true
-    }
-
-    // Initialize on component completion
+    onSelectedDateChanged: updateSelectedDateEvents()
     Component.onCompleted: {
-        detectKhalDateFormat()
+        loadEventsForMonth();
+        updateSelectedDateEvents();
     }
 
-    // Process for inserting tasks
-    Process {
-        id: addTaskProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true
-            }
+    Connections {
+        function onEventsByDateChanged() {
+            updateSelectedDateEvents();
         }
-    }
 
-    // Process for toggling task state
-    Process {
-        id: toggleTaskProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true
+        function onKhalAvailableChanged() {
+            if (CalendarService && CalendarService.khalAvailable) {
+                loadEventsForMonth();
             }
+            updateSelectedDateEvents();
         }
+
+        target: CalendarService
+        enabled: CalendarService !== null
     }
 
-    // Process for deleting tasks
-    Process {
-        id: removeTaskProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true
-            }
-        }
-    }
+    radius: Theme.cornerRadius
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: 1
 
-    // Process for detecting local tasks
-    Process {
-        id: localTasksProcess
-        command: ["cat", "/home/goatnath/.config/niri-calendar-todo/tasks.json"]
-        running: false
-        
-        stdout: StdioCollector {
-            onStreamFinished: {
-                let text = this.text.trim()
-                if (!text || text === "") {
-                    // Clear task events if file is empty
-                    let newEventsByDate = Object.assign({}, root.eventsByDate)
-                    for (let dateKey in newEventsByDate) {
-                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"))
-                    }
-                    root.eventsByDate = newEventsByDate
-                    return
+    Column {
+        anchors.fill: parent
+        anchors.margins: Theme.spacingM
+        spacing: Theme.spacingS
+
+        Item {
+            width: parent.width
+            height: 40
+            visible: showEventDetails
+
+            Rectangle {
+                width: 32
+                height: 32
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingS
+                radius: Theme.cornerRadius
+                color: backButtonArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: "arrow_back"
+                    size: 14
+                    color: Theme.primary
                 }
-                try {
-                    let parsed = JSON.parse(text)
-                    let newEventsByDate = Object.assign({}, root.eventsByDate)
-                    
-                    // Clear any existing task events to prevent duplicates
-                    for (let dateKey in newEventsByDate) {
-                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"))
-                    }
 
-                    for (let dateKey in parsed) {
-                        let taskList = parsed[dateKey]
-                        if (!newEventsByDate[dateKey]) {
-                            newEventsByDate[dateKey] = []
-                        }
-                        
-                        for (let task of taskList) {
-                            let eventId = "task_" + task.id
-                            if (newEventsByDate[dateKey].some(e => e.id === eventId)) {
-                                continue
-                            }
-                            
-                            let parts = dateKey.split("-")
-                            let taskDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
-                            
-                            let eventObj = {
-                                "id": eventId,
-                                "title": (task.completed ? "✓ " : "☐ ") + task.text,
-                                "start": taskDate,
-                                "end": taskDate,
-                                "location": "",
-                                "description": "Task from your Planner",
-                                "url": "",
-                                "calendar": "Todo Planner",
-                                "color": "#10B981", // Pastel Green
-                                "allDay": true,
-                                "isMultiDay": false
-                            }
-                            newEventsByDate[dateKey].push(eventObj)
-                        }
-                    }
-                    
-                    // Re-sort within each date
-                    for (let dateKey in newEventsByDate) {
-                        newEventsByDate[dateKey].sort((a, b) => {
-                            return a.start.getTime() - b.start.getTime()
-                        })
-                    }
-                    
-                    root.eventsByDate = newEventsByDate
-                } catch (error) {
-                    console.warn("Failed to parse local tasks JSON: " + error.toString())
+                MouseArea {
+                    id: backButtonArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.showEventDetails = false
                 }
             }
-        }
-    }
 
-    // Process for detecting khal date format
-    Process {
-        id: khalFormatProcess
-
-        command: ["khal", "printformats"]
-        running: false
-        onExited: exitCode => {
-            if (exitCode !== 0) {
-                checkKhalAvailability()
+            StyledText {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 32 + Theme.spacingS * 2
+                anchors.rightMargin: Theme.spacingS
+                height: 40
+                anchors.verticalCenter: parent.verticalCenter
+                text: {
+                    const dateStr = Qt.formatDate(selectedDate, "MMM d");
+                    if (selectedDateEvents && selectedDateEvents.length > 0) {
+                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 task") : selectedDateEvents.length + " " + I18n.tr("tasks");
+                        return dateStr + " • " + eventCount;
+                    }
+                    return dateStr;
+                }
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceText
+                font.weight: Font.Medium
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
             }
         }
+        Row {
+            width: parent.width
+            height: 28
+            visible: !showEventDetails
 
-        stdout: StdioCollector {
-            onStreamFinished: {
-                let lines = text.split('\n')
-                for (let line of lines) {
-                    if (line.startsWith('dateformat:')) {
-                        let formatExample = line.substring(line.indexOf(':') + 1).trim()
-                        let formatInfo = parseKhalDateFormat(formatExample)
-                        root.khalDateFormat = formatInfo.format
-                        break
+            Rectangle {
+                width: 28
+                height: 28
+                radius: Theme.cornerRadius
+                color: prevMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: "chevron_left"
+                    size: 14
+                    color: Theme.primary
+                }
+
+                MouseArea {
+                    id: prevMonthArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        let newDate = new Date(calendarGrid.displayDate);
+                        newDate.setMonth(newDate.getMonth() - 1);
+                        calendarGrid.displayDate = newDate;
+                        loadEventsForMonth();
                     }
                 }
-                checkKhalAvailability()
+            }
+
+            StyledText {
+                width: parent.width - 56
+                height: 28
+                text: calendarGrid.displayDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceText
+                font.weight: Font.Medium
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            Rectangle {
+                width: 28
+                height: 28
+                radius: Theme.cornerRadius
+                color: nextMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: "chevron_right"
+                    size: 14
+                    color: Theme.primary
+                }
+
+                MouseArea {
+                    id: nextMonthArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        let newDate = new Date(calendarGrid.displayDate);
+                        newDate.setMonth(newDate.getMonth() + 1);
+                        calendarGrid.displayDate = newDate;
+                        loadEventsForMonth();
+                    }
+                }
             }
         }
-    }
 
-    // Process for checking khal configuration
-    Process {
-        id: khalCheckProcess
+        Row {
+            width: parent.width
+            height: 18
+            visible: !showEventDetails
 
-        command: ["khal", "list", "today"]
-        running: false
-        onExited: exitCode => {
-            root.khalInstalled = (exitCode === 0)
-            if (root.khalInstalled) {
-                loadCurrentMonth()
-            } else {
-                // If not installed, load local tasks anyway
-                loadEvents(root.lastStartDate || new Date(), root.lastEndDate || new Date())
+            Repeater {
+                model: {
+                    const days = [];
+                    const loc = Qt.locale();
+                    const qtFirst = loc.firstDayOfWeek;
+                    for (let i = 0; i < 7; ++i) {
+                        const qtDay = ((qtFirst - 1 + i) % 7) + 1;
+                        days.push(loc.dayName(qtDay, Locale.ShortFormat));
+                    }
+                    return days;
+                }
+
+                Rectangle {
+                    width: parent.width / 7
+                    height: 18
+                    color: "transparent"
+
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: modelData
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                        font.weight: Font.Medium
+                    }
+                }
             }
         }
-    }
 
-    // Process for loading events
-    Process {
-        id: eventsProcess
+        Grid {
+            id: calendarGrid
+            visible: !showEventDetails
 
-        property date requestStartDate
-        property date requestEndDate
-        property string rawOutput: ""
+            property date displayDate: systemClock.date
+            property date selectedDate: systemClock.date
 
-        running: false
-        onExited: exitCode => {
-            root.isLoading = false
-            if (exitCode !== 0) {
-                root.lastError = "Failed to load events (exit code: " + exitCode + ")"
-                return
+            readonly property date firstDay: {
+                const firstOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1);
+                return startOfWeek(firstOfMonth);
             }
-            try {
-                let newEventsByDate = {}
-                let lines = eventsProcess.rawOutput.split('\n')
-                for (let line of lines) {
-                    line = line.trim()
-                    if (!line || line === "[]")
-                        continue
 
-                    // Parse JSON line
-                    let dayEvents = JSON.parse(line)
-                    // Process each event in this day's array
-                    for (let event of dayEvents) {
-                        if (!event.title)
-                            continue
+            width: parent.width
+            height: parent.height - 28 - 18 - Theme.spacingS * 2
+            columns: 7
+            rows: 6
 
-                        // Parse start and end dates using detected format
-                        let startDate, endDate
-                        if (event['start-date']) {
-                            startDate = Date.fromLocaleString(Qt.locale(), event['start-date'], root.khalDateFormat)
-                        } else {
-                            startDate = new Date()
+            Repeater {
+                model: 42
+
+                Rectangle {
+                    readonly property date dayDate: {
+                        const date = new Date(parent.firstDay);
+                        date.setDate(date.getDate() + index);
+                        return date;
+                    }
+                    readonly property bool isCurrentMonth: dayDate.getMonth() === calendarGrid.displayDate.getMonth()
+                    readonly property bool isToday: dayDate.toDateString() === new Date().toDateString()
+                    readonly property bool isSelected: dayDate.toDateString() === calendarGrid.selectedDate.toDateString()
+
+                    width: parent.width / 7
+                    height: parent.height / 6
+                    color: "transparent"
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: Math.min(parent.width - 4, parent.height - 4, 32)
+                        height: width
+                        color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : dayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                        radius: Theme.cornerRadius
+
+                        StyledText {
+                            anchors.centerIn: parent
+                            text: dayDate.getDate()
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            font.weight: isToday ? Font.Medium : Font.Normal
                         }
-                        if (event['end-date']) {
-                            endDate = Date.fromLocaleString(Qt.locale(), event['end-date'], root.khalDateFormat)
-                        } else {
-                            endDate = new Date(startDate)
-                        }
-                        // Create start/end times
-                        let startTime = new Date(startDate)
-                        let endTime = new Date(endDate)
-                        if (event['start-time']
-                            && event['all-day'] !== "True") {
-                            // Parse time if available and not all-day
-                            let timeStr = event['start-time']
-                            if (timeStr) {
-                                // Match time with optional seconds and AM/PM
-                                let timeParts = timeStr.match(/(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i)
-                                if (timeParts) {
-                                    let hours = parseInt(timeParts[1])
-                                    let minutes = parseInt(timeParts[2])
 
-                                    // Handle AM/PM conversion if present
-                                    if (timeParts[3]) {
-                                        let period = timeParts[3].toUpperCase()
-                                        if (period === 'PM' && hours !== 12) {
-                                            hours += 12
-                                        } else if (period === 'AM' && hours === 12) {
-                                            hours = 0
-                                        }
-                                    }
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottomMargin: 4
+                            width: 12
+                            height: 2
+                            radius: Theme.cornerRadius
+                            visible: CalendarService && CalendarService.khalAvailable && CalendarService.hasEventsForDate(dayDate)
+                            color: isToday ? Qt.lighter(Theme.primary, 1.3) : Theme.primary
+                            opacity: isToday ? 0.9 : 0.7
 
-                                    startTime.setHours(hours, minutes)
-                                    if (event['end-time']) {
-                                        let endTimeParts = event['end-time'].match(
-                                            /(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i)
-                                        if (endTimeParts) {
-                                            let endHours = parseInt(endTimeParts[1])
-                                            let endMinutes = parseInt(endTimeParts[2])
-
-                                            // Handle AM/PM conversion if present
-                                            if (endTimeParts[3]) {
-                                                let endPeriod = endTimeParts[3].toUpperCase()
-                                                if (endPeriod === 'PM' && endHours !== 12) {
-                                                    endHours += 12
-                                                } else if (endPeriod === 'AM' && endHours === 12) {
-                                                    endHours = 0
-                                                }
-                                            }
-
-                                            endTime.setHours(endHours, endMinutes)
-                                        }
-                                    } else {
-                                        // Default to 1 hour duration on same day
-                                        endTime = new Date(startTime)
-                                        endTime.setHours(
-                                            startTime.getHours() + 1)
-                                    }
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
                                 }
                             }
                         }
-                        // Create unique ID for this event (to track multi-day events)
-                        let eventId = event.title + "_" + event['start-date']
-                            + "_" + (event['start-time'] || 'allday')
-                        // Create event object template
-                        let extractedUrl = ""
-                        if (!event.url && event.description) {
-                            let urlMatch = event.description.match(/https?:\/\/[^\s]+/)
-                            if (urlMatch) {
-                                extractedUrl = urlMatch[0]
-                            }
-                        }
-                        let eventTemplate = {
-                            "id": eventId,
-                            "title": event.title || "Untitled Event",
-                            "start": startTime,
-                            "end": endTime,
-                            "location": event.location || "",
-                            "description": event.description || "",
-                            "url": event.url || extractedUrl,
-                            "calendar": "",
-                            "color": "",
-                            "allDay": event['all-day'] === "True",
-                            "isMultiDay": startDate.toDateString(
-                            ) !== endDate.toDateString()
-                        }
-                        // Add event to each day it spans
-                        let currentDate = new Date(startDate)
-                        while (currentDate <= endDate) {
-                            let dateKey = Qt.formatDate(currentDate,
-                                                        "yyyy-MM-dd")
-                            if (!newEventsByDate[dateKey])
-                                newEventsByDate[dateKey] = []
+                    }
 
-                            // Check if this exact event is already added to this date (prevent duplicates)
-                            let existingEvent = newEventsByDate[dateKey].find(
-                                e => {
-                                    return e.id === eventId
-                                })
-                            if (existingEvent) {
-                                // Move to next day without adding duplicate
-                                currentDate.setDate(currentDate.getDate() + 1)
-                                continue
-                            }
-                            // Create a copy of the event for this date
-                            let dayEvent = Object.assign({}, eventTemplate)
-                            // For multi-day events, adjust the display time for this specific day
-                            if (currentDate.getTime() === startDate.getTime()) {
-                                // First day - use original start time
-                                dayEvent.start = new Date(startTime)
-                            } else {
-                                // Subsequent days - start at beginning of day for all-day events
-                                dayEvent.start = new Date(currentDate)
-                                if (!dayEvent.allDay)
-                                    dayEvent.start.setHours(0, 0, 0, 0)
-                            }
-                            if (currentDate.getTime() === endDate.getTime()) {
-                                // Last day - use original end time
-                                dayEvent.end = new Date(endTime)
-                            } else {
-                                // Earlier days - end at end of day for all-day events
-                                dayEvent.end = new Date(currentDate)
-                                if (!dayEvent.allDay)
-                                    dayEvent.end.setHours(23, 59, 59, 999)
-                            }
-                            newEventsByDate[dateKey].push(dayEvent)
-                            // Move to next day
-                            currentDate.setDate(currentDate.getDate() + 1)
+                    MouseArea {
+                        id: dayArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.selectedDate = dayDate;
+                            root.showEventDetails = true;
                         }
                     }
                 }
-                // Sort events by start time within each date
-                for (let dateKey in newEventsByDate) {
-                    newEventsByDate[dateKey].sort((a, b) => {
-                        return a.start.getTime(
-                        ) - b.start.getTime()
-                    })
-                }
-                root.eventsByDate = newEventsByDate
-                root.lastError = ""
-            } catch (error) {
-                root.lastError = "Failed to parse events JSON: " + error.toString()
-                root.eventsByDate = {}
             }
-            // Reset for next run
-            eventsProcess.rawOutput = ""
         }
+        DankListView {
+            width: parent.width - Theme.spacingS * 2
+            height: parent.height - (showEventDetails ? 40 + 42 : 28 + 18) - Theme.spacingS
+            anchors.horizontalCenter: parent.horizontalCenter
+            model: selectedDateEvents
+            visible: showEventDetails
+            clip: true
+            spacing: Theme.spacingXS
 
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: data => {
-                eventsProcess.rawOutput += data + "\n"
+            delegate: Rectangle {
+                width: parent ? parent.width : 0
+                height: eventContent.implicitHeight + Theme.spacingS
+                radius: Theme.cornerRadius
+                color: {
+                    if (modelData.url && eventMouseArea.containsMouse) {
+                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                    } else if (eventMouseArea.containsMouse) {
+                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06);
+                    }
+                    return Theme.nestedSurface;
+                }
+                border.color: {
+                    if (modelData.url && eventMouseArea.containsMouse) {
+                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
+                    } else if (eventMouseArea.containsMouse) {
+                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15);
+                    }
+                    return Theme.outlineMedium;
+                }
+                border.width: eventMouseArea.containsMouse ? 1 : Theme.layerOutlineWidth
+
+                Rectangle {
+                    width: 3
+                    height: parent.height - 6
+                    anchors.left: parent.left
+                    anchors.leftMargin: 3
+                    anchors.verticalCenter: parent.verticalCenter
+                    radius: Theme.cornerRadius
+                    color: modelData.id.startsWith("task_") ? (modelData.title.startsWith("✓") ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
+                    opacity: 0.8
+                }
+
+                Column {
+                    id: eventContent
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: Theme.spacingS + 6
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : Theme.spacingXS
+                    spacing: 2
+
+                    StyledText {
+                        width: parent.width
+                        text: modelData.title
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: modelData.id.startsWith("task_") && modelData.title.startsWith("✓") ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
+                        font.weight: Font.Medium
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                    }
+
+                    StyledText {
+                        width: parent.width
+                        text: {
+                            if (!modelData || modelData.allDay) {
+                                return I18n.tr("All day");
+                            } else if (modelData.start && modelData.end) {
+                                const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
+                                const startTime = Qt.formatTime(modelData.start, timeFormat);
+                                if (modelData.start.toDateString() !== modelData.end.toDateString() || modelData.start.getTime() !== modelData.end.getTime()) {
+                                    return startTime + " – " + Qt.formatTime(modelData.end, timeFormat);
+                                }
+                                return startTime;
+                            }
+                            return "";
+                        }
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        font.weight: Font.Normal
+                        visible: text !== "" && !modelData.id.startsWith("task_")
+                    }
+                }
+
+                // Main body MouseArea (declared before the delete button so delete sits on top)
+                MouseArea {
+                    id: eventMouseArea
+
+                    anchors.fill: parent
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : 0
+                    hoverEnabled: true
+                    cursorShape: (modelData.url || modelData.id.startsWith("task_")) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: modelData.url !== "" || modelData.id.startsWith("task_")
+                    onClicked: {
+                        if (modelData.id.startsWith("task_")) {
+                            CalendarService.toggleTask(modelData.id);
+                        } else if (modelData.url && modelData.url !== "") {
+                            if (Qt.openUrlExternally(modelData.url) === false) {
+                                console.warn("Failed to open URL: " + modelData.url);
+                            } else {
+                                root.closeDash();
+                            }
+                        }
+                    }
+                }
+
+                // Delete Button (declared after eventMouseArea to ensure it is rendered on top and captures clicks)
+                Rectangle {
+                    id: deleteButton
+                    width: 24
+                    height: 24
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingS
+                    anchors.verticalCenter: parent.verticalCenter
+                    radius: Theme.cornerRadius
+                    color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 0.15) : "transparent"
+                    visible: modelData.id.startsWith("task_")
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "delete"
+                        size: 14
+                        color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 1.0) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    }
+
+                    MouseArea {
+                        id: deleteMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            CalendarService.removeTask(modelData.id);
+                        }
+                    }
+                }
             }
         }
+        
+        Rectangle {
+            width: parent.width - Theme.spacingS * 2
+            height: 34
+            anchors.horizontalCenter: parent.horizontalCenter
+            radius: Theme.cornerRadius
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
+            border.width: 1
+            visible: showEventDetails
+
+            TextInput {
+                id: taskInput
+                anchors.fill: parent
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                verticalAlignment: TextInput.AlignVCenter
+                color: Theme.surfaceText
+                font.pixelSize: Theme.fontSizeSmall
+                selectByMouse: true
+                clip: true
+
+                // Hint placeholder text
+                Text {
+                    text: I18n.tr("Add a task...")
+                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    visible: !taskInput.text && !taskInput.activeFocus
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                onAccepted: {
+                    let txt = text.trim();
+                    if (txt !== "") {
+                        CalendarService.addTaskForDate(root.selectedDate, txt);
+                        text = "";
+                        taskInput.focus = false;
+                    }
+                }
+            }
+        }
+    }
+
+    SystemClock {
+        id: systemClock
+        precision: SystemClock.Hours
     }
 }
