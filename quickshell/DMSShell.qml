@@ -30,6 +30,7 @@ import qs.Services
 Item {
     id: root
     readonly property var log: Log.scoped("DMSShell")
+    readonly property var _sessionsServiceRef: SessionsService
 
     property bool osdSurfacesLoaded: true
     property int pendingOsdResumeReloads: 0
@@ -1146,9 +1147,27 @@ Item {
                 lock.activate();
             }
 
+            onSwitchUserRequested: {
+                switchUserModalLoader.active = true;
+                Qt.callLater(() => {
+                    if (switchUserModalLoader.item)
+                        switchUserModalLoader.item.showFromPowerMenu();
+                });
+            }
+
             Component.onCompleted: {
                 PopoutService.powerMenuModal = powerMenuModal;
             }
+        }
+    }
+
+    LazyLoader {
+        id: switchUserModalLoader
+
+        active: false
+
+        SwitchUserModal {
+            id: switchUserModal
         }
     }
 
