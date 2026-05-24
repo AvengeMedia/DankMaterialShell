@@ -456,6 +456,11 @@ Item {
                                 desc: I18n.tr("Restart the DankMaterialShell")
                             },
                             {
+                                key: "switchuser",
+                                label: I18n.tr("Show Switch User"),
+                                desc: I18n.tr("Opens a picker of other active sessions on this seat")
+                            },
+                            {
                                 key: "hibernate",
                                 label: I18n.tr("Show Hibernate"),
                                 desc: I18n.tr("Only visible if hibernate is supported by your system"),
