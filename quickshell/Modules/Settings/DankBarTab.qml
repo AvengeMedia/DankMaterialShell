@@ -597,6 +597,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Auto-hide")
+                    description: I18n.tr("Automatically hide the bar when the pointer moves away")
                     checked: selectedBarConfig?.autoHide ?? false
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -623,6 +624,7 @@ Item {
                         id: hideDelaySlider
                         width: parent.width - parent.parent.leftPadding
                         text: I18n.tr("Hide Delay")
+                        description: I18n.tr("Time to wait before hiding after the pointer leaves")
                         value: selectedBarConfig?.autoHideDelay ?? 250
                         minimum: 0
                         maximum: 2000
@@ -645,6 +647,7 @@ Item {
                     SettingsToggleRow {
                         width: parent.width - parent.leftPadding
                         text: I18n.tr("Strict auto-hide", "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open")
+                        description: I18n.tr("Hide the bar when the pointer leaves even if a popout is still open")
                         checked: selectedBarConfig?.autoHideStrict ?? false
                         onToggled: toggled => {
                             SettingsData.updateBarConfig(selectedBarId, {
@@ -658,6 +661,7 @@ Item {
                         width: parent.width - parent.leftPadding
                         visible: CompositorService.isNiri || CompositorService.isHyprland
                         text: I18n.tr("Hide When Windows Open")
+                        description: I18n.tr("Show the bar only when no windows are open")
                         checked: selectedBarConfig?.showOnWindowsOpen ?? false
                         onToggled: toggled => {
                             SettingsData.updateBarConfig(selectedBarId, {
@@ -676,6 +680,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Manual Show/Hide")
+                    description: I18n.tr("Toggle bar visibility manually via IPC")
                     checked: selectedBarConfig?.visible ?? true
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -694,6 +699,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Click Through")
+                    description: I18n.tr("Mouse clicks pass through the bar to windows behind it")
                     checked: selectedBarConfig?.clickThrough ?? false
                     onToggled: toggled => SettingsData.updateBarConfig(selectedBarId, {
                             clickThrough: toggled
@@ -713,6 +719,7 @@ Item {
                     enabled: !SettingsData.frameEnabled
                     opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     text: I18n.tr("Show on Overview")
+                    description: I18n.tr("Show the bar when niri overview is active")
                     checked: selectedBarConfig?.openOnOverview ?? false
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -759,6 +766,7 @@ Item {
                 SettingsSliderRow {
                     id: edgeSpacingSlider
                     text: I18n.tr("Edge Spacing")
+                    description: I18n.tr("Space between the bar and screen edges")
                     value: selectedBarConfig?.spacing ?? 4
                     minimum: 0
                     maximum: 32
@@ -780,6 +788,7 @@ Item {
                 SettingsSliderRow {
                     id: exclusiveZoneSlider
                     text: I18n.tr("Exclusive Zone Offset")
+                    description: I18n.tr("Fine-tune the space reserved for the bar from the screen edge")
                     value: selectedBarConfig?.bottomGap ?? 0
                     minimum: -50
                     maximum: 50
@@ -801,6 +810,7 @@ Item {
                 SettingsSliderRow {
                     id: sizeSlider
                     text: I18n.tr("Size")
+                    description: I18n.tr("Adjust the bar height via inner padding")
                     value: selectedBarConfig?.innerPadding ?? 4
                     minimum: -8
                     maximum: 24
@@ -822,6 +832,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetPaddingSlider
                     text: I18n.tr("Padding")
+                    description: I18n.tr("Inner padding applied to each widget")
                     value: selectedBarConfig?.widgetPadding ?? 8
                     minimum: 0
                     maximum: 32
@@ -852,6 +863,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Auto Popup Gaps")
+                    description: I18n.tr("Automatically calculate popup gap based on bar spacing")
                     checked: selectedBarConfig?.popupGapsAuto ?? true
                     onToggled: checked => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -877,6 +889,7 @@ Item {
                         id: popupGapsManualSlider
                         width: parent.width - parent.parent.leftPadding
                         text: I18n.tr("Manual Gap Size")
+                        description: I18n.tr("Override the popup gap size when auto is disabled")
                         value: selectedBarConfig?.popupGapsManual ?? 4
                         minimum: 0
                         maximum: 50
@@ -907,6 +920,7 @@ Item {
                     id: barTransparencySlider
                     visible: !SettingsData.frameEnabled
                     text: I18n.tr("Bar Transparency")
+                    description: I18n.tr("Opacity of the bar background")
                     value: (selectedBarConfig?.transparency ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -929,6 +943,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetTransparencySlider
                     text: I18n.tr("Widget Transparency")
+                    description: I18n.tr("Opacity of widget backgrounds")
                     value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -1023,6 +1038,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Square Corners")
+                    description: I18n.tr("Remove corner rounding from the bar")
                     visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.squareCorners ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1032,6 +1048,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("No Background")
+                    description: I18n.tr("Make the bar background fully transparent")
                     visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.noBackground ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1041,6 +1058,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Maximize Widget Icons")
+                    description: I18n.tr("Stretch widget icons to fill the available bar height")
                     checked: selectedBarConfig?.maximizeWidgetIcons ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             maximizeWidgetIcons: checked
@@ -1049,6 +1067,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Maximize Widget Text")
+                    description: I18n.tr("Stretch widget text to fill the available bar height")
                     checked: selectedBarConfig?.maximizeWidgetText ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             maximizeWidgetText: checked
@@ -1057,6 +1076,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Remove Widget Padding")
+                    description: I18n.tr("Remove inner padding from all widgets")
                     checked: selectedBarConfig?.removeWidgetPadding ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             removeWidgetPadding: checked
@@ -1072,6 +1092,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Goth Corners")
+                    description: I18n.tr("Apply inverse concave corner cutouts to the bar")
                     visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1081,6 +1102,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Corner Radius Override")
+                    description: I18n.tr("Use a custom radius for goth corner cutouts")
                     checked: selectedBarConfig?.gothCornerRadiusOverride ?? false
                     visible: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1239,6 +1261,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Color")
+                    description: I18n.tr("Theme color used for the border")
                     model: ["Surface", "Secondary", "Primary"]
                     currentIndex: {
                         switch (selectedBarConfig?.borderColor || "surfaceText") {
@@ -1276,6 +1299,7 @@ Item {
                 SettingsSliderRow {
                     id: borderOpacitySlider
                     text: I18n.tr("Opacity")
+                    description: I18n.tr("Transparency of the border")
                     value: (selectedBarConfig?.borderOpacity ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -1298,6 +1322,7 @@ Item {
                 SettingsSliderRow {
                     id: borderThicknessSlider
                     text: I18n.tr("Thickness")
+                    description: I18n.tr("Width of the border in pixels")
                     value: selectedBarConfig?.borderThickness ?? 1
                     minimum: 1
                     maximum: 10
@@ -1329,6 +1354,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Color")
+                    description: I18n.tr("Theme color used for the widget outline")
                     model: ["Surface", "Secondary", "Primary"]
                     currentIndex: {
                         switch (selectedBarConfig?.widgetOutlineColor || "primary") {
@@ -1366,6 +1392,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetOutlineOpacitySlider
                     text: I18n.tr("Opacity")
+                    description: I18n.tr("Transparency of the widget outline")
                     value: (selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -1388,6 +1415,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetOutlineThicknessSlider
                     text: I18n.tr("Thickness")
+                    description: I18n.tr("Width of the widget outline in pixels")
                     value: selectedBarConfig?.widgetOutlineThickness ?? 1
                     minimum: 1
                     maximum: 10
@@ -1458,6 +1486,7 @@ Item {
                 SettingsSliderRow {
                     visible: shadowCard.shadowActive
                     text: I18n.tr("Intensity", "shadow intensity slider")
+                    description: I18n.tr("Shadow blur radius in pixels")
                     minimum: 0
                     maximum: 100
                     unit: "px"
@@ -1471,6 +1500,7 @@ Item {
                 SettingsSliderRow {
                     visible: shadowCard.shadowActive
                     text: I18n.tr("Opacity")
+                    description: I18n.tr("Transparency of the shadow layer")
                     minimum: 10
                     maximum: 100
                     unit: "%"
@@ -1658,6 +1688,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Y Axis")
+                    description: I18n.tr("Action performed when scrolling vertically on the bar")
                     model: CompositorService.isNiri ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")] : [I18n.tr("None"), I18n.tr("Workspace")]
                     currentIndex: {
                         switch (selectedBarConfig?.scrollYBehavior || "workspace") {
@@ -1694,6 +1725,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("X Axis")
+                    description: I18n.tr("Action performed when scrolling horizontally on the bar")
                     visible: CompositorService.isNiri
                     model: [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")]
                     currentIndex: {
