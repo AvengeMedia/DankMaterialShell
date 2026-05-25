@@ -274,6 +274,17 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "notificationDedupeEnabled"
+                    tags: ["notification", "duplicate", "dedupe", "stack", "coalesce", "repeat"]
+                    text: I18n.tr("Suppress Duplicate Notifications")
+                    description: SettingsData.notificationDedupeEnabled
+                             ? I18n.tr("Identical alerts show as one popup instead of stacking")
+                             : I18n.tr("Identical alerts stack as separate notification cards")
+                    checked: SettingsData.notificationDedupeEnabled
+                    onToggled: checked => SettingsData.set("notificationDedupeEnabled", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "notificationPopupShadowEnabled"
                     tags: ["notification", "popup", "shadow", "radius", "rounded"]
                     text: I18n.tr("Popup Shadow")

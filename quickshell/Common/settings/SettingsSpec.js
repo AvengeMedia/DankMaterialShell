@@ -399,6 +399,7 @@ var SPEC = {
     notificationTimeoutNormal: { def: 5000 },
     notificationTimeoutCritical: { def: 0 },
     notificationCompactMode: { def: false },
+    notificationDedupeEnabled: { def: true },
     notificationPopupPosition: { def: 0 },
     notificationAnimationSpeed: { def: 1 },
     notificationCustomAnimationDuration: { def: 400 },

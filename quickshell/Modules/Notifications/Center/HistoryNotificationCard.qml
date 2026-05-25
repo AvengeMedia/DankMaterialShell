@@ -182,26 +182,30 @@ Rectangle {
                 Row {
                     width: parent.width
                     spacing: Theme.spacingXS
-                    readonly property real reservedTrailingWidth: historySeparator.implicitWidth + Math.max(historyTimeText.implicitWidth, 72) + spacing
 
-                    StyledText {
-                        id: historyTitleText
-                        width: Math.min(implicitWidth, Math.max(0, parent.width - parent.reservedTrailingWidth))
-                        text: {
-                            let title = historyItem.summary || "";
-                            const appName = historyItem.appName || "";
-                            const prefix = appName + " • ";
-                            if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
-                                title = title.substring(prefix.length);
+                    Item {
+                        width: Math.max(0, parent.width - historySeparator.implicitWidth - Math.max(historyTimeText.implicitWidth, 72) - parent.spacing * 2)
+                        height: historyTitleText.implicitHeight
+                        visible: historyTitleText.text.length > 0
+
+                        StyledText {
+                            id: historyTitleText
+                            anchors.fill: parent
+                            text: {
+                                let title = historyItem.summary || "";
+                                const appName = historyItem.appName || "";
+                                const prefix = appName + " • ";
+                                if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
+                                    title = title.substring(prefix.length);
+                                }
+                                return title;
                             }
-                            return title;
+                            color: Theme.surfaceText
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
                         }
-                        color: Theme.surfaceText
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
-                        visible: text.length > 0
                     }
                     StyledText {
                         id: historySeparator

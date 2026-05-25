@@ -5808,6 +5808,28 @@
     "description": "Use smaller notification cards"
   },
   {
+    "section": "notificationDedupeEnabled",
+    "label": "Suppress Duplicate Notifications",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "coalesce",
+      "dedupe",
+      "duplicate",
+      "duplicates",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "repeat",
+      "stack",
+      "toast"
+    ],
+    "description": "Control whether identical alerts stack or show as a single popup"
+  },
+  {
     "section": "notificationHistorySaveCritical",
     "label": "Critical Priority",
     "tabIndex": 17,
