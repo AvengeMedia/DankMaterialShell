@@ -65,15 +65,6 @@ Item {
                     forceActiveFocus();
                 });
             }
-
-            Connections {
-                target: modal
-                function onOpened() {
-                    Qt.callLater(function () {
-                        searchField.forceActiveFocus();
-                    });
-                }
-            }
         }
     }
 
