@@ -331,7 +331,7 @@ Item {
                     }
 
                     StyledText {
-                        text: activePlayer?.trackTitle || I18n.tr("Unknown Artist")
+                        text: activePlayer?.trackArtist || I18n.tr("Unknown Artist")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.8)
                         width: parent.width
