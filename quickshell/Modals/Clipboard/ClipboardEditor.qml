@@ -29,32 +29,29 @@ Item {
         }
 
         try {
-            const chars = new Array(sanitized.length);
-            for (let i = 0; i < sanitized.length; i++) {
-                chars[i] = sanitized.charAt(i);
-            }
-
-            let buffer = null;
-            if (typeof Qt !== "undefined" && typeof Qt.atob === "function") {
-                buffer = Qt.atob(chars);
-            } else if (typeof atob === "function") {
-                const binary = atob(sanitized);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                buffer = bytes.buffer;
-            }
-            if (!buffer || buffer.byteLength === 0) {
+            const decoded = Qt.atob(sanitized);
+            if (!decoded) {
                 return data;
             }
 
-            const bytes = new Uint8Array(buffer);
             let binary = "";
-            for (let i = 0; i < bytes.length; i++) {
-                binary += String.fromCharCode(bytes[i]);
+            if (typeof decoded === "string") {
+                // Pre-6.11 Qt.atob returns a binary string directly
+                binary = decoded;
+            } else {
+                // Qt 6.11+ Qt.atob returns an ArrayBuffer — convert to avoid O(n²) concat/stack limits
+                const bytes = new Uint8Array(decoded);
+                const chunkSize = 8192;
+                const chunks = [];
+                for (let i = 0; i < bytes.length; i += chunkSize) {
+                    chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize)));
+                }
+                binary = chunks.join("");
             }
 
+            if (!binary) {
+                return data;
+            }
             try {
                 return decodeURIComponent(escape(binary));
             } catch (e) {
@@ -74,6 +71,7 @@ Item {
         Qt.callLater(function () {
             if (editField) {
                 editField.forceActiveFocus();
+                editField.cursorPosition = editField.text.length;
             }
         });
 
@@ -104,7 +102,17 @@ Item {
             }
             root.editorText = fullText;
             if (editField) {
-                editField.text = fullText;
+                if (fullText.length > 50000) {
+                    Qt.callLater(function () {
+                        if (editField) {
+                            editField.text = fullText;
+                            editField.cursorPosition = fullText.length;
+                        }
+                    });
+                } else {
+                    editField.text = fullText;
+                    editField.cursorPosition = fullText.length;
+                }
             }
         });
     }
@@ -252,7 +260,6 @@ Item {
                     id: editField
                     width: editScroll.width
                     height: Math.max(editScroll.height, contentHeight)
-                    text: root.editorText
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceText
                     wrapMode: TextEdit.Wrap
