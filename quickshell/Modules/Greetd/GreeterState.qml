@@ -19,6 +19,8 @@ Singleton {
     property var sessionExecs: []
     property var sessionPaths: []
     property int currentSessionIndex: 0
+    property var availableUsers: []
+    property int selectedUserIndex: -1
 
     function reset() {
         showPasswordInput = false;
@@ -26,5 +28,6 @@ Singleton {
         usernameInput = "";
         passwordBuffer = "";
         pamState = "";
+        selectedUserIndex = -1;
     }
 }

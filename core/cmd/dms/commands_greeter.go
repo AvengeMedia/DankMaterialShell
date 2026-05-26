@@ -59,22 +59,29 @@ var greeterInstallCmd = &cobra.Command{
 }
 
 var greeterSyncCmd = &cobra.Command{
-	Use:     "sync",
-	Short:   "Sync DMS theme and settings with greeter",
-	Long:    "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen",
-	PreRunE: preRunPrivileged,
+	Use:   "sync",
+	Short: "Sync DMS theme and settings with greeter",
+	Long:  "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen. Also updates a per-user cache slot at users/<username>/ for multi-account greeter theme preview.\n\nUse --profile on secondary accounts to sync only your own users/<username>/ slot without sudo or greetd changes.",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		profile, _ := cmd.Flags().GetBool("profile")
+		if profile {
+			return nil
+		}
+		return preRunPrivileged(cmd, args)
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		auth, _ := cmd.Flags().GetBool("auth")
 		local, _ := cmd.Flags().GetBool("local")
+		profile, _ := cmd.Flags().GetBool("profile")
 		term, _ := cmd.Flags().GetBool("terminal")
 		if term {
-			if err := syncInTerminal(yes, auth, local); err != nil {
+			if err := syncInTerminal(yes, auth, local, profile); err != nil {
 				log.Fatalf("Error launching sync in terminal: %v", err)
 			}
 			return
 		}
-		if err := syncGreeter(yes, auth, local); err != nil {
+		if err := syncGreeter(yes, auth, local, profile); err != nil {
 			log.Fatalf("Error syncing greeter: %v", err)
 		}
 	},
@@ -85,6 +92,7 @@ func init() {
 	greeterSyncCmd.Flags().BoolP("terminal", "t", false, "Run sync in a new terminal (for entering sudo password); terminal auto-closes when done")
 	greeterSyncCmd.Flags().BoolP("auth", "a", false, "Configure PAM for fingerprint and U2F (adds both if modules exist); overrides UI toggles")
 	greeterSyncCmd.Flags().BoolP("local", "l", false, "Developer mode: force greetd config to use a local DMS checkout path")
+	greeterSyncCmd.Flags().BoolP("profile", "p", false, "Sync only your per-user greeter slot (no sudo; for secondary accounts)")
 }
 
 var greeterEnableCmd = &cobra.Command{
@@ -512,8 +520,8 @@ func runCommandInTerminal(shellCmd string) error {
 	return fmt.Errorf("no terminal emulator found (tried: gnome-terminal, konsole, xfce4-terminal, ghostty, wezterm, alacritty, kitty, xterm)")
 }
 
-func syncInTerminal(nonInteractive bool, forceAuth bool, local bool) error {
-	syncFlags := make([]string, 0, 3)
+func syncInTerminal(nonInteractive bool, forceAuth bool, local bool, profileOnly bool) error {
+	syncFlags := make([]string, 0, 4)
 	if nonInteractive {
 		syncFlags = append(syncFlags, "--yes")
 	}
@@ -522,6 +530,9 @@ func syncInTerminal(nonInteractive bool, forceAuth bool, local bool) error {
 	}
 	if local {
 		syncFlags = append(syncFlags, "--local")
+	}
+	if profileOnly {
+		syncFlags = append(syncFlags, "--profile")
 	}
 	shellSyncCmd := "dms greeter sync"
 	if len(syncFlags) > 0 {
@@ -541,7 +552,11 @@ func resolveLocalWrapperShell() (string, error) {
 	return "", fmt.Errorf("could not find bash or sh in PATH for local greeter wrapper")
 }
 
-func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
+func syncGreeter(nonInteractive bool, forceAuth bool, local bool, profileOnly bool) error {
+	if profileOnly {
+		return syncGreeterProfileOnly(nonInteractive)
+	}
+
 	if !nonInteractive {
 		fmt.Println("=== DMS Greeter Sync ===")
 		fmt.Println()
@@ -752,6 +767,26 @@ func syncGreeter(nonInteractive bool, forceAuth bool, local bool) error {
 	return nil
 }
 
+func syncGreeterProfileOnly(nonInteractive bool) error {
+	logFunc := func(msg string) {
+		fmt.Println(msg)
+	}
+	if !nonInteractive {
+		fmt.Println("=== DMS Greeter Profile Sync ===")
+		fmt.Println()
+		fmt.Println("Syncing your personal greeter theme slot (no system changes)...")
+	}
+	if err := greeter.SyncUserProfileCache(logFunc); err != nil {
+		return err
+	}
+	if !nonInteractive {
+		fmt.Println("\n=== Profile Sync Complete ===")
+		fmt.Println("\nYour theme, wallpaper, and profile photo have been synced for the login screen.")
+		fmt.Println("Log out to preview your greeter look when selecting your account.")
+	}
+	return nil
+}
+
 func hasDmsShellQml(dir string) bool {
 	info, err := os.Stat(filepath.Join(dir, "shell.qml"))
 	return err == nil && !info.IsDir()
@@ -837,7 +872,14 @@ func resolveLocalDMSPath() (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("could not locate a local DMS checkout from %s; run from repo root or set DMS_LOCAL_PATH=/absolute/path/to/repo", wd)
+	configuredCommand := readDefaultSessionCommand("/etc/greetd/config.toml")
+	if pathOverride := extractGreeterPathOverrideFromCommand(configuredCommand); pathOverride != "" {
+		if resolved, ok := resolveDMSLocalCandidate(pathOverride); ok {
+			return resolved, nil
+		}
+	}
+
+	return "", fmt.Errorf("could not locate a local DMS checkout from %s; run from repo root, set DMS_LOCAL_PATH=/absolute/path/to/repo, or configure greetd with -p /path/to/quickshell", wd)
 }
 
 func disableDisplayManager(dmName string) (bool, error) {

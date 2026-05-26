@@ -62,6 +62,11 @@ Item {
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
     readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
+    readonly property bool multipleUsersAvailable: GreeterUsersService.loaded && GreeterUsersService.users.length > 1
+    readonly property bool showUserPicker: multipleUsersAvailable && !GreeterState.showPasswordInput
+    property bool userListOpen: false
+    property bool skipAutoSelectUser: false
+    property string pickerThemeUsername: ""
 
     function initWeatherService() {
         if (weatherInitialized)
@@ -428,20 +433,61 @@ Item {
         fprintdDeviceProbe.running = true;
     }
 
+    function applyPickerPreviewTheme() {
+        let previewUser = (pickerThemeUsername || "").trim();
+        if (!previewUser && GreetdSettings.rememberLastUser)
+            previewUser = (GreetdMemory.lastSuccessfulUser || "").trim();
+        if (previewUser)
+            GreeterUserTheme.applyForUser(previewUser);
+        else
+            GreeterUserTheme.applyDefault();
+    }
+
     function applyLastSuccessfulUser() {
+        if (root.skipAutoSelectUser)
+            return;
         if (!GreetdSettings.settingsLoaded || !GreetdSettings.rememberLastUser)
             return;
         const lastUser = GreetdMemory.lastSuccessfulUser;
         if (lastUser && !GreeterState.showPasswordInput && !GreeterState.username) {
-            GreeterState.username = lastUser;
-            GreeterState.usernameInput = lastUser;
-            GreeterState.showPasswordInput = true;
-            PortalService.getGreeterUserProfileImage(lastUser);
-            maybeAutoStartExternalAuth();
+            selectUser(lastUser, true);
         }
     }
 
-    function submitUsername(rawValue) {
+    function returnToUserPicker() {
+        if (!root.multipleUsersAvailable || GreeterState.unlocking)
+            return;
+        root.skipAutoSelectUser = true;
+        awaitingExternalAuth = false;
+        pendingPasswordResponse = false;
+        passwordSubmitRequested = false;
+        resetPasswordSessionTransition(true);
+        authTimeout.interval = defaultAuthTimeoutMs;
+        authTimeout.stop();
+        clearAuthFeedback();
+        passwordFailureCount = 0;
+        externalAuthAutoStartedForUser = "";
+        if (Greetd.state !== GreetdState.Inactive)
+            Greetd.cancelSession();
+        const previousUser = GreeterState.username;
+        GreeterState.reset();
+        inputField.text = "";
+        PortalService.profileImage = "";
+        if (previousUser)
+            root.pickerThemeUsername = previousUser;
+        root.applyPickerPreviewTheme();
+        root.userListOpen = true;
+    }
+
+    function selectUser(rawValue, skipDropdownUpdate) {
+        const user = (rawValue || "").trim();
+        if (!user)
+            return;
+        root.skipAutoSelectUser = false;
+        submitUsername(user, skipDropdownUpdate === true);
+    }
+
+    function submitUsername(rawValue, skipDropdownUpdate) {
         const user = (rawValue || "").trim();
         if (!user)
             return;
@@ -450,8 +496,15 @@ Item {
             clearAuthFeedback();
             externalAuthAutoStartedForUser = "";
         }
+        root.pickerThemeUsername = user;
         GreeterState.username = user;
+        GreeterState.usernameInput = user;
         GreeterState.showPasswordInput = true;
+        if (!skipDropdownUpdate && typeof GreeterUsersService !== "undefined") {
+            const idx = GreeterUsersService.usernames.indexOf(user);
+            GreeterState.selectedUserIndex = idx;
+        }
+        root.userListOpen = false;
         PortalService.getGreeterUserProfileImage(user);
         GreeterState.passwordBuffer = "";
         pendingPasswordResponse = false;
@@ -638,12 +691,43 @@ Item {
     }
 
     Connections {
+        target: GreeterUsersService
+        function onLoadedChanged() {
+            if (GreeterUsersService.loaded && isPrimaryScreen)
+                applyPickerPreviewTheme();
+        }
+        function onSyncedThemePathsChanged() {
+            if (!isPrimaryScreen)
+                return;
+            if (GreeterState.username)
+                GreeterUserTheme.applyForUser(GreeterState.username);
+            else if (root.showUserPicker || root.userListOpen)
+                applyPickerPreviewTheme();
+        }
+    }
+
+    Connections {
         target: GreeterState
         function onUsernameChanged() {
             if (GreeterState.username) {
+                root.pickerThemeUsername = GreeterState.username;
+                GreeterUserTheme.applyForUser(GreeterState.username);
                 PortalService.getGreeterUserProfileImage(GreeterState.username);
+            } else if (root.showUserPicker || root.userListOpen) {
+                applyPickerPreviewTheme();
             }
         }
+        function onShowPasswordInputChanged() {
+            if (GreeterState.showPasswordInput)
+                root.userListOpen = false;
+        }
+    }
+
+    onShowUserPickerChanged: {
+        if (showUserPicker && !GreeterState.username)
+            applyPickerPreviewTheme();
+        if (!showUserPicker)
+            userListOpen = false;
     }
 
     FileView {
@@ -736,19 +820,26 @@ Item {
         anchors.fill: parent
         color: "transparent"
 
-        Item {
-            id: clockContainer
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.verticalCenter
-            anchors.bottomMargin: 60
-            width: parent.width
-            height: clockText.implicitHeight
+        Column {
+            id: greeterMainColumn
 
-            Row {
-                id: clockText
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                spacing: 0
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: Theme.spacingM
+            width: 380
+
+            Item {
+                id: clockContainer
+
+                width: parent.width
+                height: clockText.implicitHeight
+
+                Row {
+                    id: clockText
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    spacing: 0
 
                 property string fullTimeStr: {
                     const format = GreetdSettings.getEffectiveTimeFormat();
@@ -853,59 +944,117 @@ Item {
                     visible: clockText.ampm !== ""
                 }
             }
-        }
-
-        StyledText {
-            id: dateText
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: clockContainer.bottom
-            anchors.topMargin: 4
-            text: {
-                return systemClock.date.toLocaleDateString(I18n.locale(), GreetdSettings.getEffectiveLockDateFormat());
             }
-            font.pixelSize: Theme.fontSizeXLarge
-            color: "white"
-            opacity: 0.9
-        }
 
-        Item {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: dateText.bottom
-            anchors.topMargin: Theme.spacingL
-            width: 380
-            height: 140
+            StyledText {
+                id: dateText
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: systemClock.date.toLocaleDateString(I18n.locale(), GreetdSettings.getEffectiveLockDateFormat())
+                font.pixelSize: Theme.fontSizeXLarge
+                color: "white"
+                opacity: 0.9
+            }
+
+            StyledText {
+                id: userPickerHint
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: root.showUserPicker && !GreeterState.showPasswordInput && !GreeterState.username && !root.userListOpen
+                text: I18n.tr("Select user...", "greeter user picker placeholder")
+                font.pixelSize: Theme.fontSizeMedium
+                color: "white"
+                opacity: 0.85
+            }
 
             ColumnLayout {
-                anchors.fill: parent
+                id: authColumn
+
+                width: parent.width
                 spacing: Theme.spacingM
 
                 RowLayout {
                     spacing: Theme.spacingL
                     Layout.fillWidth: true
 
-                    DankCircularImage {
+                    Item {
                         Layout.preferredWidth: 60
                         Layout.preferredHeight: 60
-                        imageSource: {
-                            if (PortalService.profileImage === "")
-                                return "";
-                            if (PortalService.profileImage.startsWith("/"))
-                                return encodeFileUrl(PortalService.profileImage);
-                            return PortalService.profileImage;
+                        visible: GreetdSettings.lockScreenShowProfileImage || root.multipleUsersAvailable
+
+                        DankCircularImage {
+                            anchors.fill: parent
+                            imageSource: {
+                                const displayUser = GreeterState.username || root.pickerThemeUsername;
+                                if (displayUser) {
+                                    const cachedPath = GreeterUsersService.profileImagePath(displayUser);
+                                    if (cachedPath)
+                                        return encodeFileUrl(cachedPath);
+                                }
+                                if (PortalService.profileImage === "")
+                                    return "";
+                                if (PortalService.profileImage.startsWith("/"))
+                                    return encodeFileUrl(PortalService.profileImage);
+                                return PortalService.profileImage;
+                            }
+                            fallbackIcon: "person"
                         }
-                        fallbackIcon: "person"
-                        visible: GreetdSettings.lockScreenShowProfileImage
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: width / 2
+                            color: "transparent"
+                            border.color: Theme.primary
+                            border.width: avatarPickerArea.containsMouse || root.userListOpen ? 2 : 0
+                            visible: root.multipleUsersAvailable
+                            Behavior on border.width {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: avatarPickerArea
+
+                            anchors.fill: parent
+                            visible: root.multipleUsersAvailable
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (GreeterState.showPasswordInput)
+                                    root.returnToUserPicker();
+                                else
+                                    root.userListOpen = !root.userListOpen;
+                            }
+                        }
                     }
 
                     Rectangle {
                         property bool showPassword: false
 
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 60
+                        Layout.preferredHeight: root.showUserPicker && root.userListOpen ? Math.max(60, userPicker.implicitHeight + Theme.spacingM * 2) : 60
+
                         radius: Theme.cornerRadius
                         color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
                         border.color: inputField.activeFocus ? Theme.primary : Qt.rgba(1, 1, 1, 0.3)
                         border.width: inputField.activeFocus ? 2 : 1
+
+                        GreeterUserPicker {
+                            id: userPicker
+
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.verticalCenter: root.userListOpen ? undefined : parent.verticalCenter
+                            anchors.top: root.userListOpen ? parent.top : undefined
+                            anchors.margins: Theme.spacingM
+                            visible: root.showUserPicker && !GreeterState.showPasswordInput
+                            expanded: root.userListOpen
+                            onUserSelected: username => root.selectUser(username, false)
+                            onToggleRequested: root.userListOpen = !root.userListOpen
+                        }
 
                         DankIcon {
                             id: lockIcon
@@ -916,6 +1065,7 @@ Item {
                             name: GreeterState.showPasswordInput ? "lock" : "person"
                             size: 20
                             color: inputField.activeFocus ? Theme.primary : Theme.surfaceVariantText
+                            visible: !root.showUserPicker
                         }
 
                         TextInput {
@@ -941,8 +1091,9 @@ Item {
                                 }
                                 return margin;
                             }
+                            enabled: !root.showUserPicker || GreeterState.showPasswordInput
                             opacity: 0
-                            focus: true
+                            focus: !root.showUserPicker || GreeterState.showPasswordInput
                             echoMode: GreeterState.showPasswordInput ? (parent.showPassword ? TextInput.Normal : TextInput.Password) : TextInput.Normal
                             onTextChanged: {
                                 if (syncingFromState)
@@ -1005,11 +1156,14 @@ Item {
                                 if (GreeterState.showPasswordInput) {
                                     return I18n.tr("Password...");
                                 }
+                                if (root.showUserPicker) {
+                                    return "";
+                                }
                                 return I18n.tr("Username...");
                             }
                             color: (GreeterState.unlocking || (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse)) ? Theme.primary : Theme.outline
                             font.pixelSize: Theme.fontSizeMedium
-                            opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length === 0 : GreeterState.usernameInput.length === 0) ? 1 : 0
+                            opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length === 0 : (root.showUserPicker ? false : GreeterState.usernameInput.length === 0)) ? 1 : 0
 
                             Behavior on opacity {
                                 NumberAnimation {
@@ -1043,7 +1197,7 @@ Item {
                             }
                             color: Theme.surfaceText
                             font.pixelSize: (GreeterState.showPasswordInput && !parent.showPassword) ? Theme.fontSizeLarge : Theme.fontSizeMedium
-                            opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length > 0 : GreeterState.usernameInput.length > 0) ? 1 : 0
+                            opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length > 0 : (root.showUserPicker ? false : GreeterState.usernameInput.length > 0)) ? 1 : 0
                             clip: true
                             elide: Text.ElideNone
                             horizontalAlignment: implicitWidth > width ? Text.AlignRight : Text.AlignLeft
@@ -1088,7 +1242,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: "keyboard"
                             buttonSize: 32
-                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
+                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking && (!root.showUserPicker || GreeterState.showPasswordInput)
                             enabled: visible
                             onClicked: {
                                 if (keyboard_controller.isKeyboardActive) {
@@ -1107,7 +1261,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: "keyboard_return"
                             buttonSize: 36
-                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
+                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking && (!root.showUserPicker || GreeterState.showPasswordInput)
                             enabled: true
                             onClicked: {
                                 if (GreeterState.showPasswordInput) {
@@ -1198,13 +1352,8 @@ Item {
                     StateLayer {
                         stateColor: Theme.primary
                         cornerRadius: parent.radius
-                        enabled: !GreeterState.unlocking && Greetd.state === GreetdState.Inactive && GreeterState.showPasswordInput
-                        onClicked: {
-                            GreeterState.reset();
-                            root.externalAuthAutoStartedForUser = "";
-                            inputField.text = "";
-                            PortalService.profileImage = "";
-                        }
+                        enabled: !GreeterState.unlocking && GreeterState.showPasswordInput
+                        onClicked: root.returnToUserPicker()
                     }
                 }
             }

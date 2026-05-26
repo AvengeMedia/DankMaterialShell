@@ -58,6 +58,30 @@ Item {
         dropdownMenu.close();
     }
 
+    function openDropdownMenu() {
+        if (dropdownMenu.visible) {
+            dropdownMenu.close();
+            return;
+        }
+        if (root.options.length === 0)
+            return;
+
+        dropdownMenu.open();
+
+        let currentIndex = root.options.indexOf(root.currentValue);
+        listView.positionViewAtIndex(currentIndex >= 0 ? currentIndex : 0, ListView.Beginning);
+
+        const pos = dropdown.mapToItem(Overlay.overlay, 0, 0);
+        const popupW = dropdownMenu.width;
+        const popupH = dropdownMenu.height;
+        const overlayH = Overlay.overlay.height;
+        const goUp = root.openUpwards || pos.y + dropdown.height + popupH + 4 > overlayH;
+        dropdownMenu.x = root.alignPopupRight ? pos.x + dropdown.width - popupW : pos.x - (root.popupWidthOffset / 2);
+        dropdownMenu.y = goUp ? pos.y - popupH - 4 : pos.y + dropdown.height + 4;
+        if (root.enableFuzzySearch)
+            searchField.forceActiveFocus();
+    }
+
     function resetSearch() {
         searchField.text = "";
         dropdownMenu.fzfFinder = null;
@@ -123,27 +147,7 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                if (dropdownMenu.visible) {
-                    dropdownMenu.close();
-                    return;
-                }
-
-                dropdownMenu.open();
-
-                let currentIndex = root.options.indexOf(root.currentValue);
-                listView.positionViewAtIndex(currentIndex, ListView.Beginning);
-
-                const pos = dropdown.mapToItem(Overlay.overlay, 0, 0);
-                const popupW = dropdownMenu.width;
-                const popupH = dropdownMenu.height;
-                const overlayH = Overlay.overlay.height;
-                const goUp = root.openUpwards || pos.y + dropdown.height + popupH + 4 > overlayH;
-                dropdownMenu.x = root.alignPopupRight ? pos.x + dropdown.width - popupW : pos.x - (root.popupWidthOffset / 2);
-                dropdownMenu.y = goUp ? pos.y - popupH - 4 : pos.y + dropdown.height + 4;
-                if (root.enableFuzzySearch)
-                    searchField.forceActiveFocus();
-            }
+            onClicked: root.openDropdownMenu()
         }
 
         Row {
@@ -165,10 +169,10 @@ Item {
             }
 
             StyledText {
-                text: root.currentValue
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
                 anchors.verticalCenter: parent.verticalCenter
+                text: root.currentValue !== "" ? root.currentValue : root.emptyText
+                font.pixelSize: Theme.fontSizeMedium
+                color: root.currentValue !== "" ? Theme.surfaceText : Theme.outline
                 width: contentRow.width - (contentRow.children[0].visible ? contentRow.children[0].width + contentRow.spacing : 0)
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap

@@ -2079,12 +2079,29 @@ Singleton {
         }
     }
 
+    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
+
+    property string greeterColorsBaseDir: root._greeterCacheDir
+
+    function setGreeterColorsBaseDir(dir) {
+        const next = dir || root._greeterCacheDir;
+        if (greeterColorsBaseDir === next)
+            return;
+        greeterColorsBaseDir = next;
+        if (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
+            dynamicColorsFileView.reload();
+    }
+
+    function resetGreeterColorsBaseDir() {
+        setGreeterColorsBaseDir(root._greeterCacheDir);
+    }
+
     FileView {
         id: dynamicColorsFileView
         path: {
-            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
-            const colorsPath = SessionData.isGreeterMode ? greetCfgDir + "/colors.json" : stateDir + "/dms-colors.json";
-            return colorsPath;
+            if (SessionData.isGreeterMode)
+                return root.greeterColorsBaseDir ? (root.greeterColorsBaseDir + "/colors.json") : "";
+            return stateDir + "/dms-colors.json";
         }
         blockLoading: false
         watchChanges: !SessionData.isGreeterMode
