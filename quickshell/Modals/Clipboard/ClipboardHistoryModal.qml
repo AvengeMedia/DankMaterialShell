@@ -43,6 +43,18 @@ DankModal {
         service: ClipboardService
     }
 
+    property string mode: "history"
+    onModeChanged: {
+        if (mode !== "history") {
+            return;
+        }
+        Qt.callLater(function () {
+            if (contentLoader.item?.searchField) {
+                contentLoader.item.searchField.forceActiveFocus();
+            }
+        });
+    }
+
     function updateFilteredModel() {
         ClipboardService.updateFilteredModel();
     }
@@ -61,6 +73,7 @@ DankModal {
 
     function show() {
         open();
+        mode = "history";
         activeImageLoads = 0;
         shouldHaveFocus = true;
         ClipboardService.reset();
@@ -130,6 +143,21 @@ DankModal {
         return ClipboardService.getEntryType(entry);
     }
 
+    function editEntry(entry) {
+        if (!entry) {
+            return;
+        }
+        if (entry.isImage) {
+            return;
+        }
+        const editor = contentLoader.item?.editorView;
+        if (!editor) {
+            return;
+        }
+        editor.setEntry(entry);
+        mode = "editor";
+    }
+
     visible: false
     modalWidth: ClipboardConstants.modalWidth
     modalHeight: ClipboardConstants.modalHeight
@@ -138,6 +166,7 @@ DankModal {
     borderColor: Theme.outlineMedium
     borderWidth: 1
     enableShadow: true
+    closeOnEscapeKey: mode !== "editor"
     onBackgroundClicked: hide()
     modalFocusScope.Keys.onPressed: function (event) {
         keyboardController.handleKey(event);
@@ -174,9 +203,109 @@ DankModal {
     property var confirmDialog: clearConfirmDialog
 
     clipboardContent: Component {
-        ClipboardContent {
-            modal: clipboardHistoryModal
-            clearConfirmDialog: clipboardHistoryModal.confirmDialog
+        Item {
+            id: viewContainer
+
+            property alias editorView: editorView
+            property alias searchField: historyContent.searchField
+
+            anchors.fill: parent
+
+            Item {
+                id: historyView
+
+                anchors.fill: parent
+                opacity: 1
+                scale: 1
+                visible: opacity > 0.01
+                enabled: clipboardHistoryModal.mode === "history"
+
+                ClipboardContent {
+                    id: historyContent
+                    anchors.fill: parent
+                    modal: clipboardHistoryModal
+                    clearConfirmDialog: clipboardHistoryModal.confirmDialog
+                }
+            }
+
+            ClipboardEditor {
+                id: editorView
+
+                anchors.fill: parent
+                opacity: 0
+                scale: 0.98
+                visible: opacity > 0.01
+                enabled: clipboardHistoryModal.mode === "editor"
+                focus: clipboardHistoryModal.mode === "editor"
+                modal: clipboardHistoryModal
+                keyController: keyboardController
+            }
+
+            states: [
+                State {
+                    name: "history"
+                    when: clipboardHistoryModal.mode === "history"
+                    PropertyChanges {
+                        target: historyView
+                        opacity: 1
+                        scale: 1
+                    }
+                    PropertyChanges {
+                        target: editorView
+                        opacity: 0
+                        scale: 0.98
+                    }
+                },
+                State {
+                    name: "editor"
+                    when: clipboardHistoryModal.mode === "editor"
+                    PropertyChanges {
+                        target: historyView
+                        opacity: 0
+                        scale: 0.98
+                    }
+                    PropertyChanges {
+                        target: editorView
+                        opacity: 1
+                        scale: 1
+                    }
+                }
+            ]
+
+            transitions: [
+                Transition {
+                    from: "history"
+                    to: "editor"
+                    ParallelAnimation {
+                        NumberAnimation {
+                            property: "opacity"
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                        NumberAnimation {
+                            property: "scale"
+                            duration: Theme.shortDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+                },
+                Transition {
+                    from: "editor"
+                    to: "history"
+                    ParallelAnimation {
+                        NumberAnimation {
+                            property: "opacity"
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                        NumberAnimation {
+                            property: "scale"
+                            duration: Theme.shortDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+                }
+            ]
         }
     }
 }

@@ -17,6 +17,7 @@ Rectangle {
     signal deleteRequested
     signal pinRequested
     signal unpinRequested
+    signal editRequested
 
     readonly property string entryType: modal ? modal.getEntryType(entry) : "text"
     readonly property string entryPreview: modal ? modal.getEntryPreview(entry) : ""
@@ -68,6 +69,20 @@ Rectangle {
             iconColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primary : Theme.surfaceText
             backgroundColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primarySelected : "transparent"
             onClicked: entry.pinned ? unpinRequested() : pinRequested()
+        }
+
+        DankActionButton {
+            iconName: "edit"
+            iconSize: Theme.iconSize - 6
+            iconColor: Theme.surfaceText
+
+            onClicked: {
+                if (entryType === "image") {
+                    // TODO - forward to editing software
+                } else {
+                    editRequested();
+                }
+            }
         }
 
         DankActionButton {
@@ -142,8 +157,11 @@ Rectangle {
 
     MouseArea {
         id: mouseArea
-        anchors.fill: parent
-        anchors.rightMargin: 80
+        anchors.left: parent.left
+        anchors.right: actionButtons.left
+        anchors.rightMargin: Theme.spacingS
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onPressed: mouse => {

@@ -10,7 +10,7 @@ Rectangle {
     readonly property string hintsText: {
         if (!wtypeAvailable)
             return I18n.tr("Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close");
-        return enterToPaste ? I18n.tr("Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close", "Keyboard hints when enter-to-paste is enabled") : I18n.tr("Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close");
+        return enterToPaste ? I18n.tr("Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close", "Keyboard hints when enter-to-paste is enabled") : I18n.tr("Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close");
     }
 
     height: ClipboardConstants.keyboardHintsHeight
@@ -22,13 +22,17 @@ Rectangle {
     z: 100
 
     Column {
+        width: parent.width - Theme.spacingL * 2
         anchors.centerIn: parent
         spacing: 2
 
         StyledText {
-            text: keyboardHints.enterToPaste ? I18n.tr("↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help", "Keyboard hints when enter-to-paste is enabled") : I18n.tr("↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help")
+            text: keyboardHints.enterToPaste ? I18n.tr("↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help", "Keyboard hints when enter-to-paste is enabled") : I18n.tr("↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
+            width: parent.width
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -36,6 +40,9 @@ Rectangle {
             text: keyboardHints.hintsText
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
+            width: parent.width
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
