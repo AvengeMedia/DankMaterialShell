@@ -66,7 +66,24 @@ QtObject {
         }
     }
 
+    function editSelected() {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0) {
+            return;
+        }
+        const index = ClipboardService.selectedIndex >= 0 && ClipboardService.selectedIndex < entries.length ? ClipboardService.selectedIndex : 0;
+        modal.editEntry(entries[index]);
+    }
+
     function handleKey(event) {
+        if (modal.mode === "editor") {
+            if (event.key === Qt.Key_Escape) {
+                modal.mode = "history";
+                event.accepted = true;
+            }
+            return;
+        }
+
         switch (event.key) {
         case Qt.Key_Escape:
             if (ClipboardService.keyboardNavigationActive) {
@@ -151,6 +168,10 @@ QtObject {
                     togglePinSelected();
                     event.accepted = true;
                 }
+                return;
+            case Qt.Key_E:
+                editSelected();
+                event.accepted = true;
                 return;
             }
         }
