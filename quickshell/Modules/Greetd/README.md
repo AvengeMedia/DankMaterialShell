@@ -97,7 +97,8 @@ sudo rpm -ivh x86_64/dms-greeter-*.rpm
 ```
 
 The package automatically:
-- Creates the greeter user
+
+- Creates the greeter user (via `systemd-sysusers` from `/usr/lib/sysusers.d/dms-greeter.conf` for atomic/immutable compatibility, with package script fallback)
 - Sets up directories and permissions
 - Configures greetd with auto-detected compositor
 - Applies SELinux contexts
@@ -249,7 +250,17 @@ Only niri currently has a generated greeter config path managed by `dms greeter 
 
 The greeter can be personalized with wallpapers, themes, weather, clock formats, and more - configured exactly the same as dms.
 
-**Easiest method:** Run `dms greeter sync` to automatically sync your DMS theme with the greeter.
+**Easiest method (single user):** Run `dms greeter sync` to automatically sync your DMS theme with the greeter.
+
+**Multi-user systems:** One **main admin** runs full sync once to set up greetd and the shared cache (`dms greeter sync`, or `dms greeter sync --local` when developing from a checkout). **Every other account**—including other admins—should only run:
+
+```bash
+dms greeter sync --profile
+```
+
+Before that, an administrator must add each user to the `greeter` group in **Settings → Users** (greeter toggle) or with `sudo usermod -aG greeter <username>`. Each added user must log out and back in before `--profile` will work.
+
+Per-user settings are stored under `/var/cache/dms-greeter/users/<username>/` for the login picker; the root cache remains the default fallback and is owned by whoever ran full sync.
 
 **Manual method:** You can manually synchronize configurations if you want greeter settings to always mirror your shell:
 

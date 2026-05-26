@@ -388,6 +388,7 @@ Item {
         if (!spotlightContent)
             return;
         contentVisible = true;
+        spotlightContent.closeTransientUi?.();
         // NOTE: forceActiveFocus() is deliberately NOT called here.
         // It is deferred to after animation starts to avoid compositor IPC stalls.
 
@@ -395,12 +396,12 @@ Item {
             spotlightContent.searchField.text = query;
         }
         if (spotlightContent.controller) {
-            var targetMode = mode || SessionData.launcherLastMode || "all";
+            var targetMode = mode || SessionData.getLauncherRestoreMode();
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
             spotlightContent.controller.pluginFilter = "";
-            spotlightContent.controller.fileSearchType = "all";
+            spotlightContent.controller.fileSearchType = SessionData.launcherLastFileSearchType || "all";
             spotlightContent.controller.fileSearchExt = "";
             spotlightContent.controller.fileSearchFolder = "";
             spotlightContent.controller.fileSearchSort = "score";
@@ -480,6 +481,7 @@ Item {
     function hide() {
         if (!spotlightOpen)
             return;
+        spotlightContent?.closeTransientUi?.();
         openedFromOverview = false;
         isClosing = true;
         // For directional effects, defer contentVisible=false so content stays rendered during exit slide
@@ -537,8 +539,8 @@ Item {
 
     Connections {
         target: spotlightContent?.controller ?? null
-        function onModeChanged(mode) {
-            if (spotlightContent.controller.autoSwitchedToFiles)
+        function onModeChanged(mode, userInitiated) {
+            if (!userInitiated || !SettingsData.rememberLastMode)
                 return;
             SessionData.setLauncherLastMode(mode);
         }
@@ -926,8 +928,12 @@ Item {
                                 }
                             }
 
+                            Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
                             Keys.onEscapePressed: event => {
-                                root.hide();
+                                root.spotlightContent?.activeContextMenu?.handleKey(event);
+                                if (!event.accepted)
+                                    root.hide();
                                 event.accepted = true;
                             }
                         }

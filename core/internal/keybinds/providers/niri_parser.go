@@ -162,6 +162,14 @@ func NewNiriParser(configDir string) *NiriParser {
 	}
 }
 
+func normalizeNiriBindKey(key string) string {
+	parts := strings.Split(key, "+")
+	for i := range parts {
+		parts[i] = strings.ToLower(strings.TrimSpace(parts[i]))
+	}
+	return strings.Join(parts, "+")
+}
+
 func (p *NiriParser) Parse() (*NiriSection, error) {
 	dmsBindsPath := filepath.Join(p.configDir, "dms", "binds.kdl")
 	if _, err := os.Stat(dmsBindsPath); err == nil {
@@ -213,24 +221,25 @@ func (p *NiriParser) finalizeBinds() []NiriKeyBinding {
 
 func (p *NiriParser) addBind(kb *NiriKeyBinding) {
 	key := p.formatBindKey(kb)
+	normalizedKey := normalizeNiriBindKey(key)
 	isDMSBind := strings.Contains(kb.Source, "dms/binds.kdl")
 
 	if isDMSBind {
-		p.dmsBindKeys[key] = true
-		p.dmsBindMap[key] = kb
-	} else if p.dmsBindKeys[key] {
+		p.dmsBindKeys[normalizedKey] = true
+		p.dmsBindMap[normalizedKey] = kb
+	} else if p.dmsBindKeys[normalizedKey] {
 		p.bindsAfterDMS++
-		p.conflictingConfigs[key] = kb
-		p.configBindKeys[key] = true
+		p.conflictingConfigs[normalizedKey] = kb
+		p.configBindKeys[normalizedKey] = true
 		return
 	} else {
-		p.configBindKeys[key] = true
+		p.configBindKeys[normalizedKey] = true
 	}
 
-	if _, exists := p.bindMap[key]; !exists {
-		p.bindOrder = append(p.bindOrder, key)
+	if _, exists := p.bindMap[normalizedKey]; !exists {
+		p.bindOrder = append(p.bindOrder, normalizedKey)
 	}
-	p.bindMap[key] = kb
+	p.bindMap[normalizedKey] = kb
 }
 
 func (p *NiriParser) formatBindKey(kb *NiriKeyBinding) string {

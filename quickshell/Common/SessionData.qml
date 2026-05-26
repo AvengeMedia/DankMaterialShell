@@ -187,6 +187,7 @@ Singleton {
     property string timeLocale: ""
 
     property string launcherLastMode: "all"
+    property string launcherLastFileSearchType: "all"
     property string launcherLastQuery: ""
     property var launcherQueryHistory: []
     property string appDrawerLastMode: "apps"
@@ -1178,6 +1179,17 @@ Singleton {
         saveSettings();
     }
 
+    function getLauncherRestoreMode() {
+        if (!SettingsData.rememberLastMode)
+            return "all";
+        return launcherLastMode || "all";
+    }
+
+    function setLauncherLastFileSearchType(type) {
+        launcherLastFileSearchType = type;
+        saveSettings();
+    }
+
     function setLauncherLastQuery(query) {
         launcherLastQuery = query;
         saveSettings();
@@ -1341,13 +1353,27 @@ Singleton {
         }
     }
 
+    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
+
+    property string greeterSessionBaseDir: root._greeterCacheDir
+
+    function setGreeterSessionBaseDir(dir) {
+        const next = dir || root._greeterCacheDir;
+        if (greeterSessionBaseDir === next)
+            return;
+        greeterSessionBaseDir = next;
+        if (isGreeterMode)
+            greeterSessionFile.reload();
+    }
+
+    function resetGreeterSessionBaseDir() {
+        setGreeterSessionBaseDir(root._greeterCacheDir);
+    }
+
     FileView {
         id: greeterSessionFile
 
-        path: {
-            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
-            return greetCfgDir + "/session.json";
-        }
+        path: root.greeterSessionBaseDir ? (root.greeterSessionBaseDir + "/session.json") : ""
         preload: isGreeterMode
         blockLoading: false
         blockWrites: true

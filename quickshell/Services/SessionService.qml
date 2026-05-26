@@ -205,6 +205,8 @@ Singleton {
     }
 
     function launchDesktopEntry(desktopEntry, useNvidia) {
+        if (!desktopEntry || !desktopEntry.command)
+            return;
         let cmd = desktopEntry.command;
 
         const appId = desktopEntry.id || desktopEntry.execString || desktopEntry.exec || "";
@@ -261,6 +263,8 @@ Singleton {
     }
 
     function launchDesktopAction(desktopEntry, action, useNvidia) {
+        if (!desktopEntry || !action || !action.command)
+            return;
         let cmd = action.command;
 
         const appId = desktopEntry.id || desktopEntry.execString || desktopEntry.exec || "";

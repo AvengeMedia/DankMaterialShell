@@ -145,6 +145,7 @@ Item {
                 onDeleteRequested: clipboardContent.modal.deleteEntry(modelData)
                 onPinRequested: clipboardContent.modal.pinEntry(modelData)
                 onUnpinRequested: clipboardContent.modal.unpinEntry(modelData)
+                onEditRequested: clipboardContent.modal.editEntry(modelData)
             }
         }
 
@@ -204,6 +205,7 @@ Item {
                 onDeleteRequested: clipboardContent.modal.deletePinnedEntry(modelData)
                 onPinRequested: clipboardContent.modal.pinEntry(modelData)
                 onUnpinRequested: clipboardContent.modal.unpinEntry(modelData)
+                onEditRequested: clipboardContent.modal.editEntry(modelData)
             }
         }
 

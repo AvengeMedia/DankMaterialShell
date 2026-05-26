@@ -64,6 +64,7 @@ FocusScope {
 
             sourceComponent: KeybindsTab {
                 parentModal: root.parentModal
+                requestedSearchQuery: root.parentModal?.keybindSearchQuery ?? ""
             }
 
             onActiveChanged: {
@@ -548,6 +549,21 @@ FocusScope {
             focus: active
 
             sourceComponent: FrameTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: usersLoader
+            anchors.fill: parent
+            active: root.currentIndex === 35
+            visible: active
+            focus: active
+
+            sourceComponent: UsersTab {}
 
             onActiveChanged: {
                 if (active && item)

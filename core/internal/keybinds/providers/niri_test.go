@@ -367,7 +367,7 @@ func TestNiriEmptyArgsPreservation(t *testing.T) {
 	}
 
 	for key, expected := range binds {
-		loaded, ok := loadedBinds[key]
+		loaded, ok := loadedBinds[normalizeNiriBindKey(key)]
 		if !ok {
 			t.Errorf("Missing bind for key %s", key)
 			continue

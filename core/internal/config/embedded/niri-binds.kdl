@@ -9,6 +9,9 @@ binds {
     Mod+Space hotkey-overlay-title="Application Launcher" {
         spawn "dms" "ipc" "call" "spotlight" "toggle";
     }
+    Alt+Space hotkey-overlay-title="Spotlight Bar" {
+        spawn "dms" "ipc" "call" "spotlight-bar" "toggle";
+    }
     Mod+V hotkey-overlay-title="Clipboard Manager" {
         spawn "dms" "ipc" "call" "clipboard" "toggle";
     }

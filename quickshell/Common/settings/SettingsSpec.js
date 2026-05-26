@@ -153,6 +153,7 @@ var SPEC = {
     audioWheelScrollAmount: { def: 5 },
     clockCompactMode: { def: false },
     focusedWindowCompactMode: { def: false },
+    focusedWindowSize: { def: 1 },
     runningAppsCompactMode: { def: true },
     barMaxVisibleApps: { def: 0 },
     barMaxVisibleRunningApps: { def: 0 },
@@ -202,6 +203,7 @@ var SPEC = {
     appLauncherGridColumns: { def: 4 },
     spotlightCloseNiriOverview: { def: true },
     rememberLastQuery: { def: false },
+    rememberLastMode: { def: true },
     spotlightSectionViewModes: { def: {} },
     appDrawerSectionViewModes: { def: {} },
     niriOverviewOverlayEnabled: { def: true },
@@ -215,6 +217,7 @@ var SPEC = {
     dankLauncherV2IncludeFoldersInAll: { def: false },
     launcherUseOverlayLayer: { def: false },
     launcherStyle: { def: "full" },
+    spotlightBarShowModeChips: { def: false },
 
     useAutoLocation: { def: false },
     weatherEnabled: { def: true },
@@ -396,6 +399,7 @@ var SPEC = {
     notificationTimeoutNormal: { def: 5000 },
     notificationTimeoutCritical: { def: 0 },
     notificationCompactMode: { def: false },
+    notificationDedupeEnabled: { def: true },
     notificationPopupPosition: { def: 0 },
     notificationAnimationSpeed: { def: 1 },
     notificationCustomAnimationDuration: { def: 400 },
@@ -574,7 +578,6 @@ var SPEC = {
     frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
-    frameUseSpotlightLauncher: { def: false },
     frameMode: { def: "connected" }
 };
 

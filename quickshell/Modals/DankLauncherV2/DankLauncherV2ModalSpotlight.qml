@@ -47,9 +47,9 @@ Item {
         }
     }
 
-    readonly property int _openDuration: 80
-    readonly property int _closeDuration: 70
-    readonly property int _motionDuration: 90
+    readonly property int _openDuration: 50
+    readonly property int _closeDuration: 40
+    readonly property int _motionDuration: 60
 
     // Connected frame mode clamps the centered surface inside frame insets.
     readonly property bool frameConnected: CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
@@ -75,7 +75,7 @@ Item {
         const searchBarH = 56;
         const usableH = Math.max(searchBarH, screenHeight - insetT - insetB);
         const preferred = insetT + Math.max(0, usableH * 0.33 - searchBarH / 2);
-        const maxY = Math.max(insetT, screenHeight - insetB - _contentImplicitH);
+        const maxY = Math.max(insetT, screenHeight - insetB - 56);
         return Math.max(insetT, Math.min(preferred, maxY));
     }
 
@@ -142,9 +142,10 @@ Item {
         if (!spotlightContent)
             return;
         contentVisible = true;
+        spotlightContent.closeTransientUi?.();
 
         const targetQuery = query || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
-        const targetMode = mode || SessionData.launcherLastMode || "all";
+        const targetMode = mode || SessionData.getLauncherRestoreMode();
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = targetQuery;
@@ -202,6 +203,7 @@ Item {
     function hide() {
         if (!spotlightOpen)
             return;
+        spotlightContent?.closeTransientUi?.();
         openedFromOverview = false;
         isClosing = true;
         contentVisible = false;
@@ -487,8 +489,12 @@ Item {
                         }
                     }
 
+                    Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
                     Keys.onEscapePressed: event => {
-                        root.hide();
+                        root.spotlightContent?.activeContextMenu?.handleKey(event);
+                        if (!event.accepted)
+                            root.hide();
                         event.accepted = true;
                     }
                 }

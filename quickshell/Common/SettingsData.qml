@@ -258,8 +258,6 @@ Singleton {
     onFrameLauncherEmergeSideChanged: saveSettings()
     property bool frameLauncherArcExtender: false
     onFrameLauncherArcExtenderChanged: saveSettings()
-    property bool frameUseSpotlightLauncher: false
-    onFrameUseSpotlightLauncherChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property string frameMode: "connected"
     onFrameModeChanged: saveSettings()
@@ -394,6 +392,7 @@ Singleton {
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5
     property bool clockCompactMode: false
+    property int focusedWindowSize: 1
     property bool focusedWindowCompactMode: false
     property bool runningAppsCompactMode: true
     property int barMaxVisibleApps: 0
@@ -436,6 +435,7 @@ Singleton {
     property int appLauncherGridColumns: 4
     property bool spotlightCloseNiriOverview: true
     property bool rememberLastQuery: false
+    property bool rememberLastMode: true
     property var spotlightSectionViewModes: ({})
     onSpotlightSectionViewModesChanged: saveSettings()
     property var appDrawerSectionViewModes: ({})
@@ -451,6 +451,7 @@ Singleton {
     property bool dankLauncherV2IncludeFoldersInAll: false
     property bool launcherUseOverlayLayer: false
     property string launcherStyle: "full"
+    property bool spotlightBarShowModeChips: false
 
     property string _legacyWeatherLocation: "New York, NY"
     property string _legacyWeatherCoordinates: "40.7128,-74.0060"
@@ -687,6 +688,7 @@ Singleton {
     property int notificationTimeoutNormal: 5000
     property int notificationTimeoutCritical: 0
     property bool notificationCompactMode: false
+    property bool notificationDedupeEnabled: true
     property int notificationPopupPosition: SettingsData.Position.Top
     property int notificationAnimationSpeed: SettingsData.AnimationSpeed.Short
     property int notificationCustomAnimationDuration: 400
@@ -707,6 +709,7 @@ Singleton {
     property bool osdBrightnessEnabled: true
     property bool osdIdleInhibitorEnabled: true
     property bool osdMicMuteEnabled: true
+    property bool osdMicVolumeEnabled: true
     property bool osdCapsLockEnabled: true
     property bool osdPowerProfileEnabled: true
     property bool osdAudioOutputEnabled: true

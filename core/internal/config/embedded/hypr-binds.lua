@@ -3,6 +3,7 @@
 -- === Application Launchers ===
 hl.bind("SUPER + T", hl.dsp.exec_cmd("{{TERMINAL_COMMAND}}"))
 hl.bind("SUPER + space", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
+hl.bind("ALT + space", hl.dsp.exec_cmd("dms ipc call spotlight-bar toggle"))
 hl.bind("SUPER + V", hl.dsp.exec_cmd("dms ipc call clipboard toggle"))
 hl.bind("SUPER + M", hl.dsp.exec_cmd("dms ipc call processlist focusOrToggle"))
 hl.bind("SUPER + comma", hl.dsp.exec_cmd("dms ipc call settings focusOrToggle"))

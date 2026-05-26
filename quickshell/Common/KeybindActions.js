@@ -8,9 +8,12 @@ const ACTION_TYPES = [
 ];
 
 const DMS_ACTIONS = [
-    { id: "spawn dms ipc call spotlight toggle", label: "App Launcher: Toggle" },
-    { id: "spawn dms ipc call spotlight open", label: "App Launcher: Open" },
-    { id: "spawn dms ipc call spotlight close", label: "App Launcher: Close" },
+    { id: "spawn dms ipc call spotlight toggle", label: "Default Launcher: Toggle" },
+    { id: "spawn dms ipc call spotlight open", label: "Default Launcher: Open" },
+    { id: "spawn dms ipc call spotlight close", label: "Default Launcher: Close" },
+    { id: "spawn dms ipc call spotlight-bar toggle", label: "Spotlight Bar: Toggle" },
+    { id: "spawn dms ipc call spotlight-bar open", label: "Spotlight Bar: Open" },
+    { id: "spawn dms ipc call spotlight-bar close", label: "Spotlight Bar: Close" },
     { id: "spawn dms ipc call clipboard toggle", label: "Clipboard: Toggle" },
     { id: "spawn dms ipc call clipboard open", label: "Clipboard: Open" },
     { id: "spawn dms ipc call clipboard close", label: "Clipboard: Close" },
@@ -63,7 +66,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call mpris increment 5", label: "Player Volume Up (5%)" },
     { id: "spawn dms ipc call mpris decrement 5", label: "Player Volume Down (5%)" },
     { id: "spawn dms ipc call audio mute", label: "Volume Mute Toggle" },
-    { id: "spawn dms ipc call audio micmute", label: "Microphone Mute Toggle" },
+    { id: "spawn dms ipc call mic mute", label: "Microphone Mute Toggle" },
     { id: "spawn dms ipc call audio cycleoutput", label: "Audio Output: Cycle" },
     { id: "spawn dms ipc call brightness increment 5 \"\"", label: "Brightness Up" },
     { id: "spawn dms ipc call brightness increment 1 \"\"", label: "Brightness Up (1%)" },

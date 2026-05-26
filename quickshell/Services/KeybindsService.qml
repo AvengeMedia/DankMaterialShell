@@ -463,6 +463,24 @@ Singleton {
         return _flatCache;
     }
 
+    function keysForAction(actionId) {
+        if (!actionId)
+            return [];
+        for (let i = 0; i < _flatCache.length; i++) {
+            const group = _flatCache[i];
+            if (!group || group.action !== actionId || !Array.isArray(group.keys))
+                continue;
+            const keys = [];
+            for (let k = 0; k < group.keys.length; k++) {
+                const key = group.keys[k]?.key || "";
+                if (key)
+                    keys.push(key);
+            }
+            return keys;
+        }
+        return [];
+    }
+
     function saveBind(originalKey, bindData) {
         if (!bindData.key || !Actions.isValidAction(bindData.action))
             return;

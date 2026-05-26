@@ -34,6 +34,8 @@ Singleton {
     property var clipboardHistoryModal: null
     property var dankLauncherV2Modal: null
     property var dankLauncherV2ModalLoader: null
+    property var spotlightBarModal: null
+    property var spotlightBarModalLoader: null
     property var powerMenuModal: null
     property var processListModal: null
     property var processListModalLoader: null
@@ -613,6 +615,45 @@ Singleton {
             } else {
                 dankLauncherV2Modal?.toggle();
             }
+        }
+    }
+
+    property bool _spotlightBarWantsOpen: false
+    property bool _spotlightBarWantsToggle: false
+
+    function openSpotlightBar() {
+        if (spotlightBarModal) {
+            spotlightBarModal.show();
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarWantsOpen = true;
+            _spotlightBarWantsToggle = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
+    function closeSpotlightBar() {
+        spotlightBarModal?.hide();
+    }
+
+    function toggleSpotlightBar() {
+        if (spotlightBarModal) {
+            spotlightBarModal.toggle();
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarWantsToggle = true;
+            _spotlightBarWantsOpen = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
+    function _onSpotlightBarModalLoaded() {
+        if (_spotlightBarWantsOpen) {
+            _spotlightBarWantsOpen = false;
+            spotlightBarModal?.show();
+            return;
+        }
+        if (_spotlightBarWantsToggle) {
+            _spotlightBarWantsToggle = false;
+            spotlightBarModal?.toggle();
         }
     }
 

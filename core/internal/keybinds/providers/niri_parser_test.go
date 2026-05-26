@@ -526,6 +526,50 @@ binds {
 	}
 }
 
+func TestNiriKeyIdentityIsCaseInsensitive(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatalf("Failed to create dms dir: %v", err)
+	}
+
+	config := `binds {
+    Alt+Space hotkey-overlay-title="Spotlight Bar" { spawn "dms" "ipc" "call" "spotlight-bar" "toggle"; }
+}
+include "dms/binds.kdl"
+`
+	if err := os.WriteFile(filepath.Join(tmpDir, "config.kdl"), []byte(config), 0o644); err != nil {
+		t.Fatalf("Failed to write config: %v", err)
+	}
+	include := `binds {
+    Alt+space hotkey-overlay-title="Default Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+}
+`
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds.kdl"), []byte(include), 0o644); err != nil {
+		t.Fatalf("Failed to write binds include: %v", err)
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed: %v", err)
+	}
+
+	var altSpaceBinds []NiriKeyBinding
+	parser := NewNiriParser("")
+	for _, kb := range result.Section.Keybinds {
+		if normalizeNiriBindKey(parser.formatBindKey(&kb)) == "alt+space" {
+			altSpaceBinds = append(altSpaceBinds, kb)
+		}
+	}
+
+	if len(altSpaceBinds) != 1 {
+		t.Fatalf("Expected one Alt+Space identity, got %d", len(altSpaceBinds))
+	}
+	if got := altSpaceBinds[0].Args; len(got) < 5 || got[3] != "spotlight" || got[4] != "toggle" {
+		t.Fatalf("Expected later DMS include to win with spotlight toggle, got action=%s args=%v", altSpaceBinds[0].Action, got)
+	}
+}
+
 func TestNiriParseMultipleArgs(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config.kdl")

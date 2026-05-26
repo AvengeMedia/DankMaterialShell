@@ -1341,6 +1341,25 @@ Item {
     }
 
     IpcHandler {
+        function open(): string {
+            PopoutService.openSpotlightBar();
+            return "SPOTLIGHT_BAR_OPEN_SUCCESS";
+        }
+
+        function close(): string {
+            PopoutService.closeSpotlightBar();
+            return "SPOTLIGHT_BAR_CLOSE_SUCCESS";
+        }
+
+        function toggle(): string {
+            PopoutService.toggleSpotlightBar();
+            return "SPOTLIGHT_BAR_TOGGLE_SUCCESS";
+        }
+
+        target: "spotlight-bar"
+    }
+
+    IpcHandler {
         function info(message: string): string {
             if (!message)
                 return "ERROR: No message specified";
@@ -1773,6 +1792,36 @@ Item {
         }
 
         target: "outputs"
+    }
+
+    IpcHandler {
+        target: "mic"
+
+        function setvolume(percentage: string): string {
+            return AudioService.setMicVolume(parseInt(percentage));
+        }
+
+        function increment(step: string): string {
+            return AudioService.incrementMicVolume(step);
+        }
+
+        function decrement(step: string): string {
+            return AudioService.decrementMicVolume(step);
+        }
+
+        function mute(): string {
+            return AudioService.toggleMicMute();
+        }
+
+        function status(): string {
+            if (!AudioService.source || !AudioService.source.audio) {
+                return "No audio source available";
+            }
+
+            const volume = Math.round(AudioService.source.audio.volume * 100);
+            const muteStatus = AudioService.source.audio.muted ? " (muted)" : "";
+            return `Microphone: ${volume}%${muteStatus}`;
+        }
     }
 
     IpcHandler {
