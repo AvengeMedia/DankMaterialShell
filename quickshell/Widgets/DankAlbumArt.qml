@@ -8,15 +8,19 @@ Item {
     id: root
 
     property MprisPlayer activePlayer
-    property string artUrl: (activePlayer?.trackArtUrl) || ""
+    property string artUrl: TrackArtService.resolvedArtUrl
     property string lastValidArtUrl: ""
     property alias albumArtStatus: albumArt.imageStatus
     property real albumSize: Math.min(width, height) * 0.88
     property bool showAnimation: true
     property real animationScale: 1.0
 
+    onActivePlayerChanged: {
+        lastValidArtUrl = "";
+    }
+
     onArtUrlChanged: {
-        if (artUrl && albumArt.status !== Image.Error) {
+        if (artUrl && albumArtStatus !== Image.Error) {
             lastValidArtUrl = artUrl;
         }
     }

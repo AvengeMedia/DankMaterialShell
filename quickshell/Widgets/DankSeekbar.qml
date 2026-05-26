@@ -8,12 +8,14 @@ Item {
     id: root
 
     property MprisPlayer activePlayer
+    readonly property real stableLength: MprisController.activePlayerStableLength
+
     property real seekPreviewRatio: -1
     readonly property real playerValue: {
-        if (!activePlayer || activePlayer.length <= 0)
+        if (!activePlayer || stableLength <= 0)
             return 0;
-        const pos = (activePlayer.position || 0) % Math.max(1, activePlayer.length);
-        const calculatedRatio = pos / activePlayer.length;
+        const pos = (activePlayer.position || 0) % Math.max(1, stableLength);
+        const calculatedRatio = pos / stableLength;
         return Math.max(0, Math.min(1, calculatedRatio));
     }
     property real value: seekPreviewRatio >= 0 ? seekPreviewRatio : playerValue
@@ -29,20 +31,20 @@ Item {
     }
 
     function ratioForPosition(position) {
-        if (!activePlayer || activePlayer.length <= 0)
+        if (!activePlayer || stableLength <= 0)
             return 0;
-        return clampRatio(position / activePlayer.length);
+        return clampRatio(position / stableLength);
     }
 
     function positionForRatio(ratio) {
-        if (!activePlayer || activePlayer.length <= 0)
+        if (!activePlayer || stableLength <= 0)
             return 0;
-        const rawPosition = clampRatio(ratio) * activePlayer.length;
-        return Math.min(rawPosition, activePlayer.length * 0.99);
+        const rawPosition = clampRatio(ratio) * stableLength;
+        return Math.min(rawPosition, stableLength * 0.99);
     }
 
     function updatePreviewFromMouse(mouseX, width) {
-        if (!activePlayer || activePlayer.length <= 0 || width <= 0)
+        if (!activePlayer || stableLength <= 0 || width <= 0)
             return;
         seekPreviewRatio = clampRatio(mouseX / width);
     }
@@ -68,7 +70,7 @@ Item {
         mouseArea.pressX = mouse.x;
         clearCommittedSeekPreview();
         holdTimer.restart();
-        if (activePlayer && activePlayer.length > 0 && activePlayer.canSeek) {
+        if (activePlayer && stableLength > 0 && activePlayer.canSeek) {
             updatePreviewFromMouse(mouse.x, width);
             mouseArea.pendingSeekPosition = positionForRatio(seekPreviewRatio);
         }
@@ -78,9 +80,9 @@ Item {
         holdTimer.stop();
         isSeeking = false;
         isDraggingSeek = false;
-        if (mouseArea.pendingSeekPosition >= 0 && activePlayer && activePlayer.canSeek && activePlayer.length > 0) {
-            const clamped = Math.min(mouseArea.pendingSeekPosition, activePlayer.length * 0.99);
-            activePlayer.position = clamped;
+        if (mouseArea.pendingSeekPosition >= 0 && activePlayer && activePlayer.canSeek && stableLength > 0) {
+            const clamped = Math.min(mouseArea.pendingSeekPosition, stableLength * 0.99);
+            activePlayer.position = Math.max(0.1, clamped);
             mouseArea.pendingSeekPosition = -1;
             beginCommittedSeekPreview(clamped);
         } else {
@@ -89,7 +91,7 @@ Item {
     }
 
     function handleSeekPositionChanged(mouse, width, mouseArea) {
-        if (mouseArea.pressed && isSeeking && activePlayer && activePlayer.length > 0 && activePlayer.canSeek) {
+        if (mouseArea.pressed && isSeeking && activePlayer && stableLength > 0 && activePlayer.canSeek) {
             if (!isDraggingSeek && Math.abs(mouse.x - mouseArea.pressX) >= dragThreshold)
                 isDraggingSeek = true;
             updatePreviewFromMouse(mouse.x, width);
@@ -129,7 +131,7 @@ Item {
 
     Loader {
         anchors.fill: parent
-        visible: activePlayer && activePlayer.length > 0
+        visible: activePlayer && stableLength > 0
         sourceComponent: SettingsData.waveProgressEnabled ? waveProgressComponent : flatProgressComponent
         z: 1
 
@@ -148,7 +150,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    enabled: activePlayer && activePlayer.canSeek && activePlayer.length > 0
+                    enabled: activePlayer && activePlayer.canSeek && stableLength > 0
 
                     property real pendingSeekPosition: -1
                     property real pressX: 0
@@ -236,7 +238,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    enabled: activePlayer && activePlayer.canSeek && activePlayer.length > 0
+                    enabled: activePlayer && activePlayer.canSeek && stableLength > 0
 
                     property real pendingSeekPosition: -1
                     property real pressX: 0

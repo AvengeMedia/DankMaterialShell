@@ -11,6 +11,23 @@ Singleton {
 
     readonly property list<MprisPlayer> availablePlayers: Mpris.players.values
     property MprisPlayer activePlayer: null
+    property real activePlayerStableLength: 0
+
+    Connections {
+        target: root.activePlayer
+        function onTrackTitleChanged() {
+            root.activePlayerStableLength = (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) ? root.activePlayer.length : 0;
+        }
+        function onLengthChanged() {
+            if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
+                root.activePlayerStableLength = root.activePlayer.length;
+            }
+        }
+    }
+
+    onActivePlayerChanged: {
+        activePlayerStableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
+    }
 
     onAvailablePlayersChanged: _resolveActivePlayer()
     Component.onCompleted: _resolveActivePlayer()
@@ -81,7 +98,7 @@ Singleton {
         if (!activePlayer)
             return;
         if (activePlayer.position > 8 && activePlayer.canSeek)
-            activePlayer.position = 0;
+            activePlayer.position = 0.1;
         else if (activePlayer.canGoPrevious)
             activePlayer.previous();
     }
