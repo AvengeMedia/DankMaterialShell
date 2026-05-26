@@ -402,6 +402,7 @@ DankPopout {
                                 }
                                 onHideDropdowns: root.__hideDropdowns()
                                 onDropdownButtonExited: root.__startCloseTimer()
+                                onDropdownButtonEntered: root.__stopCloseTimer()
                             }
                         }
                     }

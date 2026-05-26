@@ -29,6 +29,7 @@ Item {
     signal showPlayersDropdown(point pos, var screen, bool rightEdge, var player, var players)
     signal hideDropdowns
     signal dropdownButtonExited
+    signal dropdownButtonEntered
 
     property bool volumeExpanded: false
     property bool devicesExpanded: false
@@ -761,6 +762,7 @@ Item {
                 showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
             }
             onEntered: {
+                dropdownButtonEntered();
                 if (playersExpanded)
                     return;
                 hideDropdowns();
@@ -806,6 +808,7 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onEntered: {
+                dropdownButtonEntered();
                 if (volumeExpanded)
                     return;
                 hideDropdowns();
@@ -889,6 +892,7 @@ Item {
                 showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
             }
             onEntered: {
+                dropdownButtonEntered();
                 if (devicesExpanded)
                     return;
                 hideDropdowns();

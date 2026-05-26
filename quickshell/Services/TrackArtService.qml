@@ -83,7 +83,7 @@ Singleton {
                     resolvedArtUrl = localFileUrl;
                     loading = false;
                 } else {
-                    Paths.mkdir(Paths.imagecache);
+                    const dlCmd = "mkdir -p \"$(dirname \"$1\")\" && curl -f -s -L -o \"$1\" \"$2\" && mv \"$1\" \"$3\" || { rm -f \"$1\"; exit 1; }";
 
                     // 2. Check if this is a YouTube URL to do high quality 16:9 fallback
                     if (targetUrl.includes("img.youtube.com/vi/")) {
@@ -92,8 +92,7 @@ Singleton {
                         const mqUrl = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
                         const tmpPath = filePath + ".tmp";
 
-                        const maxresCmd = "curl -f -s -L -o '" + tmpPath + "' '" + maxresUrl + "' && mv '" + tmpPath + "' '" + filePath + "' || { rm -f '" + tmpPath + "'; exit 1; }";
-                        Proc.runCommand(null, ["sh", "-c", maxresCmd], (maxOutput, maxExitCode) => {
+                        Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, maxresUrl, filePath], (maxOutput, maxExitCode) => {
                             if (_lastArtUrl !== targetUrl)
                                 return;
 
@@ -101,8 +100,7 @@ Singleton {
                                 resolvedArtUrl = localFileUrl;
                                 loading = false;
                             } else {
-                                const mqCmd = "curl -f -s -L -o '" + tmpPath + "' '" + mqUrl + "' && mv '" + tmpPath + "' '" + filePath + "' || { rm -f '" + tmpPath + "'; exit 1; }";
-                                Proc.runCommand(null, ["sh", "-c", mqCmd], (mqOutput, mqExitCode) => {
+                                Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, mqUrl, filePath], (mqOutput, mqExitCode) => {
                                     if (_lastArtUrl !== targetUrl)
                                         return;
 
@@ -118,8 +116,7 @@ Singleton {
                     } else {
                         // Standard curl download for other remote URLs (e.g. SoundCloud)
                         const tmpPath = filePath + ".tmp";
-                        const dlCmd = "curl -f -s -L -o '" + tmpPath + "' '" + targetUrl + "' && mv '" + tmpPath + "' '" + filePath + "' || { rm -f '" + tmpPath + "'; exit 1; }";
-                        Proc.runCommand(null, ["sh", "-c", dlCmd], (dlOutput, dlExitCode) => {
+                        Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, targetUrl, filePath], (dlOutput, dlExitCode) => {
                             if (_lastArtUrl !== targetUrl)
                                 return;
 
