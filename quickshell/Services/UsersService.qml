@@ -12,7 +12,9 @@ Singleton {
 
     property var users: []
     property string adminGroup: "wheel"
+    property string greeterGroup: "greeter"
     property var adminMembers: []
+    property var greeterMembers: []
     property bool refreshing: false
 
     signal operationCompleted(string op, string username, bool success, string message)
@@ -69,6 +71,21 @@ Singleton {
         Proc.runCommand("usersService-adminMembers", ["sh", "-c", "getent group " + root.adminGroup + " | awk -F: '{print $4}'"], (output, exitCode) => {
             const members = (output || "").trim().split(",").map(s => s.trim()).filter(s => s.length > 0);
             root.adminMembers = members;
+            _detectGreeterGroup();
+        }, 0);
+    }
+
+    function _detectGreeterGroup() {
+        Proc.runCommand("usersService-detectGreeterGroup", ["sh", "-c", "getent group greeter >/dev/null 2>&1 && echo greeter || (getent group greetd >/dev/null 2>&1 && echo greetd || (getent group _greeter >/dev/null 2>&1 && echo _greeter || echo greeter))"], (output, exitCode) => {
+            root.greeterGroup = (output || "").trim() || "greeter";
+            _loadGreeterMembers();
+        }, 0);
+    }
+
+    function _loadGreeterMembers() {
+        Proc.runCommand("usersService-greeterMembers", ["sh", "-c", "getent group " + root.greeterGroup + " 2>/dev/null | awk -F: '{print $4}'"], (output, exitCode) => {
+            const members = (output || "").trim().split(",").map(s => s.trim()).filter(s => s.length > 0);
+            root.greeterMembers = members;
             _loadUsers();
         }, 0);
     }
@@ -78,8 +95,11 @@ Singleton {
             const lines = (output || "").trim().split("\n").filter(l => l.length > 0);
             const list = [];
             const adminSet = {};
+            const greeterSet = {};
             for (let i = 0; i < root.adminMembers.length; i++)
                 adminSet[root.adminMembers[i]] = true;
+            for (let i = 0; i < root.greeterMembers.length; i++)
+                greeterSet[root.greeterMembers[i]] = true;
 
             for (let i = 0; i < lines.length; i++) {
                 const parts = lines[i].split(":");
@@ -92,7 +112,8 @@ Singleton {
                     gecos: (parts[2] || "").split(",")[0],
                     home: parts[3] || "",
                     shell: parts[4] || "",
-                    isAdmin: adminSet[username] === true
+                    isAdmin: adminSet[username] === true,
+                    isGreeter: greeterSet[username] === true
                 });
             }
             list.sort((a, b) => a.username.localeCompare(b.username));
@@ -101,7 +122,7 @@ Singleton {
         }, 0);
     }
 
-    function createUser(username, password, addToAdmin, callback) {
+    function createUser(username, password, addToAdmin, addToGreeter, callback) {
         if (!isValidUsername(username)) {
             _emit("create", username, false, I18n.tr("Invalid username"), callback);
             return;
@@ -114,7 +135,7 @@ Singleton {
             _emit("create", username, false, I18n.tr("User already exists"), callback);
             return;
         }
-        _runUseradd(username, password, addToAdmin === true, callback);
+        _runUseradd(username, password, addToAdmin === true, addToGreeter === true, callback);
     }
 
     function setPassword(username, newPassword, callback) {
@@ -156,6 +177,55 @@ Singleton {
         _runAdminToggle(username, makeAdmin === true, callback);
     }
 
+    function setGreeterAccess(username, enable, callback) {
+        if (!userExists(username)) {
+            _emit("greeter", username, false, I18n.tr("User not found"), callback);
+            return;
+        }
+        _runGreeterToggle(username, enable === true, callback);
+    }
+
+    function _finishCreateUser(targetUser, addAdmin, addGreeter, outerCb) {
+        function finish(success, message) {
+            root._emit("create", targetUser, success, message, outerCb);
+        }
+
+        function maybeGreeter(onDone) {
+            if (addGreeter) {
+                root._runGreeterToggle(targetUser, true, (greeterOk, greeterMsg) => {
+                    if (greeterOk)
+                        onDone();
+                    else
+                        finish(false, greeterMsg);
+                });
+            } else {
+                onDone();
+            }
+        }
+
+        function createMessage() {
+            if (addAdmin && addGreeter)
+                return I18n.tr("User created with administrator and greeter login access");
+            if (addAdmin)
+                return I18n.tr("User created with administrator privileges");
+            if (addGreeter)
+                return I18n.tr("User created with greeter login access");
+            return I18n.tr("User created");
+        }
+
+        if (addAdmin) {
+            root._runAdminToggle(targetUser, true, (adminOk, adminMsg) => {
+                if (!adminOk) {
+                    finish(false, adminMsg);
+                    return;
+                }
+                maybeGreeter(() => finish(true, createMessage()));
+            });
+        } else {
+            maybeGreeter(() => finish(true, createMessage()));
+        }
+    }
+
     function _emit(op, username, success, message, callback) {
         root.operationCompleted(op, username, success, message);
         if (typeof callback === "function") {
@@ -174,6 +244,7 @@ Singleton {
             property string targetUser: ""
             property string targetPassword: ""
             property bool addAdmin: false
+            property bool addGreeter: false
             property var cb: null
             property string capturedErr: ""
             running: false
@@ -191,6 +262,7 @@ Singleton {
                 const targetUser = useraddProc.targetUser;
                 const targetPassword = useraddProc.targetPassword;
                 const addAdmin = useraddProc.addAdmin;
+                const addGreeter = useraddProc.addGreeter;
                 const outerCb = useraddProc.cb;
                 Qt.callLater(() => useraddProc.destroy());
 
@@ -199,17 +271,7 @@ Singleton {
                         svc._emit("create", targetUser, false, pwMsg, outerCb);
                         return;
                     }
-                    if (addAdmin) {
-                        svc._runAdminToggle(targetUser, true, (adminOk, adminMsg) => {
-                            if (adminOk) {
-                                svc._emit("create", targetUser, true, I18n.tr("User created with administrator privileges"), outerCb);
-                            } else {
-                                svc._emit("create", targetUser, false, adminMsg, outerCb);
-                            }
-                        });
-                    } else {
-                        svc._emit("create", targetUser, true, I18n.tr("User created"), outerCb);
-                    }
+                    svc._finishCreateUser(targetUser, addAdmin, addGreeter, outerCb);
                 });
             }
         }
@@ -291,6 +353,36 @@ Singleton {
     }
 
     Component {
+        id: greeterToggleComp
+        Process {
+            id: greeterToggleProc
+            property string targetUser: ""
+            property bool enableGreeter: false
+            property var cb: null
+            property string capturedErr: ""
+            running: false
+            stdout: StdioCollector {}
+            stderr: StdioCollector {
+                onStreamFinished: greeterToggleProc.capturedErr = text || ""
+            }
+            onExited: exitCode => {
+                const targetUser = greeterToggleProc.targetUser;
+                const enableGreeter = greeterToggleProc.enableGreeter;
+                const cb = greeterToggleProc.cb;
+                const err = (greeterToggleProc.capturedErr || "").trim();
+                Qt.callLater(() => greeterToggleProc.destroy());
+
+                if (exitCode !== 0) {
+                    root._emit("greeter", targetUser, false, err || I18n.tr("usermod failed (exit %1)").arg(exitCode), cb);
+                } else {
+                    root.refresh();
+                    root._emit("greeter", targetUser, true, enableGreeter ? I18n.tr("Granted greeter login access") : I18n.tr("Removed greeter login access"), cb);
+                }
+            }
+        }
+    }
+
+    Component {
         id: adminToggleComp
         Process {
             id: adminToggleProc
@@ -320,12 +412,13 @@ Singleton {
         }
     }
 
-    function _runUseradd(username, password, addToAdmin, callback) {
+    function _runUseradd(username, password, addToAdmin, addToGreeter, callback) {
         const proc = useraddComp.createObject(root, {
             command: ["pkexec", "useradd", "-m", "-s", "/bin/bash", username],
             targetUser: username,
             targetPassword: password,
             addAdmin: addToAdmin,
+            addGreeter: addToGreeter,
             cb: callback
         });
         proc.running = true;
@@ -356,6 +449,17 @@ Singleton {
             command: cmd,
             targetUser: username,
             makeAdmin: makeAdmin,
+            cb: callback
+        });
+        proc.running = true;
+    }
+
+    function _runGreeterToggle(username, enableGreeter, callback) {
+        const cmd = enableGreeter ? ["pkexec", "usermod", "-aG", root.greeterGroup, username] : ["pkexec", "gpasswd", "-d", username, root.greeterGroup];
+        const proc = greeterToggleComp.createObject(root, {
+            command: cmd,
+            targetUser: username,
+            enableGreeter: enableGreeter,
             cb: callback
         });
         proc.running = true;

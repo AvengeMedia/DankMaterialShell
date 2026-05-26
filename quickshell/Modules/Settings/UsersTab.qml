@@ -17,12 +17,14 @@ Item {
     property string pendingPassword: ""
     property string pendingConfirm: ""
     property bool pendingAdmin: false
+    property bool pendingGreeter: false
 
     function _resetForm() {
         pendingUsername = "";
         pendingPassword = "";
         pendingConfirm = "";
         pendingAdmin = false;
+        pendingGreeter = false;
         usernameField.text = "";
         passwordField.text = "";
         confirmField.text = "";
@@ -57,6 +59,10 @@ Item {
 
     ConfirmModal {
         id: adminToggleConfirm
+    }
+
+    ConfirmModal {
+        id: greeterToggleConfirm
     }
 
     DankFlickable {
@@ -113,11 +119,39 @@ Item {
                     }
 
                     StyledText {
+                        text: I18n.tr("Greeter group:")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: UsersService.greeterGroup
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Item {
+                        width: Theme.spacingM
+                        height: 1
+                    }
+
+                    StyledText {
                         text: UsersService.refreshing ? I18n.tr("Refreshing…") : ""
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         anchors.verticalCenter: parent.verticalCenter
                     }
+                }
+
+                StyledText {
+                    width: parent.width
+                    text: I18n.tr("Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.Wrap
                 }
 
                 Repeater {
@@ -179,6 +213,24 @@ Item {
                                             font.weight: Font.Medium
                                         }
                                     }
+
+                                    Rectangle {
+                                        visible: userRow.modelData.isGreeter
+                                        width: greeterChipText.implicitWidth + Theme.spacingS * 2
+                                        height: greeterChipText.implicitHeight + Theme.spacingXS * 2
+                                        radius: Theme.cornerRadius
+                                        color: Theme.withAlpha(Theme.secondary, 0.15)
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        StyledText {
+                                            id: greeterChipText
+                                            anchors.centerIn: parent
+                                            text: I18n.tr("greeter")
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.secondary
+                                            font.weight: Font.Medium
+                                        }
+                                    }
                                 }
 
                                 StyledText {
@@ -194,6 +246,34 @@ Item {
                                 id: actionButtons
                                 spacing: Theme.spacingS
                                 anchors.verticalCenter: parent.verticalCenter
+
+                                DankActionButton {
+                                    id: greeterToggleBtn
+                                    readonly property bool actionBlocked: root.operationPending
+                                    buttonSize: 36
+                                    iconSize: 20
+                                    iconName: userRow.modelData.isGreeter ? "login" : "how_to_reg"
+                                    iconColor: userRow.modelData.isGreeter ? Theme.secondary : Theme.surfaceVariantText
+                                    opacity: actionBlocked ? 0.4 : 1.0
+                                    tooltipText: userRow.modelData.isGreeter ? I18n.tr("Remove greeter login access") : I18n.tr("Allow greeter login access")
+                                    tooltipSide: "left"
+                                    onClicked: {
+                                        if (actionBlocked)
+                                            return;
+                                        const enableGreeter = !userRow.modelData.isGreeter;
+                                        greeterToggleConfirm.showWithOptions({
+                                            title: enableGreeter ? I18n.tr("Allow greeter access?") : I18n.tr("Remove greeter access?"),
+                                            message: enableGreeter ? I18n.tr("Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.").arg(userRow.modelData.username).arg(UsersService.greeterGroup) : I18n.tr("Remove \"%1\" from the %2 group?").arg(userRow.modelData.username).arg(UsersService.greeterGroup),
+                                            confirmText: enableGreeter ? I18n.tr("Allow") : I18n.tr("Remove"),
+                                            confirmColor: Theme.primary,
+                                            onConfirm: () => {
+                                                root.operationPending = true;
+                                                root.statusText = "";
+                                                UsersService.setGreeterAccess(userRow.modelData.username, enableGreeter, null);
+                                            }
+                                        });
+                                    }
+                                }
 
                                 DankActionButton {
                                     id: adminToggleBtn
@@ -380,6 +460,15 @@ Item {
                     onToggled: checked => root.pendingAdmin = checked
                 }
 
+                SettingsToggleRow {
+                    settingKey: "createUserGreeter"
+                    tags: ["user", "greeter", "login", "sync"]
+                    text: I18n.tr("Allow greeter login access")
+                    description: I18n.tr("Add the new user to the %1 group so they can run dms greeter sync --profile.").arg(UsersService.greeterGroup)
+                    checked: root.pendingGreeter
+                    onToggled: checked => root.pendingGreeter = checked
+                }
+
                 Row {
                     width: parent.width
                     spacing: Theme.spacingM
@@ -395,7 +484,7 @@ Item {
                                 return;
                             root.operationPending = true;
                             root.statusText = "";
-                            UsersService.createUser(root.pendingUsername, root.pendingPassword, root.pendingAdmin, null);
+                            UsersService.createUser(root.pendingUsername, root.pendingPassword, root.pendingAdmin, root.pendingGreeter, null);
                         }
                     }
 
