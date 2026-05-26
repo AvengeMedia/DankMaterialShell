@@ -44,6 +44,12 @@ Item {
 
     property int __panelHoverCount: 0
 
+    onDropdownTypeChanged: {
+        if (dropdownType === 0) {
+            __panelHoverCount = 0;
+        }
+    }
+
     function panelAreaEntered() {
         __panelHoverCount++;
         panelEntered();

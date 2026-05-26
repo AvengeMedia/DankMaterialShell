@@ -13,7 +13,6 @@ Singleton {
     property string resolvedArtUrl: ""
     property alias _bgArtSource: root.resolvedArtUrl
     property bool loading: false
-    property string activePlayerArtUrl: ""
 
     function djb2Hash(str) {
         if (!str) return "";
@@ -68,6 +67,7 @@ Singleton {
 
         if (url.startsWith("http://") || url.startsWith("https://")) {
             loading = true;
+            resolvedArtUrl = ""; // Clear stale artwork immediately while loading
             const targetUrl = url;
             const hash = djb2Hash(url);
             const cacheDir = Paths.strip(Paths.imagecache);
@@ -75,7 +75,7 @@ Singleton {
             const localFileUrl = "file://" + filePath;
 
             // 1. First, check if the file already exists locally
-            Proc.runCommand("trackart_check_" + hash, ["test", "-f", filePath], (output, exitCode) => {
+            Proc.runCommand(null, ["test", "-f", filePath], (output, exitCode) => {
                 if (_lastArtUrl !== targetUrl)
                     return;
 
@@ -90,8 +90,10 @@ Singleton {
                         const videoId = targetUrl.split("/vi/")[1].split("/")[0];
                         const maxresUrl = "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg";
                         const mqUrl = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
+                        const tmpPath = filePath + ".tmp";
 
-                        Proc.runCommand("trackart_dl_max_" + hash, ["curl", "-f", "-s", "-L", "-o", filePath, maxresUrl], (maxOutput, maxExitCode) => {
+                        const maxresCmd = "curl -f -s -L -o '" + tmpPath + "' '" + maxresUrl + "' && mv '" + tmpPath + "' '" + filePath + "' || { rm -f '" + tmpPath + "'; exit 1; }";
+                        Proc.runCommand(null, ["sh", "-c", maxresCmd], (maxOutput, maxExitCode) => {
                             if (_lastArtUrl !== targetUrl)
                                 return;
 
@@ -99,7 +101,8 @@ Singleton {
                                 resolvedArtUrl = localFileUrl;
                                 loading = false;
                             } else {
-                                Proc.runCommand("trackart_dl_mq_" + hash, ["curl", "-f", "-s", "-L", "-o", filePath, mqUrl], (mqOutput, mqExitCode) => {
+                                const mqCmd = "curl -f -s -L -o '" + tmpPath + "' '" + mqUrl + "' && mv '" + tmpPath + "' '" + filePath + "' || { rm -f '" + tmpPath + "'; exit 1; }";
+                                Proc.runCommand(null, ["sh", "-c", mqCmd], (mqOutput, mqExitCode) => {
                                     if (_lastArtUrl !== targetUrl)
                                         return;
 
@@ -114,7 +117,9 @@ Singleton {
                         }, 50, 15000);
                     } else {
                         // Standard curl download for other remote URLs (e.g. SoundCloud)
-                        Proc.runCommand("trackart_dl_" + hash, ["curl", "-f", "-s", "-L", "-o", filePath, targetUrl], (dlOutput, dlExitCode) => {
+                        const tmpPath = filePath + ".tmp";
+                        const dlCmd = "curl -f -s -L -o '" + tmpPath + "' '" + targetUrl + "' && mv '" + tmpPath + "' '" + filePath + "' || { rm -f '" + tmpPath + "'; exit 1; }";
+                        Proc.runCommand(null, ["sh", "-c", dlCmd], (dlOutput, dlExitCode) => {
                             if (_lastArtUrl !== targetUrl)
                                 return;
 
@@ -132,9 +137,10 @@ Singleton {
         }
 
         loading = true;
+        resolvedArtUrl = ""; // Clear stale artwork immediately while verifying local file
         const localUrl = url;
         const filePath = url.startsWith("file://") ? url.substring(7) : url;
-        Proc.runCommand("trackart", ["test", "-f", filePath], (output, exitCode) => {
+        Proc.runCommand(null, ["test", "-f", filePath], (output, exitCode) => {
             if (_lastArtUrl !== localUrl)
                 return;
             resolvedArtUrl = exitCode === 0 ? localUrl : "";
@@ -156,7 +162,6 @@ Singleton {
 
     function _updateArtUrl() {
         const url = getArtworkUrl(activePlayer);
-        activePlayerArtUrl = url;
         loadArtwork(url);
     }
 }
