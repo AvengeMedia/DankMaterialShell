@@ -7,7 +7,7 @@ import Quickshell
 Singleton {
     id: root
 
-    readonly property bool locationAvailable: DMSService.isConnected && (DMSService.capabilities.length === 0 || DMSService.capabilities.includes("location"))
+    readonly property bool locationAvailable: DMSService.isConnected && DMSService.capabilities.includes("location")
     readonly property bool valid: latitude !== 0 || longitude !== 0
 
     property var latitude: 0.0
