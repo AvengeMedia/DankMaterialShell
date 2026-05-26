@@ -139,12 +139,8 @@ Item {
         });
     }
 
-    function toggleSaveMenu() {
-        if (saveMenu.visible) {
-            saveMenu.close();
-            return;
-        }
-        saveMenu.open();
+    function positionSaveMenu() {
+        saveMenu.width = Math.max(saveMenuColumn.implicitWidth + saveMenu.padding * 2, saveButton.width);
         const pos = saveButton.mapToItem(Overlay.overlay, 0, 0);
         const popupW = saveMenu.width;
         const popupH = saveMenu.height;
@@ -162,6 +158,16 @@ Item {
 
         saveMenu.x = x;
         saveMenu.y = y;
+    }
+
+    function toggleSaveMenu() {
+        if (saveMenu.visible) {
+            saveMenu.close();
+            return;
+        }
+        saveMenu.open();
+        positionSaveMenu();
+        Qt.callLater(positionSaveMenu);
     }
 
     Shortcut {
@@ -304,9 +310,12 @@ Item {
 
             Item {
                 id: saveButton
-                property int arrowWidth: Theme.iconSize + Theme.spacingS
-                width: cancelButton.implicitWidth
-                height: cancelButton.implicitHeight
+
+                readonly property int buttonHeight: cancelButton.buttonHeight
+                readonly property int arrowWidth: Theme.iconSizeLarge
+
+                width: cancelButton.width
+                height: buttonHeight
 
                 Rectangle {
                     anchors.fill: parent
@@ -340,7 +349,7 @@ Item {
 
                 Rectangle {
                     width: 1
-                    height: parent.height - Theme.spacingM
+                    height: parent.height - cancelButton.horizontalPadding
                     color: Theme.withAlpha(Theme.onPrimary, 0.2)
                     anchors.right: saveArrowArea.left
                     anchors.verticalCenter: parent.verticalCenter
@@ -354,12 +363,14 @@ Item {
                 }
 
                 StateLayer {
+                    z: 1
                     anchors.fill: saveMainArea
                     stateColor: Theme.onPrimary
                     onClicked: root.saveEntry("history")
                 }
 
                 StateLayer {
+                    z: 1
                     anchors.fill: saveArrowArea
                     stateColor: Theme.onPrimary
                     onClicked: root.toggleSaveMenu()
@@ -370,9 +381,9 @@ Item {
         Popup {
             id: saveMenu
             parent: Overlay.overlay
-            width: saveMenuColumn.implicitWidth + padding * 2
             padding: Theme.spacingM
-            modal: false
+            modal: true
+            dim: false
             focus: true
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
