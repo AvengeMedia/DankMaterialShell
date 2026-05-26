@@ -78,10 +78,9 @@ Rectangle {
 
             onClicked: {
                 if (entryType === "image") {
-                    // TODO - forward to editing software
-                } else {
-                    editRequested();
+                    return;
                 }
+                editRequested();
             }
         }
 
