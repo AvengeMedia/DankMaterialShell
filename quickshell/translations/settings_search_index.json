@@ -735,16 +735,21 @@
     "keywords": [
       "background",
       "bar",
+      "corner",
       "corners",
       "dank",
       "panel",
       "radius",
+      "remove",
       "round",
       "rounded",
+      "rounding",
       "statusbar",
+      "taskbar",
       "topbar"
     ],
-    "icon": "rounded_corner"
+    "icon": "rounded_corner",
+    "description": "Remove corner rounding from the bar"
   },
   {
     "section": "_tab_3",
@@ -861,18 +866,24 @@
     "category": "Dank Bar",
     "keywords": [
       "bar",
+      "between",
       "dank",
+      "edges",
       "gap",
       "gaps",
       "margin",
       "margins",
       "padding",
       "panel",
+      "screen",
+      "space",
       "spacing",
       "statusbar",
+      "taskbar",
       "topbar"
     ],
-    "icon": "space_bar"
+    "icon": "space_bar",
+    "description": "Space between the bar and screen edges"
   },
   {
     "section": "trayIconTint",
@@ -909,17 +920,20 @@
     "category": "Dank Bar",
     "keywords": [
       "alpha",
+      "background",
       "bar",
       "dank",
       "opacity",
       "panel",
       "statusbar",
+      "taskbar",
       "topbar",
       "translucent",
       "transparency",
       "transparent"
     ],
-    "icon": "opacity"
+    "icon": "opacity",
+    "description": "Opacity of the bar background"
   },
   {
     "section": "barUseOverlayLayer",
@@ -949,25 +963,27 @@
     "keywords": [
       "auto-hide",
       "autohide",
+      "automatically",
+      "away",
       "bar",
       "dank",
       "fullscreen",
       "hidden",
       "hide",
       "layer",
+      "moves",
       "overlay",
       "panel",
-      "place",
+      "pointer",
       "show",
       "statusbar",
       "taskbar",
       "topbar",
       "visibility",
-      "visible",
-      "wayland"
+      "visible"
     ],
     "icon": "visibility_off",
-    "description": "Place the bar on the Wayland overlay layer"
+    "description": "Automatically hide the bar when the pointer moves away"
   },
   {
     "section": "workspaceDragReorder",
@@ -2330,6 +2346,30 @@
       "start"
     ],
     "icon": "history"
+  },
+  {
+    "section": "rememberLastMode",
+    "label": "Remember Last Mode",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "drawer",
+      "last",
+      "launcher",
+      "menu",
+      "mode",
+      "opened",
+      "remember",
+      "restore",
+      "selected",
+      "start",
+      "start menu",
+      "tab"
+    ],
+    "description": "Restore the last selected mode (tab) when the launcher is opened"
   },
   {
     "section": "rememberLastQuery",
@@ -4864,27 +4904,6 @@
     "description": "Automatically lock the screen when DMS starts"
   },
   {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "automatic",
-      "automatically",
-      "before",
-      "lock",
-      "login",
-      "password",
-      "prepares",
-      "screen",
-      "security",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
-  },
-  {
     "section": "lockScreenNotificationMode",
     "label": "Notification Display",
     "tabIndex": 11,
@@ -5808,28 +5827,6 @@
     "description": "Use smaller notification cards"
   },
   {
-    "section": "notificationDedupeEnabled",
-    "label": "Suppress Duplicate Notifications",
-    "tabIndex": 17,
-    "category": "Notifications",
-    "keywords": [
-      "alert",
-      "alerts",
-      "coalesce",
-      "dedupe",
-      "duplicate",
-      "duplicates",
-      "messages",
-      "notif",
-      "notification",
-      "notifications",
-      "repeat",
-      "stack",
-      "toast"
-    ],
-    "description": "Control whether identical alerts stack or show as a single popup"
-  },
-  {
     "section": "notificationHistorySaveCritical",
     "label": "Critical Priority",
     "tabIndex": 17,
@@ -6368,6 +6365,28 @@
       "until"
     ],
     "description": "Hide notification content until expanded; popups show collapsed by default"
+  },
+  {
+    "section": "notificationDedupeEnabled",
+    "label": "Suppress Duplicate Notifications",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "coalesce",
+      "dedupe",
+      "duplicate",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "notifs",
+      "repeat",
+      "stack",
+      "suppress",
+      "toast"
+    ]
   },
   {
     "section": "osdAlwaysShowValue",
@@ -7011,6 +7030,27 @@
     ],
     "icon": "schedule",
     "description": "Gradually fade the screen before locking with a configurable grace period"
+  },
+  {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "automatically",
+      "before",
+      "energy",
+      "lock",
+      "power",
+      "prepares",
+      "screen",
+      "security",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "fadeToLockGracePeriod",
@@ -7698,5 +7738,16 @@
       "settings"
     ],
     "icon": "apps"
+  },
+  {
+    "section": "_tab_35",
+    "label": "Users",
+    "tabIndex": 35,
+    "category": "Settings",
+    "keywords": [
+      "settings",
+      "users"
+    ],
+    "icon": "manage_accounts"
   }
 ]
