@@ -418,6 +418,7 @@ func handleConnection(conn net.Conn) {
 	conn.Write(capsData)
 	conn.Write([]byte("\n"))
 	scanner := bufio.NewScanner(conn)
+	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), 64*1024*1024) // grow up to 64 MB for large clipboard payloads
 	for scanner.Scan() {
 		line := scanner.Bytes()
 
