@@ -1019,7 +1019,7 @@ Column {
         property int widgetIndex: -1
         readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
 
-        width: 220
+        width: 280
         height: contentColumn.implicitHeight + Theme.spacingS * 2
         padding: 0
         modal: true
