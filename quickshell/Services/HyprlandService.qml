@@ -58,7 +58,7 @@ Singleton {
 
     function getOutputIdentifier(output, outputName) {
         if (SettingsData.displayNameMode === "model" && output.make && output.model)
-            return "desc:" + output.make + " " + output.model + " " + (output.serial || "Unknown");
+            return ("desc:" + output.make + " " + output.model + " " + (output.serial || "Unknown")).replace(",", "");
         return outputName;
     }
 
