@@ -315,6 +315,7 @@ Singleton {
     property bool controlCenterShowBatteryIcon: false
     property bool controlCenterShowPrinterIcon: false
     property bool controlCenterShowScreenSharingIcon: true
+    property bool controlCenterShowIdleInhibitorIcon: false
     property bool showPrivacyButton: true
     property bool privacyShowMicIcon: false
     property bool privacyShowCameraIcon: false

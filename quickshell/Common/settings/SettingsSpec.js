@@ -104,6 +104,7 @@ var SPEC = {
     controlCenterShowBatteryIcon: { def: false },
     controlCenterShowPrinterIcon: { def: false },
     controlCenterShowScreenSharingIcon: { def: true },
+    controlCenterShowIdleInhibitorIcon: { def: false },
 
     showPrivacyButton: { def: true },
     privacyShowMicIcon: { def: false },

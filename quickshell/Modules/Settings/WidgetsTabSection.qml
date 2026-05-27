@@ -42,7 +42,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "showMountPath", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -1520,6 +1520,16 @@ Column {
                         setting: "showScreenSharingIcon"
                     }
                 ]
+            },
+            {
+                id: "idleInhibitor",
+                rows: [
+                    {
+                        icon: "motion_sensor_active",
+                        label: I18n.tr("Idle Inhibitor"),
+                        setting: "showIdleInhibitorIcon"
+                    }
+                ]
             }
         ]
         property var controlCenterGroups: defaultControlCenterGroups
@@ -1660,7 +1670,7 @@ Column {
                     id: longestControlCenterLabelMetrics
                     font.pixelSize: Theme.fontSizeSmall
                     text: {
-                        const labels = [I18n.tr("Network"), I18n.tr("VPN"), I18n.tr("Bluetooth"), I18n.tr("Audio"), I18n.tr("Volume"), I18n.tr("Microphone"), I18n.tr("Microphone Volume"), I18n.tr("Brightness"), I18n.tr("Brightness Value"), I18n.tr("Battery"), I18n.tr("Printer"), I18n.tr("Screen Sharing")];
+                        const labels = [I18n.tr("Network"), I18n.tr("VPN"), I18n.tr("Bluetooth"), I18n.tr("Audio"), I18n.tr("Volume"), I18n.tr("Microphone"), I18n.tr("Microphone Volume"), I18n.tr("Brightness"), I18n.tr("Brightness Value"), I18n.tr("Battery"), I18n.tr("Printer"), I18n.tr("Screen Sharing"), I18n.tr("Idle Inhibitor")];
                         let longest = "";
                         for (let i = 0; i < labels.length; i++) {
                             if (labels[i].length > longest.length)
@@ -1707,6 +1717,8 @@ Column {
                                 return wd?.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
                             case "showScreenSharingIcon":
                                 return wd?.showScreenSharingIcon ?? SettingsData.controlCenterShowScreenSharingIcon;
+                            case "showIdleInhibitorIcon":
+                                return wd?.showIdleInhibitorIcon ?? SettingsData.controlCenterShowIdleInhibitorIcon;
                             default:
                                 return false;
                             }
