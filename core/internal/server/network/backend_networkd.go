@@ -27,16 +27,19 @@ type linkInfo struct {
 }
 
 func (l *linkInfo) isWired() bool {
+	if looksVirtual(l.name) {
+		return false
+	}
 	if l.linkType != "" {
 		return l.linkType == "ether"
 	}
-	if looksVirtual(l.name) || strings.HasPrefix(l.name, "wlan") || strings.HasPrefix(l.name, "wlp") {
-		return false
-	}
-	return true
+	return !strings.HasPrefix(l.name, "wlan") && !strings.HasPrefix(l.name, "wlp")
 }
 
 func (l *linkInfo) isWireless() bool {
+	if looksVirtual(l.name) {
+		return false
+	}
 	if l.linkType != "" {
 		return l.linkType == "wlan"
 	}
@@ -45,7 +48,7 @@ func (l *linkInfo) isWireless() bool {
 
 func looksVirtual(name string) bool {
 	virtualPrefixes := []string{
-		"lo", "docker", "veth", "virbr", "br-", "vnet", "tun", "tap",
+		"lo", "docker", "podman", "veth", "virbr", "br-", "vnet", "tun", "tap",
 		"vboxnet", "vmnet", "kube", "cni", "flannel", "cali",
 	}
 	for _, prefix := range virtualPrefixes {
@@ -110,6 +113,12 @@ func (b *SystemdNetworkdBackend) Close() {
 	}
 }
 
+type enumeratedLink struct {
+	ifindex int32
+	name    string
+	path    dbus.ObjectPath
+}
+
 func (b *SystemdNetworkdBackend) enumerateLinks() error {
 	obj := b.conn.Object(networkdBusName, b.managerPath)
 
@@ -123,25 +132,48 @@ func (b *SystemdNetworkdBackend) enumerateLinks() error {
 		return fmt.Errorf("ListLinks: %w", err)
 	}
 
+	fresh := make([]enumeratedLink, len(links))
+	for i, l := range links {
+		fresh[i] = enumeratedLink{ifindex: l.Ifindex, name: l.Name, path: l.Path}
+	}
+
 	b.linksMutex.Lock()
 	defer b.linksMutex.Unlock()
+	b.syncLinks(fresh)
 
-	for _, l := range links {
-		if existing, ok := b.links[l.Name]; ok && existing.path == l.Path {
-			existing.ifindex = l.Ifindex
+	return nil
+}
+
+// syncLinks reconciles the cached link map against the freshly enumerated set:
+// it adds links not seen before (querying their Type once), refreshes the
+// ifindex of survivors, and prunes links that no longer appear. Pruning is what
+// keeps torn-down container interfaces (podman bridges, veth pairs) from
+// lingering as routable and being mistaken for the wired uplink.
+// Callers must hold linksMutex.
+func (b *SystemdNetworkdBackend) syncLinks(fresh []enumeratedLink) {
+	present := make(map[string]bool, len(fresh))
+	for _, l := range fresh {
+		present[l.name] = true
+		if existing, ok := b.links[l.name]; ok && existing.path == l.path {
+			existing.ifindex = l.ifindex
 			continue
 		}
 		info := &linkInfo{
-			ifindex:  l.Ifindex,
-			name:     l.Name,
-			path:     l.Path,
-			linkType: b.fetchLinkType(l.Path),
+			ifindex:  l.ifindex,
+			name:     l.name,
+			path:     l.path,
+			linkType: b.fetchLinkType(l.path),
 		}
-		b.links[l.Name] = info
-		log.Debugf("networkd: enumerated link %s (ifindex=%d, path=%s, type=%q)", l.Name, l.Ifindex, l.Path, info.linkType)
+		b.links[l.name] = info
+		log.Debugf("networkd: enumerated link %s (ifindex=%d, path=%s, type=%q)", l.name, l.ifindex, l.path, info.linkType)
 	}
 
-	return nil
+	for name := range b.links {
+		if !present[name] {
+			log.Debugf("networkd: pruned stale link %s", name)
+			delete(b.links, name)
+		}
+	}
 }
 
 // fetchLinkType queries networkd's Describe method and extracts the link Type
