@@ -403,6 +403,7 @@ Item {
         if (widgetId === "diskUsage") {
             widgetObj.mountPath = "/";
             widgetObj.diskUsageMode = 0;
+            widgetObj.showMountPath = true;
         }
         if (widgetId === "cpuUsage" || widgetId === "memUsage" || widgetId === "cpuTemp" || widgetId === "gpuTemp" || widgetId === "diskUsage")
             widgetObj.minimumWidth = true;
@@ -690,6 +691,8 @@ Item {
                     item.mountPath = widget.mountPath;
                 if (widget.diskUsageMode !== undefined)
                     item.diskUsageMode = widget.diskUsageMode;
+                if (widget.showMountPath !== undefined)
+                    item.showMountPath = widget.showMountPath;
                 if (widget.showNetworkIcon !== undefined)
                     item.showNetworkIcon = widget.showNetworkIcon;
                 if (widget.showBluetoothIcon !== undefined)

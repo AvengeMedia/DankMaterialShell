@@ -10,6 +10,7 @@ BasePill {
     property var widgetData: null
     property string mountPath: (widgetData && widgetData.mountPath !== undefined) ? widgetData.mountPath : "/"
     property int diskUsageMode: (widgetData && widgetData.diskUsageMode !== undefined) ? widgetData.diskUsageMode : 0
+    property bool showMountPath: (widgetData && widgetData.showMountPath !== undefined) ? widgetData.showMountPath : true
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
@@ -179,6 +180,7 @@ BasePill {
 
                 StyledText {
                     id: mountText
+                    visible: root.showMountPath
                     text: {
                         if (!root.selectedMount) {
                             return "--";

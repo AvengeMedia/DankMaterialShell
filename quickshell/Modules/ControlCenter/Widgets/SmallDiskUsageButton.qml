@@ -11,6 +11,7 @@ Rectangle {
 
     property string mountPath: "/"
     property string instanceId: ""
+    property bool showMountPath: true
 
     property var selectedMount: {
         if (!DgopService.diskMounts || DgopService.diskMounts.length === 0)
@@ -82,6 +83,7 @@ Rectangle {
             spacing: 0
 
             StyledText {
+                visible: root.showMountPath
                 text: root.selectedMount?.mount || root.mountPath
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceVariantText

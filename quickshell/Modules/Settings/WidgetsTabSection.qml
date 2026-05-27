@@ -42,7 +42,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "showMountPath", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
