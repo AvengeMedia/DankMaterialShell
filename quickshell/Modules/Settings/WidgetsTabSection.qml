@@ -30,6 +30,7 @@ Column {
     signal controlCenterSettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal controlCenterGroupOrderChanged(string sectionId, int widgetIndex, var groupOrder)
     signal privacySettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
+    signal keyboardLayoutNameSettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
     signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
     signal showInGbChanged(string sectionId, int widgetIndex, bool enabled)
@@ -42,7 +43,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -554,6 +555,40 @@ Column {
                                 }
                                 onExited: {
                                     sharedTooltip.hide();
+                                }
+                            }
+
+                            DankActionButton {
+                                id: kbdLayoutCtxMenuButton
+                                buttonSize: 32
+                                visible: modelData.id === "keyboard_layout_name"
+                                iconName: "more_vert"
+                                iconSize: 18
+                                iconColor: Theme.outline
+
+                                onClicked: {
+                                    kbdLayoutCtxMenu.widgetData = modelData;
+                                    kbdLayoutCtxMenu.sectionId = root.sectionId;
+                                    kbdLayoutCtxMenu.widgetIndex = index;
+
+                                    var buttonPos = kbdLayoutCtxMenuButton.mapToItem(root, 0, 0);
+                                    var popupWidth = kbdLayoutCtxMenu.width;
+                                    var popupHeight = kbdLayoutCtxMenu.height;
+
+                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
+                                    if (xPos < 0)
+                                        xPos = buttonPos.x + kbdLayoutCtxMenuButton.width + Theme.spacingS;
+
+                                    var yPos = buttonPos.y - popupHeight / 2 + kbdLayoutCtxMenuButton.height / 2;
+                                    if (yPos < 0) {
+                                        yPos = Theme.spacingS;
+                                    } else if (yPos + popupHeight > root.height) {
+                                        yPos = root.height - popupHeight - Theme.spacingS;
+                                    }
+
+                                    kbdLayoutCtxMenu.x = xPos;
+                                    kbdLayoutCtxMenu.y = yPos;
+                                    kbdLayoutCtxMenu.open();
                                 }
                             }
 
@@ -1086,6 +1121,92 @@ Column {
                         onClicked: {
                             const newValue = !(trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false);
                             root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayUseInlineExpansion", newValue);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Popup {
+        id: kbdLayoutCtxMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
+
+        width: 200
+        height: kbdLayoutCtxMenuColumn.implicitHeight + Theme.spacingS * 2
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+            Column {
+                id: kbdLayoutCtxMenuColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: kbdLayoutCtxMenuIconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "visibility"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show Icon")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: kbdLayoutCtxMenuIconToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: kbdLayoutCtxMenu.currentWidgetData?.keyboardLayoutNameShowIcon ?? SettingsData.keyboardLayoutNameShowIcon
+                        onToggled: toggled => {
+                            root.keyboardLayoutNameSettingChanged(kbdLayoutCtxMenu.sectionId, kbdLayoutCtxMenu.widgetIndex, "showIcon", toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: kbdLayoutCtxMenuIconArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+
+                        onClicked: {
+                            kbdLayoutCtxMenuIconToggle.checked = !kbdLayoutCtxMenuIconToggle.checked;
+                            root.keyboardLayoutNameSettingChanged(kbdLayoutCtxMenu.sectionId, kbdLayoutCtxMenu.widgetIndex, "showIcon", kbdLayoutCtxMenuIconToggle.checked);
                         }
                     }
                 }

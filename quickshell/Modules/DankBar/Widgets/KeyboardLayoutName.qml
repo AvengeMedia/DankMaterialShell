@@ -11,6 +11,7 @@ BasePill {
 
     property var widgetData: null
     property bool compactMode: widgetData?.keyboardLayoutNameCompactMode !== undefined ? widgetData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode
+    property bool showIcon: widgetData?.keyboardLayoutNameShowIcon !== undefined ? widgetData.keyboardLayoutNameShowIcon : SettingsData.keyboardLayoutNameShowIcon
     readonly property var langCodes: ({
             "afrikaans": "af",
             "albanian": "sq",
@@ -134,6 +135,7 @@ BasePill {
                     size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
+                    visible: root.isVerticalOrientation && widgetData?.keyboardLayoutNameShowIcon !== undefined ? widgetData.keyboardLayoutNameShowIcon : SettingsData.keyboardLayoutNameShowIcon
                 }
 
                 StyledText {
@@ -155,6 +157,14 @@ BasePill {
                 visible: !root.isVerticalOrientation
                 anchors.centerIn: parent
                 spacing: Theme.spacingS
+
+                DankIcon {
+                    name: "keyboard"
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    color: Theme.widgetTextColor
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: !root.isVerticalOrientation && widgetData?.keyboardLayoutNameShowIcon !== undefined ? widgetData.keyboardLayoutNameShowIcon : SettingsData.keyboardLayoutNameShowIcon
+                }
 
                 StyledText {
                     text: {
