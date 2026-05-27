@@ -57,9 +57,15 @@ const KEY_MAP = {
     16842802: "XF86Eject",
     16842791: "XF86Calculator",
     16842806: "XF86Explorer",
+    16777360: "XF86HomePage",
     16842794: "XF86HomePage",
+    16777362: "XF86Search",
     16777426: "XF86Search",
+    16777376: "XF86Mail",
     16777427: "XF86Mail",
+    16777377: "XF86AudioMedia",
+    16777419: "XF86Calculator",
+    16777429: "XF86Explorer",
     16777442: "XF86Launch0",
     16777443: "XF86Launch1",
     33: "1",
@@ -129,6 +135,10 @@ function xkbKeyFromQtKey(qk) {
         return String.fromCharCode(qk);
     if (qk >= 16777264 && qk <= 16777298)
         return "F" + (qk - 16777264 + 1);
+    if (qk >= 16777378 && qk <= 16777387)
+        return "XF86Launch" + (qk - 16777378);
+    if (qk >= 16777388 && qk <= 16777393)
+        return "XF86Launch" + String.fromCharCode(65 + qk - 16777388);
     return KEY_MAP[qk] || "";
 }
 
