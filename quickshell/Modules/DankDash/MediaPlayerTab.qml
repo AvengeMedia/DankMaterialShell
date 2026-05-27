@@ -13,6 +13,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property MprisPlayer activePlayer: MprisController.activePlayer
+    readonly property real stableLength: MprisController.activePlayerStableLength
     property var allPlayers: MprisController.availablePlayers
     property var targetScreen: null
     property real popoutX: 0
@@ -27,7 +28,8 @@ Item {
     signal showAudioDevicesDropdown(point pos, var screen, bool rightEdge)
     signal showPlayersDropdown(point pos, var screen, bool rightEdge, var player, var players)
     signal hideDropdowns
-    signal volumeButtonExited
+    signal dropdownButtonExited
+    signal dropdownButtonEntered
 
     property bool volumeExpanded: false
     property bool devicesExpanded: false
@@ -39,9 +41,7 @@ Item {
         playersExpanded = false;
     }
 
-    DankTooltipV2 {
-        id: sharedTooltip
-    }
+
 
     readonly property bool isRightEdge: {
         if (barPosition === SettingsData.Position.Right)
@@ -85,7 +85,6 @@ Item {
         isSwitching = true;
         _switchHold = true;
         _switchHoldTimer.restart();
-        TrackArtService.loadArtwork(activePlayer.trackArtUrl);
     }
 
     function maybeFinishSwitch() {
@@ -96,11 +95,11 @@ Item {
     }
 
     readonly property real ratio: {
-        if (!activePlayer || !activePlayer.length || activePlayer.length <= 0) {
+        if (!activePlayer || stableLength <= 0) {
             return 0;
         }
-        const pos = (activePlayer.position || 0) % Math.max(1, activePlayer.length);
-        const calculatedRatio = pos / activePlayer.length;
+        const pos = (activePlayer.position || 0) % Math.max(1, stableLength);
+        const calculatedRatio = pos / stableLength;
         return Math.max(0, Math.min(1, calculatedRatio));
     }
 
@@ -109,12 +108,10 @@ Item {
 
     Connections {
         target: activePlayer
+        ignoreUnknownSignals: true
         function onTrackTitleChanged() {
             _switchHoldTimer.restart();
             maybeFinishSwitch();
-        }
-        function onTrackArtUrlChanged() {
-            TrackArtService.loadArtwork(activePlayer.trackArtUrl);
         }
     }
 
@@ -186,6 +183,102 @@ Item {
         }
     }
 
+    function triggerVolumeDropdown() {
+        if (!volumeAvailable)
+            return;
+        if (volumeExpanded)
+            return;
+        hideDropdowns();
+        volumeExpanded = true;
+        const buttonsOnRight = !isRightEdge;
+        const btnY = volumeButton.y + volumeButton.height / 2;
+        const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
+        const screenY = popoutY + contentOffsetY + btnY;
+        showVolumeDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+    }
+
+    function toggleMute() {
+        if (!volumeAvailable)
+            return;
+        SessionData.suppressOSDTemporarily();
+        if (currentVolume > 0) {
+            volumeButton.previousVolume = currentVolume;
+            if (usePlayerVolume) {
+                activePlayer.volume = 0;
+            } else if (AudioService.sink?.audio) {
+                AudioService.sink.audio.volume = 0;
+            }
+        } else {
+            const restoreVolume = volumeButton.previousVolume > 0 ? volumeButton.previousVolume : 0.5;
+            if (usePlayerVolume) {
+                activePlayer.volume = restoreVolume;
+            } else if (AudioService.sink?.audio) {
+                AudioService.sink.audio.volume = restoreVolume;
+            }
+        }
+    }
+
+    function handleKeyEvent(event) {
+        if (!activePlayer)
+            return false;
+
+        // 1. Number keys 0-9 to seek to 0%-90%
+        if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
+            if (activePlayer.canSeek && stableLength > 0) {
+                const ratio = (event.key - Qt.Key_0) * 0.1;
+                const targetPosition = ratio * stableLength;
+                activePlayer.position = Math.max(0.1, Math.min(targetPosition, stableLength * 0.99));
+                return true;
+            }
+        }
+
+        // 2. Left / Right arrows to seek backward / forward 5s
+        if (event.key === Qt.Key_Left) {
+            if (activePlayer.canSeek) {
+                activePlayer.position = Math.max(0.1, activePlayer.position - 5);
+                return true;
+            }
+        }
+        if (event.key === Qt.Key_Right) {
+            if (activePlayer.canSeek && stableLength > 0) {
+                activePlayer.position = Math.max(0.1, Math.min(stableLength - 1, activePlayer.position + 5));
+                return true;
+            }
+        }
+
+        // 3. Up / Down arrows to adjust volume
+        if (event.key === Qt.Key_Up) {
+            adjustVolume(5);
+            triggerVolumeDropdown();
+            dropdownButtonExited();
+            return true;
+        }
+        if (event.key === Qt.Key_Down) {
+            adjustVolume(-5);
+            triggerVolumeDropdown();
+            dropdownButtonExited();
+            return true;
+        }
+
+        // 4. Spacebar to play/pause
+        if (event.key === Qt.Key_Space) {
+            if (activePlayer.canTogglePlaying) {
+                activePlayer.togglePlaying();
+                return true;
+            }
+        }
+
+        // 5. M key to toggle mute
+        if (event.key === Qt.Key_M) {
+            toggleMute();
+            triggerVolumeDropdown();
+            dropdownButtonExited();
+            return true;
+        }
+
+        return false;
+    }
+
     property bool isSeeking: false
 
     Timer {
@@ -198,14 +291,14 @@ Item {
     Item {
         id: bgContainer
         anchors.fill: parent
-        visible: TrackArtService._bgArtSource !== ""
+        visible: TrackArtService.resolvedArtUrl !== ""
 
         Image {
             id: bgImage
             anchors.centerIn: parent
             width: Math.max(parent.width, parent.height) * 1.1
             height: width
-            source: TrackArtService._bgArtSource
+            source: TrackArtService.resolvedArtUrl
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             cache: true
@@ -331,7 +424,7 @@ Item {
                     }
 
                     StyledText {
-                        text: activePlayer?.trackTitle || I18n.tr("Unknown Artist")
+                        text: activePlayer?.trackArtist || I18n.tr("Unknown Artist")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.8)
                         width: parent.width
@@ -389,7 +482,7 @@ Item {
                                     if (!activePlayer)
                                         return "0:00";
                                     const rawPos = Math.max(0, activePlayer.position || 0);
-                                    const pos = activePlayer.length ? rawPos % Math.max(1, activePlayer.length) : rawPos;
+                                    const pos = stableLength ? rawPos % Math.max(1, stableLength) : rawPos;
                                     const minutes = Math.floor(pos / 60);
                                     const seconds = Math.floor(pos % 60);
                                     const timeStr = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
@@ -403,9 +496,9 @@ Item {
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: {
-                                    if (!activePlayer || !activePlayer.length)
-                                        return "0:00";
-                                    const dur = Math.max(0, activePlayer.length || 0);
+                                    if (!activePlayer || stableLength <= 0)
+                                        return "--:--";
+                                    const dur = stableLength;
                                     const minutes = Math.floor(dur / 60);
                                     const seconds = Math.floor(dur % 60);
                                     return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
@@ -647,7 +740,17 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (playersExpanded) {
-                    hideDropdowns();
+                    if (allPlayers && allPlayers.length > 1) {
+                        let currentIndex = -1;
+                        for (let i = 0; i < allPlayers.length; i++) {
+                            if (allPlayers[i] === activePlayer) {
+                                currentIndex = i;
+                                break;
+                            }
+                        }
+                        const nextIndex = (currentIndex + 1) % allPlayers.length;
+                        MprisController.setActivePlayer(allPlayers[nextIndex]);
+                    }
                     return;
                 }
                 hideDropdowns();
@@ -658,8 +761,22 @@ Item {
                 const screenY = popoutY + contentOffsetY + btnY;
                 showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
             }
-            onEntered: sharedTooltip.show(I18n.tr("Media Players"), playerSelectorButton, 0, 0, isRightEdge ? "right" : "left")
-            onExited: sharedTooltip.hide()
+            onEntered: {
+                dropdownButtonEntered();
+                if (playersExpanded)
+                    return;
+                hideDropdowns();
+                playersExpanded = true;
+                const buttonsOnRight = !isRightEdge;
+                const btnY = playerSelectorButton.y + playerSelectorButton.height / 2;
+                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
+                const screenY = popoutY + contentOffsetY + btnY;
+                showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+            }
+            onExited: {
+                if (playersExpanded)
+                    dropdownButtonExited();
+            }
         }
     }
 
@@ -691,6 +808,7 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onEntered: {
+                dropdownButtonEntered();
                 if (volumeExpanded)
                     return;
                 hideDropdowns();
@@ -703,25 +821,10 @@ Item {
             }
             onExited: {
                 if (volumeExpanded)
-                    volumeButtonExited();
+                    dropdownButtonExited();
             }
             onClicked: {
-                SessionData.suppressOSDTemporarily();
-                if (currentVolume > 0) {
-                    volumeButton.previousVolume = currentVolume;
-                    if (usePlayerVolume) {
-                        activePlayer.volume = 0;
-                    } else if (AudioService.sink?.audio) {
-                        AudioService.sink.audio.volume = 0;
-                    }
-                } else {
-                    const restoreVolume = volumeButton.previousVolume > 0 ? volumeButton.previousVolume : 0.5;
-                    if (usePlayerVolume) {
-                        activePlayer.volume = restoreVolume;
-                    } else if (AudioService.sink?.audio) {
-                        AudioService.sink.audio.volume = restoreVolume;
-                    }
-                }
+                toggleMute();
             }
             onWheel: wheelEvent => {
                 SessionData.suppressOSDTemporarily();
@@ -754,7 +857,7 @@ Item {
 
         DankIcon {
             anchors.centerIn: parent
-            name: devicesExpanded ? "expand_less" : "speaker"
+            name: "speaker"
             size: 18
             color: Theme.surfaceText
         }
@@ -766,7 +869,18 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (devicesExpanded) {
-                    hideDropdowns();
+                    const sinks = AudioService.getAvailableSinks();
+                    if (sinks && sinks.length > 1) {
+                        let currentIndex = -1;
+                        for (let i = 0; i < sinks.length; i++) {
+                            if (sinks[i]?.name === AudioService.sink?.name) {
+                                currentIndex = i;
+                                break;
+                            }
+                        }
+                        const nextIndex = (currentIndex + 1) % sinks.length;
+                        AudioService.setSink(sinks[nextIndex]);
+                    }
                     return;
                 }
                 hideDropdowns();
@@ -777,8 +891,22 @@ Item {
                 const screenY = popoutY + contentOffsetY + btnY;
                 showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
             }
-            onEntered: sharedTooltip.show(I18n.tr("Output Device"), audioDevicesButton, 0, 0, isRightEdge ? "right" : "left")
-            onExited: sharedTooltip.hide()
+            onEntered: {
+                dropdownButtonEntered();
+                if (devicesExpanded)
+                    return;
+                hideDropdowns();
+                devicesExpanded = true;
+                const buttonsOnRight = !isRightEdge;
+                const btnY = audioDevicesButton.y + audioDevicesButton.height / 2;
+                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
+                const screenY = popoutY + contentOffsetY + btnY;
+                showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
+            }
+            onExited: {
+                if (devicesExpanded)
+                    dropdownButtonExited();
+            }
         }
     }
 }

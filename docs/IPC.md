@@ -212,6 +212,52 @@ dms ipc call lock lock
 dms ipc call lock isLocked
 ```
 
+## Target: `sessions`
+
+Logind session enumeration and seat-local session switching. Wraps `loginctl list-sessions` and `loginctl activate`. Only switches between sessions that are *already running* on the current seat — creating a fresh login as another user requires a multi-session greeter setup (greetd-flexiserver / GDM / LightDM) and is out of scope.
+
+### Functions
+
+**`list`**
+- Print every session DMS knows about as tab-separated columns: `sessionId\tusername\tseat\ttty\ttype\tcurrent-marker`
+- Returns: Multi-line string. The current session is marked with `*current*`.
+
+**`refresh`**
+- Re-enumerate sessions in the background (the picker also refreshes itself on open)
+- Returns: `"ok"`
+
+**`open`**
+- Refresh and open the Switch User picker on the focused screen
+- Returns: `"ok"`
+
+**`activate <sessionId>`**
+- Activate a session by its numeric logind ID (the `Id=` field from `loginctl show-session`). Performs a VT switch
+- Parameters: `sessionId` - Numeric session ID
+- Returns: `"ok"` on dispatch, `"ERROR: missing session id"` if blank
+- Note: Failures from `loginctl activate` surface through the `switchFailed` QML signal and a Log warning — the IPC call returns success once the spawn is queued, not after activation completes
+
+**`switchTo <target>`**
+- Switch to another session by username *or* session ID. The first non-current session matching the username wins; if there's no match, the call fails through the same logging path as `activate`
+- Parameters: `target` - Username (e.g. `testuser2`) or numeric session ID
+- Returns: `"ok"` on dispatch, `"ERROR: missing target (username or session id)"` if blank
+
+### Examples
+```bash
+# Inspect what's switchable
+dms ipc call sessions list
+
+# Open the picker (useful for a keybind)
+dms ipc call sessions open
+
+# Jump straight to another logged-in user without the picker
+dms ipc call sessions switchTo testuser2
+
+# Or by session ID, when the user has multiple sessions
+dms ipc call sessions activate 4
+```
+
+The dedicated `dms switch-user [target]` CLI command wraps the same behavior with a friendlier error path (it prints the switchable list when no target matches).
+
 ## Target: `inhibit`
 
 Idle inhibitor control to prevent automatic sleep/lock.

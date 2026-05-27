@@ -50,8 +50,8 @@ PanelWindow {
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     color: "transparent"
 
-    readonly property real toastWidth: shouldBeVisible ? Math.min(900, messageText.implicitWidth + statusIcon.width + Theme.spacingM + (ToastService.hasDetails ? (expandButton.width + closeButton.width + 4) : (ToastService.currentLevel === ToastService.levelError ? closeButton.width + Theme.spacingS : 0)) + Theme.spacingL * 2 + Theme.spacingM * 2) : frozenWidth
-    readonly property real toastHeight: toastContent.height + Theme.spacingL * 2
+    readonly property real toastWidth: shouldBeVisible ? Theme.px(Math.min(900, messageText.implicitWidth + statusIcon.width + Theme.spacingM + (ToastService.hasDetails ? (expandButton.width + closeButton.width + 4) : (ToastService.currentLevel === ToastService.levelError ? closeButton.width + Theme.spacingS : 0)) + Theme.spacingL * 2 + Theme.spacingM * 2), dpr) : frozenWidth
+    readonly property real toastHeight: Theme.px(toastContent.height + Theme.spacingL * 2, dpr)
 
     anchors {
         top: true
@@ -63,8 +63,8 @@ PanelWindow {
         top: Math.max(0, Theme.snap(toastY - shadowBuffer, dpr))
     }
 
-    implicitWidth: toastWidth + (shadowBuffer * 2)
-    implicitHeight: toastHeight + (shadowBuffer * 2)
+    implicitWidth: Theme.px(toastWidth + (shadowBuffer * 2), dpr)
+    implicitHeight: Theme.px(toastHeight + (shadowBuffer * 2), dpr)
 
     Rectangle {
         id: toast

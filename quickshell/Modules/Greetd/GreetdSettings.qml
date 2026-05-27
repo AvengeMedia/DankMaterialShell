@@ -12,16 +12,24 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("GreetdSettings")
 
-    readonly property string configPath: {
-        const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
-        return greetCfgDir + "/settings.json";
+    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
+
+    property string configBaseDir: root._greeterCacheDir
+    readonly property string configPath: root.configBaseDir ? (root.configBaseDir + "/settings.json") : ""
+    readonly property string greeterWallpaperOverridePath: root.configBaseDir ? (root.configBaseDir + "/greeter_wallpaper_override.jpg") : ""
+
+    function setConfigBaseDir(dir) {
+        const next = dir || root._greeterCacheDir;
+        if (configBaseDir === next)
+            return;
+        configBaseDir = next;
+        settingsLoaded = false;
+        settingsFile.reload();
     }
 
-    readonly property string _greeterCacheDir: {
-        const i = root.configPath.lastIndexOf("/");
-        return i >= 0 ? root.configPath.substring(0, i) : "";
+    function resetConfigBaseDir() {
+        setConfigBaseDir(root._greeterCacheDir);
     }
-    readonly property string greeterWallpaperOverridePath: root._greeterCacheDir ? (root._greeterCacheDir + "/greeter_wallpaper_override.jpg") : ""
 
     property string currentThemeName: "purple"
     property bool settingsLoaded: false
