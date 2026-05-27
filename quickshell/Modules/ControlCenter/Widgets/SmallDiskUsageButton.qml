@@ -68,7 +68,7 @@ Rectangle {
         DankIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: "storage"
-            size: Theme.iconSizeSmall
+            size: Theme.iconSizeLarge
             color: {
                 if (root.usagePercent > 90)
                     return Theme.error;
@@ -85,7 +85,7 @@ Rectangle {
             StyledText {
                 visible: root.showMountPath
                 text: root.selectedMount?.mount || root.mountPath
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeLarge
                 color: Theme.surfaceVariantText
                 elide: Text.ElideMiddle
                 width: Math.min(implicitWidth, root.width - Theme.iconSizeSmall - Theme.spacingM)
@@ -94,7 +94,7 @@ Rectangle {
 
             StyledText {
                 text: `${root.usagePercent.toFixed(0)}%`
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeLarge
                 font.weight: Font.Bold
                 color: {
                     if (root.usagePercent > 90)
