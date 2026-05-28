@@ -36,6 +36,8 @@ Rectangle {
 
     signal closed
 
+    signal switchUserRequested
+
     function updateVisibleActions() {
         const allActions = powerMenuActionsOverride !== undefined ? powerMenuActionsOverride : ((typeof SettingsData !== "undefined" && SettingsData.powerMenuActions) ? SettingsData.powerMenuActions : ["logout", "suspend", "hibernate", "reboot", "poweroff"]);
         const hibernateSupported = (typeof SessionService !== "undefined" && SessionService.hibernateSupported) || false;
@@ -128,6 +130,12 @@ Rectangle {
                 "label": I18n.tr("Hibernate"),
                 "key": "H"
             };
+        case "switchuser":
+            return {
+                "icon": "switch_account",
+                "label": I18n.tr("Switch User"),
+                "key": "U"
+            };
         default:
             return {
                 "icon": "help",
@@ -183,6 +191,11 @@ Rectangle {
     function executeAction(action) {
         if (!action)
             return;
+        if (action === "switchuser") {
+            hide();
+            switchUserRequested();
+            return;
+        }
         if (typeof SessionService === "undefined")
             return;
         hide();

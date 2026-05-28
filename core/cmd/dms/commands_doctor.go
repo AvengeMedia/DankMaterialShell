@@ -947,9 +947,12 @@ func checkSystemdServices() []checkResult {
 			message = fmt.Sprintf("%s, %s", dmsState.enabled, dmsState.active)
 		}
 		switch {
+		case dmsState.active == "failed":
+			status = statusError
+		case dmsState.active == "active":
 		case dmsState.enabled == "disabled":
 			status, message = statusWarn, "Disabled"
-		case dmsState.active == "failed" || dmsState.active == "inactive":
+		case dmsState.active == "inactive":
 			status = statusError
 		}
 		results = append(results, checkResult{catServices, "dms.service", status, message, "", doctorDocsURL + "#services"})

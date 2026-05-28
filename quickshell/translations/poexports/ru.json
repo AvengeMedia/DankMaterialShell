@@ -293,6 +293,12 @@
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Современная оболочка рабочего стола для композиторов Wayland"
   },
+  "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": {
+    "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": ""
+  },
+  "A user with that name already exists.": {
+    "A user with that name already exists.": ""
+  },
   "AC Power": {
     "AC Power": "Сеть"
   },
@@ -334,6 +340,12 @@
   },
   "Action failed or terminal was closed.": {
     "Action failed or terminal was closed.": ""
+  },
+  "Action performed when scrolling horizontally on the bar": {
+    "Action performed when scrolling horizontally on the bar": ""
+  },
+  "Action performed when scrolling vertically on the bar": {
+    "Action performed when scrolling vertically on the bar": ""
   },
   "Actions": {
     "Actions": "Действия"
@@ -383,6 +395,12 @@
   "Add": {
     "Add": "Добавить"
   },
+  "Add \"%1\" to the %2 group?": {
+    "Add \"%1\" to the %2 group?": ""
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": ""
+  },
   "Add Bar": {
     "Add Bar": "Добавить бар"
   },
@@ -413,6 +431,15 @@
   "Add by Address": {
     "Add by Address": ""
   },
+  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
+  },
+  "Add the new user to the %1 group so they can use sudo.": {
+    "Add the new user to the %1 group so they can use sudo.": ""
+  },
+  "Adjust the bar height via inner padding": {
+    "Adjust the bar height via inner padding": ""
+  },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Настроить количество столбцов в режиме сетки."
   },
@@ -421,6 +448,9 @@
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
     "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+  },
+  "Administrator group:": {
+    "Administrator group:": ""
   },
   "Advanced": {
     "Advanced": "Дополнительно"
@@ -443,8 +473,20 @@
   "All displays": {
     "All displays": "Все мониторы"
   },
+  "Allow": {
+    "Allow": ""
+  },
   "Allow clicks to pass through the widget": {
     "Allow clicks to pass through the widget": "Разрешить клики проходить сквозь виджет"
+  },
+  "Allow greeter access?": {
+    "Allow greeter access?": ""
+  },
+  "Allow greeter login access": {
+    "Allow greeter login access": ""
+  },
+  "Already on that session": {
+    "Already on that session": ""
   },
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Назад • F1/I: Информация о Файле • F10: Справка • Esc: Закрыть"
@@ -544,6 +586,9 @@
   },
   "Apply compositor blur behind the frame border": {
     "Apply compositor blur behind the frame border": ""
+  },
+  "Apply inverse concave corner cutouts to the bar": {
+    "Apply inverse concave corner cutouts to the bar": ""
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Применить тёплую цветовую температуру для снижения нагрузки на глаза. Используйте настройки автоматизации ниже для управления активацией."
@@ -728,6 +773,9 @@
   "Automatic Cycling": {
     "Automatic Cycling": "Автоматическое Переключение"
   },
+  "Automatically calculate popup gap based on bar spacing": {
+    "Automatically calculate popup gap based on bar spacing": ""
+  },
   "Automatically cycle through wallpapers in the same folder": {
     "Automatically cycle through wallpapers in the same folder": "Автоматическое переключение между обоями в одной папке"
   },
@@ -739,6 +787,9 @@
   },
   "Automatically determine your location using your IP address": {
     "Automatically determine your location using your IP address": "Автоматическое определение вашего местоположения с помощью вашего IP-адреса"
+  },
+  "Automatically hide the bar when the pointer moves away": {
+    "Automatically hide the bar when the pointer moves away": ""
   },
   "Automatically lock after": {
     "Automatically lock after": "Автоматическая блокировка после"
@@ -859,6 +910,12 @@
   },
   "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": {
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "Привязать экран блокировки к DBus-сигналам от loginctl. Отключите при использовании внешнего экрана блокировки"
+  },
+  "Bind the spotlight IPC action in your compositor config.": {
+    "Bind the spotlight IPC action in your compositor config.": ""
+  },
+  "Bind the spotlight-bar IPC action in your compositor config.": {
+    "Bind the spotlight-bar IPC action in your compositor config.": ""
   },
   "Binds Include Missing": {
     "Binds Include Missing": "Binds Include отсутствует"
@@ -1043,6 +1100,9 @@
   "Canceled": {
     "Canceled": "Отменено"
   },
+  "Cannot delete the only administrator": {
+    "Cannot delete the only administrator": ""
+  },
   "Cannot disable the only output": {
     "Cannot disable the only output": ""
   },
@@ -1054,6 +1114,9 @@
   },
   "Cannot pair": {
     "Cannot pair": "Невозможно сопрячь"
+  },
+  "Cannot remove the only administrator": {
+    "Cannot remove the only administrator": ""
   },
   "Capabilities": {
     "Capabilities": "Возможности"
@@ -1111,6 +1174,9 @@
   },
   "Check on startup": {
     "Check on startup": ""
+  },
+  "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": ""
   },
   "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
@@ -1445,6 +1511,9 @@
   "Confirm passkey for ": {
     "Confirm passkey for ": "Подтвердить ключ доступа для "
   },
+  "Confirm password": {
+    "Confirm password": ""
+  },
   "Conflicts with: %1": {
     "Conflicts with: %1": "Конфликтует с: %1"
   },
@@ -1468,6 +1537,9 @@
   },
   "Connected Displays": {
     "Connected Displays": "Подключённые Мониторы"
+  },
+  "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": {
+    "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": ""
   },
   "Connected Options": {
     "Connected Options": ""
@@ -1616,6 +1688,9 @@
   "Create Printer": {
     "Create Printer": "Создать принтер"
   },
+  "Create User": {
+    "Create User": ""
+  },
   "Create Window Rule": {
     "Create Window Rule": "Создать правило окна"
   },
@@ -1645,6 +1720,12 @@
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
     "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": {
+    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": {
+    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": ""
   },
   "Current": {
     "Current": "История"
@@ -1787,6 +1868,9 @@
   "DMS Settings": {
     "DMS Settings": ""
   },
+  "DMS Settings now writes Lua. Edits won't apply until you migrate.": {
+    "DMS Settings now writes Lua. Edits won't apply until you migrate.": ""
+  },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Комбинации клавиш DMS"
   },
@@ -1889,8 +1973,23 @@
   "Default Apps": {
     "Default Apps": ""
   },
+  "Default Launcher": {
+    "Default Launcher": ""
+  },
+  "Default Launcher Shortcut": {
+    "Default Launcher Shortcut": ""
+  },
+  "Default Opens": {
+    "Default Opens": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Ширина по умолчанию (%)"
+  },
+  "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
+    "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": ""
+  },
+  "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": {
+    "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": ""
   },
   "Default selected action": {
     "Default selected action": "Действие по умолчанию"
@@ -1906,6 +2005,9 @@
   },
   "Delete": {
     "Delete": "Удалить"
+  },
+  "Delete \"%1\" and remove the home directory? This cannot be undone.": {
+    "Delete \"%1\" and remove the home directory? This cannot be undone.": ""
   },
   "Delete \"%1\"?": {
     "Delete \"%1\"?": "Удалить \"%1\"?"
@@ -1927,6 +2029,12 @@
   },
   "Delete profile \"%1\"?": {
     "Delete profile \"%1\"?": "Удалить профиль \"%1\"?"
+  },
+  "Delete user": {
+    "Delete user": ""
+  },
+  "Delete user?": {
+    "Delete user?": ""
   },
   "Demi Bold": {
     "Demi Bold": ""
@@ -2198,6 +2306,9 @@
   "Drizzle": {
     "Drizzle": "Морось"
   },
+  "Drop your override for %1 so the DMS default action re-applies?": {
+    "Drop your override for %1 so the DMS default action re-applies?": ""
+  },
   "Duplicate": {
     "Duplicate": "Дублировать"
   },
@@ -2246,8 +2357,14 @@
   "Edit App": {
     "Edit App": "Изменить приложение"
   },
+  "Edit Clipboard": {
+    "Edit Clipboard": ""
+  },
   "Edit Window Rule": {
     "Edit Window Rule": "Изменить правило окна"
+  },
+  "Edit clipboard text": {
+    "Edit clipboard text": ""
   },
   "Education": {
     "Education": "Обучение"
@@ -2461,6 +2578,9 @@
   },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "Смещение Исключительной Зоны"
+  },
+  "Existing Users": {
+    "Existing Users": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "Экспериментальная функция"
@@ -2744,6 +2864,9 @@
   "Failed to update autoconnect": {
     "Failed to update autoconnect": "Не удалось обновить автоподключение"
   },
+  "Failed to update clipboard": {
+    "Failed to update clipboard": ""
+  },
   "Failed to update description": {
     "Failed to update description": "Не удалось обновить описание"
   },
@@ -2815,6 +2938,9 @@
   },
   "Find in note...": {
     "Find in note...": "Поиск по заметке..."
+  },
+  "Fine-tune the space reserved for the bar from the screen edge": {
+    "Fine-tune the space reserved for the bar from the screen edge": ""
   },
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": ""
@@ -2914,6 +3040,9 @@
   },
   "Follow focus": {
     "Follow focus": "Следовать за фокусом"
+  },
+  "Follows the default launcher choice selected above.": {
+    "Follows the default launcher choice selected above.": ""
   },
   "Font": {
     "Font": ""
@@ -3125,6 +3254,21 @@
   "Gradually fade the screen before turning off monitors with a configurable grace period": {
     "Gradually fade the screen before turning off monitors with a configurable grace period": "Постепенно затемнять экран перед выключением мониторов с настраиваемым льготным периодом"
   },
+  "Grant": {
+    "Grant": ""
+  },
+  "Grant admin?": {
+    "Grant admin?": ""
+  },
+  "Grant administrator privileges": {
+    "Grant administrator privileges": ""
+  },
+  "Granted administrator privileges": {
+    "Granted administrator privileges": ""
+  },
+  "Granted greeter login access": {
+    "Granted greeter login access": ""
+  },
   "Graph Time Range": {
     "Graph Time Range": "Временной диапазон графика"
   },
@@ -3148,6 +3292,12 @@
   },
   "Greeter font": {
     "Greeter font": ""
+  },
+  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": ""
+  },
+  "Greeter group:": {
+    "Greeter group:": ""
   },
   "Greeter only — does not affect main clock": {
     "Greeter only — does not affect main clock": ""
@@ -3305,6 +3455,9 @@
   "Hide on Touch": {
     "Hide on Touch": "Скрывать при касании"
   },
+  "Hide the bar when the pointer leaves even if a popout is still open": {
+    "Hide the bar when the pointer leaves even if a popout is still open": ""
+  },
   "Hide the dock when a window is fullscreen": {
     "Hide the dock when a window is fullscreen": ""
   },
@@ -3395,6 +3548,9 @@
   "Hyprland Website": {
     "Hyprland Website": ""
   },
+  "Hyprland config still uses hyprlang": {
+    "Hyprland config still uses hyprlang": ""
+  },
   "I Understand": {
     "I Understand": "Я Понимаю"
   },
@@ -3424,6 +3580,12 @@
   },
   "Icon Theme": {
     "Icon Theme": "Тема Значков"
+  },
+  "Identical alerts show as one popup instead of stacking": {
+    "Identical alerts show as one popup instead of stacking": ""
+  },
+  "Identical alerts stack as separate notification cards": {
+    "Identical alerts stack as separate notification cards": ""
   },
   "Idle": {
     "Idle": "Бездействие"
@@ -3515,6 +3677,9 @@
   "Inhibitable": {
     "Inhibitable": "Блокируемый"
   },
+  "Inner padding applied to each widget": {
+    "Inner padding applied to each widget": ""
+  },
   "Input Devices": {
     "Input Devices": "Устройства Ввода"
   },
@@ -3604,6 +3769,9 @@
   },
   "Invalid password for %1": {
     "Invalid password for %1": ""
+  },
+  "Invalid username": {
+    "Invalid username": ""
   },
   "Invert on mode change": {
     "Invert on mode change": "Инвертировать при смене режима"
@@ -3872,6 +4040,9 @@
   "Log Out": {
     "Log Out": "Выйти"
   },
+  "Log out": {
+    "Log out": ""
+  },
   "Logging in...": {
     "Logging in...": ""
   },
@@ -3905,8 +4076,14 @@
   "Mail": {
     "Mail": ""
   },
+  "Make admin": {
+    "Make admin": ""
+  },
   "Make sure KDE Connect or Valent is running on your other devices": {
     "Make sure KDE Connect or Valent is running on your other devices": "Убедитесь, что KDE Connect или Valent запущены на других устройствах"
+  },
+  "Make the bar background fully transparent": {
+    "Make the bar background fully transparent": ""
   },
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "Управление и настройка дополнений для расширения функционала DMS"
@@ -3949,6 +4126,9 @@
   },
   "Manual Show/Hide": {
     "Manual Show/Hide": "Ручное Отображение/Скрытие"
+  },
+  "Manual config": {
+    "Manual config": ""
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "Сопоставить имена классов окон с именами значков для правильного отображения значков"
@@ -4238,6 +4418,9 @@
   "Mount Points": {
     "Mount Points": "Точки монтирования"
   },
+  "Mouse clicks pass through the bar to windows behind it": {
+    "Mouse clicks pass through the bar to windows behind it": ""
+  },
   "Mouse pointer appearance": {
     "Mouse pointer appearance": "Внешний вид указателя мыши"
   },
@@ -4475,6 +4658,9 @@
   "No active %1 sessions": {
     "No active %1 sessions": ""
   },
+  "No active session found for %1": {
+    "No active session found for %1": ""
+  },
   "No adapter": {
     "No adapter": "Выкл"
   },
@@ -4547,6 +4733,9 @@
   "No hidden apps.": {
     "No hidden apps.": "Нет скрытых приложений."
   },
+  "No human user accounts found.": {
+    "No human user accounts found.": ""
+  },
   "No info items": {
     "No info items": "Нет предупреждений"
   },
@@ -4585,6 +4774,9 @@
   },
   "No mount points found": {
     "No mount points found": "Точки монтирования не найдены"
+  },
+  "No other active sessions on this seat": {
+    "No other active sessions on this seat": ""
   },
   "No output device": {
     "No output device": "Выбрать устройство"
@@ -4631,6 +4823,9 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": "Сохранённые записи буфера обмена отсутствуют"
   },
+  "No session selected": {
+    "No session selected": ""
+  },
   "No sessions found": {
     "No sessions found": ""
   },
@@ -4651,6 +4846,9 @@
   },
   "No trigger": {
     "No trigger": "Нет триггера"
+  },
+  "No user specified": {
+    "No user specified": ""
   },
   "No video found in folder": {
     "No video found in folder": ""
@@ -4708,6 +4906,9 @@
   },
   "Not available — install or configure pam_u2f.": {
     "Not available — install or configure pam_u2f.": ""
+  },
+  "Not bound": {
+    "Not bound": ""
   },
   "Not connected": {
     "Not connected": "Не подключено"
@@ -4838,6 +5039,12 @@
   "Opacity": {
     "Opacity": "Непрозрачность"
   },
+  "Opacity of the bar background": {
+    "Opacity of the bar background": ""
+  },
+  "Opacity of widget backgrounds": {
+    "Opacity of widget backgrounds": ""
+  },
   "Opaque": {
     "Opaque": "Непрозрачный"
   },
@@ -4901,8 +5108,14 @@
   "Opening terminal: ": {
     "Opening terminal: ": ""
   },
+  "Opens a picker of other active sessions on this seat": {
+    "Opens a picker of other active sessions on this seat": ""
+  },
   "Opens image files": {
     "Opens image files": ""
+  },
+  "Opens the connected launcher in Connected Frame Mode.": {
+    "Opens the connected launcher in Connected Frame Mode.": ""
   },
   "Optional description": {
     "Optional description": "Необязательное описание"
@@ -4978,6 +5191,9 @@
   },
   "Override the global shadow with per-bar settings": {
     "Override the global shadow with per-bar settings": ""
+  },
+  "Override the popup gap size when auto is disabled": {
+    "Override the popup gap size when auto is disabled": ""
   },
   "Overrides": {
     "Overrides": "Переопределения"
@@ -5063,8 +5279,23 @@
   "Password": {
     "Password": "Пароль"
   },
+  "Password cannot be empty": {
+    "Password cannot be empty": ""
+  },
+  "Password change failed (exit %1)": {
+    "Password change failed (exit %1)": ""
+  },
+  "Password set": {
+    "Password set": ""
+  },
+  "Password updated": {
+    "Password updated": ""
+  },
   "Password...": {
     "Password...": ""
+  },
+  "Passwords do not match.": {
+    "Passwords do not match.": ""
   },
   "Paste": {
     "Paste": "Вставить"
@@ -5171,6 +5402,12 @@
   "Place plugins in %1": {
     "Place plugins in %1": "Поместите плагины в %1"
   },
+  "Place the bar on the Wayland overlay layer": {
+    "Place the bar on the Wayland overlay layer": ""
+  },
+  "Place the dock on the Wayland overlay layer": {
+    "Place the dock on the Wayland overlay layer": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
   },
@@ -5248,6 +5485,9 @@
   },
   "Pointer": {
     "Pointer": "Указатель"
+  },
+  "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
+    "Polkit integration is disabled. User management requires Polkit to elevate privileges.": ""
   },
   "Popout Shadows": {
     "Popout Shadows": ""
@@ -5516,6 +5756,9 @@
   "Rate": {
     "Rate": "Частота"
   },
+  "Re-enter password": {
+    "Re-enter password": ""
+  },
   "Read:": {
     "Read:": "Прочитано:"
   },
@@ -5543,6 +5786,9 @@
   "Refresh Weather": {
     "Refresh Weather": "Обновить погоду"
   },
+  "Refreshing…": {
+    "Refreshing…": ""
+  },
   "Regex": {
     "Regex": "Регулярное выражение"
   },
@@ -5567,6 +5813,9 @@
   "Remaining / Total": {
     "Remaining / Total": ""
   },
+  "Remember Last Mode": {
+    "Remember Last Mode": ""
+  },
   "Remember Last Query": {
     "Remember Last Query": ""
   },
@@ -5579,11 +5828,47 @@
   "Remove": {
     "Remove": "Удалить"
   },
+  "Remove \"%1\" from the %2 group?": {
+    "Remove \"%1\" from the %2 group?": ""
+  },
+  "Remove Shortcut?": {
+    "Remove Shortcut?": ""
+  },
   "Remove Widget Padding": {
     "Remove Widget Padding": "Убрать отступ виджета"
   },
+  "Remove admin": {
+    "Remove admin": ""
+  },
+  "Remove admin?": {
+    "Remove admin?": ""
+  },
+  "Remove corner rounding from the bar": {
+    "Remove corner rounding from the bar": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Убрать отступы и границу когда окна развёрнуты"
+  },
+  "Remove greeter access?": {
+    "Remove greeter access?": ""
+  },
+  "Remove greeter login access": {
+    "Remove greeter login access": ""
+  },
+  "Remove inner padding from all widgets": {
+    "Remove inner padding from all widgets": ""
+  },
+  "Remove the shortcut %1?": {
+    "Remove the shortcut %1?": ""
+  },
+  "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
+    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": ""
+  },
+  "Removed administrator privileges": {
+    "Removed administrator privileges": ""
+  },
+  "Removed greeter login access": {
+    "Removed greeter login access": ""
   },
   "Rename": {
     "Rename": "Переименовать"
@@ -5642,6 +5927,12 @@
   "Reset Size": {
     "Reset Size": "Сбросить размер"
   },
+  "Reset to Default?": {
+    "Reset to Default?": ""
+  },
+  "Reset to default": {
+    "Reset to default": ""
+  },
   "Reset to default name": {
     "Reset to default name": "Сбросить к имени по умолчанию"
   },
@@ -5665,6 +5956,9 @@
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": ""
+  },
+  "Restore the last selected mode (tab) when the launcher is opened": {
+    "Restore the last selected mode (tab) when the launcher is opened": ""
   },
   "Resume": {
     "Resume": "Продолжить"
@@ -5779,6 +6073,12 @@
   },
   "Save QR Code": {
     "Save QR Code": "Сохранить QR-код"
+  },
+  "Save and close": {
+    "Save and close": ""
+  },
+  "Save and paste": {
+    "Save and paste": ""
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Сохранить и переключаться между конфигурациями дисплеев"
@@ -5987,6 +6287,9 @@
   "Select a window...": {
     "Select a window...": "Выбрать окно..."
   },
+  "Select an active session to switch to. The current session stays running in the background.": {
+    "Select an active session to switch to. The current session stays running in the background.": ""
+  },
   "Select an image file...": {
     "Select an image file...": "Выбрать изображение..."
   },
@@ -6025,6 +6328,9 @@
   },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Выбрать алгоритм палитры, используемый для цветов на основе обоев"
+  },
+  "Select user...": {
+    "Select user...": ""
   },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Выбрать, какие источники комбинаций клавиш включать"
@@ -6083,6 +6389,9 @@
   "Set different wallpapers for light and dark mode": {
     "Set different wallpapers for light and dark mode": "Установить разные обои для светлого и тёмного режима"
   },
+  "Set initial password": {
+    "Set initial password": ""
+  },
   "Set key and action to save": {
     "Set key and action to save": "Установить клавишу и действие для сохранения"
   },
@@ -6115,6 +6424,9 @@
   },
   "Shadow Override": {
     "Shadow Override": ""
+  },
+  "Shadow blur radius in pixels": {
+    "Shadow blur radius in pixels": ""
   },
   "Shadow elevation on bars and panels": {
     "Shadow elevation on bars and panels": ""
@@ -6181,6 +6493,9 @@
   },
   "Show All Tags": {
     "Show All Tags": "Показать все тэги"
+  },
+  "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": {
+    "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": ""
   },
   "Show Badge": {
     "Show Badge": "Показать значок"
@@ -6260,6 +6575,9 @@
   "Show Memory in GB": {
     "Show Memory in GB": ""
   },
+  "Show Mode Chips": {
+    "Show Mode Chips": ""
+  },
   "Show Network": {
     "Show Network": "Показать сеть"
   },
@@ -6310,6 +6628,9 @@
   },
   "Show Swap": {
     "Show Swap": ""
+  },
+  "Show Switch User": {
+    "Show Switch User": ""
   },
   "Show System Date": {
     "Show System Date": "Показать системную дату"
@@ -6431,6 +6752,12 @@
   "Show seconds": {
     "Show seconds": ""
   },
+  "Show the bar only when no windows are open": {
+    "Show the bar only when no windows are open": ""
+  },
+  "Show the bar when niri overview is active": {
+    "Show the bar when niri overview is active": ""
+  },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Показывать информацию о погоде в верхней панели и центре управления"
   },
@@ -6530,6 +6857,9 @@
   "Sounds": {
     "Sounds": "Звуки"
   },
+  "Space between the bar and screen edges": {
+    "Space between the bar and screen edges": ""
+  },
   "Space between windows": {
     "Space between windows": "Расстояние между окнами"
   },
@@ -6556,6 +6886,12 @@
   },
   "Spotlight": {
     "Spotlight": ""
+  },
+  "Spotlight Bar": {
+    "Spotlight Bar": ""
+  },
+  "Spotlight Bar Shortcut": {
+    "Spotlight Bar Shortcut": ""
   },
   "Spotlight Search": {
     "Spotlight Search": ""
@@ -6602,6 +6938,12 @@
   "Stretch": {
     "Stretch": "Плитка вертикально"
   },
+  "Stretch widget icons to fill the available bar height": {
+    "Stretch widget icons to fill the available bar height": ""
+  },
+  "Stretch widget text to fill the available bar height": {
+    "Stretch widget text to fill the available bar height": ""
+  },
   "Strict auto-hide": {
     "Strict auto-hide": ""
   },
@@ -6619,6 +6961,9 @@
   },
   "Sunset": {
     "Sunset": "Закат"
+  },
+  "Suppress Duplicate Notifications": {
+    "Suppress Duplicate Notifications": ""
   },
   "Suppress notification popups while enabled": {
     "Suppress notification popups while enabled": "Подавить всплывающие уведомления, пока включено"
@@ -6842,6 +7187,12 @@
   "Theme Registry": {
     "Theme Registry": "Реестр тем"
   },
+  "Theme color used for the border": {
+    "Theme color used for the border": ""
+  },
+  "Theme color used for the widget outline": {
+    "Theme color used for the widget outline": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": ""
   },
@@ -6929,6 +7280,9 @@
   "Time remaining: %1": {
     "Time remaining: %1": "Осталось времени: %1"
   },
+  "Time to wait before hiding after the pointer leaves": {
+    "Time to wait before hiding after the pointer leaves": ""
+  },
   "Time until full: %1": {
     "Time until full: %1": "Времени до полной зарядки: %1"
   },
@@ -6959,6 +7313,9 @@
   "To Full": {
     "To Full": "До полной"
   },
+  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
+    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": ""
+  },
   "To update, run the following command:": {
     "To update, run the following command:": "Для обновления, запустите следующую команду:"
   },
@@ -6970,6 +7327,9 @@
   },
   "Today": {
     "Today": "Сегодня"
+  },
+  "Toggle bar visibility manually via IPC": {
+    "Toggle bar visibility manually via IPC": ""
   },
   "Toggle fonts": {
     "Toggle fonts": ""
@@ -7042,6 +7402,15 @@
   },
   "Transparency": {
     "Transparency": "Прозрачность"
+  },
+  "Transparency of the border": {
+    "Transparency of the border": ""
+  },
+  "Transparency of the shadow layer": {
+    "Transparency of the shadow layer": ""
+  },
+  "Transparency of the widget outline": {
+    "Transparency of the widget outline": ""
   },
   "Trash": {
     "Trash": ""
@@ -7283,6 +7652,9 @@
   "Use Monospace Font": {
     "Use Monospace Font": "Использовать моноширинный шрифт"
   },
+  "Use Overlay Layer": {
+    "Use Overlay Layer": ""
+  },
   "Use Spotlight Launcher": {
     "Use Spotlight Launcher": ""
   },
@@ -7291,6 +7663,9 @@
   },
   "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
     "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": ""
+  },
+  "Use a custom radius for goth corner cutouts": {
+    "Use a custom radius for goth corner cutouts": ""
   },
   "Use a fixed shadow direction for this bar": {
     "Use a fixed shadow direction for this bar": ""
@@ -7349,6 +7724,9 @@
   "Use the extended surface for launcher content": {
     "Use the extended surface for launcher content": ""
   },
+  "Use the overlay layer when opening the launcher": {
+    "Use the overlay layer when opening the launcher": ""
+  },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Использовать одинаковую позицию и размер на всех дисплеях"
   },
@@ -7364,17 +7742,47 @@
   "User": {
     "User": "Пользователь"
   },
+  "User already exists": {
+    "User already exists": ""
+  },
+  "User created": {
+    "User created": ""
+  },
+  "User created with administrator and greeter login access": {
+    "User created with administrator and greeter login access": ""
+  },
+  "User created with administrator privileges": {
+    "User created with administrator privileges": ""
+  },
+  "User created with greeter login access": {
+    "User created with greeter login access": ""
+  },
+  "User deleted": {
+    "User deleted": ""
+  },
+  "User not found": {
+    "User not found": ""
+  },
   "Username": {
     "Username": "Имя пользователя"
   },
+  "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
+    "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": ""
+  },
   "Username...": {
     "Username...": ""
+  },
+  "Users": {
+    "Users": ""
   },
   "Uses sunrise/sunset times based on your location.": {
     "Uses sunrise/sunset times based on your location.": "Использует время восхода/заката солнца на основе вашего местоположения."
   },
   "Uses sunrise/sunset times to automatically adjust night mode based on your location.": {
     "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "Использует время восхода/заката солнца для автоматической настройки ночного режима на основе вашего местоположения."
+  },
+  "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
+    "Uses the spotlight-bar IPC action and always opens the minimal bar.": ""
   },
   "Using global monospace font from Settings → Personalization": {
     "Using global monospace font from Settings → Personalization": ""
@@ -7619,6 +8027,12 @@
   "Width": {
     "Width": "Ширина"
   },
+  "Width of the border in pixels": {
+    "Width of the border in pixels": ""
+  },
+  "Width of the widget outline in pixels": {
+    "Width of the widget outline in pixels": ""
+  },
   "Width of window border (borderpx)": {
     "Width of window border (borderpx)": "Ширина границы окна (borderpx)"
   },
@@ -7666,6 +8080,9 @@
   },
   "Wipe": {
     "Wipe": "Стирание"
+  },
+  "Working…": {
+    "Working…": ""
   },
   "Workspace": {
     "Workspace": "Рабочее пространство"
@@ -7736,6 +8153,9 @@
   "actions": {
     "actions": "действия"
   },
+  "admin": {
+    "admin": ""
+  },
   "attached": {
     "attached": ""
   },
@@ -7772,6 +8192,9 @@
   "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": {
     "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": "dms/outputs config существует, но не включён в ваш конфиг композитора. Изменения дисплеев не сохранятся."
   },
+  "e.g. alice": {
+    "e.g. alice": ""
+  },
   "e.g., firefox, kitty --title foo": {
     "e.g., firefox, kitty --title foo": "например, firefox, kitty --title foo"
   },
@@ -7793,11 +8216,17 @@
   "featured": {
     "featured": "избранное"
   },
+  "greeter": {
+    "greeter": ""
+  },
   "last seen %1": {
     "last seen %1": ""
   },
   "leave empty for default": {
     "leave empty for default": "оставьте пустым для значения по умолчанию"
+  },
+  "loginctl activate failed (exit %1)": {
+    "loginctl activate failed (exit %1)": ""
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl недоступен — интеграция блокировки требует подключения к сокету DMS"
@@ -7886,8 +8315,14 @@
   "relay: %1": {
     "relay: %1": ""
   },
+  "remote": {
+    "remote": ""
+  },
   "seconds": {
     "seconds": "секунд"
+  },
+  "session %1": {
+    "session %1": ""
   },
   "source": {
     "source": "исходный"
@@ -7903,6 +8338,15 @@
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "обновите dms для NM интеграции."
+  },
+  "useradd failed (exit %1)": {
+    "useradd failed (exit %1)": ""
+  },
+  "userdel failed (exit %1)": {
+    "userdel failed (exit %1)": ""
+  },
+  "usermod failed (exit %1)": {
+    "usermod failed (exit %1)": ""
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 от %2"
@@ -7952,8 +8396,14 @@
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
     "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Навигация • Пробел: Развернуть • Enter: Действие/Развернуть • E: Текст"
   },
+  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
+    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": ""
+  },
   "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": {
     "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": ""
+  },
+  "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
+    "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": ""
   },
   "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": {
     "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: Навигация • Enter: Вставить • Del: Удалить • F10: Справка"

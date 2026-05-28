@@ -81,6 +81,8 @@ DankModal {
         executeAction(action);
     }
 
+    signal switchUserRequested
+
     function executeAction(action) {
         if (action === "lock") {
             close();
@@ -90,6 +92,11 @@ DankModal {
         if (action === "restart") {
             close();
             Quickshell.execDetached(["dms", "restart"]);
+            return;
+        }
+        if (action === "switchuser") {
+            close();
+            switchUserRequested();
             return;
         }
         close();
@@ -215,6 +222,12 @@ DankModal {
                 "icon": "refresh",
                 "label": I18n.tr("Restart DMS"),
                 "key": "D"
+            };
+        case "switchuser":
+            return {
+                "icon": "switch_account",
+                "label": I18n.tr("Switch User"),
+                "key": "U"
             };
         default:
             return {

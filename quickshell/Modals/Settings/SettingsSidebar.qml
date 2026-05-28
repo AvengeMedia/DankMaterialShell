@@ -294,6 +294,12 @@ Rectangle {
                     "updaterOnly": true
                 },
                 {
+                    "id": "users",
+                    "text": I18n.tr("Users"),
+                    "icon": "manage_accounts",
+                    "tabIndex": 35
+                },
+                {
                     "id": "window_rules",
                     "text": I18n.tr("Window Rules"),
                     "icon": "select_window",

@@ -9,6 +9,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import qs.Common
+import qs.Modals
 import qs.Services
 import qs.Widgets
 
@@ -1728,5 +1729,12 @@ Item {
                 Qt.callLater(() => passwordField.forceActiveFocus());
             }
         }
+        onSwitchUserRequested: {
+            switchUserPicker.showFromLockScreen();
+        }
+    }
+
+    SwitchUserModal {
+        id: switchUserPicker
     }
 }

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"strings"
 	"time"
@@ -572,6 +573,7 @@ func EnsureGreeterCacheDir(logFunc func(string), sudoPassword string) error {
 	}
 
 	runtimeDirs := []string{
+		filepath.Join(cacheDir, "users"),
 		filepath.Join(cacheDir, ".local"),
 		filepath.Join(cacheDir, ".local", "state"),
 		filepath.Join(cacheDir, ".local", "share"),
@@ -1253,6 +1255,16 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 
 	if err := syncGreeterWallpaperOverride(cacheDir, logFunc, sudoPassword, state); err != nil {
 		return fmt.Errorf("greeter wallpaper override sync failed: %w", err)
+	}
+
+	currentUser, err := user.Current()
+	if err != nil {
+		return fmt.Errorf("failed to resolve syncing user for per-user greeter cache: %w", err)
+	}
+	if err := syncUserGreeterCacheSlot(homeDir, cacheDir, currentUser.Username, state, logFunc, userSlotSyncOpts{
+		sudoPassword: sudoPassword,
+	}); err != nil {
+		return fmt.Errorf("per-user greeter cache sync failed: %w", err)
 	}
 
 	if strings.ToLower(compositor) != "niri" {

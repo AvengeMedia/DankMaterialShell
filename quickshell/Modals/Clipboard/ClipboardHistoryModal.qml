@@ -17,61 +17,28 @@ DankModal {
         active: clipboardHistoryModal.useHyprlandFocusGrab && clipboardHistoryModal.shouldHaveFocus
     }
 
-    property string activeTab: "recents"
-    onActiveTabChanged: {
-        ClipboardService.selectedIndex = 0;
-        ClipboardService.keyboardNavigationActive = false;
-    }
-    property bool showKeyboardHints: false
-    property Component clipboardContent
-    property int activeImageLoads: 0
-    readonly property int maxConcurrentLoads: 3
-
-    readonly property bool clipboardAvailable: ClipboardService.clipboardAvailable
-    readonly property bool wtypeAvailable: ClipboardService.wtypeAvailable
-    readonly property int totalCount: ClipboardService.totalCount
-    readonly property var clipboardEntries: ClipboardService.clipboardEntries
-    readonly property var pinnedEntries: ClipboardService.pinnedEntries
-    readonly property int pinnedCount: ClipboardService.pinnedCount
-    readonly property var unpinnedEntries: ClipboardService.unpinnedEntries
-    readonly property int selectedIndex: ClipboardService.selectedIndex
-    readonly property bool keyboardNavigationActive: ClipboardService.keyboardNavigationActive
-    property string searchText: ClipboardService.searchText
-    onSearchTextChanged: ClipboardService.searchText = searchText
-
-    Ref {
-        service: ClipboardService
-    }
-
-    function updateFilteredModel() {
-        ClipboardService.updateFilteredModel();
-    }
-
-    function pasteSelected() {
-        ClipboardService.pasteSelected(instantClose);
-    }
-
     function toggle() {
         if (shouldBeVisible) {
             hide();
-        } else {
-            show();
+            return;
         }
+        show();
     }
 
     function show() {
         open();
-        activeImageLoads = 0;
         shouldHaveFocus = true;
-        ClipboardService.reset();
-        keyboardController.reset();
 
         Qt.callLater(function () {
-            if (clipboardAvailable) {
+            if (contentLoader.item) {
+                contentLoader.item.resetState();
+            }
+            if (clipboardHistoryModal.clipboardAvailable) {
                 if (Theme.isConnectedEffect) {
                     Qt.callLater(() => {
-                        if (clipboardHistoryModal.shouldBeVisible)
+                        if (clipboardHistoryModal.shouldBeVisible) {
                             ClipboardService.refresh();
+                        }
                     });
                 } else {
                     ClipboardService.refresh();
@@ -89,46 +56,12 @@ DankModal {
     }
 
     onDialogClosed: {
-        activeImageLoads = 0;
-        ClipboardService.reset();
-        keyboardController.reset();
+        if (contentLoader.item) {
+            contentLoader.item.resetState();
+        }
     }
 
-    function refreshClipboard() {
-        ClipboardService.refresh();
-    }
-
-    function copyEntry(entry) {
-        ClipboardService.copyEntry(entry, hide);
-    }
-
-    function deleteEntry(entry) {
-        ClipboardService.deleteEntry(entry);
-    }
-
-    function deletePinnedEntry(entry) {
-        ClipboardService.deletePinnedEntry(entry, clearConfirmDialog);
-    }
-
-    function pinEntry(entry) {
-        ClipboardService.pinEntry(entry);
-    }
-
-    function unpinEntry(entry) {
-        ClipboardService.unpinEntry(entry);
-    }
-
-    function clearAll() {
-        ClipboardService.clearAll();
-    }
-
-    function getEntryPreview(entry) {
-        return ClipboardService.getEntryPreview(entry);
-    }
-
-    function getEntryType(entry) {
-        return ClipboardService.getEntryType(entry);
-    }
+    readonly property bool clipboardAvailable: ClipboardService.clipboardAvailable
 
     visible: false
     modalWidth: ClipboardConstants.modalWidth
@@ -138,15 +71,11 @@ DankModal {
     borderColor: Theme.outlineMedium
     borderWidth: 1
     enableShadow: true
+    closeOnEscapeKey: (contentLoader.item?.mode ?? "history") !== "editor"
     onBackgroundClicked: hide()
-    modalFocusScope.Keys.onPressed: function (event) {
-        keyboardController.handleKey(event);
-    }
-    content: clipboardContent
 
-    ClipboardKeyboardController {
-        id: keyboardController
-        modal: clipboardHistoryModal
+    Ref {
+        service: ClipboardService
     }
 
     ConfirmModal {
@@ -171,12 +100,11 @@ DankModal {
         }
     }
 
-    property var confirmDialog: clearConfirmDialog
-
-    clipboardContent: Component {
-        ClipboardContent {
-            modal: clipboardHistoryModal
-            clearConfirmDialog: clipboardHistoryModal.confirmDialog
+    content: Component {
+        ClipboardHistoryContent {
+            clearConfirmDialog: clearConfirmDialog
+            onCloseRequested: clipboardHistoryModal.hide()
+            onInstantCloseRequested: clipboardHistoryModal.instantClose()
         }
     }
 }
