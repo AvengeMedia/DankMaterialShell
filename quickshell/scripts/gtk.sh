@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
 CONFIG_DIR="$1"
+# apply: setup symlinks and config dirs
+# include: refresh overrides in adw-gtk3
+MODE="${2:-apply}"
+IS_LIGHT="${3:-light}"
 
 if [ -z "$CONFIG_DIR" ]; then
-    echo "Usage: $0 <config_dir> [is_light] [shell_dir]" >&2
-    exit 1
+	echo "Usage: $0 <config_dir> [apply|include] [is_light] [shell_dir]" >&2
+	exit 1
 fi
 
 get_adw_gtk3_dir() {
@@ -28,41 +32,95 @@ get_adw_gtk3_dir() {
 	echo "$target"
 }
 
+do_include() {
+	local theme_dir="$1"
+	local variant="$2"
+	local css_variant=""
+	[ "$variant" = "dark" ] && css_variant="-${variant}"
+	if sed -i.backup '/\/\* BEGIN DMS OVERRIDE \*\//,/\/\* END DMS OVERRIDE \*\//d' "${theme_dir}/gtk${css_variant}.css" && cat "${gtk3_dir}/dank-colors.css" >>"${theme_dir}/gtk${css_variant}.css"; then
+		echo "GTK3 colors successfully included in adw-gtk3 $variant in '$theme_dir/gtk${css_variant}.css'"
+	else
+		echo "Error: failed to apply colors override to adw-gtk3 $variant in '$theme_dir/gtk${css_variant}.css'"
+		exit 1
+	fi
+}
+
+include_gtk3_colors() {
+	local config_dir="$1"
+	local is_light="$2"
+
+	# Include generated colors for current variant
+	local gtk3_dir="$config_dir/gtk-3.0"
+	local variant="light"
+	[ "$is_light" = "false" ] && variant="dark"
+	local adw_gtk3_dir && adw_gtk3_dir=$(get_adw_gtk3_dir "$variant")
+
+	if [ -z "$adw_gtk3_dir" ]; then
+		echo "Warning: No version of adw-gtk3 ${variant} was found" >&2
+		exit 1
+	fi
+
+	if [[ "$adw_gtk3_dir" =~ ^/usr ]]; then
+		echo "Warning: No user version of adw-gtk3 ${variant} was found." >&2
+		exit 1
+	fi
+
+	if [ ! -f "${gtk3_dir}/dank-colors.css" ]; then
+		echo "Error: GTK3 dank-colors.css not found at '${gtk3_dir}'" >&2
+		echo "Run matugen first to generate theme files" >&2
+		exit 1
+	fi
+
+	# NOTE : for adw-gtk3-dark gtk.css and gtk-dark.css are the same file
+	if [ "$variant" = "dark" ]; then
+		do_include "$adw_gtk3_dir" "dark"
+		do_include "$adw_gtk3_dir" "light"
+		do_include "$(get_adw_gtk3_dir "light")" "dark"
+	else
+		do_include "$adw_gtk3_dir" "light"
+	fi
+}
+
 apply_gtk3_colors() {
 	local config_dir="$1"
 
-	# Make sure there's no global override
-	local gtk3_dir_cfg="$config_dir/gtk-3.0"
-	local gtk3_override="$gtk3_dir_cfg/gtk.css"
-	if [ -L "$gtk3_override" ]; then
-		rm "$gtk3_override"
-	elif [ -f "$gtk3_override" ]; then
-		mv "$gtk3_override" "$gtk3_override.backup"
-		echo "Backed up and removed global theme override for gtk3."
-	fi
+	local gtk3_dir="$config_dir/gtk-3.0"
+	local gtk3_override="$gtk3_dir/gtk.css"
+	# If no adw-gtk3 or only system wide, use global override
+	local adw_gtk3 && adw_gtk3="$(get_adw_gtk3_dir)"
+	if [[ "$adw_gtk3" =~ ^/usr ]] || [[ -z "$adw_gtk3" ]]; then
+		echo "Warning: No user version of adw-gtk3 found" >&2
+		echo "Falling back on global css override" >&2
+		local dank_colors="$gtk3_dir/dank-colors.css"
 
-	# Include generated colors for each variant
-	# (fail on first miss)
-	for variant in light dark; do
-		local adw_gtk3_dir
-		adw_gtk3_dir=$(get_adw_gtk3_dir "$variant")
-
-		if [ -z "$adw_gtk3_dir" ]; then
-			echo "Error: No version of adw-gtk3 ${variant} was found" >&2
-			exit 1
-		fi
-
-		if [ ! -f "${gtk3_dir_cfg}/dank-${variant}-colors.css" ]; then
-			echo "Error: GTK3 dank-${variant}-colors.css not found at '${gtk3_dir_cfg}'" >&2
+		if [ ! -f "$dank_colors" ]; then
+			echo "Error: dank-colors.css not found at $dank_colors" >&2
 			echo "Run matugen first to generate theme files" >&2
 			exit 1
 		fi
 
-		if sed -i.backup '/\/\* BEGIN DMS OVERRIDE \*\//,/\/\* END DMS OVERRIDE \*\//d' "${adw_gtk3_dir}/gtk.css" && cat "${gtk3_dir_cfg}/dank-${variant}-colors.css" >>"${adw_gtk3_dir}/gtk.css"; then
-			echo "GTK3 colors successfully applied to adw-gtk3 $variant in '$adw_gtk3_dir/gtk.css'"
+		if [ -L "$gtk3_override" ]; then
+			rm "$gtk3_override"
+		elif [ -f "$gtk3_override" ]; then
+			mv "$gtk3_override" "$gtk3_override.backup.$(date +%s)"
+			echo "Backed up existing gtk.css"
 		fi
 
-	done
+		ln -s "dank-colors.css" "$gtk3_override"
+		echo "Created symlink: $gtk3_override -> dank-colors.css"
+
+		link_gtk3_assets "$gtk3_dir"
+
+		return
+	fi
+
+	# Else ensure there's no global override
+	if [ -L "$gtk3_override" ]; then
+		rm "$gtk3_override"
+	elif [ -f "$gtk3_override" ]; then
+		echo "Backed up and removed existing gtk.css"
+		mv "$gtk3_override" "$gtk3_override.backup"
+	fi
 }
 
 apply_gtk4_colors() {
@@ -92,9 +150,17 @@ apply_gtk4_colors() {
 	echo "Updated GTK4 CSS import"
 }
 
-mkdir -p "$CONFIG_DIR/gtk-3.0" "$CONFIG_DIR/gtk-4.0"
+case "$MODE" in
+	include)
+		include_gtk3_colors "$CONFIG_DIR" "$IS_LIGHT"
+		echo "GTK3 colors included successfully"
+		;;
+	apply | *)
+		mkdir -p "$CONFIG_DIR/gtk-3.0" "$CONFIG_DIR/gtk-4.0"
 
-apply_gtk3_colors "$CONFIG_DIR"
-apply_gtk4_colors "$CONFIG_DIR"
+		apply_gtk3_colors "$CONFIG_DIR"
+		apply_gtk4_colors "$CONFIG_DIR"
 
-echo "GTK colors applied successfully"
+		echo "GTK colors applied successfully"
+		;;
+esac
