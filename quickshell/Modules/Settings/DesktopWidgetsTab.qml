@@ -231,6 +231,8 @@ Item {
                                     DankActionButton {
                                         id: deleteGroupBtn
                                         iconName: "delete"
+                                        backgroundColor: Theme.withAlpha(Theme.error, 0.15)
+                                        iconColor: Theme.error
                                         anchors.verticalCenter: parent.verticalCenter
                                         onClicked: {
                                             SettingsData.removeDesktopWidgetGroup(groupItem.modelData.id);
@@ -242,6 +244,7 @@ Item {
                                 MouseArea {
                                     id: groupMouseArea
                                     anchors.fill: parent
+                                    z: -1
                                     hoverEnabled: true
                                     onDoubleClicked: root.editingGroupId = groupItem.modelData.id
                                 }
