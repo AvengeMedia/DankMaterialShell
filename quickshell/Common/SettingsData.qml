@@ -1384,6 +1384,7 @@ Singleton {
             _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
             _hasLoaded = true;
             applyStoredTheme();
+            applyStoredIconTheme();
             updateCompositorCursor();
             Processes.detectQtTools();
 
@@ -1394,6 +1395,7 @@ Singleton {
             log.error("Failed to parse settings.json - file will not be overwritten. Error:", msg);
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse settings.json"), msg));
             applyStoredTheme();
+            applyStoredIconTheme();
         } finally {
             _loading = false;
         }
@@ -3152,6 +3154,7 @@ Singleton {
                 _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
                 _hasLoaded = true;
                 applyStoredTheme();
+                applyStoredIconTheme();
                 updateCompositorCursor();
             } catch (e) {
                 _parseError = true;
@@ -3165,6 +3168,7 @@ Singleton {
         onLoadFailed: error => {
             if (!isGreeterMode) {
                 applyStoredTheme();
+                applyStoredIconTheme();
             }
         }
         onSaveFailed: error => {
