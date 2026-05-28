@@ -63,8 +63,11 @@ Item {
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
     readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
     readonly property bool multipleUsersAvailable: GreeterUsersService.loaded && GreeterUsersService.users.length > 1
-    readonly property bool showUserPicker: multipleUsersAvailable && !GreeterState.showPasswordInput
+    readonly property bool showUserPicker: multipleUsersAvailable && !GreeterState.showPasswordInput && !manualUsernameEntry
+    readonly property bool showAccountSwitchLink: multipleUsersAvailable && !GreeterState.showPasswordInput && !GreeterState.unlocking
+    readonly property int userPickerMaxHeight: Math.min(400, Math.max(120, height * 0.35))
     property bool userListOpen: false
+    property bool manualUsernameEntry: false
     property bool skipAutoSelectUser: false
     property string pickerThemeUsername: ""
 
@@ -454,9 +457,34 @@ Item {
         }
     }
 
+    function enterManualUsernameEntry() {
+        if (!root.multipleUsersAvailable || GreeterState.showPasswordInput)
+            return;
+        root.manualUsernameEntry = true;
+        root.userListOpen = false;
+        GreeterState.username = "";
+        GreeterState.usernameInput = "";
+        GreeterState.selectedUserIndex = -1;
+        inputField.text = "";
+        root.applyPickerPreviewTheme();
+        Qt.callLater(() => inputField.forceActiveFocus());
+    }
+
+    function returnToUserListFromManualEntry() {
+        if (!root.multipleUsersAvailable)
+            return;
+        root.manualUsernameEntry = false;
+        root.userListOpen = true;
+        GreeterState.username = "";
+        GreeterState.usernameInput = "";
+        inputField.text = "";
+        root.applyPickerPreviewTheme();
+    }
+
     function returnToUserPicker() {
         if (!root.multipleUsersAvailable || GreeterState.unlocking)
             return;
+        root.manualUsernameEntry = false;
         root.skipAutoSelectUser = true;
         awaitingExternalAuth = false;
         pendingPasswordResponse = false;
@@ -483,6 +511,7 @@ Item {
         const user = (rawValue || "").trim();
         if (!user)
             return;
+        root.manualUsernameEntry = false;
         root.skipAutoSelectUser = false;
         submitUsername(user, skipDropdownUpdate === true);
     }
@@ -1025,6 +1054,8 @@ Item {
                             onClicked: {
                                 if (GreeterState.showPasswordInput)
                                     root.returnToUserPicker();
+                                else if (root.manualUsernameEntry)
+                                    root.returnToUserListFromManualEntry();
                                 else
                                     root.userListOpen = !root.userListOpen;
                             }
@@ -1050,6 +1081,7 @@ Item {
                             anchors.verticalCenter: root.userListOpen ? undefined : parent.verticalCenter
                             anchors.top: root.userListOpen ? parent.top : undefined
                             anchors.margins: Theme.spacingM
+                            maxExpandedHeight: root.userPickerMaxHeight
                             visible: root.showUserPicker && !GreeterState.showPasswordInput
                             expanded: root.userListOpen
                             onUserSelected: username => root.selectUser(username, false)
@@ -1287,6 +1319,36 @@ Item {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
+                        }
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: root.showAccountSwitchLink ? 28 : 0
+                    visible: root.showAccountSwitchLink
+
+                    StyledText {
+                        id: accountSwitchLabel
+
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: root.manualUsernameEntry ? I18n.tr("Back to user list", "greeter link to return from manual username entry to user picker") : I18n.tr("Not listed?", "greeter link to switch to manual username entry")
+                        color: Theme.primary
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.underline: accountSwitchMouse.containsMouse
+                    }
+
+                    MouseArea {
+                        id: accountSwitchMouse
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (root.manualUsernameEntry)
+                                root.returnToUserListFromManualEntry();
+                            else
+                                root.enterManualUsernameEntry();
                         }
                     }
                 }
