@@ -31,7 +31,7 @@ DankModal {
     onShouldBeVisibleChanged: {
         if (!shouldBeVisible)
             return;
-        
+
         if (typeof PowerProfiles !== "undefined") {
             const current = PowerProfiles.profile;
             const idx = profileModel.indexOf(current);
@@ -66,6 +66,7 @@ DankModal {
             selectedIndex = (selectedIndex + 1) % profileModel.length;
             event.accepted = true;
             break;
+        case Qt.Key_Space:
         case Qt.Key_Return:
         case Qt.Key_Enter:
             if (selectedIndex >= 0 && selectedIndex < profileModel.length) {
@@ -161,11 +162,11 @@ DankModal {
 
                             readonly property bool isSelected: root.selectedIndex === index
                             readonly property bool isActive: (typeof PowerProfiles !== "undefined") && PowerProfiles.profile === modelData
-                            
+
                             width: (parent.width - Theme.spacingM * (root.profileModel.length - 1)) / root.profileModel.length
                             height: 120
                             radius: Theme.cornerRadius
-                            
+
                             color: {
                                 if (isActive)
                                     return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16);
@@ -175,7 +176,7 @@ DankModal {
                                     return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.12);
                                 return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.06);
                             }
-                            
+
                             border.color: isActive ? Theme.primary : (isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5) : "transparent")
                             border.width: (isActive || isSelected) ? 2 : 0
 
@@ -260,7 +261,7 @@ DankModal {
                     }
 
                     StyledText {
-                        text: I18n.tr("Use keys 1-3 or arrows, Enter to select")
+                        text: I18n.tr("Use keys 1-3 or arrows, Enter/Space to select")
                         font.pixelSize: Theme.fontSizeSmall - 1
                         color: Theme.surfaceText
                     }
