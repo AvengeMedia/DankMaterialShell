@@ -91,7 +91,7 @@ Singleton {
     }
 
     function _loadUsers() {
-        Proc.runCommand("usersService-loadUsers", ["sh", "-c", "getent passwd | awk -F: '$3>=1000 && $3<60000 && $1!=\"nobody\" {print $1\":\"$3\":\"$5\":\"$6\":\"$7}'"], (output, exitCode) => {
+        Proc.runCommand("usersService-loadUsers", ["sh", "-c", "getent passwd | awk -F: '$3>=1000 && $3<60000 && $1!=\"nobody\" && $7!~/(nologin|false)$/ && $6!=\"/var/empty\" {print $1\":\"$3\":\"$5\":\"$6\":\"$7}'"], (output, exitCode) => {
             const lines = (output || "").trim().split("\n").filter(l => l.length > 0);
             const list = [];
             const adminSet = {};
