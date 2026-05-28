@@ -20,6 +20,10 @@ Singleton {
             if (root.isIdle(root.activePlayer))
                 root._resolveActivePlayer();
         }
+        function onTrackArtistChanged() {
+            if (root.isIdle(root.activePlayer))
+                root._resolveActivePlayer();
+        }
         function onLengthChanged() {
             if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
                 root.activePlayerStableLength = root.activePlayer.length;
