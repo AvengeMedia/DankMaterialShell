@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import qs.Common
 import qs.Widgets
 import qs.Services
 
 Column {
     id: root
-    readonly property var log: Log.scoped("WidgetsTabSection")
 
     property var items: []
     property var allWidgets: []
@@ -24,25 +24,20 @@ Column {
     signal removeWidget(string sectionId, int widgetIndex)
     signal spacerSizeChanged(string sectionId, int widgetIndex, int newSize)
     signal compactModeChanged(string widgetId, var value)
-    signal widgetSizeChanged(string widgetId, var value)
     signal gpuSelectionChanged(string sectionId, int widgetIndex, int selectedIndex)
     signal diskMountSelectionChanged(string sectionId, int widgetIndex, string mountPath)
     signal controlCenterSettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
-    signal controlCenterGroupOrderChanged(string sectionId, int widgetIndex, var groupOrder)
     signal privacySettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
     signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
-    signal showInGbChanged(string sectionId, int widgetIndex, bool enabled)
-    signal diskUsageModeChanged(string sectionId, int widgetIndex, int mode)
     signal overflowSettingChanged(string sectionId, int widgetIndex, string settingName, var value)
-    signal hideWhenIdleChanged(string sectionId, int widgetIndex, bool enabled)
 
     function cloneWidgetData(widget) {
         var result = {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -54,14 +49,15 @@ Column {
     height: implicitHeight
     spacing: Theme.spacingM
 
-    Row {
+    RowLayout {
+        width: parent.width
         spacing: Theme.spacingM
 
         DankIcon {
             name: root.titleIcon
             size: Theme.iconSize
             color: Theme.primary
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment: Qt.AlignVCenter
         }
 
         StyledText {
@@ -69,7 +65,54 @@ Column {
             font.pixelSize: Theme.fontSizeLarge
             font.weight: Font.Medium
             color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment: Qt.AlignVCenter
+        }
+
+        Item {
+            height: 1
+            Layout.fillWidth: true
+        }
+
+        RowLayout {
+            spacing: Theme.spacingXS
+            Layout.alignment: Qt.AlignVCenter
+            visible: root.sectionId === "center"
+
+            DankActionButton {
+                id: indexCenterButton
+                buttonSize: 28
+                iconName: "format_list_numbered"
+                iconSize: 16
+                iconColor: SettingsData.centeringMode === "index" ? Theme.primary : Theme.outline
+                onClicked: {
+                    console.log("Centering mode changed to: index");
+                    SettingsData.set("centeringMode", "index");
+                }
+                onEntered: {
+                    sharedTooltip.show("Index Centering", indexCenterButton, 0, 0, "bottom");
+                }
+                onExited: {
+                    sharedTooltip.hide();
+                }
+            }
+
+            DankActionButton {
+                id: geometricCenterButton
+                buttonSize: 28
+                iconName: "center_focus_weak"
+                iconSize: 16
+                iconColor: SettingsData.centeringMode === "geometric" ? Theme.primary : Theme.outline
+                onClicked: {
+                    console.log("Centering mode changed to: geometric");
+                    SettingsData.set("centeringMode", "geometric");
+                }
+                onEntered: {
+                    sharedTooltip.show("Geometric Centering", geometricCenterButton, 0, 0, "bottom");
+                }
+                onExited: {
+                    sharedTooltip.hide();
+                }
+            }
         }
     }
 
@@ -232,34 +275,6 @@ Column {
                             }
                         }
 
-                        DankActionButton {
-                            id: diskMenuButton
-                            visible: modelData.id === "diskUsage"
-                            buttonSize: 32
-                            iconName: "more_vert"
-                            iconSize: 18
-                            iconColor: Theme.outline
-                            onClicked: {
-                                diskUsageContextMenu.widgetData = modelData;
-                                diskUsageContextMenu.sectionId = root.sectionId;
-                                diskUsageContextMenu.widgetIndex = index;
-
-                                var buttonPos = diskMenuButton.mapToItem(root, 0, 0);
-                                var xPos = buttonPos.x - diskUsageContextMenu.width - Theme.spacingS;
-                                if (xPos < 0)
-                                    xPos = buttonPos.x + diskMenuButton.width + Theme.spacingS;
-                                var yPos = buttonPos.y - diskUsageContextMenu.height / 2 + diskMenuButton.height / 2;
-                                if (yPos < 0)
-                                    yPos = Theme.spacingS;
-                                else if (yPos + diskUsageContextMenu.height > root.height)
-                                    yPos = root.height - diskUsageContextMenu.height - Theme.spacingS;
-
-                                diskUsageContextMenu.x = xPos;
-                                diskUsageContextMenu.y = yPos;
-                                diskUsageContextMenu.open();
-                            }
-                        }
-
                         Item {
                             width: 32
                             height: 32
@@ -320,7 +335,7 @@ Column {
                         DankActionButton {
                             id: minimumWidthButton
                             buttonSize: 28
-                            visible: modelData.id === "cpuUsage" || modelData.id === "memUsage" || modelData.id === "cpuTemp" || modelData.id === "gpuTemp"
+                            visible: modelData.id === "cpuUsage" || modelData.id === "memUsage" || modelData.id === "cpuTemp" || modelData.id === "gpuTemp" || modelData.id === "diskUsage"
                             iconName: "straighten"
                             iconSize: 16
                             iconColor: (modelData.minimumWidth !== undefined ? modelData.minimumWidth : true) ? Theme.primary : Theme.outline
@@ -339,88 +354,23 @@ Column {
                         }
 
                         DankActionButton {
-                            id: hideWhenIdleButton
+                            id: showSwapButton
                             buttonSize: 28
-                            visible: modelData.id === "systemUpdate"
-                            iconName: "visibility_off"
+                            visible: modelData.id === "memUsage"
+                            iconName: "swap_horiz"
                             iconSize: 16
-                            iconColor: (modelData.hideWhenIdle === true) ? Theme.primary : Theme.outline
+                            iconColor: (modelData.showSwap !== undefined ? modelData.showSwap : false) ? Theme.primary : Theme.outline
                             onClicked: {
-                                root.hideWhenIdleChanged(root.sectionId, index, modelData.hideWhenIdle !== true);
+                                var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false;
+                                root.showSwapChanged(root.sectionId, index, !currentEnabled);
                             }
                             onEntered: {
-                                const tooltipText = modelData.hideWhenIdle === true ? "Hide when no updates: ON" : "Hide when no updates: OFF";
-                                sharedTooltip.show(tooltipText, hideWhenIdleButton, 0, 0, "bottom");
+                                var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false;
+                                const tooltipText = currentEnabled ? "Hide Swap" : "Show Swap";
+                                sharedTooltip.show(tooltipText, showSwapButton, 0, 0, "bottom");
                             }
                             onExited: {
                                 sharedTooltip.hide();
-                            }
-                        }
-
-                        DankActionButton {
-                            id: memMenuButton
-                            visible: modelData.id === "memUsage"
-                            buttonSize: 32
-                            iconName: "more_vert"
-                            iconSize: 18
-                            iconColor: Theme.outline
-                            onClicked: {
-                                memUsageContextMenu.widgetData = modelData;
-                                memUsageContextMenu.sectionId = root.sectionId;
-                                memUsageContextMenu.widgetIndex = index;
-
-                                var buttonPos = memMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = memUsageContextMenu.width;
-                                var popupHeight = memUsageContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0) {
-                                    xPos = buttonPos.x + memMenuButton.width + Theme.spacingS;
-                                }
-
-                                var yPos = buttonPos.y - popupHeight / 2 + memMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                memUsageContextMenu.x = xPos;
-                                memUsageContextMenu.y = yPos;
-                                memUsageContextMenu.open();
-                            }
-                        }
-
-                        DankActionButton {
-                            id: focusedWindowMenuButton
-                            buttonSize: 32
-                            visible: modelData.id === "focusedWindow"
-                            iconName: "more_vert"
-                            iconSize: 18
-                            iconColor: Theme.outline
-                            onClicked: {
-                                focusedWindowContextMenu.widgetData = modelData;
-                                focusedWindowContextMenu.sectionId = root.sectionId;
-                                focusedWindowContextMenu.widgetIndex = index;
-
-                                var buttonPos = focusedWindowMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = focusedWindowContextMenu.width;
-                                var popupHeight = focusedWindowContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0)
-                                xPos = buttonPos.x + focusedWindowMenuButton.width + Theme.spacingS;
-
-                                var yPos = buttonPos.y - popupHeight / 2 + focusedWindowMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                focusedWindowContextMenu.x = xPos;
-                                focusedWindowContextMenu.y = yPos;
-                                focusedWindowContextMenu.open();
                             }
                         }
 
@@ -492,17 +442,19 @@ Column {
 
                         Row {
                             spacing: Theme.spacingXS
-                            visible: modelData.id === "clock" || modelData.id === "keyboard_layout_name" || modelData.id === "appsDock" || modelData.id === "systemTray"
+                            visible: modelData.id === "clock" || modelData.id === "focusedWindow" || modelData.id === "keyboard_layout_name" || modelData.id === "appsDock"
 
                             DankActionButton {
                                 id: compactModeButton
                                 buttonSize: 28
-                                visible: modelData.id === "clock" || modelData.id === "keyboard_layout_name"
+                                visible: modelData.id === "clock" || modelData.id === "focusedWindow" || modelData.id === "keyboard_layout_name"
                                 iconName: {
                                     const isCompact = (() => {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
+                                            case "focusedWindow":
+                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -517,6 +469,8 @@ Column {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
+                                            case "focusedWindow":
+                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -530,6 +484,8 @@ Column {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
+                                            case "focusedWindow":
+                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -543,6 +499,8 @@ Column {
                                             switch (modelData.id) {
                                             case "clock":
                                                 return modelData.clockCompactMode !== undefined ? modelData.clockCompactMode : SettingsData.clockCompactMode;
+                                            case "focusedWindow":
+                                                return modelData.focusedWindowCompactMode !== undefined ? modelData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode;
                                             case "keyboard_layout_name":
                                                 return modelData.keyboardLayoutNameCompactMode !== undefined ? modelData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode;
                                             default:
@@ -590,39 +548,6 @@ Column {
                                 }
                             }
 
-                            DankActionButton {
-                                id: trayMenuButton
-                                buttonSize: 32
-                                visible: modelData.id === "systemTray"
-                                iconName: "more_vert"
-                                iconSize: 18
-                                iconColor: Theme.outline
-                                onClicked: {
-                                    trayContextMenu.widgetData = modelData;
-                                    trayContextMenu.sectionId = root.sectionId;
-                                    trayContextMenu.widgetIndex = index;
-
-                                    var buttonPos = trayMenuButton.mapToItem(root, 0, 0);
-                                    var popupWidth = trayContextMenu.width;
-                                    var popupHeight = trayContextMenu.height;
-
-                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                    if (xPos < 0)
-                                        xPos = buttonPos.x + trayMenuButton.width + Theme.spacingS;
-
-                                    var yPos = buttonPos.y - popupHeight / 2 + trayMenuButton.height / 2;
-                                    if (yPos < 0) {
-                                        yPos = Theme.spacingS;
-                                    } else if (yPos + popupHeight > root.height) {
-                                        yPos = root.height - popupHeight - Theme.spacingS;
-                                    }
-
-                                    trayContextMenu.x = xPos;
-                                    trayContextMenu.y = yPos;
-                                    trayContextMenu.open();
-                                }
-                            }
-
                             Rectangle {
                                 id: compactModeTooltip
                                 width: tooltipText.contentWidth + Theme.spacingM * 2
@@ -665,7 +590,6 @@ Column {
                                 controlCenterContextMenu.widgetData = modelData;
                                 controlCenterContextMenu.sectionId = root.sectionId;
                                 controlCenterContextMenu.widgetIndex = index;
-                                controlCenterContextMenu.controlCenterGroups = controlCenterContextMenu.getOrderedControlCenterGroups();
 
                                 var buttonPos = ccMenuButton.mapToItem(root, 0, 0);
                                 var popupWidth = controlCenterContextMenu.width;
@@ -876,758 +800,18 @@ Column {
     }
 
     Popup {
-        id: memUsageContextMenu
-
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-
-        width: 200
-        height: 80
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 0
-        }
-
-        contentItem: Item {
-            Column {
-                anchors.fill: parent
-                anchors.margins: Theme.spacingS
-                spacing: 2
-
-                Rectangle {
-                    width: parent.width
-                    height: 32
-                    radius: Theme.cornerRadius
-                    color: swapToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: "swap_horiz"
-                            size: 16
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Show Swap")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Normal
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    DankToggle {
-                        id: swapToggle
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 40
-                        height: 20
-                        checked: memUsageContextMenu.widgetData?.showSwap ?? false
-                        onToggled: {
-                            root.showSwapChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, toggled);
-                        }
-                    }
-
-                    MouseArea {
-                        id: swapToggleArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: {
-                            swapToggle.checked = !swapToggle.checked;
-                            root.showSwapChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, swapToggle.checked);
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 32
-                    radius: Theme.cornerRadius
-                    color: gbToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: "straighten"
-                            size: 16
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Show in GB")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Normal
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    DankToggle {
-                        id: gbToggle
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 40
-                        height: 20
-                        checked: memUsageContextMenu.widgetData?.showInGb ?? false
-                        onToggled: {
-                            root.showInGbChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, toggled);
-                        }
-                    }
-
-                    MouseArea {
-                        id: gbToggleArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: {
-                            gbToggle.checked = !gbToggle.checked;
-                            root.showInGbChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, gbToggle.checked);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Popup {
-        id: trayContextMenu
-
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
-
-        width: 220
-        height: contentColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 0
-        }
-
-        contentItem: Item {
-            Column {
-                id: contentColumn
-                anchors.fill: parent
-                anchors.margins: Theme.spacingS
-                spacing: 2
-
-                Rectangle {
-                    width: parent.width
-                    height: 32
-                    radius: Theme.cornerRadius
-                    color: trayOverflowArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: "arrow_selector_tool"
-                            size: 16
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Use Inline Expansion")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Normal
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    DankToggle {
-                        id: trayOverflowToggle
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 40
-                        height: 20
-                        checked: trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false
-                    }
-
-                    MouseArea {
-                        id: trayOverflowArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            const newValue = !(trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false);
-                            root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayUseInlineExpansion", newValue);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Popup {
-        id: focusedWindowContextMenu
-
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-
-        width: 180
-        height: focusedWindowMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 0
-        }
-
-        contentItem: Item {
-            Column {
-                id: focusedWindowMenuColumn
-                anchors.fill: parent
-                anchors.margins: Theme.spacingS
-                spacing: 2
-
-                Rectangle {
-                    width: parent.width
-                    height: 32
-                    radius: Theme.cornerRadius
-                    color: fwCompactArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: "zoom_in"
-                            size: 16
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Compact")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Normal
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    DankToggle {
-                        id: fwCompactToggle
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 40
-                        height: 20
-                        checked: focusedWindowContextMenu.currentWidgetData?.focusedWindowCompactMode ?? SettingsData.focusedWindowCompactMode
-                        onToggled: {
-                            root.overflowSettingChanged(focusedWindowContextMenu.sectionId, focusedWindowContextMenu.widgetIndex, "focuswedWindowCompactMode", toggled);
-                        }
-                    }
-
-                    MouseArea {
-                        id: fwCompactArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: {
-                            fwCompactToggle.checked = !fwCompactToggle.checked;
-                            root.overflowSettingChanged(focusedWindowContextMenu.sectionId, focusedWindowContextMenu.widgetIndex, "focusedWindowCompactMode", fwCompactToggle.checked);
-                        }
-                    }
-                }
-
-                Repeater {
-                    model: [
-                        {
-                            icon: "photo_size_select_small",
-                            label: I18n.tr("Small"),
-                            sizeValue: 0
-                        },
-                        {
-                            icon: "photo_size_select_actual",
-                            label: I18n.tr("Medium"),
-                            sizeValue: 1
-                        },
-                        {
-                            icon: "photo_size_select_large",
-                            label: I18n.tr("Large"),
-                            sizeValue: 2
-                        },
-                        {
-                            icon: "fit_screen",
-                            label: I18n.tr("Largest"),
-                            sizeValue: 3
-                        }
-                    ]
-
-                    delegate: Rectangle {
-                        required property var modelData
-                        required property int index
-
-                        function isSelected() {
-                            var wd = focusedWindowContextMenu.widgetData;
-                            var currentSize = wd?.focusedWindowSize ?? SettingsData.focusedWindowSize;
-                            return currentSize === modelData.sizeValue;
-                        }
-
-                        width: focusedWindowMenuColumn.width
-                        height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
-                        radius: Theme.cornerRadius
-                        color: focusedWindowOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-
-                        Row {
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: modelData.icon
-                                size: 18
-                                color: isSelected() ? Theme.primary : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: modelData.label
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: isSelected() ? Font.Medium : Font.Normal
-                                color: isSelected() ? Theme.primary : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        DankIcon {
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "check"
-                            size: 16
-                            color: Theme.primary
-                            visible: isSelected()
-                        }
-
-                        MouseArea {
-                            id: focusedWindowOptionArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.widgetSizeChanged("focusedWindow", modelData.sizeValue);
-                                focusedWindowContextMenu.close();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Popup {
-        id: diskUsageContextMenu
-
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
-
-        width: 240
-        height: diskMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 0
-        }
-
-        contentItem: Item {
-            Column {
-                id: diskMenuColumn
-                anchors.fill: parent
-                anchors.margins: Theme.spacingS
-                spacing: 2
-
-                Rectangle {
-                    width: parent.width
-                    height: 32
-                    radius: Theme.cornerRadius
-                    color: "transparent"
-
-                    StyledText {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: I18n.tr("Disk Usage Display")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                    }
-                }
-
-                Repeater {
-                    model: [
-                        {
-                            label: I18n.tr("Percentage"),
-                            mode: 0,
-                            icon: "percent"
-                        },
-                        {
-                            label: I18n.tr("Total"),
-                            mode: 1,
-                            icon: "storage"
-                        },
-                        {
-                            label: I18n.tr("Remaining"),
-                            mode: 2,
-                            icon: "hourglass_empty"
-                        },
-                        {
-                            label: I18n.tr("Remaining / Total"),
-                            mode: 3,
-                            icon: "pie_chart"
-                        }
-                    ]
-
-                    delegate: Rectangle {
-                        required property var modelData
-                        required property int index
-
-                        width: diskMenuColumn.width
-                        height: 32
-                        radius: Theme.cornerRadius
-                        color: diskOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-
-                        function isSelected() {
-                            return (diskUsageContextMenu.currentWidgetData?.diskUsageMode ?? 0) === modelData.mode;
-                        }
-
-                        Row {
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: modelData.icon
-                                size: 16
-                                color: isSelected() ? Theme.primary : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: modelData.label
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: isSelected() ? Theme.primary : Theme.surfaceText
-                                font.weight: isSelected() ? Font.Medium : Font.Normal
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        DankIcon {
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "check"
-                            size: 16
-                            color: Theme.primary
-                            visible: isSelected()
-                        }
-
-                        MouseArea {
-                            id: diskOptionArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.diskUsageModeChanged(diskUsageContextMenu.sectionId, diskUsageContextMenu.widgetIndex, modelData.mode);
-                                diskUsageContextMenu.close();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Popup {
         id: controlCenterContextMenu
 
         property var widgetData: null
         property string sectionId: ""
         property int widgetIndex: -1
 
-        readonly property real minimumContentWidth: controlCenterContentMetrics.implicitWidth + Theme.spacingS * 2
-        readonly property real controlCenterRowHeight: 32
-        readonly property real controlCenterRowSpacing: 1
-        readonly property real controlCenterGroupVerticalPadding: Theme.spacingXS * 2
-        readonly property real controlCenterMenuSpacing: 2
-        width: Math.max(220, minimumContentWidth)
-        height: getControlCenterPopupHeight(controlCenterGroups)
+        width: 220
+        height: menuColumn.implicitHeight + Theme.spacingS * 2
         padding: 0
         modal: true
         focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        onClosed: {
-            cancelControlCenterDrag();
-        }
-
-        readonly property var defaultControlCenterGroups: [
-            {
-                id: "network",
-                rows: [
-                    {
-                        icon: "lan",
-                        label: I18n.tr("Network"),
-                        setting: "showNetworkIcon"
-                    }
-                ]
-            },
-            {
-                id: "vpn",
-                rows: [
-                    {
-                        icon: "vpn_lock",
-                        label: I18n.tr("VPN"),
-                        setting: "showVpnIcon"
-                    }
-                ]
-            },
-            {
-                id: "bluetooth",
-                rows: [
-                    {
-                        icon: "bluetooth",
-                        label: I18n.tr("Bluetooth"),
-                        setting: "showBluetoothIcon"
-                    }
-                ]
-            },
-            {
-                id: "audio",
-                rows: [
-                    {
-                        icon: "volume_up",
-                        label: I18n.tr("Audio"),
-                        setting: "showAudioIcon"
-                    },
-                    {
-                        icon: "percent",
-                        label: I18n.tr("Volume"),
-                        setting: "showAudioPercent"
-                    }
-                ]
-            },
-            {
-                id: "microphone",
-                rows: [
-                    {
-                        icon: "mic",
-                        label: I18n.tr("Microphone"),
-                        setting: "showMicIcon"
-                    },
-                    {
-                        icon: "percent",
-                        label: I18n.tr("Microphone Volume"),
-                        setting: "showMicPercent"
-                    }
-                ]
-            },
-            {
-                id: "brightness",
-                rows: [
-                    {
-                        icon: "brightness_high",
-                        label: I18n.tr("Brightness"),
-                        setting: "showBrightnessIcon"
-                    },
-                    {
-                        icon: "percent",
-                        label: I18n.tr("Brightness Value"),
-                        setting: "showBrightnessPercent"
-                    }
-                ]
-            },
-            {
-                id: "battery",
-                rows: [
-                    {
-                        icon: "battery_full",
-                        label: I18n.tr("Battery"),
-                        setting: "showBatteryIcon"
-                    }
-                ]
-            },
-            {
-                id: "printer",
-                rows: [
-                    {
-                        icon: "print",
-                        label: I18n.tr("Printer"),
-                        setting: "showPrinterIcon"
-                    }
-                ]
-            },
-            {
-                id: "screenSharing",
-                rows: [
-                    {
-                        icon: "screen_record",
-                        label: I18n.tr("Screen Sharing"),
-                        setting: "showScreenSharingIcon"
-                    }
-                ]
-            }
-        ]
-        property var controlCenterGroups: defaultControlCenterGroups
-        property int draggedControlCenterGroupIndex: -1
-        property int controlCenterGroupDropIndex: -1
-
-        function updateControlCenterGroupDropIndex(draggedIndex, localY) {
-            const totalGroups = controlCenterGroups.length;
-            let dropIndex = totalGroups;
-
-            for (let i = 0; i < totalGroups; i++) {
-                const delegate = groupRepeater.itemAt(i);
-                if (!delegate)
-                    continue;
-
-                const midpoint = delegate.y + delegate.height / 2;
-                if (localY < midpoint) {
-                    dropIndex = i;
-                    break;
-                }
-            }
-
-            controlCenterGroupDropIndex = Math.max(0, Math.min(totalGroups, dropIndex));
-            draggedControlCenterGroupIndex = draggedIndex;
-        }
-
-        function finishControlCenterDrag() {
-            if (draggedControlCenterGroupIndex < 0) {
-                controlCenterGroupDropIndex = -1;
-                return;
-            }
-
-            const fromIndex = draggedControlCenterGroupIndex;
-            let toIndex = controlCenterGroupDropIndex;
-
-            draggedControlCenterGroupIndex = -1;
-            controlCenterGroupDropIndex = -1;
-
-            if (toIndex < 0 || toIndex > controlCenterGroups.length || toIndex === fromIndex || toIndex === fromIndex + 1)
-                return;
-
-            const groups = controlCenterGroups.slice();
-            const moved = groups.splice(fromIndex, 1)[0];
-
-            if (toIndex > fromIndex)
-                toIndex -= 1;
-
-            groups.splice(toIndex, 0, moved);
-            controlCenterGroups = groups;
-            const reorderedGroupIds = groups.map(group => group.id);
-            root.controlCenterGroupOrderChanged(sectionId, widgetIndex, reorderedGroupIds);
-        }
-
-        function cancelControlCenterDrag() {
-            draggedControlCenterGroupIndex = -1;
-            controlCenterGroupDropIndex = -1;
-        }
-
-        function getControlCenterGroupHeight(group) {
-            const rowCount = group?.rows?.length ?? 0;
-            if (rowCount <= 0)
-                return controlCenterGroupVerticalPadding;
-
-            return rowCount * controlCenterRowHeight + Math.max(0, rowCount - 1) * controlCenterRowSpacing + controlCenterGroupVerticalPadding;
-        }
-
-        function getControlCenterPopupHeight(groups) {
-            const orderedGroups = groups || [];
-            let totalHeight = Theme.spacingS * 2;
-
-            for (let i = 0; i < orderedGroups.length; i++) {
-                totalHeight += getControlCenterGroupHeight(orderedGroups[i]);
-                if (i < orderedGroups.length - 1)
-                    totalHeight += controlCenterMenuSpacing;
-            }
-
-            return totalHeight;
-        }
-
-        function getOrderedControlCenterGroups() {
-            const baseGroups = defaultControlCenterGroups.slice();
-            const currentWidget = contentItem.getCurrentWidgetData();
-            const savedOrder = currentWidget?.controlCenterGroupOrder;
-            if (!savedOrder || !savedOrder.length)
-                return baseGroups;
-
-            const groupMap = {};
-            for (let i = 0; i < baseGroups.length; i++)
-                groupMap[baseGroups[i].id] = baseGroups[i];
-
-            const orderedGroups = [];
-            for (let i = 0; i < savedOrder.length; i++) {
-                const groupId = savedOrder[i];
-                const group = groupMap[groupId];
-                if (group) {
-                    orderedGroups.push(group);
-                    delete groupMap[groupId];
-                }
-            }
-
-            for (let i = 0; i < baseGroups.length; i++) {
-                const group = baseGroups[i];
-                if (groupMap[group.id])
-                    orderedGroups.push(group);
-            }
-
-            return orderedGroups;
-        }
 
         background: Rectangle {
             color: Theme.surfaceContainer
@@ -1637,52 +821,83 @@ Column {
         }
 
         contentItem: Item {
-            function getCurrentWidgetData() {
-                const widgets = root.items || [];
-                if (controlCenterContextMenu.widgetIndex >= 0 && controlCenterContextMenu.widgetIndex < widgets.length)
-                    return widgets[controlCenterContextMenu.widgetIndex];
-                return controlCenterContextMenu.widgetData;
-            }
-
             Column {
                 id: menuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
                 spacing: 2
 
-                Item {
-                    id: controlCenterContentMetrics
-                    visible: false
-                    implicitWidth: 16 + Theme.spacingS + 16 + Theme.spacingS + longestControlCenterLabelMetrics.advanceWidth + Theme.spacingM + 40 + Theme.spacingS * 2 + Theme.spacingM
-                }
-
-                TextMetrics {
-                    id: longestControlCenterLabelMetrics
-                    font.pixelSize: Theme.fontSizeSmall
-                    text: {
-                        const labels = [I18n.tr("Network"), I18n.tr("VPN"), I18n.tr("Bluetooth"), I18n.tr("Audio"), I18n.tr("Volume"), I18n.tr("Microphone"), I18n.tr("Microphone Volume"), I18n.tr("Brightness"), I18n.tr("Brightness Value"), I18n.tr("Battery"), I18n.tr("Printer"), I18n.tr("Screen Sharing")];
-                        let longest = "";
-                        for (let i = 0; i < labels.length; i++) {
-                            if (labels[i].length > longest.length)
-                                longest = labels[i];
-                        }
-                        return longest;
-                    }
-                }
-
                 Repeater {
-                    id: groupRepeater
-                    model: controlCenterContextMenu.controlCenterGroups
+                    model: [
+                        {
+                            icon: "lan",
+                            label: I18n.tr("Network"),
+                            setting: "showNetworkIcon"
+                        },
+                        {
+                            icon: "vpn_lock",
+                            label: I18n.tr("VPN"),
+                            setting: "showVpnIcon"
+                        },
+                        {
+                            icon: "bluetooth",
+                            label: I18n.tr("Bluetooth"),
+                            setting: "showBluetoothIcon"
+                        },
+                        {
+                            icon: "volume_up",
+                            label: I18n.tr("Audio"),
+                            setting: "showAudioIcon"
+                        },
+                        {
+                            icon: "percent",
+                            label: I18n.tr("Volume"),
+                            setting: "showAudioPercent"
+                        },
+                        {
+                            icon: "mic",
+                            label: I18n.tr("Microphone"),
+                            setting: "showMicIcon"
+                        },
+                        {
+                            icon: "percent",
+                            label: I18n.tr("Microphone Volume"),
+                            setting: "showMicPercent"
+                        },
+                        {
+                            icon: "brightness_high",
+                            label: I18n.tr("Brightness"),
+                            setting: "showBrightnessIcon"
+                        },
+                        {
+                            icon: "percent",
+                            label: I18n.tr("Brightness Value"),
+                            setting: "showBrightnessPercent"
+                        },
+                        {
+                            icon: "battery_full",
+                            label: I18n.tr("Battery"),
+                            setting: "showBatteryIcon"
+                        },
+                        {
+                            icon: "print",
+                            label: I18n.tr("Printer"),
+                            setting: "showPrinterIcon"
+                        },
+                        {
+                            icon: "screen_record",
+                            label: I18n.tr("Screen Sharing"),
+                            setting: "showScreenSharingIcon"
+                        }
+                    ]
 
-                    delegate: Item {
-                        id: delegateRoot
-
+                    delegate: Rectangle {
                         required property var modelData
                         required property int index
 
-                        function getCheckedState(settingName) {
-                            const wd = controlCenterContextMenu.contentItem.getCurrentWidgetData();
-                            switch (settingName) {
+                        function getCheckedState() {
+                            var wd = controlCenterContextMenu.widgetData;
+                            switch (modelData.setting) {
                             case "showNetworkIcon":
                                 return wd?.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
                             case "showVpnIcon":
@@ -1712,192 +927,54 @@ Column {
                             }
                         }
 
-                        readonly property string rootSetting: modelData.rows[0]?.setting ?? ""
-                        readonly property bool rootEnabled: rootSetting ? getCheckedState(rootSetting) : true
-                        readonly property bool isDragged: controlCenterContextMenu.draggedControlCenterGroupIndex === index
-                        readonly property bool showDropIndicatorAbove: controlCenterContextMenu.controlCenterGroupDropIndex === index
-                        readonly property bool showDropIndicatorBelow: controlCenterContextMenu.controlCenterGroupDropIndex === controlCenterContextMenu.controlCenterGroups.length && index === controlCenterContextMenu.controlCenterGroups.length - 1
-
                         width: menuColumn.width
-                        height: groupBackground.height
+                        height: 32
+                        radius: Theme.cornerRadius
+                        color: toggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
 
-                        Rectangle {
-                            id: groupBackground
+                        Row {
                             anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            height: groupContent.implicitHeight + Theme.spacingXS * 2
-                            radius: Theme.cornerRadius
-                            color: isDragged ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18) : (groupHoverArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent")
-                            opacity: isDragged ? 0.75 : 1.0
-                        }
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
 
-                        Rectangle {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.topMargin: -1
-                            height: 2
-                            radius: 1
-                            color: Theme.primary
-                            visible: showDropIndicatorAbove
-                            z: 3
-                        }
-
-                        Rectangle {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: -1
-                            height: 2
-                            radius: 1
-                            color: Theme.primary
-                            visible: showDropIndicatorBelow
-                            z: 3
-                        }
-
-                        Item {
-                            id: groupContent
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.topMargin: Theme.spacingXS
-                            implicitHeight: groupColumn.implicitHeight
-
-                            Column {
-                                id: groupColumn
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                spacing: 1
-
-                                Repeater {
-                                    id: groupColumnRepeater
-                                    model: modelData.rows
-
-                                    delegate: Rectangle {
-                                        required property var modelData
-                                        required property int index
-
-                                        readonly property var rowData: modelData
-                                        readonly property bool isFirstRow: index === 0
-                                        readonly property bool rowEnabled: isFirstRow ? true : delegateRoot.rootEnabled
-                                        readonly property bool computedCheckedState: rowEnabled ? getCheckedState(rowData.setting) : false
-                                        readonly property bool rowHovered: rowEnabled && (toggleArea.containsMouse || (isFirstRow && groupDragHandleArea.containsMouse))
-
-                                        width: groupColumn.width
-                                        height: 32
-                                        radius: Theme.cornerRadius
-                                        opacity: rowEnabled ? 1.0 : 0.5
-                                        color: rowHovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
-
-                                        Row {
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: Theme.spacingS
-                                            anchors.right: toggle.left
-                                            anchors.rightMargin: Theme.spacingM
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            spacing: Theme.spacingS
-
-                                            Item {
-                                                width: 16
-                                                height: 16
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                DankIcon {
-                                                    anchors.centerIn: parent
-                                                    name: "drag_indicator"
-                                                    size: 16
-                                                    color: groupDragHandleArea.pressed || isDragged ? Theme.primary : Theme.outline
-                                                    visible: isFirstRow
-                                                }
-
-                                                MouseArea {
-                                                    id: groupDragHandleArea
-                                                    anchors.fill: parent
-                                                    hoverEnabled: true
-                                                    preventStealing: true
-                                                    enabled: isFirstRow
-                                                    cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-
-                                                    onPressed: mouse => {
-                                                        mouse.accepted = true;
-                                                        const point = mapToItem(menuColumn, mouse.x, mouse.y);
-                                                        controlCenterContextMenu.updateControlCenterGroupDropIndex(delegateRoot.index, point.y);
-                                                    }
-                                                    onPositionChanged: mouse => {
-                                                        if (!pressed)
-                                                            return;
-                                                        mouse.accepted = true;
-                                                        const point = mapToItem(menuColumn, mouse.x, mouse.y);
-                                                        controlCenterContextMenu.updateControlCenterGroupDropIndex(delegateRoot.index, point.y);
-                                                    }
-                                                    onReleased: mouse => {
-                                                        mouse.accepted = true;
-                                                        const point = mapToItem(menuColumn, mouse.x, mouse.y);
-                                                        controlCenterContextMenu.updateControlCenterGroupDropIndex(delegateRoot.index, point.y);
-                                                        controlCenterContextMenu.finishControlCenterDrag();
-                                                    }
-                                                    onCanceled: {
-                                                        controlCenterContextMenu.cancelControlCenterDrag();
-                                                    }
-                                                }
-                                            }
-
-                                            DankIcon {
-                                                name: rowData.icon
-                                                size: 16
-                                                color: Theme.surfaceText
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-
-                                            StyledText {
-                                                text: rowData.label
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: Theme.surfaceText
-                                                font.weight: Font.Normal
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-                                        }
-
-                                        DankToggle {
-                                            id: toggle
-                                            anchors.right: parent.right
-                                            anchors.rightMargin: Theme.spacingS
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            width: 40
-                                            height: 20
-                                            enabled: rowEnabled
-                                            checked: computedCheckedState
-
-                                            onToggled: {
-                                                if (!rowEnabled)
-                                                    return;
-                                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, rowData.setting, toggled);
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            id: toggleArea
-                                            anchors.fill: parent
-                                            anchors.leftMargin: 16 + Theme.spacingS * 2
-                                            hoverEnabled: true
-                                            cursorShape: rowEnabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                            enabled: rowEnabled && controlCenterContextMenu.draggedControlCenterGroupIndex < 0
-                                            onPressed: {
-                                                if (!rowEnabled)
-                                                    return;
-                                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, rowData.setting, !computedCheckedState);
-                                            }
-                                        }
-                                    }
-                                }
+                            DankIcon {
+                                name: modelData.icon
+                                size: 16
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            MouseArea {
-                                id: groupHoverArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                enabled: false
+                            StyledText {
+                                text: modelData.label
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                font.weight: Font.Normal
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        DankToggle {
+                            id: toggle
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 40
+                            height: 20
+                            checked: getCheckedState()
+                            onToggled: {
+                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, modelData.setting, toggled);
+                            }
+                        }
+
+                        MouseArea {
+                            id: toggleArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onPressed: {
+                                toggle.checked = !toggle.checked;
+                                root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, modelData.setting, toggle.checked);
                             }
                         }
                     }
@@ -1921,11 +998,11 @@ Column {
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         onOpened: {
-            log.debug("Privacy context menu opened");
+            console.log("Privacy context menu opened");
         }
 
         onClosed: {
-            log.debug("Privacy Center context menu closed");
+            console.log("Privacy Center context menu closed");
         }
 
         background: Rectangle {
@@ -2338,7 +1415,7 @@ Column {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.widgetSizeChanged("music", modelData.sizeValue);
+                                root.compactModeChanged("music", modelData.sizeValue);
                                 musicContextMenu.close();
                             }
                         }
