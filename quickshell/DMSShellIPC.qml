@@ -1882,87 +1882,20 @@ Item {
             if (typeof PowerProfiles === "undefined")
                 return "ERROR: power-profiles-daemon not available";
 
-            const loader = PopoutService.batteryPopoutLoader;
-            if (!loader)
-                return "ERROR: battery popout loader not available";
-
-            loader.active = true;
-            const popout = loader.item;
-            if (!popout)
-                return "ERROR: battery popout not ready";
-
-            const bar = root.getPreferredBar() || root.getPreferredBar("controlCenterButtonRef");
-            if (bar) {
-                popout.triggerScreen = bar.screen;
-                const barPosition = 0; // 0 represents top edge
-                if (popout.setBarContext) {
-                    popout.setBarContext(barPosition, bar.barConfig?.bottomGap ?? 0);
-                }
-                if (popout.setTriggerPosition) {
-                    let x = bar.screen.x + bar.screen.width - popout.popupWidth - 16;
-                    let y = bar.screen.y + 16;
-                    
-                    if (bar.axis?.horizontal && bar.axis?.edge === "top") {
-                        y = bar.y + bar.height + 16;
-                    } else if (!bar.axis?.horizontal && bar.axis?.edge === "right") {
-                        x = bar.x - popout.popupWidth - 16;
-                    }
-                    popout.setTriggerPosition(x, y, 70, "right", bar.screen, barPosition, bar.effectiveBarThickness, bar.barConfig?.spacing ?? 4, bar.barConfig);
-                }
-            }
-
-            popout.open();
+            PopoutService.openPowerProfileModal();
             return "POWERPROFILE_OPEN_SUCCESS";
         }
 
         function close(): string {
-            const loader = PopoutService.batteryPopoutLoader;
-            if (loader && loader.item) {
-                loader.item.close();
-                return "POWERPROFILE_CLOSE_SUCCESS";
-            }
-            return "POWERPROFILE_CLOSE_FAILED";
+            PopoutService.closePowerProfileModal();
+            return "POWERPROFILE_CLOSE_SUCCESS";
         }
 
         function toggle(): string {
             if (typeof PowerProfiles === "undefined")
                 return "ERROR: power-profiles-daemon not available";
 
-            const loader = PopoutService.batteryPopoutLoader;
-            if (!loader)
-                return "ERROR: battery popout loader not available";
-
-            loader.active = true;
-            const popout = loader.item;
-            if (!popout)
-                return "ERROR: battery popout not ready";
-
-            if (popout.shouldBeVisible) {
-                popout.close();
-                return "POWERPROFILE_TOGGLE_SUCCESS";
-            }
-
-            const bar = root.getPreferredBar() || root.getPreferredBar("controlCenterButtonRef");
-            if (bar) {
-                popout.triggerScreen = bar.screen;
-                const barPosition = 0; // 0 represents top edge
-                if (popout.setBarContext) {
-                    popout.setBarContext(barPosition, bar.barConfig?.bottomGap ?? 0);
-                }
-                if (popout.setTriggerPosition) {
-                    let x = bar.screen.x + bar.screen.width - popout.popupWidth - 16;
-                    let y = bar.screen.y + 16;
-                    
-                    if (bar.axis?.horizontal && bar.axis?.edge === "top") {
-                        y = bar.y + bar.height + 16;
-                    } else if (!bar.axis?.horizontal && bar.axis?.edge === "right") {
-                        x = bar.x - popout.popupWidth - 16;
-                    }
-                    popout.setTriggerPosition(x, y, 70, "right", bar.screen, barPosition, bar.effectiveBarThickness, bar.barConfig?.spacing ?? 4, bar.barConfig);
-                }
-            }
-
-            popout.toggle();
+            PopoutService.togglePowerProfileModal();
             return "POWERPROFILE_TOGGLE_SUCCESS";
         }
 
