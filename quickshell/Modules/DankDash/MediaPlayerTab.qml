@@ -65,8 +65,7 @@ Item {
     // Derived "no players" state: always correct, no timers.
     readonly property int _playerCount: allPlayers ? allPlayers.length : 0
     readonly property bool _noneAvailable: _playerCount === 0
-    readonly property bool _trulyIdle: activePlayer && activePlayer.playbackState === MprisPlaybackState.Stopped && !activePlayer.trackTitle && !activePlayer.trackArtist
-    readonly property bool showNoPlayerNow: (!_switchHold) && (_noneAvailable || _trulyIdle)
+    readonly property bool showNoPlayerNow: (!_switchHold) && (_noneAvailable || !activePlayer)
 
     property bool _switchHold: false
     Timer {

@@ -17,11 +17,21 @@ Singleton {
         target: root.activePlayer
         function onTrackTitleChanged() {
             root.activePlayerStableLength = (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) ? root.activePlayer.length : 0;
+            if (root.isIdle(root.activePlayer))
+                root._resolveActivePlayer();
+        }
+        function onTrackArtistChanged() {
+            if (root.isIdle(root.activePlayer))
+                root._resolveActivePlayer();
         }
         function onLengthChanged() {
             if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
                 root.activePlayerStableLength = root.activePlayer.length;
             }
+        }
+        function onPlaybackStateChanged() {
+            if (root.isIdle(root.activePlayer))
+                root._resolveActivePlayer();
         }
     }
 
@@ -44,6 +54,13 @@ Singleton {
         }
     }
 
+    function isIdle(player: MprisPlayer): bool {
+        return player
+            && player.playbackState === MprisPlaybackState.Stopped
+            && !player.trackTitle
+            && !player.trackArtist;
+    }
+
     function _resolveActivePlayer(): void {
         const playing = availablePlayers.find(p => p.isPlaying);
         if (playing) {
@@ -51,17 +68,17 @@ Singleton {
             _persistIdentity(playing.identity);
             return;
         }
-        if (activePlayer && availablePlayers.indexOf(activePlayer) >= 0)
+        if (activePlayer && availablePlayers.indexOf(activePlayer) >= 0 && !isIdle(activePlayer))
             return;
         const savedId = SessionData.lastPlayerIdentity;
         if (savedId) {
             const match = availablePlayers.find(p => p.identity === savedId);
-            if (match) {
+            if (match && !isIdle(match)) {
                 activePlayer = match;
                 return;
             }
         }
-        activePlayer = availablePlayers.find(p => p.canControl && p.canPlay) ?? null;
+        activePlayer = availablePlayers.find(p => p.canControl && !isIdle(p)) ?? null;
         if (activePlayer)
             _persistIdentity(activePlayer.identity);
     }
