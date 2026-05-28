@@ -911,7 +911,7 @@ func generateDank16Variants(primaryDark, primaryLight, surface string, mode Colo
 }
 
 func isDMSGTKActive(configDir string) bool {
-	gtkCSS := filepath.Join(configDir, "gtk-3.0", "gtk.css")
+	gtkCSS := filepath.Join(configDir, "gtk-4.0", "gtk.css")
 
 	info, err := os.Lstat(gtkCSS)
 	if err != nil {

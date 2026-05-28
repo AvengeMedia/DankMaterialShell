@@ -1,3 +1,5 @@
+/* BEGIN DMS OVERRIDE */
+
 /*
 * GTK Colors
 * Generated with Matugen
@@ -7820,3 +7822,5 @@ window.background:not(.solid-csd):not(.csd) > notebook > stack:not(:only-child) 
 @define-color sidebar_fg_color @window_fg_color;
 @define-color sidebar_border_color @window_bg_color;
 @define-color sidebar_backdrop_color @window_bg_color;
+
+/* END DMS OVERRIDE */
