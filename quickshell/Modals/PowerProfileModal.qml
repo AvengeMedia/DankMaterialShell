@@ -23,8 +23,8 @@ DankModal {
     }
 
     shouldBeVisible: false
-    modalWidth: 380
-    modalHeight: 220
+    modalWidth: 440
+    modalHeight: 290
     enableShadow: true
     onBackgroundClicked: hideDialog()
 
@@ -163,7 +163,7 @@ DankModal {
                             readonly property bool isActive: (typeof PowerProfiles !== "undefined") && PowerProfiles.profile === modelData
                             
                             width: (parent.width - Theme.spacingM * (root.profileModel.length - 1)) / root.profileModel.length
-                            height: 100
+                            height: 120
                             radius: Theme.cornerRadius
                             
                             color: {
@@ -179,39 +179,44 @@ DankModal {
                             border.color: isActive ? Theme.primary : (isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5) : "transparent")
                             border.width: (isActive || isSelected) ? 2 : 0
 
+                            // Shortcut Key Badge on Top-Right Corner
+                            Rectangle {
+                                anchors.top: parent.top
+                                anchors.right: parent.right
+                                anchors.margins: Theme.spacingS
+                                width: 20
+                                height: 20
+                                radius: 4
+                                color: isActive ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                                border.color: isActive ? Theme.primary : "transparent"
+                                border.width: isActive ? 1 : 0
+
+                                StyledText {
+                                    text: (index + 1).toString()
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Bold
+                                    color: isActive ? Theme.primary : Theme.surfaceTextMedium
+                                    anchors.centerIn: parent
+                                }
+                            }
+
                             Column {
                                 anchors.centerIn: parent
                                 spacing: Theme.spacingS
 
                                 DankIcon {
                                     name: Theme.getPowerProfileIcon(modelData)
-                                    size: Theme.iconSize + 8
+                                    size: Theme.iconSize + 16
                                     color: isActive ? Theme.primary : Theme.surfaceText
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
 
                                 StyledText {
                                     text: Theme.getPowerProfileLabel(modelData)
-                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.pixelSize: Theme.fontSizeMedium
                                     color: isActive ? Theme.primary : Theme.surfaceText
                                     font.weight: Font.Medium
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                }
-
-                                Rectangle {
-                                    width: 18
-                                    height: 14
-                                    radius: 3
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    StyledText {
-                                        text: (index + 1).toString()
-                                        font.pixelSize: Theme.fontSizeSmall - 2
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
-                                        font.weight: Font.Medium
-                                        anchors.centerIn: parent
-                                    }
                                 }
                             }
 
@@ -220,12 +225,44 @@ DankModal {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: {
+                                onEntered: {
                                     root.selectedIndex = index;
+                                }
+                                onClicked: {
                                     root.setProfile(modelData);
                                 }
                             }
                         }
+                    }
+                }
+
+                // Selected power profile description
+                StyledText {
+                    text: (root.selectedIndex >= 0 && root.selectedIndex < root.profileModel.length) ? Theme.getPowerProfileDescription(root.profileModel[root.selectedIndex]) : ""
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceTextMedium
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    wrapMode: Text.WordWrap
+                    width: parent.width - Theme.spacingL * 2
+                }
+
+                // Keyboard Shortcut Guide Footer
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: Theme.spacingXS
+                    opacity: 0.5
+
+                    DankIcon {
+                        name: "keyboard"
+                        size: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Use keys 1-3 or arrows, Enter to select")
+                        font.pixelSize: Theme.fontSizeSmall - 1
+                        color: Theme.surfaceText
                     }
                 }
             }
