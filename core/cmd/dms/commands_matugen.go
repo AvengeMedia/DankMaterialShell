@@ -47,6 +47,7 @@ func init() {
 		cmd.Flags().String("state-dir", "", "State directory for cache files")
 		cmd.Flags().String("shell-dir", "", "DMS shell installation directory")
 		cmd.Flags().String("config-dir", "", "User config directory")
+		cmd.Flags().String("data-dir", "", "User data directory")
 		cmd.Flags().String("kind", "image", "Source type: image or hex")
 		cmd.Flags().String("value", "", "Wallpaper path or hex color")
 		cmd.Flags().String("mode", "dark", "Color mode: dark or light")
@@ -68,6 +69,7 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 	stateDir, _ := cmd.Flags().GetString("state-dir")
 	shellDir, _ := cmd.Flags().GetString("shell-dir")
 	configDir, _ := cmd.Flags().GetString("config-dir")
+	dataDir, _ := cmd.Flags().GetString("data-dir")
 	kind, _ := cmd.Flags().GetString("kind")
 	value, _ := cmd.Flags().GetString("value")
 	mode, _ := cmd.Flags().GetString("mode")
@@ -84,6 +86,7 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 		StateDir:            stateDir,
 		ShellDir:            shellDir,
 		ConfigDir:           configDir,
+		DataDir:             dataDir,
 		Kind:                kind,
 		Value:               value,
 		Mode:                matugen.ColorMode(mode),
@@ -121,6 +124,7 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 			"stateDir":            opts.StateDir,
 			"shellDir":            opts.ShellDir,
 			"configDir":           opts.ConfigDir,
+			"dataDir":             opts.DataDir,
 			"kind":                opts.Kind,
 			"value":               opts.Value,
 			"mode":                opts.Mode,

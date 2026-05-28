@@ -19,6 +19,7 @@ func handleMatugenQueue(conn net.Conn, req models.Request) {
 		StateDir:            models.GetOr(req, "stateDir", ""),
 		ShellDir:            models.GetOr(req, "shellDir", ""),
 		ConfigDir:           models.GetOr(req, "configDir", ""),
+		DataDir:             models.GetOr(req, "dataDir", ""),
 		Kind:                models.GetOr(req, "kind", ""),
 		Value:               models.GetOr(req, "value", ""),
 		Mode:                matugen.ColorMode(models.GetOr(req, "mode", "")),
