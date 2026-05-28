@@ -997,6 +997,8 @@ Singleton {
                 const id = (o.make + " " + o.model + " " + serial).trim();
                 liveByIdentifier[id] = true;
                 liveByIdentifier[o.make + " " + o.model] = true;
+                if (CompositorService.isHyprland)
+                    liveByIdentifier[getHyprlandOutputIdentifier(o, name)] = true;
             }
             liveByIdentifier[name] = true;
         }
@@ -1132,11 +1134,13 @@ Singleton {
                 "scale": typeof scaleValue === "number" ? scaleValue : 1.0,
                 "transform": hyprlandToTransform(transform)
             },
-            "modes": modeMatch ? [{
-                        "width": parseInt(modeMatch[1]),
-                        "height": parseInt(modeMatch[2]),
-                        "refresh_rate": Math.round(parseFloat(modeMatch[3]) * 1000)
-                    }] : [],
+            "modes": modeMatch ? [
+                {
+                    "width": parseInt(modeMatch[1]),
+                    "height": parseInt(modeMatch[2]),
+                    "refresh_rate": Math.round(parseFloat(modeMatch[3]) * 1000)
+                }
+            ] : [],
             "current_mode": modeMatch ? 0 : -1,
             "vrr_enabled": vrrMode >= 1,
             "vrr_supported": vrrMode > 0,
@@ -1666,7 +1670,7 @@ Singleton {
 
     function getHyprlandOutputIdentifier(output, outputName) {
         if (SettingsData.displayNameMode === "model" && output?.make && output?.model)
-            return "desc:" + output.make + " " + output.model + " " + (output?.serial || "Unknown");
+            return ("desc:" + output.make + " " + output.model + " " + (output?.serial || "Unknown")).replace(/,/g, "");
         return outputName;
     }
 
