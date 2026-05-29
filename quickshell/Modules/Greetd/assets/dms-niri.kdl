@@ -8,10 +8,6 @@ environment {
 
 spawn-at-startup "sh" "-c" "qs -p _DMS_PATH_; niri msg action quit --skip-confirmation"
 
-debug {
-  keep-max-bpc-unchanged
-}
-
 gestures {
    hot-corners {
      off

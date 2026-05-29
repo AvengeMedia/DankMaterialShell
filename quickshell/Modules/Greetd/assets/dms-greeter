@@ -263,10 +263,6 @@ environment {
     DMS_RUN_GREETER "1"
 }
 
-debug {
-  keep-max-bpc-unchanged
-}
-
 gestures {
    hot-corners {
      off
