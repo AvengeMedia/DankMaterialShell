@@ -446,7 +446,7 @@ Item {
         WlrLayershell.namespace: "dms:launcher-context-menu"
         WlrLayershell.layer: WlrLayershell.Overlay
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: root.renderActive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : (root.renderActive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
 
         anchors {
             top: true
