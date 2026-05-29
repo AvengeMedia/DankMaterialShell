@@ -162,6 +162,21 @@ Item {
     }
 
     IpcHandler {
+        // Screenshot region-select handshake
+        function begin(): string {
+            PopoutManager.screenshotActive = true;
+            return "SCREENSHOT_MODE_ON";
+        }
+
+        function end(): string {
+            PopoutManager.screenshotActive = false;
+            return "SCREENSHOT_MODE_OFF";
+        }
+
+        target: "screenshot"
+    }
+
+    IpcHandler {
         function resolveTabIndex(tab: string): int {
             switch ((tab || "").toLowerCase()) {
             case "media":

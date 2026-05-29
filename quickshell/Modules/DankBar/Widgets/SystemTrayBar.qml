@@ -981,6 +981,8 @@ BasePill {
         WlrLayershell.layer: root.barUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
+            if (PopoutManager.screenshotActive)
+                return WlrKeyboardFocus.None;
             if (!root.menuOpen)
                 return WlrKeyboardFocus.None;
             if (CompositorService.useHyprlandFocusGrab)
@@ -1449,6 +1451,8 @@ BasePill {
                 WlrLayershell.layer: root.barUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: {
+                    if (PopoutManager.screenshotActive)
+                        return WlrKeyboardFocus.None;
                     if (!menuRoot.showMenu)
                         return WlrKeyboardFocus.None;
                     if (CompositorService.useHyprlandFocusGrab)

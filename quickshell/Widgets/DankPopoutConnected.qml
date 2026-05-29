@@ -749,6 +749,8 @@ Item {
         WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
+            if (PopoutManager.screenshotActive)
+                return WlrKeyboardFocus.None;
             if (customKeyboardFocus !== null)
                 return customKeyboardFocus;
             if (!shouldBeVisible)

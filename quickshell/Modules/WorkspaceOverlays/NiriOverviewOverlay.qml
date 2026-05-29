@@ -124,6 +124,8 @@ Scope {
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: {
+                    if (PopoutManager.screenshotActive)
+                        return WlrKeyboardFocus.None;
                     if (!NiriService.inOverview)
                         return WlrKeyboardFocus.None;
                     if (!isActiveScreen)

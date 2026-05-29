@@ -300,6 +300,8 @@ Item {
         }
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
         WlrLayershell.keyboardFocus: {
+            if (PopoutManager.screenshotActive)
+                return WlrKeyboardFocus.None;
             if (root.isInteracting) {
                 if (CompositorService.useHyprlandFocusGrab)
                     return WlrKeyboardFocus.OnDemand;
