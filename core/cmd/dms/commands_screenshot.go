@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
@@ -179,9 +181,39 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	return config
 }
 
+// setPopoutScreenshotMode toggles the shell handshake so popouts drop their keyboard grab during region select. Best-effort.
+func setPopoutScreenshotMode(begin bool) {
+	fn := "end"
+	if begin {
+		fn = "begin"
+	}
+	cmdArgs := []string{"ipc"}
+	if pid, ok := getFirstDMSPID(); ok {
+		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
+	} else {
+		if err := findConfig(nil, nil); err != nil {
+			return
+		}
+		if qsHasAnyDisplay() {
+			cmdArgs = append(cmdArgs, "--any-display")
+		}
+		cmdArgs = append(cmdArgs, "-p", configPath)
+	}
+	cmdArgs = append(cmdArgs, "call", "screenshot", fn)
+	_ = exec.Command("qs", cmdArgs...).Run()
+}
+
 func runScreenshot(config screenshot.Config) {
-	sc := screenshot.New(config)
-	result, err := sc.Run()
+	// Region select needs the keyboard; drop popout grabs for its duration.
+	result, err := func() (*screenshot.CaptureResult, error) {
+		interactive := config.Mode == screenshot.ModeRegion || config.Mode == screenshot.ModeLastRegion
+		if interactive {
+			setPopoutScreenshotMode(true)
+			defer setPopoutScreenshotMode(false)
+		}
+		return screenshot.New(config).Run()
+	}()
+
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
