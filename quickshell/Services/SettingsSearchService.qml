@@ -20,6 +20,18 @@ Singleton {
     property bool indexLoaded: false
     property var _translatedCache: []
 
+    Connections {
+        target: I18n
+
+        function onTranslationsChanged() {
+            root._refreshTranslatedCache();
+        }
+
+        function onTranslationsLoadedChanged() {
+            root._refreshTranslatedCache();
+        }
+    }
+
     readonly property var conditionMap: ({
             "isNiri": () => CompositorService.isNiri,
             "isHyprland": () => CompositorService.isHyprland,
@@ -143,6 +155,7 @@ Singleton {
         for (var i = 0; i < settingsIndex.length; i++) {
             var item = settingsIndex[i];
             var t = translateItem(item);
+            var sourceDescription = item.description || "";
             cache.push({
                 section: t.section,
                 label: t.label,
@@ -152,11 +165,56 @@ Singleton {
                 icon: t.icon,
                 description: t.description,
                 conditionKey: t.conditionKey,
-                labelLower: t.label.toLowerCase(),
-                categoryLower: t.category.toLowerCase()
+                labelSearch: _lowerVariants([item.label, t.label]),
+                categorySearch: _lowerVariants([item.category, t.category]),
+                descriptionSearch: _lowerVariants([sourceDescription, t.description])
             });
         }
         _translatedCache = cache;
+    }
+
+    function _lowerVariants(values) {
+        var out = [];
+        for (var i = 0; i < values.length; i++) {
+            var value = values[i];
+            if (!value)
+                continue;
+            var lower = String(value).toLowerCase();
+            if (out.indexOf(lower) === -1)
+                out.push(lower);
+        }
+        return out;
+    }
+
+    function _bestFieldScore(fields, queryLower, exactScore, prefixScore, includesScore) {
+        var score = 0;
+        for (var i = 0; i < fields.length; i++) {
+            var field = fields[i];
+            if (field === queryLower) {
+                score = Math.max(score, exactScore);
+            } else if (field.startsWith(queryLower)) {
+                score = Math.max(score, prefixScore);
+            } else if (field.includes(queryLower)) {
+                score = Math.max(score, includesScore);
+            }
+        }
+        return score;
+    }
+
+    function _fieldsContainWord(fields, word) {
+        for (var i = 0; i < fields.length; i++) {
+            if (fields[i].includes(word))
+                return true;
+        }
+        return false;
+    }
+
+    function _refreshTranslatedCache() {
+        if (!indexLoaded)
+            return;
+        _rebuildTranslationCache();
+        if (query)
+            results = _searchEntries(query, 15);
     }
 
     function _searchEntries(text, maxResults) {
@@ -174,19 +232,11 @@ Singleton {
             if (!checkCondition(entry))
                 continue;
 
-            var labelLower = entry.labelLower;
-            var categoryLower = entry.categoryLower;
             var score = 0;
 
-            if (labelLower === queryLower) {
-                score = 10000;
-            } else if (labelLower.startsWith(queryLower)) {
-                score = 5000;
-            } else if (labelLower.includes(queryLower)) {
-                score = 1000;
-            } else if (categoryLower.includes(queryLower)) {
-                score = 500;
-            }
+            score = Math.max(score, _bestFieldScore(entry.labelSearch, queryLower, 10000, 5000, 1000));
+            score = Math.max(score, _bestFieldScore(entry.categorySearch, queryLower, 500, 500, 500));
+            score = Math.max(score, _bestFieldScore(entry.descriptionSearch, queryLower, 250, 250, 250));
 
             if (score === 0) {
                 var keywords = entry.keywords;
@@ -205,7 +255,11 @@ Singleton {
                 var allMatch = true;
                 for (var w = 0; w < queryWords.length; w++) {
                     var word = queryWords[w];
-                    if (labelLower.includes(word))
+                    if (_fieldsContainWord(entry.labelSearch, word))
+                        continue;
+                    if (_fieldsContainWord(entry.descriptionSearch, word))
+                        continue;
+                    if (_fieldsContainWord(entry.categorySearch, word))
                         continue;
                     var inKeywords = false;
                     for (var k = 0; k < entry.keywords.length; k++) {
@@ -214,7 +268,7 @@ Singleton {
                             break;
                         }
                     }
-                    if (!inKeywords && !categoryLower.includes(word)) {
+                    if (!inKeywords) {
                         allMatch = false;
                         break;
                     }
