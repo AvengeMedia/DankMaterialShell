@@ -34,19 +34,12 @@ BasePill {
     visible: true
 
     function cyclePowerProfiles() {
-        if (typeof PowerProfiles === "undefined") {
+        if (!PowerProfileWatcher.available) {
             ToastService.showError(I18n.tr("power-profiles-daemon not available"));
             return;
         }
 
-        const profiles = [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []);
-        var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
-
-        // Cycle through profiles
-        index = (index + 1) % profiles.length;
-
-        PowerProfiles.profile = profiles[index];
-        if (PowerProfiles.profile !== profiles[index]) {
+        if (!PowerProfileWatcher.cycleProfile()) {
             ToastService.showError(I18n.tr("Failed to set power profile"));
         }
     }

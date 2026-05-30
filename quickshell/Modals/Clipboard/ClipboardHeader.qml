@@ -6,7 +6,8 @@ import qs.Modals.Clipboard
 Item {
     id: header
 
-    property int totalCount: 0
+    property int recentsCount: 0
+    property int savedCount: 0
     property bool showKeyboardHints: false
     property string activeTab: "recents"
     property int pinnedCount: 0
@@ -31,7 +32,7 @@ Item {
         }
 
         StyledText {
-            text: I18n.tr("Clipboard History") + ` (${totalCount})`
+            text: (header.activeTab === "saved" ? I18n.tr("Clipboard Saved") : I18n.tr("Clipboard History")) + ` (${header.activeTab === "saved" ? header.savedCount : header.recentsCount})`
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.surfaceText
             font.weight: Font.Medium
@@ -48,6 +49,7 @@ Item {
             iconName: "push_pin"
             iconSize: Theme.iconSize - 4
             iconColor: header.activeTab === "saved" ? Theme.primary : Theme.surfaceText
+            backgroundColor: header.activeTab === "saved" ? Theme.primarySelected : "transparent"
             visible: header.pinnedCount > 0
             tooltipText: header.activeTab === "saved" ? I18n.tr("Recent") : I18n.tr("Saved")
             onClicked: tabChanged(header.activeTab === "saved" ? "recents" : "saved")
