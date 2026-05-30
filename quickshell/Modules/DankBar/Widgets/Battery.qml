@@ -48,9 +48,6 @@ BasePill {
         PowerProfiles.profile = profiles[index];
         if (PowerProfiles.profile !== profiles[index]) {
             ToastService.showError(I18n.tr("Failed to set power profile"));
-        } else {
-            const label = Theme.getPowerProfileLabel(profiles[index]);
-            ToastService.showInfo(I18n.tr("Power Profile: %1").arg(label));
         }
     }
 
