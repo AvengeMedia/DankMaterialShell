@@ -49,6 +49,7 @@ Item {
             iconName: "push_pin"
             iconSize: Theme.iconSize - 4
             iconColor: header.activeTab === "saved" ? Theme.primary : Theme.surfaceText
+            backgroundColor: header.activeTab === "saved" ? Theme.primarySelected : "transparent"
             visible: header.pinnedCount > 0
             tooltipText: header.activeTab === "saved" ? I18n.tr("Recent") : I18n.tr("Saved")
             onClicked: tabChanged(header.activeTab === "saved" ? "recents" : "saved")
