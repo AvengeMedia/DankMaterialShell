@@ -404,7 +404,7 @@ Item {
             widgetObj.mountPath = "/";
             widgetObj.diskUsageMode = 0;
         }
-        if (widgetId === "cpuUsage" || widgetId === "memUsage" || widgetId === "cpuTemp" || widgetId === "gpuTemp")
+        if (widgetId === "cpuUsage" || widgetId === "memUsage" || widgetId === "cpuTemp" || widgetId === "gpuTemp" || widgetId === "diskUsage")
             widgetObj.minimumWidth = true;
         if (widgetId === "memUsage")
             widgetObj.showInGb = false;
