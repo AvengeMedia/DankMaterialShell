@@ -3,6 +3,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Services.SystemTray
+import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
 import qs.Modules.Settings.DisplayConfig
@@ -1889,5 +1890,87 @@ Item {
         }
 
         target: "tray"
+    }
+
+    IpcHandler {
+        function open(): string {
+            if (typeof PowerProfiles === "undefined")
+                return "ERROR: power-profiles-daemon not available";
+
+            PopoutService.openPowerProfileModal();
+            return "POWERPROFILE_OPEN_SUCCESS";
+        }
+
+        function close(): string {
+            PopoutService.closePowerProfileModal();
+            return "POWERPROFILE_CLOSE_SUCCESS";
+        }
+
+        function toggle(): string {
+            if (typeof PowerProfiles === "undefined")
+                return "ERROR: power-profiles-daemon not available";
+
+            PopoutService.togglePowerProfileModal();
+            return "POWERPROFILE_TOGGLE_SUCCESS";
+        }
+
+        function list(): string {
+            if (typeof PowerProfiles === "undefined")
+                return "ERROR: power-profiles-daemon not available";
+
+            const profiles = ["power-saver", "balanced"];
+            if (PowerProfiles.hasPerformanceProfile)
+                profiles.push("performance");
+
+            return profiles.join("\n");
+        }
+
+        function set(profile: string): string {
+            if (typeof PowerProfiles === "undefined")
+                return "ERROR: power-profiles-daemon not available";
+
+            if (!profile)
+                return "ERROR: No profile specified";
+
+            const lower = profile.toLowerCase().trim();
+            if (lower === "power-saver" || lower === "powersaver" || lower === "saver" || lower === "0") {
+                PowerProfiles.profile = PowerProfile.PowerSaver;
+                return "POWERPROFILE_SET_SUCCESS";
+            } else if (lower === "balanced" || lower === "1") {
+                PowerProfiles.profile = PowerProfile.Balanced;
+                return "POWERPROFILE_SET_SUCCESS";
+            } else if (lower === "performance" || lower === "2") {
+                if (PowerProfiles.hasPerformanceProfile) {
+                    PowerProfiles.profile = PowerProfile.Performance;
+                    return "POWERPROFILE_SET_SUCCESS";
+                } else {
+                    return "ERROR: Performance profile not supported by hardware";
+                }
+            } else {
+                return "ERROR: Unknown power profile. Supported options: power-saver, balanced, performance";
+            }
+        }
+
+        function cycle(): string {
+            if (typeof PowerProfiles === "undefined")
+                return "ERROR: power-profiles-daemon not available";
+
+            const current = PowerProfiles.profile;
+            const profiles = [PowerProfile.PowerSaver, PowerProfile.Balanced];
+            if (PowerProfiles.hasPerformanceProfile)
+                profiles.push(PowerProfile.Performance);
+
+            const index = profiles.indexOf(current);
+            if (index === -1) {
+                PowerProfiles.profile = PowerProfile.Balanced;
+                return "POWERPROFILE_CYCLE_SUCCESS";
+            }
+
+            const nextIndex = (index + 1) % profiles.length;
+            PowerProfiles.profile = profiles[nextIndex];
+            return "POWERPROFILE_CYCLE_SUCCESS";
+        }
+
+        target: "powerprofile"
     }
 }

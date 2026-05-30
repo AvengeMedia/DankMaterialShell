@@ -1185,6 +1185,24 @@ Item {
         }
     }
 
+    LazyLoader {
+        id: powerProfileModalLoader
+
+        active: false
+
+        PowerProfileModal {
+            id: powerProfileModal
+
+            Component.onCompleted: {
+                PopoutService.powerProfileModal = powerProfileModal;
+            }
+        }
+
+        Component.onCompleted: {
+            PopoutService.powerProfileModalLoader = powerProfileModalLoader;
+        }
+    }
+
     DMSShellIPC {
         powerMenuModalLoader: powerMenuModalLoader
         processListModalLoader: processListModalLoader

@@ -50,6 +50,8 @@ Singleton {
     property var bluetoothPairingModal: null
     property var networkInfoModal: null
     property var windowRuleModalLoader: null
+    property var powerProfileModal: null
+    property var powerProfileModalLoader: null
 
     property var notepadSlideouts: []
 
@@ -672,6 +674,40 @@ Singleton {
             } else {
                 powerMenuModal.openCentered();
             }
+        }
+    }
+
+    function openPowerProfileModal() {
+        if (powerProfileModal) {
+            powerProfileModal.openCentered();
+        } else if (powerProfileModalLoader) {
+            powerProfileModalLoader.active = true;
+            Qt.callLater(() => powerProfileModal?.openCentered());
+        }
+    }
+
+    function closePowerProfileModal() {
+        powerProfileModal?.close();
+    }
+
+    function togglePowerProfileModal() {
+        if (powerProfileModal) {
+            if (powerProfileModal.shouldBeVisible) {
+                powerProfileModal.close();
+            } else {
+                powerProfileModal.openCentered();
+            }
+        } else if (powerProfileModalLoader) {
+            powerProfileModalLoader.active = true;
+            Qt.callLater(() => {
+                if (powerProfileModal) {
+                    if (powerProfileModal.shouldBeVisible) {
+                        powerProfileModal.close();
+                    } else {
+                        powerProfileModal.openCentered();
+                    }
+                }
+            });
         }
     }
 
