@@ -99,7 +99,9 @@ Card {
                 }
 
                 StyledText {
-                    text: I18n.tr("up") + " " + DgopService.shortUptime.slice(3)
+                    text: DgopService.shortUptime
+                        ? I18n.tr("up") + DgopService.shortUptime.slice(2)
+                        : I18n.tr("up")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                     anchors.verticalCenter: parent.verticalCenter
