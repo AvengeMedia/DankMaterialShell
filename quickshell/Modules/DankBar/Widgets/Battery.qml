@@ -33,6 +33,27 @@ BasePill {
 
     visible: true
 
+    function cyclePowerProfiles() {
+        if (typeof PowerProfiles === "undefined") {
+            ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+            return;
+        }
+
+        const profiles = [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []);
+        var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
+
+        // Cycle through profiles
+        index = (index + 1) % profiles.length;
+
+        PowerProfiles.profile = profiles[index];
+        if (PowerProfiles.profile !== profiles[index]) {
+            ToastService.showError(I18n.tr("Failed to set power profile"));
+        } else {
+            const label = Theme.getPowerProfileLabel(profiles[index]);
+            ToastService.showInfo(I18n.tr("Power Profile: %1").arg(label));
+        }
+    }
+
     content: Component {
         Item {
             implicitWidth: battery.isVerticalOrientation ? (battery.widgetThickness - battery.horizontalPadding * 2) : batteryContent.implicitWidth
@@ -118,10 +139,14 @@ BasePill {
         width: battery.width + battery.leftMargin + battery.rightMargin
         height: battery.height + battery.topMargin + battery.bottomMargin
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: mouse => {
             battery.triggerRipple(this, mouse.x, mouse.y);
-            toggleBatteryPopup();
+            if (mouse.button === Qt.LeftButton) {
+                toggleBatteryPopup();
+            } else if (mouse.button === Qt.RightButton) {
+                battery.cyclePowerProfiles();
+            }
         }
         onWheel: wheel => {
             var delta = wheel.angleDelta.y;
@@ -131,39 +156,19 @@ BasePill {
             // Check if this is a touchpad
             if (delta !== 120 && delta !== -120) {
                 touchpadAccumulator += delta;
-                log.info("Acc: " + touchpadAccumulator);
                 if (Math.abs(touchpadAccumulator) < 500)
                     return;
                 delta = touchpadAccumulator;
                 touchpadAccumulator = 0;
             }
-            log.info("Trigger! Delta: " + delta);
 
-            // This is after the other delta checks so it only shows on valid Y scroll
-            if (typeof PowerProfiles === "undefined") {
-                ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+            if (!DisplayService.brightnessAvailable) {
                 return;
             }
 
-            // Get list of profiles, and current index
-            const profiles = [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []);
-            var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
-
-            // Step once based on mouse wheel direction
-            if (delta > 0)
-                index += 1;
-            else
-                index -= 1;
-
-            // Already at end of list, can't go further
-            if (index < 0 || index >= profiles.length)
-                return;
-
-            // Set new profile
-            PowerProfiles.profile = profiles[index];
-            if (PowerProfiles.profile !== profiles[index]) {
-                ToastService.showError(I18n.tr("Failed to set power profile"));
-            }
+            const step = 5;
+            const newBrightness = delta > 0 ? DisplayService.brightnessLevel + step : DisplayService.brightnessLevel - step;
+            DisplayService.setBrightness(newBrightness, "", false);
         }
     }
 }
