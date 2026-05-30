@@ -245,6 +245,12 @@ Rectangle {
                     "icon": "app_registration",
                     "tabIndex": 19,
                     "hyprlandNiriOnly": true
+                },
+                {
+                    "id": "autostart",
+                    "text": I18n.tr("Autostart Apps"),
+                    "icon": "line_start",
+                    "tabIndex": 36
                 }
             ]
         },
