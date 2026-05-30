@@ -109,6 +109,20 @@ Item {
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
 
+            states: [
+                State {
+                    name: "snap"
+                    when: Theme.snapListModelChanges
+                    PropertyChanges {
+                        target: clipboardListView
+                        add: null
+                        remove: null
+                        displaced: null
+                        move: null
+                    }
+                }
+            ]
+
             function ensureVisible(index) {
                 if (index < 0 || index >= count) {
                     return;
@@ -167,6 +181,20 @@ Item {
             boundsMovement: Flickable.FollowBoundsBehavior
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
+
+            states: [
+                State {
+                    name: "snap"
+                    when: Theme.snapListModelChanges
+                    PropertyChanges {
+                        target: savedListView
+                        add: null
+                        remove: null
+                        displaced: null
+                        move: null
+                    }
+                }
+            ]
 
             function ensureVisible(index) {
                 if (index < 0 || index >= count) {
