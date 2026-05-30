@@ -24,14 +24,13 @@ Rectangle {
     }
 
     function setProfile(profile) {
-        if (typeof PowerProfiles === "undefined") {
-            ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+        if (PowerProfileWatcher.applyProfile(profile))
             return;
-        }
-        PowerProfiles.profile = profile;
-        if (PowerProfiles.profile !== profile) {
+
+        if (!PowerProfileWatcher.available)
+            ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+        else
             ToastService.showError(I18n.tr("Failed to set power profile"));
-        }
     }
 
     Column {
@@ -193,7 +192,7 @@ Rectangle {
         }
 
         DankButtonGroup {
-            property var profileModel: (typeof PowerProfiles !== "undefined") ? [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []) : [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
+            property var profileModel: PowerProfileWatcher.availableProfiles
             property int currentProfileIndex: {
                 if (typeof PowerProfiles === "undefined")
                     return 1;

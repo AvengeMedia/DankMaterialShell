@@ -282,6 +282,53 @@ dms ipc call inhibit toggle
 dms ipc call inhibit enable
 ```
 
+## Target: `powerprofile`
+
+Power profile control via `power-profiles-daemon`. Changes stay in sync with DMS UI and trigger the power profile OSD when enabled.
+
+Requires `power-profiles-daemon` to be installed and running. Works on all compositors.
+
+### Functions
+
+**`open`**
+- Show the power profile picker modal
+- Returns: Success confirmation or error if daemon unavailable
+
+**`close`**
+- Close the power profile picker modal
+- Returns: Success confirmation
+
+**`toggle`**
+- Toggle power profile picker modal visibility
+- Returns: Success confirmation or error if daemon unavailable
+
+**`list`**
+- List available profile slugs, one per line
+- Returns: `power-saver`, `balanced`, and `performance` when supported
+
+**`status`**
+- Get the currently active profile slug
+- Returns: `power-saver`, `balanced`, `performance`, or error if daemon unavailable
+
+**`set <profile>`**
+- Set the active power profile
+- Parameters: Profile slug or alias — `power-saver` (`powersaver`, `saver`, `0`), `balanced` (`1`), `performance` (`2`)
+- Returns: Success confirmation or error if profile unknown, unsupported, or write failed
+
+**`cycle`**
+- Cycle to the next available profile in order: power-saver → balanced → performance → power-saver
+- Returns: Success confirmation or error if daemon unavailable or write failed
+
+### Examples
+```bash
+dms ipc call powerprofile status
+dms ipc call powerprofile list
+dms ipc call powerprofile cycle
+dms ipc call powerprofile set balanced
+dms ipc call powerprofile set performance
+dms ipc call powerprofile toggle
+```
+
 ## Target: `wallpaper`
 
 Wallpaper management and retrieval with support for per-monitor configurations.
@@ -543,6 +590,18 @@ Power menu modal control for system power actions.
 - `close` - Hide power menu modal
 - `toggle` - Toggle power menu modal visibility
 
+### Target: `powerprofile`
+Power profile picker modal and profile control via `power-profiles-daemon`.
+
+**Functions:**
+- `open` - Show power profile picker modal
+- `close` - Hide power profile picker modal
+- `toggle` - Toggle power profile picker modal visibility
+- `list` - List available profile slugs
+- `status` - Get current profile slug
+- `set <profile>` - Set profile by slug or alias (`power-saver`, `balanced`, `performance`)
+- `cycle` - Cycle to the next available profile
+
 ### Target: `control-center`
 Control Center popout containing network, bluetooth, audio, power, and other quick settings.
 
@@ -672,6 +731,10 @@ dms ipc call processlist toggle
 
 # Show power menu
 dms ipc call powermenu toggle
+
+# Cycle or set power profile (requires power-profiles-daemon)
+dms ipc call powerprofile cycle
+dms ipc call powerprofile toggle
 
 # Open notepad
 dms ipc call notepad toggle

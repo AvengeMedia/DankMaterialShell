@@ -12,7 +12,7 @@ DankModal {
     keepPopoutsOpen: true
 
     property int selectedIndex: 0
-    property var profileModel: (typeof PowerProfiles !== "undefined") ? [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []) : [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
+    property var profileModel: PowerProfileWatcher.availableProfiles
 
     function openCentered() {
         open();
@@ -100,10 +100,15 @@ DankModal {
     }
 
     function setProfile(profile) {
-        if (typeof PowerProfiles !== "undefined") {
-            PowerProfiles.profile = profile;
+        if (PowerProfileWatcher.applyProfile(profile)) {
+            hideDialog();
+            return;
         }
-        hideDialog();
+
+        if (!PowerProfileWatcher.available)
+            ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+        else
+            ToastService.showError(I18n.tr("Failed to set power profile"));
     }
 
     content: Component {

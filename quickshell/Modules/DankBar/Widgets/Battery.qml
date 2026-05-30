@@ -140,30 +140,24 @@ BasePill {
             log.info("Trigger! Delta: " + delta);
 
             // This is after the other delta checks so it only shows on valid Y scroll
-            if (typeof PowerProfiles === "undefined") {
+            if (!PowerProfileWatcher.available) {
                 ToastService.showError(I18n.tr("power-profiles-daemon not available"));
                 return;
             }
 
-            // Get list of profiles, and current index
-            const profiles = [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []);
+            const profiles = PowerProfileWatcher.availableProfiles;
             var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
 
-            // Step once based on mouse wheel direction
             if (delta > 0)
                 index += 1;
             else
                 index -= 1;
 
-            // Already at end of list, can't go further
             if (index < 0 || index >= profiles.length)
                 return;
 
-            // Set new profile
-            PowerProfiles.profile = profiles[index];
-            if (PowerProfiles.profile !== profiles[index]) {
+            if (!PowerProfileWatcher.applyProfile(profiles[index]))
                 ToastService.showError(I18n.tr("Failed to set power profile"));
-            }
         }
     }
 }
