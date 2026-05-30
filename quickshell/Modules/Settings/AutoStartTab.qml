@@ -23,7 +23,10 @@ Item {
         return configHome + "/autostart";
     }
 
-    readonly property string systemdUserDir: Quickshell.env("HOME") + "/.config/systemd/user"
+    readonly property string systemdUserDir: {
+        const configHome = Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config";
+        return configHome + "/systemd/user";
+    }
 
     function loadEntries() {
         const proc = readDirComponent.createObject(root, {
