@@ -34,14 +34,11 @@ BasePill {
     visible: true
 
     function cyclePowerProfiles() {
-        if (!PowerProfileWatcher.available) {
-            ToastService.showError(I18n.tr("power-profiles-daemon not available"));
-            return;
-        }
-
-        if (!PowerProfileWatcher.cycleProfile()) {
-            ToastService.showError(I18n.tr("Failed to set power profile"));
-        }
+        DMSService.sendRequest("powerprofile.cycle", null, response => {
+            if (response.error) {
+                ToastService.showError(I18n.tr("Failed to set power profile"));
+            }
+        });
     }
 
     content: Component {
