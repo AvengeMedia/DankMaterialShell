@@ -23,8 +23,11 @@ Item {
 
     property var cursorIncludeStatus: ({
             "exists": false,
-            "included": false
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
         })
+    readonly property bool cursorReadOnly: CompositorService.isHyprland && cursorIncludeStatus.readOnly === true
     property bool checkingCursorInclude: false
     property bool fixingCursorInclude: false
 
@@ -62,7 +65,9 @@ Item {
         if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl") {
             cursorIncludeStatus = {
                 "exists": false,
-                "included": false
+                "included": false,
+                "configFormat": "",
+                "readOnly": false
             };
             return;
         }
@@ -76,7 +81,9 @@ Item {
             if (exitCode !== 0) {
                 cursorIncludeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
                 return;
             }
@@ -85,13 +92,19 @@ Item {
             } catch (e) {
                 cursorIncludeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
             }
         });
     }
 
     function fixCursorInclude() {
+        if (cursorReadOnly) {
+            ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings."), "dms setup", "hyprland-migration");
+            return;
+        }
         const paths = getCursorConfigPaths();
         if (!paths)
             return;

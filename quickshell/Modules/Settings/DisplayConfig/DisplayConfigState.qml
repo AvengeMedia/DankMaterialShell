@@ -21,8 +21,11 @@ Singleton {
 
     property var includeStatus: ({
             "exists": false,
-            "included": false
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
         })
+    readonly property bool readOnly: CompositorService.isHyprland && includeStatus.readOnly === true
     property bool checkingInclude: false
     property bool fixingInclude: false
 
@@ -481,6 +484,15 @@ Singleton {
 
     // Write compositor config from a neutral config entry and optionally reload
     function applyConfigEntry(configEntry, configId, profileName, isManual) {
+        if (CompositorService.isHyprland && readOnly) {
+            if (isManual) {
+                profilesLoading = false;
+                manualActivation = false;
+                profileError(I18n.tr("Hyprland conf mode is read-only in Settings"));
+            }
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         ensureEnabledOutput(configEntry);
         // Capture the entry being applied so disabled-output settings fields can read
         // scale/position/transform back even when wlr reports no logical viewport.
@@ -1372,7 +1384,9 @@ Singleton {
         if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl") {
             includeStatus = {
                 "exists": false,
-                "included": false
+                "included": false,
+                "configFormat": "",
+                "readOnly": false
             };
             return;
         }
@@ -1386,7 +1400,9 @@ Singleton {
             if (exitCode !== 0) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
                 return;
             }
@@ -1395,13 +1411,19 @@ Singleton {
             } catch (e) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
             }
         });
     }
 
     function fixOutputsInclude() {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         const paths = getConfigPaths();
         if (!paths)
             return;
@@ -1424,6 +1446,10 @@ Singleton {
             checkIncludeStatus();
             WlrOutputService.requestState();
         });
+    }
+
+    function showHyprlandReadOnlyWarning() {
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing display settings."), "dms setup", "display-config");
     }
 
     function buildOutputsMap() {
@@ -1514,6 +1540,10 @@ Singleton {
             NiriService.generateOutputsConfig(outputsData);
             break;
         case "hyprland":
+            if (readOnly) {
+                showHyprlandReadOnlyWarning();
+                return false;
+            }
             HyprlandService.generateOutputsConfig(outputsData, buildMergedHyprlandSettings());
             break;
         case "dwl":
@@ -1523,6 +1553,7 @@ Singleton {
             WlrOutputService.applyOutputsConfig(outputsData, outputs);
             break;
         }
+        return true;
     }
 
     function normalizeOutputPositions(outputsData) {
@@ -1830,6 +1861,10 @@ Singleton {
     function applyChanges() {
         if (!hasPendingChanges)
             return;
+        if (CompositorService.isHyprland && readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         const changeDescriptions = [];
 
         if (formatChanged) {

@@ -18,8 +18,16 @@ Singleton {
     readonly property string layoutPath: hyprDmsDir + "/layout.lua"
     readonly property string cursorPath: hyprDmsDir + "/cursor.lua"
     readonly property string windowrulesPath: hyprDmsDir + "/windowrules.lua"
+    readonly property bool luaConfigActive: CompositorService.isHyprland && Hyprland.usingLua === true
 
     property int _lastGapValue: -1
+
+    onLuaConfigActiveChanged: {
+        if (luaConfigActive) {
+            Qt.callLater(generateLayoutConfig);
+            Qt.callLater(ensureWindowrulesConfig);
+        }
+    }
 
     Component.onCompleted: {
         if (CompositorService.isHyprland) {
@@ -29,6 +37,8 @@ Singleton {
     }
 
     function ensureWindowrulesConfig() {
+        if (!canWriteLuaConfig("windowrules"))
+            return;
         Proc.runCommand("hypr-ensure-windowrules", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && [ ! -f "${windowrulesPath}" ] && touch "${windowrulesPath}" || true`], (output, exitCode) => {
             if (exitCode !== 0)
                 log.warn("Failed to ensure windowrules.lua:", output);
@@ -66,6 +76,13 @@ Singleton {
         return JSON.stringify(String(str ?? ""));
     }
 
+    function canWriteLuaConfig(name) {
+        if (luaConfigActive)
+            return true;
+        log.info("Skipping Hyprland", name || "config", "Lua write because the active Hyprland config is not Lua");
+        return false;
+    }
+
     function forceFlagValue(value) {
         if (value === true)
             return 1;
@@ -75,6 +92,11 @@ Singleton {
     }
 
     function generateOutputsConfig(outputsData, hyprlandSettings, callback) {
+        if (!canWriteLuaConfig("outputs")) {
+            if (callback)
+                callback(false);
+            return;
+        }
         if (!outputsData || Object.keys(outputsData).length === 0) {
             if (callback)
                 callback(false);
@@ -172,6 +194,8 @@ Singleton {
     function generateLayoutConfig() {
         if (!CompositorService.isHyprland)
             return;
+        if (!canWriteLuaConfig("layout"))
+            return;
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
         const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4;
@@ -253,6 +277,8 @@ hl.config({
 
     function generateCursorConfig() {
         if (!CompositorService.isHyprland)
+            return;
+        if (!canWriteLuaConfig("cursor"))
             return;
 
         const settings = typeof SettingsData !== "undefined" ? SettingsData.cursorSettings : null;

@@ -84,6 +84,10 @@ Item {
     }
 
     function startNewBind() {
+        if (KeybindsService.readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         showingNewBind = true;
         expandedKey = "";
     }
@@ -292,7 +296,7 @@ Item {
 
                             StyledText {
                                 readonly property string bindsFile: KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
-                                text: I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
+                                text: KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -326,7 +330,7 @@ Item {
                             iconSize: Theme.iconSize
                             iconColor: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
-                            enabled: !keybindsTab.showingNewBind
+                            enabled: !keybindsTab.showingNewBind && !KeybindsService.readOnly
                             opacity: enabled ? 1 : 0.5
                             onClicked: keybindsTab.startNewBind()
                         }
@@ -342,14 +346,15 @@ Item {
                 radius: Theme.cornerRadius
 
                 readonly property var status: KeybindsService.dmsStatus
-                readonly property bool showError: !status.included && status.exists
-                readonly property bool showWarning: status.included && status.overriddenBy > 0
-                readonly property bool showSetup: !status.exists
+                readonly property bool showLegacy: KeybindsService.readOnly
+                readonly property bool showError: !showLegacy && !status.included && status.exists
+                readonly property bool showWarning: !showLegacy && status.included && status.overriddenBy > 0
+                readonly property bool showSetup: !showLegacy && !status.exists
 
-                color: (showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                border.color: (showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
+                color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                border.color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
                 border.width: 1
-                visible: (showError || showWarning || showSetup) && !KeybindsService.loading
+                visible: (showLegacy || showError || showWarning || showSetup) && !KeybindsService.loading
 
                 Column {
                     id: warningSection
@@ -375,6 +380,8 @@ Item {
 
                             StyledText {
                                 text: {
+                                    if (warningBox.showLegacy)
+                                        return I18n.tr("Hyprland conf mode");
                                     if (warningBox.showSetup)
                                         return I18n.tr("First Time Setup");
                                     if (warningBox.showError)
@@ -391,6 +398,8 @@ Item {
                             StyledText {
                                 readonly property string bindsFile: KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
                                 text: {
+                                    if (warningBox.showLegacy)
+                                        return I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.");
                                     if (warningBox.showSetup)
                                         return I18n.tr("Click 'Setup' to create %1 and add include to config.").arg(bindsFile);
                                     if (warningBox.showError)
@@ -411,7 +420,7 @@ Item {
 
                         DankButton {
                             id: fixButton
-                            visible: warningBox.showError || warningBox.showSetup
+                            visible: !warningBox.showLegacy && (warningBox.showError || warningBox.showSetup)
                             text: {
                                 if (KeybindsService.fixing)
                                     return I18n.tr("Fixing...");
@@ -559,6 +568,7 @@ Item {
                                 desc: ""
                             })
                         panelWindow: keybindsTab.parentModal
+                        readOnly: KeybindsService.readOnly
                         onSaveBind: (originalKey, newData) => keybindsTab.saveNewBind(newData)
                         onCancelEdit: keybindsTab.cancelNewBind()
                     }
@@ -668,6 +678,7 @@ Item {
                             bindData: modelData
                             isExpanded: keybindsTab.expandedKey === modelData.action
                             panelWindow: keybindsTab.parentModal
+                            readOnly: KeybindsService.readOnly
                             onToggleExpand: keybindsTab.toggleExpanded(modelData.action)
                             onSaveBind: (originalKey, newData) => {
                                 KeybindsService.saveBind(originalKey, newData);

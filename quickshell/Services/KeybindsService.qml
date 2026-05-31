@@ -52,7 +52,9 @@ Singleton {
             "bindsAfterDms": 0,
             "effective": true,
             "overriddenBy": 0,
-            "statusMessage": ""
+            "statusMessage": "",
+            "configFormat": "",
+            "readOnly": false
         })
 
     property var _rawData: null
@@ -102,6 +104,7 @@ Singleton {
             return "";
         }
     }
+    readonly property bool readOnly: currentProvider === "hyprland" && dmsStatus.readOnly === true
     readonly property var actionTypes: Actions.getActionTypes()
     readonly property var dmsActions: getDmsActions()
 
@@ -258,6 +261,10 @@ Singleton {
     function fixDmsBindsInclude() {
         if (fixing || dmsBindsIncluded || !compositorConfigDir)
             return;
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         fixing = true;
         const timestamp = Math.floor(Date.now() / 1000);
         const backupPath = `${mainConfigPath}.dmsbackup${timestamp}`;
@@ -343,7 +350,9 @@ Singleton {
                 "bindsAfterDms": status.bindsAfterDms ?? 0,
                 "effective": status.effective ?? true,
                 "overriddenBy": status.overriddenBy ?? 0,
-                "statusMessage": status.statusMessage ?? ""
+                "statusMessage": status.statusMessage ?? "",
+                "configFormat": status.configFormat ?? "",
+                "readOnly": status.readOnly === true
             };
         }
         _maybeWarnHyprlandLegacyConf();
@@ -482,6 +491,10 @@ Singleton {
     }
 
     function saveBind(originalKey, bindData) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!bindData.key || !Actions.isValidAction(bindData.action))
             return;
         saving = true;
@@ -510,13 +523,26 @@ Singleton {
             return;
         if (currentProvider !== "hyprland")
             return;
+        if (readOnly) {
+            _hyprlandLegacyWarnShown = true;
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!dmsStatus.exists || dmsStatus.included)
             return;
         _hyprlandLegacyWarnShown = true;
-        ToastService.showWarning(I18n.tr("Hyprland config still uses hyprlang"), I18n.tr("DMS Settings now writes Lua. Edits won't apply until you migrate."), "dms setup", "hyprland-migration");
+        ToastService.showWarning(I18n.tr("Hyprland config include missing"), I18n.tr("DMS Settings writes Lua keybinds. Add the DMS include so edits apply."), "dms setup", "hyprland-migration");
+    }
+
+    function showHyprlandReadOnlyWarning() {
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings."), "dms setup", "hyprland-migration");
     }
 
     function removeBind(key) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!key)
             return;
         removeProcess.command = ["dms", "keybinds", "remove", currentProvider, key];
@@ -525,6 +551,10 @@ Singleton {
     }
 
     function resetBind(key) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!key)
             return;
         removeProcess.command = ["dms", "keybinds", "reset", currentProvider, key];

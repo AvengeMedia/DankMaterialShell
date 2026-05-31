@@ -68,6 +68,8 @@ func (h *HyprlandProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 			Effective:       result.DMSStatus.Effective,
 			OverriddenBy:    result.DMSStatus.OverriddenBy,
 			StatusMessage:   result.DMSStatus.StatusMessage,
+			ConfigFormat:    result.DMSStatus.ConfigFormat,
+			ReadOnly:        result.DMSStatus.ReadOnly,
 		}
 	}
 
@@ -219,6 +221,9 @@ func (h *HyprlandProvider) validateAction(action string) error {
 }
 
 func (h *HyprlandProvider) SetBind(key, action, description string, options map[string]any) error {
+	if err := h.ensureWritableConfig(); err != nil {
+		return err
+	}
 	if err := h.validateAction(action); err != nil {
 		return err
 	}
@@ -242,9 +247,10 @@ func (h *HyprlandProvider) SetBind(key, action, description string, options map[
 		}
 	}
 
-	normalizedKey := strings.ToLower(key)
+	canonicalKey := canonicalHyprlandOverrideKey(key)
+	normalizedKey := hyprlandOverrideMapKey(canonicalKey)
 	existingBinds[normalizedKey] = &hyprlandOverrideBind{
-		Key:         key,
+		Key:         canonicalKey,
 		Action:      action,
 		Description: description,
 		Flags:       flags,
@@ -255,21 +261,28 @@ func (h *HyprlandProvider) SetBind(key, action, description string, options map[
 }
 
 func (h *HyprlandProvider) RemoveBind(key string) error {
+	if err := h.ensureWritableConfig(); err != nil {
+		return err
+	}
 	existingBinds, err := h.loadOverrideBinds()
 	if err != nil {
 		return nil
 	}
-	normalizedKey := strings.ToLower(key)
-	existingBinds[normalizedKey] = &hyprlandOverrideBind{Key: key, Unbind: true}
+	canonicalKey := canonicalHyprlandOverrideKey(key)
+	normalizedKey := hyprlandOverrideMapKey(canonicalKey)
+	existingBinds[normalizedKey] = &hyprlandOverrideBind{Key: canonicalKey, Unbind: true}
 	return h.writeOverrideBinds(existingBinds)
 }
 
 func (h *HyprlandProvider) ResetBind(key string) error {
+	if err := h.ensureWritableConfig(); err != nil {
+		return err
+	}
 	existingBinds, err := h.loadOverrideBinds()
 	if err != nil {
 		return nil
 	}
-	normalizedKey := strings.ToLower(key)
+	normalizedKey := hyprlandOverrideMapKey(key)
 	delete(existingBinds, normalizedKey)
 	return h.writeOverrideBinds(existingBinds)
 }
@@ -284,8 +297,44 @@ type hyprlandOverrideBind struct {
 	Unbind bool
 }
 
+func (h *HyprlandProvider) ensureWritableConfig() error {
+	if h.isLegacyConfigReadOnly() {
+		return fmt.Errorf("hyprland legacy conf configs are read-only; run dms setup to migrate to Lua before editing keybinds")
+	}
+	return nil
+}
+
+func (h *HyprlandProvider) isLegacyConfigReadOnly() bool {
+	expanded, err := utils.ExpandPath(h.configPath)
+	if err != nil {
+		expanded = h.configPath
+	}
+	luaPath := filepath.Join(expanded, "hyprland.lua")
+	if st, err := os.Stat(luaPath); err == nil && st.Mode().IsRegular() {
+		return false
+	}
+	confPath := filepath.Join(expanded, "hyprland.conf")
+	if st, err := os.Stat(confPath); err == nil && st.Mode().IsRegular() {
+		return true
+	}
+	return false
+}
+
 func (h *HyprlandProvider) loadOverrideBinds() (map[string]*hyprlandOverrideBind, error) {
 	return readLuaOrHyprlangOverride(h.GetOverridePath())
+}
+
+func canonicalHyprlandOverrideKey(key string) string {
+	trimmed := strings.TrimSpace(key)
+	normalized := luaKeyComboToInternalKey(trimmed)
+	if normalized == "" {
+		return trimmed
+	}
+	return normalized
+}
+
+func hyprlandOverrideMapKey(key string) string {
+	return strings.ToLower(canonicalHyprlandOverrideKey(key))
 }
 
 func (h *HyprlandProvider) getBindSortPriority(action string) int {
@@ -368,24 +417,354 @@ func normalizeLuaBindKeyPart(part string) string {
 	return part
 }
 
+type luaField struct {
+	name  string
+	value string
+}
+
+func luaDispatcherTableCall(funcName string, fields ...luaField) string {
+	parts := make([]string, 0, len(fields))
+	for _, field := range fields {
+		if field.name == "" || field.value == "" {
+			continue
+		}
+		parts = append(parts, field.name+" = "+field.value)
+	}
+	return fmt.Sprintf(`%s({ %s })`, funcName, strings.Join(parts, ", "))
+}
+
+func luaStringField(name, value string) luaField {
+	return luaField{name: name, value: strconv.Quote(strings.TrimSpace(value))}
+}
+
+func luaBoolField(name string, value bool) luaField {
+	if value {
+		return luaField{name: name, value: "true"}
+	}
+	return luaField{name: name, value: "false"}
+}
+
+func luaNumberOrStringField(name, value string) luaField {
+	value = strings.TrimSpace(value)
+	if isBareLuaNumber(value) {
+		return luaField{name: name, value: value}
+	}
+	return luaStringField(name, value)
+}
+
+func isBareLuaNumber(value string) bool {
+	if value == "" || strings.HasPrefix(value, "+") {
+		return false
+	}
+	if value[0] == '-' {
+		value = value[1:]
+	}
+	if value == "" {
+		return false
+	}
+	digitsBeforeDot := 0
+	i := 0
+	for i < len(value) && value[i] >= '0' && value[i] <= '9' {
+		digitsBeforeDot++
+		i++
+	}
+	digitsAfterDot := 0
+	if i < len(value) && value[i] == '.' {
+		i++
+		for i < len(value) && value[i] >= '0' && value[i] <= '9' {
+			digitsAfterDot++
+			i++
+		}
+	}
+	return i == len(value) && (digitsBeforeDot > 0 || digitsAfterDot > 0)
+}
+
+func splitHyprlandAction(action string) (dispatcher, params string) {
+	action = strings.TrimSpace(action)
+	if action == "" {
+		return "", ""
+	}
+	idx := strings.IndexFunc(action, func(r rune) bool {
+		return r == ' ' || r == '\t' || r == '\r' || r == '\n'
+	})
+	if idx < 0 {
+		return strings.ToLower(action), ""
+	}
+	return strings.ToLower(strings.TrimSpace(action[:idx])), strings.TrimSpace(action[idx+1:])
+}
+
+func firstParam(params string) (head, rest string) {
+	params = strings.TrimSpace(params)
+	if params == "" {
+		return "", ""
+	}
+	fields := strings.Fields(params)
+	if len(fields) == 0 {
+		return "", ""
+	}
+	head = fields[0]
+	rest = strings.TrimSpace(strings.TrimPrefix(params, head))
+	return head, rest
+}
+
+func xyParams(params string) (x, y string, relative bool, ok bool) {
+	fields := strings.Fields(params)
+	if len(fields) > 0 && strings.EqualFold(fields[0], "exact") {
+		relative = false
+		fields = fields[1:]
+	} else {
+		relative = true
+	}
+	if len(fields) < 2 {
+		return "", "", relative, false
+	}
+	return fields[0], fields[1], relative, true
+}
+
+func dispatcherWorkspaceMove(params string, follow *bool) string {
+	workspace, window := firstParam(params)
+	if workspace == "" {
+		return ""
+	}
+	fields := []luaField{luaStringField("workspace", workspace)}
+	if follow != nil {
+		fields = append(fields, luaBoolField("follow", *follow))
+	}
+	if window != "" {
+		fields = append(fields, luaStringField("window", window))
+	}
+	return luaDispatcherTableCall("hl.dsp.window.move", fields...)
+}
+
+func dispatcherActiveMoveResize(funcName, params string) string {
+	x, y, relative, ok := xyParams(params)
+	if !ok {
+		return ""
+	}
+	if !isBareLuaNumber(x) || !isBareLuaNumber(y) {
+		return ""
+	}
+	return luaDispatcherTableCall(funcName,
+		luaNumberOrStringField("x", x),
+		luaNumberOrStringField("y", y),
+		luaBoolField("relative", relative),
+	)
+}
+
+func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
+	dispatcher, params := splitHyprlandAction(action)
+	switch dispatcher {
+	case "spawn", "exec":
+		return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote(params)), true
+	case "killactive":
+		return `hl.dsp.window.kill()`, true
+	case "closewindow":
+		if params == "" {
+			return `hl.dsp.window.close()`, true
+		}
+		return fmt.Sprintf(`hl.dsp.window.close(%s)`, strconv.Quote(params)), true
+	case "killwindow":
+		if params == "" {
+			return `hl.dsp.window.kill()`, true
+		}
+		return fmt.Sprintf(`hl.dsp.window.kill(%s)`, strconv.Quote(params)), true
+	case "togglefloating":
+		return `hl.dsp.window.float({ action = "toggle" })`, true
+	case "setfloating":
+		return `hl.dsp.window.float({ action = "set" })`, true
+	case "settiled":
+		return `hl.dsp.window.float({ action = "unset" })`, true
+	case "fullscreen":
+		mode := strings.TrimSpace(params)
+		switch mode {
+		case "", "0":
+			return `hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })`, true
+		case "1":
+			return `hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })`, true
+		}
+	case "fullscreenstate":
+		internal, rest := firstParam(params)
+		client, _ := firstParam(rest)
+		if internal != "" && client != "" {
+			return luaDispatcherTableCall("hl.dsp.window.fullscreen_state",
+				luaNumberOrStringField("internal", internal),
+				luaNumberOrStringField("client", client),
+			), true
+		}
+	case "pin":
+		if params == "" {
+			return `hl.dsp.window.pin()`, true
+		}
+	case "centerwindow":
+		return `hl.dsp.window.center()`, true
+	case "resizewindow":
+		return `hl.dsp.window.resize()`, true
+	case "movewindow":
+		if params == "" {
+			return `hl.dsp.window.drag()`, true
+		}
+		if monitor, ok := strings.CutPrefix(params, "mon:"); ok {
+			return luaDispatcherTableCall("hl.dsp.window.move", luaStringField("monitor", monitor)), true
+		}
+		return luaDispatcherTableCall("hl.dsp.window.move", luaStringField("direction", params)), true
+	case "swapwindow":
+		if params == "" {
+			return "", false
+		}
+		return luaDispatcherTableCall("hl.dsp.window.swap", luaStringField("direction", params)), true
+	case "resizeactive":
+		if expr := dispatcherActiveMoveResize("hl.dsp.window.resize", params); expr != "" {
+			return expr, true
+		}
+	case "moveactive":
+		if expr := dispatcherActiveMoveResize("hl.dsp.window.move", params); expr != "" {
+			return expr, true
+		}
+	case "workspace":
+		if params == "" {
+			return "", false
+		}
+		return luaDispatcherTableCall("hl.dsp.focus", luaStringField("workspace", params)), true
+	case "focusworkspaceoncurrentmonitor":
+		if params == "" {
+			return "", false
+		}
+		return luaDispatcherTableCall("hl.dsp.focus", luaStringField("workspace", params), luaBoolField("on_current_monitor", true)), true
+	case "movetoworkspace":
+		if expr := dispatcherWorkspaceMove(params, nil); expr != "" {
+			return expr, true
+		}
+	case "movetoworkspacesilent":
+		follow := false
+		if expr := dispatcherWorkspaceMove(params, &follow); expr != "" {
+			return expr, true
+		}
+	case "togglespecialworkspace":
+		if params == "" {
+			return `hl.dsp.workspace.toggle_special()`, true
+		}
+		return fmt.Sprintf(`hl.dsp.workspace.toggle_special(%s)`, strconv.Quote(params)), true
+	case "renameworkspace":
+		workspace, name := firstParam(params)
+		if workspace != "" {
+			fields := []luaField{luaStringField("workspace", workspace)}
+			if name != "" {
+				fields = append(fields, luaStringField("name", name))
+			}
+			return luaDispatcherTableCall("hl.dsp.workspace.rename", fields...), true
+		}
+	case "movecurrentworkspacetomonitor":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.workspace.move", luaStringField("monitor", params)), true
+		}
+	case "moveworkspacetomonitor":
+		workspace, monitor := firstParam(params)
+		if workspace != "" && monitor != "" {
+			return luaDispatcherTableCall("hl.dsp.workspace.move", luaStringField("workspace", workspace), luaStringField("monitor", monitor)), true
+		}
+	case "swapactiveworkspaces":
+		monitor1, rest := firstParam(params)
+		monitor2, _ := firstParam(rest)
+		if monitor1 != "" && monitor2 != "" {
+			return luaDispatcherTableCall("hl.dsp.workspace.swap_monitors", luaStringField("monitor1", monitor1), luaStringField("monitor2", monitor2)), true
+		}
+	case "movefocus":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.focus", luaStringField("direction", params)), true
+		}
+	case "focusmonitor":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.focus", luaStringField("monitor", params)), true
+		}
+	case "focuswindow":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.focus", luaStringField("window", params)), true
+		}
+	case "focuscurrentorlast":
+		return `hl.dsp.focus({ last = true })`, true
+	case "focusurgentorlast":
+		return `hl.dsp.focus({ urgent_or_last = true })`, true
+	case "layoutmsg":
+		if params != "" {
+			return fmt.Sprintf(`hl.dsp.layout(%s)`, strconv.Quote(params)), true
+		}
+	case "alterzorder":
+		mode, window := firstParam(params)
+		if mode != "" {
+			fields := []luaField{luaStringField("mode", mode)}
+			if window != "" {
+				fields = append(fields, luaStringField("window", window))
+			}
+			return luaDispatcherTableCall("hl.dsp.window.alter_zorder", fields...), true
+		}
+	case "setprop":
+		window, rest := firstParam(params)
+		prop, value := firstParam(rest)
+		if window != "" && prop != "" && value != "" {
+			return luaDispatcherTableCall("hl.dsp.window.set_prop",
+				luaStringField("window", window),
+				luaStringField("prop", prop),
+				luaStringField("value", value),
+			), true
+		}
+	case "dpms":
+		dpmsAction := strings.TrimSpace(params)
+		switch dpmsAction {
+		case "on":
+			dpmsAction = "enable"
+		case "off":
+			dpmsAction = "disable"
+		}
+		if dpmsAction == "" {
+			return `hl.dsp.dpms({})`, true
+		}
+		return luaDispatcherTableCall("hl.dsp.dpms", luaStringField("action", dpmsAction)), true
+	case "exit":
+		return `hl.dsp.exit()`, true
+	case "submap":
+		return fmt.Sprintf(`hl.dsp.submap(%s)`, strconv.Quote(params)), true
+	case "global":
+		return fmt.Sprintf(`hl.dsp.global(%s)`, strconv.Quote(params)), true
+	case "event":
+		return fmt.Sprintf(`hl.dsp.event(%s)`, strconv.Quote(params)), true
+	case "pass":
+		if params == "" {
+			return `hl.dsp.pass({})`, true
+		}
+		return luaDispatcherTableCall("hl.dsp.pass", luaStringField("window", params)), true
+	case "sendshortcut":
+		mod, rest := firstParam(params)
+		key, window := firstParam(rest)
+		if mod != "" && key != "" {
+			fields := []luaField{luaStringField("mods", mod), luaStringField("key", key)}
+			if window != "" {
+				fields = append(fields, luaStringField("window", window))
+			}
+			return luaDispatcherTableCall("hl.dsp.send_shortcut", fields...), true
+		}
+	case "sendkeystate":
+		mod, rest := firstParam(params)
+		key, rest := firstParam(rest)
+		state, window := firstParam(rest)
+		if mod != "" && key != "" && state != "" {
+			fields := []luaField{luaStringField("mods", mod), luaStringField("key", key), luaStringField("state", state)}
+			if window != "" {
+				fields = append(fields, luaStringField("window", window))
+			}
+			return luaDispatcherTableCall("hl.dsp.send_key_state", fields...), true
+		}
+	case "togglegroup":
+		return `hl.dsp.group.toggle()`, true
+	}
+	return "", false
+}
+
 func luaActionStringFromHyprlangAction(action string) string {
 	action = strings.TrimSpace(action)
-	if strings.HasPrefix(action, "spawn ") {
-		return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote(strings.TrimSpace(strings.TrimPrefix(action, "spawn "))))
+	if expr, ok := luaActionStringFromKnownHyprlandAction(action); ok {
+		return expr
 	}
-	if strings.HasPrefix(action, "exec ") {
-		return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote(strings.TrimPrefix(action, "exec ")))
-	}
-	switch action {
-	case "killactive":
-		return `hl.dsp.window.kill()`
-	case "togglefloating":
-		return `hl.dsp.window.float({ action = "toggle" })`
-	case "exit":
-		return `hl.dsp.exit()`
-	default:
-		return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote("hyprctl dispatch "+action))
-	}
+	return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote("hyprctl dispatch "+action))
 }
 
 func luaExprToInternalAction(expr string) string {
@@ -498,11 +877,12 @@ func readLuaOrHyprlangOverride(path string) (map[string]*hyprlandOverrideBind, e
 			continue
 		}
 		if key, ok := parseLuaUnbindLine(line); ok {
-			pendingUnbinds[strings.ToLower(key)] = key
+			pendingUnbinds[hyprlandOverrideMapKey(key)] = canonicalHyprlandOverrideKey(key)
 			continue
 		}
 		if kb, ok := parseLuaBindOverrideLine(line); ok {
-			normalizedKey := strings.ToLower(kb.Key)
+			kb.Key = canonicalHyprlandOverrideKey(kb.Key)
+			normalizedKey := hyprlandOverrideMapKey(kb.Key)
 			binds[normalizedKey] = kb
 			delete(pendingUnbinds, normalizedKey)
 			continue
@@ -520,7 +900,8 @@ func readLuaOrHyprlangOverride(path string) (map[string]*hyprlandOverrideBind, e
 			action = kb.Dispatcher + " " + kb.Params
 		}
 		flags := kb.Flags
-		normalizedKey := strings.ToLower(keyStr)
+		keyStr = canonicalHyprlandOverrideKey(keyStr)
+		normalizedKey := hyprlandOverrideMapKey(keyStr)
 		binds[normalizedKey] = &hyprlandOverrideBind{
 			Key:         keyStr,
 			Action:      action,

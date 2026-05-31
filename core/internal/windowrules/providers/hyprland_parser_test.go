@@ -188,6 +188,27 @@ func TestHyprlandSetAndLoadDMSRules(t *testing.T) {
 	}
 }
 
+func TestHyprlandSetRuleLeavesConfOnlyInstallReadOnly(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.conf"), []byte("windowrulev2 = float, class:^(kitty)$\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	provider := NewHyprlandWritableProvider(tmpDir)
+	rule := newTestWindowRule("test_id", "Test Rule", "^(firefox)$")
+	rule.Actions.OpenFloating = boolPtr(true)
+
+	err := provider.SetRule(rule)
+	if err == nil {
+		t.Fatal("expected SetRule to reject conf-only Hyprland config")
+	}
+	if !strings.Contains(err.Error(), "read-only") {
+		t.Fatalf("expected read-only error, got %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(tmpDir, "dms", "windowrules.lua")); !os.IsNotExist(err) {
+		t.Fatalf("expected no Lua windowrules file to be created for conf-only config, stat err=%v", err)
+	}
+}
+
 func TestHyprlandRemoveRule(t *testing.T) {
 	tmpDir := t.TempDir()
 	provider := NewHyprlandWritableProvider(tmpDir)

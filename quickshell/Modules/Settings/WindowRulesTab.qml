@@ -19,8 +19,11 @@ Item {
     property var parentModal: null
     property var windowRulesIncludeStatus: ({
             "exists": false,
-            "included": false
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
         })
+    readonly property bool readOnly: CompositorService.isHyprland && windowRulesIncludeStatus.readOnly === true
     property bool checkingInclude: false
     property bool fixingInclude: false
     property var windowRules: []
@@ -84,7 +87,9 @@ Item {
                 if (result.dmsStatus) {
                     windowRulesIncludeStatus = {
                         "exists": result.dmsStatus.exists,
-                        "included": result.dmsStatus.included
+                        "included": result.dmsStatus.included,
+                        "configFormat": result.dmsStatus.configFormat ?? "",
+                        "readOnly": result.dmsStatus.readOnly === true
                     };
                 }
             } catch (e) {
@@ -94,6 +99,10 @@ Item {
     }
 
     function removeRule(ruleId) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         const compositor = CompositorService.compositor;
         if (compositor !== "niri" && compositor !== "hyprland")
             return;
@@ -107,6 +116,10 @@ Item {
     }
 
     function reorderRules(fromIndex, toIndex) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         if (fromIndex === toIndex)
             return;
 
@@ -131,7 +144,9 @@ Item {
         if (compositor !== "niri" && compositor !== "hyprland") {
             windowRulesIncludeStatus = {
                 "exists": false,
-                "included": false
+                "included": false,
+                "configFormat": "",
+                "readOnly": false
             };
             return;
         }
@@ -143,7 +158,9 @@ Item {
             if (exitCode !== 0) {
                 windowRulesIncludeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
                 return;
             }
@@ -152,13 +169,19 @@ Item {
             } catch (e) {
                 windowRulesIncludeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
             }
         });
     }
 
     function fixWindowRulesInclude() {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         const paths = getWindowRulesConfigPaths();
         if (!paths)
             return;
@@ -182,6 +205,10 @@ Item {
     }
 
     function openRuleModal(window) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!PopoutService.windowRuleModalLoader)
             return;
         PopoutService.windowRuleModalLoader.active = true;
@@ -192,6 +219,10 @@ Item {
     }
 
     function editRule(rule) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!PopoutService.windowRuleModalLoader)
             return;
         PopoutService.windowRuleModalLoader.active = true;
@@ -199,6 +230,10 @@ Item {
             PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
             PopoutService.windowRuleModalLoader.item.showEdit(rule);
         }
+    }
+
+    function showHyprlandReadOnlyWarning() {
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings."), "dms setup", "hyprland-migration");
     }
 
     Component.onCompleted: {
@@ -274,6 +309,8 @@ Item {
                             iconName: "add"
                             iconSize: Theme.iconSize
                             iconColor: Theme.primary
+                            enabled: !root.readOnly
+                            opacity: enabled ? 1 : 0.5
                             onClicked: root.openRuleModal()
                         }
                     }
@@ -322,13 +359,14 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
 
-                readonly property bool showError: root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
-                readonly property bool showSetup: !root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
+                readonly property bool showLegacy: root.readOnly
+                readonly property bool showError: !showLegacy && root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
+                readonly property bool showSetup: !showLegacy && !root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
 
-                color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : "transparent"
-                border.color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : "transparent"
+                color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : "transparent"
+                border.color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : "transparent"
                 border.width: 1
-                visible: (showError || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland)
+                visible: (showLegacy || showError || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland)
 
                 Row {
                     id: warningSection
@@ -349,7 +387,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
 
                         StyledText {
-                            text: warningBox.showSetup ? I18n.tr("Window Rules Not Configured") : I18n.tr("Window Rules Include Missing")
+                            text: warningBox.showLegacy ? I18n.tr("Hyprland conf mode") : (warningBox.showSetup ? I18n.tr("Window Rules Not Configured") : I18n.tr("Window Rules Include Missing"))
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.warning
@@ -359,7 +397,7 @@ Item {
 
                         StyledText {
                             readonly property string rulesFile: CompositorService.isNiri ? "dms/windowrules.kdl" : "dms/windowrules.lua"
-                            text: warningBox.showSetup ? I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(rulesFile) : I18n.tr("%1 exists but is not included. Window rules won't apply.").arg(rulesFile)
+                            text: warningBox.showLegacy ? I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.") : (warningBox.showSetup ? I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(rulesFile) : I18n.tr("%1 exists but is not included. Window rules won't apply.").arg(rulesFile))
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
@@ -370,7 +408,7 @@ Item {
 
                     DankButton {
                         id: fixButton
-                        visible: warningBox.showError || warningBox.showSetup
+                        visible: !warningBox.showLegacy && (warningBox.showError || warningBox.showSetup)
                         text: root.fixingInclude ? I18n.tr("Fixing...") : (warningBox.showSetup ? I18n.tr("Setup") : I18n.tr("Fix Now"))
                         backgroundColor: Theme.warning
                         textColor: Theme.background
@@ -611,6 +649,8 @@ Item {
                                                 iconSize: 16
                                                 backgroundColor: "transparent"
                                                 iconColor: Theme.surfaceVariantText
+                                                enabled: !root.readOnly
+                                                opacity: enabled ? 1 : 0.5
                                                 onClicked: root.editRule(ruleDelegateItem.liveRuleData)
                                             }
 
@@ -621,12 +661,14 @@ Item {
                                                 iconSize: 16
                                                 backgroundColor: "transparent"
                                                 iconColor: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
+                                                enabled: !root.readOnly
+                                                opacity: enabled ? 1 : 0.5
 
                                                 MouseArea {
                                                     id: deleteArea
                                                     anchors.fill: parent
-                                                    hoverEnabled: true
-                                                    cursorShape: Qt.PointingHandCursor
+                                                    hoverEnabled: !root.readOnly
+                                                    cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
                                                     onClicked: root.removeRule(ruleDelegateItem.ruleIdRef)
                                                 }
                                             }
@@ -641,8 +683,8 @@ Item {
                                     width: 40
                                     height: ruleCard.height
                                     hoverEnabled: true
-                                    cursorShape: Qt.SizeVerCursor
-                                    drag.target: ruleDelegateItem.held ? ruleDelegateItem : undefined
+                                    cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.SizeVerCursor
+                                    drag.target: !root.readOnly && ruleDelegateItem.held ? ruleDelegateItem : undefined
                                     drag.axis: Drag.YAxis
                                     preventStealing: true
 
