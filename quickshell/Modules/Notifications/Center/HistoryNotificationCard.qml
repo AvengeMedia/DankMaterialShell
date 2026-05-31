@@ -229,6 +229,7 @@ Rectangle {
                     property bool hasMoreText: truncated
 
                     text: historyItem.htmlBody || historyItem.body || ""
+                    textFormat: Text.RichText
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                     width: parent.width

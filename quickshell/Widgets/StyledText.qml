@@ -59,6 +59,7 @@ Text {
     font.pixelSize: Appearance.fontSize.normal
     font.family: resolvedFontFamily
     font.weight: Theme.fontWeight
+    textFormat: Text.PlainText
     wrapMode: Text.WordWrap
     elide: Text.ElideRight
     verticalAlignment: Text.AlignVCenter

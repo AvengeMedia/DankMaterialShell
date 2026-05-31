@@ -395,6 +395,7 @@ Rectangle {
                     property bool hasMoreText: truncated
 
                     text: fullText
+                    textFormat: Text.RichText
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                     width: parent.width
@@ -705,6 +706,7 @@ Rectangle {
                                         property bool hasMoreText: truncated
 
                                         text: modelData?.htmlBody || ""
+                                        textFormat: Text.RichText
                                         color: Theme.surfaceVariantText
                                         font.pixelSize: Theme.fontSizeSmall
                                         width: parent.width
