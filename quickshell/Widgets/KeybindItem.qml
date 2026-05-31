@@ -21,6 +21,7 @@ Item {
     property var panelWindow: null
     property bool recording: false
     property bool isNew: false
+    property bool readOnly: false
     property string restoreKey: ""
 
     property int editingKeyIndex: -1
@@ -160,6 +161,10 @@ Item {
     }
 
     function startAddingNewKey() {
+        if (readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         addingNewKey = true;
         editingKeyIndex = -1;
         editKey = "";
@@ -181,6 +186,8 @@ Item {
     }
 
     function updateEdit(changes) {
+        if (readOnly)
+            return;
         if (changes.key !== undefined)
             editKey = changes.key;
         if (changes.action !== undefined)
@@ -208,6 +215,8 @@ Item {
     }
 
     function canSave() {
+        if (readOnly)
+            return false;
         if (!editKey)
             return false;
         if (!Actions.isValidAction(editAction))
@@ -216,6 +225,10 @@ Item {
     }
 
     function doSave() {
+        if (readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!canSave())
             return;
         const origKey = addingNewKey ? "" : _originalKey;
@@ -247,6 +260,10 @@ Item {
     }
 
     function startRecording() {
+        if (readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         recording = true;
     }
 
@@ -438,6 +455,7 @@ Item {
                 anchors.top: parent.top
                 anchors.margins: Theme.spacingL
                 spacing: Theme.spacingM
+                enabled: !root.readOnly
 
                 Rectangle {
                     Layout.fillWidth: true
@@ -554,7 +572,7 @@ Item {
                             height: root._chipHeight
                             radius: root._chipHeight / 4
                             color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
-                            visible: !root.isNew
+                            visible: !root.isNew && !root.readOnly
 
                             Rectangle {
                                 anchors.fill: parent
@@ -644,6 +662,7 @@ Item {
                                     iconName: root.recording ? "close" : "radio_button_checked"
                                     iconSize: Theme.iconSizeSmall
                                     iconColor: root.recording ? Theme.error : Theme.primary
+                                    enabled: !root.readOnly
                                     onClicked: root.recording ? root.stopRecording() : root.startRecording()
                                 }
                             }
@@ -746,7 +765,7 @@ Item {
                         Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
                         color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
-                        visible: root.keys.length === 1 && !root.isNew
+                        visible: root.keys.length === 1 && !root.isNew && !root.readOnly
 
                         Rectangle {
                             anchors.fill: parent
@@ -861,6 +880,8 @@ Item {
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
+                                        if (root.readOnly)
+                                            return;
                                         switch (typeDelegate.modelData.id) {
                                         case "dms":
                                             root.updateEdit({
@@ -926,6 +947,8 @@ Item {
                         enableFuzzySearch: true
                         maxPopupHeight: 300
                         onValueChanged: value => {
+                            if (root.readOnly)
+                                return;
                             const actions = KeybindsService.getDmsActions();
                             for (const act of actions) {
                                 if (act.label === value) {
@@ -1176,8 +1199,12 @@ Item {
                             id: customToggleArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.useCustomCompositor = true
+                            cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.readOnly)
+                                    return;
+                                root.useCustomCompositor = true;
+                            }
                         }
                     }
                 }
@@ -1418,8 +1445,10 @@ Item {
                             id: presetToggleArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
+                            cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
                             onClicked: {
+                                if (root.readOnly)
+                                    return;
                                 root.useCustomCompositor = false;
                                 root.updateEdit({
                                     "action": "close-window",
@@ -1768,7 +1797,7 @@ Item {
                         iconName: "delete"
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.error
-                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && (root.keys[root.editingKeyIndex].isDMSManaged || root.keys[root.editingKeyIndex].isOverride) && !root.isNew
+                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && (root.keys[root.editingKeyIndex].isDMSManaged || root.keys[root.editingKeyIndex].isOverride) && !root.isNew && !root.readOnly
                         onClicked: root.removeBind(root._originalKey)
                     }
 
@@ -1777,7 +1806,7 @@ Item {
                         buttonHeight: root._buttonHeight
                         backgroundColor: Theme.surfaceContainer
                         textColor: Theme.primary
-                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride === true && root.keys[root.editingKeyIndex].hasDefault === true && !root.isNew
+                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride === true && root.keys[root.editingKeyIndex].hasDefault === true && !root.isNew && !root.readOnly
                         onClicked: root.resetBind(root._originalKey)
                     }
 
@@ -1786,7 +1815,7 @@ Item {
                     }
 
                     StyledText {
-                        text: !root.canSave() ? I18n.tr("Set key and action to save") : (root.hasChanges ? I18n.tr("Unsaved changes") : I18n.tr("No changes"))
+                        text: root.readOnly ? I18n.tr("Read-only legacy config") : (!root.canSave() ? I18n.tr("Set key and action to save") : (root.hasChanges ? I18n.tr("Unsaved changes") : I18n.tr("No changes")))
                         font.pixelSize: Theme.fontSizeSmall
                         color: root.hasChanges ? Theme.surfaceText : Theme.surfaceVariantText
                         visible: !root.isNew

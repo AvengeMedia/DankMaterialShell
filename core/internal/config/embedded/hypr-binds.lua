@@ -140,7 +140,7 @@ hl.bind("SUPER + bracketright", hl.dsp.layout("preselect r"))
 
 -- === Sizing & Layout ===
 hl.bind("SUPER + R", hl.dsp.layout("togglesplit"))
-hl.bind("SUPER + CTRL + F", hl.dsp.exec_cmd([[hyprctl dispatch resizeactive exact 100% 100%]]))
+hl.bind("SUPER + CTRL + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "set" }))
 
 -- === Move/resize windows with mainMod + LMB/RMB and dragging ===
 hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Move window" })
@@ -150,10 +150,10 @@ hl.bind("SUPER + code:20", hl.dsp.window.resize({ x = -100, y = 0, relative = tr
 hl.bind("SUPER + code:21", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { description = "Shrink window left" })
 
 -- === Manual Sizing ===
-hl.bind("SUPER + minus", hl.dsp.exec_cmd([[hyprctl dispatch resizeactive -10% 0]]), { repeating = true })
-hl.bind("SUPER + equal", hl.dsp.exec_cmd([[hyprctl dispatch resizeactive 10% 0]]), { repeating = true })
-hl.bind("SUPER + SHIFT + minus", hl.dsp.exec_cmd([[hyprctl dispatch resizeactive 0 -10%]]), { repeating = true })
-hl.bind("SUPER + SHIFT + equal", hl.dsp.exec_cmd([[hyprctl dispatch resizeactive 0 10%]]), { repeating = true })
+hl.bind("SUPER + minus", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { repeating = true })
+hl.bind("SUPER + equal", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { repeating = true })
+hl.bind("SUPER + SHIFT + minus", hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { repeating = true })
+hl.bind("SUPER + SHIFT + equal", hl.dsp.window.resize({ x = 0, y = 100, relative = true }), { repeating = true })
 
 -- === Screenshots ===
 hl.bind("Print", hl.dsp.exec_cmd("dms screenshot"))

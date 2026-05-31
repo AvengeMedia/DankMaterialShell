@@ -21,8 +21,11 @@ Singleton {
 
     property var includeStatus: ({
             "exists": false,
-            "included": false
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
         })
+    readonly property bool readOnly: CompositorService.isHyprland && includeStatus.readOnly === true
     property bool checkingInclude: false
     property bool fixingInclude: false
 
@@ -481,6 +484,15 @@ Singleton {
 
     // Write compositor config from a neutral config entry and optionally reload
     function applyConfigEntry(configEntry, configId, profileName, isManual) {
+        if (CompositorService.isHyprland && readOnly) {
+            if (isManual) {
+                profilesLoading = false;
+                manualActivation = false;
+                profileError(I18n.tr("Hyprland conf mode is read-only in Settings"));
+            }
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         ensureEnabledOutput(configEntry);
         // Capture the entry being applied so disabled-output settings fields can read
         // scale/position/transform back even when wlr reports no logical viewport.
@@ -845,6 +857,8 @@ Singleton {
     Component.onCompleted: {
         outputs = buildOutputsMap();
         reloadSavedOutputs();
+        if (CompositorService.isHyprland)
+            checkIncludeStatus();
     }
 
     function reloadSavedOutputs() {
@@ -1372,7 +1386,9 @@ Singleton {
         if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl") {
             includeStatus = {
                 "exists": false,
-                "included": false
+                "included": false,
+                "configFormat": "",
+                "readOnly": false
             };
             return;
         }
@@ -1386,7 +1402,9 @@ Singleton {
             if (exitCode !== 0) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
                 return;
             }
@@ -1395,13 +1413,24 @@ Singleton {
             } catch (e) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
             }
         });
     }
 
     function fixOutputsInclude() {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
+        if (CompositorService.isHyprland && !HyprlandService.luaConfigActive) {
+            showHyprlandReadOnlyWarning();
+            checkIncludeStatus();
+            return;
+        }
         const paths = getConfigPaths();
         if (!paths)
             return;
@@ -1418,12 +1447,32 @@ Singleton {
         });
 
         Proc.runCommand("fix-outputs-include", ["sh", "-c", script], (output, exitCode) => {
-            fixingInclude = false;
-            if (exitCode !== 0)
+            if (exitCode !== 0) {
+                fixingInclude = false;
                 return;
+            }
+
+            const liveOutputs = buildOutputsMap();
+            if (CompositorService.isHyprland && Object.keys(liveOutputs).length > 0) {
+                outputs = liveOutputs;
+                HyprlandService.generateOutputsConfig(liveOutputs, SettingsData.hyprlandOutputSettings, success => {
+                    fixingInclude = false;
+                    if (!success)
+                        ToastService.showError(I18n.tr("Display setup failed"), I18n.tr("Failed to write Hyprland outputs config."), "", "display-config");
+                    checkIncludeStatus();
+                    WlrOutputService.requestState();
+                });
+                return;
+            }
+
+            fixingInclude = false;
             checkIncludeStatus();
             WlrOutputService.requestState();
         });
+    }
+
+    function showHyprlandReadOnlyWarning() {
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing display settings."), "dms setup", "display-config");
     }
 
     function buildOutputsMap() {
@@ -1514,6 +1563,10 @@ Singleton {
             NiriService.generateOutputsConfig(outputsData);
             break;
         case "hyprland":
+            if (readOnly) {
+                showHyprlandReadOnlyWarning();
+                return false;
+            }
             HyprlandService.generateOutputsConfig(outputsData, buildMergedHyprlandSettings());
             break;
         case "dwl":
@@ -1523,6 +1576,7 @@ Singleton {
             WlrOutputService.applyOutputsConfig(outputsData, outputs);
             break;
         }
+        return true;
     }
 
     function normalizeOutputPositions(outputsData) {
@@ -1830,6 +1884,10 @@ Singleton {
     function applyChanges() {
         if (!hasPendingChanges)
             return;
+        if (CompositorService.isHyprland && readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         const changeDescriptions = [];
 
         if (formatChanged) {
@@ -2467,6 +2525,50 @@ Singleton {
         if (!mode)
             return "";
         return mode.width + "x" + mode.height + "@" + (mode.refresh_rate / 1000).toFixed(3);
+    }
+
+    function formatScaleLabel(scale) {
+        const value = Number(scale);
+        if (!isFinite(value))
+            return "1";
+        return parseFloat(value.toFixed(2)).toString();
+    }
+
+    function getScalePresetValues(outputName, outputData) {
+        if (!CompositorService.isHyprland)
+            return [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+
+        const candidates = [0.5, 2 / 3, 0.75, 0.8, 1, 4 / 3, 1.6, 2, 2.5, 8 / 3, 3.2, 4];
+        const mode = getModeForScalePresets(outputName, outputData);
+        if (!mode)
+            return candidates;
+
+        return candidates.filter(scale => scaleFitsMode(mode, scale));
+    }
+
+    function getModeForScalePresets(outputName, outputData) {
+        const pendingMode = getPendingValue(outputName, "mode");
+        const modes = outputData?.modes || [];
+        if (pendingMode) {
+            for (const mode of modes) {
+                if (formatMode(mode) === pendingMode)
+                    return mode;
+            }
+        }
+        const currentMode = outputData?.current_mode;
+        if (currentMode !== undefined && modes[currentMode])
+            return modes[currentMode];
+        return null;
+    }
+
+    function scaleFitsMode(mode, scale) {
+        const width = Number(mode?.width || 0);
+        const height = Number(mode?.height || 0);
+        if (width <= 0 || height <= 0 || scale <= 0)
+            return false;
+        const logicalWidth = width / scale;
+        const logicalHeight = height / scale;
+        return Math.abs(logicalWidth - Math.round(logicalWidth)) < 0.001 && Math.abs(logicalHeight - Math.round(logicalHeight)) < 0.001;
     }
 
     function getTransformLabel(transform) {

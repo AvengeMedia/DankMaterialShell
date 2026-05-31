@@ -54,8 +54,10 @@ func init() {
 }
 
 type IncludeResult struct {
-	Exists   bool `json:"exists"`
-	Included bool `json:"included"`
+	Exists       bool   `json:"exists"`
+	Included     bool   `json:"included"`
+	ConfigFormat string `json:"configFormat,omitempty"`
+	ReadOnly     bool   `json:"readOnly,omitempty"`
 }
 
 func runResolveInclude(cmd *cobra.Command, args []string) {
@@ -106,6 +108,8 @@ func checkHyprlandInclude(filename string) (IncludeResult, error) {
 
 	mainLua := filepath.Join(configDir, "hyprland.lua")
 	if _, err := os.Stat(mainLua); err == nil {
+		result.ConfigFormat = "lua"
+		result.ReadOnly = false
 		processedLua := make(map[string]bool)
 		if luaconfig.RequiresTarget(mainLua, targetAbs, processedLua) {
 			result.Included = true
@@ -115,6 +119,10 @@ func checkHyprlandInclude(filename string) (IncludeResult, error) {
 
 	mainConf := filepath.Join(configDir, "hyprland.conf")
 	if _, err := os.Stat(mainConf); err == nil {
+		if result.ConfigFormat == "" {
+			result.ConfigFormat = "hyprlang"
+			result.ReadOnly = true
+		}
 		processed := make(map[string]bool)
 		if hyprlandFindIncludeHyprlang(mainConf, targetRel, processed) {
 			result.Included = true

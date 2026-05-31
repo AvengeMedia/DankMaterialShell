@@ -600,6 +600,10 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystem
 		return result, result.Error
 	}
 
+	CleanupStrayHyprlandConfFile(func(format string, v ...any) {
+		cd.log(fmt.Sprintf(format, v...))
+	})
+
 	result.Deployed = true
 	cd.log("Successfully deployed Hyprland configuration")
 	return result, nil

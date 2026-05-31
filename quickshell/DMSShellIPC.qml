@@ -3,6 +3,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Services.SystemTray
+import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
 import qs.Modules.Settings.DisplayConfig
@@ -1889,5 +1890,74 @@ Item {
         }
 
         target: "tray"
+    }
+
+    IpcHandler {
+        function open(): string {
+            if (!PowerProfileWatcher.available)
+                return "ERROR: power-profiles-daemon not available";
+
+            PopoutService.openPowerProfileModal();
+            return "POWERPROFILE_OPEN_SUCCESS";
+        }
+
+        function close(): string {
+            PopoutService.closePowerProfileModal();
+            return "POWERPROFILE_CLOSE_SUCCESS";
+        }
+
+        function toggle(): string {
+            if (!PowerProfileWatcher.available)
+                return "ERROR: power-profiles-daemon not available";
+
+            PopoutService.togglePowerProfileModal();
+            return "POWERPROFILE_TOGGLE_SUCCESS";
+        }
+
+        function list(): string {
+            if (!PowerProfileWatcher.available)
+                return "ERROR: power-profiles-daemon not available";
+
+            return PowerProfileWatcher.availableProfiles.map(profile => PowerProfileWatcher.profileSlug(profile)).join("\n");
+        }
+
+        function status(): string {
+            if (!PowerProfileWatcher.available)
+                return "ERROR: power-profiles-daemon not available";
+
+            return PowerProfileWatcher.profileSlug(PowerProfiles.profile);
+        }
+
+        function set(profile: string): string {
+            if (!PowerProfileWatcher.available)
+                return "ERROR: power-profiles-daemon not available";
+
+            if (!profile)
+                return "ERROR: No profile specified";
+
+            const parsed = PowerProfileWatcher.parseProfileSlug(profile);
+            if (parsed === -1)
+                return "ERROR: Unknown power profile. Supported options: power-saver, balanced, performance";
+
+            if (parsed === PowerProfile.Performance && !PowerProfiles.hasPerformanceProfile)
+                return "ERROR: Performance profile not supported by hardware";
+
+            if (!PowerProfileWatcher.applyProfile(parsed))
+                return "ERROR: Failed to set power profile";
+
+            return "POWERPROFILE_SET_SUCCESS";
+        }
+
+        function cycle(): string {
+            if (!PowerProfileWatcher.available)
+                return "ERROR: power-profiles-daemon not available";
+
+            if (!PowerProfileWatcher.cycleProfile())
+                return "ERROR: Failed to set power profile";
+
+            return "POWERPROFILE_CYCLE_SUCCESS";
+        }
+
+        target: "powerprofile"
     }
 }

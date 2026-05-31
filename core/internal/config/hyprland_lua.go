@@ -138,11 +138,9 @@ func readExistingHyprlandConfig(configDir string) (data string, sourcePath strin
 	return "", "", nil
 }
 
-// CleanupStrayHyprlandConfFile moves a stray ~/.config/hypr/hyprland.conf
-// into .dms-backups/<timestamp>/ only when hyprland.lua also exists, which
-// proves Lua is the live config and the .conf is an autogen Hyprland 0.55
-// produced when launched without -c. If only hyprland.conf exists, the user
-// has not migrated and we must leave their config alone.
+// CleanupStrayHyprlandConfFile moves stray ~/.config/hypr/hyprland.conf and
+// top-level ~/.config/hypr/dms/*.conf files into .dms-backups/<timestamp>/ only
+// when hyprland.lua also exists as the live config.
 func CleanupStrayHyprlandConfFile(logFn func(format string, v ...any)) {
 	if os.Getenv("HYPRLAND_INSTANCE_SIGNATURE") == "" {
 		return
@@ -156,19 +154,44 @@ func CleanupStrayHyprlandConfFile(logFn func(format string, v ...any)) {
 	if _, err := os.Stat(luaPath); err != nil {
 		return
 	}
+
+	var strayPaths []string
 	confPath := filepath.Join(configDir, "hyprland.conf")
-	if _, err := os.Stat(confPath); err != nil {
-		return
+	if info, err := os.Lstat(confPath); err == nil && !info.IsDir() {
+		strayPaths = append(strayPaths, confPath)
 	}
-	ts := time.Now().Format("2006-01-02_15-04-05")
-	dst := filepath.Join(configDir, hyprlandBackupDirName, ts, "hyprland.conf")
-	if err := moveHyprlandConfigFile(confPath, dst); err != nil {
-		if logFn != nil {
-			logFn("Could not move stray hyprland.conf: %v", err)
+	dmsConfPaths, err := filepath.Glob(filepath.Join(configDir, "dms", "*.conf"))
+	if err == nil {
+		for _, p := range dmsConfPaths {
+			if info, err := os.Lstat(p); err == nil && !info.IsDir() {
+				strayPaths = append(strayPaths, p)
+			}
 		}
+	}
+	if len(strayPaths) == 0 {
 		return
 	}
-	if logFn != nil {
-		logFn("Moved stray hyprland.conf to %s", dst)
+
+	ts := time.Now().Format("2006-01-02_15-04-05")
+	moved := 0
+	for _, src := range strayPaths {
+		rel, err := filepath.Rel(configDir, src)
+		if err != nil {
+			rel = filepath.Base(src)
+		}
+		dst := filepath.Join(configDir, hyprlandBackupDirName, ts, rel)
+		if err := moveHyprlandConfigFile(src, dst); err != nil {
+			if logFn != nil {
+				logFn("Could not move stray Hyprland conf file %s: %v", src, err)
+			}
+			continue
+		}
+		moved++
+		if logFn != nil {
+			logFn("Moved stray Hyprland conf file to %s", dst)
+		}
+	}
+	if moved > 0 && logFn != nil {
+		logFn("Moved %d stray Hyprland conf file(s) out of the active Lua config tree", moved)
 	}
 }

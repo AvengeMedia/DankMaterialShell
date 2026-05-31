@@ -25,6 +25,8 @@ type DMSBindsStatus struct {
 	Effective       bool   `json:"effective"`
 	OverriddenBy    int    `json:"overriddenBy"`
 	StatusMessage   string `json:"statusMessage"`
+	ConfigFormat    string `json:"configFormat,omitempty"`
+	ReadOnly        bool   `json:"readOnly,omitempty"`
 }
 
 type CheatSheet struct {

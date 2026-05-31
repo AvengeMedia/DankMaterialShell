@@ -26,7 +26,8 @@ Item {
         ClipboardHeader {
             id: header
             width: parent.width
-            totalCount: modal.totalCount
+            recentsCount: modal.unpinnedEntries.length
+            savedCount: modal.pinnedEntries.length
             showKeyboardHints: modal.showKeyboardHints
             activeTab: modal.activeTab
             pinnedCount: modal.pinnedCount
@@ -99,6 +100,20 @@ Item {
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
 
+            states: [
+                State {
+                    name: "snap"
+                    when: Theme.snapListModelChanges
+                    PropertyChanges {
+                        target: clipboardListView
+                        add: null
+                        remove: null
+                        displaced: null
+                        move: null
+                    }
+                }
+            ]
+
             function ensureVisible(index) {
                 if (index < 0 || index >= count) {
                     return;
@@ -158,6 +173,20 @@ Item {
             boundsMovement: Flickable.FollowBoundsBehavior
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
+
+            states: [
+                State {
+                    name: "snap"
+                    when: Theme.snapListModelChanges
+                    PropertyChanges {
+                        target: savedListView
+                        add: null
+                        remove: null
+                        displaced: null
+                        move: null
+                    }
+                }
+            ]
 
             function ensureVisible(index) {
                 if (index < 0 || index >= count) {

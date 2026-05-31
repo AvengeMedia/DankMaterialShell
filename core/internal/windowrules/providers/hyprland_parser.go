@@ -44,6 +44,8 @@ type HyprlandRulesParser struct {
 	dmsIncludePos    int
 	rulesAfterDMS    int
 	dmsProcessed     bool
+	configFormat     string
+	readOnly         bool
 
 	requireLineInMain int    // hyprland.lua line (1-based) where require("dms.windowrules") occurs; else -1
 	primaryHyprLua    string // absolute path to ~/.config/hypr/hyprland.lua when that is the main config
@@ -82,10 +84,15 @@ func (p *HyprlandRulesParser) Parse() ([]HyprlandWindowRule, error) {
 	}
 
 	if strings.EqualFold(filepath.Ext(mainConfig), ".lua") {
+		p.configFormat = "lua"
+		p.readOnly = false
 		p.probeRequireWindowrulesLine(mainConfig)
 		if ap, err := filepath.Abs(mainConfig); err == nil {
 			p.primaryHyprLua = ap
 		}
+	} else {
+		p.configFormat = "hyprlang"
+		p.readOnly = true
 	}
 
 	if err := p.parseFile(mainConfig); err != nil {
@@ -300,6 +307,8 @@ func (p *HyprlandRulesParser) buildDMSStatus() *windowrules.DMSRulesStatus {
 		IncludePosition: p.dmsIncludePos,
 		TotalIncludes:   p.includeCount,
 		RulesAfterDMS:   p.rulesAfterDMS,
+		ConfigFormat:    p.configFormat,
+		ReadOnly:        p.readOnly,
 	}
 
 	switch {
@@ -451,6 +460,9 @@ func (p *HyprlandWritableProvider) GetRuleSet() (*windowrules.RuleSet, error) {
 }
 
 func (p *HyprlandWritableProvider) SetRule(rule windowrules.WindowRule) error {
+	if err := p.ensureWritableConfig(); err != nil {
+		return err
+	}
 	rules, err := p.LoadDMSRules()
 	if err != nil {
 		rules = []windowrules.WindowRule{}
@@ -472,6 +484,9 @@ func (p *HyprlandWritableProvider) SetRule(rule windowrules.WindowRule) error {
 }
 
 func (p *HyprlandWritableProvider) RemoveRule(id string) error {
+	if err := p.ensureWritableConfig(); err != nil {
+		return err
+	}
 	rules, err := p.LoadDMSRules()
 	if err != nil {
 		return err
@@ -488,6 +503,9 @@ func (p *HyprlandWritableProvider) RemoveRule(id string) error {
 }
 
 func (p *HyprlandWritableProvider) ReorderRules(ids []string) error {
+	if err := p.ensureWritableConfig(); err != nil {
+		return err
+	}
 	rules, err := p.LoadDMSRules()
 	if err != nil {
 		return err
@@ -511,6 +529,29 @@ func (p *HyprlandWritableProvider) ReorderRules(ids []string) error {
 	}
 
 	return p.writeDMSRules(newRules)
+}
+
+func (p *HyprlandWritableProvider) ensureWritableConfig() error {
+	if p.isLegacyConfigReadOnly() {
+		return fmt.Errorf("hyprland legacy conf configs are read-only; run dms setup to migrate to Lua before editing window rules")
+	}
+	return nil
+}
+
+func (p *HyprlandWritableProvider) isLegacyConfigReadOnly() bool {
+	expanded, err := utils.ExpandPath(p.configDir)
+	if err != nil {
+		expanded = p.configDir
+	}
+	luaPath := filepath.Join(expanded, "hyprland.lua")
+	if st, err := os.Stat(luaPath); err == nil && st.Mode().IsRegular() {
+		return false
+	}
+	confPath := filepath.Join(expanded, "hyprland.conf")
+	if st, err := os.Stat(confPath); err == nil && st.Mode().IsRegular() {
+		return true
+	}
+	return false
 }
 
 var dmsRuleCommentRegex = regexp.MustCompile(`^#\s*DMS-RULE:\s*id=([^,]+),\s*name=(.*)$`)

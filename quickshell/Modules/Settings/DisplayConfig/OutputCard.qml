@@ -203,12 +203,40 @@ StyledRect {
                     height: scaleDropdown.visible ? scaleDropdown.height : scaleInput.height
 
                     property bool customMode: false
-                    property string currentScale: {
+                    property real currentScaleValue: {
                         const pendingScale = DisplayConfigState.getPendingValue(root.outputName, "scale");
                         if (pendingScale !== undefined)
-                            return parseFloat(pendingScale.toFixed(2)).toString();
-                        const scale = root.outputData?.logical?.scale || 1.0;
-                        return parseFloat(scale.toFixed(2)).toString();
+                            return pendingScale;
+                        return root.outputData?.logical?.scale || 1.0;
+                    }
+                    property string currentScale: DisplayConfigState.formatScaleLabel(currentScaleValue)
+                    property var scaleOptionsData: {
+                        void (DisplayConfigState.pendingChanges);
+                        const customLabel = I18n.tr("Custom...");
+                        const values = DisplayConfigState.getScalePresetValues(root.outputName, root.outputData);
+                        const labels = [];
+                        const valueByLabel = {};
+
+                        function addValue(value) {
+                            if (!isFinite(value) || value <= 0)
+                                return;
+                            const label = DisplayConfigState.formatScaleLabel(value);
+                            if (valueByLabel[label] !== undefined)
+                                return;
+                            valueByLabel[label] = value;
+                            labels.push(label);
+                        }
+
+                        for (const value of values)
+                            addValue(value);
+                        addValue(scaleContainer.currentScaleValue);
+
+                        labels.sort((a, b) => parseFloat(a) - parseFloat(b));
+                        labels.push(customLabel);
+                        return {
+                            "labels": labels,
+                            "valueByLabel": valueByLabel
+                        };
                     }
 
                     DankDropdown {
@@ -217,20 +245,7 @@ StyledRect {
                         dropdownWidth: parent.width
                         visible: !scaleContainer.customMode
                         currentValue: scaleContainer.currentScale
-                        options: {
-                            const standard = ["0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "2.5", "3", I18n.tr("Custom...")];
-                            const current = scaleContainer.currentScale;
-                            if (standard.slice(0, -1).includes(current))
-                                return standard;
-                            const opts = [...standard.slice(0, -1), current, standard[standard.length - 1]];
-                            return opts.sort((a, b) => {
-                                if (a === I18n.tr("Custom..."))
-                                    return 1;
-                                if (b === I18n.tr("Custom..."))
-                                    return -1;
-                                return parseFloat(a) - parseFloat(b);
-                            });
-                        }
+                        options: scaleContainer.scaleOptionsData.labels
                         onValueChanged: value => {
                             if (value === I18n.tr("Custom...")) {
                                 scaleContainer.customMode = true;
@@ -239,7 +254,8 @@ StyledRect {
                                 scaleInput.selectAll();
                                 return;
                             }
-                            DisplayConfigState.setPendingChange(root.outputName, "scale", parseFloat(value));
+                            const mapped = scaleContainer.scaleOptionsData.valueByLabel[value];
+                            DisplayConfigState.setPendingChange(root.outputName, "scale", mapped !== undefined ? mapped : parseFloat(value));
                         }
                     }
 
@@ -248,7 +264,7 @@ StyledRect {
                         width: parent.width
                         height: 40
                         visible: scaleContainer.customMode
-                        placeholderText: "0.5 - 4.0"
+                        placeholderText: "0.25 - 4.0"
 
                         function applyValue() {
                             const val = parseFloat(text);
@@ -257,7 +273,7 @@ StyledRect {
                                 scaleContainer.customMode = false;
                                 return;
                             }
-                            DisplayConfigState.setPendingChange(root.outputName, "scale", parseFloat(val.toFixed(2)));
+                            DisplayConfigState.setPendingChange(root.outputName, "scale", parseFloat(val.toFixed(6)));
                             scaleContainer.customMode = false;
                         }
 
