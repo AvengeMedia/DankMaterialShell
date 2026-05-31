@@ -32,6 +32,7 @@ Singleton {
     readonly property string miracleSocket: Quickshell.env("MIRACLESOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
     property bool useNiriSorting: isNiri && NiriService
+    property bool useMangoSorting: isMango && MangoService
 
     property var randrScales: ({})
     property bool randrReady: false
@@ -223,6 +224,9 @@ Singleton {
 
         if (useNiriSorting)
             return NiriService.sortToplevels(ToplevelManager.toplevels.values);
+
+        if (useMangoSorting)
+            return MangoService.sortToplevels(ToplevelManager.toplevels.values);
 
         if (isHyprland)
             return sortHyprlandToplevelsSafe();
@@ -473,6 +477,8 @@ Singleton {
     function filterCurrentWorkspace(toplevels, screen) {
         if (useNiriSorting)
             return NiriService.filterCurrentWorkspace(toplevels, screen);
+        if (useMangoSorting)
+            return MangoService.filterCurrentWorkspace(toplevels, screen);
         if (isHyprland)
             return filterHyprlandCurrentWorkspaceSafe(toplevels, screen);
         return toplevels;
@@ -481,6 +487,8 @@ Singleton {
     function filterCurrentDisplay(toplevels, screenName) {
         if (!toplevels || toplevels.length === 0 || !screenName)
             return toplevels;
+        if (useMangoSorting)
+            return MangoService.filterCurrentDisplay(toplevels, screenName);
         if (useNiriSorting) {
             const active = ToplevelManager.activeToplevel;
             if (active && toplevels.length === 1 && toplevels[0] === active) {
@@ -537,6 +545,15 @@ Singleton {
         }
 
         if (isHyprland) {
+            const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
+            for (let i = 0; i < filtered.length; i++) {
+                if (filtered[i]?.fullscreen)
+                    return true;
+            }
+            return false;
+        }
+
+        if (isMango) {
             const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
             for (let i = 0; i < filtered.length; i++) {
                 if (filtered[i]?.fullscreen)

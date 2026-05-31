@@ -124,6 +124,7 @@ Singleton {
                 "scale": m.scale ?? 1.0,
                 "layoutIndex": m.layout_index ?? 0,
                 "layout": m.layout_index ?? 0,
+                "activeTags": m.active_tags || [],
                 "layoutSymbol": m.layout_symbol ?? "",
                 "lastOpenSurface": m.last_open_surface ?? "",
                 "keymode": m.keymode ?? "",
@@ -206,6 +207,129 @@ Singleton {
 
     function getOutputScale(outputName) {
         return displayScales[outputName];
+    }
+
+    // ── Window list ↔ wlr toplevel matching (per-tag sort/filter) ──────────
+    // mango clients carry appid/title/tags/monitor/geometry. Match them to the
+    // wlr foreign-toplevels (by appId + title) to enrich toplevels with the
+    // owning tags/monitor, enabling per-tag filtering and stable ordering.
+    // wlr activation handles focus, so toplevel methods are preserved as-is.
+
+    function _screenName(screenOrName) {
+        return (typeof screenOrName === "string") ? screenOrName : (screenOrName?.name ?? "");
+    }
+
+    function _orderedClients() {
+        const list = (windows || []).slice();
+        list.sort((a, b) => {
+            const ma = outputs[a.monitor], mb = outputs[b.monitor];
+            const ax = ma?.x ?? 1e9, ay = ma?.y ?? 1e9;
+            const bx = mb?.x ?? 1e9, by = mb?.y ?? 1e9;
+            if (ax !== bx)
+                return ax - bx;
+            if (ay !== by)
+                return ay - by;
+            if ((a.y ?? 0) !== (b.y ?? 0))
+                return (a.y ?? 0) - (b.y ?? 0);
+            if ((a.x ?? 0) !== (b.x ?? 0))
+                return (a.x ?? 0) - (b.x ?? 0);
+            return (a.id ?? 0) - (b.id ?? 0);
+        });
+        return list;
+    }
+
+    function _matchAndEnrich(toplevels, clients) {
+        const used = new Set();
+        const result = [];
+        for (const client of clients) {
+            let bestMatch = null;
+            let bestScore = -1;
+            for (const toplevel of toplevels) {
+                if (used.has(toplevel))
+                    continue;
+                if (toplevel.appId !== client.appid)
+                    continue;
+                let score = 1;
+                if (client.title && toplevel.title) {
+                    if (toplevel.title === client.title)
+                        score = 3;
+                    else if (toplevel.title.includes(client.title) || client.title.includes(toplevel.title))
+                        score = 2;
+                }
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMatch = toplevel;
+                    if (score === 3)
+                        break;
+                }
+            }
+            if (!bestMatch)
+                continue;
+            used.add(bestMatch);
+
+            const enriched = {
+                "appId": bestMatch.appId,
+                "title": bestMatch.title,
+                "activated": !!client.is_focused,
+                "mangoWindowId": client.id,
+                "mangoTags": client.tags || [],
+                "mangoMonitor": client.monitor
+            };
+            for (let prop in bestMatch) {
+                if (!(prop in enriched))
+                    enriched[prop] = bestMatch[prop];
+            }
+            result.push(enriched);
+        }
+        return result;
+    }
+
+    function sortToplevels(toplevels) {
+        if (!toplevels || toplevels.length === 0 || windows.length === 0)
+            return [...toplevels];
+        const enriched = _matchAndEnrich(toplevels, _orderedClients());
+        const used = new Set(enriched.map(e => e.mangoWindowId));
+        // Append wlr toplevels that had no mango client match (rare).
+        const matchedTitles = new Set(enriched.map(e => e.title + " " + e.appId));
+        for (const t of toplevels) {
+            if (!matchedTitles.has((t.title || "") + " " + (t.appId || "")))
+                enriched.push(t);
+        }
+        return enriched;
+    }
+
+    function _activeTagSet(screenName) {
+        const out = outputs[screenName];
+        return new Set((out?.activeTags) || []);
+    }
+
+    function filterCurrentWorkspace(toplevels, screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!screenName)
+            return toplevels;
+        const active = _activeTagSet(screenName);
+        if (active.size === 0)
+            return toplevels;
+
+        const onActive = tags => (tags || []).some(t => active.has(t));
+
+        if (toplevels.length > 0 && toplevels[0].mangoTags !== undefined)
+            return toplevels.filter(t => t.mangoMonitor === screenName && onActive(t.mangoTags));
+
+        const clients = (windows || []).filter(c => c.monitor === screenName && onActive(c.tags));
+        return _matchAndEnrich(toplevels, clients);
+    }
+
+    function filterCurrentDisplay(toplevels, screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!toplevels || toplevels.length === 0 || !screenName)
+            return toplevels;
+
+        if (toplevels.length > 0 && toplevels[0].mangoMonitor !== undefined)
+            return toplevels.filter(t => t.mangoMonitor === screenName);
+
+        const clients = (windows || []).filter(c => c.monitor === screenName);
+        return _matchAndEnrich(toplevels, clients);
     }
 
     // ── Commands (mango verb IPC: mmsg dispatch <func>,<args>) ─────────────
