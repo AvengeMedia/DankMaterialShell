@@ -161,6 +161,11 @@ Variants {
                     root._overviewBlurSettling = true;
                     overviewBlurSettleTimer.restart();
                 }
+
+                function onWallpaperFillModeChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
             }
 
             Connections {

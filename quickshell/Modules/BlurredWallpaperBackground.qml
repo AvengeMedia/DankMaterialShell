@@ -126,6 +126,14 @@ Variants {
                 }
             }
 
+            Connections {
+                target: SettingsData
+                function onWallpaperFillModeChanged() {
+                    root._renderSettling = true;
+                    renderSettleTimer.restart();
+                }
+            }
+
             Timer {
                 id: renderSettleTimer
                 interval: 1000
