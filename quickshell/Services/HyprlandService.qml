@@ -18,22 +18,30 @@ Singleton {
     readonly property string layoutPath: hyprDmsDir + "/layout.lua"
     readonly property string cursorPath: hyprDmsDir + "/cursor.lua"
     readonly property string windowrulesPath: hyprDmsDir + "/windowrules.lua"
-    readonly property bool luaConfigActive: CompositorService.isHyprland && Hyprland.usingLua === true
+    readonly property bool luaConfigActive: CompositorService.isHyprland && (Hyprland.usingLua === true || luaConfigDetected)
 
     property int _lastGapValue: -1
+    property bool luaConfigDetected: false
+    property bool luaConfigStatusReady: false
+    property bool luaConfigStatusLoading: false
+    property string luaConfigFormat: ""
 
     onLuaConfigActiveChanged: {
-        if (luaConfigActive) {
-            Qt.callLater(generateLayoutConfig);
-            Qt.callLater(ensureWindowrulesConfig);
-        }
+        if (luaConfigActive)
+            ensureDmsLuaConfigs();
     }
 
     Component.onCompleted: {
         if (CompositorService.isHyprland) {
-            Qt.callLater(generateLayoutConfig);
-            ensureWindowrulesConfig();
+            refreshLuaConfigStatus();
+            if (luaConfigActive)
+                ensureDmsLuaConfigs();
         }
+    }
+
+    function ensureDmsLuaConfigs() {
+        Qt.callLater(generateLayoutConfig);
+        Qt.callLater(ensureWindowrulesConfig);
     }
 
     function ensureWindowrulesConfig() {
@@ -61,8 +69,16 @@ Singleton {
     Connections {
         target: CompositorService
         function onIsHyprlandChanged() {
-            if (CompositorService.isHyprland)
-                generateLayoutConfig();
+            if (CompositorService.isHyprland) {
+                refreshLuaConfigStatus();
+                if (luaConfigActive)
+                    ensureDmsLuaConfigs();
+                return;
+            }
+            luaConfigDetected = false;
+            luaConfigStatusReady = false;
+            luaConfigStatusLoading = false;
+            luaConfigFormat = "";
         }
     }
 
@@ -76,9 +92,46 @@ Singleton {
         return JSON.stringify(String(str ?? ""));
     }
 
+    function refreshLuaConfigStatus() {
+        if (!CompositorService.isHyprland) {
+            luaConfigDetected = false;
+            luaConfigStatusReady = false;
+            luaConfigStatusLoading = false;
+            luaConfigFormat = "";
+            return;
+        }
+        if (luaConfigStatusLoading)
+            return;
+
+        luaConfigStatusLoading = true;
+        Proc.runCommand("hypr-lua-config-status", ["dms", "config", "resolve-include", "hyprland", "outputs.lua"], (output, exitCode) => {
+            luaConfigStatusLoading = false;
+            luaConfigStatusReady = true;
+            if (exitCode !== 0) {
+                luaConfigDetected = false;
+                luaConfigFormat = "";
+                return;
+            }
+            try {
+                const status = JSON.parse(output.trim());
+                luaConfigFormat = status.configFormat ?? "";
+                luaConfigDetected = luaConfigFormat === "lua" && status.readOnly !== true;
+            } catch (e) {
+                luaConfigDetected = false;
+                luaConfigFormat = "";
+            }
+        });
+    }
+
     function canWriteLuaConfig(name) {
         if (luaConfigActive)
             return true;
+        if (CompositorService.isHyprland && !luaConfigStatusReady && !luaConfigStatusLoading)
+            refreshLuaConfigStatus();
+        if (CompositorService.isHyprland && (luaConfigStatusLoading || !luaConfigStatusReady)) {
+            log.debug("Deferring Hyprland", name || "config", "Lua write until config format is known");
+            return false;
+        }
         log.info("Skipping Hyprland", name || "config", "Lua write because the active Hyprland config is not Lua");
         return false;
     }
@@ -352,7 +405,7 @@ hl.config({
         if (!wsId)
             return;
         const fullName = wsId + " " + newName;
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.workspace.rename({ workspace = ${luaValue(wsId)}, name = ${luaString(fullName)} })`);
         } else {
             Hyprland.dispatch(`renameworkspace ${wsId} ${fullName}`);
@@ -360,7 +413,7 @@ hl.config({
     }
 
     function focusWorkspace(workspace) {
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.focus({ workspace = ${luaValue(workspace)} })`);
         } else {
             Hyprland.dispatch(`workspace ${workspace}`);
@@ -392,7 +445,7 @@ hl.config({
         if (!selector)
             return;
 
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.focus({ window = ${luaString(selector)} })`);
         } else {
             Hyprland.dispatch(`focuswindow ${selector}`);
@@ -404,7 +457,7 @@ hl.config({
         if (!selector)
             return;
 
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.window.close(${luaString(selector)})`);
         } else {
             Hyprland.dispatch(`closewindow ${selector}`);
@@ -416,7 +469,7 @@ hl.config({
         if (!selector)
             return;
 
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.window.move({ workspace = ${luaValue(workspace)}, window = ${luaString(selector)}, follow = ${follow ? "true" : "false"} })`);
         } else {
             const dispatcher = follow ? "movetoworkspace" : "movetoworkspacesilent";
@@ -425,7 +478,7 @@ hl.config({
     }
 
     function toggleSpecial(specialName) {
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${luaString(specialName)})`);
         } else {
             Hyprland.dispatch("togglespecialworkspace " + specialName);
@@ -433,7 +486,7 @@ hl.config({
     }
 
     function exit() {
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch("hl.dsp.exit()");
         } else {
             Hyprland.dispatch("exit");
@@ -441,7 +494,7 @@ hl.config({
     }
 
     function dpmsOff() {
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.dpms({ action = "disable" })`);
         } else {
             Hyprland.dispatch("dpms off");
@@ -449,7 +502,7 @@ hl.config({
     }
 
     function dpmsOn() {
-        if (Hyprland.usingLua) {
+        if (luaConfigActive) {
             Hyprland.dispatch(`hl.dsp.dpms({ action = "enable" })`);
         } else {
             Hyprland.dispatch("dpms on");
