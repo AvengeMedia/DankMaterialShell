@@ -55,6 +55,7 @@ Item {
     readonly property var configConflict: bindData.conflict || null
     readonly property bool hasConfigConflict: configConflict !== null
     readonly property string _originalKey: editingKeyIndex >= 0 && editingKeyIndex < keys.length ? keys[editingKeyIndex].key : ""
+    readonly property string _selectedDesc: editingKeyIndex >= 0 && editingKeyIndex < keys.length ? (keys[editingKeyIndex].desc || bindData.desc || "") : (bindData.desc || "")
     readonly property var _conflicts: editKey ? KeyUtils.getConflictingBinds(editKey, bindData.action, KeybindsService.getFlatBinds()) : []
     readonly property bool hasConflict: _conflicts.length > 0
 
@@ -100,7 +101,7 @@ Item {
                 editingKeyIndex = i;
                 editKey = keyToFind;
                 editAction = bindData.action || "";
-                editDesc = bindData.desc || "";
+                editDesc = keys[i].desc || bindData.desc || "";
                 if (_savedCooldownMs >= 0) {
                     editCooldownMs = _savedCooldownMs;
                     _savedCooldownMs = -1;
@@ -149,7 +150,7 @@ Item {
         editingKeyIndex = keys.length > 0 ? 0 : -1;
         editKey = editingKeyIndex >= 0 ? keys[editingKeyIndex].key : "";
         editAction = bindData.action || "";
-        editDesc = bindData.desc || "";
+        editDesc = editingKeyIndex >= 0 ? (keys[editingKeyIndex].desc || bindData.desc || "") : (bindData.desc || "");
         editCooldownMs = editingKeyIndex >= 0 ? (keys[editingKeyIndex].cooldownMs || 0) : 0;
         editFlags = editingKeyIndex >= 0 ? (keys[editingKeyIndex].flags || "") : "";
         editAllowWhenLocked = editingKeyIndex >= 0 ? (keys[editingKeyIndex].allowWhenLocked || false) : false;
@@ -177,6 +178,7 @@ Item {
         addingNewKey = false;
         editingKeyIndex = index;
         editKey = keys[index].key;
+        editDesc = keys[index].desc || bindData.desc || "";
         editCooldownMs = keys[index].cooldownMs || 0;
         editFlags = keys[index].flags || "";
         editAllowWhenLocked = keys[index].allowWhenLocked || false;
@@ -206,12 +208,13 @@ Item {
             editAllowInhibiting = changes.allowInhibiting;
         const hasKey = editingKeyIndex >= 0 && editingKeyIndex < keys.length;
         const origKey = hasKey ? keys[editingKeyIndex].key : "";
+        const origDesc = hasKey ? (keys[editingKeyIndex].desc || bindData.desc || "") : (bindData.desc || "");
         const origCooldown = hasKey ? (keys[editingKeyIndex].cooldownMs || 0) : 0;
         const origFlags = hasKey ? (keys[editingKeyIndex].flags || "") : "";
         const origAllowWhenLocked = hasKey ? (keys[editingKeyIndex].allowWhenLocked || false) : false;
         const origRepeat = hasKey ? keys[editingKeyIndex].repeat : undefined;
         const origAllowInhibiting = hasKey ? keys[editingKeyIndex].allowInhibiting : undefined;
-        hasChanges = editKey !== origKey || editAction !== (bindData.action || "") || editDesc !== (bindData.desc || "") || editCooldownMs !== origCooldown || editFlags !== origFlags || editAllowWhenLocked !== origAllowWhenLocked || editRepeat !== origRepeat || editAllowInhibiting !== origAllowInhibiting;
+        hasChanges = editKey !== origKey || editAction !== (bindData.action || "") || editDesc !== origDesc || editCooldownMs !== origCooldown || editFlags !== origFlags || editAllowWhenLocked !== origAllowWhenLocked || editRepeat !== origRepeat || editAllowInhibiting !== origAllowInhibiting;
     }
 
     function canSave() {
@@ -353,7 +356,7 @@ Item {
                     spacing: 2
 
                     StyledText {
-                        text: root.bindData.desc || root.bindData.action || I18n.tr("No action")
+                        text: root.isExpanded ? (root._selectedDesc || root.bindData.action || I18n.tr("No action")) : (root.bindData.desc || root.bindData.action || I18n.tr("No action"))
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceText
                         elide: Text.ElideRight
@@ -1246,6 +1249,18 @@ Item {
                             }
                             placeholderText: optionsRow.argConfig?.config?.args[0]?.placeholder || ""
 
+                            function commitValue(textValue) {
+                                const cfg = optionsRow.argConfig;
+                                if (!cfg)
+                                    return;
+                                const parsed = optionsRow.parsedArgs;
+                                const args = Object.assign({}, parsed?.args || {});
+                                args[_argName] = textValue;
+                                root.updateEdit({
+                                    "action": Actions.buildCompositorAction(KeybindsService.currentProvider, parsed?.base || cfg.base, args)
+                                });
+                            }
+
                             Connections {
                                 target: optionsRow
                                 function onParsedArgsChanged() {
@@ -1260,17 +1275,7 @@ Item {
                                 text = optionsRow.parsedArgs?.args[_argName] || "";
                             }
 
-                            onEditingFinished: {
-                                const cfg = optionsRow.argConfig;
-                                if (!cfg)
-                                    return;
-                                const parsed = optionsRow.parsedArgs;
-                                const args = Object.assign({}, parsed?.args || {});
-                                args[_argName] = text;
-                                root.updateEdit({
-                                    "action": Actions.buildCompositorAction(KeybindsService.currentProvider, parsed?.base || cfg.base, args)
-                                });
-                            }
+                            onTextChanged: commitValue(text)
                         }
 
                         RowLayout {

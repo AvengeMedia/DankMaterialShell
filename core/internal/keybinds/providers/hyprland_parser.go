@@ -1006,17 +1006,17 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 		if arg != "" {
 			if u, err := strconv.Unquote(arg); err == nil {
 				if strings.HasPrefix(u, "hyprctl dispatch ") {
-					rest := strings.TrimSpace(strings.TrimPrefix(u, "hyprctl dispatch "))
-					parts := strings.SplitN(rest, " ", 2)
-					if len(parts) == 1 {
-						return parts[0], ""
-					}
-					return parts[0], parts[1]
+					return splitDispatchCommand(strings.TrimSpace(strings.TrimPrefix(u, "hyprctl dispatch ")))
 				}
 				return "exec", u
 			}
 		}
 		return "exec", strings.TrimSpace(strings.TrimPrefix(expr, "hl.dsp.exec_cmd"))
+	case strings.HasPrefix(expr, "hl.dispatch("):
+		if arg := luaCallStringArgValue(expr, "hl.dispatch"); arg != "" {
+			return splitDispatchCommand(arg)
+		}
+		return "", ""
 	case strings.HasPrefix(expr, "hl.dsp.window.close("):
 		if arg := luaCallStringArgValue(expr, "hl.dsp.window.close"); arg != "" {
 			return "closewindow", arg
@@ -1190,6 +1190,18 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 	return "exec", "hyprctl dispatch lua:" + expr
 }
 
+func splitDispatchCommand(command string) (dispatcher, params string) {
+	command = strings.TrimSpace(command)
+	if command == "" {
+		return "", ""
+	}
+	parts := strings.SplitN(command, " ", 2)
+	if len(parts) == 1 {
+		return parts[0], ""
+	}
+	return parts[0], strings.TrimSpace(parts[1])
+}
+
 func joinDispatcherParams(dispatcher string, values ...string) (string, string) {
 	parts := make([]string, 0, len(values))
 	for _, value := range values {
@@ -1300,8 +1312,38 @@ func luaStringValue(raw string) string {
 }
 
 func luaLineTrailingComment(line string) string {
-	if idx := strings.Index(line, "--"); idx >= 0 {
-		return strings.TrimSpace(line[idx+2:])
+	inString := byte(0)
+	escaped := false
+	for i := 0; i < len(line)-1; i++ {
+		c := line[i]
+		if inString != 0 {
+			if escaped {
+				escaped = false
+				continue
+			}
+			if c == '\\' && inString == '"' {
+				escaped = true
+				continue
+			}
+			if c == inString {
+				inString = 0
+			}
+			continue
+		}
+		if c == '"' || c == '\'' {
+			inString = c
+			continue
+		}
+		if c == '[' && line[i+1] == '[' {
+			if end := strings.Index(line[i+2:], "]]"); end >= 0 {
+				i += end + 3
+				continue
+			}
+			return ""
+		}
+		if c == '-' && line[i+1] == '-' {
+			return strings.TrimSpace(line[i+2:])
+		}
 	}
 	return ""
 }

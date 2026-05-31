@@ -764,7 +764,7 @@ func luaActionStringFromHyprlangAction(action string) string {
 	if expr, ok := luaActionStringFromKnownHyprlandAction(action); ok {
 		return expr
 	}
-	return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote("hyprctl dispatch "+action))
+	return fmt.Sprintf(`hl.dispatch(%s)`, strconv.Quote(action))
 }
 
 func luaExprToInternalAction(expr string) string {
@@ -786,7 +786,7 @@ func luaBindOptions(bind *hyprlandOverrideBind) []string {
 	if strings.Contains(bind.Flags, "e") {
 		opts = append(opts, "repeating = true")
 	}
-	if bind.Description != "" && strings.Contains(bind.Flags, "d") {
+	if bind.Description != "" {
 		opts = append(opts, fmt.Sprintf("description = %s", strconv.Quote(bind.Description)))
 	}
 	return opts
@@ -806,11 +806,7 @@ func writeLuaBindLine(sb *strings.Builder, bind *hyprlandOverrideBind) {
 	if len(opts) > 0 {
 		fmt.Fprintf(sb, `hl.bind("%s", %s, { %s })`, key, expr, strings.Join(opts, ", "))
 	} else {
-		if bind.Description != "" {
-			fmt.Fprintf(sb, `hl.bind("%s", %s) -- %s`, key, expr, bind.Description)
-		} else {
-			fmt.Fprintf(sb, `hl.bind("%s", %s)`, key, expr)
-		}
+		fmt.Fprintf(sb, `hl.bind("%s", %s)`, key, expr)
 	}
 	sb.WriteByte('\n')
 }
@@ -829,6 +825,9 @@ func parseLuaBindOverrideLine(line string) (*hyprlandOverrideBind, bool) {
 	action := luaExprToInternalAction(actionExpr)
 	flags := luaBindOptFlags(optSuffix)
 	description := luaBindOptDescription(optSuffix)
+	if description == "" {
+		description = luaLineTrailingComment(line)
+	}
 	return &hyprlandOverrideBind{
 		Key:         internalKey,
 		Action:      action,

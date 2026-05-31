@@ -403,6 +403,7 @@ Singleton {
                 const sourceStr = bind.source || "config";
                 const keyData = {
                     "key": bind.key || "",
+                    "desc": bind.desc || "",
                     "source": sourceStr,
                     "isOverride": sourceStr === "dms",
                     "isDMSManaged": sourceStr === "dms" || sourceStr === "dms-default",

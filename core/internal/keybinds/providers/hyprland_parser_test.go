@@ -71,6 +71,8 @@ func TestHyprlandLuaBindRoundTripHelpers(t *testing.T) {
 	}{
 		{`hl.dsp.exec_cmd([[dms ipc call brightness increment 5 ""]])`, "exec", `dms ipc call brightness increment 5 ""`},
 		{`hl.dsp.exec_cmd([[hyprctl dispatch workspace 1]])`, "workspace", "1"},
+		{`hl.dispatch("workspace 2")`, "workspace", "2"},
+		{`hl.dispatch([[customdispatcher arg one]])`, "customdispatcher", "arg one"},
 		{`hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })`, "fullscreen", "1"},
 		{`hl.dsp.focus({ workspace = "e+1" })`, "workspace", "e+1"},
 		{`hl.dsp.focus({ workspace = "2", on_current_monitor = true })`, "focusworkspaceoncurrentmonitor", "2"},
@@ -118,7 +120,7 @@ func TestWriteLuaBindLineMapsSpawnActionForHyprland(t *testing.T) {
 	})
 
 	want := `hl.unbind("SUPER + N")
-hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle")) -- Notepad: Toggle`
+hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle"), { description = "Notepad: Toggle" })`
 	if got := strings.TrimSpace(sb.String()); got != want {
 		t.Fatalf("writeLuaBindLine() = %q, want %q", got, want)
 	}
@@ -153,9 +155,47 @@ func TestLuaActionStringFromHyprlangActionUsesNativeDispatchers(t *testing.T) {
 
 func TestLuaActionStringFallsBackForUnsupportedResizePercentages(t *testing.T) {
 	got := luaActionStringFromHyprlangAction("resizeactive exact 100% 100%")
-	want := `hl.dsp.exec_cmd("hyprctl dispatch resizeactive exact 100% 100%")`
+	want := `hl.dispatch("resizeactive exact 100% 100%")`
 	if got != want {
 		t.Fatalf("luaActionStringFromHyprlangAction() = %q, want %q", got, want)
+	}
+}
+
+func TestLuaActionStringFallsBackToDispatchWithoutHyprctl(t *testing.T) {
+	got := luaActionStringFromHyprlangAction("customdispatcher USER_INPUT")
+	want := `hl.dispatch("customdispatcher USER_INPUT")`
+	if got != want {
+		t.Fatalf("luaActionStringFromHyprlangAction() = %q, want %q", got, want)
+	}
+	if strings.Contains(got, "hyprctl dispatch") {
+		t.Fatalf("expected hl.dispatch fallback without hyprctl dispatch wrapper, got %q", got)
+	}
+}
+
+func TestReadLuaOverrideMigratesTrailingCommentToDescription(t *testing.T) {
+	tmpDir := t.TempDir()
+	overridePath := filepath.Join(tmpDir, "binds-user.lua")
+	contents := `hl.unbind("SUPER + N")
+hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle")) -- Notepad: Toggle
+hl.bind("SUPER + H", hl.dsp.exec_cmd("app --help"))
+`
+	if err := os.WriteFile(overridePath, []byte(contents), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	binds, err := readLuaOrHyprlangOverride(overridePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := binds["super+n"]
+	if got == nil {
+		t.Fatalf("expected SUPER+N override, got %#v", binds)
+	}
+	if got.Description != "Notepad: Toggle" {
+		t.Fatalf("expected trailing comment to be preserved as description, got %q", got.Description)
+	}
+	if got := binds["super+h"]; got == nil || got.Description != "" {
+		t.Fatalf("expected -- inside a Lua string to stay out of the description, got %#v", got)
 	}
 }
 
