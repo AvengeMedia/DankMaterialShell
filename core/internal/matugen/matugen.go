@@ -878,8 +878,28 @@ func syncColorScheme(mode ColorMode) {
 	}
 }
 
+func isKDEPlasmaThemeBreeze() bool {
+	out, err := exec.Command("plasma-apply-desktoptheme", "--list-themes").Output()
+	if err != nil {
+		return false
+	}
+	for _, line := range strings.Split(string(out), "\n") {
+		if !strings.Contains(line, "(current") {
+			continue
+		}
+		// Extract theme name: " * themename (current ...)"
+		parts := strings.Fields(line)
+		if len(parts) < 2 {
+			return false
+		}
+		name := parts[1]
+		return name == "default" || strings.HasPrefix(name, "breeze")
+	}
+	return false
+}
+
 func applyKDEColorScheme(mode ColorMode) {
-	if !utils.CommandExists("plasma-apply-colorscheme") {
+	if !utils.CommandExists("plasma-apply-colorscheme") || isKDEPlasmaThemeBreeze() {
 		return
 	}
 
