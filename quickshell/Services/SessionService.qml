@@ -319,6 +319,11 @@ Singleton {
                 return;
             }
 
+            if (CompositorService.isMango) {
+                MangoService.quit();
+                return;
+            }
+
             if (CompositorService.isLabwc) {
                 LabwcService.quit();
                 return;

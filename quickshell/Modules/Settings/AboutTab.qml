@@ -15,7 +15,7 @@ Item {
     property bool isSway: CompositorService.isSway
     property bool isScroll: CompositorService.isScroll
     property bool isMiracle: CompositorService.isMiracle
-    property bool isDwl: CompositorService.isDwl
+    property bool isDwl: CompositorService.isDwl || CompositorService.isMango
     property bool isLabwc: CompositorService.isLabwc
 
     property string compositorName: {

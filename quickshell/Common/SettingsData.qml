@@ -1222,6 +1222,8 @@ Singleton {
             HyprlandService.generateLayoutConfig();
         if (CompositorService.isDwl && typeof DwlService !== "undefined")
             DwlService.generateLayoutConfig();
+        if (CompositorService.isMango && typeof MangoService !== "undefined")
+            MangoService.generateLayoutConfig();
     }
 
     function applyStoredIconTheme() {
@@ -2444,6 +2446,10 @@ Singleton {
         }
         if (CompositorService.isDwl && typeof DwlService !== "undefined") {
             DwlService.generateCursorConfig();
+            return;
+        }
+        if (CompositorService.isMango && typeof MangoService !== "undefined") {
+            MangoService.generateCursorConfig();
             return;
         }
     }

@@ -37,8 +37,8 @@ Item {
                 "text": I18n.tr("Layout"),
                 "description": I18n.tr("Display and switch DWL layouts"),
                 "icon": "view_quilt",
-                "enabled": CompositorService.isDwl && DwlService.dwlAvailable,
-                "warning": !CompositorService.isDwl ? I18n.tr("Requires DWL compositor") : (!DwlService.dwlAvailable ? I18n.tr("DWL service not available") : undefined)
+                "enabled": (CompositorService.isDwl && DwlService.dwlAvailable) || (CompositorService.isMango && MangoService.available),
+                "warning": CompositorService.isMango ? (!MangoService.available ? I18n.tr("DWL service not available") : undefined) : (!CompositorService.isDwl ? I18n.tr("Requires DWL compositor") : (!DwlService.dwlAvailable ? I18n.tr("DWL service not available") : undefined))
             },
             {
                 "id": "launcherButton",

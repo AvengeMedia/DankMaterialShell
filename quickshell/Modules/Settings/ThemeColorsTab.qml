@@ -49,6 +49,7 @@ Item {
                 "includeLine": "require(\"dms.cursor\")"
             };
         case "dwl":
+        case "mango":
             return {
                 "configFile": configDir + "/mango/config.conf",
                 "cursorFile": configDir + "/mango/dms/cursor.conf",
@@ -62,7 +63,7 @@ Item {
 
     function checkCursorIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl" && compositor !== "mango") {
             cursorIncludeStatus = {
                 "exists": false,
                 "included": false,
@@ -73,7 +74,7 @@ Item {
         }
 
         const filename = (compositor === "niri") ? "cursor.kdl" : ((compositor === "hyprland") ? "cursor.lua" : "cursor.conf");
-        const compositorArg = (compositor === "dwl") ? "mangowc" : compositor;
+        const compositorArg = (compositor === "dwl" || compositor === "mango") ? "mangowc" : compositor;
 
         checkingCursorInclude = true;
         Proc.runCommand("check-cursor-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
@@ -193,7 +194,7 @@ Item {
                 themeColorsTab.templateDetection = JSON.parse(output.trim());
             } catch (e) {}
         });
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl)
+        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango)
             checkCursorIncludeStatus();
     }
 
@@ -2177,7 +2178,7 @@ Item {
                 title: I18n.tr("MangoWC Layout Overrides")
                 settingKey: "mangoLayout"
                 iconName: "crop_square"
-                visible: CompositorService.isDwl
+                visible: CompositorService.isDwl || CompositorService.isMango
 
                 SettingsToggleRow {
                     tab: "theme"
@@ -2334,7 +2335,7 @@ Item {
                 title: I18n.tr("Cursor Theme")
                 settingKey: "cursorTheme"
                 iconName: "mouse"
-                visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl
+                visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango
 
                 Column {
                     width: parent.width
@@ -2490,6 +2491,8 @@ Item {
                                 return SettingsData.cursorSettings.hyprland?.inactiveTimeout || 0;
                             if (CompositorService.isDwl)
                                 return SettingsData.cursorSettings.dwl?.cursorHideTimeout || 0;
+                            if (CompositorService.isMango)
+                                return SettingsData.cursorSettings.mango?.cursorHideTimeout || 0;
                             return 0;
                         }
                         minimum: 0
@@ -2510,6 +2513,10 @@ Item {
                                 if (!updated.dwl)
                                     updated.dwl = {};
                                 updated.dwl.cursorHideTimeout = newValue;
+                            } else if (CompositorService.isMango) {
+                                if (!updated.mango)
+                                    updated.mango = {};
+                                updated.mango.cursorHideTimeout = newValue;
                             }
                             SettingsData.set("cursorSettings", updated);
                         }

@@ -24,6 +24,7 @@ Singleton {
     property string compositor: "unknown"
     readonly property bool useHyprlandFocusGrab: isHyprland && Quickshell.env("DMS_HYPRLAND_EXCLUSIVE_FOCUS") !== "1"
 
+    readonly property string mangoSignature: Quickshell.env("MANGO_INSTANCE_SIGNATURE")
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
     readonly property string niriSocket: Quickshell.env("NIRI_SOCKET")
     readonly property string swaySocket: Quickshell.env("SWAYSOCK")
@@ -817,6 +818,20 @@ Singleton {
     }
 
     function detectCompositor() {
+        if (mangoSignature && mangoSignature.length > 0) {
+            isHyprland = false;
+            isNiri = false;
+            isDwl = false;
+            isMango = true;
+            isSway = false;
+            isScroll = false;
+            isMiracle = false;
+            isLabwc = false;
+            compositor = "mango";
+            log.info("Detected MangoWM via MANGO_INSTANCE_SIGNATURE");
+            return;
+        }
+
         if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !miracleSocket && !labwcPid) {
             isHyprland = true;
             isNiri = false;
@@ -930,13 +945,15 @@ Singleton {
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
-            if (!isHyprland && !isNiri && !isDwl && !isLabwc) {
+            if (!isHyprland && !isNiri && !isDwl && !isMango && !isLabwc) {
                 checkForDwl();
             }
         }
     }
 
     function checkForDwl() {
+        if (isMango)
+            return;
         if (DMSService.apiVersion >= 12 && DMSService.capabilities.includes("dwl")) {
             isHyprland = false;
             isNiri = false;

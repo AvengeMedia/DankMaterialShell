@@ -21,6 +21,8 @@ Singleton {
     property int _lastGapValue: -1
 
     property bool dwlAvailable: false
+    // Alias so consumers can treat DwlService/MangoService uniformly via `.available`.
+    readonly property bool available: dwlAvailable
     property var outputs: ({})
     property var tagCount: 9
     property var layouts: []

@@ -70,6 +70,8 @@ Card {
                         // technically they might not be on mangowc, but its what we support in the docs
                         if (CompositorService.isDwl)
                             return I18n.tr("on MangoWC");
+                        if (CompositorService.isMango)
+                            return I18n.tr("on MangoWC");
                         if (CompositorService.isSway)
                             return I18n.tr("on Sway");
                         if (CompositorService.isScroll)

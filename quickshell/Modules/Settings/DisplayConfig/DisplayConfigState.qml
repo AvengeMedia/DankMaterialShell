@@ -158,12 +158,14 @@ Singleton {
         const compositorDirs = {
             "niri": configDir + "/niri/dms/profiles",
             "hyprland": configDir + "/hypr/dms/profiles",
-            "dwl": configDir + "/mango/dms/profiles"
+            "dwl": configDir + "/mango/dms/profiles",
+            "mango": configDir + "/mango/dms/profiles"
         };
         const compositorExts = {
             "niri": ".kdl",
             "hyprland": ".conf",
-            "dwl": ".conf"
+            "dwl": ".conf",
+            "mango": ".conf"
         };
 
         const tasks = [];
@@ -536,6 +538,14 @@ Singleton {
             }
         case "hyprland":
             HyprlandService.generateOutputsConfig(outputsData, getHyprlandSettingsFromConfig(configEntry), success => {
+                if (success)
+                    onWriteSuccess();
+                else
+                    onWriteFailed();
+            });
+            break;
+        case "mango":
+            MangoService.generateOutputsConfig(outputsData, success => {
                 if (success)
                     onWriteSuccess();
                 else
@@ -1032,6 +1042,7 @@ Singleton {
         case "hyprland":
             return parseHyprlandOutputs(content);
         case "dwl":
+        case "mango":
             return parseMangoOutputs(content);
         default:
             return {};
@@ -1370,6 +1381,7 @@ Singleton {
                 "includeLine": "require(\"dms.outputs\")"
             };
         case "dwl":
+        case "mango":
             return {
                 "configFile": configDir + "/mango/config.conf",
                 "outputsFile": configDir + "/mango/dms/outputs.conf",
@@ -1383,7 +1395,7 @@ Singleton {
 
     function checkIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl" && compositor !== "mango") {
             includeStatus = {
                 "exists": false,
                 "included": false,
@@ -1394,7 +1406,8 @@ Singleton {
         }
 
         const filename = (compositor === "niri") ? "outputs.kdl" : ((compositor === "hyprland") ? "outputs.lua" : "outputs.conf");
-        const compositorArg = (compositor === "dwl") ? "mangowc" : compositor;
+        // mango and dwl both use outputs.conf under ~/.config/mango
+        const compositorArg = (compositor === "dwl" || compositor === "mango") ? "mangowc" : compositor;
 
         checkingInclude = true;
         Proc.runCommand("check-outputs-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
@@ -1568,6 +1581,9 @@ Singleton {
                 return false;
             }
             HyprlandService.generateOutputsConfig(outputsData, buildMergedHyprlandSettings());
+            break;
+        case "mango":
+            MangoService.generateOutputsConfig(outputsData);
             break;
         case "dwl":
             DwlService.generateOutputsConfig(outputsData);

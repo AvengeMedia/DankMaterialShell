@@ -404,7 +404,7 @@ borderpx=${borderSize}
 
         const themeName = settings.theme === "System Default" ? (SettingsData.systemDefaultCursorTheme || "") : settings.theme;
         const size = settings.size || 24;
-        const hideTimeout = settings.dwl?.cursorHideTimeout || 0;
+        const hideTimeout = settings.mango?.cursorHideTimeout || 0;
 
         const isDefaultConfig = !themeName && size === 24 && hideTimeout === 0;
         if (isDefaultConfig) {
