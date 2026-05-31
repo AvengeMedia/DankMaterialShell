@@ -975,7 +975,7 @@ Singleton {
         for (let i = 0; i < Quickshell.screens.length; i++) {
             const screen = Quickshell.screens[i];
             if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "-d", "disable_monitor," + screen.name]);
+                Quickshell.execDetached(["mmsg", "dispatch", "disable_monitor," + screen.name]);
             }
         }
     }
@@ -989,7 +989,7 @@ Singleton {
         for (let i = 0; i < Quickshell.screens.length; i++) {
             const screen = Quickshell.screens[i];
             if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "-d", "enable_monitor," + screen.name]);
+                Quickshell.execDetached(["mmsg", "dispatch", "enable_monitor," + screen.name]);
             }
         }
     }
