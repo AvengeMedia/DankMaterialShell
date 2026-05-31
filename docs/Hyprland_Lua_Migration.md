@@ -48,6 +48,13 @@ fragments.
 keyboard shortcuts in `dms/binds-user.lua`, or use the Keyboard Shortcuts page in
 DMS Settings.
 
+Stock configs include a 3-finger horizontal touchpad gesture for workspace
+switching (`hl.gesture` in `dms/binds.lua`) and basic touchpad settings
+(`tap_to_click`, `natural_scroll` in `hyprland.lua`). To customize or disable
+gestures, add your own `hl.gesture(...)` lines to `dms/binds-user.lua`, or unset
+a stock gesture with `action = "unset"` matching the original fingers,
+direction, and modifiers.
+
 Most other existing non-empty Lua fragments are preserved.
 
 ## Legacy Config Migration

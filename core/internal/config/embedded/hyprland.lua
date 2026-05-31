@@ -13,6 +13,10 @@ hl.config({
 	input = {
 		kb_layout = "us",
 		numlock_by_default = true,
+		touchpad = {
+			tap_to_click = true,
+			natural_scroll = true,
+		},
 	},
 	general = {
 		gaps_in = 5,
