@@ -332,19 +332,26 @@ Item {
                 return;
             }
 
-            let winWs = null;
-            if (CompositorService.isNiri) {
-                winWs = w.workspace_id;
-            } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-                winWs = w.workspace?.num;
+            if (CompositorService.isMango) {
+                // mango toplevels are enriched with mangoTags (1-based); tag
+                // model targetWorkspaceId is 0-based.
+                if (!(w.mangoTags || []).includes(targetWorkspaceId + 1))
+                    return;
             } else {
-                const hyprlandToplevels = Array.from(Hyprland.toplevels?.values || []);
-                const hyprToplevel = hyprlandToplevels.find(ht => ht.wayland === w);
-                winWs = hyprToplevel?.workspace?.id;
-            }
+                let winWs = null;
+                if (CompositorService.isNiri) {
+                    winWs = w.workspace_id;
+                } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
+                    winWs = w.workspace?.num;
+                } else {
+                    const hyprlandToplevels = Array.from(Hyprland.toplevels?.values || []);
+                    const hyprToplevel = hyprlandToplevels.find(ht => ht.wayland === w);
+                    winWs = hyprToplevel?.workspace?.id;
+                }
 
-            if (winWs === undefined || winWs === null || winWs !== targetWorkspaceId) {
-                return;
+                if (winWs === undefined || winWs === null || winWs !== targetWorkspaceId) {
+                    return;
+                }
             }
 
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
@@ -1091,8 +1098,12 @@ Item {
                             winWs = hyprToplevel?.workspace?.id;
                         }
 
-                        if (winWs !== targetWorkspaceId)
+                        if (CompositorService.isMango) {
+                            if (!(w.mangoTags || []).includes(targetWorkspaceId + 1))
+                                continue;
+                        } else if (winWs !== targetWorkspaceId) {
                             continue;
+                        }
                         totalCount++;
 
                         const appKey = w.app_id || w.appId || w.class || w.windowClass || "unknown";
