@@ -101,6 +101,12 @@ Singleton {
                 return dwlScale;
         }
 
+        if (isMango && screen) {
+            const mangoScale = MangoService.getOutputScale(screen.name);
+            if (mangoScale !== undefined && mangoScale > 0)
+                return mangoScale;
+        }
+
         return screen?.devicePixelRatio || 1;
     }
 
@@ -115,6 +121,8 @@ Singleton {
             screenName = focusedWs?.monitor?.name || "";
         } else if (isDwl && DwlService.activeOutput)
             screenName = DwlService.activeOutput;
+        else if (isMango && MangoService.activeOutput)
+            screenName = MangoService.activeOutput;
 
         if (!screenName)
             return Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
@@ -183,6 +191,7 @@ Singleton {
             NiriService.generateNiriLayoutConfig();
             HyprlandService.generateLayoutConfig();
             DwlService.generateLayoutConfig();
+            MangoService.generateLayoutConfig();
         });
     }
 
@@ -192,6 +201,18 @@ Singleton {
             if (isDwl && !isHyprland && !isNiri) {
                 scheduleSort();
             }
+        }
+    }
+
+    Connections {
+        target: MangoService
+        function onStateChanged() {
+            if (isMango)
+                scheduleSort();
+        }
+        function onWindowsChanged() {
+            if (isMango)
+                scheduleSort();
         }
     }
 
@@ -934,6 +955,8 @@ Singleton {
             return NiriService.powerOffMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOff();
+        if (isMango)
+            return MangoService.powerOffMonitors();
         if (isDwl)
             return _dwlPowerOffMonitors();
         if (isSway || isScroll || isMiracle) {
@@ -953,6 +976,8 @@ Singleton {
             return NiriService.powerOnMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOn();
+        if (isMango)
+            return MangoService.powerOnMonitors();
         if (isDwl)
             return _dwlPowerOnMonitors();
         if (isSway || isScroll || isMiracle) {
