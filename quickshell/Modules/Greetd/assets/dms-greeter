@@ -429,9 +429,9 @@ MIRACLE_EOF
     mango|mangowc)
         require_command "mango"
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
-            exec_compositor "mango" mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
+            exec_compositor "mango" mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg dispatch quit"
         else
-            exec_compositor "mango" mango -s "$QS_CMD && mmsg -d quit"
+            exec_compositor "mango" mango -s "$QS_CMD && mmsg dispatch quit"
         fi
         ;;
 
