@@ -323,7 +323,11 @@ Singleton {
             const transform = transformToMango(output.logical?.transform ?? "Normal");
             const vrr = output.vrr_enabled ? 1 : 0;
 
-            const rule = ["name:" + outputName, "width:" + width, "height:" + height, "refresh:" + refreshRate, "x:" + x, "y:" + y, "scale:" + scale, "rr:" + transform, "vrr:" + vrr].join(",");
+            // Anchor the name regex: mango matches monitorrule `name:` as an
+            // unanchored regex with first-match-wins, so an unanchored "DP-1"
+            // also matches "eDP-1" and steals its rule, collapsing both outputs
+            // onto one position. ^...$ pins each rule to exactly one output.
+            const rule = ["name:^" + outputName + "$", "width:" + width, "height:" + height, "refresh:" + refreshRate, "x:" + x, "y:" + y, "scale:" + scale, "rr:" + transform, "vrr:" + vrr].join(",");
 
             lines.push("monitorrule=" + rule);
         }

@@ -1302,7 +1302,7 @@ Singleton {
                 params[pair.substring(0, colonIdx).trim()] = pair.substring(colonIdx + 1).trim();
             }
 
-            const name = params.name;
+            const name = (params.name || "").replace(/^\^/, "").replace(/\$$/, "");
             if (!name)
                 continue;
 
