@@ -123,6 +123,7 @@ Singleton {
                 "height": m.height ?? 0,
                 "scale": m.scale ?? 1.0,
                 "layoutIndex": m.layout_index ?? 0,
+                "layout": m.layout_index ?? 0,
                 "layoutSymbol": m.layout_symbol ?? "",
                 "lastOpenSurface": m.last_open_surface ?? "",
                 "keymode": m.keymode ?? "",
@@ -230,8 +231,18 @@ Singleton {
         Quickshell.execDetached(["mmsg", "dispatch", "toggleview," + (tagIndex + 1)]);
     }
 
-    function setLayout(index) {
-        Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + index]);
+    // mango's tiling layouts are a fixed compiled-in set (src/layout/layout.h)
+    // and the IPC exposes no list, so mirror it here. Symbol order matches
+    // mango's layouts[] table so layout_index aligns with these indices.
+    // `setlayout` dispatches by NAME (not index/symbol), so keep the parallel
+    // name list for index -> name mapping.
+    readonly property var layouts: ["T", "S", "G", "M", "K", "CT", "RT", "VS", "VT", "VG", "VK", "DW", "F", "VF"]
+    readonly property var _layoutNames: ["tile", "scroller", "grid", "monocle", "deck", "center_tile", "right_tile", "vertical_scroller", "vertical_tile", "vertical_grid", "vertical_deck", "dwindle", "fair", "vertical_fair"]
+
+    function setLayout(outputName, index) {
+        const name = _layoutNames[index];
+        if (name)
+            Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + name]);
     }
 
     function cycleKeyboardLayout() {
