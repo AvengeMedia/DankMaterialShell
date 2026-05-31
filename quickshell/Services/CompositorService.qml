@@ -16,6 +16,7 @@ Singleton {
     property bool isHyprland: false
     property bool isNiri: false
     property bool isDwl: false
+    property bool isMango: false
     property bool isSway: false
     property bool isScroll: false
     property bool isMiracle: false
