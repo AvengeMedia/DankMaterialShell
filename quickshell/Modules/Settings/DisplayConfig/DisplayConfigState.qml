@@ -857,6 +857,8 @@ Singleton {
     Component.onCompleted: {
         outputs = buildOutputsMap();
         reloadSavedOutputs();
+        if (CompositorService.isHyprland)
+            checkIncludeStatus();
     }
 
     function reloadSavedOutputs() {
@@ -1424,6 +1426,11 @@ Singleton {
             showHyprlandReadOnlyWarning();
             return;
         }
+        if (CompositorService.isHyprland && !HyprlandService.luaConfigActive) {
+            showHyprlandReadOnlyWarning();
+            checkIncludeStatus();
+            return;
+        }
         const paths = getConfigPaths();
         if (!paths)
             return;
@@ -1440,9 +1447,25 @@ Singleton {
         });
 
         Proc.runCommand("fix-outputs-include", ["sh", "-c", script], (output, exitCode) => {
-            fixingInclude = false;
-            if (exitCode !== 0)
+            if (exitCode !== 0) {
+                fixingInclude = false;
                 return;
+            }
+
+            const liveOutputs = buildOutputsMap();
+            if (CompositorService.isHyprland && Object.keys(liveOutputs).length > 0) {
+                outputs = liveOutputs;
+                HyprlandService.generateOutputsConfig(liveOutputs, SettingsData.hyprlandOutputSettings, success => {
+                    fixingInclude = false;
+                    if (!success)
+                        ToastService.showError(I18n.tr("Display setup failed"), I18n.tr("Failed to write Hyprland outputs config."), "", "display-config");
+                    checkIncludeStatus();
+                    WlrOutputService.requestState();
+                });
+                return;
+            }
+
+            fixingInclude = false;
             checkIncludeStatus();
             WlrOutputService.requestState();
         });
@@ -2502,6 +2525,50 @@ Singleton {
         if (!mode)
             return "";
         return mode.width + "x" + mode.height + "@" + (mode.refresh_rate / 1000).toFixed(3);
+    }
+
+    function formatScaleLabel(scale) {
+        const value = Number(scale);
+        if (!isFinite(value))
+            return "1";
+        return parseFloat(value.toFixed(2)).toString();
+    }
+
+    function getScalePresetValues(outputName, outputData) {
+        if (!CompositorService.isHyprland)
+            return [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+
+        const candidates = [0.5, 2 / 3, 0.75, 0.8, 1, 4 / 3, 1.6, 2, 2.5, 8 / 3, 3.2, 4];
+        const mode = getModeForScalePresets(outputName, outputData);
+        if (!mode)
+            return candidates;
+
+        return candidates.filter(scale => scaleFitsMode(mode, scale));
+    }
+
+    function getModeForScalePresets(outputName, outputData) {
+        const pendingMode = getPendingValue(outputName, "mode");
+        const modes = outputData?.modes || [];
+        if (pendingMode) {
+            for (const mode of modes) {
+                if (formatMode(mode) === pendingMode)
+                    return mode;
+            }
+        }
+        const currentMode = outputData?.current_mode;
+        if (currentMode !== undefined && modes[currentMode])
+            return modes[currentMode];
+        return null;
+    }
+
+    function scaleFitsMode(mode, scale) {
+        const width = Number(mode?.width || 0);
+        const height = Number(mode?.height || 0);
+        if (width <= 0 || height <= 0 || scale <= 0)
+            return false;
+        const logicalWidth = width / scale;
+        const logicalHeight = height / scale;
+        return Math.abs(logicalWidth - Math.round(logicalWidth)) < 0.001 && Math.abs(logicalHeight - Math.round(logicalHeight)) < 0.001;
     }
 
     function getTransformLabel(transform) {
