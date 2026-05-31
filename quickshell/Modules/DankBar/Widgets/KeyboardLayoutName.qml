@@ -208,7 +208,7 @@ BasePill {
             } else if (CompositorService.isHyprland) {
                 Quickshell.execDetached(["hyprctl", "switchxkblayout", root.hyprlandKeyboard, "next"]);
             } else if (CompositorService.isDwl) {
-                Quickshell.execDetached(["mmsg", "-d", "switch_keyboard_layout"]);
+                Quickshell.execDetached(["mmsg", "dispatch", "switch_keyboard_layout"]);
             }
         }
     }
