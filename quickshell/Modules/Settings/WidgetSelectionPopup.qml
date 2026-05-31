@@ -22,6 +22,15 @@ FloatingWindow {
 
     signal widgetSelected(string widgetId, string targetSection)
 
+    function translateSection(section) {
+        switch (section.toLowerCase()) {
+        case "left":   return I18n.tr("Left Section");
+        case "center": return I18n.tr("Center Section");
+        case "right":  return I18n.tr("Right Section");
+        default:       return section;
+        }
+    }
+
     function updateFilteredWidgets() {
         if (!searchQuery || searchQuery.length === 0) {
             filteredWidgets = allWidgets.slice();
@@ -224,7 +233,7 @@ FloatingWindow {
                     }
 
                     StyledText {
-                        text: I18n.tr("Add Widget to %1 Section").arg(root.targetSection)
+                        text: I18n.tr("Add Widget to %1").arg(translateSection(root.targetSection))
                         font.pixelSize: Theme.fontSizeXLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium

@@ -251,59 +251,59 @@ Item {
                     settingKey: "fontWeight"
                     text: I18n.tr("Font Weight")
                     description: I18n.tr("Select font weight for UI text")
-                    options: [I18n.tr("Thin"), I18n.tr("Extra Light"), I18n.tr("Light"), I18n.tr("Regular"), I18n.tr("Medium"), I18n.tr("Demi Bold"), I18n.tr("Bold"), I18n.tr("Extra Bold"), I18n.tr("Black")]
+                    options: [I18n.tr("Thin", "font weight"), I18n.tr("Extra Light", "font weight"), I18n.tr("Light", "font weight"), I18n.tr("Regular", "font weight"), I18n.tr("Medium", "font weight"), I18n.tr("Demi Bold", "font weight"), I18n.tr("Bold", "font weight"), I18n.tr("Extra Bold", "font weight"), I18n.tr("Black", "font weight")]
                     currentValue: {
                         switch (SettingsData.fontWeight) {
                         case Font.Thin:
-                            return I18n.tr("Thin");
+                            return I18n.tr("Thin", "font weight");
                         case Font.ExtraLight:
-                            return I18n.tr("Extra Light");
+                            return I18n.tr("Extra Light", "font weight");
                         case Font.Light:
-                            return I18n.tr("Light");
+                            return I18n.tr("Light", "font weight");
                         case Font.Normal:
-                            return I18n.tr("Regular");
+                            return I18n.tr("Regular", "font weight");
                         case Font.Medium:
-                            return I18n.tr("Medium");
+                            return I18n.tr("Medium", "font weight");
                         case Font.DemiBold:
-                            return I18n.tr("Demi Bold");
+                            return I18n.tr("Demi Bold", "font weight");
                         case Font.Bold:
-                            return I18n.tr("Bold");
+                            return I18n.tr("Bold", "font weight");
                         case Font.ExtraBold:
-                            return I18n.tr("Extra Bold");
+                            return I18n.tr("Extra Bold", "font weight");
                         case Font.Black:
-                            return I18n.tr("Black");
+                            return I18n.tr("Black", "font weight");
                         default:
-                            return I18n.tr("Regular");
+                            return I18n.tr("Regular", "font weight");
                         }
                     }
                     onValueChanged: value => {
                         var weight;
                         switch (value) {
-                        case I18n.tr("Thin"):
+                        case I18n.tr("Thin", "font weight"):
                             weight = Font.Thin;
                             break;
-                        case I18n.tr("Extra Light"):
+                        case I18n.tr("Extra Light", "font weight"):
                             weight = Font.ExtraLight;
                             break;
-                        case I18n.tr("Light"):
+                        case I18n.tr("Light", "font weight"):
                             weight = Font.Light;
                             break;
-                        case I18n.tr("Regular"):
+                        case I18n.tr("Regular", "font weight"):
                             weight = Font.Normal;
                             break;
-                        case I18n.tr("Medium"):
+                        case I18n.tr("Medium", "font weight"):
                             weight = Font.Medium;
                             break;
-                        case I18n.tr("Demi Bold"):
+                        case I18n.tr("Demi Bold", "font weight"):
                             weight = Font.DemiBold;
                             break;
-                        case I18n.tr("Bold"):
+                        case I18n.tr("Bold", "font weight"):
                             weight = Font.Bold;
                             break;
-                        case I18n.tr("Extra Bold"):
+                        case I18n.tr("Extra Bold", "font weight"):
                             weight = Font.ExtraBold;
                             break;
-                        case I18n.tr("Black"):
+                        case I18n.tr("Black", "font weight"):
                             weight = Font.Black;
                             break;
                         default:
@@ -347,7 +347,7 @@ Item {
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 64 : 96
                         textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: ["Native", "Qt", "Curve"]
+                        model: [I18n.tr("Native"), I18n.tr("Qt"), I18n.tr("Curve")]
                         selectionMode: "single"
                         currentIndex: {
                             switch (SettingsData.textRenderType) {
@@ -455,7 +455,7 @@ Item {
                         buttonPadding: parent.width < 480 ? Theme.spacingXS : Theme.spacingS
                         minButtonWidth: parent.width < 480 ? 40 : 56
                         textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: ["Default", "Low", "Normal", "High", "Very High"]
+                        model: [I18n.tr("Default"), I18n.tr("Low"), I18n.tr("Normal"), I18n.tr("High"), I18n.tr("Very High")]
                         selectionMode: "single"
                         currentIndex: SettingsData.textRenderQuality
                         onSelectionChanged: (index, selected) => {
