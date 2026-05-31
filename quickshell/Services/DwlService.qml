@@ -233,27 +233,23 @@ Singleton {
     }
 
     function quit() {
-        Quickshell.execDetached(["mmsg", "-d", "quit"]);
+        Quickshell.execDetached(["mmsg", "dispatch", "quit"]);
     }
 
     Process {
         id: scaleQueryProcess
-        command: ["mmsg", "-A"]
+        command: ["mmsg", "get", "all-monitors"]
         running: false
 
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
                     const newScales = {};
-                    const lines = text.trim().split('\n');
-                    for (const line of lines) {
-                        const parts = line.trim().split(/\s+/);
-                        if (parts.length >= 3 && parts[1] === "scale_factor") {
-                            const outputName = parts[0];
-                            const scale = parseFloat(parts[2]);
-                            if (!isNaN(scale)) {
-                                newScales[outputName] = scale;
-                            }
+                    const data = JSON.parse(text.trim());
+                    const monitors = data.monitors || [];
+                    for (const mon of monitors) {
+                        if (mon.name && typeof mon.scale === "number" && mon.scale > 0) {
+                            newScales[mon.name] = mon.scale;
                         }
                     }
                     outputScales = newScales;
@@ -352,7 +348,7 @@ Singleton {
     }
 
     function reloadConfig() {
-        Proc.runCommand("mango-reload", ["mmsg", "-d", "reload_config"], (output, exitCode) => {
+        Proc.runCommand("mango-reload", ["mmsg", "dispatch", "reload_config"], (output, exitCode) => {
             if (exitCode !== 0)
                 log.warn("mmsg reload_config failed:", output);
         });
