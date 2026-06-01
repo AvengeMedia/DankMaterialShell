@@ -50,7 +50,7 @@ DankPopout {
         }
     }
 
-    popupWidth: 400
+    popupWidth: 400 + Theme.spacingL
     popupHeight: stablePopupHeight
     positioning: ""
     suspendShadowWhileResizing: false

@@ -1721,11 +1721,15 @@ Item {
             return "";
         var idx = text.toLowerCase().indexOf(lowerQuery);
         if (idx === -1)
-            return text;
+            return _escapeRichText(text);
         var before = text.substring(0, idx);
         var match = text.substring(idx, idx + queryLen);
         var after = text.substring(idx + queryLen);
-        return '<span style="color:' + baseColor + '">' + before + '</span><span style="color:' + highlightColor + '; font-weight:600">' + match + '</span><span style="color:' + baseColor + '">' + after + '</span>';
+        return '<span style="color:' + baseColor + '">' + _escapeRichText(before) + '</span><span style="color:' + highlightColor + '; font-weight:600">' + _escapeRichText(match) + '</span><span style="color:' + baseColor + '">' + _escapeRichText(after) + '</span>';
+    }
+
+    function _escapeRichText(text) {
+        return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     function getCurrentSectionViewMode() {

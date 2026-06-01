@@ -99,8 +99,9 @@ Rectangle {
         id: contentItem
 
         readonly property real expandedTextHeight: descriptionText.contentHeight
-        readonly property real twoLineHeight: descriptionText.font.pixelSize * 1.2 * 2
-        readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > twoLineHeight + 2) ? (expandedTextHeight - twoLineHeight) : 0
+        readonly property real collapsedLineCount: compactMode ? 1 : 2
+        readonly property real collapsedLineHeight: descriptionText.font.pixelSize * 1.2 * collapsedLineCount
+        readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedLineHeight + 2) ? (expandedTextHeight - collapsedLineHeight) : 0
 
         anchors.top: parent.top
         anchors.left: parent.left
@@ -229,7 +230,7 @@ Rectangle {
                     property bool hasMoreText: truncated
 
                     text: historyItem.htmlBody || historyItem.body || ""
-                    textFormat: Text.RichText
+                    textFormat: Text.StyledText
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                     width: parent.width

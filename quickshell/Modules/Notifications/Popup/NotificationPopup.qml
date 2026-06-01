@@ -755,7 +755,7 @@ PanelWindow {
                 visible: false
                 width: Math.max(0, backgroundContainer.width - Theme.spacingL - (Theme.spacingL + Theme.notificationHoverRevealMargin) - popupIconSize - Theme.spacingM)
                 text: notificationData ? (notificationData.htmlBody || "") : ""
-                textFormat: Text.RichText
+                textFormat: Text.StyledText
                 font.pixelSize: Theme.fontSizeSmall
                 elide: Text.ElideNone
                 horizontalAlignment: Text.AlignLeft
@@ -913,7 +913,7 @@ PanelWindow {
                         property bool hasMoreText: truncated
 
                         text: notificationData ? (notificationData.htmlBody || "") : ""
-                        textFormat: Text.RichText
+                        textFormat: Text.StyledText
                         color: Theme.surfaceVariantText
                         font.pixelSize: Theme.fontSizeSmall
                         width: parent.width
