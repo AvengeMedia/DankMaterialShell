@@ -65,20 +65,11 @@ Item {
     readonly property bool backgroundDismissWindowRequired: backgroundInteractive
     readonly property bool backgroundWindowRequired: backgroundDismissWindowRequired || root.overlayContent !== null
     readonly property bool _fullHeight: fullHeightSurface
-    readonly property var effectivePopoutLayer: {
-        switch (Quickshell.env("DMS_POPOUT_LAYER")) {
-        case "bottom":
-            root.log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
-            return WlrLayershell.Top;
-        case "background":
-            root.log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
-            return WlrLayershell.Top;
-        case "overlay":
-            return WlrLayershell.Overlay;
-        default:
-            return root.triggerUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top;
-        }
-    }
+    readonly property var effectivePopoutLayer: LayerShell.fromEnv("DMS_POPOUT_LAYER", root.triggerUsesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Top,
+        "label": "popouts"
+    })
 
     function _frameEdgeInset(side) {
         if (!screen)

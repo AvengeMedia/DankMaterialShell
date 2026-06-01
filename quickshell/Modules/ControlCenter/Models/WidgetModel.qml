@@ -352,6 +352,10 @@ QtObject {
         WidgetUtils.moveWidget(fromIndex, toIndex);
     }
 
+    function reorderWidgets(newOrder) {
+        WidgetUtils.reorderWidgets(newOrder);
+    }
+
     function resetToDefault() {
         WidgetUtils.resetToDefault();
     }

@@ -409,7 +409,7 @@ Column {
 
                                 var xPos = buttonPos.x - popupWidth - Theme.spacingS;
                                 if (xPos < 0)
-                                xPos = buttonPos.x + focusedWindowMenuButton.width + Theme.spacingS;
+                                    xPos = buttonPos.x + focusedWindowMenuButton.width + Theme.spacingS;
 
                                 var yPos = buttonPos.y - popupHeight / 2 + focusedWindowMenuButton.height / 2;
                                 if (yPos < 0) {

@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -39,18 +38,7 @@ Item {
     readonly property real rightMargin: !isVerticalOrientation ? (isRightBarEdge && isLast ? barEdgeExtension : (isLast ? gapExtension : gapExtension / 2)) : 0
     readonly property real topMargin: isVerticalOrientation ? (isTopBarEdge && isFirst ? barEdgeExtension : (isFirst ? gapExtension : gapExtension / 2)) : 0
     readonly property real bottomMargin: isVerticalOrientation ? (isBottomBarEdge && isLast ? barEdgeExtension : (isLast ? gapExtension : gapExtension / 2)) : 0
-    readonly property bool barUsesOverlayLayer: {
-        switch (Quickshell.env("DMS_DANKBAR_LAYER")) {
-        case "overlay":
-            return true;
-        case "bottom":
-        case "background":
-        case "top":
-            return false;
-        default:
-            return (barConfig?.useOverlayLayer ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(parentScreen);
-        }
-    }
+    readonly property bool barUsesOverlayLayer: LayerShell.envUsesOverlay("DMS_DANKBAR_LAYER", (barConfig?.useOverlayLayer ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(parentScreen))
 
     signal clicked
     signal rightClicked(real rootX, real rootY)

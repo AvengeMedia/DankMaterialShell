@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 
@@ -170,16 +169,7 @@ Item {
     }
 
     function _triggerBarUsesOverlayLayer(targetScreen, barConfig) {
-        switch (Quickshell.env("DMS_DANKBAR_LAYER")) {
-        case "overlay":
-            return true;
-        case "bottom":
-        case "background":
-        case "top":
-            return false;
-        default:
-            return (barConfig?.useOverlayLayer ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen);
-        }
+        return LayerShell.envUsesOverlay("DMS_DANKBAR_LAYER", (barConfig?.useOverlayLayer ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen));
     }
 
     function setTriggerPosition(x, y, width, section, targetScreen, barPosition, barThickness, barSpacing, barConfig) {

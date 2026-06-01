@@ -221,6 +221,7 @@ def main():
 
     client = LspClient([qmlls])
     changed = 0
+    skipped = 0
     unused_by_file = {}
     try:
         client.request("initialize", {
@@ -252,10 +253,22 @@ def main():
                 },
             })
 
-            edits = client.request("textDocument/formatting", {
-                "textDocument": {"uri": uri},
-                "options": {"tabSize": TAB_SIZE, "insertSpaces": True},
-            })
+            try:
+                edits = client.request("textDocument/formatting", {
+                    "textDocument": {"uri": uri},
+                    "options": {"tabSize": TAB_SIZE, "insertSpaces": True},
+                })
+            except RuntimeError as exc:
+                # qmlls (qmlformat's DOM) refuses some valid files — notably
+                # "Cannot format invalid documents!" on constructs qmllint
+                # accepts. Don't let one file's formatter bug abort the commit.
+                client.notify("textDocument/didClose", {"textDocument": {"uri": uri}})
+                if "invalid document" in str(exc).lower():
+                    print("skipped (qmlls rejected as invalid;")
+                else:
+                    print(f"skipped ({exc})")
+                skipped += 1
+                continue
 
             client.notify("textDocument/didClose", {"textDocument": {"uri": uri}})
 
@@ -276,6 +289,8 @@ def main():
                     unused_by_file[file] = findings
 
         print(f"\n{changed} of {len(files)} file(s) changed.")
+        if skipped:
+            print(f"{skipped} file(s) skipped (could not be formatted; see above).")
 
         if unused_by_file:
             print("\nUnused import warnings (informational, not auto-removed):")

@@ -81,20 +81,12 @@ Item {
     readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     readonly property bool useBackgroundDarken: !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
     readonly property bool usesOverlayLayer: useBackgroundDarken || SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
-    readonly property var effectiveLauncherLayer: {
-        switch (Quickshell.env("DMS_MODAL_LAYER")) {
-        case "bottom":
-            log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-            return WlrLayershell.Top;
-        case "background":
-            log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
-            return WlrLayershell.Top;
-        case "overlay":
-            return WlrLayershell.Overlay;
-        default:
-            return root.usesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top;
-        }
-    }
+    readonly property var effectiveLauncherLayer: LayerShell.fromEnv("DMS_MODAL_LAYER", root.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Top,
+        "label": "modals",
+        "error": true
+    })
     readonly property real cornerRadius: Theme.cornerRadius
     readonly property color borderColor: {
         if (!SettingsData.dankLauncherV2BorderEnabled)

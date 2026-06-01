@@ -497,22 +497,12 @@ Item {
         }
 
         WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: {
-            if (root.useOverlayLayer)
-                return WlrLayershell.Overlay;
-            switch (Quickshell.env("DMS_MODAL_LAYER")) {
-            case "bottom":
-                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.useOverlayLayer ? WlrLayer.Overlay : LayerShell.fromEnv("DMS_MODAL_LAYER", WlrLayer.Top, {
+            "allow": ["top", "overlay"],
+            "invalidLayer": WlrLayer.Top,
+            "label": "modals",
+            "error": true
+        })
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
             if (customKeyboardFocus !== null)

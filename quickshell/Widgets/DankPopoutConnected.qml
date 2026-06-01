@@ -57,20 +57,11 @@ Item {
     property var screen: null
     // Connected resize uses one full-screen surface; body-sized regions are masks.
     readonly property bool useBackgroundWindow: false
-    readonly property var effectivePopoutLayer: {
-        switch (Quickshell.env("DMS_POPOUT_LAYER")) {
-        case "bottom":
-            log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
-            return WlrLayershell.Top;
-        case "background":
-            log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
-            return WlrLayershell.Top;
-        case "overlay":
-            return WlrLayershell.Overlay;
-        default:
-            return root.triggerUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top;
-        }
-    }
+    readonly property var effectivePopoutLayer: LayerShell.fromEnv("DMS_POPOUT_LAYER", root.triggerUsesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Top,
+        "label": "popouts"
+    })
 
     readonly property real effectiveBarThickness: {
         if (root.usesConnectedSurfaceChrome)

@@ -110,20 +110,7 @@ PanelWindow {
 
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)
 
-    readonly property var dBarLayer: {
-        switch (Quickshell.env("DMS_DANKBAR_LAYER")) {
-        case "bottom":
-            return WlrLayer.Bottom;
-        case "overlay":
-            return WlrLayer.Overlay;
-        case "background":
-            return WlrLayer.Background;
-        case "top":
-            return WlrLayer.Top;
-        default:
-            return barWindow.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top;
-        }
-    }
+    readonly property var dBarLayer: LayerShell.fromEnv("DMS_DANKBAR_LAYER", barWindow.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)
 
     property var blurRegion: null
     property var _blurWidgetItems: []

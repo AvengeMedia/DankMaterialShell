@@ -54,6 +54,8 @@ Column {
     }
 
     readonly property real targetImplicitHeight: {
+        if (editMode)
+            return editModeGrid.implicitHeight;
         const rows = layoutResult.rows;
         let totalHeight = 0;
         for (let i = 0; i < rows.length; i++) {
@@ -106,8 +108,40 @@ Column {
         item.z = 1000;
     }
 
+    function componentForWidget(widgetData) {
+        const id = widgetData.id || "";
+        const widgetWidth = widgetData.width || 50;
+        if (id.startsWith("builtin_"))
+            return builtinPluginWidgetComponent;
+        if (id.startsWith("plugin_"))
+            return pluginWidgetComponent;
+        switch (id) {
+        case "wifi":
+        case "bluetooth":
+        case "audioOutput":
+        case "audioInput":
+            return compoundPillComponent;
+        case "volumeSlider":
+            return audioSliderComponent;
+        case "brightnessSlider":
+            return brightnessSliderComponent;
+        case "inputVolumeSlider":
+            return inputAudioSliderComponent;
+        case "battery":
+            return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent;
+        case "diskUsage":
+            return widgetWidth <= 25 ? smallDiskUsageComponent : diskUsagePillComponent;
+        case "colorPicker":
+            return colorPickerPillComponent;
+        case "doNotDisturb":
+            return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
+        default:
+            return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
+        }
+    }
+
     Repeater {
-        model: root.layoutResult.rows
+        model: root.editMode ? [] : root.layoutResult.rows
 
         Column {
             width: root.width
@@ -174,32 +208,7 @@ Column {
                             return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
                         }
 
-                        widgetComponent: {
-                            const id = modelData.id || "";
-                            if (id.startsWith("builtin_")) {
-                                return builtinPluginWidgetComponent;
-                            } else if (id.startsWith("plugin_")) {
-                                return pluginWidgetComponent;
-                            } else if (id === "wifi" || id === "bluetooth" || id === "audioOutput" || id === "audioInput") {
-                                return compoundPillComponent;
-                            } else if (id === "volumeSlider") {
-                                return audioSliderComponent;
-                            } else if (id === "brightnessSlider") {
-                                return brightnessSliderComponent;
-                            } else if (id === "inputVolumeSlider") {
-                                return inputAudioSliderComponent;
-                            } else if (id === "battery") {
-                                return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent;
-                            } else if (id === "diskUsage") {
-                                return widgetWidth <= 25 ? smallDiskUsageComponent : diskUsagePillComponent;
-                            } else if (id === "colorPicker") {
-                                return colorPickerPillComponent;
-                            } else if (id === "doNotDisturb") {
-                                return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
-                            } else {
-                                return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
-                            }
-                        }
+                        widgetComponent: root.componentForWidget(modelData)
 
                         onWidgetMoved: (fromIndex, toIndex) => root.moveWidget(fromIndex, toIndex)
                         onRemoveWidget: index => root.removeWidget(index)
@@ -277,6 +286,18 @@ Column {
                 }
             }
         }
+    }
+
+    EditModeGrid {
+        id: editModeGrid
+        width: root.width
+        visible: root.editMode
+        active: root.editMode
+        model: root.model
+        componentProvider: root
+        onRemoveWidget: index => root.removeWidget(index)
+        onToggleWidgetSize: index => root.toggleWidgetSize(index)
+        onConfigRequested: (idx, data, anchor) => root.configRequested(idx, data, anchor)
     }
 
     Component {
