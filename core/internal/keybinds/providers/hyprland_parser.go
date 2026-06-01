@@ -882,23 +882,20 @@ func parseLuaStringLiteral(line string, i int) (value string, next int, ok bool)
 	return "", i, false
 }
 
-// parseLuaFirstArgExpr parses a single Lua expression starting at i, stopping when parentheses
-// opened from the first '(' are balanced (handles nested () and {} and double-quoted strings).
+// parseLuaFirstArgExpr parses a single Lua expression starting at i, stopping at
+// the next top-level comma. It handles nested calls/tables and inline functions.
 func parseLuaFirstArgExpr(line string, start int) (expr string, next int, ok bool) {
 	start = skipLuaWS(line, start)
 	if start >= len(line) {
 		return "", start, false
 	}
-	// Find first '(' of the call (e.g. hl.dsp.exec_cmd(...)
-	firstParen := strings.IndexByte(line[start:], '(')
-	if firstParen < 0 {
-		return "", start, false
-	}
-	i := start + firstParen
-	depth := 0
+	i := start
+	parenDepth := 0
+	braceDepth := 0
+	bracketDepth := 0
+	functionDepth := 0
 	inStr := byte(0)
 	esc := false
-	exprStart := start
 	for ; i < len(line); i++ {
 		c := line[i]
 		if inStr != 0 {
@@ -915,19 +912,66 @@ func parseLuaFirstArgExpr(line string, start int) (expr string, next int, ok boo
 			}
 			continue
 		}
+		if c == '[' && i+1 < len(line) && line[i+1] == '[' {
+			if end := strings.Index(line[i+2:], "]]"); end >= 0 {
+				i += end + 3
+				continue
+			}
+			return "", start, false
+		}
+		if luaWordAt(line, i, "function") {
+			functionDepth++
+			i += len("function") - 1
+			continue
+		}
+		if luaWordAt(line, i, "end") && functionDepth > 0 {
+			functionDepth--
+			i += len("end") - 1
+			continue
+		}
 		switch c {
 		case '"', '\'':
 			inStr = c
 		case '(':
-			depth++
+			parenDepth++
 		case ')':
-			depth--
-			if depth == 0 {
-				return strings.TrimSpace(line[exprStart : i+1]), i + 1, true
+			if parenDepth > 0 {
+				parenDepth--
+			}
+		case '{':
+			braceDepth++
+		case '}':
+			if braceDepth > 0 {
+				braceDepth--
+			}
+		case '[':
+			bracketDepth++
+		case ']':
+			if bracketDepth > 0 {
+				bracketDepth--
+			}
+		case ',':
+			if parenDepth == 0 && braceDepth == 0 && bracketDepth == 0 && functionDepth == 0 {
+				return strings.TrimSpace(line[start:i]), i, true
 			}
 		}
 	}
-	return "", start, false
+	expr = strings.TrimSpace(line[start:i])
+	return expr, i, expr != ""
+}
+
+func luaWordAt(line string, idx int, word string) bool {
+	if idx < 0 || idx+len(word) > len(line) || line[idx:idx+len(word)] != word {
+		return false
+	}
+	before := idx == 0 || !isLuaIdentByte(line[idx-1])
+	afterIdx := idx + len(word)
+	after := afterIdx >= len(line) || !isLuaIdentByte(line[afterIdx])
+	return before && after
+}
+
+func isLuaIdentByte(c byte) bool {
+	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
 }
 
 // parseLuaBindInvocation parses one hl.bind("KEY", expr [, opts]) on a single line.
@@ -1012,19 +1056,28 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 			}
 		}
 		return "exec", strings.TrimSpace(strings.TrimPrefix(expr, "hl.dsp.exec_cmd"))
+	case strings.HasPrefix(expr, "hl.dsp.exec_raw("):
+		return "execr", luaCallStringArgValue(expr, "hl.dsp.exec_raw")
 	case strings.HasPrefix(expr, "hl.dispatch("):
 		if arg := luaCallStringArgValue(expr, "hl.dispatch"); arg != "" {
 			return splitDispatchCommand(arg)
 		}
 		return "", ""
+	case strings.Contains(expr, "hl.exec_cmd("):
+		if arg := luaEmbeddedCallStringArgValue(expr, "hl.exec_cmd"); strings.HasPrefix(arg, "hyprctl dispatch ") {
+			return splitDispatchCommand(strings.TrimSpace(strings.TrimPrefix(arg, "hyprctl dispatch ")))
+		}
 	case strings.HasPrefix(expr, "hl.dsp.window.close("):
+		if window := luaTableStringField(expr, "window"); window != "" {
+			return "closewindow", window
+		}
 		if arg := luaCallStringArgValue(expr, "hl.dsp.window.close"); arg != "" {
 			return "closewindow", arg
 		}
 		return "closewindow", ""
 	case strings.HasPrefix(expr, "hl.dsp.window.kill("):
-		if luaTableBoolFieldValue(expr, "force") {
-			return "forcekillactive", ""
+		if window := luaTableStringField(expr, "window"); window != "" {
+			return "killwindow", window
 		}
 		if arg := luaCallStringArgValue(expr, "hl.dsp.window.kill"); arg != "" {
 			return "killwindow", arg
@@ -1043,23 +1096,50 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 		client := luaStringValue(luaTableScalarField(expr, "client"))
 		return joinDispatcherParams("fullscreenstate", internal, client)
 	case strings.HasPrefix(expr, "hl.dsp.window.float("):
-		switch luaTableStringField(expr, "action") {
-		case "set":
+		switch luaToggleActionToLegacy(luaTableStringField(expr, "action")) {
+		case "on":
 			return "setfloating", ""
-		case "unset":
+		case "off":
 			return "settiled", ""
 		default:
 			return "togglefloating", ""
 		}
+	case strings.HasPrefix(expr, "hl.dsp.window.pseudo("):
+		action := luaToggleActionToLegacy(luaTableStringField(expr, "action"))
+		if action == "" || action == "toggle" {
+			return "pseudo", ""
+		}
+		return "pseudo", action
 	case strings.HasPrefix(expr, "hl.dsp.window.pin("):
-		if action := luaTableStringField(expr, "action"); action != "" && action != "toggle" {
+		if action := luaToggleActionToLegacy(luaTableStringField(expr, "action")); action != "" && action != "toggle" {
 			return "pin", action
 		}
 		return "pin", ""
 	case strings.Contains(expr, "hl.dsp.window.center()"):
 		return "centerwindow", ""
+	case strings.Contains(expr, "hl.dsp.window.bring_to_top()"):
+		return "bringactivetotop", ""
+	case strings.Contains(expr, "hl.dsp.window.toggle_swallow()"):
+		return "toggleswallow", ""
 	case strings.Contains(expr, "hl.dsp.group.toggle()"):
 		return "togglegroup", ""
+	case strings.Contains(expr, "hl.dsp.group.next()"):
+		return "changegroupactive", "f"
+	case strings.Contains(expr, "hl.dsp.group.prev()"):
+		return "changegroupactive", "b"
+	case strings.HasPrefix(expr, "hl.dsp.group.active("):
+		return "changegroupactive", luaStringValue(luaTableScalarField(expr, "index"))
+	case strings.HasPrefix(expr, "hl.dsp.group.move_window("):
+		if forward, ok := luaTableBoolField(expr, "forward"); ok && !forward {
+			return "movegroupwindow", "b"
+		}
+		return "movegroupwindow", "f"
+	case strings.HasPrefix(expr, "hl.dsp.group.lock_active("):
+		return "lockactivegroup", luaToggleActionToLockArg(luaTableStringField(expr, "action"))
+	case strings.HasPrefix(expr, "hl.dsp.group.lock("):
+		return "lockgroups", luaToggleActionToLockArg(luaTableStringField(expr, "action"))
+	case strings.HasPrefix(expr, "hl.dsp.window.deny_from_group("):
+		return "denywindowfromgroup", luaToggleActionToLegacy(luaTableStringField(expr, "action"))
 	case strings.HasPrefix(expr, "hl.dsp.focus("):
 		switch {
 		case luaTableStringField(expr, "direction") != "":
@@ -1093,8 +1173,23 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 			if raw, ok := luaTableBoolField(expr, "relative"); ok && !raw {
 				prefix = "exact "
 			}
-			return "moveactive", prefix + x + " " + y
+			params := prefix + x + " " + y
+			if window := luaTableStringField(expr, "window"); window != "" {
+				return "movewindowpixel", params + "," + window
+			}
+			return "moveactive", params
+		case luaTableStringField(expr, "into_group") != "":
+			return "moveintogroup", luaTableStringField(expr, "into_group")
+		case luaTableStringField(expr, "into_or_create_group") != "":
+			return "moveintoorcreategroup", luaTableStringField(expr, "into_or_create_group")
+		case luaTableBoolFieldValue(expr, "out_of_group"):
+			return "moveoutofgroup", ""
+		case luaTableStringField(expr, "out_of_group") != "":
+			return "moveoutofgroup", luaTableStringField(expr, "out_of_group")
 		case luaTableStringField(expr, "direction") != "":
+			if luaTableBoolFieldValue(expr, "group_aware") {
+				return "movewindoworgroup", luaTableStringField(expr, "direction")
+			}
 			return "movewindow", luaTableStringField(expr, "direction")
 		case luaTableStringField(expr, "monitor") != "":
 			return "movewindow", "mon:" + luaTableStringField(expr, "monitor")
@@ -1123,10 +1218,41 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 			if relative, ok := luaTableBoolField(expr, "relative"); ok && !relative {
 				prefix = "exact "
 			}
-			return "resizeactive", prefix + x + " " + y
+			params := prefix + x + " " + y
+			if window := luaTableStringField(expr, "window"); window != "" {
+				return "resizewindowpixel", params + "," + window
+			}
+			return "resizeactive", params
 		}
 	case strings.HasPrefix(expr, "hl.dsp.window.swap("):
+		switch {
+		case luaTableBoolFieldValue(expr, "next"):
+			return "swapnext", ""
+		case luaTableBoolFieldValue(expr, "prev"):
+			return "swapnext", "prev"
+		}
 		return "swapwindow", luaTableStringField(expr, "direction")
+	case strings.HasPrefix(expr, "hl.dsp.window.cycle_next("):
+		parts := []string{}
+		if next, ok := luaTableBoolField(expr, "next"); ok && !next {
+			parts = append(parts, "prev")
+		}
+		if luaTableBoolFieldValue(expr, "tiled") {
+			parts = append(parts, "tiled")
+		}
+		if luaTableBoolFieldValue(expr, "floating") {
+			parts = append(parts, "floating")
+		}
+		return "cyclenext", strings.Join(parts, " ")
+	case strings.HasPrefix(expr, "hl.dsp.window.signal("):
+		signal := luaStringValue(luaTableScalarField(expr, "signal"))
+		window := luaTableStringField(expr, "window")
+		if window != "" {
+			return joinDispatcherParams("signalwindow", window, signal)
+		}
+		return "signal", signal
+	case strings.HasPrefix(expr, "hl.dsp.window.tag("):
+		return joinDispatcherParams("tagwindow", luaTableStringField(expr, "tag"), luaTableStringField(expr, "window"))
 	case strings.HasPrefix(expr, "hl.dsp.window.alter_zorder("):
 		mode := luaTableStringField(expr, "mode")
 		if mode == "" {
@@ -1182,12 +1308,20 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 		return joinDispatcherParams("sendshortcut", luaTableModsField(expr), luaTableStringField(expr, "key"), luaTableStringField(expr, "window"))
 	case strings.HasPrefix(expr, "hl.dsp.send_key_state("):
 		return joinDispatcherParams("sendkeystate", luaTableModsField(expr), luaTableStringField(expr, "key"), luaTableStringField(expr, "state"), luaTableStringField(expr, "window"))
+	case strings.HasPrefix(expr, "hl.dsp.cursor.move_to_corner("):
+		return "movecursortocorner", luaStringValue(luaTableScalarField(expr, "corner"))
+	case strings.HasPrefix(expr, "hl.dsp.cursor.move("):
+		return joinDispatcherParams("movecursor", luaStringValue(luaTableScalarField(expr, "x")), luaStringValue(luaTableScalarField(expr, "y")))
+	case strings.Contains(expr, "hl.dsp.force_renderer_reload()"):
+		return "forcerendererreload", ""
+	case strings.HasPrefix(expr, "hl.dsp.force_idle("):
+		return "forceidle", luaCallScalarArgValue(expr, "hl.dsp.force_idle")
 	case strings.Contains(expr, "hl.dsp.exit()"):
 		return "exit", ""
 	default:
-		return "exec", "hyprctl dispatch lua:" + expr
+		return expr, ""
 	}
-	return "exec", "hyprctl dispatch lua:" + expr
+	return expr, ""
 }
 
 func splitDispatchCommand(command string) (dispatcher, params string) {
@@ -1211,6 +1345,53 @@ func joinDispatcherParams(dispatcher string, values ...string) (string, string) 
 		}
 	}
 	return dispatcher, strings.Join(parts, " ")
+}
+
+func luaEmbeddedCallStringArgValue(expr, funcName string) string {
+	idx := strings.Index(expr, funcName+"(")
+	if idx < 0 {
+		return ""
+	}
+	return luaCallStringArgValue(expr[idx:], funcName)
+}
+
+func luaCallScalarArgValue(callExpr, funcName string) string {
+	callExpr = strings.TrimSpace(callExpr)
+	prefix := funcName + "("
+	if !strings.HasPrefix(callExpr, prefix) {
+		return ""
+	}
+	inner := strings.TrimSpace(callExpr[len(prefix):])
+	if inner == "" {
+		return ""
+	}
+	if s := luaCallStringArgValue(callExpr, funcName); s != "" {
+		return s
+	}
+	re := regexp.MustCompile(`^-?\d+(?:\.\d+)?`)
+	return re.FindString(inner)
+}
+
+func luaToggleActionToLegacy(action string) string {
+	switch strings.ToLower(strings.TrimSpace(action)) {
+	case "on", "enable", "enabled", "set", "lock":
+		return "on"
+	case "off", "disable", "disabled", "unset", "unlock":
+		return "off"
+	default:
+		return "toggle"
+	}
+}
+
+func luaToggleActionToLockArg(action string) string {
+	switch luaToggleActionToLegacy(action) {
+	case "on":
+		return "lock"
+	case "off":
+		return "unlock"
+	default:
+		return "toggle"
+	}
 }
 
 func extractLuaCallStringArg(callExpr, funcName string) string {

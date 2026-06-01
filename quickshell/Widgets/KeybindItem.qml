@@ -1416,7 +1416,7 @@ Item {
                         id: customCompositorField
                         Layout.fillWidth: true
                         Layout.preferredHeight: root._inputHeight
-                        placeholderText: I18n.tr("e.g., focus-workspace 3, resize-column -10")
+                        placeholderText: KeybindsService.currentProvider === "hyprland" ? I18n.tr("e.g., hl.dsp.focus({ workspace = \"3\" })") : I18n.tr("e.g., focus-workspace 3, resize-column -10")
                         text: root._actionType === "compositor" ? root.editAction : ""
                         onTextChanged: {
                             if (root._actionType !== "compositor")

@@ -74,15 +74,31 @@ func TestHyprlandLuaBindRoundTripHelpers(t *testing.T) {
 		{`hl.dispatch("workspace 2")`, "workspace", "2"},
 		{`hl.dispatch([[customdispatcher arg one]])`, "customdispatcher", "arg one"},
 		{`hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })`, "fullscreen", "1"},
+		{`hl.dsp.window.float({ action = "on" })`, "setfloating", ""},
+		{`hl.dsp.window.close({ window = "class:^(kitty)$" })`, "closewindow", "class:^(kitty)$"},
 		{`hl.dsp.focus({ workspace = "e+1" })`, "workspace", "e+1"},
 		{`hl.dsp.focus({ workspace = "2", on_current_monitor = true })`, "focusworkspaceoncurrentmonitor", "2"},
 		{`hl.dsp.window.move({ monitor = "l" })`, "movewindow", "mon:l"},
+		{`hl.dsp.window.move({ direction = "r", group_aware = true })`, "movewindoworgroup", "r"},
+		{`hl.dsp.window.move({ into_group = "l" })`, "moveintogroup", "l"},
+		{`hl.dsp.window.move({ out_of_group = true })`, "moveoutofgroup", ""},
 		{`hl.dsp.window.move({ workspace = "special:magic", follow = false })`, "movetoworkspacesilent", "special:magic"},
 		{`hl.dsp.window.resize({ x = -100, y = 0, relative = true })`, "resizeactive", "-100 0"},
 		{`hl.dsp.window.resize({ x = 1280, y = 720, relative = false })`, "resizeactive", "exact 1280 720"},
+		{`hl.dsp.window.resize({ x = 100, y = 50, relative = true, window = "class:^(app)$" })`, "resizewindowpixel", "100 50,class:^(app)$"},
+		{`hl.dsp.window.cycle_next({ next = false, tiled = true })`, "cyclenext", "prev tiled"},
+		{`hl.dsp.group.next()`, "changegroupactive", "f"},
+		{`hl.dsp.group.prev()`, "changegroupactive", "b"},
+		{`hl.dsp.group.active({ index = 2 })`, "changegroupactive", "2"},
+		{`hl.dsp.group.move_window({ forward = false })`, "movegroupwindow", "b"},
+		{`hl.dsp.group.lock({ action = "on" })`, "lockgroups", "lock"},
+		{`hl.dsp.group.lock_active({ action = "off" })`, "lockactivegroup", "unlock"},
+		{`hl.dsp.window.deny_from_group({ action = "toggle" })`, "denywindowfromgroup", "toggle"},
+		{`function() hl.exec_cmd("hyprctl dispatch splitratio +0.1") end`, "splitratio", "+0.1"},
 		{`hl.dsp.layout("togglesplit")`, "layoutmsg", "togglesplit"},
 		{`hl.dsp.dpms({ action = "toggle" })`, "dpms", "toggle"},
 		{`hl.dsp.workspace.rename({ workspace = "1", name = "work" })`, "renameworkspace", "1 work"},
+		{`hl.dsp.no_op()`, "hl.dsp.no_op()", ""},
 	}
 
 	for _, tt := range tests {
@@ -126,6 +142,21 @@ hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle"), { descripti
 	}
 }
 
+func TestWriteLuaBindLineLeavesCustomLuaDispatcherRaw(t *testing.T) {
+	var sb strings.Builder
+	writeLuaBindLine(&sb, &hyprlandOverrideBind{
+		Key:         "Super+u",
+		Action:      "hl.dsp.no_op()",
+		Description: "Custom Lua",
+	})
+
+	want := `hl.unbind("SUPER + U")
+hl.bind("SUPER + U", hl.dsp.no_op(), { description = "Custom Lua" })`
+	if got := strings.TrimSpace(sb.String()); got != want {
+		t.Fatalf("writeLuaBindLine() = %q, want %q", got, want)
+	}
+}
+
 func TestLuaActionStringFromHyprlangActionUsesNativeDispatchers(t *testing.T) {
 	tests := []struct {
 		action string
@@ -138,6 +169,22 @@ func TestLuaActionStringFromHyprlangActionUsesNativeDispatchers(t *testing.T) {
 		{"resizeactive exact 1280 720", `hl.dsp.window.resize({ x = 1280, y = 720, relative = false })`},
 		{"dpms toggle", `hl.dsp.dpms({ action = "toggle" })`},
 		{"renameworkspace 1 work", `hl.dsp.workspace.rename({ workspace = "1", name = "work" })`},
+		{"changegroupactive f", `hl.dsp.group.next()`},
+		{"changegroupactive b", `hl.dsp.group.prev()`},
+		{"changegroupactive 2", `hl.dsp.group.active({ index = 2 })`},
+		{"moveintogroup l", `hl.dsp.window.move({ into_group = "l" })`},
+		{"moveoutofgroup", `hl.dsp.window.move({ out_of_group = true })`},
+		{"movewindoworgroup r", `hl.dsp.window.move({ direction = "r", group_aware = true })`},
+		{"movegroupwindow b", `hl.dsp.group.move_window({ forward = false })`},
+		{"lockgroups lock", `hl.dsp.group.lock({ action = "on" })`},
+		{"lockactivegroup unlock", `hl.dsp.group.lock_active({ action = "off" })`},
+		{"denywindowfromgroup toggle", `hl.dsp.window.deny_from_group({ action = "toggle" })`},
+		{"cyclenext prev", `hl.dsp.window.cycle_next({ next = false })`},
+		{"setfloating", `hl.dsp.window.float({ action = "on" })`},
+		{"settiled", `hl.dsp.window.float({ action = "off" })`},
+		{"bringactivetotop", `hl.dsp.window.bring_to_top()`},
+		{"toggleswallow", `hl.dsp.window.toggle_swallow()`},
+		{"forceidle 300", `hl.dsp.force_idle(300)`},
 	}
 
 	for _, tt := range tests {
@@ -155,20 +202,34 @@ func TestLuaActionStringFromHyprlangActionUsesNativeDispatchers(t *testing.T) {
 
 func TestLuaActionStringFallsBackForUnsupportedResizePercentages(t *testing.T) {
 	got := luaActionStringFromHyprlangAction("resizeactive exact 100% 100%")
-	want := `hl.dispatch("resizeactive exact 100% 100%")`
+	want := `function() hl.exec_cmd("hyprctl dispatch resizeactive exact 100% 100%") end`
 	if got != want {
 		t.Fatalf("luaActionStringFromHyprlangAction() = %q, want %q", got, want)
 	}
 }
 
-func TestLuaActionStringFallsBackToDispatchWithoutHyprctl(t *testing.T) {
-	got := luaActionStringFromHyprlangAction("customdispatcher USER_INPUT")
-	want := `hl.dispatch("customdispatcher USER_INPUT")`
+func TestParseLuaBindLineHandlesFunctionDispatcherFallback(t *testing.T) {
+	line := `hl.bind("SUPER + R", function() hl.exec_cmd("hyprctl dispatch resizeactive exact 100% 100%") end, { description = "Unsupported Resize" })`
+	got, ok := parseLuaBindOverrideLine(line)
+	if !ok {
+		t.Fatalf("expected line to parse")
+	}
+	if got.Action != "resizeactive exact 100% 100%" {
+		t.Fatalf("Action = %q, want resizeactive exact 100%% 100%%", got.Action)
+	}
+	if got.Description != "Unsupported Resize" {
+		t.Fatalf("Description = %q, want Unsupported Resize", got.Description)
+	}
+}
+
+func TestLuaActionStringLeavesCustomLuaDispatcherRaw(t *testing.T) {
+	got := luaActionStringFromHyprlangAction("hl.dsp.no_op()")
+	want := `hl.dsp.no_op()`
 	if got != want {
 		t.Fatalf("luaActionStringFromHyprlangAction() = %q, want %q", got, want)
 	}
-	if strings.Contains(got, "hyprctl dispatch") {
-		t.Fatalf("expected hl.dispatch fallback without hyprctl dispatch wrapper, got %q", got)
+	if strings.Contains(got, "hl.dispatch") || strings.Contains(got, "hyprctl dispatch") {
+		t.Fatalf("expected custom Lua dispatcher expression to stay raw, got %q", got)
 	}
 }
 

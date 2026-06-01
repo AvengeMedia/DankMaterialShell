@@ -493,6 +493,31 @@ func splitHyprlandAction(action string) (dispatcher, params string) {
 	return strings.ToLower(strings.TrimSpace(action[:idx])), strings.TrimSpace(action[idx+1:])
 }
 
+func isKnownHyprlandDispatcher(dispatcher string) bool {
+	switch dispatcher {
+	case "exec", "execr", "spawn",
+		"killactive", "forcekillactive", "closewindow", "killwindow",
+		"signal", "signalwindow", "togglefloating", "setfloating", "settiled",
+		"workspace", "renameworkspace", "fullscreen", "fullscreenstate", "fakefullscreen",
+		"movetoworkspace", "movetoworkspacesilent", "pseudo", "movefocus",
+		"movewindow", "swapwindow", "centerwindow", "togglegroup", "changegroupactive",
+		"movegroupwindow", "focusmonitor", "movecursortocorner", "movecursor",
+		"workspaceopt", "exit", "movecurrentworkspacetomonitor", "focusworkspaceoncurrentmonitor",
+		"moveworkspacetomonitor", "togglespecialworkspace", "forcerendererreload",
+		"resizeactive", "moveactive", "cyclenext", "focuswindowbyclass", "focuswindow",
+		"tagwindow", "toggleswallow", "submap", "pass", "sendshortcut", "sendkeystate",
+		"layoutmsg", "splitratio", "dpms", "movewindowpixel", "resizewindowpixel",
+		"swapnext", "swapactiveworkspaces", "pin", "mouse", "bringactivetotop",
+		"alterzorder", "focusurgentorlast", "focuscurrentorlast", "lockgroups",
+		"lockactivegroup", "moveintogroup", "moveoutofgroup", "movewindoworgroup",
+		"moveintoorcreategroup", "setignoregrouplock", "denywindowfromgroup", "event",
+		"global", "setprop", "forceidle":
+		return true
+	default:
+		return false
+	}
+}
+
 func firstParam(params string) (head, rest string) {
 	params = strings.TrimSpace(params)
 	if params == "" {
@@ -551,29 +576,181 @@ func dispatcherActiveMoveResize(funcName, params string) string {
 	)
 }
 
+func dispatcherWindowMoveResize(funcName, params string) string {
+	geometry, window := splitCommaParams(params)
+	x, y, relative, ok := xyParams(geometry)
+	if !ok {
+		return ""
+	}
+	if !isBareLuaNumber(x) || !isBareLuaNumber(y) {
+		return ""
+	}
+	fields := []luaField{
+		luaNumberOrStringField("x", x),
+		luaNumberOrStringField("y", y),
+		luaBoolField("relative", relative),
+	}
+	if window != "" {
+		fields = append(fields, luaStringField("window", window))
+	}
+	return luaDispatcherTableCall(funcName, fields...)
+}
+
+func splitCommaParams(params string) (left, right string) {
+	left = strings.TrimSpace(params)
+	if idx := strings.Index(left, ","); idx >= 0 {
+		right = strings.TrimSpace(left[idx+1:])
+		left = strings.TrimSpace(left[:idx])
+	}
+	return left, right
+}
+
+func luaHyprctlDispatchFunction(action string) string {
+	return fmt.Sprintf(`function() hl.exec_cmd(%s) end`, strconv.Quote("hyprctl dispatch "+strings.TrimSpace(action)))
+}
+
+func luaToggleActionValue(params string) string {
+	switch strings.ToLower(strings.TrimSpace(params)) {
+	case "on", "enable", "enabled", "set", "lock":
+		return "on"
+	case "off", "disable", "disabled", "unset", "unlock":
+		return "off"
+	default:
+		return "toggle"
+	}
+}
+
+func dispatcherToggleTableCall(funcName, params string) string {
+	return luaDispatcherTableCall(funcName, luaStringField("action", luaToggleActionValue(params)))
+}
+
+func dispatcherCycleNext(params string) string {
+	params = strings.TrimSpace(strings.ToLower(params))
+	if params == "" {
+		return `hl.dsp.window.cycle_next()`
+	}
+	fields := []luaField{}
+	for _, field := range strings.Fields(params) {
+		switch field {
+		case "prev", "previous", "b":
+			fields = append(fields, luaBoolField("next", false))
+		case "next", "f":
+			fields = append(fields, luaBoolField("next", true))
+		case "tiled":
+			fields = append(fields, luaBoolField("tiled", true))
+		case "floating":
+			fields = append(fields, luaBoolField("floating", true))
+		}
+	}
+	if len(fields) == 0 {
+		return ""
+	}
+	return luaDispatcherTableCall("hl.dsp.window.cycle_next", fields...)
+}
+
+func dispatcherSwapNext(params string) string {
+	switch strings.ToLower(strings.TrimSpace(params)) {
+	case "prev", "previous", "b":
+		return `hl.dsp.window.swap({ prev = true })`
+	default:
+		return `hl.dsp.window.swap({ next = true })`
+	}
+}
+
+func dispatcherGroupActive(params string) string {
+	switch strings.ToLower(strings.TrimSpace(params)) {
+	case "f", "next", "forward":
+		return `hl.dsp.group.next()`
+	case "b", "prev", "previous", "backward":
+		return `hl.dsp.group.prev()`
+	}
+	if isBareLuaNumber(params) {
+		return luaDispatcherTableCall("hl.dsp.group.active", luaNumberOrStringField("index", params))
+	}
+	return ""
+}
+
+func dispatcherMoveGroupWindow(params string) string {
+	switch strings.ToLower(strings.TrimSpace(params)) {
+	case "b", "prev", "previous", "backward":
+		return `hl.dsp.group.move_window({ forward = false })`
+	default:
+		return `hl.dsp.group.move_window({ forward = true })`
+	}
+}
+
+func dispatcherCursorMove(params string) string {
+	x, y, _, ok := xyParams(params)
+	if !ok || !isBareLuaNumber(x) || !isBareLuaNumber(y) {
+		return ""
+	}
+	return luaDispatcherTableCall("hl.dsp.cursor.move", luaNumberOrStringField("x", x), luaNumberOrStringField("y", y))
+}
+
+func dispatcherSignal(params string) string {
+	signal, window := firstParam(params)
+	if signal == "" || !isBareLuaNumber(signal) {
+		return ""
+	}
+	fields := []luaField{luaNumberOrStringField("signal", signal)}
+	if window != "" {
+		fields = append(fields, luaStringField("window", window))
+	}
+	return luaDispatcherTableCall("hl.dsp.window.signal", fields...)
+}
+
+func dispatcherSignalWindow(params string) string {
+	window, rest := firstParam(params)
+	signal, _ := firstParam(rest)
+	if signal == "" || !isBareLuaNumber(signal) {
+		return ""
+	}
+	fields := []luaField{luaNumberOrStringField("signal", signal)}
+	if window != "" {
+		fields = append(fields, luaStringField("window", window))
+	}
+	return luaDispatcherTableCall("hl.dsp.window.signal", fields...)
+}
+
+func dispatcherTagWindow(params string) string {
+	tag, window := firstParam(params)
+	if tag == "" {
+		return ""
+	}
+	fields := []luaField{luaStringField("tag", tag)}
+	if window != "" {
+		fields = append(fields, luaStringField("window", window))
+	}
+	return luaDispatcherTableCall("hl.dsp.window.tag", fields...)
+}
+
 func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 	dispatcher, params := splitHyprlandAction(action)
 	switch dispatcher {
 	case "spawn", "exec":
 		return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote(params)), true
+	case "execr":
+		return fmt.Sprintf(`hl.dsp.exec_raw(%s)`, strconv.Quote(params)), true
 	case "killactive":
+		return `hl.dsp.window.kill()`, true
+	case "forcekillactive":
 		return `hl.dsp.window.kill()`, true
 	case "closewindow":
 		if params == "" {
 			return `hl.dsp.window.close()`, true
 		}
-		return fmt.Sprintf(`hl.dsp.window.close(%s)`, strconv.Quote(params)), true
+		return luaDispatcherTableCall("hl.dsp.window.close", luaStringField("window", params)), true
 	case "killwindow":
 		if params == "" {
 			return `hl.dsp.window.kill()`, true
 		}
-		return fmt.Sprintf(`hl.dsp.window.kill(%s)`, strconv.Quote(params)), true
+		return luaDispatcherTableCall("hl.dsp.window.kill", luaStringField("window", params)), true
 	case "togglefloating":
-		return `hl.dsp.window.float({ action = "toggle" })`, true
+		return dispatcherToggleTableCall("hl.dsp.window.float", "toggle"), true
 	case "setfloating":
-		return `hl.dsp.window.float({ action = "set" })`, true
+		return dispatcherToggleTableCall("hl.dsp.window.float", "on"), true
 	case "settiled":
-		return `hl.dsp.window.float({ action = "unset" })`, true
+		return dispatcherToggleTableCall("hl.dsp.window.float", "off"), true
 	case "fullscreen":
 		mode := strings.TrimSpace(params)
 		switch mode {
@@ -582,6 +759,7 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		case "1":
 			return `hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })`, true
 		}
+		return luaHyprctlDispatchFunction(action), true
 	case "fullscreenstate":
 		internal, rest := firstParam(params)
 		client, _ := firstParam(rest)
@@ -591,10 +769,15 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 				luaNumberOrStringField("client", client),
 			), true
 		}
+	case "fakefullscreen":
+		return luaHyprctlDispatchFunction(action), true
 	case "pin":
 		if params == "" {
 			return `hl.dsp.window.pin()`, true
 		}
+		return dispatcherToggleTableCall("hl.dsp.window.pin", params), true
+	case "pseudo":
+		return dispatcherToggleTableCall("hl.dsp.window.pseudo", params), true
 	case "centerwindow":
 		return `hl.dsp.window.center()`, true
 	case "resizewindow":
@@ -612,14 +795,28 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 			return "", false
 		}
 		return luaDispatcherTableCall("hl.dsp.window.swap", luaStringField("direction", params)), true
+	case "swapnext":
+		return dispatcherSwapNext(params), true
 	case "resizeactive":
 		if expr := dispatcherActiveMoveResize("hl.dsp.window.resize", params); expr != "" {
 			return expr, true
 		}
+		return luaHyprctlDispatchFunction(action), true
 	case "moveactive":
 		if expr := dispatcherActiveMoveResize("hl.dsp.window.move", params); expr != "" {
 			return expr, true
 		}
+		return luaHyprctlDispatchFunction(action), true
+	case "resizewindowpixel":
+		if expr := dispatcherWindowMoveResize("hl.dsp.window.resize", params); expr != "" {
+			return expr, true
+		}
+		return luaHyprctlDispatchFunction(action), true
+	case "movewindowpixel":
+		if expr := dispatcherWindowMoveResize("hl.dsp.window.move", params); expr != "" {
+			return expr, true
+		}
+		return luaHyprctlDispatchFunction(action), true
 	case "workspace":
 		if params == "" {
 			return "", false
@@ -662,6 +859,8 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		if workspace != "" && monitor != "" {
 			return luaDispatcherTableCall("hl.dsp.workspace.move", luaStringField("workspace", workspace), luaStringField("monitor", monitor)), true
 		}
+	case "workspaceopt":
+		return luaHyprctlDispatchFunction(action), true
 	case "swapactiveworkspaces":
 		monitor1, rest := firstParam(params)
 		monitor2, _ := firstParam(rest)
@@ -680,14 +879,25 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		if params != "" {
 			return luaDispatcherTableCall("hl.dsp.focus", luaStringField("window", params)), true
 		}
+	case "focuswindowbyclass":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.focus", luaStringField("window", "class:"+params)), true
+		}
 	case "focuscurrentorlast":
 		return `hl.dsp.focus({ last = true })`, true
 	case "focusurgentorlast":
 		return `hl.dsp.focus({ urgent_or_last = true })`, true
+	case "cyclenext":
+		if expr := dispatcherCycleNext(params); expr != "" {
+			return expr, true
+		}
+		return luaHyprctlDispatchFunction(action), true
 	case "layoutmsg":
 		if params != "" {
 			return fmt.Sprintf(`hl.dsp.layout(%s)`, strconv.Quote(params)), true
 		}
+	case "splitratio":
+		return luaHyprctlDispatchFunction(action), true
 	case "alterzorder":
 		mode, window := firstParam(params)
 		if mode != "" {
@@ -706,6 +916,22 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 				luaStringField("prop", prop),
 				luaStringField("value", value),
 			), true
+		}
+	case "bringactivetotop":
+		return `hl.dsp.window.bring_to_top()`, true
+	case "toggleswallow":
+		return `hl.dsp.window.toggle_swallow()`, true
+	case "signal":
+		if expr := dispatcherSignal(params); expr != "" {
+			return expr, true
+		}
+	case "signalwindow":
+		if expr := dispatcherSignalWindow(params); expr != "" {
+			return expr, true
+		}
+	case "tagwindow":
+		if expr := dispatcherTagWindow(params); expr != "" {
+			return expr, true
 		}
 	case "dpms":
 		dpmsAction := strings.TrimSpace(params)
@@ -753,8 +979,57 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 			}
 			return luaDispatcherTableCall("hl.dsp.send_key_state", fields...), true
 		}
+	case "movecursortocorner":
+		if params != "" && isBareLuaNumber(params) {
+			return luaDispatcherTableCall("hl.dsp.cursor.move_to_corner", luaNumberOrStringField("corner", params)), true
+		}
+	case "movecursor":
+		if expr := dispatcherCursorMove(params); expr != "" {
+			return expr, true
+		}
 	case "togglegroup":
 		return `hl.dsp.group.toggle()`, true
+	case "changegroupactive":
+		if expr := dispatcherGroupActive(params); expr != "" {
+			return expr, true
+		}
+		return luaHyprctlDispatchFunction(action), true
+	case "movegroupwindow":
+		return dispatcherMoveGroupWindow(params), true
+	case "moveintogroup":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.window.move", luaStringField("into_group", params)), true
+		}
+	case "moveintoorcreategroup":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.window.move", luaStringField("into_or_create_group", params)), true
+		}
+	case "moveoutofgroup":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.window.move", luaStringField("out_of_group", params)), true
+		}
+		return luaDispatcherTableCall("hl.dsp.window.move", luaBoolField("out_of_group", true)), true
+	case "movewindoworgroup":
+		if params != "" {
+			return luaDispatcherTableCall("hl.dsp.window.move", luaStringField("direction", params), luaBoolField("group_aware", true)), true
+		}
+	case "lockgroups":
+		return dispatcherToggleTableCall("hl.dsp.group.lock", params), true
+	case "lockactivegroup":
+		return dispatcherToggleTableCall("hl.dsp.group.lock_active", params), true
+	case "denywindowfromgroup":
+		return dispatcherToggleTableCall("hl.dsp.window.deny_from_group", params), true
+	case "setignoregrouplock":
+		return luaHyprctlDispatchFunction(action), true
+	case "forcerendererreload":
+		return `hl.dsp.force_renderer_reload()`, true
+	case "forceidle":
+		if params != "" && isBareLuaNumber(params) {
+			return fmt.Sprintf(`hl.dsp.force_idle(%s)`, params), true
+		}
+	}
+	if isKnownHyprlandDispatcher(dispatcher) {
+		return luaHyprctlDispatchFunction(action), true
 	}
 	return "", false
 }
@@ -764,7 +1039,7 @@ func luaActionStringFromHyprlangAction(action string) string {
 	if expr, ok := luaActionStringFromKnownHyprlandAction(action); ok {
 		return expr
 	}
-	return fmt.Sprintf(`hl.dispatch(%s)`, strconv.Quote(action))
+	return action
 }
 
 func luaExprToInternalAction(expr string) string {
