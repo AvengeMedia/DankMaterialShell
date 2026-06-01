@@ -25,6 +25,7 @@ Column {
     signal moveWidget(int fromIndex, int toIndex)
     signal toggleWidgetSize(int index)
     signal collapseRequested
+    signal configRequested(int index, var widgetData, var anchor)
 
     function requestCollapse() {
         collapseRequested();
@@ -203,6 +204,7 @@ Column {
                         onWidgetMoved: (fromIndex, toIndex) => root.moveWidget(fromIndex, toIndex)
                         onRemoveWidget: index => root.removeWidget(index)
                         onToggleWidgetSize: index => root.toggleWidgetSize(index)
+                        onConfigRequested: (idx, data, anchor) => root.configRequested(idx, data, anchor)
                     }
                 }
             }
@@ -869,6 +871,7 @@ Column {
 
             mountPath: widgetData.mountPath || "/"
             instanceId: widgetData.instanceId || ""
+            showMountPath: widgetData.showMountPath !== undefined ? widgetData.showMountPath : true
 
             onExpandClicked: {
                 if (!root.editMode) {
@@ -888,6 +891,7 @@ Column {
 
             mountPath: widgetData.mountPath || "/"
             instanceId: widgetData.instanceId || ""
+            showMountPath: widgetData.showMountPath !== undefined ? widgetData.showMountPath : true
 
             onClicked: {
                 if (!root.editMode) {

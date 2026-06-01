@@ -64,7 +64,7 @@ Rectangle {
 
         DankIcon {
             name: BatteryService.getBatteryIcon()
-            size: parent.parent.width * 0.25
+            size: Theme.iconSizeLarge
             color: {
                 if (BatteryService.isLowBattery && !BatteryService.isCharging) {
                     return Theme.error;
@@ -76,8 +76,8 @@ Rectangle {
 
         StyledText {
             text: BatteryService.batteryAvailable ? `${BatteryService.batteryLevel}%` : ""
-            font.pixelSize: parent.parent.width * 0.15
-            font.weight: Font.Medium
+            font.pixelSize: Theme.fontSizeLarge
+            font.weight: Font.Bold
             color: {
                 if (BatteryService.isLowBattery && !BatteryService.isCharging) {
                     return Theme.error;

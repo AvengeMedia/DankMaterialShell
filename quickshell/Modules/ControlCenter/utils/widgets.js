@@ -13,6 +13,7 @@ function addWidget(widgetId) {
     if (widgetId === "diskUsage") {
         widget.instanceId = generateUniqueId()
         widget.mountPath = "/"
+        widget.showMountPath = true
     }
 
     if (widgetId === "brightnessSlider") {

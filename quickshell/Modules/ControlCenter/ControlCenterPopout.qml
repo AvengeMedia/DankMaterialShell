@@ -273,6 +273,7 @@ DankPopout {
                         onMoveWidget: (fromIndex, toIndex) => widgetModel.moveWidget(fromIndex, toIndex)
                         onToggleWidgetSize: index => widgetModel.toggleWidgetSize(index)
                         onCollapseRequested: root.collapseAll()
+                        onConfigRequested: (idx, data, anchor) => widgetConfigOverlay.open(idx, data, anchor)
                     }
 
                     EditControls {
@@ -302,6 +303,11 @@ DankPopout {
                 id: bluetoothCodecSelector
                 anchors.fill: parent
                 z: 10000
+            }
+
+            WidgetConfigOverlay {
+                id: widgetConfigOverlay
+                anchors.fill: parent
             }
         }
     }

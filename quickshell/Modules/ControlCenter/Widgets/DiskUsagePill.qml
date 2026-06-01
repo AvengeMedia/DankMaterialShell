@@ -8,6 +8,7 @@ CompoundPill {
 
     property string mountPath: "/"
     property string instanceId: ""
+    property bool showMountPath: true
 
     iconName: "storage"
 
@@ -36,6 +37,9 @@ CompoundPill {
         }
         if (!selectedMount) {
             return I18n.tr("No disk data");
+        }
+        if (!showMountPath) {
+            return I18n.tr("Disk Usage");
         }
         return selectedMount.mount;
     }
