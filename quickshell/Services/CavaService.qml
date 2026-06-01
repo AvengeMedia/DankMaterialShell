@@ -1,9 +1,11 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 
+import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Common
 
 Singleton {
     id: root
@@ -11,6 +13,7 @@ Singleton {
     property list<int> values: Array(6)
     property int refCount: 0
     property bool cavaAvailable: false
+    readonly property string _confPath: `${Paths.strip(StandardPaths.writableLocation(StandardPaths.TempLocation))}/dms-cava-${Date.now()}-${Math.floor(Math.random() * 1000000)}.conf`
 
     Process {
         id: cavaCheck
@@ -30,7 +33,7 @@ Singleton {
         id: cavaProcess
 
         running: root.cavaAvailable && root.refCount > 0
-        command: ["sh", "-c", `cat <<'CAVACONF' | cava -p /dev/stdin
+        command: ["sh", "-c", `cat <<'CAVACONF' > ${root._confPath}
 [general]
 framerate=25
 bars=6
@@ -52,7 +55,8 @@ integral=90
 gravity=95
 ignore=2
 monstercat=1.5
-CAVACONF`]
+CAVACONF
+exec cava -p ${root._confPath} < /dev/null`]
 
         onRunningChanged: {
             if (!running) {
