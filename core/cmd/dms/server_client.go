@@ -12,6 +12,10 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 )
 
+// maxIPCMessageSize allows room for a 50 MB clipboard entry plus JSON/base64
+// overhead in the line-delimited IPC response.
+const maxIPCMessageSize = 96 * 1024 * 1024
+
 func sendServerRequest(req models.Request) (*models.Response[any], error) {
 	socketPath := getServerSocketPath()
 
@@ -22,6 +26,7 @@ func sendServerRequest(req models.Request) (*models.Response[any], error) {
 	defer conn.Close()
 
 	scanner := bufio.NewScanner(conn)
+	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), maxIPCMessageSize)
 	scanner.Scan() // discard initial capabilities message
 
 	reqData, err := json.Marshal(req)
@@ -61,6 +66,7 @@ func sendServerRequestFireAndForget(req models.Request) error {
 	defer conn.Close()
 
 	scanner := bufio.NewScanner(conn)
+	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), maxIPCMessageSize)
 	scanner.Scan() // discard initial capabilities message
 
 	reqData, err := json.Marshal(req)
