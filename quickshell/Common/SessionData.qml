@@ -154,6 +154,8 @@ Singleton {
     property var trayItemOrder: []
     property var recentColors: []
     property bool showThirdPartyPlugins: false
+    property bool pluginBrowserInstalledFirst: false
+    property string pluginBrowserSortMode: "default"
     property string launchPrefix: ""
     property string lastBrightnessDevice: ""
     property var brightnessExponentialDevices: ({})
@@ -961,6 +963,20 @@ Singleton {
 
     function setShowThirdPartyPlugins(enabled) {
         showThirdPartyPlugins = enabled;
+        saveSettings();
+    }
+
+    function setPluginBrowserInstalledFirst(enabled) {
+        pluginBrowserInstalledFirst = enabled;
+        saveSettings();
+    }
+
+    function setPluginBrowserSortMode(mode) {
+        if (mode === "type" || mode === "contributor")
+            mode = "author";
+        if (mode !== "default" && mode !== "name" && mode !== "author" && mode !== "category")
+            mode = "default";
+        pluginBrowserSortMode = mode;
         saveSettings();
     }
 

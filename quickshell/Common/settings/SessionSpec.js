@@ -56,6 +56,8 @@ var SPEC = {
     trayItemOrder: { def: [] },
     recentColors: { def: [] },
     showThirdPartyPlugins: { def: false },
+    pluginBrowserInstalledFirst: { def: false },
+    pluginBrowserSortMode: { def: "default" },
     launchPrefix: { def: "" },
     lastBrightnessDevice: { def: "" },
 
