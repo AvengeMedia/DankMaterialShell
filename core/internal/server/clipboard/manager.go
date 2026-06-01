@@ -572,16 +572,16 @@ func (m *Manager) hasSensitiveMimeType(mimes []string) bool {
 func (m *Manager) selectMimeType(mimes []string) string {
 	preferredTypes := []string{
 		"text/uri-list",
-		"text/plain;charset=utf-8",
-		"text/plain",
-		"UTF8_STRING",
-		"STRING",
-		"TEXT",
 		"image/png",
 		"image/jpeg",
 		"image/gif",
 		"image/bmp",
 		"image/tiff",
+		"text/plain;charset=utf-8",
+		"text/plain",
+		"UTF8_STRING",
+		"STRING",
+		"TEXT",
 	}
 
 	for _, pref := range preferredTypes {
