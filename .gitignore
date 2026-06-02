@@ -115,3 +115,6 @@ core.*
 .direnv/
 quickshell/dms-plugins
 __pycache__
+
+
+references/
