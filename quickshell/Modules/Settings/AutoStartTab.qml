@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -19,12 +20,12 @@ Item {
     property string newEntryCommandWrapper: "%command%"
 
     readonly property string autostartDir: {
-        const configHome = Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config";
+        const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         return configHome + "/autostart";
     }
 
     readonly property string systemdUserDir: {
-        const configHome = Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config";
+        const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         return configHome + "/systemd/user";
     }
 
