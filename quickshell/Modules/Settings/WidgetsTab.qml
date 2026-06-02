@@ -392,7 +392,9 @@ Item {
             widgetObj.showBatteryIcon = SettingsData.controlCenterShowBatteryIcon;
             widgetObj.showPrinterIcon = SettingsData.controlCenterShowPrinterIcon;
             widgetObj.showScreenSharingIcon = SettingsData.controlCenterShowScreenSharingIcon;
-            widgetObj.controlCenterGroupOrder = ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing"];
+            widgetObj.showIdleInhibitorIcon = SettingsData.controlCenterShowIdleInhibitorIcon;
+            widgetObj.showDoNotDisturbIcon = SettingsData.controlCenterShowDoNotDisturbIcon;
+            widgetObj.controlCenterGroupOrder = ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing", "idleInhibitor", "doNotDisturb"];
         }
         if (widgetId === "runningApps") {
             widgetObj.runningAppsCompactMode = SettingsData.runningAppsCompactMode;
@@ -432,7 +434,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "hideWhenIdle"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "hideWhenIdle"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -543,6 +545,24 @@ Item {
             SettingsData.set("privacyShowScreenShareIcon", value);
             break;
         }
+    }
+
+    function handleKeyboardLayoutNameSettingChanged(sectionId, widgetIndex, settingName, value) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+            setWidgetsForSection(sectionId, widgets);
+            return;
+        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+
+        switch (settingName) {
+        case "showIcon":
+            newWidget["keyboardLayoutNameShowIcon"] = value;
+            break;
+        }
+
+        widgets[widgetIndex] = newWidget;
+        setWidgetsForSection(sectionId, widgets);
     }
 
     function handleMinimumWidthChanged(sectionId, widgetIndex, enabled) {
@@ -717,6 +737,10 @@ Item {
                     item.showPrinterIcon = widget.showPrinterIcon;
                 if (widget.showScreenSharingIcon !== undefined)
                     item.showScreenSharingIcon = widget.showScreenSharingIcon;
+                if (widget.showIdleInhibitorIcon !== undefined)
+                    item.showIdleInhibitorIcon = widget.showIdleInhibitorIcon;
+                if (widget.showDoNotDisturbIcon !== undefined)
+                    item.showDoNotDisturbIcon = widget.showDoNotDisturbIcon;
                 if (widget.controlCenterGroupOrder !== undefined)
                     item.controlCenterGroupOrder = widget.controlCenterGroupOrder;
                 if (widget.minimumWidth !== undefined)
@@ -743,6 +767,8 @@ Item {
                     item.runningAppsCurrentMonitor = widget.runningAppsCurrentMonitor;
                 if (widget.keyboardLayoutNameCompactMode !== undefined)
                     item.keyboardLayoutNameCompactMode = widget.keyboardLayoutNameCompactMode;
+                if (widget.keyboardLayoutNameShowIcon !== undefined)
+                    item.keyboardLayoutNameShowIcon = widget.keyboardLayoutNameShowIcon;
                 if (widget.barMaxVisibleApps !== undefined)
                     item.barMaxVisibleApps = widget.barMaxVisibleApps;
                 if (widget.barMaxVisibleRunningApps !== undefined)
@@ -1024,6 +1050,9 @@ Item {
                         onPrivacySettingChanged: (sectionId, index, setting, value) => {
                             widgetsTab.handlePrivacySettingChanged(sectionId, index, setting, value);
                         }
+                        onKeyboardLayoutNameSettingChanged: (sectionId, index, setting, value) => {
+                            widgetsTab.handleKeyboardLayoutNameSettingChanged(sectionId, index, setting, value);
+                        }
                         onMinimumWidthChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleMinimumWidthChanged(sectionId, index, enabled);
                         }
@@ -1097,6 +1126,9 @@ Item {
                         onPrivacySettingChanged: (sectionId, index, setting, value) => {
                             widgetsTab.handlePrivacySettingChanged(sectionId, index, setting, value);
                         }
+                        onKeyboardLayoutNameSettingChanged: (sectionId, index, setting, value) => {
+                            widgetsTab.handleKeyboardLayoutNameSettingChanged(sectionId, index, setting, value);
+                        }
                         onMinimumWidthChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleMinimumWidthChanged(sectionId, index, enabled);
                         }
@@ -1169,6 +1201,9 @@ Item {
                         }
                         onPrivacySettingChanged: (sectionId, index, setting, value) => {
                             widgetsTab.handlePrivacySettingChanged(sectionId, index, setting, value);
+                        }
+                        onKeyboardLayoutNameSettingChanged: (sectionId, index, setting, value) => {
+                            widgetsTab.handleKeyboardLayoutNameSettingChanged(sectionId, index, setting, value);
                         }
                         onMinimumWidthChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleMinimumWidthChanged(sectionId, index, enabled);

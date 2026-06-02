@@ -315,6 +315,8 @@ Singleton {
     property bool controlCenterShowBatteryIcon: false
     property bool controlCenterShowPrinterIcon: false
     property bool controlCenterShowScreenSharingIcon: true
+    property bool controlCenterShowIdleInhibitorIcon: false
+    property bool controlCenterShowDoNotDisturbIcon: false
     property bool showPrivacyButton: true
     property bool privacyShowMicIcon: false
     property bool privacyShowCameraIcon: false
@@ -405,6 +407,7 @@ Singleton {
     property int appsDockEnlargePercentage: 125
     property int appsDockIconSizePercentage: 100
     property bool keyboardLayoutNameCompactMode: false
+    property bool keyboardLayoutNameShowIcon: false
     property bool runningAppsCurrentWorkspace: true
     property bool runningAppsGroupByApp: false
     property bool runningAppsCurrentMonitor: false

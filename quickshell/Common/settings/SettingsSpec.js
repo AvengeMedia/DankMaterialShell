@@ -104,6 +104,8 @@ var SPEC = {
     controlCenterShowBatteryIcon: { def: false },
     controlCenterShowPrinterIcon: { def: false },
     controlCenterShowScreenSharingIcon: { def: true },
+    controlCenterShowIdleInhibitorIcon: { def: false },
+    controlCenterShowDoNotDisturbIcon: { def: false },
 
     showPrivacyButton: { def: true },
     privacyShowMicIcon: { def: false },
@@ -165,6 +167,7 @@ var SPEC = {
     appsDockEnlargePercentage: { def: 125 },
     appsDockIconSizePercentage: { def: 100 },
     keyboardLayoutNameCompactMode: { def: false },
+    keyboardLayoutNameShowIcon: { def: false},
     runningAppsCurrentWorkspace: { def: true },
     runningAppsGroupByApp: { def: false },
     runningAppsCurrentMonitor: { def: false },

@@ -26,6 +26,8 @@ BasePill {
     property bool showBatteryIcon: widgetData?.showBatteryIcon !== undefined ? widgetData.showBatteryIcon : SettingsData.controlCenterShowBatteryIcon
     property bool showPrinterIcon: widgetData?.showPrinterIcon !== undefined ? widgetData.showPrinterIcon : SettingsData.controlCenterShowPrinterIcon
     property bool showScreenSharingIcon: widgetData?.showScreenSharingIcon !== undefined ? widgetData.showScreenSharingIcon : SettingsData.controlCenterShowScreenSharingIcon
+    property bool showIdleInhibitorIcon: widgetData?.showIdleInhibitorIcon !== undefined ? widgetData.showIdleInhibitorIcon : SettingsData.controlCenterShowIdleInhibitorIcon
+    property bool showDoNotDisturbIcon: widgetData?.showDoNotDisturbIcon !== undefined ? widgetData.showDoNotDisturbIcon : SettingsData.controlCenterShowDoNotDisturbIcon
     property real touchpadThreshold: 100
     property real micAccumulator: 0
     property real volumeAccumulator: 0
@@ -40,7 +42,7 @@ BasePill {
     property var _vBrightness: null
     property var _vMic: null
     property var _interactionDelegates: []
-    readonly property var defaultControlCenterGroupOrder: ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing"]
+    readonly property var defaultControlCenterGroupOrder: ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing", "idleInhibitor", "doNotDisturb"]
     readonly property var effectiveControlCenterGroupOrder: getEffectiveControlCenterGroupOrder()
     readonly property var controlCenterRenderModel: getControlCenterRenderModel()
 
@@ -353,6 +355,10 @@ BasePill {
             return root.showBatteryIcon && BatteryService.batteryAvailable;
         case "printer":
             return root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs();
+        case "idleInhibitor":
+            return root.showIdleInhibitorIcon && SessionService.idleInhibited;
+        case "doNotDisturb":
+            return root.showDoNotDisturbIcon && SessionData.doNotDisturb;
         default:
             return false;
         }
@@ -512,6 +518,10 @@ BasePill {
                                     return Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable);
                                 case "printer":
                                     return "print";
+                                case "idleInhibitor":
+                                    return "motion_sensor_active";
+                                case "doNotDisturb":
+                                    return "do_not_disturb_on";
                                 default:
                                     return "settings";
                                 }
@@ -530,6 +540,10 @@ BasePill {
                                 case "battery":
                                     return root.getBatteryIconColor();
                                 case "printer":
+                                    return Theme.primary;
+                                case "idleInhibitor":
+                                    return Theme.primary;
+                                case "doNotDisturb":
                                     return Theme.primary;
                                 default:
                                     return Theme.widgetIconColor;
@@ -689,6 +703,10 @@ BasePill {
                                     return Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable);
                                 case "printer":
                                     return "print";
+                                case "idleInhibitor":
+                                    return "motion_sensor_active";
+                                case "doNotDisturb":
+                                    return "do_not_disturb_on";
                                 default:
                                     return "settings";
                                 }
@@ -707,6 +725,10 @@ BasePill {
                                 case "battery":
                                     return root.getBatteryIconColor();
                                 case "printer":
+                                    return Theme.primary;
+                                case "idleInhibitor":
+                                    return Theme.primary;
+                                case "doNotDisturb":
                                     return Theme.primary;
                                 default:
                                     return Theme.widgetIconColor;
