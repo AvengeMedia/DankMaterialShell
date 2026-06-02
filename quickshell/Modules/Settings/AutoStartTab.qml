@@ -160,11 +160,14 @@ Item {
         id: writerFileView
         blockLoading: true
         atomicWrites: true
+        onSaveFailed: error => {
+            ToastService.showError(I18n.tr("Failed to write autostart entry"))
+            log.warn("Failed to write autostart entry to " + writerFileView.path + ": " + error);
+        }
     }
 
     FolderListModel {
         id: folderModel
-        folder: "file://" + root.autostartDir
         nameFilters: ["*.desktop"]
         showDirs: false
         showDotAndDotDot: false
@@ -272,6 +275,11 @@ Item {
             setText("[Unit]\nAfter=dms.service\n");
             ToastService.showInfo(I18n.tr("Systemd Override generated"));
         }
+
+        onSaveFailed: error => {
+            ToastService.showError(I18n.tr("Failed to generate systemd override"));
+            log.warn("Failed to write systemd override to " + systemdOverrideWriter.path + ": " + error);
+        }
     }
 
     Component {
@@ -290,8 +298,22 @@ Item {
         }
     }
 
+    Component {
+        id: autostartInitMkDirComp
+        Process {
+            command: ["mkdir", "-p", root.autostartDir]
+            onExited: (exitCode) => {
+                if (exitCode === 0) {
+                    folderModel.folder = "file://" + root.autostartDir;
+                }
+                destroy();
+            }
+        }
+    }
+
     Component.onCompleted: {
         desktopApps = AppSearchService.getVisibleApplications() || [];
+        autostartInitMkDirComp.createObject(root, { running: true });
     }
 
     Component.onDestruction: {
