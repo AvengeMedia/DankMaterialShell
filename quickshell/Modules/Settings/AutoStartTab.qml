@@ -110,10 +110,6 @@ Item {
         newEntryCommandWrapper = "%command%";
     }
 
-    function generateTrayOverride() {
-        const proc = writeOverrideComponent.createObject(root, { running: true });
-    }
-
     function addOrUpdateEntry(entry) {
         var list = root.entries.slice();
         for (var i = 0; i < list.length; i++) {
@@ -205,19 +201,53 @@ Item {
         }
     }
 
-    Component {
-        id: writeOverrideComponent
-        Process {
-            readonly property string systemdUserDir: {
-                const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-                return configHome + "/systemd/user";
+    function generateTrayIconFixSystemdOverride() {
+        const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        const dir = configHome + "/systemd/user/app-@autostart.service.d";
+        const proc = systemdOverrideMkDirComp.createObject(root, { targetPath: dir, running: true });
+    }
+
+    FileView {
+        id: systemdOverrideWriter
+        atomicWrites: true
+
+        // make sure we don't overwrite an existing override with a default one, in case the user has already customized it
+        function buildOverrideContent(existing) {
+            if (!existing) return "[Unit]\nAfter=dms.service\n";
+            const lines = existing.split("\n");
+            const hasAfter = lines.some(l => l.trim() === "After=dms.service");
+            if (hasAfter) return existing;
+            const unitIdx = lines.findIndex(l => l.trim() === "[Unit]");
+            if (unitIdx >= 0) {
+                lines.splice(unitIdx + 1, 0, "After=dms.service");
+            } else {
+                lines.push("[Unit]", "After=dms.service");
             }
-            command: ["sh", "-c", "mkdir -p \"" + systemdUserDir + "/app-@autostart.service.d\" && cat > \"" + systemdUserDir + "/app-@autostart.service.d/override.conf\" << 'DMS_EOF'\n[Unit]\nAfter=dms.service\nDMS_EOF"]
-            onExited: (exitCode, exitStatus) => {
+            return lines.join("\n");
+        }
+
+        onLoaded: {
+            const merged = buildOverrideContent(text());
+            if (merged !== text()) setText(merged);
+            ToastService.showInfo(I18n.tr("Systemd Override generated"));
+        }
+
+        onLoadFailed: {
+            setText("[Unit]\nAfter=dms.service\n");
+            ToastService.showInfo(I18n.tr("Systemd Override generated"));
+        }
+    }
+
+    Component {
+        id: systemdOverrideMkDirComp
+        Process {
+            property string targetPath: ""
+            command: ["mkdir", "-p", targetPath]
+            onExited: (exitCode) => {
                 if (exitCode === 0) {
-                    ToastService.showInfo(I18n.tr("Override generated"));
+                    systemdOverrideWriter.path = targetPath + "/override.conf";
                 } else {
-                    ToastService.showError(I18n.tr("Failed to generate override"));
+                    ToastService.showError(I18n.tr("Failed to generate systemd override"));
                 }
                 destroy();
             }
@@ -644,7 +674,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: I18n.tr("Generate Override")
                         iconName: "build"
-                        onClicked: root.generateTrayOverride()
+                        onClicked: root.generateTrayIconFixSystemdOverride()
                     }
                 }
             }
