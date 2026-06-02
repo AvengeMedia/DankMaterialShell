@@ -1,5 +1,6 @@
 import QtCore
 import QtQuick
+import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 import qs.Common
@@ -22,17 +23,6 @@ Item {
     readonly property string autostartDir: {
         const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         return configHome + "/autostart";
-    }
-
-    readonly property string systemdUserDir: {
-        const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        return configHome + "/systemd/user";
-    }
-
-    function loadEntries() {
-        const proc = readDirComponent.createObject(root, {
-            running: true
-        });
     }
 
     function lookupDesktopIcon(name, exec, fileName) {
@@ -64,6 +54,7 @@ Item {
             if (line === "[Desktop Entry]") {
                 isDesktopEntry = true;
             } else if (isDesktopEntry) {
+                if (line.startsWith("[")) break; // stop parsing if we reach another section
                 const nameMatch = line.match(/^Name=(.+)$/);
                 if (nameMatch) name = nameMatch[1];
                 const execMatch = line.match(/^Exec=(.+)$/);
@@ -99,11 +90,9 @@ Item {
     function writeDesktopFile(fileName, name, execCmd, icon) {
         let content = "[Desktop Entry]\nType=Application\nName=" + name + "\nExec=" + execCmd + "\n";
         if (icon) content += "Icon=" + icon + "\n";
-        const proc = writeFileComponent.createObject(root, {
-            fileName: fileName,
-            fileContent: content,
-            running: true
-        });
+        writerFileView.path = root.autostartDir + "/" + fileName;
+        writerFileView.setText(content);
+        root.resetNewEntry();
     }
 
     function removeEntry(filePath) {
@@ -125,69 +114,81 @@ Item {
         const proc = writeOverrideComponent.createObject(root, { running: true });
     }
 
-    Component {
-        id: readDirComponent
-        Process {
-            command: ["sh", "-c", "ls -1 \"" + root.autostartDir + "\"/*.desktop 2>/dev/null || true"]
-            stdout: StdioCollector {
-                onStreamFinished: {
-                    const fileNames = text.trim();
-                    if (!fileNames) {
-                        root.entries = [];
-                        destroy();
-                        return;
-                    }
-                    const files = fileNames.split("\n").filter(f => f.trim().length > 0);
-                    root.entries = [];
-                    for (let i = 0; i < files.length; i++) {
-                        const filePath = files[i].trim();
-                        const readProc = readFileComponent.createObject(root, {
-                            filePath: filePath,
-                            running: true
-                        });
-                    }
-                    destroy();
-                }
+    function addOrUpdateEntry(entry) {
+        var list = root.entries.slice();
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].filePath === entry.filePath) {
+                list[i] = entry;
+                root.entries = list;
+                return;
             }
-            onExited: (exitCode, exitStatus) => {
-                destroy();
-            }
+        }
+        list.push(entry);
+        list.sort((a, b) => a.fileName.localeCompare(b.fileName));
+        root.entries = list;
+    }
+
+    function removeEntryByPath(filePath) {
+        var list = root.entries.filter(e => e.filePath !== filePath);
+        root.entries = list;
+    }
+
+    FileView {
+        id: writerFileView
+        blockLoading: true
+        atomicWrites: true
+    }
+
+    FolderListModel {
+        id: folderModel
+        folder: "file://" + root.autostartDir
+        nameFilters: ["*.desktop"]
+        showDirs: false
+        showDotAndDotDot: false
+        showHidden: false
+        sortField: FolderListModel.Name
+
+        onStatusChanged: {
+            if (status === FolderListModel.Ready)
+                root.entries = [];
+        }
+
+        onCountChanged: {
+            fileReaderRepeater.model = count;
         }
     }
 
-    Component {
-        id: readFileComponent
-        Process {
-            property string filePath: ""
-            command: ["sh", "-c", "cat \"" + filePath + "\""]
-            stdout: StdioCollector {
-                onStreamFinished: {
-                    const entry = root.parseDesktopFile(text, filePath);
+    Repeater {
+        id: fileReaderRepeater
+        model: 0
+
+        Item {
+            required property int index
+
+            readonly property string filePath: {
+                const fp = folderModel.get(index, "filePath") || "";
+                return fp.startsWith("file://") ? fp.substring(7) : fp;
+            }
+
+            FileView {
+                id: fileView
+                path: filePath ? "file://" + filePath : ""
+                watchChanges: true
+
+                onLoaded: {
+                    const entry = root.parseDesktopFile(fileView.text(), filePath);
                     if (entry) {
-                        const entries = root.entries.slice();
-                        entries.push(entry);
-                        root.entries = entries;
+                        root.addOrUpdateEntry(entry);
+                    } else {
+                        root.removeEntryByPath(filePath);
                     }
                 }
-            }
-            onExited: (exitCode, exitStatus) => {
-                destroy();
-            }
-        }
-    }
 
-    Component {
-        id: writeFileComponent
-        Process {
-            property string fileName: ""
-            property string fileContent: ""
-            command: ["sh", "-c", "mkdir -p \"" + root.autostartDir + "\" && cat > \"" + root.autostartDir + "/" + fileName + "\" << 'DMS_EOF'\n" + fileContent + "\nDMS_EOF"]
-            onExited: (exitCode, exitStatus) => {
-                if (exitCode === 0) {
-                    root.resetNewEntry();
-                    root.loadEntries();
+                onFileChanged: reload()
+
+                onLoadFailed: {
+                    root.removeEntryByPath(filePath);
                 }
-                destroy();
             }
         }
     }
@@ -198,7 +199,7 @@ Item {
             property string targetPath: ""
             command: ["rm", "-f", targetPath]
             onExited: (exitCode, exitStatus) => {
-                if (exitCode === 0) root.loadEntries();
+                root.removeEntryByPath(targetPath);
                 destroy();
             }
         }
@@ -207,7 +208,11 @@ Item {
     Component {
         id: writeOverrideComponent
         Process {
-            command: ["sh", "-c", "mkdir -p \"" + root.systemdUserDir + "/app-@autostart.service.d\" && cat > \"" + root.systemdUserDir + "/app-@autostart.service.d/override.conf\" << 'DMS_EOF'\n[Unit]\nAfter=dms.service\nDMS_EOF"]
+            readonly property string systemdUserDir: {
+                const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+                return configHome + "/systemd/user";
+            }
+            command: ["sh", "-c", "mkdir -p \"" + systemdUserDir + "/app-@autostart.service.d\" && cat > \"" + systemdUserDir + "/app-@autostart.service.d/override.conf\" << 'DMS_EOF'\n[Unit]\nAfter=dms.service\nDMS_EOF"]
             onExited: (exitCode, exitStatus) => {
                 if (exitCode === 0) {
                     ToastService.showInfo(I18n.tr("Override generated"));
@@ -221,7 +226,6 @@ Item {
 
     Component.onCompleted: {
         desktopApps = AppSearchService.getVisibleApplications() || [];
-        loadEntries();
     }
 
     Component.onDestruction: {
