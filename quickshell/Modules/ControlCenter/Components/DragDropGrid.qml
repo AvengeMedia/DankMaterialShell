@@ -3,6 +3,7 @@ import qs.Common
 import qs.Services
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.ControlCenter.Components
+import "../utils/detailHeight.js" as DetailHeightUtils
 import "../utils/layout.js" as LayoutUtils
 
 Column {
@@ -38,8 +39,6 @@ Column {
     property real currentRowWidth: 0
     property int expandedRowIndex: -1
     property var colorPickerModal: null
-    // Detail instance of the currently expanded plugin section, so the grid can
-    // honor its dynamic ccDetailHeight instead of a fixed slot size.
     property var activePluginDetailInstance: null
 
     readonly property real _maxDetailHeight: {
@@ -76,17 +75,7 @@ Column {
     }
 
     function detailHeightForSection(section) {
-        if (!section)
-            return 0;
-        if (section === "wifi" || section === "bluetooth" || section === "builtin_vpn")
-            return Math.min(350, _maxDetailHeight);
-        if (section.startsWith("brightnessSlider_"))
-            return Math.min(400, _maxDetailHeight);
-        if (section.startsWith("plugin_")) {
-            const h = activePluginDetailInstance ? activePluginDetailInstance.ccDetailHeight : 0;
-            return Math.min(h > 0 ? h : 250, _maxDetailHeight);
-        }
-        return Math.min(250, _maxDetailHeight);
+        return DetailHeightUtils.detailHeightForSection(section, _maxDetailHeight, activePluginDetailInstance);
     }
 
     function calculateRowsAndWidgets() {
@@ -226,7 +215,6 @@ Column {
             DetailHost {
                 id: detailHost
                 width: parent.width
-                maxAvailableHeight: root._maxDetailHeight
                 height: active ? (root.detailHeightForSection(root.expandedSection) + Theme.spacingS) : 0
                 clip: true
                 property string retainedSection: ""
