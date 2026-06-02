@@ -135,7 +135,7 @@ BasePill {
                     size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
-                    visible: root.isVerticalOrientation && widgetData?.keyboardLayoutNameShowIcon !== undefined ? widgetData.keyboardLayoutNameShowIcon : SettingsData.keyboardLayoutNameShowIcon
+                    visible: root.showIcon
                 }
 
                 StyledText {
@@ -163,7 +163,7 @@ BasePill {
                     size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: !root.isVerticalOrientation && widgetData?.keyboardLayoutNameShowIcon !== undefined ? widgetData.keyboardLayoutNameShowIcon : SettingsData.keyboardLayoutNameShowIcon
+                    visible: root.showIcon
                 }
 
                 StyledText {
