@@ -414,6 +414,7 @@ Singleton {
     property string lockDateFormat: ""
     property bool greeterRememberLastSession: true
     property bool greeterRememberLastUser: true
+    property bool greeterAutoLogin: false
     property bool greeterEnableFprint: false
     property bool greeterEnableU2f: false
     property string greeterWallpaperPath: ""
@@ -1333,6 +1334,15 @@ Singleton {
         });
     }
 
+    function scheduleGreeterAutoLoginSync() {
+        if (isGreeterMode)
+            return;
+        Qt.callLater(() => {
+            Processes.settingsRoot = root;
+            Processes.scheduleGreeterAutoLoginSync();
+        });
+    }
+
     readonly property var _hooks: ({
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
@@ -1340,7 +1350,8 @@ Singleton {
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
-            "scheduleAuthApply": scheduleAuthApply
+            "scheduleAuthApply": scheduleAuthApply,
+            "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync
         })
 
     function set(key, value) {

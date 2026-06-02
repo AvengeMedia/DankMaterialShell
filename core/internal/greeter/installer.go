@@ -192,6 +192,421 @@ func upsertDefaultSession(configContent, greeterUser, command string) string {
 	return strings.Join(out, "\n")
 }
 
+func removeTomlSection(configContent, sectionName string) string {
+	lines := strings.Split(configContent, "\n")
+	var out []string
+	inSection := false
+
+	for _, line := range lines {
+		if section, ok := parseTomlSection(line); ok {
+			inSection = section == sectionName
+			if inSection {
+				continue
+			}
+			out = append(out, line)
+			continue
+		}
+
+		if inSection {
+			continue
+		}
+
+		out = append(out, line)
+	}
+
+	result := strings.TrimRight(strings.Join(out, "\n"), "\n")
+	if result != "" {
+		result += "\n"
+	}
+	return result
+}
+
+func stripDesktopExecCodes(execLine string) string {
+	fields := strings.Fields(execLine)
+	cleaned := make([]string, 0, len(fields))
+	for _, field := range fields {
+		if strings.HasPrefix(field, "%") {
+			continue
+		}
+		cleaned = append(cleaned, field)
+	}
+	return strings.Join(cleaned, " ")
+}
+
+func formatInitialSessionCommand(sessionExec string) string {
+	execLine := strings.TrimSpace(stripDesktopExecCodes(sessionExec))
+	if execLine == "" {
+		return `command = ""`
+	}
+	escaped := strings.ReplaceAll(execLine, `'`, `'\''`)
+	inner := fmt.Sprintf("env XDG_SESSION_TYPE=wayland sh -c 'exec %s'", escaped)
+	tomlEscaped := strings.ReplaceAll(inner, `\`, `\\`)
+	tomlEscaped = strings.ReplaceAll(tomlEscaped, `"`, `\"`)
+	return fmt.Sprintf(`command = "%s"`, tomlEscaped)
+}
+
+func upsertInitialSession(configContent, loginUser, sessionExec string, enabled bool) string {
+	if !enabled {
+		return removeTomlSection(configContent, "initial_session")
+	}
+
+	commandLine := formatInitialSessionCommand(sessionExec)
+	lines := strings.Split(configContent, "\n")
+	var out []string
+
+	inInitialSession := false
+	foundInitialSession := false
+	initialSessionUserSet := false
+	initialSessionCommandSet := false
+
+	appendInitialSessionFields := func() {
+		if !initialSessionUserSet {
+			out = append(out, fmt.Sprintf(`user = "%s"`, loginUser))
+		}
+		if !initialSessionCommandSet {
+			out = append(out, commandLine)
+		}
+	}
+
+	for _, line := range lines {
+		if section, ok := parseTomlSection(line); ok {
+			if inInitialSession {
+				appendInitialSessionFields()
+			}
+
+			inInitialSession = section == "initial_session"
+			if inInitialSession {
+				foundInitialSession = true
+				initialSessionUserSet = false
+				initialSessionCommandSet = false
+			}
+
+			out = append(out, line)
+			continue
+		}
+
+		if inInitialSession {
+			trimmed := stripTomlComment(line)
+			if strings.HasPrefix(trimmed, "user =") || strings.HasPrefix(trimmed, "user=") {
+				out = append(out, fmt.Sprintf(`user = "%s"`, loginUser))
+				initialSessionUserSet = true
+				continue
+			}
+
+			if strings.HasPrefix(trimmed, "command =") || strings.HasPrefix(trimmed, "command=") {
+				if !initialSessionCommandSet {
+					out = append(out, commandLine)
+					initialSessionCommandSet = true
+				}
+				continue
+			}
+		}
+
+		out = append(out, line)
+	}
+
+	if inInitialSession {
+		appendInitialSessionFields()
+	}
+
+	if !foundInitialSession {
+		if len(out) > 0 && strings.TrimSpace(out[len(out)-1]) != "" {
+			out = append(out, "")
+		}
+		out = append(out, "[initial_session]")
+		out = append(out, fmt.Sprintf(`user = "%s"`, loginUser))
+		out = append(out, commandLine)
+	}
+
+	return strings.Join(out, "\n")
+}
+
+type greeterAutoLoginConfig struct {
+	GreeterAutoLogin           bool `json:"greeterAutoLogin"`
+	GreeterRememberLastUser    bool `json:"greeterRememberLastUser"`
+	GreeterRememberLastSession bool `json:"greeterRememberLastSession"`
+}
+
+type greeterAutoLoginMemory struct {
+	LastSuccessfulUser string `json:"lastSuccessfulUser"`
+	LastSessionID      string `json:"lastSessionId"`
+	LastSessionExec    string `json:"lastSessionExec"`
+	AutoLoginEnabled   bool   `json:"autoLoginEnabled"`
+}
+
+func readGreeterAutoLoginConfig(settingsPath string) (greeterAutoLoginConfig, error) {
+	cfg := greeterAutoLoginConfig{
+		GreeterRememberLastUser:    true,
+		GreeterRememberLastSession: true,
+	}
+	data, err := os.ReadFile(settingsPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return cfg, nil
+		}
+		return cfg, err
+	}
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return cfg, fmt.Errorf("failed to parse settings at %s: %w", settingsPath, err)
+	}
+	return cfg, nil
+}
+
+func readGreeterAutoLoginMemory(memoryPath string) (greeterAutoLoginMemory, error) {
+	var mem greeterAutoLoginMemory
+	data, err := os.ReadFile(memoryPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return mem, nil
+		}
+		return mem, err
+	}
+	if err := json.Unmarshal(data, &mem); err != nil {
+		return mem, fmt.Errorf("failed to parse greeter memory at %s: %w", memoryPath, err)
+	}
+	return mem, nil
+}
+
+func execFromDesktopFile(path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	for line := range strings.SplitSeq(string(data), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "Exec=") {
+			return strings.TrimSpace(trimmed[len("Exec="):]), nil
+		}
+	}
+	return "", fmt.Errorf("no Exec= line found in %s", path)
+}
+
+func resolveGreeterAutoLoginState(cacheDir, homeDir string) (enabled bool, loginUser string, sessionExec string, err error) {
+	settingsPath := filepath.Join(cacheDir, "settings.json")
+	if _, statErr := os.Stat(settingsPath); statErr != nil {
+		settingsPath = filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
+	}
+
+	cfg, err := readGreeterAutoLoginConfig(settingsPath)
+	if err != nil {
+		return false, "", "", err
+	}
+
+	memoryPath := filepath.Join(cacheDir, ".local/state/memory.json")
+	mem, err := readGreeterAutoLoginMemory(memoryPath)
+	if err != nil {
+		return false, "", "", err
+	}
+
+	enabled = cfg.GreeterAutoLogin
+	if !enabled {
+		return false, "", "", nil
+	}
+
+	if !cfg.GreeterRememberLastUser || !cfg.GreeterRememberLastSession {
+		return true, "", "", nil
+	}
+
+	loginUser = mem.LastSuccessfulUser
+	if loginUser == "" {
+		current, userErr := user.Current()
+		if userErr != nil {
+			return true, "", "", userErr
+		}
+		loginUser = current.Username
+	}
+
+	sessionExec = mem.LastSessionExec
+	if sessionExec == "" && mem.LastSessionID != "" {
+		sessionExec, err = execFromDesktopFile(mem.LastSessionID)
+		if err != nil {
+			sessionExec = ""
+		}
+	}
+
+	return true, loginUser, sessionExec, nil
+}
+
+func writeGreetdConfig(configPath, content string, logFunc func(string), sudoPassword, successMsg string) error {
+	if err := backupFileIfExists(sudoPassword, configPath, ".backup"); err != nil {
+		return fmt.Errorf("failed to backup greetd config: %w", err)
+	}
+
+	tmpFile, err := os.CreateTemp("", "greetd-config-*.toml")
+	if err != nil {
+		return fmt.Errorf("failed to create temp greetd config: %w", err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.WriteString(content); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("failed to write temp greetd config: %w", err)
+	}
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("failed to close temp greetd config: %w", err)
+	}
+
+	if err := privesc.Run(context.Background(), sudoPassword, "mkdir", "-p", "/etc/greetd"); err != nil {
+		return fmt.Errorf("failed to create /etc/greetd: %w", err)
+	}
+
+	if err := privesc.Run(context.Background(), sudoPassword, "install", "-o", "root", "-g", "root", "-m", "0644", tmpFile.Name(), configPath); err != nil {
+		return fmt.Errorf("failed to install greetd config: %w", err)
+	}
+
+	if logFunc != nil && successMsg != "" {
+		logFunc(successMsg)
+	}
+	return nil
+}
+
+func clearGreeterAutoLoginMemory(memoryPath, sudoPassword string) error {
+	data, err := readGreeterMemoryFile(memoryPath, sudoPassword)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	if len(strings.TrimSpace(string(data))) == 0 {
+		return nil
+	}
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return fmt.Errorf("failed to parse greeter memory at %s: %w", memoryPath, err)
+	}
+	if _, ok := raw["autoLoginEnabled"]; !ok {
+		return nil
+	}
+	delete(raw, "autoLoginEnabled")
+	encoded, err := json.MarshalIndent(raw, "", "  ")
+	if err != nil {
+		return err
+	}
+	if len(encoded) == 0 || string(encoded) == "null" {
+		encoded = []byte("{}")
+	}
+	encoded = append(encoded, '\n')
+
+	if err := os.WriteFile(memoryPath, encoded, 0o644); err == nil {
+		return nil
+	} else if !os.IsPermission(err) {
+		return err
+	}
+
+	tmpFile, err := os.CreateTemp("", "greeter-memory-*.json")
+	if err != nil {
+		return fmt.Errorf("failed to create temp greeter memory file: %w", err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.Write(encoded); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("failed to write temp greeter memory file: %w", err)
+	}
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("failed to close temp greeter memory file: %w", err)
+	}
+
+	greeterUser := DetectGreeterUser()
+	greeterGroup := DetectGreeterGroup()
+	owner := greeterUser + ":" + greeterGroup
+	if err := privesc.Run(context.Background(), sudoPassword, "install", "-o", greeterUser, "-g", greeterGroup, "-m", "0664", tmpFile.Name(), memoryPath); err != nil {
+		if fallbackErr := privesc.Run(context.Background(), sudoPassword, "install", "-o", "root", "-g", greeterGroup, "-m", "0664", tmpFile.Name(), memoryPath); fallbackErr != nil {
+			return fmt.Errorf("failed to install greeter memory file (preferred %s: %w; fallback root:%s: %v)", owner, err, greeterGroup, fallbackErr)
+		}
+	}
+	return nil
+}
+
+func readGreeterMemoryFile(memoryPath, sudoPassword string) ([]byte, error) {
+	data, err := os.ReadFile(memoryPath)
+	if err == nil || !os.IsPermission(err) {
+		return data, err
+	}
+
+	tmpFile, err := os.CreateTemp("", "greeter-memory-read-*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create temp file for greeter memory read: %w", err)
+	}
+	tmpPath := tmpFile.Name()
+	_ = tmpFile.Close()
+	defer os.Remove(tmpPath)
+
+	if err := privesc.Run(context.Background(), sudoPassword, "cp", "-f", memoryPath, tmpPath); err != nil {
+		return nil, fmt.Errorf("failed to read greeter memory at %s: %w", memoryPath, err)
+	}
+	return os.ReadFile(tmpPath)
+}
+
+func SyncGreetdAutoLogin(cacheDir, homeDir string, logFunc func(string), sudoPassword string) error {
+	enabled, loginUser, sessionExec, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
+	if err != nil {
+		return err
+	}
+
+	configPath := "/etc/greetd/config.toml"
+	configContent := ""
+	if data, readErr := os.ReadFile(configPath); readErr == nil {
+		configContent = string(data)
+	} else if !os.IsNotExist(readErr) {
+		return fmt.Errorf("failed to read greetd config: %w", readErr)
+	}
+
+	if !enabled {
+		memoryPath := filepath.Join(cacheDir, ".local/state/memory.json")
+		if err := clearGreeterAutoLoginMemory(memoryPath, sudoPassword); err != nil && logFunc != nil {
+			logFunc(fmt.Sprintf("⚠ Warning: Failed to clear greeter auto-login memory flag: %v", err))
+		}
+		newConfig := upsertInitialSession(configContent, "", "", false)
+		if newConfig == configContent {
+			if logFunc != nil {
+				logFunc("✓ Greeter auto-login disabled")
+			}
+			return nil
+		}
+		return writeGreetdConfig(configPath, newConfig, logFunc, sudoPassword, "✓ Disabled greeter auto-login")
+	}
+
+	if loginUser == "" || sessionExec == "" {
+		if logFunc != nil {
+			logFunc("⚠ Greeter auto-login is enabled but user or session is not configured yet. Log in manually once, then run sync.")
+		}
+		newConfig := upsertInitialSession(configContent, "", "", false)
+		if newConfig != configContent {
+			return writeGreetdConfig(configPath, newConfig, nil, sudoPassword, "")
+		}
+		return nil
+	}
+
+	newConfig := upsertInitialSession(configContent, loginUser, sessionExec, true)
+	if newConfig == configContent {
+		if logFunc != nil {
+			logFunc(fmt.Sprintf("✓ Greeter auto-login already configured for %s", loginUser))
+		}
+		memoryPath := filepath.Join(cacheDir, ".local/state/memory.json")
+		_ = clearGreeterAutoLoginMemory(memoryPath, sudoPassword)
+		return nil
+	}
+
+	if err := writeGreetdConfig(configPath, newConfig, logFunc, sudoPassword, fmt.Sprintf("✓ Configured greeter auto-login for %s", loginUser)); err != nil {
+		return err
+	}
+	memoryPath := filepath.Join(cacheDir, ".local/state/memory.json")
+	if err := clearGreeterAutoLoginMemory(memoryPath, sudoPassword); err != nil && logFunc != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: Failed to clear greeter auto-login memory flag: %v", err))
+	}
+	return nil
+}
+
+func SyncGreeterAutoLoginOnly(logFunc func(string), sudoPassword string) error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get user home directory: %w", err)
+	}
+	return SyncGreetdAutoLogin(GreeterCacheDir, homeDir, logFunc, sudoPassword)
+}
+
 func DetectGreeterUser() string {
 	passwdData, err := os.ReadFile("/etc/passwd")
 	if err == nil {
@@ -1267,6 +1682,10 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 		return fmt.Errorf("per-user greeter cache sync failed: %w", err)
 	}
 
+	if err := SyncGreetdAutoLogin(cacheDir, homeDir, logFunc, sudoPassword); err != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: greeter auto-login sync failed: %v", err))
+	}
+
 	if strings.ToLower(compositor) != "niri" {
 		return nil
 	}
@@ -1731,29 +2150,22 @@ vt = 1
 	commandLine := fmt.Sprintf(`command = "%s"`, commandValue)
 	newConfig := upsertDefaultSession(configContent, greeterUser, commandLine)
 
-	tmpFile, err := os.CreateTemp("", "greetd-config-*.toml")
-	if err != nil {
-		return fmt.Errorf("failed to create temp greetd config: %w", err)
-	}
-	defer os.Remove(tmpFile.Name())
-
-	if _, err := tmpFile.WriteString(newConfig); err != nil {
-		_ = tmpFile.Close()
-		return fmt.Errorf("failed to write temp greetd config: %w", err)
-	}
-	if err := tmpFile.Close(); err != nil {
-		return fmt.Errorf("failed to close temp greetd config: %w", err)
+	homeDir, homeErr := os.UserHomeDir()
+	if homeErr == nil {
+		enabled, loginUser, sessionExec, resolveErr := resolveGreeterAutoLoginState(GreeterCacheDir, homeDir)
+		if resolveErr != nil {
+			logFunc(fmt.Sprintf("⚠ Warning: Failed to resolve greeter auto-login state: %v", resolveErr))
+		} else if enabled && loginUser != "" && sessionExec != "" {
+			newConfig = upsertInitialSession(newConfig, loginUser, sessionExec, true)
+		} else {
+			newConfig = upsertInitialSession(newConfig, "", "", false)
+		}
 	}
 
-	if err := privesc.Run(context.Background(), sudoPassword, "mkdir", "-p", "/etc/greetd"); err != nil {
-		return fmt.Errorf("failed to create /etc/greetd: %w", err)
+	if err := writeGreetdConfig(configPath, newConfig, logFunc, sudoPassword, fmt.Sprintf("✓ Updated greetd configuration (user: %s, command: %s)", greeterUser, commandValue)); err != nil {
+		return err
 	}
 
-	if err := privesc.Run(context.Background(), sudoPassword, "install", "-o", "root", "-g", "root", "-m", "0644", tmpFile.Name(), configPath); err != nil {
-		return fmt.Errorf("failed to install greetd config: %w", err)
-	}
-
-	logFunc(fmt.Sprintf("✓ Updated greetd configuration (user: %s, command: %s)", greeterUser, commandValue))
 	return nil
 }
 

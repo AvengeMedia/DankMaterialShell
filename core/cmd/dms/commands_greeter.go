@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -74,10 +75,17 @@ var greeterSyncCmd = &cobra.Command{
 		auth, _ := cmd.Flags().GetBool("auth")
 		local, _ := cmd.Flags().GetBool("local")
 		profile, _ := cmd.Flags().GetBool("profile")
+		autologinOnly, _ := cmd.Flags().GetBool("autologin-only")
 		term, _ := cmd.Flags().GetBool("terminal")
 		if term {
-			if err := syncInTerminal(yes, auth, local, profile); err != nil {
+			if err := syncInTerminal(yes, auth, local, profile, autologinOnly); err != nil {
 				log.Fatalf("Error launching sync in terminal: %v", err)
+			}
+			return
+		}
+		if autologinOnly {
+			if err := syncGreeterAutoLoginOnly(yes); err != nil {
+				log.Fatalf("Error syncing greeter auto-login: %v", err)
 			}
 			return
 		}
@@ -93,6 +101,7 @@ func init() {
 	greeterSyncCmd.Flags().BoolP("auth", "a", false, "Configure PAM for fingerprint and U2F (adds both if modules exist); overrides UI toggles")
 	greeterSyncCmd.Flags().BoolP("local", "l", false, "Developer mode: force greetd config to use a local DMS checkout path")
 	greeterSyncCmd.Flags().BoolP("profile", "p", false, "Sync only your per-user greeter slot (no sudo; for secondary accounts)")
+	greeterSyncCmd.Flags().Bool("autologin-only", false, "Apply only greeter auto-login on startup settings to greetd (no theme or auth sync)")
 }
 
 var greeterEnableCmd = &cobra.Command{
@@ -520,8 +529,8 @@ func runCommandInTerminal(shellCmd string) error {
 	return fmt.Errorf("no terminal emulator found (tried: gnome-terminal, konsole, xfce4-terminal, ghostty, wezterm, alacritty, kitty, xterm)")
 }
 
-func syncInTerminal(nonInteractive bool, forceAuth bool, local bool, profileOnly bool) error {
-	syncFlags := make([]string, 0, 4)
+func syncInTerminal(nonInteractive bool, forceAuth bool, local bool, profileOnly bool, autologinOnly bool) error {
+	syncFlags := make([]string, 0, 5)
 	if nonInteractive {
 		syncFlags = append(syncFlags, "--yes")
 	}
@@ -534,11 +543,19 @@ func syncInTerminal(nonInteractive bool, forceAuth bool, local bool, profileOnly
 	if profileOnly {
 		syncFlags = append(syncFlags, "--profile")
 	}
+	if autologinOnly {
+		syncFlags = append(syncFlags, "--autologin-only")
+	}
 	shellSyncCmd := "dms greeter sync"
 	if len(syncFlags) > 0 {
 		shellSyncCmd += " " + strings.Join(syncFlags, " ")
 	}
-	shellCmd := shellSyncCmd + `; echo; echo "Sync finished. Closing in 3 seconds..."; sleep 3`
+	var shellCmd string
+	if autologinOnly {
+		shellCmd = shellSyncCmd + `; echo; echo "Auto-login update finished. Closing in 3 seconds..."; sleep 3`
+	} else {
+		shellCmd = shellSyncCmd + `; echo; echo "Sync finished. Closing in 3 seconds..."; sleep 3`
+	}
 	return runCommandInTerminal(shellCmd)
 }
 
@@ -550,6 +567,49 @@ func resolveLocalWrapperShell() (string, error) {
 		}
 	}
 	return "", fmt.Errorf("could not find bash or sh in PATH for local greeter wrapper")
+}
+
+func syncGreeterAutoLoginOnly(nonInteractive bool) error {
+	logFunc := func(msg string) {
+		fmt.Println(msg)
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get user home directory: %w", err)
+	}
+
+	settingsPath := filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
+	cacheSettingsPath := filepath.Join(greeter.GreeterCacheDir, "settings.json")
+	enabled := false
+	for _, path := range []string{cacheSettingsPath, settingsPath} {
+		data, readErr := os.ReadFile(path)
+		if readErr != nil {
+			continue
+		}
+		var cfg struct {
+			GreeterAutoLogin bool `json:"greeterAutoLogin"`
+		}
+		if json.Unmarshal(data, &cfg) == nil {
+			enabled = cfg.GreeterAutoLogin
+			break
+		}
+	}
+
+	fmt.Println("=== Greeter Auto-Login ===")
+	fmt.Println()
+	if enabled {
+		fmt.Println("Enabling auto-login on startup in greetd.")
+		fmt.Println("After your next reboot, DMS will skip the greeter password until you sign out.")
+	} else {
+		fmt.Println("Disabling auto-login on startup in greetd.")
+		fmt.Println("After your next reboot, you will enter your password at the greeter again.")
+	}
+	fmt.Println()
+	fmt.Println("Administrator (sudo) access is required to update /etc/greetd/config.toml.")
+	fmt.Println()
+
+	return greeter.SyncGreeterAutoLoginOnly(logFunc, "")
 }
 
 func syncGreeter(nonInteractive bool, forceAuth bool, local bool, profileOnly bool) error {

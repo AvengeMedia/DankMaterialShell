@@ -57,6 +57,7 @@ Item {
     property int maxPasswordSessionTransitionRetries: 2
     property bool fprintdProbeComplete: false
     property bool fprintdHasDevice: false
+    property bool autoLoginOnSuccess: false
     // Falls back to PAM-only detection until the fprintd D-Bus probe completes.
     readonly property bool greeterPamHasFprint: greeterPamStackHasModule("pam_fprintd") && (!fprintdProbeComplete || fprintdHasDevice)
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
@@ -524,6 +525,7 @@ Item {
             passwordFailureCount = 0;
             clearAuthFeedback();
             externalAuthAutoStartedForUser = "";
+            root.autoLoginOnSuccess = false;
         }
         root.pickerThemeUsername = user;
         GreeterState.username = user;
@@ -644,6 +646,12 @@ Item {
         if (CompositorService.isHyprland) {
             hyprlandLayoutProcess.running = true;
         }
+    }
+
+    Process {
+        id: greeterAutoLoginPendingProcess
+        command: ["sh", "-c", "mkdir -p $(dirname " + JSON.stringify((Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter") + "/.local/state/auto-login-sync-pending") + ") && touch " + JSON.stringify((Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter") + "/.local/state/auto-login-sync-pending")]
+        running: false
     }
 
     Process {
@@ -870,109 +878,109 @@ Item {
                     anchors.top: parent.top
                     spacing: 0
 
-                property string fullTimeStr: {
-                    const format = GreetdSettings.getEffectiveTimeFormat();
-                    return systemClock.date.toLocaleTimeString(I18n.locale(), format);
-                }
-                property var timeParts: fullTimeStr.split(':')
-                property string hours: timeParts[0] || ""
-                property string minutes: timeParts[1] || ""
-                property string secondsWithAmPm: timeParts.length > 2 ? timeParts[2] : ""
-                property string seconds: secondsWithAmPm.replace(/\s*(AM|PM|am|pm)$/i, '')
-                property string ampm: {
-                    const match = fullTimeStr.match(/\s*(AM|PM|am|pm)$/i);
-                    return match ? match[0].trim() : "";
-                }
-                property bool hasSeconds: timeParts.length > 2
+                    property string fullTimeStr: {
+                        const format = GreetdSettings.getEffectiveTimeFormat();
+                        return systemClock.date.toLocaleTimeString(I18n.locale(), format);
+                    }
+                    property var timeParts: fullTimeStr.split(':')
+                    property string hours: timeParts[0] || ""
+                    property string minutes: timeParts[1] || ""
+                    property string secondsWithAmPm: timeParts.length > 2 ? timeParts[2] : ""
+                    property string seconds: secondsWithAmPm.replace(/\s*(AM|PM|am|pm)$/i, '')
+                    property string ampm: {
+                        const match = fullTimeStr.match(/\s*(AM|PM|am|pm)$/i);
+                        return match ? match[0].trim() : "";
+                    }
+                    property bool hasSeconds: timeParts.length > 2
 
-                StyledText {
-                    width: 75
-                    text: clockText.hours.length > 1 ? clockText.hours[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                }
+                    StyledText {
+                        width: 75
+                        text: clockText.hours.length > 1 ? clockText.hours[0] : ""
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
 
-                StyledText {
-                    width: 75
-                    text: clockText.hours.length > 1 ? clockText.hours[1] : clockText.hours.length > 0 ? clockText.hours[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                }
+                    StyledText {
+                        width: 75
+                        text: clockText.hours.length > 1 ? clockText.hours[1] : clockText.hours.length > 0 ? clockText.hours[0] : ""
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
 
-                StyledText {
-                    text: ":"
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                }
+                    StyledText {
+                        text: ":"
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                    }
 
-                StyledText {
-                    width: 75
-                    text: clockText.minutes.length > 0 ? clockText.minutes[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                }
+                    StyledText {
+                        width: 75
+                        text: clockText.minutes.length > 0 ? clockText.minutes[0] : ""
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
 
-                StyledText {
-                    width: 75
-                    text: clockText.minutes.length > 1 ? clockText.minutes[1] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                }
+                    StyledText {
+                        width: 75
+                        text: clockText.minutes.length > 1 ? clockText.minutes[1] : ""
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
 
-                StyledText {
-                    text: clockText.hasSeconds ? ":" : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    visible: clockText.hasSeconds
-                }
+                    StyledText {
+                        text: clockText.hasSeconds ? ":" : ""
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        visible: clockText.hasSeconds
+                    }
 
-                StyledText {
-                    width: 75
-                    text: clockText.hasSeconds && clockText.seconds.length > 0 ? clockText.seconds[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    visible: clockText.hasSeconds
-                }
+                    StyledText {
+                        width: 75
+                        text: clockText.hasSeconds && clockText.seconds.length > 0 ? clockText.seconds[0] : ""
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        visible: clockText.hasSeconds
+                    }
 
-                StyledText {
-                    width: 75
-                    text: clockText.hasSeconds && clockText.seconds.length > 1 ? clockText.seconds[1] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    visible: clockText.hasSeconds
-                }
+                    StyledText {
+                        width: 75
+                        text: clockText.hasSeconds && clockText.seconds.length > 1 ? clockText.seconds[1] : ""
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        visible: clockText.hasSeconds
+                    }
 
-                StyledText {
-                    width: 20
-                    text: " "
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    visible: clockText.ampm !== ""
-                }
+                    StyledText {
+                        width: 20
+                        text: " "
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        visible: clockText.ampm !== ""
+                    }
 
-                StyledText {
-                    text: clockText.ampm
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    visible: clockText.ampm !== ""
+                    StyledText {
+                        text: clockText.ampm
+                        font.pixelSize: 120
+                        font.weight: Font.Light
+                        color: "white"
+                        visible: clockText.ampm !== ""
+                    }
                 }
-            }
             }
 
             StyledText {
@@ -1355,7 +1363,7 @@ Item {
 
                 StyledText {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 38
+                    Layout.preferredHeight: root.authFeedbackMessage !== "" ? 38 : 0
                     Layout.topMargin: -Theme.spacingS
                     Layout.bottomMargin: -Theme.spacingS
                     text: root.authFeedbackMessage
@@ -1374,48 +1382,150 @@ Item {
                     }
                 }
 
-                Rectangle {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.topMargin: 0
-                    Layout.preferredWidth: switchUserRow.width + Theme.spacingL * 2
-                    Layout.preferredHeight: 40
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceContainer
-                    opacity: GreeterState.showPasswordInput ? 1 : 0
-                    enabled: GreeterState.showPasswordInput
+                // Password-screen actions: Switch User + Auto-login toggle as one compact chip row
+                Item {
+                    id: passwordActions
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.standardEasing
-                        }
-                    }
+                    readonly property bool autoLoginAvailable: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
+
+                    Layout.fillWidth: true
+                    Layout.topMargin: Theme.spacingXS
+                    Layout.preferredHeight: visible ? 32 : 0
+                    visible: GreeterState.showPasswordInput && !GreeterState.unlocking && (root.multipleUsersAvailable || autoLoginAvailable)
 
                     Row {
-                        id: switchUserRow
                         anchors.centerIn: parent
                         spacing: Theme.spacingS
 
-                        DankIcon {
-                            name: "people"
-                            size: Theme.iconSize - 4
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                        Rectangle {
+                            id: switchUserChip
+
+                            visible: root.multipleUsersAvailable
+                            height: 32
+                            width: switchUserContent.implicitWidth + Theme.spacingM * 2
+                            radius: height / 2
+                            color: Theme.withAlpha(Theme.surfaceVariant, 0.65)
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: (switchUserMouse.containsMouse || switchUserMouse.pressed) ? Theme.surfaceTextHover : "transparent"
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Theme.shorterDuration
+                                        easing.type: Theme.standardEasing
+                                    }
+                                }
+                            }
+
+                            DankRipple {
+                                id: switchUserRipple
+                                cornerRadius: switchUserChip.radius
+                                rippleColor: Theme.surfaceVariantText
+                            }
+
+                            Row {
+                                id: switchUserContent
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+
+                                DankIcon {
+                                    name: "people"
+                                    size: 16
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Switch User")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            MouseArea {
+                                id: switchUserMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onPressed: mouse => switchUserRipple.trigger(mouse.x, mouse.y)
+                                onClicked: root.returnToUserPicker()
+                            }
                         }
 
-                        StyledText {
-                            text: I18n.tr("Switch User")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
+                        Rectangle {
+                            id: autoLoginChip
 
-                    StateLayer {
-                        stateColor: Theme.primary
-                        cornerRadius: parent.radius
-                        enabled: !GreeterState.unlocking && GreeterState.showPasswordInput
-                        onClicked: root.returnToUserPicker()
+                            visible: passwordActions.autoLoginAvailable
+                            height: 32
+                            width: autoLoginContent.implicitWidth + Theme.spacingM * 2
+                            radius: height / 2
+                            color: root.autoLoginOnSuccess ? Theme.withAlpha(Theme.primary, 0.85) : Theme.withAlpha(Theme.surfaceVariant, 0.65)
+
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: {
+                                    if (autoLoginMouse.pressed)
+                                        return root.autoLoginOnSuccess ? Theme.primaryPressed : Theme.surfaceTextHover;
+                                    if (autoLoginMouse.containsMouse)
+                                        return root.autoLoginOnSuccess ? Theme.primaryHover : Theme.surfaceTextHover;
+                                    return "transparent";
+                                }
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Theme.shorterDuration
+                                        easing.type: Theme.standardEasing
+                                    }
+                                }
+                            }
+
+                            DankRipple {
+                                id: autoLoginRipple
+                                cornerRadius: autoLoginChip.radius
+                                rippleColor: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
+                            }
+
+                            Row {
+                                id: autoLoginContent
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+
+                                DankIcon {
+                                    name: root.autoLoginOnSuccess ? "check" : "login"
+                                    size: 16
+                                    color: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Auto-login")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: root.autoLoginOnSuccess ? Font.Medium : Font.Normal
+                                    color: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            MouseArea {
+                                id: autoLoginMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.autoLoginOnSuccess = !root.autoLoginOnSuccess
+                                onPressed: mouse => autoLoginRipple.trigger(mouse.x, mouse.y)
+                            }
+                        }
                     }
                 }
             }
@@ -1984,7 +2094,8 @@ Item {
             launchTimeout.restart();
             if (GreetdSettings.rememberLastSession) {
                 GreetdMemory.setLastSessionId(sessionPath);
-            } else if (GreetdMemory.lastSessionId) {
+                GreetdMemory.setLastSessionExec(sessionCmd);
+            } else if (GreetdMemory.lastSessionId || GreetdMemory.lastSessionExec) {
                 GreetdMemory.setLastSessionId("");
             }
             if (GreetdSettings.rememberLastUser) {
@@ -1992,6 +2103,8 @@ Item {
             } else if (GreetdMemory.lastSuccessfulUser) {
                 GreetdMemory.setLastSuccessfulUser("");
             }
+            if (root.autoLoginOnSuccess)
+                greeterAutoLoginPendingProcess.running = true;
             pendingLaunchCommand = sessionCmd;
             pendingLaunchEnv = ["XDG_SESSION_TYPE=wayland"];
             memoryFlushTimer.restart();

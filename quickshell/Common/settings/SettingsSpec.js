@@ -182,6 +182,7 @@ var SPEC = {
     lockDateFormat: { def: "" },
     greeterRememberLastSession: { def: true },
     greeterRememberLastUser: { def: true },
+    greeterAutoLogin: { def: false, onChange: "scheduleGreeterAutoLoginSync" },
     greeterEnableFprint: { def: false, onChange: "scheduleAuthApply" },
     greeterEnableU2f: { def: false, onChange: "scheduleAuthApply" },
     greeterWallpaperPath: { def: "" },

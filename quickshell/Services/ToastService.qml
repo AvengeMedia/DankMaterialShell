@@ -23,6 +23,11 @@ Singleton {
     property var lastErrorTime: ({})
     property int errorThrottleMs: 1000
     property string currentCategory: ""
+    readonly property var stickyCategories: ["greeter-autologin-sync"]
+
+    function isStickyCategory(category) {
+        return category && stickyCategories.indexOf(category) >= 0
+    }
 
     function showToast(message, level = levelInfo, details = "", command = "", category = "") {
         const now = Date.now()
@@ -137,7 +142,9 @@ Singleton {
         toastVisible = true
         resetToastState()
 
-        if (toast.level === levelError && hasDetails) {
+        if (isStickyCategory(toast.category)) {
+            toastTimer.stop()
+        } else if (toast.level === levelError && hasDetails) {
             toastTimer.interval = 8000
             toastTimer.start()
         } else {
@@ -153,6 +160,9 @@ Singleton {
     }
 
     function restartTimer() {
+        if (isStickyCategory(currentCategory)) {
+            return
+        }
         if (hasDetails && currentLevel === levelError) {
             toastTimer.interval = 8000
             toastTimer.restart()
