@@ -19,6 +19,7 @@ Item {
     property string newEntryExec: ""
     property string newEntryDesktopId: ""
     property string newEntryCommandWrapper: "%command%"
+    property bool isSystemd: false
 
     readonly property string autostartDir: {
         const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
@@ -256,10 +257,22 @@ Item {
 
     Component.onCompleted: {
         desktopApps = AppSearchService.getVisibleApplications() || [];
+        systemdCheck.running = true;
     }
 
     Component.onDestruction: {
         desktopApps = [];
+    }
+
+    Process {
+        id: systemdCheck
+        command: ["sh", "-c", "cat /proc/1/comm 2>/dev/null | tr -d '\\n'"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.isSystemd = (text || "").trim() === "systemd";
+            }
+        }
     }
 
     DankFlickable {
@@ -655,8 +668,9 @@ Item {
 
             SettingsCard {
                 width: parent.width
-                iconName: "system_tray"
+                iconName: "construction"
                 title: I18n.tr("Tray Icon Fix")
+                visible: root.isSystemd
 
                 Column {
                     width: parent.width
