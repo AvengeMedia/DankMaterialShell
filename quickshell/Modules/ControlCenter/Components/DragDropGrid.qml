@@ -38,6 +38,9 @@ Column {
     property real currentRowWidth: 0
     property int expandedRowIndex: -1
     property var colorPickerModal: null
+    // Detail instance of the currently expanded plugin section, so the grid can
+    // honor its dynamic ccDetailHeight instead of a fixed slot size.
+    property var activePluginDetailInstance: null
 
     readonly property real _maxDetailHeight: {
         const rows = layoutResult.rows;
@@ -79,8 +82,10 @@ Column {
             return Math.min(350, _maxDetailHeight);
         if (section.startsWith("brightnessSlider_"))
             return Math.min(400, _maxDetailHeight);
-        if (section.startsWith("plugin_"))
-            return Math.min(250, _maxDetailHeight);
+        if (section.startsWith("plugin_")) {
+            const h = activePluginDetailInstance ? activePluginDetailInstance.ccDetailHeight : 0;
+            return Math.min(h > 0 ? h : 250, _maxDetailHeight);
+        }
         return Math.min(250, _maxDetailHeight);
     }
 
@@ -258,7 +263,19 @@ Column {
                     retainedWidgetData = root.expandedWidgetData;
                 }
 
-                onActiveChanged: retainActiveDetail()
+                function syncActivePluginDetail() {
+                    if (active) {
+                        root.activePluginDetailInstance = pluginDetailInstance;
+                    } else if (root.activePluginDetailInstance === pluginDetailInstance) {
+                        root.activePluginDetailInstance = null;
+                    }
+                }
+
+                onActiveChanged: {
+                    retainActiveDetail();
+                    syncActivePluginDetail();
+                }
+                onPluginDetailInstanceChanged: syncActivePluginDetail()
                 onHeightChanged: {
                     if (!active && height <= 0.5) {
                         retainedSection = "";
