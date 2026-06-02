@@ -234,15 +234,7 @@ func (a *ArchDistribution) getMatugenMapping(variant deps.PackageVariant) Packag
 }
 
 func (a *ArchDistribution) getDMSMapping(variant deps.PackageVariant) PackageMapping {
-	if forceDMSGit || variant == deps.VariantGit {
-		return PackageMapping{Name: "dms-shell-git", Repository: RepoTypeAUR}
-	}
-
-	if a.packageInstalled("dms-shell-git") {
-		return PackageMapping{Name: "dms-shell-git", Repository: RepoTypeAUR}
-	}
-
-	return PackageMapping{Name: "dms-shell", Repository: RepoTypeSystem}
+	return PackageMapping{Name: "dms", Repository: RepoTypeManual}
 }
 
 func (a *ArchDistribution) detectXwaylandSatellite() deps.Dependency {

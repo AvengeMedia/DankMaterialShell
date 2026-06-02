@@ -147,10 +147,7 @@ func (o *OpenSUSEDistribution) GetPackageMappingWithVariants(wm deps.WindowManag
 }
 
 func (o *OpenSUSEDistribution) getDmsMapping(variant deps.PackageVariant) PackageMapping {
-	if variant == deps.VariantGit {
-		return PackageMapping{Name: "dms-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:dms-git"}
-	}
-	return PackageMapping{Name: "dms", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:dms"}
+	return PackageMapping{Name: "dms", Repository: RepoTypeManual}
 }
 
 func (o *OpenSUSEDistribution) getQuickshellMapping(variant deps.PackageVariant) PackageMapping {

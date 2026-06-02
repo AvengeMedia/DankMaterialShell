@@ -142,10 +142,7 @@ func (u *UbuntuDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 }
 
 func (u *UbuntuDistribution) getDmsMapping(variant deps.PackageVariant) PackageMapping {
-	if variant == deps.VariantGit {
-		return PackageMapping{Name: "dms-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/dms-git"}
-	}
-	return PackageMapping{Name: "dms", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/dms"}
+	return PackageMapping{Name: "dms", Repository: RepoTypeManual}
 }
 
 func (u *UbuntuDistribution) getQuickshellMapping(variant deps.PackageVariant) PackageMapping {

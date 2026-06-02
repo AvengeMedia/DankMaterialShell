@@ -186,7 +186,7 @@ func (g *GentooDistribution) getQuickshellMapping(_ deps.PackageVariant) Package
 }
 
 func (g *GentooDistribution) getDmsMapping() PackageMapping {
-	return PackageMapping{Name: "gui-apps/dankmaterialshell", Repository: RepoTypeGURU, AcceptKeywords: g.getArchKeyword()}
+	return PackageMapping{Name: "dms", Repository: RepoTypeManual}
 }
 
 func (g *GentooDistribution) getHyprlandMapping(_ deps.PackageVariant) PackageMapping {

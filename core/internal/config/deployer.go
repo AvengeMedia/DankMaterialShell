@@ -224,6 +224,49 @@ func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal, useSystemd bo
 		}
 	}
 
+	repoRoot := findRepoRoot()
+	if repoRoot != "" {
+		cd.log(fmt.Sprintf("Symlinking Niri config files from repo: %s", repoRoot))
+		
+		niriRepoPath := filepath.Join(repoRoot, "core", "internal", "config", "embedded", "niri.kdl")
+		_ = replaceAndWriteRepoConfig(niriRepoPath, "{{TERMINAL_COMMAND}}", terminalCommand)
+
+		if err := cd.deploySymlink(repoRoot, "niri.kdl", result.Path, "", ""); err != nil {
+			result.Error = err
+			return result, result.Error
+		}
+
+		subconfigs := []struct {
+			name     string
+			destName string
+		}{
+			{"niri-colors.kdl", "colors.kdl"},
+			{"niri-layout.kdl", "layout.kdl"},
+			{"niri-alttab.kdl", "alttab.kdl"},
+			{"niri-binds.kdl", "binds.kdl"},
+			{"niri-greeter.kdl", "greeter.kdl"},
+		}
+
+		for _, cfg := range subconfigs {
+			destPath := filepath.Join(dmsDir, cfg.destName)
+			if err := cd.deploySymlink(repoRoot, cfg.name, destPath, "{{TERMINAL_COMMAND}}", terminalCommand); err != nil {
+				result.Error = err
+				return result, result.Error
+			}
+		}
+
+		for _, name := range []string{"outputs.kdl", "cursor.kdl", "windowrules.kdl"} {
+			path := filepath.Join(dmsDir, name)
+			if _, err := os.Stat(path); os.IsNotExist(err) {
+				_ = os.WriteFile(path, []byte(""), 0o644)
+			}
+		}
+
+		result.Deployed = true
+		cd.log("Successfully deployed Niri configuration via symlinks")
+		return result, nil
+	}
+
 	if err := os.WriteFile(result.Path, []byte(newConfig), 0o644); err != nil {
 		result.Error = fmt.Errorf("failed to write config: %w", err)
 		return result, result.Error
@@ -301,6 +344,36 @@ func (cd *ConfigDeployer) deployGhosttyConfig() ([]DeploymentResult, error) {
 		cd.log(fmt.Sprintf("Backed up existing config to %s", mainResult.BackupPath))
 	}
 
+	repoRoot := findRepoRoot()
+	if repoRoot != "" {
+		cd.log(fmt.Sprintf("Symlinking Ghostty config from repo: %s", repoRoot))
+		if err := cd.deploySymlink(repoRoot, "ghostty.conf", mainResult.Path, "", ""); err != nil {
+			mainResult.Error = err
+			return []DeploymentResult{mainResult}, mainResult.Error
+		}
+		mainResult.Deployed = true
+		results = append(results, mainResult)
+
+		colorResult := DeploymentResult{
+			ConfigType: "Ghostty Colors",
+			Path:       filepath.Join(os.Getenv("HOME"), ".config", "ghostty", "themes", "dankcolors"),
+		}
+		themesDir := filepath.Dir(colorResult.Path)
+		if err := os.MkdirAll(themesDir, 0o755); err != nil {
+			mainResult.Error = fmt.Errorf("failed to create themes directory: %w", err)
+			return []DeploymentResult{mainResult}, mainResult.Error
+		}
+
+		if err := cd.deploySymlink(repoRoot, "ghostty-colors.conf", colorResult.Path, "", ""); err != nil {
+			colorResult.Error = err
+			return results, colorResult.Error
+		}
+		colorResult.Deployed = true
+		results = append(results, colorResult)
+
+		return results, nil
+	}
+
 	if err := os.WriteFile(mainResult.Path, []byte(GhosttyConfig), 0o644); err != nil {
 		mainResult.Error = fmt.Errorf("failed to write config: %w", err)
 		return []DeploymentResult{mainResult}, mainResult.Error
@@ -363,6 +436,41 @@ func (cd *ConfigDeployer) deployKittyConfig() ([]DeploymentResult, error) {
 			return []DeploymentResult{mainResult}, mainResult.Error
 		}
 		cd.log(fmt.Sprintf("Backed up existing config to %s", mainResult.BackupPath))
+	}
+
+	repoRoot := findRepoRoot()
+	if repoRoot != "" {
+		cd.log(fmt.Sprintf("Symlinking Kitty config from repo: %s", repoRoot))
+		if err := cd.deploySymlink(repoRoot, "kitty.conf", mainResult.Path, "", ""); err != nil {
+			mainResult.Error = err
+			return []DeploymentResult{mainResult}, mainResult.Error
+		}
+		mainResult.Deployed = true
+		results = append(results, mainResult)
+
+		themeResult := DeploymentResult{
+			ConfigType: "Kitty Theme",
+			Path:       filepath.Join(os.Getenv("HOME"), ".config", "kitty", "dank-theme.conf"),
+		}
+		if err := cd.deploySymlink(repoRoot, "kitty-theme.conf", themeResult.Path, "", ""); err != nil {
+			themeResult.Error = err
+			return results, themeResult.Error
+		}
+		themeResult.Deployed = true
+		results = append(results, themeResult)
+
+		tabsResult := DeploymentResult{
+			ConfigType: "Kitty Tabs",
+			Path:       filepath.Join(os.Getenv("HOME"), ".config", "kitty", "dank-tabs.conf"),
+		}
+		if err := cd.deploySymlink(repoRoot, "kitty-tabs.conf", tabsResult.Path, "", ""); err != nil {
+			tabsResult.Error = err
+			return results, tabsResult.Error
+		}
+		tabsResult.Deployed = true
+		results = append(results, tabsResult)
+
+		return results, nil
 	}
 
 	if err := os.WriteFile(mainResult.Path, []byte(KittyConfig), 0o644); err != nil {
@@ -435,6 +543,30 @@ func (cd *ConfigDeployer) deployAlacrittyConfig() ([]DeploymentResult, error) {
 			return []DeploymentResult{mainResult}, mainResult.Error
 		}
 		cd.log(fmt.Sprintf("Backed up existing config to %s", mainResult.BackupPath))
+	}
+
+	repoRoot := findRepoRoot()
+	if repoRoot != "" {
+		cd.log(fmt.Sprintf("Symlinking Alacritty config from repo: %s", repoRoot))
+		if err := cd.deploySymlink(repoRoot, "alacritty.toml", mainResult.Path, "", ""); err != nil {
+			mainResult.Error = err
+			return []DeploymentResult{mainResult}, mainResult.Error
+		}
+		mainResult.Deployed = true
+		results = append(results, mainResult)
+
+		themeResult := DeploymentResult{
+			ConfigType: "Alacritty Theme",
+			Path:       filepath.Join(os.Getenv("HOME"), ".config", "alacritty", "dank-theme.toml"),
+		}
+		if err := cd.deploySymlink(repoRoot, "alacritty-theme.toml", themeResult.Path, "", ""); err != nil {
+			themeResult.Error = err
+			return results, themeResult.Error
+		}
+		themeResult.Deployed = true
+		results = append(results, themeResult)
+
+		return results, nil
 	}
 
 	if err := os.WriteFile(mainResult.Path, []byte(AlacrittyConfig), 0o644); err != nil {
@@ -576,6 +708,48 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystem
 			newConfig = mergedConfig
 			cd.log("Successfully merged existing monitor sections")
 		}
+	}
+
+	repoRoot := findRepoRoot()
+	if repoRoot != "" {
+		cd.log(fmt.Sprintf("Symlinking Hyprland config from repo: %s", repoRoot))
+
+		hyprlandRepoPath := filepath.Join(repoRoot, "core", "internal", "config", "embedded", "hyprland.lua")
+		_ = replaceAndWriteRepoConfig(hyprlandRepoPath, "{{TERMINAL_COMMAND}}", terminalCommand)
+
+		if err := cd.deploySymlink(repoRoot, "hyprland.lua", result.Path, "", ""); err != nil {
+			result.Error = err
+			return result, result.Error
+		}
+
+		subconfigs := []struct {
+			name     string
+			destName string
+		}{
+			{"hypr-colors.lua", "colors.lua"},
+			{"hypr-layout.lua", "layout.lua"},
+			{"hypr-binds.lua", "binds.lua"},
+			{"hypr-binds-user.lua", "binds-user.lua"},
+			{"hypr-outputs.lua", "outputs.lua"},
+			{"hypr-cursor.lua", "cursor.lua"},
+			{"hypr-windowrules.lua", "windowrules.lua"},
+		}
+
+		for _, cfg := range subconfigs {
+			destPath := filepath.Join(dmsDir, cfg.destName)
+			if err := cd.deploySymlink(repoRoot, cfg.name, destPath, "{{TERMINAL_COMMAND}}", terminalCommand); err != nil {
+				result.Error = err
+				return result, result.Error
+			}
+		}
+
+		CleanupStrayHyprlandConfFile(func(format string, v ...any) {
+			cd.log(fmt.Sprintf(format, v...))
+		})
+
+		result.Deployed = true
+		cd.log("Successfully deployed Hyprland configuration via symlinks")
+		return result, nil
 	}
 
 	if err := os.WriteFile(result.Path, []byte(newConfig), 0o644); err != nil {
@@ -788,4 +962,104 @@ func (cd *ConfigDeployer) transformNiriConfigForNonSystemd(config, terminalComma
 	}
 
 	return config
+}
+
+func findRepoRoot() string {
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test.") {
+			return ""
+		}
+	}
+	binary := filepath.Base(os.Args[0])
+	if strings.HasSuffix(binary, ".test") || strings.Contains(os.Args[0], "go-build") {
+		return ""
+	}
+	cwd, err := os.Getwd()
+	if err == nil {
+		dir := cwd
+		for {
+			if _, err := os.Stat(filepath.Join(dir, "core", "cmd", "dms", "main.go")); err == nil {
+				if _, err := os.Stat(filepath.Join(dir, "quickshell", "shell.qml")); err == nil {
+					return dir
+				}
+			}
+			parent := filepath.Dir(dir)
+			if parent == dir {
+				break
+			}
+			dir = parent
+		}
+	}
+	home := os.Getenv("HOME")
+	if home != "" {
+		for _, name := range []string{"DankMaterialShellFork", "DankMaterialShell"} {
+			path := filepath.Join(home, name)
+			if _, err := os.Stat(filepath.Join(path, "core", "cmd", "dms", "main.go")); err == nil {
+				return path
+			}
+		}
+	}
+	return ""
+}
+
+func replaceAndWriteRepoConfig(repoPath string, placeholder string, value string) error {
+	data, err := os.ReadFile(repoPath)
+	if err != nil {
+		return err
+	}
+	content := string(data)
+	if strings.Contains(content, placeholder) {
+		newContent := strings.ReplaceAll(content, placeholder, value)
+		return os.WriteFile(repoPath, []byte(newContent), 0o644)
+	}
+	return nil
+}
+
+func (cd *ConfigDeployer) deploySymlink(repoRoot, repoRelativeSrc, destPath, placeholder, value string) error {
+	sourcePath := filepath.Join(repoRoot, "core", "internal", "config", "embedded", repoRelativeSrc)
+
+	if _, err := os.Stat(sourcePath); err != nil {
+		return fmt.Errorf("symlink source file not found in repo: %s: %w", sourcePath, err)
+	}
+
+	if placeholder != "" && value != "" {
+		if err := replaceAndWriteRepoConfig(sourcePath, placeholder, value); err != nil {
+			return fmt.Errorf("failed to replace placeholder in repo file: %w", err)
+		}
+	}
+
+	return cd.createSymlink(sourcePath, destPath)
+}
+
+func (cd *ConfigDeployer) createSymlink(sourcePath, destPath string) error {
+	if err := os.MkdirAll(filepath.Dir(destPath), 0o755); err != nil {
+		return err
+	}
+
+	if info, err := os.Lstat(destPath); err == nil {
+		if info.Mode()&os.ModeSymlink != 0 {
+			target, err := os.Readlink(destPath)
+			if err == nil && target == sourcePath {
+				cd.log(fmt.Sprintf("Symlink already exists: %s -> %s", destPath, sourcePath))
+				return nil
+			}
+		}
+		if info.Mode().IsRegular() {
+			timestamp := time.Now().Format("2006-01-02_15-04-05")
+			backupPath := destPath + ".backup." + timestamp
+			if data, err := os.ReadFile(destPath); err == nil {
+				_ = os.WriteFile(backupPath, data, 0o644)
+				cd.log(fmt.Sprintf("Backed up existing regular config file to %s", backupPath))
+			}
+		}
+		if err := os.RemoveAll(destPath); err != nil {
+			return fmt.Errorf("failed to remove existing config path %s: %w", destPath, err)
+		}
+	}
+
+	if err := os.Symlink(sourcePath, destPath); err != nil {
+		return fmt.Errorf("failed to create symlink: %w", err)
+	}
+	cd.log(fmt.Sprintf("Created symlink: %s -> %s", destPath, sourcePath))
+	return nil
 }

@@ -505,111 +505,170 @@ func (m *ManualPackageInstaller) installMatugen(ctx context.Context, sudoPasswor
 	return nil
 }
 
-func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, variant deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
-	m.log("Installing DankMaterialShell (DMS)...")
-
-	if err := m.installDMSBinary(ctx, sudoPassword, progressChan); err != nil {
-		m.logError("Failed to install DMS binary", err)
+func findRepoRoot() string {
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test.") {
+			return ""
+		}
 	}
+	binary := filepath.Base(os.Args[0])
+	if strings.HasSuffix(binary, ".test") || strings.Contains(os.Args[0], "go-build") {
+		return ""
+	}
+	cwd, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+	dir := cwd
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "core", "cmd", "dms", "main.go")); err == nil {
+			if _, err := os.Stat(filepath.Join(dir, "quickshell", "shell.qml")); err == nil {
+				return dir
+			}
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+	return ""
+}
+
+func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, variant deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	m.log("Installing DankMaterialShell (DMS) from source...")
 
 	dmsPath := filepath.Join(os.Getenv("HOME"), ".config/quickshell/dms")
+	repoRoot := findRepoRoot()
+	homeFolderRepo := filepath.Join(os.Getenv("HOME"), "DankMaterialShellFork")
 
-	if _, err := os.Stat(dmsPath); os.IsNotExist(err) {
-		progressChan <- InstallProgressMsg{
-			Phase:       PhaseSystemPackages,
-			Progress:    0.90,
-			Step:        "Cloning DankMaterialShell...",
-			IsComplete:  false,
-			CommandInfo: "git clone https://github.com/AvengeMedia/DankMaterialShell.git",
+	if repoRoot != "" {
+		m.log(fmt.Sprintf("Found local repository root at %s", repoRoot))
+	} else {
+		m.log("No local repository root found, cloning from fork repository...")
+	}
+
+	// 1. Compile and install DMS binary from source
+	var sourceDir string
+	if repoRoot != "" {
+		sourceDir = repoRoot
+	} else {
+		// Clone if needed
+		if _, err := os.Stat(homeFolderRepo); os.IsNotExist(err) {
+			progressChan <- InstallProgressMsg{
+				Phase:       PhaseSystemPackages,
+				Progress:    0.85,
+				Step:        "Cloning DankMaterialShell fork...",
+				IsComplete:  false,
+				CommandInfo: "git clone https://github.com/umeshwayakole27/DankMaterialShellFork.git",
+			}
+
+			cloneCmd := exec.CommandContext(ctx, "git", "clone",
+				"https://github.com/umeshwayakole27/DankMaterialShellFork.git", homeFolderRepo)
+			if err := cloneCmd.Run(); err != nil {
+				return fmt.Errorf("failed to clone DankMaterialShell fork: %w", err)
+			}
+			m.log("DankMaterialShell fork cloned successfully")
+		} else {
+			// Update the clone
+			progressChan <- InstallProgressMsg{
+				Phase:       PhaseSystemPackages,
+				Progress:    0.85,
+				Step:        "Updating DankMaterialShell fork...",
+				IsComplete:  false,
+				CommandInfo: "Updating fork repo at ~/DankMaterialShellFork",
+			}
+			fetchCmd := exec.CommandContext(ctx, "git", "-C", homeFolderRepo, "fetch", "origin", "--tags", "--force")
+			if err := fetchCmd.Run(); err != nil {
+				m.logError("Failed to fetch updates for fork repo", err)
+			} else {
+				pullCmd := exec.CommandContext(ctx, "git", "-C", homeFolderRepo, "pull", "origin", "master")
+				_ = pullCmd.Run()
+			}
 		}
+		sourceDir = homeFolderRepo
+	}
 
-		configDir := filepath.Dir(dmsPath)
-		if err := os.MkdirAll(configDir, 0o755); err != nil {
-			return fmt.Errorf("failed to create quickshell config directory: %w", err)
-		}
+	// Compile DMS binary from sourceDir/core
+	m.log(fmt.Sprintf("Building DMS binary from source directory: %s/core", sourceDir))
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get user home directory: %w", err)
+	}
+	tmpBuildDir := filepath.Join(homeDir, ".cache", "dankinstall", "manual-builds")
+	if err := os.MkdirAll(tmpBuildDir, 0o755); err != nil {
+		return fmt.Errorf("failed to create build temp directory: %w", err)
+	}
+	defer os.RemoveAll(tmpBuildDir)
 
-		cloneCmd := exec.CommandContext(ctx, "git", "clone",
-			"https://github.com/AvengeMedia/DankMaterialShell.git", dmsPath)
-		if err := cloneCmd.Run(); err != nil {
-			return fmt.Errorf("failed to clone DankMaterialShell: %w", err)
-		}
+	tempBinaryPath := filepath.Join(tmpBuildDir, "dms")
 
-		if forceDMSGit || variant == deps.VariantGit {
-			m.log("Using git variant (master branch)")
-			return nil
-		}
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseSystemPackages,
+		Progress:    0.88,
+		Step:        "Building DMS binary from source...",
+		IsComplete:  false,
+		CommandInfo: "go build -o dms ./core/cmd/dms",
+	}
 
-		tagCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "describe", "--tags", "--abbrev=0", "origin/master")
-		tagOutput, err := tagCmd.Output()
-		if err != nil {
-			m.log("Using default branch (no tags found)")
-			return nil
-		}
-
-		latestTag := strings.TrimSpace(string(tagOutput))
-		checkoutCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "checkout", latestTag)
-		if err := checkoutCmd.Run(); err != nil {
-			m.logError(fmt.Sprintf("Failed to checkout tag %s", latestTag), err)
-			return nil
-		}
-
-		m.log(fmt.Sprintf("Checked out latest tag: %s", latestTag))
-		m.log("DankMaterialShell cloned successfully")
-		return nil
+	buildCmd := exec.CommandContext(ctx, "go", "build", "-ldflags=-s -w", "-o", tempBinaryPath, "./cmd/dms")
+	buildCmd.Dir = filepath.Join(sourceDir, "core")
+	if output, err := buildCmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to compile DMS binary: %w\nOutput:\n%s", err, string(output))
 	}
 
 	progressChan <- InstallProgressMsg{
 		Phase:       PhaseSystemPackages,
-		Progress:    0.90,
-		Step:        "Updating DankMaterialShell...",
+		Progress:    0.92,
+		Step:        "Installing DMS binary to /usr/local/bin...",
 		IsComplete:  false,
-		CommandInfo: "Updating ~/.config/quickshell/dms",
+		NeedsSudo:   true,
+		CommandInfo: "sudo cp dms /usr/local/bin/",
 	}
 
-	fetchCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "fetch", "origin", "--tags", "--force")
-	if err := fetchCmd.Run(); err != nil {
-		m.logError("Failed to fetch updates", err)
-		return nil
+	installCmd := privesc.ExecCommand(ctx, sudoPassword, fmt.Sprintf("cp %s /usr/local/bin/dms", tempBinaryPath))
+	if err := installCmd.Run(); err != nil {
+		return fmt.Errorf("failed to install DMS binary: %w", err)
 	}
 
-	if forceDMSGit || variant == deps.VariantGit {
-		branchCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "rev-parse", "--abbrev-ref", "HEAD")
-		branchOutput, err := branchCmd.Output()
-		if err != nil {
-			m.logError("Failed to get current branch", err)
-			return nil
+	// 2. Create symlink from ~/.config/quickshell/dms to sourceDir
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseSystemPackages,
+		Progress:    0.95,
+		Step:        "Symlinking shell configurations...",
+		IsComplete:  false,
+		CommandInfo: fmt.Sprintf("ln -s %s %s", sourceDir, dmsPath),
+	}
+
+	configParentDir := filepath.Dir(dmsPath)
+	if err := os.MkdirAll(configParentDir, 0o755); err != nil {
+		return fmt.Errorf("failed to create quickshell config parent directory: %w", err)
+	}
+
+	needSymlink := true
+	if info, err := os.Lstat(dmsPath); err == nil {
+		if info.Mode()&os.ModeSymlink != 0 {
+			target, err := os.Readlink(dmsPath)
+			if err == nil && target == sourceDir {
+				m.log("Shell configurations already symlinked")
+				needSymlink = false
+			}
 		}
-
-		branch := strings.TrimSpace(string(branchOutput))
-		if branch == "" {
-			branch = "master"
+		if needSymlink {
+			if err := os.RemoveAll(dmsPath); err != nil {
+				return fmt.Errorf("failed to remove existing quickshell config directory: %w", err)
+			}
 		}
+	}
 
-		pullCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "pull", "origin", branch)
-		if err := pullCmd.Run(); err != nil {
-			m.logError("Failed to pull updates", err)
-			return nil
+	if needSymlink {
+		if err := os.Symlink(sourceDir, dmsPath); err != nil {
+			return fmt.Errorf("failed to create symlink for quickshell config: %w", err)
 		}
-
-		m.log("DankMaterialShell updated successfully (git variant)")
-		return nil
+		m.log(fmt.Sprintf("Symlinked quickshell config: %s -> %s", dmsPath, sourceDir))
 	}
 
-	latestTagCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "describe", "--tags", "--abbrev=0", "origin/master")
-	tagOutput, err := latestTagCmd.Output()
-	if err != nil {
-		m.logError("Failed to get latest tag", err)
-		return nil
-	}
-
-	latestTag := strings.TrimSpace(string(tagOutput))
-	checkoutCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "checkout", latestTag)
-	if err := checkoutCmd.Run(); err != nil {
-		m.logError(fmt.Sprintf("Failed to checkout tag %s", latestTag), err)
-		return nil
-	}
-
-	m.log(fmt.Sprintf("Updated to tag: %s", latestTag))
+	m.log("DankMaterialShell built and installed successfully from source")
 	return nil
 }
 

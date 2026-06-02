@@ -152,10 +152,7 @@ func (f *FedoraDistribution) getQuickshellMapping(variant deps.PackageVariant) P
 }
 
 func (f *FedoraDistribution) getDmsMapping(variant deps.PackageVariant) PackageMapping {
-	if variant == deps.VariantGit {
-		return PackageMapping{Name: "dms", Repository: RepoTypeCOPR, RepoURL: "avengemedia/dms-git"}
-	}
-	return PackageMapping{Name: "dms", Repository: RepoTypeCOPR, RepoURL: "avengemedia/dms"}
+	return PackageMapping{Name: "dms", Repository: RepoTypeManual}
 }
 
 func (f *FedoraDistribution) getHyprlandMapping(_ deps.PackageVariant) PackageMapping {
