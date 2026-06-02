@@ -48,25 +48,28 @@ Item {
         let name = "";
         let execCmd = "";
         let icon = "";
+        let hidden = false;
         let isDesktopEntry = false;
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
             if (line === "[Desktop Entry]") {
                 isDesktopEntry = true;
             } else if (isDesktopEntry) {
-                if (line.startsWith("[")) break; // stop parsing if we reach another section
+                if (line.startsWith("[")) break;
                 const nameMatch = line.match(/^Name=(.+)$/);
                 if (nameMatch) name = nameMatch[1];
                 const execMatch = line.match(/^Exec=(.+)$/);
                 if (execMatch) execCmd = execMatch[1];
                 const iconMatch = line.match(/^Icon=(.+)$/);
                 if (iconMatch) icon = iconMatch[1];
+                const hiddenMatch = line.match(/^Hidden=(true|false)$/);
+                if (hiddenMatch) hidden = hiddenMatch[1] === "true";
             }
         }
         if (!isDesktopEntry || !name || !execCmd) return null;
         const fileName = filePath.split("/").pop();
         if (!icon) icon = root.lookupDesktopIcon(name, execCmd, fileName);
-        return { name: name, exec: execCmd, icon: icon, filePath: filePath, fileName: fileName };
+        return { name: name, exec: execCmd, icon: icon, hidden: hidden, filePath: filePath, fileName: fileName, content: content };
     }
 
     function addEntry() {
@@ -93,6 +96,30 @@ Item {
         writerFileView.path = root.autostartDir + "/" + fileName;
         writerFileView.setText(content);
         root.resetNewEntry();
+    }
+
+    function setHidden(entry, hidden) {
+        if (!entry || !entry.content) return;
+        const lines = entry.content.split("\n");
+        const hiddenValue = hidden ? "true" : "false";
+        let found = false;
+        const merged = lines.map(line => {
+            const m = line.match(/^Hidden=(true|false)\s*$/);
+            if (m) {
+                found = true;
+                return "Hidden=" + hiddenValue;
+            }
+            return line;
+        });
+        if (!found) {
+            const idx = merged.findIndex(l => l.trim() === "[Desktop Entry]");
+            if (idx >= 0)
+                merged.splice(idx + 1, 0, "Hidden=" + hiddenValue);
+            else
+                merged.unshift("Hidden=" + hiddenValue);
+        }
+        writerFileView.path = entry.filePath;
+        writerFileView.setText(merged.join("\n"));
     }
 
     function removeEntry(filePath) {
@@ -145,8 +172,17 @@ Item {
         sortField: FolderListModel.Name
 
         onStatusChanged: {
-            if (status === FolderListModel.Ready)
-                root.entries = [];
+            if (status !== FolderListModel.Ready) return;
+            // rebuild entries
+            const validPaths = new Set();
+            for (let i = 0; i < folderModel.count; i++) {
+                const fp = folderModel.get(i, "filePath") || "";
+                validPaths.add(fp.startsWith("file://") ? fp.substring(7) : fp);
+            }
+            const filtered = root.entries.filter(e => validPaths.has(e.filePath));
+            if (filtered.length !== root.entries.length) {
+                root.entries = filtered;
+            }
         }
 
         onCountChanged: {
@@ -606,7 +642,7 @@ Item {
                                 }
 
                                 Column {
-                                    width: parent.width - 20 - Theme.spacingM - 24 - Theme.spacingM - Theme.spacingM - 32 - Theme.spacingS
+                                    width: parent.width - 20 - Theme.spacingM - 24 - Theme.spacingM - Theme.spacingM - 60 - Theme.spacingM - 32 - Theme.spacingS
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: 2
 
@@ -615,17 +651,24 @@ Item {
                                         text: modelData.name
                                         font.pixelSize: Theme.fontSizeMedium
                                         font.weight: Font.Medium
-                                        color: Theme.surfaceText
+                                        color: modelData.hidden ? Theme.surfaceVariantText : Theme.surfaceText
                                         elide: Text.ElideRight
+                                        opacity: modelData.hidden ? 0.6 : 1.0
                                     }
 
                                     StyledText {
                                         width: parent.width
-                                        text: modelData.exec
+                                        text: modelData.hidden ? I18n.tr("Disabled") : modelData.exec
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                         elide: Text.ElideRight
                                     }
+                                }
+
+                                DankToggle {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    checked: !modelData.hidden
+                                    onToggled: checked => root.setHidden(modelData, !checked)
                                 }
                             }
 
