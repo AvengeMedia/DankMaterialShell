@@ -16,6 +16,7 @@ Item {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property int forceRefreshCount: 0
+    property var killedPids: []
 
     readonly property bool pauseUpdates: (contextMenu?.visible ?? false) || expandedPid.length > 0
     readonly property bool shouldUpdate: !pauseUpdates || forceRefreshCount > 0
@@ -29,6 +30,11 @@ Item {
         cachedProcesses = filteredProcesses;
         if (forceRefreshCount > 0)
             forceRefreshCount--;
+
+        if (killedPids.length > 0 && DgopService.allProcesses) {
+            var activePids = DgopService.allProcesses.map(p => p.pid);
+            killedPids = killedPids.filter(pid => activePids.includes(pid));
+        }
     }
 
     onShouldUpdateChanged: {
@@ -41,6 +47,10 @@ Item {
             return [];
 
         let procs = DgopService.allProcesses.slice();
+
+        if (root.killedPids.length > 0) {
+            procs = procs.filter(p => !root.killedPids.includes(p.pid));
+        }
 
         if (processFilter === "user") {
             procs = procs.filter(p => p.username === UserInfoService.username);
@@ -301,19 +311,10 @@ Item {
             clip: true
             spacing: 2
 
-            states: [
-                State {
-                    name: "snap"
-                    when: Theme.snapListModelChanges
-                    PropertyChanges {
-                        target: processListView
-                        add: null
-                        remove: null
-                        displaced: null
-                        move: null
-                    }
-                }
-            ]
+            add: root.searchText.length > 0 ? ListViewTransitions.add : null
+            remove: root.searchText.length > 0 ? ListViewTransitions.remove : null
+            displaced: root.searchText.length > 0 ? ListViewTransitions.displaced : null
+            move: root.searchText.length > 0 ? ListViewTransitions.move : null
 
             model: ScriptModel {
                 values: root.cachedProcesses
@@ -460,6 +461,9 @@ Item {
         signal clicked
         signal contextMenuRequested(real mouseX, real mouseY)
 
+        property bool isAnimating: false
+        property var particles: []
+
         readonly property int processPid: process?.pid ?? 0
         readonly property real processCpu: process?.cpu ?? 0
         readonly property int processMemKB: process?.memoryKB ?? 0
@@ -479,7 +483,7 @@ Item {
             return processMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent";
         }
         border.width: 1
-        clip: true
+        clip: !isAnimating
 
         Behavior on height {
             NumberAnimation {
@@ -513,6 +517,14 @@ Item {
         Column {
             anchors.fill: parent
             spacing: 0
+            opacity: processItemRoot.isAnimating ? 0 : 1
+            visible: opacity > 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 100
+                }
+            }
 
             Item {
                 width: parent.width
@@ -706,6 +718,32 @@ Item {
                         }
 
                         Rectangle {
+                            id: killBtn
+                            Layout.preferredWidth: 24
+                            Layout.preferredHeight: 24
+                            Layout.alignment: Qt.AlignVCenter
+                            radius: Theme.cornerRadius - 2
+                            color: killMouseArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15) : "transparent"
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: "delete"
+                                size: 14
+                                color: killMouseArea.containsMouse ? Theme.error : Theme.surfaceVariantText
+                            }
+
+                            MouseArea {
+                                id: killMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    processItemRoot.startScatterAnimation();
+                                }
+                            }
+                        }
+
+                        Rectangle {
                             id: copyBtn
                             Layout.preferredWidth: 24
                             Layout.preferredHeight: 24
@@ -771,6 +809,128 @@ Item {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        function startScatterAnimation() {
+            isAnimating = true;
+
+            var tempParticles = [];
+            var numParticles = 80;
+            var w = processItemRoot.width;
+            var h = processItemRoot.height;
+
+            // Get delete button coordinates to spawn a dense burst
+            var bx = w / 2;
+            var by = h / 2;
+            if (typeof killBtn !== "undefined" && killBtn !== null) {
+                var btnCenter = killBtn.mapToItem(processItemRoot, killBtn.width / 2, killBtn.height / 2);
+                bx = btnCenter.x;
+                by = btnCenter.y;
+            }
+
+            var color1 = Theme.error;
+            var color2 = Theme.primary;
+            var color3 = Theme.surfaceText;
+
+            for (var i = 0; i < numParticles; i++) {
+                var px, py, vx, vy, size;
+                var pColor = Math.random() < 0.5 ? color1 : (Math.random() < 0.8 ? color2 : color3);
+
+                // First half of particles explode from the button
+                if (i < 30) {
+                    px = bx;
+                    py = by;
+                    var angle = Math.random() * Math.PI * 2;
+                    var speed = Math.random() * 5 + 2;
+                    vx = Math.cos(angle) * speed;
+                    vy = Math.sin(angle) * speed - 2.5; // push slightly upwards
+                    size = Math.random() * 4 + 2;
+                } else {
+                    // Second half dissolves the entire process row
+                    px = Math.random() * w;
+                    py = Math.random() * h;
+                    vx = (Math.random() - 0.5) * 3;
+                    vy = (Math.random() - 0.5) * 2 - 1.5; // slight upward drift
+                    size = Math.random() * 3 + 1.5;
+                }
+
+                tempParticles.push({
+                    x: px,
+                    y: py,
+                    vx: vx,
+                    vy: vy,
+                    size: size,
+                    alpha: 1.0,
+                    color: pColor
+                });
+            }
+
+            particles = tempParticles;
+            particleTimer.start();
+        }
+
+        Timer {
+            id: particleTimer
+            interval: 16
+            repeat: true
+            onTriggered: {
+                var active = false;
+                var tempParticles = processItemRoot.particles;
+                for (var i = 0; i < tempParticles.length; i++) {
+                    var p = tempParticles[i];
+                    if (p.alpha > 0) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+
+                        p.vy += 0.15; // gravity
+                        p.vx *= 0.95; // drag
+                        p.vy *= 0.95;
+
+                        p.alpha -= 0.035; // fade
+                        if (p.alpha < 0) p.alpha = 0;
+
+                        active = true;
+                    }
+                }
+
+                if (active) {
+                    processItemRoot.particles = tempParticles;
+                    particleCanvas.requestPaint();
+                } else {
+                    particleTimer.stop();
+                    processItemRoot.isAnimating = false;
+                    root.killedPids = root.killedPids.concat([processItemRoot.processPid]);
+                    Quickshell.execDetached(["kill", processItemRoot.processPid.toString()]);
+                    root.expandedPid = "";
+                }
+            }
+        }
+
+        Canvas {
+            id: particleCanvas
+            anchors.fill: parent
+            visible: processItemRoot.isAnimating
+            renderStrategy: Canvas.Cooperative
+
+            onPaint: {
+                var ctx = getContext("2d");
+                ctx.reset();
+                ctx.clearRect(0, 0, width, height);
+
+                var tempParticles = processItemRoot.particles;
+                if (!tempParticles || tempParticles.length === 0)
+                    return;
+
+                for (var i = 0; i < tempParticles.length; i++) {
+                    var p = tempParticles[i];
+                    if (p.alpha <= 0) continue;
+
+                    ctx.fillStyle = Qt.rgba(p.color.r, p.color.g, p.color.b, p.alpha);
+                    ctx.beginPath();
+                    ctx.rect(p.x, p.y, p.size, p.size);
+                    ctx.fill();
                 }
             }
         }
