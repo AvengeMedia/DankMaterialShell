@@ -225,7 +225,7 @@ Item {
                                         StyledText {
                                             id: greeterChipText
                                             anchors.centerIn: parent
-                                            text: I18n.tr("greeter")
+                                            text: I18n.tr("Greeter")
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.secondary
                                             font.weight: Font.Medium

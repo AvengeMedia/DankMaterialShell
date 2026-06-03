@@ -1,4 +1,7 @@
 {
+  "%1 (+%2 more)": {
+    "%1 (+%2 more)": ""
+  },
   "%1 Animation Speed": {
     "%1 Animation Speed": "%1 動畫速度"
   },
@@ -103,6 +106,9 @@
   },
   "%1m ago": {
     "%1m ago": "%1 分鐘前"
+  },
+  "%command%": {
+    "%command%": ""
   },
   "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": {
     "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "「替代」讓密鑰自行解鎖。「第二因素」需要先輸入密碼或指紋，然後再輸入密鑰。"
@@ -374,6 +380,9 @@
   "Active VPN": {
     "Active VPN": "啟用中的 VPN"
   },
+  "Active in Column": {
+    "Active in Column": ""
+  },
   "Active tile background and icon color": {
     "Active tile background and icon color": "啟用磚背景與圖示顏色"
   },
@@ -407,6 +416,9 @@
   "Add Desktop Widget": {
     "Add Desktop Widget": "新增桌面小工具"
   },
+  "Add Entry": {
+    "Add Entry": ""
+  },
   "Add Printer": {
     "Add Printer": "新增印表機"
   },
@@ -416,8 +428,11 @@
   "Add Widget": {
     "Add Widget": "新增部件"
   },
-  "Add Widget to %1 Section": {
-    "Add Widget to %1 Section": "將部件新增至 %1 部分"
+  "Add Widget to %1": {
+    "Add Widget to %1": ""
+  },
+  "Add Window Rule": {
+    "Add Window Rule": ""
   },
   "Add a border around the dock": {
     "Add a border around the dock": "在 Dock 周圍新增邊框"
@@ -431,11 +446,17 @@
   "Add by Address": {
     "Add by Address": "按位址新增"
   },
+  "Add match": {
+    "Add match": ""
+  },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": ""
+  },
+  "Add to Autostart": {
+    "Add to Autostart": ""
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": ""
@@ -545,11 +566,23 @@
   "Anonymous Identity (optional)": {
     "Anonymous Identity (optional)": "匿名身分 (可選)"
   },
+  "Any": {
+    "Any": ""
+  },
+  "Any window": {
+    "Any window": ""
+  },
   "App Customizations": {
     "App Customizations": "應用程式自訂"
   },
+  "App ID": {
+    "App ID": ""
+  },
   "App ID Substitutions": {
     "App ID Substitutions": "應用程式ID替換"
+  },
+  "App ID regex": {
+    "App ID regex": ""
   },
   "App ID regex (e.g. ^firefox$)": {
     "App ID regex (e.g. ^firefox$)": "應用程式 ID 正規表示式 (例如：^firefox$)"
@@ -566,11 +599,17 @@
   "Appearance": {
     "Appearance": "外觀"
   },
+  "Application": {
+    "Application": ""
+  },
   "Application Dock": {
     "Application Dock": "應用程式 Dock"
   },
   "Applications": {
     "Applications": "應用程式"
+  },
+  "Applications and commands to start automatically when you log in": {
+    "Applications and commands to start automatically when you log in": ""
   },
   "Apply Changes": {
     "Apply Changes": "套用變更"
@@ -595,6 +634,9 @@
   },
   "Applying authentication changes…": {
     "Applying authentication changes…": "正在套用身份驗證變更…"
+  },
+  "Applying auto-login on startup…": {
+    "Applying auto-login on startup…": ""
   },
   "Apps": {
     "Apps": "應用程式"
@@ -628,6 +670,9 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "排列顯示器並設定解析度、重新整理頻率和 VRR"
+  },
+  "At Startup": {
+    "At Startup": ""
   },
   "At least one output must remain enabled": {
     "At least one output must remain enabled": "至少一個輸出必須保持啟用"
@@ -749,6 +794,18 @@
   "Auto-hide Dock": {
     "Auto-hide Dock": "自動隱藏 Dock"
   },
+  "Auto-login": {
+    "Auto-login": ""
+  },
+  "Auto-login disabled": {
+    "Auto-login disabled": ""
+  },
+  "Auto-login enabled": {
+    "Auto-login enabled": ""
+  },
+  "Auto-login on startup": {
+    "Auto-login on startup": ""
+  },
   "Auto-saving...": {
     "Auto-saving...": "自動保存..."
   },
@@ -803,6 +860,12 @@
   "Automation": {
     "Automation": "自動化"
   },
+  "Autostart Apps": {
+    "Autostart Apps": ""
+  },
+  "Autostart Entries": {
+    "Autostart Entries": ""
+  },
   "Available": {
     "Available": "可用"
   },
@@ -830,6 +893,9 @@
   "Back": {
     "Back": "返回"
   },
+  "Back to user list": {
+    "Back to user list": ""
+  },
   "Backend": {
     "Backend": "後端"
   },
@@ -841,6 +907,9 @@
   },
   "Background Blur": {
     "Background Blur": "背景模糊"
+  },
+  "Background Effect": {
+    "Background Effect": ""
   },
   "Background Opacity": {
     "Background Opacity": "背景不透明度"
@@ -880,9 +949,6 @@
   },
   "Bar spacing and size": {
     "Bar spacing and size": "長條間距和大小"
-  },
-  "Bar transparency": {
-    "Bar transparency": "長條透明度"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "陰影的基礎顏色 (不透明度會自動套用)"
@@ -953,6 +1019,9 @@
   "Bluetooth not available": {
     "Bluetooth not available": "藍牙不可用"
   },
+  "Blur": {
+    "Blur": ""
+  },
   "Blur Border Color": {
     "Blur Border Color": "模糊邊框顏色"
   },
@@ -983,6 +1052,9 @@
   "Border Color": {
     "Border Color": "邊框顏色"
   },
+  "Border Off": {
+    "Border Off": ""
+  },
   "Border Opacity": {
     "Border Opacity": "邊框不透明度"
   },
@@ -1001,8 +1073,11 @@
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": "模糊表面周圍的邊框顏色"
   },
-  "Border with BG": {
-    "Border with BG": "含背景邊界"
+  "Border w/ Bg": {
+    "Border w/ Bg": ""
+  },
+  "Border with Background": {
+    "Border with Background": ""
   },
   "Bottom": {
     "Bottom": "下方"
@@ -1133,6 +1208,12 @@
   "Caps Lock is on": {
     "Caps Lock is on": "大寫鎖定已開啟"
   },
+  "Cast Target": {
+    "Cast Target": ""
+  },
+  "Category": {
+    "Category": ""
+  },
   "Center Section": {
     "Center Section": "中間區塊"
   },
@@ -1178,9 +1259,6 @@
   "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": {
     "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": ""
   },
-  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
-    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": "按需檢查同步狀態。同步會將您的主題、設定和桌布配置複製到登入畫面。身份驗證變更會自動套用。"
-  },
   "Check your custom command in Settings → Dock → Trash.": {
     "Check your custom command in Settings → Dock → Trash.": "請在「設定」→「Dock」→「垃圾桶」中檢查您的自訂指令。"
   },
@@ -1217,6 +1295,9 @@
   "Choose a color": {
     "Choose a color": "選擇顏色"
   },
+  "Choose a power profile": {
+    "Choose a power profile": ""
+  },
   "Choose colors from palette": {
     "Choose colors from palette": "從調色盤選擇顏色"
   },
@@ -1247,6 +1328,9 @@
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "選擇螢幕顯示出現在螢幕上的位置"
   },
+  "Choose whether to launch a desktop app or a command": {
+    "Choose whether to launch a desktop app or a command": ""
+  },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "選擇哪些顯示器顯示此小工具"
   },
@@ -1261,6 +1345,9 @@
   },
   "Circle": {
     "Circle": "圓形"
+  },
+  "Class regex": {
+    "Class regex": ""
   },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "類別正規表示式 (例如：^firefox$)"
@@ -1331,11 +1418,11 @@
   "Clipboard Manager": {
     "Clipboard Manager": "剪貼簿管理"
   },
+  "Clipboard Saved": {
+    "Clipboard Saved": ""
+  },
   "Clipboard sent": {
     "Clipboard sent": "剪貼簿已傳送"
-  },
-  "Clipboard service not available": {
-    "Clipboard service not available": "剪貼簿服務無法使用"
   },
   "Clipboard works but nothing saved to disk": {
     "Clipboard works but nothing saved to disk": "剪貼簿運作正常但未儲存任何內容至磁碟"
@@ -1430,6 +1517,9 @@
   "Command": {
     "Command": "指令"
   },
+  "Command Line": {
+    "Command Line": ""
+  },
   "Commands": {
     "Commands": "指令"
   },
@@ -1453,9 +1543,6 @@
   },
   "Compositor Settings": {
     "Compositor Settings": "合成器設定"
-  },
-  "Compositor not supported": {
-    "Compositor not supported": "不支援合成器"
   },
   "Config Format": {
     "Config Format": "配置格式"
@@ -1571,6 +1658,9 @@
   "Contrast": {
     "Contrast": "對比"
   },
+  "Contributor": {
+    "Contributor": ""
+  },
   "Control Center": {
     "Control Center": "控制台"
   },
@@ -1619,6 +1709,9 @@
   "Convenience options for the login screen. Sync to apply.": {
     "Convenience options for the login screen. Sync to apply.": "登入畫面的便捷選項。同步以套用。"
   },
+  "Convert to DMS": {
+    "Convert to DMS": ""
+  },
   "Cooldown": {
     "Cooldown": "冷卻時間"
   },
@@ -1655,9 +1748,6 @@
   "Copy PID": {
     "Copy PID": "複製 PID"
   },
-  "Copy Path": {
-    "Copy Path": "複製路徑"
-  },
   "Copy Text": {
     "Copy Text": "複製文字"
   },
@@ -1672,6 +1762,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "邊角與背景"
+  },
+  "Couldn't open a terminal for the auto-login update.": {
+    "Couldn't open a terminal for the auto-login update.": ""
   },
   "Count Only": {
     "Count Only": "僅計數"
@@ -1714,12 +1807,6 @@
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
     "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab：切換分頁 • Ctrl+S：釘選/取消釘選 • Shift+Del：全部清除 • Esc：關閉"
-  },
-  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab：切換分頁 • Ctrl+S：釘選/取消釘選 • Shift+Enter：複製 • Shift+Del：全部清除 • Esc：關閉"
-  },
-  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab：切換分頁 • Ctrl+S：釘選/取消釘選 • Shift+Enter：貼上 • Shift+Del：全部清除 • Esc：關閉"
   },
   "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": {
     "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": ""
@@ -1777,6 +1864,9 @@
   },
   "Cursor Theme": {
     "Cursor Theme": "游標主題"
+  },
+  "Curve": {
+    "Curve": ""
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": "曲線：曲線光柵化器。"
@@ -1868,14 +1958,17 @@
   "DMS Settings": {
     "DMS Settings": ""
   },
-  "DMS Settings now writes Lua. Edits won't apply until you migrate.": {
-    "DMS Settings now writes Lua. Edits won't apply until you migrate.": ""
+  "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": {
+    "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": ""
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "DMS 捷徑"
   },
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": "DMS 歡迎介面需要：greetd, dms-greeter。指紋：fprintd, pam_fprintd。安全金鑰：pam_u2f。將您的使用者加入 greeter 群組。身份驗證變更會自動套用，當需要 sudo 身份驗證時可能會開啟終端機。"
+  },
+  "DMS needs administrator access. The terminal closes automatically when done.": {
+    "DMS needs administrator access. The terminal closes automatically when done.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS 已過期"
@@ -1930,9 +2023,6 @@
   },
   "Date Format": {
     "Date Format": "日期格式"
-  },
-  "Date format": {
-    "Date format": "日期格式"
   },
   "Date format on greeter": {
     "Date format on greeter": "歡迎畫面上的日期格式"
@@ -2018,6 +2108,9 @@
   "Delete Printer": {
     "Delete Printer": "刪除印表機"
   },
+  "Delete Rule": {
+    "Delete Rule": ""
+  },
   "Delete Saved Item?": {
     "Delete Saved Item?": "刪除已儲存項目？"
   },
@@ -2056,6 +2149,9 @@
   },
   "Desktop": {
     "Desktop": "桌面"
+  },
+  "Desktop Application": {
+    "Desktop Application": ""
   },
   "Desktop Clock": {
     "Desktop Clock": "桌面時鐘"
@@ -2131,6 +2227,9 @@
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "正在停用 Wi-Fi..."
+  },
+  "Disabling auto-login on startup…": {
+    "Disabling auto-login on startup…": ""
   },
   "Disc": {
     "Disc": "光碟"
@@ -2216,6 +2315,9 @@
   "Display line numbers in editor": {
     "Display line numbers in editor": ""
   },
+  "Display name for this entry": {
+    "Display name for this entry": ""
+  },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "只顯示包含視窗的工作區"
   },
@@ -2224,6 +2326,9 @@
   },
   "Display seconds in the clock": {
     "Display seconds in the clock": "在時鐘中顯示秒數"
+  },
+  "Display setup failed": {
+    "Display setup failed": ""
   },
   "Display the power system menu": {
     "Display the power system menu": "顯示電源系統選單"
@@ -2263,9 +2368,6 @@
   },
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": "Dock 邊距、透明度和邊框"
-  },
-  "Dock spacing, transparency, and border": {
-    "Dock spacing, transparency, and border": "停靠欄間距、透明度和邊界"
   },
   "Docs": {
     "Docs": "文件"
@@ -2359,6 +2461,9 @@
   },
   "Edit Clipboard": {
     "Edit Clipboard": ""
+  },
+  "Edit Rule": {
+    "Edit Rule": ""
   },
   "Edit Window Rule": {
     "Edit Window Rule": "編輯視窗規則"
@@ -2543,6 +2648,9 @@
   "Enterprise": {
     "Enterprise": "企業"
   },
+  "Entry Type": {
+    "Entry Type": ""
+  },
   "Entry pinned": {
     "Entry pinned": "項目已釘選"
   },
@@ -2633,9 +2741,6 @@
   "Failed to activate configuration": {
     "Failed to activate configuration": "無法啟動配置"
   },
-  "Failed to activate profile - file not found": {
-    "Failed to activate profile - file not found": "無法啟用設定檔 - 找不到檔案"
-  },
   "Failed to add binds include": {
     "Failed to add binds include": "新增綁定包含失敗"
   },
@@ -2660,9 +2765,6 @@
   "Failed to cancel selected job": {
     "Failed to cancel selected job": "取消選定工作失敗"
   },
-  "Failed to check for updates:\n%1": {
-    "Failed to check for updates:\n%1": "檢查更新失敗：\n%1"
-  },
   "Failed to check pin limit": {
     "Failed to check pin limit": "無法檢查釘選限制"
   },
@@ -2677,9 +2779,6 @@
   },
   "Failed to create printer": {
     "Failed to create printer": "無法建立印表機"
-  },
-  "Failed to create profiles directory": {
-    "Failed to create profiles directory": "無法建立設定檔目錄"
   },
   "Failed to delete VPN": {
     "Failed to delete VPN": "刪除 VPN 失敗"
@@ -2728,6 +2827,9 @@
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": ""
+  },
+  "Failed to generate systemd override": {
+    "Failed to generate systemd override": ""
   },
   "Failed to hold job": {
     "Failed to hold job": "無法保留工作"
@@ -2816,9 +2918,6 @@
   "Failed to save profile": {
     "Failed to save profile": "儲存設定檔失敗"
   },
-  "Failed to save profile file": {
-    "Failed to save profile file": "無法儲存設定檔"
-  },
   "Failed to send clipboard": {
     "Failed to send clipboard": "無法傳送剪貼簿"
   },
@@ -2875,6 +2974,12 @@
   },
   "Failed to update sharing": {
     "Failed to update sharing": "無法更新分享設定"
+  },
+  "Failed to write Hyprland outputs config.": {
+    "Failed to write Hyprland outputs config.": ""
+  },
+  "Failed to write autostart entry": {
+    "Failed to write autostart entry": ""
   },
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "寫入驗證的暫存檔案失敗"
@@ -2933,6 +3038,9 @@
   "Fill": {
     "Fill": "填滿"
   },
+  "Filter": {
+    "Filter": ""
+  },
   "Find in Text": {
     "Find in Text": "尋找文字"
   },
@@ -2947,9 +3055,6 @@
   },
   "Fingerprint error": {
     "Fingerprint error": "指紋錯誤"
-  },
-  "Fingerprint error: %1": {
-    "Fingerprint error: %1": "指紋錯誤：%1"
   },
   "Fingerprint not recognized (%1/%2). Please try again or use password.": {
     "Fingerprint not recognized (%1/%2). Please try again or use password.": "指紋無法識別 (%1/%2)。請再試一次或使用密碼。"
@@ -2996,6 +3101,9 @@
   "Float": {
     "Float": "浮動"
   },
+  "Floating": {
+    "Floating": ""
+  },
   "Fluent": {
     "Fluent": "流暢"
   },
@@ -3005,8 +3113,17 @@
   "Focus": {
     "Focus": "聚焦"
   },
+  "Focus Ring Color": {
+    "Focus Ring Color": ""
+  },
+  "Focus Ring Off": {
+    "Focus Ring Off": ""
+  },
   "Focus at Startup": {
     "Focus at Startup": "啟動時聚焦"
+  },
+  "Focused": {
+    "Focused": ""
   },
   "Focused Border": {
     "Focused Border": "聚焦邊框"
@@ -3089,6 +3206,9 @@
   "Force Kill (SIGKILL)": {
     "Force Kill (SIGKILL)": "強制終止 (SIGKILL)"
   },
+  "Force RGBX": {
+    "Force RGBX": ""
+  },
   "Force Wide Color": {
     "Force Wide Color": "強制廣色域"
   },
@@ -3128,12 +3248,6 @@
   "Format Legend": {
     "Format Legend": "格式說明"
   },
-  "Found %1 package to update:": {
-    "Found %1 package to update:": "找到 %1 個待更新套件："
-  },
-  "Found %1 packages to update:": {
-    "Found %1 packages to update:": "找到 %1 個待更新套件："
-  },
   "Frame": {
     "Frame": "框架"
   },
@@ -3170,11 +3284,11 @@
   "Full Day & Month": {
     "Full Day & Month": "完整月日"
   },
+  "Full command to execute": {
+    "Full command to execute": ""
+  },
   "Full with Year": {
     "Full with Year": "完整含年份"
-  },
-  "Full-featured launcher with mode tabs, grid view, and action panel.": {
-    "Full-featured launcher with mode tabs, grid view, and action panel.": ""
   },
   "Fullscreen": {
     "Fullscreen": "全螢幕"
@@ -3217,6 +3331,9 @@
   },
   "Gamma control not available. Requires DMS API v6+.": {
     "Gamma control not available. Requires DMS API v6+.": "Gamma 控制不可用。需要 DMS API v6+。"
+  },
+  "Generate Override": {
+    "Generate Override": ""
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "產生基準 GTK3/4 或 QT5/QT6（需要 qt6ct-kde）配置以遵循 DMS 顏色。僅需執行一次。<br /><br />建議在應用 GTK 主題之前配置<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a>。"
@@ -3422,12 +3539,6 @@
   "Hide Indicators": {
     "Hide Indicators": "隱藏指示器"
   },
-  "Hide Updater Widget": {
-    "Hide Updater Widget": "隱藏更新器小工具"
-  },
-  "Hide When Fullscreen": {
-    "Hide When Fullscreen": "全螢幕時隱藏"
-  },
   "Hide When Typing": {
     "Hide When Typing": "打字時隱藏"
   },
@@ -3458,8 +3569,8 @@
   "Hide the bar when the pointer leaves even if a popout is still open": {
     "Hide the bar when the pointer leaves even if a popout is still open": ""
   },
-  "Hide the dock when a window is fullscreen": {
-    "Hide the dock when a window is fullscreen": "當視窗全螢幕時隱藏 Dock"
+  "High": {
+    "High": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "保留來源色調的高保真調色板。"
@@ -3548,8 +3659,14 @@
   "Hyprland Website": {
     "Hyprland Website": "Hyprland 網站"
   },
-  "Hyprland config still uses hyprlang": {
-    "Hyprland config still uses hyprlang": ""
+  "Hyprland conf mode": {
+    "Hyprland conf mode": ""
+  },
+  "Hyprland conf mode is read-only in Settings": {
+    "Hyprland conf mode is read-only in Settings": ""
+  },
+  "Hyprland config include missing": {
+    "Hyprland config include missing": ""
   },
   "I Understand": {
     "I Understand": "我了解"
@@ -3590,14 +3707,17 @@
   "Idle": {
     "Idle": "閒置"
   },
+  "Idle Inhibit": {
+    "Idle Inhibit": ""
+  },
   "Idle Inhibitor": {
     "Idle Inhibitor": "空閒抑制器"
   },
   "Idle Settings": {
     "Idle Settings": "閒置設定"
   },
-  "Idle monitoring not supported - requires newer Quickshell version": {
-    "Idle monitoring not supported - requires newer Quickshell version": "不支援閒置監控 - 需要最新的 Quickshell 版本"
+  "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps": {
+    "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps": ""
   },
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "如果此欄位已隱藏，只要按下按鍵便會顯示。"
@@ -3676,6 +3796,9 @@
   },
   "Inhibitable": {
     "Inhibitable": "可抑制"
+  },
+  "Initialised": {
+    "Initialised": ""
   },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": ""
@@ -3893,9 +4016,6 @@
   "Launch on dGPU": {
     "Launch on dGPU": "在 dGPU 上啟動"
   },
-  "Launch on dGPU by default": {
-    "Launch on dGPU by default": "預設在獨顯上啟動"
-  },
   "Launcher": {
     "Launcher": "啟動器"
   },
@@ -3907,9 +4027,6 @@
   },
   "Launcher Emerge Side": {
     "Launcher Emerge Side": "啟動器彈出側邊"
-  },
-  "Launcher Style": {
-    "Launcher Style": ""
   },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": "圖層輪廓不透明度"
@@ -4040,9 +4157,6 @@
   "Log Out": {
     "Log Out": "登出"
   },
-  "Log out": {
-    "Log out": ""
-  },
   "Logging in...": {
     "Logging in...": "正在登入..."
   },
@@ -4063,6 +4177,9 @@
   },
   "Longitude": {
     "Longitude": "經度"
+  },
+  "Low": {
+    "Low": ""
   },
   "Low Priority": {
     "Low Priority": "低優先級"
@@ -4093,9 +4210,6 @@
   },
   "Managed by Frame": {
     "Managed by Frame": "由框架管理"
-  },
-  "Managed by Frame Mode": {
-    "Managed by Frame Mode": ""
   },
   "Managed by Frame in Connected Mode": {
     "Managed by Frame in Connected Mode": "在連接模式下由框架管理"
@@ -4148,11 +4262,14 @@
   "Marker Waste Full": {
     "Marker Waste Full": "標記廢料已滿"
   },
+  "Match (%1)": {
+    "Match (%1)": ""
+  },
+  "Match Conditions": {
+    "Match Conditions": ""
+  },
   "Match Criteria": {
     "Match Criteria": "符合條件"
-  },
-  "Matches profile: %1": {
-    "Matches profile: %1": "符合設定檔：%1"
   },
   "Material": {
     "Material": "材質"
@@ -4283,9 +4400,6 @@
   "Media Player Settings": {
     "Media Player Settings": "媒體播放設定"
   },
-  "Media Players": {
-    "Media Players": "媒體播放器"
-  },
   "Media Players (": {
     "Media Players (": "媒體播放 ("
   },
@@ -4342,9 +4456,6 @@
   },
   "Min W": {
     "Min W": "最小寬度"
-  },
-  "Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.": {
-    "Minimal Spotlight-style bar: appears instantly at the top of the screen and expands as you type.": ""
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "圍繞單一色調構建的最小調色板。"
@@ -4487,6 +4598,9 @@
   "Named Workspace Icons": {
     "Named Workspace Icons": "命名工作區圖示"
   },
+  "Native": {
+    "Native": ""
+  },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "原生：平台渲染器 (FreeType)。"
   },
@@ -4598,9 +4712,6 @@
   "No Background": {
     "No Background": "部件無背景"
   },
-  "No Battery": {
-    "No Battery": "無電池"
-  },
   "No Bluetooth adapter found": {
     "No Bluetooth adapter found": "未找到藍芽適配器"
   },
@@ -4670,6 +4781,9 @@
   "No app customizations.": {
     "No app customizations.": "沒有應用程式自訂設定。"
   },
+  "No application selected": {
+    "No application selected": ""
+  },
   "No apps found": {
     "No apps found": "未找到應用程式"
   },
@@ -4678,6 +4792,9 @@
   },
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
     "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "未靜音任何應用程式。右鍵點擊通知並選擇「靜音彈出視窗」以在此處添加一個。"
+  },
+  "No autostart entries": {
+    "No autostart entries": ""
   },
   "No battery": {
     "No battery": "無電池"
@@ -4784,9 +4901,6 @@
   "No output devices found": {
     "No output devices found": "找不到輸出裝置"
   },
-  "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
-    "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": "未找到套件管理器。請在基於 Arch 的系統上安裝 'paru' 或 'yay' 來檢查更新。"
-  },
   "No peers found": {
     "No peers found": "未找到對等點"
   },
@@ -4877,6 +4991,9 @@
   "No window rules configured": {
     "No window rules configured": "未設定任何視窗規則"
   },
+  "Noise": {
+    "Noise": ""
+  },
   "None": {
     "None": "無"
   },
@@ -4915,6 +5032,9 @@
   },
   "Not detected": {
     "Not detected": "未偵測到"
+  },
+  "Not listed?": {
+    "Not listed?": ""
   },
   "Not paired": {
     "Not paired": "未配對"
@@ -5105,6 +5225,9 @@
   "Opening files": {
     "Opening files": "正在開啟檔案"
   },
+  "Opening terminal to update greetd": {
+    "Opening terminal to update greetd": ""
+  },
   "Opening terminal: ": {
     "Opening terminal: ": "正在開啟終端機："
   },
@@ -5122,6 +5245,9 @@
   },
   "Optional location": {
     "Optional location": "選填位置"
+  },
+  "Optional state-based conditions applied to the first match.": {
+    "Optional state-based conditions applied to the first match.": ""
   },
   "Options": {
     "Options": "選項"
@@ -5146,9 +5272,6 @@
   },
   "Output Area Full": {
     "Output Area Full": "輸出區域已滿"
-  },
-  "Output Device": {
-    "Output Device": "輸出裝置"
   },
   "Output Devices": {
     "Output Devices": "輸出裝置"
@@ -5507,9 +5630,6 @@
   "Popup Shadow": {
     "Popup Shadow": "彈出視窗陰影"
   },
-  "Popup Transparency": {
-    "Popup Transparency": "彈窗透明度"
-  },
   "Popup behavior, position": {
     "Popup behavior, position": "彈出視窗行為與位置"
   },
@@ -5542,6 +5662,9 @@
   },
   "Power Menu Customization": {
     "Power Menu Customization": "電源選單自訂"
+  },
+  "Power Mode": {
+    "Power Mode": ""
   },
   "Power Off": {
     "Power Off": "關機"
@@ -5702,6 +5825,9 @@
   "Protocol": {
     "Protocol": "協定"
   },
+  "Qt": {
+    "Qt": ""
+  },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": ""
   },
@@ -5758,6 +5884,9 @@
   },
   "Re-enter password": {
     "Re-enter password": ""
+  },
+  "Read-only legacy config": {
+    "Read-only legacy config": ""
   },
   "Read:": {
     "Read:": "讀取："
@@ -5858,6 +5987,9 @@
   "Remove inner padding from all widgets": {
     "Remove inner padding from all widgets": ""
   },
+  "Remove match": {
+    "Remove match": ""
+  },
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": ""
   },
@@ -5917,6 +6049,9 @@
   },
   "Requires night mode support": {
     "Requires night mode support": "需要夜間模式支援"
+  },
+  "Requires remembering the last user and session. Enable those options first.": {
+    "Requires remembering the last user and session. Enable those options first.": ""
   },
   "Reset": {
     "Reset": "重設"
@@ -6026,6 +6161,9 @@
   "Rules (%1)": {
     "Rules (%1)": "規則 (%1)"
   },
+  "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.": {
+    "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.": ""
+  },
   "Run Again": {
     "Run Again": "重新執行"
   },
@@ -6064,6 +6202,9 @@
   },
   "SMS": {
     "SMS": "簡訊"
+  },
+  "Saturation": {
+    "Saturation": ""
   },
   "Save": {
     "Save": "儲存"
@@ -6140,9 +6281,6 @@
   "Score": {
     "Score": "分數"
   },
-  "Screen Sharing": {
-    "Screen Sharing": "螢幕分享"
-  },
   "Screen sharing": {
     "Screen sharing": "螢幕分享"
   },
@@ -6175,6 +6313,9 @@
   },
   "Search Options": {
     "Search Options": "搜尋選項"
+  },
+  "Search applications...": {
+    "Search applications...": ""
   },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "按組合鍵、描述或動作名稱搜尋。\n\n預設動作將綁定鍵複製到剪貼簿。\n右鍵點擊或按右箭頭以釘選常用綁定鍵 — 搜尋時它們將出現在頂部。"
@@ -6277,6 +6418,9 @@
   },
   "Select a color from the palette or use custom sliders": {
     "Select a color from the palette or use custom sliders": "從調色板中選取一個顏色，或使用滑條調整"
+  },
+  "Select a desktop application": {
+    "Select a desktop application": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "選取一個小工具以新增至您的桌面。每個小工具都是獨立的實例，擁有自己的設定。"
@@ -6458,20 +6602,11 @@
   "Shell": {
     "Shell": "Shell"
   },
-  "Shift+Del: Clear All • Esc: Close": {
-    "Shift+Del: Clear All • Esc: Close": "Shift+Del: 清除所有 • Esc: 關閉"
-  },
   "Shift+Enter to copy": {
     "Shift+Enter to copy": ""
   },
   "Shift+Enter to paste": {
     "Shift+Enter to paste": "Shift+Enter 貼上"
-  },
-  "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
-    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Shift+Enter: 複製 • Shift+Del: 清除全部 • Esc: 關閉"
-  },
-  "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
-    "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": "Shift+Enter：貼上 • Shift+Del：全部清除 • Esc：關閉"
   },
   "Short": {
     "Short": "短"
@@ -6544,6 +6679,9 @@
   },
   "Show Humidity": {
     "Show Humidity": "顯示濕度"
+  },
+  "Show Icon": {
+    "Show Icon": ""
   },
   "Show Launcher Button": {
     "Show Launcher Button": "顯示啟動器按鈕"
@@ -6698,6 +6836,9 @@
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "在底部顯示模式分頁與鍵盤提示。"
   },
+  "Show mount path": {
+    "Show mount path": ""
+  },
   "Show notification popups only on the currently focused monitor": {
     "Show notification popups only on the currently focused monitor": "僅在當前焦點顯示器上顯示通知彈出視窗"
   },
@@ -6748,9 +6889,6 @@
   },
   "Show on-screen display when volume changes": {
     "Show on-screen display when volume changes": "音量改變時顯示螢幕顯示"
-  },
-  "Show seconds": {
-    "Show seconds": "顯示秒"
   },
   "Show the bar only when no windows are open": {
     "Show the bar only when no windows are open": ""
@@ -6824,6 +6962,9 @@
   "Skip setup": {
     "Skip setup": "跳過設定"
   },
+  "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": {
+    "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": ""
+  },
   "Small": {
     "Small": "小"
   },
@@ -6856,6 +6997,9 @@
   },
   "Sounds": {
     "Sounds": "聲音"
+  },
+  "Source: %1": {
+    "Source: %1": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": ""
@@ -6949,9 +7093,6 @@
   },
   "Stripes": {
     "Stripes": "條紋"
-  },
-  "Style": {
-    "Style": ""
   },
   "Summary": {
     "Summary": "摘要"
@@ -7085,8 +7226,8 @@
   "System toast notifications": {
     "System toast notifications": "系統快顯通知"
   },
-  "System update custom command": {
-    "System update custom command": "自訂系統更新指令"
+  "Systemd Override generated": {
+    "Systemd Override generated": ""
   },
   "Tab": {
     "Tab": "分頁"
@@ -7111,9 +7252,6 @@
   },
   "Terminal additional parameters": {
     "Terminal additional parameters": "終端機額外參數"
-  },
-  "Terminal custom additional parameters": {
-    "Terminal custom additional parameters": "自訂終端附加參數"
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "終端機備用失敗。請安裝支援的終端機模擬器或手動執行 'dms auth sync'。"
@@ -7178,6 +7316,9 @@
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "此印表機的工作佇列為空"
   },
+  "The rule applies to any window matching one of these.": {
+    "The rule applies to any window matching one of these.": ""
+  },
   "Theme & Colors": {
     "Theme & Colors": "主題和顏色"
   },
@@ -7199,6 +7340,9 @@
   "Themes": {
     "Themes": "主題"
   },
+  "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
+    "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": ""
+  },
   "Thickness": {
     "Thickness": "粗細"
   },
@@ -7216,6 +7360,18 @@
   },
   "This device": {
     "This device": "此裝置"
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.": ""
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": ""
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": ""
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "這可能需要幾秒鐘"
@@ -7273,9 +7429,6 @@
   },
   "Time Format": {
     "Time Format": "時間格式"
-  },
-  "Time format": {
-    "Time format": "時間格式"
   },
   "Time remaining: %1": {
     "Time remaining: %1": "剩餘時間：%1"
@@ -7418,6 +7571,9 @@
   "Trash command failed (exit %1)": {
     "Trash command failed (exit %1)": "垃圾桶指令失敗（返回碼 %1）"
   },
+  "Tray Icon Fix": {
+    "Tray Icon Fix": ""
+  },
   "Trending GIFs": {
     "Trending GIFs": "熱門 GIF"
   },
@@ -7483,6 +7639,9 @@
   },
   "Unavailable": {
     "Unavailable": "不可用"
+  },
+  "Uncategorized": {
+    "Uncategorized": ""
   },
   "Unfocused Color": {
     "Unfocused Color": "未聚焦顏色"
@@ -7622,6 +7781,9 @@
   "Uptime:": {
     "Uptime:": "開機時間："
   },
+  "Urgent": {
+    "Urgent": ""
+  },
   "Urgent Color": {
     "Urgent Color": "緊急顏色"
   },
@@ -7655,9 +7817,6 @@
   "Use Overlay Layer": {
     "Use Overlay Layer": ""
   },
-  "Use Spotlight Launcher": {
-    "Use Spotlight Launcher": ""
-  },
   "Use System Theme": {
     "Use System Theme": "使用系統主題"
   },
@@ -7685,12 +7844,6 @@
   "Use custom border/focus-ring width": {
     "Use custom border/focus-ring width": "使用自訂邊框/焦點環寬度"
   },
-  "Use custom command": {
-    "Use custom command": "使用自訂指令"
-  },
-  "Use custom command for update your system": {
-    "Use custom command for update your system": "使用自訂指令更新您的系統"
-  },
   "Use custom gaps instead of bar spacing": {
     "Use custom gaps instead of bar spacing": "使用自訂間距而非預設間距"
   },
@@ -7706,6 +7859,9 @@
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": "使用指紋驗證鎖定螢幕。"
   },
+  "Use keys 1-3 or arrows, Enter/Space to select": {
+    "Use keys 1-3 or arrows, Enter/Space to select": ""
+  },
   "Use light theme instead of dark theme": {
     "Use light theme instead of dark theme": "使用淺色主題而不是深色主題"
   },
@@ -7717,9 +7873,6 @@
   },
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "使用系統設定中的音效主題"
-  },
-  "Use the centered minimal launcher instead of the connected V2 launcher": {
-    "Use the centered minimal launcher instead of the connected V2 launcher": ""
   },
   "Use the extended surface for launcher content": {
     "Use the extended surface for launcher content": "使用延伸表面作為啟動器內容"
@@ -7741,6 +7894,9 @@
   },
   "User": {
     "User": "使用者"
+  },
+  "User Window Rules (%1)": {
+    "User Window Rules (%1)": ""
   },
   "User already exists": {
     "User already exists": ""
@@ -7850,6 +8006,9 @@
   "Vertical Tiling": {
     "Vertical Tiling": "垂直平鋪"
   },
+  "Very High": {
+    "Very High": ""
+  },
   "Vibrant": {
     "Vibrant": "鮮豔"
   },
@@ -7957,9 +8116,6 @@
   },
   "When locked": {
     "When locked": "鎖定時"
-  },
-  "When updater widget is used, then hide it if no update found": {
-    "When updater widget is used, then hide it if no update found": "使用更新小工具時，若無更新則隱藏"
   },
   "Wi-Fi Password": {
     "Wi-Fi Password": "Wi-Fi 密碼"
@@ -8114,11 +8270,23 @@
   "Workspaces & Widgets": {
     "Workspaces & Widgets": "工作區與小工具"
   },
+  "Wrap the app command. %command% is replaced with the actual executable": {
+    "Wrap the app command. %command% is replaced with the actual executable": ""
+  },
   "Write:": {
     "Write:": "寫入："
   },
   "X Axis": {
     "X Axis": "X 軸"
+  },
+  "X-Ray": {
+    "X-Ray": ""
+  },
+  "XWayland": {
+    "XWayland": ""
+  },
+  "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
+    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": ""
   },
   "Y Axis": {
     "Y Axis": "Y 軸"
@@ -8144,8 +8312,17 @@
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "您需要設定以下其中一個環境變數並重新啟動 shell：\nQT_QPA_PLATFORMTHEME=gtk3 或\nQT_QPA_PLATFORMTHEME=qt6ct\n\nqt6ct 需要安裝 qt6ct-kde。"
   },
+  "You'll enter your password at the greeter after the next reboot.": {
+    "You'll enter your password at the greeter after the next reboot.": ""
+  },
+  "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": {
+    "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": ""
+  },
   "You're All Set!": {
     "You're All Set!": "一切就緒！"
+  },
+  "Your compositor does not support background blur (ext-background-effect-v1)": {
+    "Your compositor does not support background blur (ext-background-effect-v1)": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "您的系統是最新版本！"
@@ -8192,6 +8369,12 @@
   "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": {
     "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": "dms/outputs 組態存在，但未包含在您的合成器組態中。顯示變更將不會保留。"
   },
+  "e.g. /usr/bin/my-script --flag": {
+    "e.g. /usr/bin/my-script --flag": ""
+  },
+  "e.g. My Script": {
+    "e.g. My Script": ""
+  },
   "e.g. alice": {
     "e.g. alice": ""
   },
@@ -8200,6 +8383,9 @@
   },
   "e.g., focus-workspace 3, resize-column -10": {
     "e.g., focus-workspace 3, resize-column -10": "例如，focus-workspace 3, resize-column -10"
+  },
+  "e.g., hl.dsp.focus({ workspace = \"3\" })": {
+    "e.g., hl.dsp.focus({ workspace = \"3\" })": ""
   },
   "e.g., notify-send 'Hello' && sleep 1": {
     "e.g., notify-send 'Hello' && sleep 1": "例如：notify-send 'Hello' && sleep 1"
@@ -8215,9 +8401,6 @@
   },
   "featured": {
     "featured": "精選"
-  },
-  "greeter": {
-    "greeter": ""
   },
   "last seen %1": {
     "last seen %1": "上次看到 %1"
@@ -8399,13 +8582,7 @@
   "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
     "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": ""
   },
-  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": {
-    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": "↑/↓: 導航 • Enter/Ctrl+C: 複製 • Del: 刪除 • F10: 幫助"
-  },
   "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
     "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": ""
-  },
-  "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": {
-    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: 導航 • Enter: 貼上 • Del: 刪除 • F10: 幫助"
   }
 }

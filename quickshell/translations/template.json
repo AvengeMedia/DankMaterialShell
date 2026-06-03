@@ -1,5 +1,12 @@
 [
   {
+    "term": "%1 (+%2 more)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 Animation Speed",
     "translation": "",
     "context": "",
@@ -245,6 +252,13 @@
     "comment": ""
   },
   {
+    "term": "%command%",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
     "translation": "",
     "context": "lock screen U2F security key mode setting",
@@ -449,13 +463,6 @@
   },
   {
     "term": "24-hour clock",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "24-hour format",
     "translation": "",
     "context": "",
     "reference": "",
@@ -875,6 +882,13 @@
     "comment": ""
   },
   {
+    "term": "Active in Column",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Active tile background and icon color",
     "translation": "",
     "context": "control center tile color setting description",
@@ -952,6 +966,13 @@
     "comment": ""
   },
   {
+    "term": "Add Entry",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Add Printer",
     "translation": "",
     "context": "",
@@ -973,7 +994,14 @@
     "comment": ""
   },
   {
-    "term": "Add Widget to %1 Section",
+    "term": "Add Widget to %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Add Window Rule",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1008,6 +1036,13 @@
     "comment": ""
   },
   {
+    "term": "Add match",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Add the new user to the %1 group so they can run dms greeter sync --profile.",
     "translation": "",
     "context": "",
@@ -1016,6 +1051,13 @@
   },
   {
     "term": "Add the new user to the %1 group so they can use sudo.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Add to Autostart",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1073,7 +1115,7 @@
   {
     "term": "All",
     "translation": "",
-    "context": "Tailscale filter: all devices | notification history filter",
+    "context": "Tailscale filter: all devices | notification history filter | plugin browser category filter",
     "reference": "",
     "comment": ""
   },
@@ -1274,6 +1316,20 @@
     "comment": ""
   },
   {
+    "term": "Any",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Any window",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "App Customizations",
     "translation": "",
     "context": "",
@@ -1281,7 +1337,21 @@
     "comment": ""
   },
   {
+    "term": "App ID",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "App ID Substitutions",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "App ID regex",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1323,6 +1393,13 @@
     "comment": ""
   },
   {
+    "term": "Application",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Application Dock",
     "translation": "",
     "context": "",
@@ -1331,6 +1408,13 @@
   },
   {
     "term": "Applications",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Applications and commands to start automatically when you log in",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1387,6 +1471,13 @@
   },
   {
     "term": "Applying authentication changes…",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Applying auto-login on startup…",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1464,6 +1555,13 @@
   },
   {
     "term": "Arrange displays and configure resolution, refresh rate, and VRR",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "At Startup",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1750,6 +1848,34 @@
     "comment": ""
   },
   {
+    "term": "Auto-login",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Auto-login disabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Auto-login enabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Auto-login on startup",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Auto-saving...",
     "translation": "",
     "context": "",
@@ -1876,6 +2002,20 @@
     "comment": ""
   },
   {
+    "term": "Autostart Apps",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Autostart Entries",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Available",
     "translation": "",
     "context": "",
@@ -1939,6 +2079,13 @@
     "comment": ""
   },
   {
+    "term": "Back to user list",
+    "translation": "",
+    "context": "greeter link to return from manual username entry to user picker",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Backend",
     "translation": "",
     "context": "",
@@ -1961,6 +2108,13 @@
   },
   {
     "term": "Background Blur",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Background Effect",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2052,13 +2206,6 @@
   },
   {
     "term": "Bar spacing and size",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Bar transparency",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2165,7 +2312,7 @@
   {
     "term": "Black",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -2226,6 +2373,13 @@
     "comment": ""
   },
   {
+    "term": "Blur",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Blur Border Color",
     "translation": "",
     "context": "",
@@ -2277,7 +2431,7 @@
   {
     "term": "Bold",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -2290,6 +2444,13 @@
   },
   {
     "term": "Border Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Border Off",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2338,7 +2499,14 @@
     "comment": ""
   },
   {
-    "term": "Border with BG",
+    "term": "Border w/ Bg",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Border with Background",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2646,6 +2814,20 @@
     "comment": ""
   },
   {
+    "term": "Cast Target",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Category",
+    "translation": "",
+    "context": "plugin browser sort option",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Center Section",
     "translation": "",
     "context": "",
@@ -2835,6 +3017,13 @@
     "comment": ""
   },
   {
+    "term": "Choose a power profile",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose colors from palette",
     "translation": "",
     "context": "",
@@ -2905,6 +3094,13 @@
     "comment": ""
   },
   {
+    "term": "Choose whether to launch a desktop app or a command",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose which displays show this widget",
     "translation": "",
     "context": "",
@@ -2936,6 +3132,13 @@
     "term": "Circle",
     "translation": "",
     "context": "dock indicator style option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Class regex",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -3095,6 +3298,13 @@
   },
   {
     "term": "Clipboard Manager",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Clipboard Saved",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3319,6 +3529,13 @@
   },
   {
     "term": "Command",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Command Line",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3647,6 +3864,13 @@
     "comment": ""
   },
   {
+    "term": "Contributor",
+    "translation": "",
+    "context": "plugin browser sort option",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Control Center",
     "translation": "",
     "context": "greeter feature card title",
@@ -3759,6 +3983,13 @@
     "comment": ""
   },
   {
+    "term": "Convert to DMS",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Cooldown",
     "translation": "",
     "context": "",
@@ -3843,13 +4074,6 @@
     "comment": ""
   },
   {
-    "term": "Copy Path",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Copy Text",
     "translation": "",
     "context": "",
@@ -3879,6 +4103,13 @@
   },
   {
     "term": "Corners & Background",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Couldn't open a terminal for the auto-login update.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4116,6 +4347,13 @@
     "comment": ""
   },
   {
+    "term": "Curve",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Curve: curve rasterizer.",
     "translation": "",
     "context": "",
@@ -4326,7 +4564,7 @@
     "comment": ""
   },
   {
-    "term": "DMS Settings now writes Lua. Edits won't apply until you migrate.",
+    "term": "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4341,6 +4579,13 @@
   },
   {
     "term": "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "DMS needs administrator access. The terminal closes automatically when done.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4473,13 +4718,6 @@
     "comment": ""
   },
   {
-    "term": "Date format",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Date format on greeter",
     "translation": "",
     "context": "",
@@ -4545,7 +4783,7 @@
   {
     "term": "Default",
     "translation": "",
-    "context": "notification rule action option | notification rule urgency option | widget style option",
+    "context": "notification rule action option | notification rule urgency option | plugin browser sort option | widget style option",
     "reference": "",
     "comment": ""
   },
@@ -4676,6 +4914,13 @@
     "comment": ""
   },
   {
+    "term": "Delete Rule",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Delete Saved Item?",
     "translation": "",
     "context": "",
@@ -4720,7 +4965,7 @@
   {
     "term": "Demi Bold",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -4761,6 +5006,13 @@
   },
   {
     "term": "Desktop",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Desktop Application",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4938,6 +5190,13 @@
     "term": "Disabling WiFi...",
     "translation": "",
     "context": "network status",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Disabling auto-login on startup…",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -5138,6 +5397,13 @@
     "comment": ""
   },
   {
+    "term": "Display name for this entry",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Display only workspaces that contain windows",
     "translation": "",
     "context": "",
@@ -5153,6 +5419,13 @@
   },
   {
     "term": "Display seconds in the clock",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Display setup failed",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5461,6 +5734,13 @@
   },
   {
     "term": "Edit Clipboard",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Edit Rule",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5894,6 +6174,13 @@
     "comment": ""
   },
   {
+    "term": "Entry Type",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Entry pinned",
     "translation": "",
     "context": "",
@@ -6050,14 +6337,14 @@
   {
     "term": "Extra Bold",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Extra Light",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -6301,6 +6588,13 @@
   },
   {
     "term": "Failed to fetch network QR code: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to generate systemd override",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6643,6 +6937,20 @@
     "comment": ""
   },
   {
+    "term": "Failed to write Hyprland outputs config.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to write autostart entry",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to write temp file for validation",
     "translation": "",
     "context": "",
@@ -6772,6 +7080,13 @@
     "term": "Fill",
     "translation": "",
     "context": "wallpaper fill mode",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Filter",
+    "translation": "",
+    "context": "plugin browser category filter label",
     "reference": "",
     "comment": ""
   },
@@ -6916,6 +7231,13 @@
     "comment": ""
   },
   {
+    "term": "Floating",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Fluent",
     "translation": "",
     "context": "",
@@ -6937,7 +7259,28 @@
     "comment": ""
   },
   {
+    "term": "Focus Ring Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Focus Ring Off",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Focus at Startup",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Focused",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6966,13 +7309,6 @@
   },
   {
     "term": "Focused Window",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Focused monitor only",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7127,6 +7463,13 @@
   },
   {
     "term": "Force Kill (SIGKILL)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Force RGBX",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7308,6 +7651,13 @@
     "comment": ""
   },
   {
+    "term": "Full command to execute",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Full with Year",
     "translation": "",
     "context": "date format option",
@@ -7407,6 +7757,13 @@
   },
   {
     "term": "Gamma control not available. Requires DMS API v6+.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Generate Override",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7959,6 +8316,13 @@
     "comment": ""
   },
   {
+    "term": "High",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "High-fidelity palette that preserves source hues.",
     "translation": "",
     "context": "",
@@ -8162,7 +8526,21 @@
     "comment": ""
   },
   {
-    "term": "Hyprland config still uses hyprlang",
+    "term": "Hyprland conf mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Hyprland conf mode is read-only in Settings",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Hyprland config include missing",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8260,6 +8638,13 @@
     "comment": ""
   },
   {
+    "term": "Idle Inhibit",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Idle Inhibitor",
     "translation": "",
     "context": "",
@@ -8268,6 +8653,13 @@
   },
   {
     "term": "Idle Settings",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8456,6 +8848,13 @@
     "comment": ""
   },
   {
+    "term": "Initialised",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Inner padding applied to each widget",
     "translation": "",
     "context": "",
@@ -8584,7 +8983,7 @@
   {
     "term": "Installed",
     "translation": "",
-    "context": "installed status",
+    "context": "installed status | plugin browser filter chip",
     "reference": "",
     "comment": ""
   },
@@ -9039,7 +9438,7 @@
   {
     "term": "Light",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -9289,13 +9688,6 @@
     "comment": ""
   },
   {
-    "term": "Log out",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Logging in...",
     "translation": "",
     "context": "",
@@ -9339,6 +9731,13 @@
   },
   {
     "term": "Longitude",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Low",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9528,6 +9927,20 @@
   },
   {
     "term": "Marker Waste Full",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Match (%1)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Match Conditions",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9842,13 +10255,6 @@
     "comment": ""
   },
   {
-    "term": "Media Players",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Media Players (",
     "translation": "",
     "context": "",
@@ -9865,7 +10271,7 @@
   {
     "term": "Medium",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -10299,12 +10705,19 @@
   {
     "term": "Name",
     "translation": "",
-    "context": "",
+    "context": "plugin browser sort option",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Named Workspace Icons",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Native",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10570,13 +10983,6 @@
     "comment": ""
   },
   {
-    "term": "No Battery",
-    "translation": "",
-    "context": "battery status",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "No Bluetooth adapter found",
     "translation": "",
     "context": "",
@@ -10738,6 +11144,13 @@
     "comment": ""
   },
   {
+    "term": "No application selected",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No apps found",
     "translation": "",
     "context": "",
@@ -10759,9 +11172,16 @@
     "comment": ""
   },
   {
-    "term": "No battery",
+    "term": "No autostart entries",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No battery",
+    "translation": "",
+    "context": "battery status",
     "reference": "",
     "comment": ""
   },
@@ -11214,6 +11634,13 @@
     "comment": ""
   },
   {
+    "term": "Noise",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "None",
     "translation": "",
     "context": "wallpaper transition option",
@@ -11301,6 +11728,13 @@
     "term": "Not detected",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Not listed?",
+    "translation": "",
+    "context": "greeter link to switch to manual username entry",
     "reference": "",
     "comment": ""
   },
@@ -11529,13 +11963,6 @@
     "comment": ""
   },
   {
-    "term": "On-Screen Displays",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "On-screen Displays",
     "translation": "",
     "context": "",
@@ -11746,6 +12173,13 @@
     "comment": ""
   },
   {
+    "term": "Opening terminal to update greetd",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Opening terminal: ",
     "translation": "",
     "context": "",
@@ -11782,6 +12216,13 @@
   },
   {
     "term": "Optional location",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Optional state-based conditions applied to the first match.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11838,13 +12279,6 @@
   },
   {
     "term": "Output Area Full",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Output Device",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12544,13 +12978,6 @@
     "comment": ""
   },
   {
-    "term": "Plugged in",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Plugin",
     "translation": "",
     "context": "",
@@ -12755,6 +13182,13 @@
   },
   {
     "term": "Power Menu Customization",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Power Mode",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13132,6 +13566,13 @@
     "comment": ""
   },
   {
+    "term": "Qt",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Qt colors applied successfully",
     "translation": "",
     "context": "",
@@ -13265,6 +13706,13 @@
     "comment": ""
   },
   {
+    "term": "Read-only legacy config",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Read:",
     "translation": "",
     "context": "disk read label",
@@ -13344,7 +13792,7 @@
   {
     "term": "Regular",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -13496,6 +13944,13 @@
     "comment": ""
   },
   {
+    "term": "Remove match",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Remove the shortcut %1?",
     "translation": "",
     "context": "",
@@ -13630,6 +14085,13 @@
   },
   {
     "term": "Requires night mode support",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Requires remembering the last user and session. Enable those options first.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13888,6 +14350,13 @@
     "comment": ""
   },
   {
+    "term": "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Run Again",
     "translation": "",
     "context": "greeter doctor page button",
@@ -13975,6 +14444,13 @@
     "term": "SMS",
     "translation": "",
     "context": "KDE Connect SMS tooltip",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Saturation",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -14154,13 +14630,6 @@
     "comment": ""
   },
   {
-    "term": "Screen Sharing",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Screen sharing",
     "translation": "",
     "context": "",
@@ -14232,6 +14701,13 @@
   },
   {
     "term": "Search Options",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Search applications...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14470,6 +14946,13 @@
   },
   {
     "term": "Select a color from the palette or use custom sliders",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select a desktop application",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15078,6 +15561,13 @@
     "comment": ""
   },
   {
+    "term": "Show Icon",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show Launcher Button",
     "translation": "",
     "context": "",
@@ -15435,6 +15925,13 @@
     "comment": ""
   },
   {
+    "term": "Show mount path",
+    "translation": "",
+    "context": "toggle in control center disk usage widget to turn mount path display on or off",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show notification popups only on the currently focused monitor",
     "translation": "",
     "context": "",
@@ -15548,13 +16045,6 @@
   },
   {
     "term": "Show on-screen display when volume changes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Show seconds",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15729,6 +16219,13 @@
     "comment": ""
   },
   {
+    "term": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Small",
     "translation": "",
     "context": "",
@@ -15800,6 +16297,13 @@
   },
   {
     "term": "Sounds",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Source: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16331,6 +16835,13 @@
     "comment": ""
   },
   {
+    "term": "Systemd Override generated",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Tab",
     "translation": "",
     "context": "",
@@ -16534,6 +17045,13 @@
     "comment": ""
   },
   {
+    "term": "The rule applies to any window matching one of these.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Theme & Colors",
     "translation": "",
     "context": "greeter settings link",
@@ -16583,6 +17101,13 @@
     "comment": ""
   },
   {
+    "term": "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Thickness",
     "translation": "",
     "context": "border thickness",
@@ -16592,7 +17117,7 @@
   {
     "term": "Thin",
     "translation": "",
-    "context": "",
+    "context": "font weight",
     "reference": "",
     "comment": ""
   },
@@ -16621,6 +17146,34 @@
     "term": "This device",
     "translation": "",
     "context": "Label for the user's own device in Tailscale",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -16752,13 +17305,6 @@
   },
   {
     "term": "Time Format",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Time format",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17094,6 +17640,13 @@
     "comment": ""
   },
   {
+    "term": "Tray Icon Fix",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Trending GIFs",
     "translation": "",
     "context": "",
@@ -17244,6 +17797,13 @@
     "term": "Unavailable",
     "translation": "",
     "context": "Phone Connect unavailable status",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Uncategorized",
+    "translation": "",
+    "context": "plugin browser category filter",
     "reference": "",
     "comment": ""
   },
@@ -17570,6 +18130,13 @@
     "comment": ""
   },
   {
+    "term": "Urgent",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Urgent Color",
     "translation": "",
     "context": "",
@@ -17710,13 +18277,6 @@
     "comment": ""
   },
   {
-    "term": "Use custom command",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Use custom gaps instead of bar spacing",
     "translation": "",
     "context": "",
@@ -17746,6 +18306,13 @@
   },
   {
     "term": "Use fingerprint authentication for the lock screen.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use keys 1-3 or arrows, Enter/Space to select",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17823,6 +18390,13 @@
   },
   {
     "term": "User",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "User Window Rules (%1)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17976,13 +18550,6 @@
     "comment": ""
   },
   {
-    "term": "VPN connections",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "VPN deleted",
     "translation": "",
     "context": "",
@@ -18075,6 +18642,13 @@
   },
   {
     "term": "Vertical Tiling",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Very High",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18690,6 +19264,13 @@
     "comment": ""
   },
   {
+    "term": "Wrap the app command. %command% is replaced with the actual executable",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Write:",
     "translation": "",
     "context": "disk write label",
@@ -18698,6 +19279,27 @@
   },
   {
     "term": "X Axis",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "X-Ray",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "XWayland",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18760,9 +19362,30 @@
     "comment": ""
   },
   {
+    "term": "You'll enter your password at the greeter after the next reboot.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "You're All Set!",
     "translation": "",
     "context": "greeter completion page title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Your compositor does not support background blur (ext-background-effect-v1)",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -18872,6 +19495,20 @@
     "comment": ""
   },
   {
+    "term": "e.g. /usr/bin/my-script --flag",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "e.g. My Script",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "e.g. alice",
     "translation": "",
     "context": "",
@@ -18887,6 +19524,13 @@
   },
   {
     "term": "e.g., focus-workspace 3, resize-column -10",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "e.g., hl.dsp.focus({ workspace = \"3\" })",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18922,13 +19566,6 @@
   },
   {
     "term": "featured",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "greeter",
     "translation": "",
     "context": "",
     "reference": "",

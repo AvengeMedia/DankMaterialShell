@@ -1131,7 +1131,7 @@ Item {
                         }
 
                         StyledText {
-                            text: I18n.tr("24-hour format")
+                            text: I18n.tr("24-Hour Format")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             anchors.verticalCenter: parent.verticalCenter

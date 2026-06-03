@@ -250,7 +250,7 @@ DankModal {
 
                     DankButton {
                         visible: SessionsService.otherSessions().length === 0 && !root.lockOnSwitch
-                        text: I18n.tr("Log out")
+                        text: I18n.tr("Log Out")
                         iconName: "logout"
                         backgroundColor: Theme.primary
                         textColor: Theme.primaryText

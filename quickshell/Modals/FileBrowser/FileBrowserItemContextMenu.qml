@@ -25,7 +25,7 @@ Popup {
             dangerous: true
         },
         {
-            text: I18n.tr("Copy Path"),
+            text: I18n.tr("Copy path"),
             icon: "content_copy",
             action: copyPath,
             enabled: filePath.length > 0

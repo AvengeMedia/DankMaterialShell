@@ -586,7 +586,7 @@ Item {
                 }
 
                 StyledText {
-                    text: I18n.tr("Time format")
+                    text: I18n.tr("Time Format")
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -605,7 +605,7 @@ Item {
                 SettingsToggleRow {
                     settingKey: "greeterShowSeconds"
                     tags: ["greeter", "time", "seconds"]
-                    text: I18n.tr("Show seconds")
+                    text: I18n.tr("Show Seconds")
                     checked: SettingsData.greeterShowSeconds
                     onToggled: checked => SettingsData.set("greeterShowSeconds", checked)
                 }
@@ -630,7 +630,7 @@ Item {
                 SettingsDropdownRow {
                     settingKey: "greeterLockDateFormat"
                     tags: ["greeter", "date", "format"]
-                    text: I18n.tr("Date format")
+                    text: I18n.tr("Date Format")
                     description: I18n.tr("Greeter only — format for the date on the login screen")
                     options: root._lockDateFormatPresets.map(p => p.label)
                     currentValue: {

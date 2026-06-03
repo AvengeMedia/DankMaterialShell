@@ -34,12 +34,12 @@ Item {
     readonly property var matchLabels: ({
             "appId": I18n.tr("App ID"),
             "title": I18n.tr("Title"),
-            "isFloating": I18n.tr("Is Floating"),
-            "isActive": I18n.tr("Is Active"),
-            "isFocused": I18n.tr("Is Focused"),
-            "isActiveInColumn": I18n.tr("Active In Column"),
+            "isFloating": I18n.tr("Floating"),
+            "isActive": I18n.tr("Active"),
+            "isFocused": I18n.tr("Focused"),
+            "isActiveInColumn": I18n.tr("Active in Column"),
             "isWindowCastTarget": I18n.tr("Cast Target"),
-            "isUrgent": I18n.tr("Is Urgent"),
+            "isUrgent": I18n.tr("Urgent"),
             "atStartup": I18n.tr("At Startup"),
             "xwayland": I18n.tr("XWayland"),
             "fullscreen": I18n.tr("Fullscreen"),
@@ -64,7 +64,7 @@ Item {
                 continue;
             const label = labels[k] || k;
             if (typeof v === "boolean")
-                out.push(label + ": " + (v ? I18n.tr("yes") : I18n.tr("no")));
+                out.push(label + ": " + (v ? I18n.tr("Yes") : I18n.tr("No")));
             else
                 out.push(label + ": " + v);
         }
@@ -699,7 +699,7 @@ Item {
                                                         return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
                                                             const val = a[k];
                                                             if (typeof val === "boolean")
-                                                                return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("off");
+                                                                return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("Off");
                                                             return (labels[k] || k) + ": " + val;
                                                         });
                                                     }
@@ -952,7 +952,7 @@ Item {
                                                         parts.push("title: " + m.title);
                                                     const base = parts.length > 0 ? parts.join(" · ") : I18n.tr("No match criteria");
                                                     const count = root.matchesOf(externalCard.modelData).length;
-                                                    return count > 1 ? I18n.tr("%1  (+%2 more)").arg(base).arg(count - 1) : base;
+                                                    return count > 1 ? I18n.tr("%1 (+%2 more)").arg(base).arg(count - 1) : base;
                                                 }
                                                 font.pixelSize: Theme.fontSizeSmall
                                                 color: Theme.surfaceVariantText
@@ -976,7 +976,7 @@ Item {
                                                         return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
                                                             const val = a[k];
                                                             if (typeof val === "boolean")
-                                                                return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("off");
+                                                                return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("Off");
                                                             return (labels[k] || k) + ": " + val;
                                                         });
                                                     }

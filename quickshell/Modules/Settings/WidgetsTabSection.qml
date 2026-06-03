@@ -1637,7 +1637,7 @@ Column {
                 rows: [
                     {
                         icon: "screen_record",
-                        label: I18n.tr("Screen Sharing"),
+                        label: I18n.tr("Screen sharing"),
                         setting: "showScreenSharingIcon"
                     }
                 ]
@@ -1801,7 +1801,7 @@ Column {
                     id: longestControlCenterLabelMetrics
                     font.pixelSize: Theme.fontSizeSmall
                     text: {
-                        const labels = [I18n.tr("Network"), I18n.tr("VPN"), I18n.tr("Bluetooth"), I18n.tr("Audio"), I18n.tr("Volume"), I18n.tr("Microphone"), I18n.tr("Microphone Volume"), I18n.tr("Brightness"), I18n.tr("Brightness Value"), I18n.tr("Battery"), I18n.tr("Printer"), I18n.tr("Screen Sharing"), I18n.tr("Idle Inhibitor"), I18n.tr("Do Not Disturb")];
+                        const labels = [I18n.tr("Network"), I18n.tr("VPN"), I18n.tr("Bluetooth"), I18n.tr("Audio"), I18n.tr("Volume"), I18n.tr("Microphone"), I18n.tr("Microphone Volume"), I18n.tr("Brightness"), I18n.tr("Brightness Value"), I18n.tr("Battery"), I18n.tr("Printer"), I18n.tr("Screen sharing"), I18n.tr("Idle Inhibitor"), I18n.tr("Do Not Disturb")];
                         let longest = "";
                         for (let i = 0; i < labels.length; i++) {
                             if (labels[i].length > longest.length)

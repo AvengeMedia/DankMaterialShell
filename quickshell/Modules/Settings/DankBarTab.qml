@@ -966,7 +966,7 @@ Item {
                 SettingsControlledByFrame {
                     visible: SettingsData.frameEnabled
                     parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar transparency")
+                    settingLabel: I18n.tr("Bar Transparency")
                     reason: I18n.tr("Managed by Frame")
                 }
             }

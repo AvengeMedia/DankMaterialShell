@@ -2756,20 +2756,20 @@
       "background",
       "blur",
       "colors",
+      "compositor",
+      "does",
+      "effect",
       "frosted",
       "glass",
       "look",
-      "newer",
-      "quickshell",
-      "requires",
       "scheme",
       "style",
+      "support",
       "theme",
-      "transparency",
-      "version"
+      "transparency"
     ],
     "icon": "blur_on",
-    "description": "Requires a newer version of Quickshell"
+    "description": "Your compositor does not support background blur (ext-background-effect-v1)"
   },
   {
     "section": "barElevationEnabled",
@@ -7749,5 +7749,17 @@
       "users"
     ],
     "icon": "manage_accounts"
+  },
+  {
+    "section": "_tab_36",
+    "label": "Autostart Apps",
+    "tabIndex": 36,
+    "category": "Settings",
+    "keywords": [
+      "apps",
+      "autostart",
+      "settings"
+    ],
+    "icon": "line_start"
   }
 ]

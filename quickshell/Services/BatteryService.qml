@@ -218,7 +218,7 @@ Singleton {
     // Aggregated battery status
     readonly property string batteryStatus: {
         if (!batteryAvailable) {
-            return I18n.tr("No Battery", "battery status");
+            return I18n.tr("No battery", "battery status");
         }
 
         const targetBatteries = stateKnownBatteries.length > 0 ? stateKnownBatteries : batteries;
