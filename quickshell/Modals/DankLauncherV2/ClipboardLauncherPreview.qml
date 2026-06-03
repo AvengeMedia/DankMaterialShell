@@ -57,7 +57,11 @@ Rectangle {
                 return;
             if (response.error)
                 return;
-            const result = response.result ?? {};
+            if (!response.result) {
+                ClipboardService.refresh();
+                return;
+            }
+            const result = response.result;
             const mimeType = (result.mimeType ?? entry?.mimeType ?? "").toString();
             const data = (result.data ?? "").toString();
             if (data.length === 0 || !resolvedSourceUrl(data, mimeType))

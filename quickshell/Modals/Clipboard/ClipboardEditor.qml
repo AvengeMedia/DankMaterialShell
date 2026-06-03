@@ -89,6 +89,10 @@ Item {
             if (!root.entry || root.entry.id !== requestedId) {
                 return;
             }
+            if (!response.result) {
+                ClipboardService.refresh();
+                return;
+            }
             const result = response.result;
             let fullText = "";
             if (result?.data) {

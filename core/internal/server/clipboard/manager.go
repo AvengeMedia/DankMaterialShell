@@ -3,6 +3,7 @@ package clipboard
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -33,6 +34,8 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
+
+var errEntryNotFound = errors.New("entry not found")
 
 // These mime types won't be stored in history
 var sensitiveMimeTypes = []string{
@@ -764,7 +767,23 @@ func stateEqual(a, b *State) bool {
 	if len(a.History) != len(b.History) {
 		return false
 	}
+	for i := range a.History {
+		if !entryStateEqual(a.History[i], b.History[i]) {
+			return false
+		}
+	}
 	return true
+}
+
+func entryStateEqual(a, b Entry) bool {
+	return a.ID == b.ID &&
+		a.Hash == b.Hash &&
+		a.Pinned == b.Pinned &&
+		a.IsImage == b.IsImage &&
+		a.MimeType == b.MimeType &&
+		a.Preview == b.Preview &&
+		a.Size == b.Size &&
+		a.Timestamp.Equal(b.Timestamp)
 }
 
 func (m *Manager) GetHistory() []Entry {
@@ -854,7 +873,7 @@ func (m *Manager) GetEntry(id uint64) (*Entry, error) {
 		return nil, err
 	}
 	if !found {
-		return nil, fmt.Errorf("entry not found")
+		return nil, errEntryNotFound
 	}
 
 	return &entry, nil

@@ -1,16 +1,51 @@
 package clipboard
 
 import (
+	"bytes"
+	"encoding/json"
+	"net"
+	"path/filepath"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	mocks_wlcontext "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlcontext"
 )
+
+type clipboardTestConn struct {
+	net.Conn
+	writeBuf *bytes.Buffer
+}
+
+func newClipboardTestConn() *clipboardTestConn {
+	return &clipboardTestConn{writeBuf: &bytes.Buffer{}}
+}
+
+func (c *clipboardTestConn) Write(b []byte) (int, error) {
+	return c.writeBuf.Write(b)
+}
+
+func newTestManagerWithDB(t *testing.T) *Manager {
+	t.Helper()
+
+	db, err := openDB(filepath.Join(t.TempDir(), "clipboard.db"))
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		db.Close()
+	})
+
+	return &Manager{
+		config: DefaultConfig(),
+		db:     db,
+	}
+}
 
 func TestEncodeDecodeEntry_Roundtrip(t *testing.T) {
 	original := Entry{
@@ -131,9 +166,111 @@ func TestStateEqual_HistoryLengthDiffers(t *testing.T) {
 }
 
 func TestStateEqual_BothEqual(t *testing.T) {
-	a := &State{Enabled: true, History: []Entry{{ID: 1}, {ID: 2}}}
-	b := &State{Enabled: true, History: []Entry{{ID: 3}, {ID: 4}}}
+	ts := time.Now().Truncate(time.Second)
+	entry := Entry{
+		ID:        1,
+		Hash:      100,
+		MimeType:  "image/png",
+		Preview:   "[[ image 1 KiB png 32x32 ]]",
+		Size:      1024,
+		Timestamp: ts,
+		IsImage:   true,
+		Pinned:    true,
+	}
+	a := &State{Enabled: true, History: []Entry{entry}}
+	b := &State{Enabled: true, History: []Entry{entry}}
 	assert.True(t, stateEqual(a, b))
+}
+
+func TestStateEqual_SameLengthDifferentIDs(t *testing.T) {
+	ts := time.Now().Truncate(time.Second)
+	a := &State{Enabled: true, History: []Entry{{ID: 1, Hash: 100, Timestamp: ts}}}
+	b := &State{Enabled: true, History: []Entry{{ID: 2, Hash: 100, Timestamp: ts}}}
+
+	assert.False(t, stateEqual(a, b))
+}
+
+func TestStateEqual_MetadataDiffers(t *testing.T) {
+	ts := time.Now().Truncate(time.Second)
+	base := Entry{
+		ID:        1,
+		Hash:      100,
+		MimeType:  "image/png",
+		Preview:   "[[ image 1 KiB png 32x32 ]]",
+		Size:      1024,
+		Timestamp: ts,
+		IsImage:   true,
+		Pinned:    false,
+	}
+
+	tests := []struct {
+		name   string
+		mutate func(*Entry)
+	}{
+		{name: "hash", mutate: func(e *Entry) { e.Hash = 101 }},
+		{name: "pinned", mutate: func(e *Entry) { e.Pinned = true }},
+		{name: "is image", mutate: func(e *Entry) { e.IsImage = false }},
+		{name: "mime type", mutate: func(e *Entry) { e.MimeType = "image/jpeg" }},
+		{name: "preview", mutate: func(e *Entry) { e.Preview = "[[ image 2 KiB jpeg 64x64 ]]" }},
+		{name: "size", mutate: func(e *Entry) { e.Size = 2048 }},
+		{name: "timestamp", mutate: func(e *Entry) { e.Timestamp = ts.Add(time.Second) }},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			changed := base
+			tt.mutate(&changed)
+
+			a := &State{Enabled: true, History: []Entry{base}}
+			b := &State{Enabled: true, History: []Entry{changed}}
+
+			assert.False(t, stateEqual(a, b))
+		})
+	}
+}
+
+func TestHandleGetEntry_ReturnsExistingEntry(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	err := m.storeEntry(Entry{
+		Data:      []byte("hello world"),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   "hello world",
+		Size:      len("hello world"),
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   false,
+	})
+	require.NoError(t, err)
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+
+	conn := newClipboardTestConn()
+	handleGetEntry(conn, models.Request{
+		ID:     1,
+		Params: map[string]any{"id": float64(history[0].ID)},
+	}, m)
+
+	var resp models.Response[Entry]
+	require.NoError(t, json.NewDecoder(conn.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+	require.NotNil(t, resp.Result)
+	assert.Equal(t, history[0].ID, resp.Result.ID)
+	assert.Equal(t, []byte("hello world"), resp.Result.Data)
+}
+
+func TestHandleGetEntry_MissingIDReturnsNullResult(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	conn := newClipboardTestConn()
+
+	handleGetEntry(conn, models.Request{
+		ID:     1,
+		Params: map[string]any{"id": float64(999)},
+	}, m)
+
+	var resp models.Response[any]
+	require.NoError(t, json.NewDecoder(conn.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+	assert.Nil(t, resp.Result)
 }
 
 func TestManager_ConcurrentSubscriberAccess(t *testing.T) {
