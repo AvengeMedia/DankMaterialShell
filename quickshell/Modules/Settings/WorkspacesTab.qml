@@ -126,6 +126,16 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "groupActiveWorkspaceApps"
+                    tags: ["workspace", "apps", "icons", "group", "grouped", "active", "focused"]
+                    text: I18n.tr("Group Active Workspace")
+                    description: I18n.tr("Also group repeated application icons on the active workspace")
+                    checked: SettingsData.groupActiveWorkspaceApps
+                    visible: SettingsData.showWorkspaceApps && SettingsData.groupWorkspaceApps
+                    onToggled: checked => SettingsData.set("groupActiveWorkspaceApps", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "workspaceActiveAppHighlightEnabled"
                     tags: ["workspace", "apps", "icons", "highlight", "active", "focused"]
                     text: I18n.tr("Highlight Active Workspace App")

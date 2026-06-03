@@ -134,6 +134,7 @@ var SPEC = {
     maxWorkspaceIcons: { def: 3 },
     workspaceAppIconSizeOffset: { def: 0 },
     groupWorkspaceApps: { def: true },
+    groupActiveWorkspaceApps: { def: false },
     workspaceFollowFocus: { def: false },
     showOccupiedWorkspacesOnly: { def: false },
     reverseScrolling: { def: false },
