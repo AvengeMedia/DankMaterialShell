@@ -27,7 +27,107 @@ Item {
     property bool checkingInclude: false
     property bool fixingInclude: false
     property var windowRules: []
+    property var externalRules: []
     property var activeWindows: getActiveWindows()
+    property string expandedExternalId: ""
+
+    readonly property var matchLabels: ({
+            "appId": I18n.tr("App ID"),
+            "title": I18n.tr("Title"),
+            "isFloating": I18n.tr("Is Floating"),
+            "isActive": I18n.tr("Is Active"),
+            "isFocused": I18n.tr("Is Focused"),
+            "isActiveInColumn": I18n.tr("Active In Column"),
+            "isWindowCastTarget": I18n.tr("Cast Target"),
+            "isUrgent": I18n.tr("Is Urgent"),
+            "atStartup": I18n.tr("At Startup"),
+            "xwayland": I18n.tr("XWayland"),
+            "fullscreen": I18n.tr("Fullscreen"),
+            "pinned": I18n.tr("Pinned"),
+            "initialised": I18n.tr("Initialised")
+        })
+
+    function matchesOf(rule) {
+        const m = rule.matches;
+        if (m && m.length > 0)
+            return m;
+        return [rule.matchCriteria || {}];
+    }
+
+    function formatCriteria(obj, labels) {
+        let out = [];
+        const keys = Object.keys(obj || {});
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const v = obj[k];
+            if (v === undefined || v === null || v === "")
+                continue;
+            const label = labels[k] || k;
+            if (typeof v === "boolean")
+                out.push(label + ": " + (v ? I18n.tr("yes") : I18n.tr("no")));
+            else
+                out.push(label + ": " + v);
+        }
+        return out;
+    }
+
+    function matchSummary(rule) {
+        const matches = matchesOf(rule);
+        const first = matches[0] || {};
+        const label = first.appId || first.title || I18n.tr("Any window");
+        if (matches.length > 1)
+            return I18n.tr("%1 (+%2 more)").arg(label).arg(matches.length - 1);
+        return label;
+    }
+
+    readonly property var actionLabels: ({
+            "opacity": I18n.tr("Opacity"),
+            "openFloating": I18n.tr("Float"),
+            "openMaximized": I18n.tr("Maximize"),
+            "openMaximizedToEdges": I18n.tr("Max Edges"),
+            "openFullscreen": I18n.tr("Fullscreen"),
+            "openFocused": I18n.tr("Focus"),
+            "openOnOutput": I18n.tr("Output"),
+            "openOnWorkspace": I18n.tr("Workspace"),
+            "defaultColumnWidth": I18n.tr("Width"),
+            "defaultWindowHeight": I18n.tr("Height"),
+            "variableRefreshRate": I18n.tr("VRR"),
+            "blockOutFrom": I18n.tr("Block Out"),
+            "defaultColumnDisplay": I18n.tr("Display"),
+            "scrollFactor": I18n.tr("Scroll"),
+            "cornerRadius": I18n.tr("Radius"),
+            "clipToGeometry": I18n.tr("Clip"),
+            "tiledState": I18n.tr("Tiled"),
+            "minWidth": I18n.tr("Min W"),
+            "maxWidth": I18n.tr("Max W"),
+            "minHeight": I18n.tr("Min H"),
+            "maxHeight": I18n.tr("Max H"),
+            "tile": I18n.tr("Tile"),
+            "nofocus": I18n.tr("No Focus"),
+            "noborder": I18n.tr("No Border"),
+            "noshadow": I18n.tr("No Shadow"),
+            "nodim": I18n.tr("No Dim"),
+            "noblur": I18n.tr("No Blur"),
+            "noanim": I18n.tr("No Anim"),
+            "norounding": I18n.tr("No Round"),
+            "pin": I18n.tr("Pin"),
+            "opaque": I18n.tr("Opaque"),
+            "size": I18n.tr("Size"),
+            "move": I18n.tr("Move"),
+            "monitor": I18n.tr("Monitor"),
+            "workspace": I18n.tr("Workspace"),
+            "drawBorderWithBackground": I18n.tr("Border w/ Bg"),
+            "backgroundBlur": I18n.tr("Blur"),
+            "backgroundXray": I18n.tr("X-Ray"),
+            "backgroundNoise": I18n.tr("Noise"),
+            "backgroundSaturation": I18n.tr("Saturation"),
+            "borderColor": I18n.tr("Border Color"),
+            "focusRingColor": I18n.tr("Focus Ring Color"),
+            "focusRingOff": I18n.tr("Focus Ring Off"),
+            "borderOff": I18n.tr("Border Off"),
+            "forcergbx": I18n.tr("Force RGBX"),
+            "idleinhibit": I18n.tr("Idle Inhibit")
+        })
 
     signal rulesChanged
 
@@ -72,18 +172,21 @@ Item {
         const compositor = CompositorService.compositor;
         if (compositor !== "niri" && compositor !== "hyprland") {
             windowRules = [];
+            externalRules = [];
             return;
         }
 
         Proc.runCommand("load-windowrules", ["dms", "config", "windowrules", "list", compositor], (output, exitCode) => {
             if (exitCode !== 0) {
                 windowRules = [];
+                externalRules = [];
                 return;
             }
             try {
                 const result = JSON.parse(output.trim());
                 const allRules = result.rules || [];
                 windowRules = allRules.filter(r => (r.source || "").includes("dms/windowrules"));
+                externalRules = allRules.filter(r => !(r.source || "").includes("dms/windowrules"));
                 if (result.dmsStatus) {
                     windowRulesIncludeStatus = {
                         "exists": result.dmsStatus.exists,
@@ -94,6 +197,7 @@ Item {
                 }
             } catch (e) {
                 windowRules = [];
+                externalRules = [];
             }
         });
     }
@@ -232,6 +336,20 @@ Item {
         }
     }
 
+    function copyRuleToDms(rule) {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
+        if (!PopoutService.windowRuleModalLoader)
+            return;
+        PopoutService.windowRuleModalLoader.active = true;
+        if (PopoutService.windowRuleModalLoader.item) {
+            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
+            PopoutService.windowRuleModalLoader.item.showCopy(rule);
+        }
+    }
+
     function showHyprlandReadOnlyWarning() {
         ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings."), "dms setup", "hyprland-migration");
     }
@@ -311,6 +429,8 @@ Item {
                             iconColor: Theme.primary
                             enabled: !root.readOnly
                             opacity: enabled ? 1 : 0.5
+                            tooltipText: I18n.tr("Add Window Rule")
+                            tooltipSide: "left"
                             onClicked: root.openRuleModal()
                         }
                     }
@@ -575,47 +695,11 @@ Item {
                                                 Repeater {
                                                     model: {
                                                         const a = ruleDelegateItem.liveRuleData.actions || {};
-                                                        const labels = {
-                                                            "opacity": I18n.tr("Opacity"),
-                                                            "openFloating": I18n.tr("Float"),
-                                                            "openMaximized": I18n.tr("Maximize"),
-                                                            "openMaximizedToEdges": I18n.tr("Max Edges"),
-                                                            "openFullscreen": I18n.tr("Fullscreen"),
-                                                            "openFocused": I18n.tr("Focus"),
-                                                            "openOnOutput": I18n.tr("Output"),
-                                                            "openOnWorkspace": I18n.tr("Workspace"),
-                                                            "defaultColumnWidth": I18n.tr("Width"),
-                                                            "defaultWindowHeight": I18n.tr("Height"),
-                                                            "variableRefreshRate": I18n.tr("VRR"),
-                                                            "blockOutFrom": I18n.tr("Block Out"),
-                                                            "defaultColumnDisplay": I18n.tr("Display"),
-                                                            "scrollFactor": I18n.tr("Scroll"),
-                                                            "cornerRadius": I18n.tr("Radius"),
-                                                            "clipToGeometry": I18n.tr("Clip"),
-                                                            "tiledState": I18n.tr("Tiled"),
-                                                            "minWidth": I18n.tr("Min W"),
-                                                            "maxWidth": I18n.tr("Max W"),
-                                                            "minHeight": I18n.tr("Min H"),
-                                                            "maxHeight": I18n.tr("Max H"),
-                                                            "tile": I18n.tr("Tile"),
-                                                            "nofocus": I18n.tr("No Focus"),
-                                                            "noborder": I18n.tr("No Border"),
-                                                            "noshadow": I18n.tr("No Shadow"),
-                                                            "nodim": I18n.tr("No Dim"),
-                                                            "noblur": I18n.tr("No Blur"),
-                                                            "noanim": I18n.tr("No Anim"),
-                                                            "norounding": I18n.tr("No Round"),
-                                                            "pin": I18n.tr("Pin"),
-                                                            "opaque": I18n.tr("Opaque"),
-                                                            "size": I18n.tr("Size"),
-                                                            "move": I18n.tr("Move"),
-                                                            "monitor": I18n.tr("Monitor"),
-                                                            "workspace": I18n.tr("Workspace")
-                                                        };
+                                                        const labels = root.actionLabels;
                                                         return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
                                                             const val = a[k];
                                                             if (typeof val === "boolean")
-                                                                return labels[k] || k;
+                                                                return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("off");
                                                             return (labels[k] || k) + ": " + val;
                                                         });
                                                     }
@@ -651,26 +735,26 @@ Item {
                                                 iconColor: Theme.surfaceVariantText
                                                 enabled: !root.readOnly
                                                 opacity: enabled ? 1 : 0.5
+                                                tooltipText: I18n.tr("Edit Rule")
+                                                tooltipSide: "top"
                                                 onClicked: root.editRule(ruleDelegateItem.liveRuleData)
                                             }
 
                                             DankActionButton {
                                                 id: deleteBtn
+                                                property bool hovered: false
                                                 buttonSize: 28
                                                 iconName: "delete"
                                                 iconSize: 16
                                                 backgroundColor: "transparent"
-                                                iconColor: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
+                                                iconColor: hovered ? Theme.error : Theme.surfaceVariantText
                                                 enabled: !root.readOnly
                                                 opacity: enabled ? 1 : 0.5
-
-                                                MouseArea {
-                                                    id: deleteArea
-                                                    anchors.fill: parent
-                                                    hoverEnabled: !root.readOnly
-                                                    cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
-                                                    onClicked: root.removeRule(ruleDelegateItem.ruleIdRef)
-                                                }
+                                                tooltipText: I18n.tr("Delete Rule")
+                                                tooltipSide: "top"
+                                                onEntered: hovered = true
+                                                onExited: hovered = false
+                                                onClicked: root.removeRule(ruleDelegateItem.ruleIdRef)
                                             }
                                         }
                                     }
@@ -722,6 +806,283 @@ Item {
                                     NumberAnimation {
                                         duration: Theme.shortDuration
                                         easing.type: Theme.standardEasing
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            StyledRect {
+                width: Math.min(650, parent.width - Theme.spacingL * 2)
+                height: externalSection.implicitHeight + Theme.spacingL * 2
+                anchors.horizontalCenter: parent.horizontalCenter
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                visible: root.externalRules && root.externalRules.length > 0
+
+                Column {
+                    id: externalSection
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    RowLayout {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "description"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Theme.spacingXS
+
+                            StyledText {
+                                text: I18n.tr("User Window Rules (%1)").arg(root.externalRules?.length ?? 0)
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                                Layout.fillWidth: true
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                wrapMode: Text.WordWrap
+                                Layout.fillWidth: true
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        Repeater {
+                            model: ScriptModel {
+                                objectProp: "id"
+                                values: root.externalRules || []
+                            }
+
+                            delegate: Rectangle {
+                                id: externalCard
+                                required property var modelData
+
+                                readonly property string displayName: {
+                                    const name = externalCard.modelData.name || "";
+                                    if (name)
+                                        return name;
+                                    return root.matchSummary(externalCard.modelData);
+                                }
+                                readonly property string sourceFile: (externalCard.modelData.source || "").split("/").pop()
+                                readonly property bool expanded: root.expandedExternalId === externalCard.modelData.id
+
+                                width: parent.width
+                                height: externalContent.implicitHeight + Theme.spacingM * 2
+                                radius: Theme.cornerRadius
+                                color: Theme.withAlpha(Theme.surfaceContainer, 0.4)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: root.expandedExternalId = externalCard.expanded ? "" : externalCard.modelData.id
+                                }
+
+                                Column {
+                                    id: externalContent
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.top: parent.top
+                                    anchors.margins: Theme.spacingM
+                                    spacing: Theme.spacingS
+
+                                    RowLayout {
+                                        width: parent.width
+                                        spacing: Theme.spacingM
+
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 2
+
+                                            RowLayout {
+                                                Layout.fillWidth: true
+                                                spacing: Theme.spacingS
+
+                                                StyledText {
+                                                    text: externalCard.displayName
+                                                    font.pixelSize: Theme.fontSizeMedium
+                                                    font.weight: Font.Medium
+                                                    color: Theme.surfaceText
+                                                    elide: Text.ElideRight
+                                                    Layout.fillWidth: true
+                                                }
+
+                                                Rectangle {
+                                                    visible: externalCard.sourceFile.length > 0
+                                                    width: sourceText.implicitWidth + Theme.spacingS * 2
+                                                    height: 20
+                                                    radius: 10
+                                                    color: Theme.withAlpha(Theme.surfaceVariantText, 0.15)
+                                                    Layout.alignment: Qt.AlignVCenter
+
+                                                    StyledText {
+                                                        id: sourceText
+                                                        anchors.centerIn: parent
+                                                        text: externalCard.sourceFile
+                                                        font.pixelSize: Theme.fontSizeSmall - 2
+                                                        color: Theme.surfaceVariantText
+                                                    }
+                                                }
+                                            }
+
+                                            StyledText {
+                                                text: {
+                                                    const m = externalCard.modelData.matchCriteria || {};
+                                                    let parts = [];
+                                                    if (m.appId)
+                                                        parts.push(m.appId);
+                                                    if (m.title)
+                                                        parts.push("title: " + m.title);
+                                                    const base = parts.length > 0 ? parts.join(" · ") : I18n.tr("No match criteria");
+                                                    const count = root.matchesOf(externalCard.modelData).length;
+                                                    return count > 1 ? I18n.tr("%1  (+%2 more)").arg(base).arg(count - 1) : base;
+                                                }
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                elide: Text.ElideRight
+                                                Layout.fillWidth: true
+                                            }
+
+                                            Flow {
+                                                Layout.fillWidth: true
+                                                Layout.topMargin: 4
+                                                spacing: Theme.spacingXS
+                                                visible: {
+                                                    const a = externalCard.modelData.actions || {};
+                                                    return Object.keys(a).some(k => a[k] !== undefined && a[k] !== null && a[k] !== "");
+                                                }
+
+                                                Repeater {
+                                                    model: {
+                                                        const a = externalCard.modelData.actions || {};
+                                                        const labels = root.actionLabels;
+                                                        return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
+                                                            const val = a[k];
+                                                            if (typeof val === "boolean")
+                                                                return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("off");
+                                                            return (labels[k] || k) + ": " + val;
+                                                        });
+                                                    }
+
+                                                    delegate: Rectangle {
+                                                        required property string modelData
+                                                        width: extChipText.implicitWidth + Theme.spacingS * 2
+                                                        height: 20
+                                                        radius: 10
+                                                        color: Theme.withAlpha(Theme.primary, 0.15)
+
+                                                        StyledText {
+                                                            id: extChipText
+                                                            anchors.centerIn: parent
+                                                            text: modelData
+                                                            font.pixelSize: Theme.fontSizeSmall - 2
+                                                            color: Theme.primary
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        DankIcon {
+                                            name: externalCard.expanded ? "expand_less" : "expand_more"
+                                            size: 20
+                                            color: Theme.surfaceVariantText
+                                            Layout.alignment: Qt.AlignVCenter
+                                        }
+
+                                        DankActionButton {
+                                            buttonSize: 28
+                                            iconName: "content_copy"
+                                            iconSize: 16
+                                            backgroundColor: "transparent"
+                                            iconColor: Theme.surfaceVariantText
+                                            enabled: !root.readOnly
+                                            opacity: enabled ? 1 : 0.5
+                                            Layout.alignment: Qt.AlignVCenter
+                                            tooltipText: I18n.tr("Convert to DMS")
+                                            tooltipSide: "left"
+                                            onClicked: root.copyRuleToDms(externalCard.modelData)
+                                        }
+                                    }
+
+                                    Column {
+                                        width: parent.width
+                                        spacing: Theme.spacingXS
+                                        visible: externalCard.expanded
+
+                                        Rectangle {
+                                            width: parent.width
+                                            height: 1
+                                            color: Theme.withAlpha(Theme.outline, 0.5)
+                                        }
+
+                                        StyledText {
+                                            text: I18n.tr("Match (%1)").arg(root.matchesOf(externalCard.modelData).length)
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Font.Medium
+                                            color: Theme.surfaceText
+                                        }
+
+                                        Repeater {
+                                            model: root.matchesOf(externalCard.modelData)
+
+                                            delegate: StyledText {
+                                                required property var modelData
+                                                width: parent.width
+                                                text: {
+                                                    const c = root.formatCriteria(modelData, root.matchLabels);
+                                                    return "• " + (c.length > 0 ? c.join("   ·   ") : I18n.tr("Any window"));
+                                                }
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                wrapMode: Text.WordWrap
+                                            }
+                                        }
+
+                                        StyledText {
+                                            text: I18n.tr("Actions")
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Font.Medium
+                                            color: Theme.surfaceText
+                                            topPadding: Theme.spacingXS
+                                        }
+
+                                        StyledText {
+                                            width: parent.width
+                                            text: {
+                                                const a = root.formatCriteria(externalCard.modelData.actions, root.actionLabels);
+                                                return a.length > 0 ? a.join("   ·   ") : I18n.tr("None");
+                                            }
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceVariantText
+                                            wrapMode: Text.WordWrap
+                                        }
+
+                                        StyledText {
+                                            width: parent.width
+                                            text: I18n.tr("Source: %1").arg(externalCard.modelData.source || "")
+                                            font.pixelSize: Theme.fontSizeSmall - 1
+                                            color: Theme.surfaceVariantText
+                                            elide: Text.ElideMiddle
+                                            topPadding: Theme.spacingXS
+                                        }
                                     }
                                 }
                             }

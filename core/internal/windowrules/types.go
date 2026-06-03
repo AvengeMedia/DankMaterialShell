@@ -43,6 +43,10 @@ type Actions struct {
 	FocusRingOff         *bool    `json:"focusRingOff,omitempty"`
 	BorderOff            *bool    `json:"borderOff,omitempty"`
 	DrawBorderWithBg     *bool    `json:"drawBorderWithBackground,omitempty"`
+	BackgroundBlur       *bool    `json:"backgroundBlur,omitempty"`
+	BackgroundXray       *bool    `json:"backgroundXray,omitempty"`
+	BackgroundNoise      *float64 `json:"backgroundNoise,omitempty"`
+	BackgroundSaturation *float64 `json:"backgroundSaturation,omitempty"`
 	Size                 string   `json:"size,omitempty"`
 	Move                 string   `json:"move,omitempty"`
 	Monitor              string   `json:"monitor,omitempty"`
@@ -62,12 +66,13 @@ type Actions struct {
 }
 
 type WindowRule struct {
-	ID            string        `json:"id"`
-	Name          string        `json:"name,omitempty"`
-	Enabled       bool          `json:"enabled"`
-	MatchCriteria MatchCriteria `json:"matchCriteria"`
-	Actions       Actions       `json:"actions"`
-	Source        string        `json:"source,omitempty"`
+	ID            string          `json:"id"`
+	Name          string          `json:"name,omitempty"`
+	Enabled       bool            `json:"enabled"`
+	MatchCriteria MatchCriteria   `json:"matchCriteria"`
+	Matches       []MatchCriteria `json:"matches,omitempty"`
+	Actions       Actions         `json:"actions"`
+	Source        string          `json:"source,omitempty"`
 }
 
 type DMSRulesStatus struct {

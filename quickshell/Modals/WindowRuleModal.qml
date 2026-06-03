@@ -20,6 +20,10 @@ FloatingWindow {
     readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
     readonly property int sectionSpacing: Theme.spacingL
 
+    ListModel {
+        id: extraMatchModel
+    }
+
     objectName: "windowRuleModal"
     title: isEditMode ? I18n.tr("Edit Window Rule") : I18n.tr("Create Window Rule")
     minimumSize: Qt.size(500, 600)
@@ -31,6 +35,18 @@ FloatingWindow {
         nameInput.text = "";
         appIdInput.text = "";
         titleInput.text = "";
+        extraMatchModel.clear();
+        condFloating.triState = 0;
+        condActive.triState = 0;
+        condFocused.triState = 0;
+        condActiveInColumn.triState = 0;
+        condCastTarget.triState = 0;
+        condUrgent.triState = 0;
+        condAtStartup.triState = 0;
+        condXwayland.triState = 0;
+        condFullscreen.triState = 0;
+        condPinned.triState = 0;
+        condInitialised.triState = 0;
         opacityEnabled.checked = false;
         opacitySlider.value = 100;
         floatingToggle.checked = false;
@@ -52,6 +68,12 @@ FloatingWindow {
         clipToGeometryToggle.checked = false;
         tiledStateToggle.checked = false;
         drawBorderBgToggle.checked = false;
+        blurCond.triState = 0;
+        xrayCond.triState = 0;
+        noiseEnabled.checked = false;
+        noiseSlider.value = 5;
+        saturationEnabled.checked = false;
+        saturationSlider.value = 100;
         minWidthInput.text = "";
         maxWidthInput.text = "";
         minHeightInput.text = "";
@@ -84,18 +106,39 @@ FloatingWindow {
         Qt.callLater(() => nameInput.forceActiveFocus());
     }
 
-    function showEdit(rule) {
-        if (!rule) {
-            show();
-            return;
-        }
-        editingRule = rule;
-        resetForm();
+    function triFromBool(v) {
+        if (v === true)
+            return 1;
+        if (v === false)
+            return 2;
+        return 0;
+    }
 
+    function populateForm(rule) {
         nameInput.text = rule.name || "";
-        const match = rule.matchCriteria || {};
+        const matchList = (rule.matches && rule.matches.length > 0) ? rule.matches : [rule.matchCriteria || {}];
+        const match = matchList[0] || {};
         appIdInput.text = match.appId || "";
         titleInput.text = match.title || "";
+        extraMatchModel.clear();
+        for (let i = 1; i < matchList.length; i++) {
+            extraMatchModel.append({
+                "rowAppId": matchList[i].appId || "",
+                "rowTitle": matchList[i].title || ""
+            });
+        }
+
+        condFloating.triState = triFromBool(match.isFloating);
+        condActive.triState = triFromBool(match.isActive);
+        condFocused.triState = triFromBool(match.isFocused);
+        condActiveInColumn.triState = triFromBool(match.isActiveInColumn);
+        condCastTarget.triState = triFromBool(match.isWindowCastTarget);
+        condUrgent.triState = triFromBool(match.isUrgent);
+        condAtStartup.triState = triFromBool(match.atStartup);
+        condXwayland.triState = triFromBool(match.xwayland);
+        condFullscreen.triState = triFromBool(match.fullscreen);
+        condPinned.triState = triFromBool(match.pinned);
+        condInitialised.triState = triFromBool(match.initialised);
 
         const actions = rule.actions || {};
         const hasOpacity = actions.opacity !== undefined && actions.opacity !== null;
@@ -131,6 +174,15 @@ FloatingWindow {
 
         drawBorderBgToggle.checked = actions.drawBorderWithBackground || false;
 
+        xrayCond.triState = triFromBool(actions.backgroundXray);
+        blurCond.triState = triFromBool(actions.backgroundBlur);
+        const hasNoise = actions.backgroundNoise !== undefined && actions.backgroundNoise !== null;
+        noiseEnabled.checked = hasNoise;
+        noiseSlider.value = hasNoise ? Math.round(actions.backgroundNoise * 100) : 5;
+        const hasSaturation = actions.backgroundSaturation !== undefined && actions.backgroundSaturation !== null;
+        saturationEnabled.checked = hasSaturation;
+        saturationSlider.value = hasSaturation ? Math.round(actions.backgroundSaturation * 100) : 100;
+
         minWidthInput.text = actions.minWidth !== undefined ? String(actions.minWidth) : "";
         maxWidthInput.text = actions.maxWidth !== undefined ? String(actions.maxWidth) : "";
         minHeightInput.text = actions.minHeight !== undefined ? String(actions.minHeight) : "";
@@ -150,7 +202,28 @@ FloatingWindow {
         moveInput.text = actions.move || "";
         monitorInput.text = actions.monitor || "";
         hyprWorkspaceInput.text = actions.workspace || "";
+    }
 
+    function showEdit(rule) {
+        if (!rule) {
+            show();
+            return;
+        }
+        editingRule = rule;
+        resetForm();
+        populateForm(rule);
+        visible = true;
+        Qt.callLater(() => nameInput.forceActiveFocus());
+    }
+
+    function showCopy(rule) {
+        if (!rule) {
+            show();
+            return;
+        }
+        editingRule = null;
+        resetForm();
+        populateForm(rule);
         visible = true;
         Qt.callLater(() => nameInput.forceActiveFocus());
     }
@@ -161,12 +234,51 @@ FloatingWindow {
         targetWindow = null;
     }
 
+    function applyCond(obj, key, triState) {
+        if (triState === 1)
+            obj[key] = true;
+        else if (triState === 2)
+            obj[key] = false;
+    }
+
     function submitAndClose() {
         const matchCriteria = {};
         if (appIdInput.text.trim())
             matchCriteria.appId = appIdInput.text.trim();
         if (titleInput.text.trim())
             matchCriteria.title = titleInput.text.trim();
+
+        applyCond(matchCriteria, "isFloating", condFloating.triState);
+        if (isNiri) {
+            applyCond(matchCriteria, "isActive", condActive.triState);
+            applyCond(matchCriteria, "isFocused", condFocused.triState);
+            applyCond(matchCriteria, "isActiveInColumn", condActiveInColumn.triState);
+            applyCond(matchCriteria, "isWindowCastTarget", condCastTarget.triState);
+            applyCond(matchCriteria, "isUrgent", condUrgent.triState);
+            applyCond(matchCriteria, "atStartup", condAtStartup.triState);
+        }
+        if (isHyprland) {
+            applyCond(matchCriteria, "xwayland", condXwayland.triState);
+            applyCond(matchCriteria, "fullscreen", condFullscreen.triState);
+            applyCond(matchCriteria, "pinned", condPinned.triState);
+            applyCond(matchCriteria, "initialised", condInitialised.triState);
+        }
+
+        const matches = [];
+        if (Object.keys(matchCriteria).length > 0)
+            matches.push(matchCriteria);
+        if (isNiri) {
+            for (let i = 0; i < extraMatchModel.count; i++) {
+                const row = extraMatchModel.get(i);
+                const m = {};
+                if ((row.rowAppId || "").trim())
+                    m.appId = row.rowAppId.trim();
+                if ((row.rowTitle || "").trim())
+                    m.title = row.rowTitle.trim();
+                if (Object.keys(m).length > 0)
+                    matches.push(m);
+            }
+        }
 
         const actions = {};
 
@@ -206,6 +318,14 @@ FloatingWindow {
             actions.tiledState = true;
         if (drawBorderBgToggle.checked && isNiri)
             actions.drawBorderWithBackground = true;
+        if (isNiri) {
+            applyCond(actions, "backgroundBlur", blurCond.triState);
+            applyCond(actions, "backgroundXray", xrayCond.triState);
+        }
+        if (noiseEnabled.checked && isNiri)
+            actions.backgroundNoise = noiseSlider.value / 100;
+        if (saturationEnabled.checked && isNiri)
+            actions.backgroundSaturation = saturationSlider.value / 100;
 
         const minW = parseInt(minWidthInput.text);
         const maxW = parseInt(maxWidthInput.text);
@@ -260,6 +380,8 @@ FloatingWindow {
             actions: actions,
             enabled: true
         };
+        if (isNiri && extraMatchModel.count > 0)
+            ruleData.matches = matches;
 
         submitting = true;
 
@@ -367,6 +489,61 @@ FloatingWindow {
         color: Theme.surfaceHover
         border.color: hasFocus ? Theme.primary : Theme.outlineStrong
         border.width: hasFocus ? 2 : 1
+    }
+
+    // Tri-state toggle: 0 = unset (Inherit/Any), 1 = true, 2 = false
+    component MatchCond: Rectangle {
+        id: mc
+        property string label: ""
+        property int triState: 0
+        property string unsetLabel: I18n.tr("Any")
+        property bool readOnly: false
+        readonly property var stateText: [mc.unsetLabel, "true", "false"]
+        readonly property var stateColor: [Theme.surfaceVariantText, Theme.primary, Theme.error]
+
+        width: condRow.implicitWidth + Theme.spacingM * 2
+        height: root.inputFieldHeight
+        radius: Theme.cornerRadius
+        color: Theme.surfaceHover
+        border.width: 1
+        border.color: mc.triState === 0 ? Theme.outlineStrong : mc.stateColor[mc.triState]
+        opacity: mc.readOnly ? 0.4 : 1
+
+        Row {
+            id: condRow
+            anchors.centerIn: parent
+            spacing: Theme.spacingXS
+
+            StyledText {
+                text: mc.label
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Rectangle {
+                width: stateBadge.implicitWidth + Theme.spacingS * 2
+                height: 18
+                radius: 9
+                color: Theme.withAlpha(mc.stateColor[mc.triState], 0.15)
+                anchors.verticalCenter: parent.verticalCenter
+
+                StyledText {
+                    id: stateBadge
+                    anchors.centerIn: parent
+                    text: mc.stateText[mc.triState]
+                    font.pixelSize: Theme.fontSizeSmall - 2
+                    color: mc.stateColor[mc.triState]
+                }
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            enabled: root.visible && !mc.readOnly
+            onClicked: mc.triState = (mc.triState + 1) % 3
+        }
     }
 
     FocusScope {
@@ -511,6 +688,176 @@ FloatingWindow {
                                 return;
                             titleInput.text = "^" + root.targetWindow.title + "$";
                         }
+                    }
+                }
+
+                StyledText {
+                    width: parent.width
+                    visible: root.isNiri
+                    text: I18n.tr("The rule applies to any window matching one of these.")
+                    font.pixelSize: Theme.fontSizeSmall - 1
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+
+                Repeater {
+                    model: extraMatchModel
+
+                    delegate: Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        InputField {
+                            width: (parent.width - removeMatchBtn.width - Theme.spacingS * 2) / 2
+                            hasFocus: extraAppId.activeFocus
+                            DankTextField {
+                                id: extraAppId
+                                anchors.fill: parent
+                                font.pixelSize: Theme.fontSizeSmall
+                                textColor: Theme.surfaceText
+                                placeholderText: root.isNiri ? I18n.tr("App ID regex") : I18n.tr("Class regex")
+                                backgroundColor: "transparent"
+                                enabled: root.visible
+                                text: rowAppId
+                                onTextEdited: extraMatchModel.setProperty(index, "rowAppId", text)
+                            }
+                        }
+
+                        InputField {
+                            width: (parent.width - removeMatchBtn.width - Theme.spacingS * 2) / 2
+                            hasFocus: extraTitle.activeFocus
+                            DankTextField {
+                                id: extraTitle
+                                anchors.fill: parent
+                                font.pixelSize: Theme.fontSizeSmall
+                                textColor: Theme.surfaceText
+                                placeholderText: I18n.tr("Title regex (optional)")
+                                backgroundColor: "transparent"
+                                enabled: root.visible
+                                text: rowTitle
+                                onTextEdited: extraMatchModel.setProperty(index, "rowTitle", text)
+                            }
+                        }
+
+                        DankActionButton {
+                            id: removeMatchBtn
+                            width: root.inputFieldHeight
+                            height: root.inputFieldHeight
+                            circular: false
+                            iconName: "close"
+                            iconSize: 16
+                            iconColor: Theme.surfaceVariantText
+                            tooltipText: I18n.tr("Remove match")
+                            tooltipSide: "left"
+                            onClicked: extraMatchModel.remove(index)
+                        }
+                    }
+                }
+
+                Item {
+                    width: parent.width
+                    height: root.inputFieldHeight
+                    visible: root.isNiri
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "add"
+                            size: 18
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Add match")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: extraMatchModel.append({
+                            "rowAppId": "",
+                            "rowTitle": ""
+                        })
+                    }
+                }
+
+                SectionHeader {
+                    title: I18n.tr("Match Conditions")
+                }
+
+                StyledText {
+                    width: parent.width
+                    text: I18n.tr("Optional state-based conditions applied to the first match.")
+                    font.pixelSize: Theme.fontSizeSmall - 1
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+
+                Flow {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    MatchCond {
+                        id: condFloating
+                        label: I18n.tr("Floating")
+                    }
+                    MatchCond {
+                        id: condActive
+                        label: I18n.tr("Active")
+                        visible: isNiri
+                    }
+                    MatchCond {
+                        id: condFocused
+                        label: I18n.tr("Focused")
+                        visible: isNiri
+                    }
+                    MatchCond {
+                        id: condActiveInColumn
+                        label: I18n.tr("Active in Column")
+                        visible: isNiri
+                    }
+                    MatchCond {
+                        id: condCastTarget
+                        label: I18n.tr("Cast Target")
+                        visible: isNiri
+                    }
+                    MatchCond {
+                        id: condUrgent
+                        label: I18n.tr("Urgent")
+                        visible: isNiri
+                    }
+                    MatchCond {
+                        id: condAtStartup
+                        label: I18n.tr("At Startup")
+                        visible: isNiri
+                    }
+                    MatchCond {
+                        id: condXwayland
+                        label: I18n.tr("XWayland")
+                        visible: isHyprland
+                    }
+                    MatchCond {
+                        id: condFullscreen
+                        label: I18n.tr("Fullscreen")
+                        visible: isHyprland
+                    }
+                    MatchCond {
+                        id: condPinned
+                        label: I18n.tr("Pinned")
+                        visible: isHyprland
+                    }
+                    MatchCond {
+                        id: condInitialised
+                        label: I18n.tr("Initialised")
+                        visible: isHyprland
                     }
                 }
 
@@ -682,6 +1029,7 @@ FloatingWindow {
 
                     DankSlider {
                         id: opacitySlider
+                        wheelEnabled: false
                         width: parent.width - 100
                         minimum: 10
                         maximum: 100
@@ -710,7 +1058,7 @@ FloatingWindow {
                     }
                     CheckboxRow {
                         id: drawBorderBgToggle
-                        label: I18n.tr("Border with BG")
+                        label: I18n.tr("Border with Background")
                     }
                 }
 
@@ -777,6 +1125,7 @@ FloatingWindow {
 
                     DankSlider {
                         id: scrollFactorSlider
+                        wheelEnabled: false
                         width: parent.width - 120
                         minimum: 10
                         maximum: 200
@@ -798,11 +1147,94 @@ FloatingWindow {
 
                     DankSlider {
                         id: cornerRadiusSlider
+                        wheelEnabled: false
                         width: parent.width - 130
                         minimum: 0
                         maximum: 24
                         value: 12
                         enabled: cornerRadiusEnabled.checked
+                        opacity: enabled ? 1 : 0.4
+                    }
+                }
+
+                SectionHeader {
+                    title: I18n.tr("Background Effect")
+                    visible: isNiri
+                }
+
+                StyledText {
+                    width: parent.width
+                    visible: isNiri
+                    text: I18n.tr("Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).")
+                    font.pixelSize: Theme.fontSizeSmall - 1
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+
+                Flow {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: isNiri
+
+                    MatchCond {
+                        id: blurCond
+                        label: I18n.tr("Blur")
+                        unsetLabel: I18n.tr("Inherit")
+                        onTriStateChanged: {
+                            if (triState === 2)
+                                xrayCond.triState = 0;
+                        }
+                    }
+                    MatchCond {
+                        id: xrayCond
+                        label: I18n.tr("X-Ray")
+                        unsetLabel: I18n.tr("Inherit")
+                        readOnly: blurCond.triState === 2
+                    }
+                }
+
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacingM
+                    visible: isNiri
+
+                    CheckboxRow {
+                        id: noiseEnabled
+                        label: I18n.tr("Noise")
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    DankSlider {
+                        id: noiseSlider
+                        wheelEnabled: false
+                        width: parent.width - 130
+                        minimum: 0
+                        maximum: 100
+                        value: 5
+                        enabled: noiseEnabled.checked
+                        opacity: enabled ? 1 : 0.4
+                    }
+                }
+
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacingM
+                    visible: isNiri
+
+                    CheckboxRow {
+                        id: saturationEnabled
+                        label: I18n.tr("Saturation")
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    DankSlider {
+                        id: saturationSlider
+                        wheelEnabled: false
+                        width: parent.width - 130
+                        minimum: 0
+                        maximum: 200
+                        value: 100
+                        enabled: saturationEnabled.checked
                         opacity: enabled ? 1 : 0.4
                     }
                 }
