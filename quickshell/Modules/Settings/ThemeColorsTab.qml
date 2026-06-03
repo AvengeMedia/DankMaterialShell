@@ -1868,7 +1868,7 @@ Item {
                     tags: ["blur", "background", "transparency", "glass", "frosted"]
                     settingKey: "blurEnabled"
                     text: I18n.tr("Background Blur")
-                    description: !BlurService.available ? I18n.tr("Requires a newer version of Quickshell") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.")
+                    description: !BlurService.available ? I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.")
                     checked: SettingsData.blurEnabled ?? false
                     enabled: BlurService.available
                     onToggled: checked => SettingsData.set("blurEnabled", checked)
