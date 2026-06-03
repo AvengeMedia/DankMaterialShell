@@ -235,9 +235,9 @@ func runSetupDmsConfig(name string) error {
 	var dmsDir string
 	switch compositor {
 	case "niri":
-		dmsDir = filepath.Join(os.Getenv("HOME"), ".config", "niri", "dms")
+		dmsDir = filepath.Join(utils.XDGConfigHome(), "niri", "dms")
 	case "hyprland":
-		dmsDir = filepath.Join(os.Getenv("HOME"), ".config", "hypr", "dms")
+		dmsDir = filepath.Join(utils.XDGConfigHome(), "hypr", "dms")
 	}
 
 	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
