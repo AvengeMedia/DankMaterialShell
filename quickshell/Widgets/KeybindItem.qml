@@ -71,8 +71,24 @@ Item {
     signal resetBind(string key)
     signal cancelEdit
 
+    clip: true
+
+    property bool _userToggledExpand: false
+
     implicitHeight: contentColumn.implicitHeight
     height: implicitHeight
+
+    Behavior on implicitHeight {
+        enabled: root._userToggledExpand
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+            onRunningChanged: {
+                if (!running)
+                    root._userToggledExpand = false;
+            }
+        }
+    }
 
     Component.onCompleted: {
         if (isNew && isExpanded)
@@ -80,6 +96,7 @@ Item {
     }
 
     onIsExpandedChanged: {
+        _userToggledExpand = true;
         if (!isExpanded)
             return;
         if (restoreKey) {
@@ -431,7 +448,7 @@ Item {
             width: parent.width
             active: root.isExpanded
             visible: status === Loader.Ready
-            asynchronous: true
+            asynchronous: false
             sourceComponent: expandedComponent
         }
     }
@@ -957,7 +974,7 @@ Item {
                                 if (act.label === value) {
                                     root.updateEdit({
                                         "action": act.id,
-                                        "desc": act.label
+                                        "desc": KeybindsService.getActionLabel(act.id)
                                     });
                                     return;
                                 }
@@ -1012,11 +1029,16 @@ Item {
                         onEditingFinished: {
                             if (!dmsArgsRow.parsedArgs)
                                 return;
+                            const oldAction = root.editAction;
                             const newArgs = Object.assign({}, dmsArgsRow.parsedArgs.args);
                             newArgs.amount = text || "5";
-                            root.updateEdit({
-                                "action": Actions.buildDmsAction(dmsArgsRow.parsedArgs.base, newArgs)
-                            });
+                            const newAction = Actions.buildDmsAction(dmsArgsRow.parsedArgs.base, newArgs);
+                            const changes = {
+                                "action": newAction
+                            };
+                            if (root.editDesc === "" || root.editDesc === KeybindsService.getActionLabel(oldAction))
+                                changes.desc = KeybindsService.getActionLabel(newAction);
+                            root.updateEdit(changes);
                         }
                     }
 

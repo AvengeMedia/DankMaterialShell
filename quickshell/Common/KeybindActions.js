@@ -770,6 +770,26 @@ const DMS_ACTION_ARGS = {
     }
 };
 
+const DMS_AMOUNT_LABELS = {
+    "audio increment": "Volume Up",
+    "audio decrement": "Volume Down",
+    "mpris increment": "Player Volume Up",
+    "mpris decrement": "Player Volume Down",
+    "brightness increment": "Brightness Up",
+    "brightness decrement": "Brightness Down"
+};
+
+function getDmsAmountLabel(action) {
+    var parsed = parseDmsActionArgs(action);
+    var label = DMS_AMOUNT_LABELS[parsed.base];
+    if (!label)
+        return null;
+    var amount = parsed.args?.amount;
+    if (amount === undefined || amount === null || amount === "")
+        return label;
+    return label + " (" + amount + "%)";
+}
+
 function getActionTypes() {
     return ACTION_TYPES;
 }
@@ -843,6 +863,10 @@ function findCompositorAction(compositor, actionId) {
 function getActionLabel(action, compositor) {
     if (!action)
         return "";
+
+    var amountLabel = getDmsAmountLabel(action);
+    if (amountLabel)
+        return amountLabel;
 
     var dmsAct = findDmsAction(action);
     if (dmsAct)
