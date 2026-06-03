@@ -102,6 +102,120 @@ Column {
         item.z = 1000;
     }
 
+    function getCompoundPillIconBlinking(id) {
+        if (id === "wifi") return NetworkService.isWifiConnecting;
+        if (id === "bluetooth") return BluetoothService.connecting;
+        return false;
+    }
+
+    function getCompoundPillIconName(id, widgetDef) {
+        switch (id) {
+        case "wifi": {
+            if (NetworkService.wifiToggling) return "sync";
+            if (NetworkService.isConnecting && !NetworkService.ethernetConnected) return NetworkService.wifiSignalIcon;
+            const status = NetworkService.networkStatus;
+            if (status === "ethernet") return "settings_ethernet";
+            if (status === "vpn") return NetworkService.ethernetConnected ? "settings_ethernet" : NetworkService.wifiSignalIcon;
+            if (status === "wifi") return NetworkService.wifiSignalIcon;
+            return "wifi";
+        }
+        case "bluetooth": {
+            return "bluetooth";
+        }
+        case "audioOutput": {
+            if (!AudioService.sink?.audio) return "volume_off";
+            let volume = AudioService.sink.audio.volume;
+            let muted = AudioService.sink.audio.muted;
+            if (muted) return "volume_off";
+            if (volume === 0.0) return "volume_mute";
+            if (volume <= 0.33) return "volume_down";
+            if (volume <= 0.66) return "volume_up";
+            return "volume_up";
+        }
+        case "audioInput": {
+            if (!AudioService.source?.audio) return "mic_off";
+            return AudioService.source.audio.muted ? "mic_off" : "mic";
+        }
+        default:
+            return widgetDef?.icon || "help";
+        }
+    }
+
+    function getCompoundPillIsActive(id) {
+        switch (id) {
+        case "wifi": {
+            if (NetworkService.wifiToggling) return false;
+            const status = NetworkService.networkStatus;
+            if (status === "ethernet") return true;
+            if (status === "vpn") return NetworkService.ethernetConnected || NetworkService.wifiConnected;
+            if (status === "wifi") return true;
+            return NetworkService.wifiEnabled;
+        }
+        case "bluetooth":
+            return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled);
+        case "audioOutput":
+            return !!(AudioService.sink?.audio && !AudioService.sink.audio.muted);
+        case "audioInput":
+            return !!(AudioService.source?.audio && !AudioService.source.audio.muted);
+        default:
+            return false;
+        }
+    }
+
+    function handleCompoundPillToggled(id) {
+        switch (id) {
+        case "wifi": {
+            if (NetworkService.networkStatus !== "ethernet" && !NetworkService.wifiToggling) {
+                NetworkService.toggleWifiRadio();
+            }
+            break;
+        }
+        case "bluetooth": {
+            if (BluetoothService.available && BluetoothService.adapter) {
+                BluetoothService.adapter.enabled = !BluetoothService.adapter.enabled;
+            }
+            break;
+        }
+        case "audioOutput": {
+            if (AudioService.sink && AudioService.sink.audio) {
+                AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
+            }
+            break;
+        }
+        case "audioInput": {
+            if (AudioService.source && AudioService.source.audio) {
+                AudioService.source.audio.muted = !AudioService.source.audio.muted;
+            }
+            break;
+        }
+        }
+    }
+
+    function handleCompoundPillWheelEvent(id, wheelEvent) {
+        if (id === "audioOutput") {
+            if (!AudioService.sink || !AudioService.sink.audio) return;
+            let delta = wheelEvent.angleDelta.y;
+            let maxVol = AudioService.sinkMaxVolume;
+            let currentVolume = AudioService.sink.audio.volume * 100;
+            let newVolume;
+            if (delta > 0) newVolume = Math.min(maxVol, currentVolume + 5);
+            else newVolume = Math.max(0, currentVolume - 5);
+            AudioService.sink.audio.muted = false;
+            AudioService.sink.audio.volume = newVolume / 100;
+            wheelEvent.accepted = true;
+        } else if (id === "audioInput") {
+            if (!AudioService.source || !AudioService.source.audio) return;
+            let delta = wheelEvent.angleDelta.y;
+            let currentVolume = AudioService.source.audio.volume * 100;
+            let newVolume;
+            if (delta > 0) newVolume = Math.min(100, currentVolume + 5);
+            else newVolume = Math.max(0, currentVolume - 5);
+            AudioService.source.audio.muted = false;
+            AudioService.source.audio.volume = newVolume / 100;
+            wheelEvent.accepted = true;
+        }
+    }
+
     function componentForWidget(widgetData) {
         const id = widgetData.id || "";
         const widgetWidth = widgetData.width || 50;
@@ -114,7 +228,7 @@ Column {
         case "bluetooth":
         case "audioOutput":
         case "audioInput":
-            return compoundPillComponent;
+            return widgetWidth <= 25 ? smallCompoundComponent : compoundPillComponent;
         case "volumeSlider":
             return audioSliderComponent;
         case "brightnessSlider":
@@ -126,7 +240,7 @@ Column {
         case "diskUsage":
             return widgetWidth <= 25 ? smallDiskUsageComponent : diskUsagePillComponent;
         case "colorPicker":
-            return colorPickerPillComponent;
+            return widgetWidth <= 25 ? smallColorPickerComponent : colorPickerPillComponent;
         case "doNotDisturb":
             return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
         default:
@@ -329,69 +443,8 @@ Column {
             property var widgetDef: root.model?.getWidgetForId(widgetData.id || "")
             width: parent.width
             height: 60
-            iconBlinking: {
-                const id = widgetData.id || "";
-                if (id === "wifi")
-                    return NetworkService.isWifiConnecting;
-                if (id === "bluetooth")
-                    return BluetoothService.connecting;
-                return false;
-            }
-            iconName: {
-                switch (widgetData.id || "") {
-                case "wifi":
-                    {
-                        if (NetworkService.wifiToggling)
-                            return "sync";
-                        if (NetworkService.isConnecting && !NetworkService.ethernetConnected)
-                            return NetworkService.wifiSignalIcon;
-
-                        const status = NetworkService.networkStatus;
-                        if (status === "ethernet")
-                            return "settings_ethernet";
-                        if (status === "vpn")
-                            return NetworkService.ethernetConnected ? "settings_ethernet" : NetworkService.wifiSignalIcon;
-                        if (status === "wifi")
-                            return NetworkService.wifiSignalIcon;
-                        if (NetworkService.wifiEnabled)
-                            return "wifi_off";
-                        return "wifi_off";
-                    }
-                case "bluetooth":
-                    {
-                        if (!BluetoothService.available)
-                            return "bluetooth_disabled";
-                        if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
-                            return "bluetooth_disabled";
-                        return "bluetooth";
-                    }
-                case "audioOutput":
-                    {
-                        if (!AudioService.sink?.audio)
-                            return "volume_off";
-                        let volume = AudioService.sink.audio.volume;
-                        let muted = AudioService.sink.audio.muted;
-                        if (muted)
-                            return "volume_off";
-                        if (volume === 0.0)
-                            return "volume_mute";
-                        if (volume <= 0.33)
-                            return "volume_down";
-                        if (volume <= 0.66)
-                            return "volume_up";
-                        return "volume_up";
-                    }
-                case "audioInput":
-                    {
-                        if (!AudioService.source?.audio)
-                            return "mic_off";
-                        let muted = AudioService.source.audio.muted;
-                        return muted ? "mic_off" : "mic";
-                    }
-                default:
-                    return widgetDef?.icon || "help";
-                }
-            }
+            iconBlinking: root.getCompoundPillIconBlinking(widgetData.id || "")
+            iconName: root.getCompoundPillIconName(widgetData.id || "", widgetDef)
             primaryText: {
                 switch (widgetData.id || "") {
                 case "wifi":
@@ -506,66 +559,12 @@ Column {
                     return widgetDef?.description || "";
                 }
             }
-            isActive: {
-                switch (widgetData.id || "") {
-                case "wifi":
-                    {
-                        if (NetworkService.wifiToggling)
-                            return false;
-
-                        const status = NetworkService.networkStatus;
-                        if (status === "ethernet")
-                            return true;
-                        if (status === "vpn")
-                            return NetworkService.ethernetConnected || NetworkService.wifiConnected;
-                        if (status === "wifi")
-                            return true;
-                        return NetworkService.wifiEnabled;
-                    }
-                case "bluetooth":
-                    return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled);
-                case "audioOutput":
-                    return !!(AudioService.sink?.audio && !AudioService.sink.audio.muted);
-                case "audioInput":
-                    return !!(AudioService.source?.audio && !AudioService.source.audio.muted);
-                default:
-                    return false;
-                }
-            }
+            isActive: root.getCompoundPillIsActive(widgetData.id || "")
             enabled: widgetDef?.enabled ?? true
             onToggled: {
                 if (root.editMode)
                     return;
-                switch (widgetData.id || "") {
-                case "wifi":
-                    {
-                        if (NetworkService.networkStatus !== "ethernet" && !NetworkService.wifiToggling) {
-                            NetworkService.toggleWifiRadio();
-                        }
-                        break;
-                    }
-                case "bluetooth":
-                    {
-                        if (BluetoothService.available && BluetoothService.adapter) {
-                            BluetoothService.adapter.enabled = !BluetoothService.adapter.enabled;
-                        }
-                        break;
-                    }
-                case "audioOutput":
-                    {
-                        if (AudioService.sink && AudioService.sink.audio) {
-                            AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
-                        }
-                        break;
-                    }
-                case "audioInput":
-                    {
-                        if (AudioService.source && AudioService.source.audio) {
-                            AudioService.source.audio.muted = !AudioService.source.audio.muted;
-                        }
-                        break;
-                    }
-                }
+                root.handleCompoundPillToggled(widgetData.id || "");
             }
             onExpandClicked: {
                 if (root.editMode)
@@ -575,35 +574,7 @@ Column {
             onWheelEvent: function (wheelEvent) {
                 if (root.editMode)
                     return;
-                const id = widgetData.id || "";
-                if (id === "audioOutput") {
-                    if (!AudioService.sink || !AudioService.sink.audio)
-                        return;
-                    let delta = wheelEvent.angleDelta.y;
-                    let maxVol = AudioService.sinkMaxVolume;
-                    let currentVolume = AudioService.sink.audio.volume * 100;
-                    let newVolume;
-                    if (delta > 0)
-                        newVolume = Math.min(maxVol, currentVolume + 5);
-                    else
-                        newVolume = Math.max(0, currentVolume - 5);
-                    AudioService.sink.audio.muted = false;
-                    AudioService.sink.audio.volume = newVolume / 100;
-                    wheelEvent.accepted = true;
-                } else if (id === "audioInput") {
-                    if (!AudioService.source || !AudioService.source.audio)
-                        return;
-                    let delta = wheelEvent.angleDelta.y;
-                    let currentVolume = AudioService.source.audio.volume * 100;
-                    let newVolume;
-                    if (delta > 0)
-                        newVolume = Math.min(100, currentVolume + 5);
-                    else
-                        newVolume = Math.max(0, currentVolume - 5);
-                    AudioService.source.audio.muted = false;
-                    AudioService.source.audio.volume = newVolume / 100;
-                    wheelEvent.accepted = true;
-                }
+                root.handleCompoundPillWheelEvent(widgetData.id || "", wheelEvent);
             }
         }
     }
@@ -736,7 +707,7 @@ Column {
                 case "darkMode":
                     return "contrast";
                 case "idleInhibitor":
-                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
+                    return "motion_sensor_active";
                 default:
                     return "help";
                 }
@@ -821,9 +792,9 @@ Column {
                 case "darkMode":
                     return "contrast";
                 case "doNotDisturb":
-                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off";
+                    return "do_not_disturb_on";
                 case "idleInhibitor":
-                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
+                    return "motion_sensor_active";
                 default:
                     return "help";
                 }
@@ -1220,6 +1191,49 @@ Column {
                 } else if (pluginInstance) {
                     pluginInstance.ccWidgetToggled();
                 }
+            }
+        }
+    }
+
+    Component {
+        id: smallCompoundComponent
+        SmallCompoundButton {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            property var widgetDef: root.model?.getWidgetForId(widgetData.id || "")
+            width: parent.width
+            height: 48
+            iconBlinking: root.getCompoundPillIconBlinking(widgetData.id || "")
+            iconName: root.getCompoundPillIconName(widgetData.id || "", widgetDef)
+            isActive: root.getCompoundPillIsActive(widgetData.id || "")
+            enabled: (widgetDef?.enabled ?? true) && !root.editMode
+            onToggled: {
+                if (root.editMode) return;
+                root.handleCompoundPillToggled(widgetData.id || "");
+            }
+            onExpandClicked: {
+                if (root.editMode) return;
+                root.expandClicked(widgetData, widgetIndex);
+            }
+            onWheelEvent: function(wheelEvent) {
+                if (root.editMode) return;
+                root.handleCompoundPillWheelEvent(widgetData.id || "", wheelEvent);
+            }
+        }
+    }
+
+    Component {
+        id: smallColorPickerComponent
+        SmallColorPickerButton {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            width: parent.width
+            height: 48
+            colorPickerModal: root.colorPickerModal
+            onClicked: {
+                if (root.editMode) return;
+                if (root.colorPickerModal)
+                    root.colorPickerModal.show();
             }
         }
     }
