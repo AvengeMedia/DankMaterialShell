@@ -67,6 +67,9 @@ type NiriWindowRule struct {
 	BgXray                  *bool
 	BgNoise                 *float64
 	BgSaturation            *float64
+	DefaultFloatingX        *int
+	DefaultFloatingY        *int
+	DefaultFloatingRelative string
 	Source                  string
 }
 
@@ -316,6 +319,8 @@ func (p *NiriRulesParser) parseWindowRuleNode(node *document.Node) {
 			rule.DrawBorderWithBg = &b
 		case "background-effect":
 			p.parseBackgroundEffectNode(child, &rule)
+		case "default-floating-position":
+			p.parseFloatingPositionNode(child, &rule)
 		}
 	}
 
@@ -441,6 +446,25 @@ func (p *NiriRulesParser) parseBackgroundEffectNode(node *document.Node, rule *N
 				rule.BgSaturation = &f
 			}
 		}
+	}
+}
+
+func (p *NiriRulesParser) parseFloatingPositionNode(node *document.Node, rule *NiriWindowRule) {
+	if node.Properties == nil {
+		return
+	}
+	if val, ok := node.Properties.Get("x"); ok {
+		if n, err := strconv.Atoi(strings.TrimSpace(val.ValueString())); err == nil {
+			rule.DefaultFloatingX = &n
+		}
+	}
+	if val, ok := node.Properties.Get("y"); ok {
+		if n, err := strconv.Atoi(strings.TrimSpace(val.ValueString())); err == nil {
+			rule.DefaultFloatingY = &n
+		}
+	}
+	if val, ok := node.Properties.Get("relative-to"); ok {
+		rule.DefaultFloatingRelative = val.ValueString()
 	}
 }
 
@@ -575,36 +599,39 @@ func ConvertNiriRulesToWindowRules(niriRules []NiriWindowRule) []windowrules.Win
 			},
 			Matches: convertNiriMatches(nr.Matches),
 			Actions: windowrules.Actions{
-				Opacity:              nr.Opacity,
-				OpenFloating:         nr.OpenFloating,
-				OpenMaximized:        nr.OpenMaximized,
-				OpenMaximizedToEdges: nr.OpenMaximizedToEdges,
-				OpenFullscreen:       nr.OpenFullscreen,
-				OpenFocused:          nr.OpenFocused,
-				OpenOnOutput:         nr.OpenOnOutput,
-				OpenOnWorkspace:      nr.OpenOnWorkspace,
-				DefaultColumnWidth:   nr.DefaultColumnWidth,
-				DefaultWindowHeight:  nr.DefaultWindowHeight,
-				VariableRefreshRate:  nr.VariableRefreshRate,
-				BlockOutFrom:         nr.BlockOutFrom,
-				DefaultColumnDisplay: nr.DefaultColumnDisplay,
-				ScrollFactor:         nr.ScrollFactor,
-				CornerRadius:         nr.CornerRadius,
-				ClipToGeometry:       nr.ClipToGeometry,
-				TiledState:           nr.TiledState,
-				MinWidth:             nr.MinWidth,
-				MaxWidth:             nr.MaxWidth,
-				MinHeight:            nr.MinHeight,
-				MaxHeight:            nr.MaxHeight,
-				BorderColor:          nr.BorderColor,
-				FocusRingColor:       nr.FocusRingColor,
-				FocusRingOff:         nr.FocusRingOff,
-				BorderOff:            nr.BorderOff,
-				DrawBorderWithBg:     nr.DrawBorderWithBg,
-				BackgroundBlur:       nr.BgBlur,
-				BackgroundXray:       nr.BgXray,
-				BackgroundNoise:      nr.BgNoise,
-				BackgroundSaturation: nr.BgSaturation,
+				Opacity:                   nr.Opacity,
+				OpenFloating:              nr.OpenFloating,
+				OpenMaximized:             nr.OpenMaximized,
+				OpenMaximizedToEdges:      nr.OpenMaximizedToEdges,
+				OpenFullscreen:            nr.OpenFullscreen,
+				OpenFocused:               nr.OpenFocused,
+				OpenOnOutput:              nr.OpenOnOutput,
+				OpenOnWorkspace:           nr.OpenOnWorkspace,
+				DefaultColumnWidth:        nr.DefaultColumnWidth,
+				DefaultWindowHeight:       nr.DefaultWindowHeight,
+				VariableRefreshRate:       nr.VariableRefreshRate,
+				BlockOutFrom:              nr.BlockOutFrom,
+				DefaultColumnDisplay:      nr.DefaultColumnDisplay,
+				ScrollFactor:              nr.ScrollFactor,
+				CornerRadius:              nr.CornerRadius,
+				ClipToGeometry:            nr.ClipToGeometry,
+				TiledState:                nr.TiledState,
+				MinWidth:                  nr.MinWidth,
+				MaxWidth:                  nr.MaxWidth,
+				MinHeight:                 nr.MinHeight,
+				MaxHeight:                 nr.MaxHeight,
+				BorderColor:               nr.BorderColor,
+				FocusRingColor:            nr.FocusRingColor,
+				FocusRingOff:              nr.FocusRingOff,
+				BorderOff:                 nr.BorderOff,
+				DrawBorderWithBg:          nr.DrawBorderWithBg,
+				BackgroundBlur:            nr.BgBlur,
+				BackgroundXray:            nr.BgXray,
+				BackgroundNoise:           nr.BgNoise,
+				BackgroundSaturation:      nr.BgSaturation,
+				DefaultFloatingX:          nr.DefaultFloatingX,
+				DefaultFloatingY:          nr.DefaultFloatingY,
+				DefaultFloatingRelativeTo: nr.DefaultFloatingRelative,
 			},
 		}
 		result = append(result, wr)
@@ -785,36 +812,39 @@ func (p *NiriWritableProvider) LoadDMSRules() ([]windowrules.WindowRule, error) 
 			},
 			Matches: convertNiriMatches(nr.Matches),
 			Actions: windowrules.Actions{
-				Opacity:              nr.Opacity,
-				OpenFloating:         nr.OpenFloating,
-				OpenMaximized:        nr.OpenMaximized,
-				OpenMaximizedToEdges: nr.OpenMaximizedToEdges,
-				OpenFullscreen:       nr.OpenFullscreen,
-				OpenFocused:          nr.OpenFocused,
-				OpenOnOutput:         nr.OpenOnOutput,
-				OpenOnWorkspace:      nr.OpenOnWorkspace,
-				DefaultColumnWidth:   nr.DefaultColumnWidth,
-				DefaultWindowHeight:  nr.DefaultWindowHeight,
-				VariableRefreshRate:  nr.VariableRefreshRate,
-				BlockOutFrom:         nr.BlockOutFrom,
-				DefaultColumnDisplay: nr.DefaultColumnDisplay,
-				ScrollFactor:         nr.ScrollFactor,
-				CornerRadius:         nr.CornerRadius,
-				ClipToGeometry:       nr.ClipToGeometry,
-				TiledState:           nr.TiledState,
-				MinWidth:             nr.MinWidth,
-				MaxWidth:             nr.MaxWidth,
-				MinHeight:            nr.MinHeight,
-				MaxHeight:            nr.MaxHeight,
-				BorderColor:          nr.BorderColor,
-				FocusRingColor:       nr.FocusRingColor,
-				FocusRingOff:         nr.FocusRingOff,
-				BorderOff:            nr.BorderOff,
-				DrawBorderWithBg:     nr.DrawBorderWithBg,
-				BackgroundBlur:       nr.BgBlur,
-				BackgroundXray:       nr.BgXray,
-				BackgroundNoise:      nr.BgNoise,
-				BackgroundSaturation: nr.BgSaturation,
+				Opacity:                   nr.Opacity,
+				OpenFloating:              nr.OpenFloating,
+				OpenMaximized:             nr.OpenMaximized,
+				OpenMaximizedToEdges:      nr.OpenMaximizedToEdges,
+				OpenFullscreen:            nr.OpenFullscreen,
+				OpenFocused:               nr.OpenFocused,
+				OpenOnOutput:              nr.OpenOnOutput,
+				OpenOnWorkspace:           nr.OpenOnWorkspace,
+				DefaultColumnWidth:        nr.DefaultColumnWidth,
+				DefaultWindowHeight:       nr.DefaultWindowHeight,
+				VariableRefreshRate:       nr.VariableRefreshRate,
+				BlockOutFrom:              nr.BlockOutFrom,
+				DefaultColumnDisplay:      nr.DefaultColumnDisplay,
+				ScrollFactor:              nr.ScrollFactor,
+				CornerRadius:              nr.CornerRadius,
+				ClipToGeometry:            nr.ClipToGeometry,
+				TiledState:                nr.TiledState,
+				MinWidth:                  nr.MinWidth,
+				MaxWidth:                  nr.MaxWidth,
+				MinHeight:                 nr.MinHeight,
+				MaxHeight:                 nr.MaxHeight,
+				BorderColor:               nr.BorderColor,
+				FocusRingColor:            nr.FocusRingColor,
+				FocusRingOff:              nr.FocusRingOff,
+				BorderOff:                 nr.BorderOff,
+				DrawBorderWithBg:          nr.DrawBorderWithBg,
+				BackgroundBlur:            nr.BgBlur,
+				BackgroundXray:            nr.BgXray,
+				BackgroundNoise:           nr.BgNoise,
+				BackgroundSaturation:      nr.BgSaturation,
+				DefaultFloatingX:          nr.DefaultFloatingX,
+				DefaultFloatingY:          nr.DefaultFloatingY,
+				DefaultFloatingRelativeTo: nr.DefaultFloatingRelative,
 			},
 		}
 
@@ -987,6 +1017,14 @@ func (p *NiriWritableProvider) formatRule(rule windowrules.WindowRule) string {
 			lines = append(lines, fmt.Sprintf("        saturation %s", formatFloat(*a.BackgroundSaturation)))
 		}
 		lines = append(lines, "    }")
+	}
+
+	if a.DefaultFloatingX != nil && a.DefaultFloatingY != nil {
+		line := fmt.Sprintf("    default-floating-position x=%d y=%d", *a.DefaultFloatingX, *a.DefaultFloatingY)
+		if a.DefaultFloatingRelativeTo != "" {
+			line += fmt.Sprintf(" relative-to=%q", a.DefaultFloatingRelativeTo)
+		}
+		lines = append(lines, line)
 	}
 
 	lines = append(lines, "}")
