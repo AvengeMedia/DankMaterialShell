@@ -245,6 +245,13 @@ Rectangle {
                     "icon": "app_registration",
                     "tabIndex": 19,
                     "hyprlandNiriOnly": true
+                },
+                {
+                    "id": "autostart",
+                    "text": I18n.tr("Autostart Apps"),
+                    "icon": "line_start",
+                    "tabIndex": 36,
+                    "autostartOnly": true
                 }
             ]
         },
@@ -368,6 +375,8 @@ Rectangle {
         if (item.clipboardOnly && (!DMSService.isConnected || DMSService.apiVersion < 23))
             return false;
         if (item.updaterOnly && !SystemUpdateService.sysupdateAvailable)
+            return false;
+        if (item.autostartOnly && !DesktopService.autostartAvailable)
             return false;
         return true;
     }
