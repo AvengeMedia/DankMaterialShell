@@ -75,6 +75,8 @@ func TestHyprlandLuaBindRoundTripHelpers(t *testing.T) {
 		{`hl.dispatch([[customdispatcher arg one]])`, "customdispatcher", "arg one"},
 		{`hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })`, "fullscreen", "1"},
 		{`hl.dsp.window.float({ action = "on" })`, "setfloating", ""},
+		{`hl.dsp.window.close()`, "killactive", ""},
+		{`hl.dsp.window.kill()`, "forcekillactive", ""},
 		{`hl.dsp.window.close({ window = "class:^(kitty)$" })`, "closewindow", "class:^(kitty)$"},
 		{`hl.dsp.focus({ workspace = "e+1" })`, "workspace", "e+1"},
 		{`hl.dsp.focus({ workspace = "2", on_current_monitor = true })`, "focusworkspaceoncurrentmonitor", "2"},
@@ -162,6 +164,8 @@ func TestLuaActionStringFromHyprlangActionUsesNativeDispatchers(t *testing.T) {
 		action string
 		want   string
 	}{
+		{"killactive", `hl.dsp.window.close()`},
+		{"forcekillactive", `hl.dsp.window.kill()`},
 		{"workspace 1", `hl.dsp.focus({ workspace = "1" })`},
 		{"movetoworkspace 2", `hl.dsp.window.move({ workspace = "2" })`},
 		{"movetoworkspacesilent special:magic", `hl.dsp.window.move({ workspace = "special:magic", follow = false })`},

@@ -38,7 +38,7 @@ hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd([[dms ipc call brightness increme
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd([[dms ipc call brightness decrement 5 ""]]), { locked = true, repeating = true })
 
 -- === Window Management ===
-hl.bind("SUPER + Q", hl.dsp.window.kill())
+hl.bind("SUPER + Q", hl.dsp.window.close())
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
 hl.bind("SUPER + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind("SUPER + SHIFT + T", hl.dsp.window.float({ action = "toggle" }))

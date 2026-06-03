@@ -1074,7 +1074,7 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 		if arg := luaCallStringArgValue(expr, "hl.dsp.window.close"); arg != "" {
 			return "closewindow", arg
 		}
-		return "closewindow", ""
+		return "killactive", ""
 	case strings.HasPrefix(expr, "hl.dsp.window.kill("):
 		if window := luaTableStringField(expr, "window"); window != "" {
 			return "killwindow", window
@@ -1082,7 +1082,7 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 		if arg := luaCallStringArgValue(expr, "hl.dsp.window.kill"); arg != "" {
 			return "killwindow", arg
 		}
-		return "killactive", ""
+		return "forcekillactive", ""
 	case strings.HasPrefix(expr, "hl.dsp.window.fullscreen("):
 		switch luaTableStringField(expr, "mode") {
 		case "maximized", "maximize":

@@ -732,7 +732,7 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 	case "execr":
 		return fmt.Sprintf(`hl.dsp.exec_raw(%s)`, strconv.Quote(params)), true
 	case "killactive":
-		return `hl.dsp.window.kill()`, true
+		return `hl.dsp.window.close()`, true
 	case "forcekillactive":
 		return `hl.dsp.window.kill()`, true
 	case "closewindow":
