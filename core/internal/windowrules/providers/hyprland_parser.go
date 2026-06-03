@@ -799,11 +799,7 @@ func (p *HyprlandWritableProvider) loadDMSRulesFromLua(data []byte, rulesPath st
 					Actions:       *acts,
 				}
 				if wr.ID == "" {
-					if wr.MatchCriteria.AppID != "" {
-						wr.ID = wr.MatchCriteria.AppID
-					} else {
-						wr.ID = wr.MatchCriteria.Title
-					}
+					wr.ID = fmt.Sprintf("dms_rule_%d", len(rules))
 				}
 				rules = append(rules, wr)
 			}
