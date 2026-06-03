@@ -262,6 +262,7 @@ Item {
                 clickCatcher.visible = true;
             if (!contentWindow.visible)
                 contentWindow.visible = true;
+            opened();
             shouldHaveFocus = false;
             Qt.callLater(() => shouldHaveFocus = Qt.binding(() => shouldBeVisible));
         });
@@ -535,13 +536,11 @@ Item {
         implicitHeight: root.useSingleWindow ? 0 : root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
-            if (visible) {
-                opened();
-            } else {
-                if (Qt.inputMethod) {
-                    Qt.inputMethod.hide();
-                    Qt.inputMethod.reset();
-                }
+            if (visible)
+                return;
+            if (Qt.inputMethod) {
+                Qt.inputMethod.hide();
+                Qt.inputMethod.reset();
             }
         }
 
