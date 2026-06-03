@@ -29,6 +29,7 @@ var SPEC = {
     hyprlandLayoutGapsOverride: { def: -1, onChange: "updateCompositorLayout" },
     hyprlandLayoutRadiusOverride: { def: -1, onChange: "updateCompositorLayout" },
     hyprlandLayoutBorderSize: { def: -1, onChange: "updateCompositorLayout" },
+    hyprlandResizeOnBorder: { def: false, onChange: "updateCompositorLayout" },
     mangoLayoutGapsOverride: { def: -1, onChange: "updateCompositorLayout" },
     mangoLayoutRadiusOverride: { def: -1, onChange: "updateCompositorLayout" },
     mangoLayoutBorderSize: { def: -1, onChange: "updateCompositorLayout" },
