@@ -11,6 +11,7 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property var log: Log.scoped("AutoStartTab")
     property var parentModal: null
     property var entries: []
     property var desktopApps: []
