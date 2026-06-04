@@ -35,6 +35,7 @@ type WindowManager int
 const (
 	WindowManagerHyprland WindowManager = iota
 	WindowManagerNiri
+	WindowManagerMango
 )
 
 type Terminal int

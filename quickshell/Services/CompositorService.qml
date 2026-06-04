@@ -16,6 +16,7 @@ Singleton {
     property bool isHyprland: false
     property bool isNiri: false
     property bool isDwl: false
+    property bool isMango: false
     property bool isSway: false
     property bool isScroll: false
     property bool isMiracle: false
@@ -29,7 +30,9 @@ Singleton {
     readonly property string scrollSocket: Quickshell.env("SWAYSOCK")
     readonly property string miracleSocket: Quickshell.env("MIRACLESOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
+    readonly property string mangoSignature: Quickshell.env("MANGO_INSTANCE_SIGNATURE")
     property bool useNiriSorting: isNiri && NiriService
+    property bool useMangoSorting: isMango && MangoService
 
     property var randrScales: ({})
     property bool randrReady: false
@@ -100,6 +103,12 @@ Singleton {
                 return dwlScale;
         }
 
+        if (isMango && screen) {
+            const mangoScale = MangoService.getOutputScale(screen.name);
+            if (mangoScale !== undefined && mangoScale > 0)
+                return mangoScale;
+        }
+
         return screen?.devicePixelRatio || 1;
     }
 
@@ -114,6 +123,8 @@ Singleton {
             screenName = focusedWs?.monitor?.name || "";
         } else if (isDwl && DwlService.activeOutput)
             screenName = DwlService.activeOutput;
+        else if (isMango && MangoService.activeOutput)
+            screenName = MangoService.activeOutput;
 
         if (!screenName)
             return Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
@@ -194,12 +205,27 @@ Singleton {
         }
     }
 
+    Connections {
+        target: MangoService
+        function onStateChanged() {
+            if (isMango)
+                scheduleSort();
+        }
+        function onWindowsChanged() {
+            if (isMango)
+                scheduleSort();
+        }
+    }
+
     function computeSortedToplevels() {
         if (!ToplevelManager.toplevels || !ToplevelManager.toplevels.values)
             return [];
 
         if (useNiriSorting)
             return NiriService.sortToplevels(ToplevelManager.toplevels.values);
+
+        if (useMangoSorting)
+            return MangoService.sortToplevels(ToplevelManager.toplevels.values);
 
         if (isHyprland)
             return sortHyprlandToplevelsSafe();
@@ -697,6 +723,51 @@ Singleton {
         return false;
     }
 
+    // Mango clients carry absolute geometry + tags; count those on the screen's
+    // active tags (not minimized), made screen-relative via the monitor offset.
+    function mangoDockOverlapForSmartAutoHide(screenName, dockPosition, dockThickness, screenWidth, screenHeight) {
+        if (!isMango || !screenName || !MangoService.windows)
+            return false;
+
+        const out = MangoService.outputs[screenName];
+        const active = new Set((out?.activeTags) || []);
+        const monX = out?.x ?? 0;
+        const monY = out?.y ?? 0;
+
+        for (let i = 0; i < MangoService.windows.length; i++) {
+            const win = MangoService.windows[i];
+            if (!win || win.monitor !== screenName || win.is_minimized)
+                continue;
+            if (active.size > 0 && !(win.tags || []).some(t => active.has(t)))
+                continue;
+
+            const winX = (win.x ?? 0) - monX;
+            const winY = (win.y ?? 0) - monY;
+            const winW = win.width ?? 0;
+            const winH = win.height ?? 0;
+
+            switch (dockPosition) {
+            case SettingsData.Position.Top:
+                if (winY < dockThickness)
+                    return true;
+                break;
+            case SettingsData.Position.Bottom:
+                if (winY + winH > screenHeight - dockThickness)
+                    return true;
+                break;
+            case SettingsData.Position.Left:
+                if (winX < dockThickness)
+                    return true;
+                break;
+            case SettingsData.Position.Right:
+                if (winX + winW > screenWidth - dockThickness)
+                    return true;
+                break;
+            }
+        }
+        return false;
+    }
+
     function filterHyprlandCurrentDisplaySafe(toplevels, screenName) {
         if (!toplevels || toplevels.length === 0 || !Hyprland.toplevels)
             return toplevels;
@@ -790,15 +861,31 @@ Singleton {
                 NiriService.generateNiriLayoutConfig();
                 HyprlandService.generateLayoutConfig();
                 DwlService.generateLayoutConfig();
+                MangoService.generateLayoutConfig();
             });
         }
     }
 
     function detectCompositor() {
+        if (mangoSignature && mangoSignature.length > 0) {
+            isHyprland = false;
+            isNiri = false;
+            isDwl = false;
+            isMango = true;
+            isSway = false;
+            isScroll = false;
+            isMiracle = false;
+            isLabwc = false;
+            compositor = "mango";
+            log.info("Detected MangoWM via MANGO_INSTANCE_SIGNATURE");
+            return;
+        }
+
         if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !miracleSocket && !labwcPid) {
             isHyprland = true;
             isNiri = false;
             isDwl = false;
+            isMango = false;
             isSway = false;
             isScroll = false;
             isMiracle = false;
@@ -814,6 +901,7 @@ Singleton {
                     isNiri = true;
                     isHyprland = false;
                     isDwl = false;
+                    isMango = false;
                     isSway = false;
                     isScroll = false;
                     isMiracle = false;
@@ -849,6 +937,7 @@ Singleton {
                     isNiri = false;
                     isHyprland = false;
                     isDwl = false;
+                    isMango = false;
                     isSway = false;
                     isScroll = false;
                     isMiracle = true;
@@ -866,6 +955,7 @@ Singleton {
                     isNiri = false;
                     isHyprland = false;
                     isDwl = false;
+                    isMango = false;
                     isSway = false;
                     isScroll = true;
                     isMiracle = false;
@@ -881,6 +971,7 @@ Singleton {
             isHyprland = false;
             isNiri = false;
             isDwl = false;
+            isMango = false;
             isSway = false;
             isScroll = false;
             isMiracle = false;
@@ -896,6 +987,7 @@ Singleton {
             isHyprland = false;
             isNiri = false;
             isDwl = false;
+            isMango = false;
             isSway = false;
             isScroll = false;
             isMiracle = false;
@@ -908,13 +1000,15 @@ Singleton {
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
-            if (!isHyprland && !isNiri && !isDwl && !isLabwc) {
+            if (!isHyprland && !isNiri && !isDwl && !isMango && !isLabwc) {
                 checkForDwl();
             }
         }
     }
 
     function checkForDwl() {
+        if (isMango)
+            return;
         if (DMSService.apiVersion >= 12 && DMSService.capabilities.includes("dwl")) {
             isHyprland = false;
             isNiri = false;
@@ -935,6 +1029,8 @@ Singleton {
             return HyprlandService.dpmsOff();
         if (isDwl)
             return _dwlPowerOffMonitors();
+        if (isMango)
+            return MangoService.powerOffMonitors();
         if (isSway || isScroll || isMiracle) {
             try {
                 I3.dispatch("output * dpms off");
@@ -954,6 +1050,8 @@ Singleton {
             return HyprlandService.dpmsOn();
         if (isDwl)
             return _dwlPowerOnMonitors();
+        if (isMango)
+            return MangoService.powerOnMonitors();
         if (isSway || isScroll || isMiracle) {
             try {
                 I3.dispatch("output * dpms on");
@@ -975,7 +1073,7 @@ Singleton {
         for (let i = 0; i < Quickshell.screens.length; i++) {
             const screen = Quickshell.screens[i];
             if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "-d", "disable_monitor," + screen.name]);
+                Quickshell.execDetached(["mmsg", "dispatch", "disable_monitor," + screen.name]);
             }
         }
     }
@@ -989,7 +1087,7 @@ Singleton {
         for (let i = 0; i < Quickshell.screens.length; i++) {
             const screen = Quickshell.screens[i];
             if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "-d", "enable_monitor," + screen.name]);
+                Quickshell.execDetached(["mmsg", "dispatch", "enable_monitor," + screen.name]);
             }
         }
     }

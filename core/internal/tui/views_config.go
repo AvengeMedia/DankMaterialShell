@@ -103,15 +103,7 @@ func (m Model) updateDeployingConfigsState(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) deployConfigurations() tea.Cmd {
 	return func() tea.Msg {
 		// Determine the selected window manager
-		var wm deps.WindowManager
-		switch m.selectedWM {
-		case 0:
-			wm = deps.WindowManagerNiri
-		case 1:
-			wm = deps.WindowManagerHyprland
-		default:
-			wm = deps.WindowManagerNiri
-		}
+		wm := m.selectedWindowManager()
 
 		// Determine the selected terminal
 		var terminal deps.Terminal
@@ -288,7 +280,8 @@ func (m Model) checkExistingConfigurations() tea.Cmd {
 	return func() tea.Msg {
 		var configs []ExistingConfigInfo
 
-		if m.selectedWM == 0 {
+		switch m.selectedWindowManager() {
+		case deps.WindowManagerNiri:
 			niriPath := filepath.Join(os.Getenv("HOME"), ".config", "niri", "config.kdl")
 			niriExists := false
 			if _, err := os.Stat(niriPath); err == nil {
@@ -299,7 +292,23 @@ func (m Model) checkExistingConfigurations() tea.Cmd {
 				Path:       niriPath,
 				Exists:     niriExists,
 			})
-		} else {
+		case deps.WindowManagerMango:
+			mangoConfPath := filepath.Join(os.Getenv("HOME"), ".config", "mango", "config.conf")
+			mangoMainPath := filepath.Join(os.Getenv("HOME"), ".config", "mango", "mango.conf")
+			mangoPath := mangoConfPath
+			mangoExists := false
+			if _, err := os.Stat(mangoConfPath); err == nil {
+				mangoExists = true
+			} else if _, err := os.Stat(mangoMainPath); err == nil {
+				mangoPath = mangoMainPath
+				mangoExists = true
+			}
+			configs = append(configs, ExistingConfigInfo{
+				ConfigType: "Mango",
+				Path:       mangoPath,
+				Exists:     mangoExists,
+			})
+		default:
 			hyprlandLuaPath := filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.lua")
 			hyprlandConfPath := filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.conf")
 			hyprlandPath := hyprlandLuaPath

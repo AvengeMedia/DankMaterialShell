@@ -110,6 +110,8 @@ Item {
             focusedScreenName = focusedWs?.monitor?.name || "";
         } else if (CompositorService.isDwl && DwlService.activeOutput) {
             focusedScreenName = DwlService.activeOutput;
+        } else if (CompositorService.isMango && MangoService.activeOutput) {
+            focusedScreenName = MangoService.activeOutput;
         }
 
         if (!focusedScreenName && barVariants.instances.length > 0) {
@@ -139,6 +141,8 @@ Item {
             focusedScreenName = focusedWs?.monitor?.name || "";
         } else if (CompositorService.isDwl && DwlService.activeOutput) {
             focusedScreenName = DwlService.activeOutput;
+        } else if (CompositorService.isMango && MangoService.activeOutput) {
+            focusedScreenName = MangoService.activeOutput;
         }
 
         if (!focusedScreenName && barVariants.instances.length > 0) {

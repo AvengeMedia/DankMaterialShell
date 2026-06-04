@@ -659,7 +659,7 @@ Item {
 
                     SettingsToggleRow {
                         width: parent.width - parent.leftPadding
-                        visible: CompositorService.isNiri || CompositorService.isHyprland
+                        visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
                         text: I18n.tr("Hide When Windows Open")
                         description: I18n.tr("Show the bar only when no windows are open")
                         checked: selectedBarConfig?.showOnWindowsOpen ?? false
@@ -1144,7 +1144,7 @@ Item {
                 iconName: "fit_screen"
                 title: I18n.tr("Maximize Detection")
                 description: I18n.tr("Remove gaps and border when windows are maximized")
-                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland)
+                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
                 checked: selectedBarConfig?.maximizeDetection ?? true
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         maximizeDetection: checked

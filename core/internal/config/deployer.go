@@ -73,6 +73,10 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(ctx context.Context, wm d
 			filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.lua"),
 			filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.conf"),
 		},
+		"Mango": {
+			filepath.Join(os.Getenv("HOME"), ".config", "mango", "config.conf"),
+			filepath.Join(os.Getenv("HOME"), ".config", "mango", "mango.conf"),
+		},
 		"Ghostty": {
 			filepath.Join(os.Getenv("HOME"), ".config", "ghostty", "config"),
 		},
@@ -124,6 +128,14 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(ctx context.Context, wm d
 			results = append(results, result)
 			if err != nil {
 				return results, fmt.Errorf("failed to deploy Hyprland config: %w", err)
+			}
+		}
+	case deps.WindowManagerMango:
+		if shouldReplaceConfig("Mango") {
+			result, err := cd.deployMangoConfig(terminal, useSystemd)
+			results = append(results, result)
+			if err != nil {
+				return results, fmt.Errorf("failed to deploy Mango config: %w", err)
 			}
 		}
 	}
@@ -259,6 +271,96 @@ func (cd *ConfigDeployer) deployNiriDmsConfigs(dmsDir, terminalCommand string) e
 		if info, err := os.Stat(path); err == nil && info.Size() > 0 {
 			cd.log(fmt.Sprintf("Skipping %s (already exists)", cfg.name))
 			continue
+		}
+		if err := os.WriteFile(path, []byte(cfg.content), 0o644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", cfg.name, err)
+		}
+		cd.log(fmt.Sprintf("Deployed %s", cfg.name))
+	}
+
+	return nil
+}
+
+func (cd *ConfigDeployer) deployMangoConfig(terminal deps.Terminal, useSystemd bool) (DeploymentResult, error) {
+	result := DeploymentResult{
+		ConfigType: "Mango",
+		Path:       filepath.Join(os.Getenv("HOME"), ".config", "mango", "config.conf"),
+	}
+
+	configDir := filepath.Dir(result.Path)
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		result.Error = fmt.Errorf("failed to create config directory: %w", err)
+		return result, result.Error
+	}
+
+	dmsDir := filepath.Join(configDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		result.Error = fmt.Errorf("failed to create dms directory: %w", err)
+		return result, result.Error
+	}
+
+	var terminalCommand string
+	switch terminal {
+	case deps.TerminalGhostty:
+		terminalCommand = "ghostty"
+	case deps.TerminalKitty:
+		terminalCommand = "kitty"
+	case deps.TerminalAlacritty:
+		terminalCommand = "alacritty"
+	default:
+		terminalCommand = "ghostty"
+	}
+
+	// DMS owns config.conf for mango (like niri/hyprland): back up and replace.
+	if existingData, err := os.ReadFile(result.Path); err == nil {
+		cd.log("Found existing Mango configuration")
+		timestamp := time.Now().Format("2006-01-02_15-04-05")
+		result.BackupPath = result.Path + ".backup." + timestamp
+		if err := os.WriteFile(result.BackupPath, existingData, 0o644); err != nil {
+			result.Error = fmt.Errorf("failed to create backup: %w", err)
+			return result, result.Error
+		}
+		cd.log(fmt.Sprintf("Backed up existing config to %s", result.BackupPath))
+	}
+
+	newConfig := strings.ReplaceAll(MangoConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
+	if err := os.WriteFile(result.Path, []byte(newConfig), 0o644); err != nil {
+		result.Error = fmt.Errorf("failed to write config: %w", err)
+		return result, result.Error
+	}
+
+	if err := cd.deployMangoDmsConfigs(dmsDir, terminalCommand); err != nil {
+		result.Error = fmt.Errorf("failed to deploy dms configs: %w", err)
+		return result, result.Error
+	}
+
+	result.Deployed = true
+	cd.log("Successfully deployed Mango configuration")
+	return result, nil
+}
+
+func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string) error {
+	configs := []struct {
+		name      string
+		content   string
+		overwrite bool
+	}{
+		// binds.conf is DMS-owned (overwrite); the rest are runtime/user-managed.
+		{"binds.conf", strings.ReplaceAll(MangoBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand), true},
+		{"colors.conf", MangoColorsConfig, false},
+		{"layout.conf", MangoLayoutConfig, false},
+		{"outputs.conf", "", false},
+		{"cursor.conf", "", false},
+		{"windowrules.conf", "", false},
+	}
+
+	for _, cfg := range configs {
+		path := filepath.Join(dmsDir, cfg.name)
+		if !cfg.overwrite {
+			if info, err := os.Stat(path); err == nil && info.Size() > 0 {
+				cd.log(fmt.Sprintf("Skipping %s (already exists)", cfg.name))
+				continue
+			}
 		}
 		if err := os.WriteFile(path, []byte(cfg.content), 0o644); err != nil {
 			return fmt.Errorf("failed to write %s: %w", cfg.name, err)

@@ -282,7 +282,7 @@ Loader {
             "cpuTemp": dgopAvailable,
             "gpuTemp": dgopAvailable,
             "network_speed_monitor": dgopAvailable,
-            "layout": CompositorService.isDwl && DwlService.dwlAvailable
+            "layout": (CompositorService.isDwl && DwlService.dwlAvailable) || (CompositorService.isMango && MangoService.available)
         };
 
         return widgetVisibility[widgetId] ?? true;

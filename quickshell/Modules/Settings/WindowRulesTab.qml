@@ -30,6 +30,7 @@ Item {
     property var externalRules: []
     property var activeWindows: getActiveWindows()
     property string expandedExternalId: ""
+    readonly property string dmsRulesFileName: CompositorService.isNiri ? "dms/windowrules.kdl" : CompositorService.isMango ? "dms/windowrules.conf" : "dms/windowrules.lua"
 
     readonly property var matchLabels: ({
             "appId": I18n.tr("App ID"),
@@ -166,6 +167,13 @@ Item {
                 "grepPattern": "dms.windowrules",
                 "includeLine": "require(\"dms.windowrules\")"
             };
+        case "mango":
+            return {
+                "configFile": configDir + "/mango/config.conf",
+                "rulesFile": configDir + "/mango/dms/windowrules.conf",
+                "grepPattern": "dms/windowrules.conf",
+                "includeLine": "source=./dms/windowrules.conf"
+            };
         default:
             return null;
         }
@@ -173,7 +181,7 @@ Item {
 
     function loadWindowRules() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
             windowRules = [];
             externalRules = [];
             return;
@@ -211,11 +219,13 @@ Item {
             return;
         }
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland")
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango")
             return;
 
         Proc.runCommand("remove-windowrule", ["dms", "config", "windowrules", "remove", compositor, ruleId], (output, exitCode) => {
             if (exitCode === 0) {
+                if (CompositorService.isMango)
+                    MangoService.reloadConfig();
                 loadWindowRules();
                 rulesChanged();
             }
@@ -231,7 +241,7 @@ Item {
             return;
 
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland")
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango")
             return;
 
         let ids = windowRules.map(r => r.id);
@@ -240,6 +250,8 @@ Item {
 
         Proc.runCommand("reorder-windowrules", ["dms", "config", "windowrules", "reorder", compositor, JSON.stringify(ids)], (output, exitCode) => {
             if (exitCode === 0) {
+                if (CompositorService.isMango)
+                    MangoService.reloadConfig();
                 loadWindowRules();
                 rulesChanged();
             }
@@ -248,7 +260,7 @@ Item {
 
     function checkWindowRulesIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
             windowRulesIncludeStatus = {
                 "exists": false,
                 "included": false,
@@ -258,7 +270,7 @@ Item {
             return;
         }
 
-        const filename = (compositor === "niri") ? "windowrules.kdl" : "windowrules.lua";
+        const filename = (compositor === "niri") ? "windowrules.kdl" : (compositor === "mango") ? "windowrules.conf" : "windowrules.lua";
         checkingInclude = true;
         Proc.runCommand("check-windowrules-include", ["dms", "config", "resolve-include", compositor, filename], (output, exitCode) => {
             checkingInclude = false;
@@ -306,6 +318,8 @@ Item {
             fixingInclude = false;
             if (exitCode !== 0)
                 return;
+            if (CompositorService.isMango)
+                MangoService.reloadConfig();
             checkWindowRulesIncludeStatus();
             loadWindowRules();
         });
@@ -358,7 +372,7 @@ Item {
     }
 
     Component.onCompleted: {
-        if (CompositorService.isNiri || CompositorService.isHyprland) {
+        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) {
             checkWindowRulesIncludeStatus();
             loadWindowRules();
         }
@@ -415,7 +429,7 @@ Item {
                             }
 
                             StyledText {
-                                text: I18n.tr("Define rules for window behavior. Saves to %1").arg(CompositorService.isNiri ? "dms/windowrules.kdl" : "dms/windowrules.lua")
+                                text: I18n.tr("Define rules for window behavior. Saves to %1").arg(root.dmsRulesFileName)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -489,7 +503,7 @@ Item {
                 color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : "transparent"
                 border.color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : "transparent"
                 border.width: 1
-                visible: (showLegacy || showError || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland)
+                visible: (showLegacy || showError || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
 
                 Row {
                     id: warningSection
@@ -519,7 +533,7 @@ Item {
                         }
 
                         StyledText {
-                            readonly property string rulesFile: CompositorService.isNiri ? "dms/windowrules.kdl" : "dms/windowrules.lua"
+                            readonly property string rulesFile: root.dmsRulesFileName
                             text: warningBox.showLegacy ? I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.") : (warningBox.showSetup ? I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(rulesFile) : I18n.tr("%1 exists but is not included. Window rules won't apply.").arg(rulesFile))
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText

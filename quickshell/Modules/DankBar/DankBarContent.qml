@@ -29,6 +29,7 @@ Item {
     readonly property real _frameEdgeFloorInset: (SettingsData.frameEnabled && _usesFrameBarChrome) ? Math.max(0, SettingsData.frameThickness - _edgeBaseMargin) : 0
     readonly property bool _barIsVertical: _hasBarWindow ? barWindow.isVertical : false
     readonly property string _barScreenName: _hasBarWindow ? (barWindow.screenName || "") : ""
+    readonly property var dwlSvc: CompositorService.isMango ? MangoService : DwlService
     readonly property bool hasAdjacentTopBarLive: _hasBarWindow && barWindow.hasAdjacentTopBar
     readonly property bool hasAdjacentBottomBarLive: _hasBarWindow && barWindow.hasAdjacentBottomBar
     readonly property bool hasAdjacentLeftBarLive: _hasBarWindow && barWindow.hasAdjacentLeftBar
@@ -189,16 +190,16 @@ Item {
             }
 
             return monitorWorkspaces.sort((a, b) => a.id - b.id);
-        } else if (CompositorService.isDwl) {
-            if (!DwlService.dwlAvailable) {
+        } else if (CompositorService.isDwl || CompositorService.isMango) {
+            if (!dwlSvc.available) {
                 return [0];
             }
             if (SettingsData.dwlShowAllTags) {
                 return Array.from({
-                    length: DwlService.tagCount
+                    length: dwlSvc.tagCount
                 }, (_, i) => i);
             }
-            return DwlService.getVisibleTags(screenName);
+            return dwlSvc.getVisibleTags(screenName);
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const workspaces = I3.workspaces?.values || [];
             if (workspaces.length === 0)
@@ -234,13 +235,13 @@ Item {
             const monitors = Hyprland.monitors?.values || [];
             const currentMonitor = monitors.find(monitor => monitor.name === screenName);
             return currentMonitor?.activeWorkspace?.id ?? 1;
-        } else if (CompositorService.isDwl) {
-            if (!DwlService.dwlAvailable)
+        } else if (CompositorService.isDwl || CompositorService.isMango) {
+            if (!dwlSvc.available)
                 return 0;
-            const outputState = DwlService.getOutputState(screenName);
+            const outputState = dwlSvc.getOutputState(screenName);
             if (!outputState || !outputState.tags)
                 return 0;
-            const activeTags = DwlService.getActiveTags(screenName);
+            const activeTags = dwlSvc.getActiveTags(screenName);
             return activeTags.length > 0 ? activeTags[0] : 0;
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             if (!screenName || SettingsData.workspaceFollowFocus) {
@@ -282,14 +283,14 @@ Item {
             if (nextIndex !== validIndex) {
                 HyprlandService.focusWorkspace(realWorkspaces[nextIndex].id);
             }
-        } else if (CompositorService.isDwl) {
+        } else if (CompositorService.isDwl || CompositorService.isMango) {
             const currentTag = getCurrentWorkspace();
             const currentIndex = realWorkspaces.findIndex(tag => tag === currentTag);
             const validIndex = currentIndex === -1 ? 0 : currentIndex;
             const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
 
             if (nextIndex !== validIndex) {
-                DwlService.switchToTag(_barScreenName, realWorkspaces[nextIndex]);
+                dwlSvc.switchToTag(_barScreenName, realWorkspaces[nextIndex]);
             }
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const currentWs = getCurrentWorkspace();

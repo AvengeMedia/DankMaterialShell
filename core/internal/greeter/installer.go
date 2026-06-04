@@ -680,6 +680,9 @@ func DetectCompositors() []string {
 	if utils.CommandExists("Hyprland") {
 		compositors = append(compositors, "Hyprland")
 	}
+	if utils.CommandExists("mango") {
+		compositors = append(compositors, "mango")
+	}
 
 	return compositors
 }

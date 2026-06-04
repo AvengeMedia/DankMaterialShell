@@ -100,56 +100,72 @@ var setupWindowrulesCmd = &cobra.Command{
 }
 
 type dmsConfigSpec struct {
-	niriFile    string
-	hyprFile    string
-	niriContent func(terminal string) string
-	hyprContent func(terminal string) string
+	niriFile     string
+	hyprFile     string
+	mangoFile    string
+	niriContent  func(terminal string) string
+	hyprContent  func(terminal string) string
+	mangoContent func(terminal string) string
 }
 
 var dmsConfigSpecs = map[string]dmsConfigSpec{
 	"binds": {
-		niriFile: "binds.kdl",
-		hyprFile: "binds.lua",
+		niriFile:  "binds.kdl",
+		hyprFile:  "binds.lua",
+		mangoFile: "binds.conf",
 		niriContent: func(t string) string {
 			return strings.ReplaceAll(config.NiriBindsConfig, "{{TERMINAL_COMMAND}}", t)
 		},
 		hyprContent: func(t string) string {
 			return strings.ReplaceAll(config.DMSBindsLuaConfig, "{{TERMINAL_COMMAND}}", t)
 		},
+		mangoContent: func(t string) string {
+			return strings.ReplaceAll(config.MangoBindsConfig, "{{TERMINAL_COMMAND}}", t)
+		},
 	},
 	"layout": {
-		niriFile:    "layout.kdl",
-		hyprFile:    "layout.lua",
-		niriContent: func(_ string) string { return config.NiriLayoutConfig },
-		hyprContent: func(_ string) string { return config.DMSLayoutLuaConfig },
+		niriFile:     "layout.kdl",
+		hyprFile:     "layout.lua",
+		mangoFile:    "layout.conf",
+		niriContent:  func(_ string) string { return config.NiriLayoutConfig },
+		hyprContent:  func(_ string) string { return config.DMSLayoutLuaConfig },
+		mangoContent: func(_ string) string { return config.MangoLayoutConfig },
 	},
 	"colors": {
-		niriFile:    "colors.kdl",
-		hyprFile:    "colors.lua",
-		niriContent: func(_ string) string { return config.NiriColorsConfig },
-		hyprContent: func(_ string) string { return config.DMSColorsLuaConfig },
+		niriFile:     "colors.kdl",
+		hyprFile:     "colors.lua",
+		mangoFile:    "colors.conf",
+		niriContent:  func(_ string) string { return config.NiriColorsConfig },
+		hyprContent:  func(_ string) string { return config.DMSColorsLuaConfig },
+		mangoContent: func(_ string) string { return config.MangoColorsConfig },
 	},
 	"alttab": {
 		niriFile:    "alttab.kdl",
 		niriContent: func(_ string) string { return config.NiriAlttabConfig },
 	},
 	"outputs": {
-		niriFile:    "outputs.kdl",
-		hyprFile:    "outputs.lua",
-		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return config.DMSOutputsLuaConfig },
+		niriFile:     "outputs.kdl",
+		hyprFile:     "outputs.lua",
+		mangoFile:    "outputs.conf",
+		niriContent:  func(_ string) string { return "" },
+		hyprContent:  func(_ string) string { return config.DMSOutputsLuaConfig },
+		mangoContent: func(_ string) string { return "" },
 	},
 	"cursor": {
-		niriFile:    "cursor.kdl",
-		hyprFile:    "cursor.lua",
-		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return config.DMSCursorLuaConfig },
+		niriFile:     "cursor.kdl",
+		hyprFile:     "cursor.lua",
+		mangoFile:    "cursor.conf",
+		niriContent:  func(_ string) string { return "" },
+		hyprContent:  func(_ string) string { return config.DMSCursorLuaConfig },
+		mangoContent: func(_ string) string { return "" },
 	},
 	"windowrules": {
-		niriFile:    "windowrules.kdl",
-		hyprFile:    "windowrules.lua",
-		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return config.DMSWindowRulesLuaConfig },
+		niriFile:     "windowrules.kdl",
+		hyprFile:     "windowrules.lua",
+		mangoFile:    "windowrules.conf",
+		niriContent:  func(_ string) string { return "" },
+		hyprContent:  func(_ string) string { return config.DMSWindowRulesLuaConfig },
+		mangoContent: func(_ string) string { return "" },
 	},
 }
 
@@ -192,7 +208,7 @@ func detectCompositorForSetup() (string, error) {
 
 	switch len(compositors) {
 	case 0:
-		return "", fmt.Errorf("no supported compositors found (niri or Hyprland required)")
+		return "", fmt.Errorf("no supported compositors found (niri, Hyprland, or mango required)")
 	case 1:
 		return strings.ToLower(compositors[0]), nil
 	}
@@ -224,6 +240,9 @@ func runSetupDmsConfig(name string) error {
 	case "hyprland":
 		filename = spec.hyprFile
 		contentFn = spec.hyprContent
+	case "mango", "mangowc":
+		filename = spec.mangoFile
+		contentFn = spec.mangoContent
 	default:
 		return fmt.Errorf("unsupported compositor: %s", compositor)
 	}
@@ -238,6 +257,8 @@ func runSetupDmsConfig(name string) error {
 		dmsDir = filepath.Join(utils.XDGConfigHome(), "niri", "dms")
 	case "hyprland":
 		dmsDir = filepath.Join(utils.XDGConfigHome(), "hypr", "dms")
+	case "mango", "mangowc":
+		dmsDir = filepath.Join(utils.XDGConfigHome(), "mango", "dms")
 	}
 
 	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
@@ -379,10 +400,11 @@ func promptCompositor() (deps.WindowManager, bool) {
 	fmt.Println("Select compositor:")
 	fmt.Println("1) Niri")
 	fmt.Println("2) Hyprland")
-	fmt.Println("3) None")
+	fmt.Println("3) Mango")
+	fmt.Println("4) None")
 
 	var response string
-	fmt.Print("\nChoice (1-3): ")
+	fmt.Print("\nChoice (1-4): ")
 	fmt.Scanln(&response)
 	response = strings.TrimSpace(response)
 
@@ -391,6 +413,8 @@ func promptCompositor() (deps.WindowManager, bool) {
 		return deps.WindowManagerNiri, true
 	case "2":
 		return deps.WindowManagerHyprland, true
+	case "3":
+		return deps.WindowManagerMango, true
 	default:
 		return deps.WindowManagerNiri, false
 	}
@@ -446,6 +470,11 @@ func checkExistingConfigs(wm deps.WindowManager, wmSelected bool, terminal deps.
 			configPaths = []string{
 				filepath.Join(homeDir, ".config", "hypr", "hyprland.lua"),
 				filepath.Join(homeDir, ".config", "hypr", "hyprland.conf"),
+			}
+		case deps.WindowManagerMango:
+			configPaths = []string{
+				filepath.Join(homeDir, ".config", "mango", "config.conf"),
+				filepath.Join(homeDir, ".config", "mango", "mango.conf"),
 			}
 		}
 

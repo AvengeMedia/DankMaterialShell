@@ -14,13 +14,13 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("KeybindsService")
 
-    property bool available: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl
+    property bool available: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango
     property string currentProvider: {
         if (CompositorService.isNiri)
             return "niri";
         if (CompositorService.isHyprland)
             return "hyprland";
-        if (CompositorService.isDwl)
+        if (CompositorService.isDwl || CompositorService.isMango)
             return "mangowc";
         return "";
     }
@@ -30,7 +30,7 @@ Singleton {
             return "niri";
         if (CompositorService.isHyprland)
             return "hyprland";
-        if (CompositorService.isDwl)
+        if (CompositorService.isDwl || CompositorService.isMango)
             return "mangowc";
         return "";
     }
@@ -118,7 +118,7 @@ Singleton {
     Connections {
         target: CompositorService
         function onCompositorChanged() {
-            if (!CompositorService.isNiri)
+            if (!CompositorService.isNiri && !CompositorService.isMango)
                 return;
             Qt.callLater(root.loadBinds);
         }
@@ -203,6 +203,8 @@ Singleton {
             }
             root.lastError = "";
             root.bindSaveCompleted(true);
+            if (CompositorService.isMango)
+                MangoService.reloadConfig();
             root.loadBinds(false);
         }
     }
@@ -226,6 +228,8 @@ Singleton {
                 return;
             }
             root.lastError = "";
+            if (CompositorService.isMango)
+                MangoService.reloadConfig();
             root.loadBinds(false);
         }
     }
@@ -254,6 +258,8 @@ Singleton {
             root.dmsBindsFixed();
             const bindsRel = root.currentProvider === "niri" ? "dms/binds.kdl" : root.currentProvider === "hyprland" ? "dms/binds.lua" : "dms/binds.conf";
             ToastService.showInfo(I18n.tr("Binds include added"), I18n.tr("%1 is now included in config").arg(bindsRel), "", "keybinds");
+            if (CompositorService.isMango)
+                MangoService.reloadConfig();
             Qt.callLater(root.forceReload);
         }
     }

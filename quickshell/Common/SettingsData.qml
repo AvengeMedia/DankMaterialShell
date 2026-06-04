@@ -490,6 +490,9 @@ Singleton {
             },
             "dwl": {
                 "cursorHideTimeout": 0
+            },
+            "mango": {
+                "cursorHideTimeout": 0
             }
         })
     property var availableCursorThemes: ["System Default"]
@@ -1222,6 +1225,8 @@ Singleton {
             HyprlandService.generateLayoutConfig();
         if (CompositorService.isDwl && typeof DwlService !== "undefined")
             DwlService.generateLayoutConfig();
+        if (CompositorService.isMango && typeof MangoService !== "undefined")
+            MangoService.generateLayoutConfig();
     }
 
     function applyStoredIconTheme() {
@@ -2235,7 +2240,7 @@ Singleton {
 
     function getFilteredScreens(componentId) {
         var prefs = screenPreferences && screenPreferences[componentId] || ["all"];
-        if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
+        if (!prefs || prefs.length === 0 || prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
             return Quickshell.screens;
         }
         var filtered = Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
@@ -2444,6 +2449,10 @@ Singleton {
         }
         if (CompositorService.isDwl && typeof DwlService !== "undefined") {
             DwlService.generateCursorConfig();
+            return;
+        }
+        if (CompositorService.isMango && typeof MangoService !== "undefined") {
+            MangoService.generateCursorConfig();
             return;
         }
     }

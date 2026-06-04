@@ -27,7 +27,7 @@ var windowrulesListCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) == 0 {
-			return []string{"hyprland", "niri"}, cobra.ShellCompDirectiveNoFileComp
+			return []string{"hyprland", "niri", "mango"}, cobra.ShellCompDirectiveNoFileComp
 		}
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	},
@@ -41,7 +41,7 @@ var windowrulesAddCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) == 0 {
-			return []string{"hyprland", "niri"}, cobra.ShellCompDirectiveNoFileComp
+			return []string{"hyprland", "niri", "mango"}, cobra.ShellCompDirectiveNoFileComp
 		}
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	},
@@ -55,7 +55,7 @@ var windowrulesUpdateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(3),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) == 0 {
-			return []string{"hyprland", "niri"}, cobra.ShellCompDirectiveNoFileComp
+			return []string{"hyprland", "niri", "mango"}, cobra.ShellCompDirectiveNoFileComp
 		}
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	},
@@ -69,7 +69,7 @@ var windowrulesRemoveCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) == 0 {
-			return []string{"hyprland", "niri"}, cobra.ShellCompDirectiveNoFileComp
+			return []string{"hyprland", "niri", "mango"}, cobra.ShellCompDirectiveNoFileComp
 		}
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	},
@@ -83,7 +83,7 @@ var windowrulesReorderCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) == 0 {
-			return []string{"hyprland", "niri"}, cobra.ShellCompDirectiveNoFileComp
+			return []string{"hyprland", "niri", "mango"}, cobra.ShellCompDirectiveNoFileComp
 		}
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	},
@@ -121,6 +121,9 @@ func getCompositor(args []string) string {
 	if os.Getenv("HYPRLAND_INSTANCE_SIGNATURE") != "" {
 		return "hyprland"
 	}
+	if os.Getenv("MANGO_INSTANCE_SIGNATURE") != "" {
+		return "mango"
+	}
 	return ""
 }
 
@@ -140,7 +143,7 @@ func writeRuleSuccess(id, path string) {
 func runWindowrulesList(cmd *cobra.Command, args []string) {
 	compositor := getCompositor(args)
 	if compositor == "" {
-		log.Fatalf("Could not detect compositor. Please specify: hyprland or niri")
+		log.Fatalf("Could not detect compositor. Please specify: hyprland, niri, or mango")
 	}
 
 	var result WindowRulesListResult
@@ -201,6 +204,38 @@ func runWindowrulesList(cmd *cobra.Command, args []string) {
 		dmsIdx := 0
 		for i, r := range allRules {
 			if r.Source == dmsRulesPath {
+				if dmr, ok := dmsRuleMap[dmsIdx]; ok {
+					allRules[i].ID = dmr.ID
+					allRules[i].Name = dmr.Name
+				}
+				dmsIdx++
+			}
+		}
+
+		result.Rules = allRules
+		result.DMSStatus = parseResult.DMSStatus
+
+	case "mango", "mangowc":
+		configDir := filepath.Join(utils.XDGConfigHome(), "mango")
+
+		parseResult, err := providers.ParseMangoWindowRules(configDir)
+		if err != nil {
+			log.Fatalf("Failed to parse mango window rules: %v", err)
+		}
+
+		allRules := providers.ConvertMangoRulesToWindowRules(parseResult.Rules)
+
+		provider := providers.NewMangoWritableProvider(configDir)
+		dmsRules, _ := provider.LoadDMSRules()
+
+		dmsRuleMap := make(map[int]windowrules.WindowRule)
+		for i, dr := range dmsRules {
+			dmsRuleMap[i] = dr
+		}
+
+		dmsIdx := 0
+		for i, r := range allRules {
+			if r.Source == "dms/windowrules.conf" {
 				if dmr, ok := dmsRuleMap[dmsIdx]; ok {
 					allRules[i].ID = dmr.ID
 					allRules[i].Name = dmr.Name
@@ -315,6 +350,9 @@ func getWindowRulesProvider(compositor string) windowrules.WritableProvider {
 	case "hyprland":
 		configDir := filepath.Join(utils.XDGConfigHome(), "hypr")
 		return providers.NewHyprlandWritableProvider(configDir)
+	case "mango", "mangowc":
+		configDir := filepath.Join(utils.XDGConfigHome(), "mango")
+		return providers.NewMangoWritableProvider(configDir)
 	default:
 		return nil
 	}

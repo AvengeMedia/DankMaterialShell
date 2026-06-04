@@ -10,6 +10,26 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// windowManagerOptions returns the WM enums in selection-list order (debian omits
+// Hyprland). selectedWM indexes into this, so all index->WM conversions use it.
+func (m Model) windowManagerOptions() []deps.WindowManager {
+	opts := []deps.WindowManager{deps.WindowManagerNiri}
+	if m.osInfo == nil || m.osInfo.Distribution.ID != "debian" {
+		opts = append(opts, deps.WindowManagerHyprland)
+	}
+	opts = append(opts, deps.WindowManagerMango)
+	return opts
+}
+
+// selectedWindowManager maps the current selectedWM index to its WM enum.
+func (m Model) selectedWindowManager() deps.WindowManager {
+	opts := m.windowManagerOptions()
+	if m.selectedWM >= 0 && m.selectedWM < len(opts) {
+		return opts[m.selectedWM]
+	}
+	return deps.WindowManagerNiri
+}
+
 func (m Model) viewSelectWindowManager() string {
 	var b strings.Builder
 
@@ -33,6 +53,11 @@ func (m Model) viewSelectWindowManager() string {
 			description string
 		}{"Hyprland", "Dynamic tiling Wayland compositor."})
 	}
+
+	options = append(options, struct {
+		name        string
+		description string
+	}{"mango", "dwl-based dynamic tiling Wayland compositor."})
 
 	for i, option := range options {
 		if i == m.selectedWM {
@@ -152,10 +177,7 @@ func (m Model) updateSelectTerminalState(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) updateSelectWindowManagerState(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if keyMsg, ok := msg.(tea.KeyMsg); ok {
-		maxWMIndex := 1
-		if m.osInfo != nil && m.osInfo.Distribution.ID == "debian" {
-			maxWMIndex = 0
-		}
+		maxWMIndex := len(m.windowManagerOptions()) - 1
 
 		switch keyMsg.String() {
 		case "up":
@@ -190,12 +212,7 @@ func (m Model) detectDependencies() tea.Cmd {
 		}
 
 		// Convert TUI selection to deps enum
-		var wm deps.WindowManager
-		if m.selectedWM == 0 {
-			wm = deps.WindowManagerNiri // First option is Niri
-		} else {
-			wm = deps.WindowManagerHyprland // Second option is Hyprland
-		}
+		wm := m.selectedWindowManager()
 
 		var terminal deps.Terminal
 		if m.osInfo != nil && m.osInfo.Distribution.ID == "gentoo" {

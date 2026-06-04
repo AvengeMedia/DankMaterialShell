@@ -306,6 +306,8 @@ Item {
                                 modes.push("Hyprland");
                             } else if (CompositorService.isDwl) {
                                 modes.push("mango");
+                            } else if (CompositorService.isMango) {
+                                modes.push("mango");
                             } else if (CompositorService.isSway) {
                                 modes.push("Sway");
                             } else if (CompositorService.isScroll) {

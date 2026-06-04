@@ -227,7 +227,7 @@ Variants {
         readonly property bool shouldHideForWindows: {
             if (!SettingsData.dockSmartAutoHide)
                 return false;
-            if (!CompositorService.isNiri && !CompositorService.isHyprland)
+            if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
                 return false;
 
             const screenName = dock.modelData?.name ?? "";
@@ -289,6 +289,12 @@ Variants {
                 }
 
                 return false;
+            }
+
+            if (CompositorService.isMango) {
+                MangoService.windows;
+                MangoService.outputs;
+                return CompositorService.mangoDockOverlapForSmartAutoHide(screenName, SettingsData.dockPosition, dockThickness, screenWidth, screenHeight);
             }
 
             // Hyprland implementation (current workspace + visible special workspaces)

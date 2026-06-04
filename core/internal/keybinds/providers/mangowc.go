@@ -397,6 +397,14 @@ func (m *MangoWCProvider) writeBindLine(sb *strings.Builder, bind *mangowcOverri
 	mods, key := m.parseKeyString(bind.Key)
 	command, params := m.parseAction(bind.Action)
 
+	// Description goes on the line ABOVE the bind: mango doesn't strip inline `#`
+	// comments from a value, so a trailing comment would break spawn (extra argv).
+	if bind.Description != "" {
+		sb.WriteString("# ")
+		sb.WriteString(bind.Description)
+		sb.WriteString("\n")
+	}
+
 	sb.WriteString("bind=")
 	if mods == "" {
 		sb.WriteString("none")
@@ -411,11 +419,6 @@ func (m *MangoWCProvider) writeBindLine(sb *strings.Builder, bind *mangowcOverri
 	if params != "" {
 		sb.WriteString(",")
 		sb.WriteString(params)
-	}
-
-	if bind.Description != "" {
-		sb.WriteString(" # ")
-		sb.WriteString(bind.Description)
 	}
 
 	sb.WriteString("\n")

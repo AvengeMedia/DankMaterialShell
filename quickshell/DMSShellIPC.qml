@@ -340,6 +340,9 @@ Item {
             if (CompositorService.isDwl && DwlService.activeOutput) {
                 return DwlService.activeOutput;
             }
+            if (CompositorService.isMango && MangoService.activeOutput) {
+                return MangoService.activeOutput;
+            }
             return "";
         }
 

@@ -311,7 +311,7 @@ Rectangle {
                     "text": I18n.tr("Window Rules"),
                     "icon": "select_window",
                     "tabIndex": 28,
-                    "hyprlandNiriOnly": true
+                    "windowRulesCapable": true
                 }
             ]
         },
@@ -369,6 +369,8 @@ Rectangle {
         if (item.soundsOnly && !AudioService.soundsAvailable)
             return false;
         if (item.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland)
+            return false;
+        if (item.windowRulesCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
             return false;
         if (item.niriOnly && !CompositorService.isNiri)
             return false;

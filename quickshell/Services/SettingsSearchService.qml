@@ -36,6 +36,7 @@ Singleton {
             "isNiri": () => CompositorService.isNiri,
             "isHyprland": () => CompositorService.isHyprland,
             "isDwl": () => CompositorService.isDwl,
+            "isMango": () => CompositorService.isMango,
             "keybindsAvailable": () => KeybindsService.available,
             "soundsAvailable": () => AudioService.soundsAvailable,
             "cupsAvailable": () => CupsService.cupsAvailable,

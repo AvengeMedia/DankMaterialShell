@@ -174,7 +174,7 @@ func TestMangoWCGetKeybindAtLine(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := NewMangoWCParser("")
 			parser.contentLines = []string{tt.line}
-			result := parser.getKeybindAtLine(0)
+			result := parser.getKeybindAtLine(0, "")
 
 			if tt.expected == nil {
 				if result != nil {
@@ -421,7 +421,7 @@ func TestMangoWCInvalidBindLines(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := NewMangoWCParser("")
 			parser.contentLines = []string{tt.line}
-			result := parser.getKeybindAtLine(0)
+			result := parser.getKeybindAtLine(0, "")
 
 			if result != nil {
 				t.Errorf("expected nil for invalid line, got %+v", result)
