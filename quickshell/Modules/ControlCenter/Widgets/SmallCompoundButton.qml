@@ -12,7 +12,7 @@ Rectangle {
     property bool isActive: false
     property bool iconBlinking: false
 
-    // Left click toggles the widget, right click opens the detail/menu.
+    // Left click expands the widget (primary detail action), right click toggles on/off.
     signal toggled
     signal expandClicked
     signal wheelEvent(var wheelEvent)
