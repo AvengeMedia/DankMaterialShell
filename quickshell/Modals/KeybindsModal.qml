@@ -81,7 +81,7 @@ DankModal {
 
                     StyledText {
                         Layout.alignment: Qt.AlignLeft
-                        text: KeybindsService.cheatsheet.title || i18n("Keybinds")
+                        text: KeybindsService.cheatsheet.title || I18n.tr("Keybinds")
                         font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Bold
                         color: Theme.primary
@@ -133,9 +133,9 @@ DankModal {
                             let hasSubcats = false;
                             for (let i = 0; i < binds.length; i++) {
                                 const bind = binds[i];
-                                const keyLower = bind.key.toLowerCase();
-                                const descLower = bind.desc.toLowerCase();
-                                const actionLower = bind.action.toLowerCase();
+                                const keyLower = (bind.key || "").toLowerCase();
+                                const descLower = (bind.desc || "").toLowerCase();
+                                const actionLower = (bind.action || "").toLowerCase();
 
                                 if (bind.hideOnOverlay)
                                     continue;
