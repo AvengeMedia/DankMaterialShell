@@ -532,6 +532,54 @@ dms ipc call systemupdater close
 dms ipc call systemupdater updatestatus
 ```
 
+## Target: `defaultApp`
+
+Launch applications configured in Settings > Default Apps.
+
+### Functions
+
+**`browser`**
+- Launch the configured default web browser
+- Returns: Launch request confirmation
+
+**`fileManager`**
+- Launch the configured default file manager
+- Returns: Launch request confirmation
+
+**`textEditor`**
+- Launch the configured default text editor
+- Returns: Launch request confirmation
+
+**`pdfReader`**
+- Launch the configured default PDF reader
+- Returns: Launch request confirmation
+
+**`imageViewer`**
+- Launch the configured default image viewer
+- Returns: Launch request confirmation
+
+**`videoPlayer`**
+- Launch the configured default video player
+- Returns: Launch request confirmation
+
+**`musicPlayer`**
+- Launch the configured default music player
+- Returns: Launch request confirmation
+
+**`mail`**
+- Launch the configured default mail client
+- Returns: Launch request confirmation
+
+**`calendar`**
+- Launch the configured default calendar application
+- Returns: Launch request confirmation
+
+### Examples
+```bash
+dms ipc call defaultApp browser
+dms ipc call defaultApp fileManager
+```
+
 ## Modal Controls
 
 These targets control various modal windows and overlays.

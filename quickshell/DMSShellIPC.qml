@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
@@ -54,6 +55,93 @@ Item {
         }
 
         return currentBar;
+    }
+
+    readonly property var defaultAppMimeTypes: ({
+            browser: "x-scheme-handler/https",
+            fileManager: "inode/directory",
+            textEditor: "text/plain",
+            imageViewer: "image/png",
+            videoPlayer: "video/mp4",
+            musicPlayer: "audio/mpeg",
+            pdfReader: "application/pdf",
+            mail: "x-scheme-handler/mailto",
+            calendar: "x-scheme-handler/calendar"
+        })
+
+    function launchDesktopId(desktopId, appName) {
+        if (!desktopId || desktopId.length === 0) {
+            log.warn("No default app configured for:", appName);
+            return false;
+        }
+
+        let entry = DesktopEntries.heuristicLookup(desktopId);
+        if (!entry && desktopId.endsWith(".desktop")) {
+            entry = DesktopEntries.heuristicLookup(desktopId.slice(0, -8));
+        }
+        if (!entry) {
+            log.warn("Default app desktop entry not found:", desktopId, "for:", appName);
+            return false;
+        }
+
+        SessionService.launchDesktopEntry(entry);
+        AppUsageHistoryData.addAppUsage(entry);
+        return true;
+    }
+
+    function launchDefaultMimeApp(appName, mimeType) {
+        DMSService.sendRequest("mime.getDefault", {
+            "mimeType": mimeType
+        }, response => {
+            if (response.error) {
+                log.warn("Failed to resolve default app:", appName, response.error);
+                return;
+            }
+            const result = response.result || {};
+            root.launchDesktopId(result.desktopId || "", appName);
+        });
+
+        return `DEFAULTAPP_LAUNCH_REQUESTED: ${appName}`;
+    }
+
+    IpcHandler {
+        function browser(): string {
+            return root.launchDefaultMimeApp("browser", root.defaultAppMimeTypes.browser);
+        }
+
+        function fileManager(): string {
+            return root.launchDefaultMimeApp("fileManager", root.defaultAppMimeTypes.fileManager);
+        }
+
+        function textEditor(): string {
+            return root.launchDefaultMimeApp("textEditor", root.defaultAppMimeTypes.textEditor);
+        }
+
+        function imageViewer(): string {
+            return root.launchDefaultMimeApp("imageViewer", root.defaultAppMimeTypes.imageViewer);
+        }
+
+        function videoPlayer(): string {
+            return root.launchDefaultMimeApp("videoPlayer", root.defaultAppMimeTypes.videoPlayer);
+        }
+
+        function musicPlayer(): string {
+            return root.launchDefaultMimeApp("musicPlayer", root.defaultAppMimeTypes.musicPlayer);
+        }
+
+        function pdfReader(): string {
+            return root.launchDefaultMimeApp("pdfReader", root.defaultAppMimeTypes.pdfReader);
+        }
+
+        function mail(): string {
+            return root.launchDefaultMimeApp("mail", root.defaultAppMimeTypes.mail);
+        }
+
+        function calendar(): string {
+            return root.launchDefaultMimeApp("calendar", root.defaultAppMimeTypes.calendar);
+        }
+
+        target: "defaultApp"
     }
 
     IpcHandler {
