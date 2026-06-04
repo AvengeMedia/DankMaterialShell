@@ -47,22 +47,26 @@ type Actions struct {
 	BackgroundXray       *bool    `json:"backgroundXray,omitempty"`
 	BackgroundNoise      *float64 `json:"backgroundNoise,omitempty"`
 	BackgroundSaturation *float64 `json:"backgroundSaturation,omitempty"`
-	Size                 string   `json:"size,omitempty"`
-	Move                 string   `json:"move,omitempty"`
-	Monitor              string   `json:"monitor,omitempty"`
-	Workspace            string   `json:"workspace,omitempty"`
-	Tile                 *bool    `json:"tile,omitempty"`
-	NoFocus              *bool    `json:"nofocus,omitempty"`
-	NoBorder             *bool    `json:"noborder,omitempty"`
-	NoShadow             *bool    `json:"noshadow,omitempty"`
-	NoDim                *bool    `json:"nodim,omitempty"`
-	NoBlur               *bool    `json:"noblur,omitempty"`
-	NoAnim               *bool    `json:"noanim,omitempty"`
-	NoRounding           *bool    `json:"norounding,omitempty"`
-	Pin                  *bool    `json:"pin,omitempty"`
-	Opaque               *bool    `json:"opaque,omitempty"`
-	ForcergbX            *bool    `json:"forcergbx,omitempty"`
-	Idleinhibit          string   `json:"idleinhibit,omitempty"`
+
+	DefaultFloatingX          *int   `json:"defaultFloatingX,omitempty"`
+	DefaultFloatingY          *int   `json:"defaultFloatingY,omitempty"`
+	DefaultFloatingRelativeTo string `json:"defaultFloatingRelativeTo,omitempty"`
+	Size                      string `json:"size,omitempty"`
+	Move                      string `json:"move,omitempty"`
+	Monitor                   string `json:"monitor,omitempty"`
+	Workspace                 string `json:"workspace,omitempty"`
+	Tile                      *bool  `json:"tile,omitempty"`
+	NoFocus                   *bool  `json:"nofocus,omitempty"`
+	NoBorder                  *bool  `json:"noborder,omitempty"`
+	NoShadow                  *bool  `json:"noshadow,omitempty"`
+	NoDim                     *bool  `json:"nodim,omitempty"`
+	NoBlur                    *bool  `json:"noblur,omitempty"`
+	NoAnim                    *bool  `json:"noanim,omitempty"`
+	NoRounding                *bool  `json:"norounding,omitempty"`
+	Pin                       *bool  `json:"pin,omitempty"`
+	Opaque                    *bool  `json:"opaque,omitempty"`
+	ForcergbX                 *bool  `json:"forcergbx,omitempty"`
+	Idleinhibit               string `json:"idleinhibit,omitempty"`
 }
 
 type WindowRule struct {

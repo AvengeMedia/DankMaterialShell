@@ -311,7 +311,7 @@ Rectangle {
                     "text": I18n.tr("Window Rules"),
                     "icon": "select_window",
                     "tabIndex": 28,
-                    "niriOnly": true
+                    "hyprlandNiriOnly": true
                 }
             ]
         },

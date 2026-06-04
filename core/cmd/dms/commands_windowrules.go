@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -146,10 +147,7 @@ func runWindowrulesList(cmd *cobra.Command, args []string) {
 
 	switch compositor {
 	case "niri":
-		configDir, err := utils.ExpandPath("$HOME/.config/niri")
-		if err != nil {
-			log.Fatalf("Failed to expand niri config path: %v", err)
-		}
+		configDir := filepath.Join(utils.XDGConfigHome(), "niri")
 
 		parseResult, err := providers.ParseNiriWindowRules(configDir)
 		if err != nil {
@@ -182,10 +180,7 @@ func runWindowrulesList(cmd *cobra.Command, args []string) {
 		result.DMSStatus = parseResult.DMSStatus
 
 	case "hyprland":
-		configDir, err := utils.ExpandPath("$HOME/.config/hypr")
-		if err != nil {
-			log.Fatalf("Failed to expand hyprland config path: %v", err)
-		}
+		configDir := filepath.Join(utils.XDGConfigHome(), "hypr")
 
 		parseResult, err := providers.ParseHyprlandWindowRules(configDir)
 		if err != nil {
@@ -315,16 +310,10 @@ func runWindowrulesReorder(cmd *cobra.Command, args []string) {
 func getWindowRulesProvider(compositor string) windowrules.WritableProvider {
 	switch compositor {
 	case "niri":
-		configDir, err := utils.ExpandPath("$HOME/.config/niri")
-		if err != nil {
-			return nil
-		}
+		configDir := filepath.Join(utils.XDGConfigHome(), "niri")
 		return providers.NewNiriWritableProvider(configDir)
 	case "hyprland":
-		configDir, err := utils.ExpandPath("$HOME/.config/hypr")
-		if err != nil {
-			return nil
-		}
+		configDir := filepath.Join(utils.XDGConfigHome(), "hypr")
 		return providers.NewHyprlandWritableProvider(configDir)
 	default:
 		return nil

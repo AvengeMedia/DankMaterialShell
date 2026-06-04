@@ -2159,6 +2159,16 @@ Item {
                     defaultValue: 2
                     onSliderValueChanged: newValue => SettingsData.set("hyprlandLayoutBorderSize", newValue)
                 }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["hyprland", "resize", "border", "mouse", "drag"]
+                    settingKey: "hyprlandResizeOnBorder"
+                    text: I18n.tr("Resize on Border")
+                    description: I18n.tr("Resize windows by dragging their edges with the mouse")
+                    checked: SettingsData.hyprlandResizeOnBorder
+                    onToggled: checked => SettingsData.set("hyprlandResizeOnBorder", checked)
+                }
             }
 
             SettingsCard {

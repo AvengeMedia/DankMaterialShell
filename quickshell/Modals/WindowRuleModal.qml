@@ -74,6 +74,9 @@ FloatingWindow {
         noiseSlider.value = 5;
         saturationEnabled.checked = false;
         saturationSlider.value = 100;
+        floatingXInput.text = "";
+        floatingYInput.text = "";
+        floatingRelativeDropdown.currentValue = "top-left";
         minWidthInput.text = "";
         maxWidthInput.text = "";
         minHeightInput.text = "";
@@ -182,6 +185,10 @@ FloatingWindow {
         const hasSaturation = actions.backgroundSaturation !== undefined && actions.backgroundSaturation !== null;
         saturationEnabled.checked = hasSaturation;
         saturationSlider.value = hasSaturation ? Math.round(actions.backgroundSaturation * 100) : 100;
+
+        floatingXInput.text = (actions.defaultFloatingX !== undefined && actions.defaultFloatingX !== null) ? String(actions.defaultFloatingX) : "";
+        floatingYInput.text = (actions.defaultFloatingY !== undefined && actions.defaultFloatingY !== null) ? String(actions.defaultFloatingY) : "";
+        floatingRelativeDropdown.currentValue = actions.defaultFloatingRelativeTo || "top-left";
 
         minWidthInput.text = actions.minWidth !== undefined ? String(actions.minWidth) : "";
         maxWidthInput.text = actions.maxWidth !== undefined ? String(actions.maxWidth) : "";
@@ -326,6 +333,15 @@ FloatingWindow {
             actions.backgroundNoise = noiseSlider.value / 100;
         if (saturationEnabled.checked && isNiri)
             actions.backgroundSaturation = saturationSlider.value / 100;
+
+        const floatX = parseInt(floatingXInput.text);
+        const floatY = parseInt(floatingYInput.text);
+        if (isNiri && !isNaN(floatX) && !isNaN(floatY)) {
+            actions.defaultFloatingX = floatX;
+            actions.defaultFloatingY = floatY;
+            if (floatingRelativeDropdown.currentValue && floatingRelativeDropdown.currentValue !== "top-left")
+                actions.defaultFloatingRelativeTo = floatingRelativeDropdown.currentValue;
+        }
 
         const minW = parseInt(minWidthInput.text);
         const maxW = parseInt(maxWidthInput.text);
@@ -496,7 +512,7 @@ FloatingWindow {
         id: mc
         property string label: ""
         property int triState: 0
-        property string unsetLabel: I18n.tr("Any")
+        property string unsetLabel: I18n.tr("Default")
         property bool readOnly: false
         readonly property var stateText: [mc.unsetLabel, "true", "false"]
         readonly property var stateColor: [Theme.surfaceVariantText, Theme.primary, Theme.error]
@@ -1236,6 +1252,101 @@ FloatingWindow {
                         value: 100
                         enabled: saturationEnabled.checked
                         opacity: enabled ? 1 : 0.4
+                    }
+                }
+
+                SectionHeader {
+                    title: I18n.tr("Floating Position")
+                    visible: isNiri
+                }
+
+                StyledText {
+                    width: parent.width
+                    visible: isNiri
+                    text: I18n.tr("Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.")
+                    font.pixelSize: Theme.fontSizeSmall - 1
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacingM
+                    visible: isNiri
+
+                    Column {
+                        width: (parent.width - Theme.spacingM * 2) / 3
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("X")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        InputField {
+                            width: parent.width
+                            hasFocus: floatingXInput.activeFocus
+                            DankTextField {
+                                id: floatingXInput
+                                anchors.fill: parent
+                                font.pixelSize: Theme.fontSizeSmall
+                                textColor: Theme.surfaceText
+                                placeholderText: "px"
+                                backgroundColor: "transparent"
+                                enabled: root.visible
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: (parent.width - Theme.spacingM * 2) / 3
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Y")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        InputField {
+                            width: parent.width
+                            hasFocus: floatingYInput.activeFocus
+                            DankTextField {
+                                id: floatingYInput
+                                anchors.fill: parent
+                                font.pixelSize: Theme.fontSizeSmall
+                                textColor: Theme.surfaceText
+                                placeholderText: "px"
+                                backgroundColor: "transparent"
+                                enabled: root.visible
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: (parent.width - Theme.spacingM * 2) / 3
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Anchor")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        DankDropdown {
+                            id: floatingRelativeDropdown
+                            width: parent.width
+                            dropdownWidth: parent.width
+                            compactMode: true
+                            options: ["top-left", "top-right", "bottom-left", "bottom-right", "top", "bottom", "left", "right"]
+                        }
                     }
                 }
 

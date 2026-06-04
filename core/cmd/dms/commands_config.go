@@ -87,10 +87,7 @@ func runResolveInclude(cmd *cobra.Command, args []string) {
 }
 
 func checkHyprlandInclude(filename string) (IncludeResult, error) {
-	configDir, err := utils.ExpandPath("$HOME/.config/hypr")
-	if err != nil {
-		return IncludeResult{}, err
-	}
+	configDir := filepath.Join(utils.XDGConfigHome(), "hypr")
 
 	targetPath := filepath.Join(configDir, "dms", filename)
 	result := IncludeResult{}
@@ -191,10 +188,7 @@ func hyprlandFindIncludeHyprlang(filePath, target string, processed map[string]b
 }
 
 func checkNiriInclude(filename string) (IncludeResult, error) {
-	configDir, err := utils.ExpandPath("$HOME/.config/niri")
-	if err != nil {
-		return IncludeResult{}, err
-	}
+	configDir := filepath.Join(utils.XDGConfigHome(), "niri")
 
 	targetPath := filepath.Join(configDir, "dms", filename)
 	result := IncludeResult{}
@@ -270,10 +264,7 @@ func niriFindInclude(filePath, target string, processed map[string]bool) bool {
 }
 
 func checkMangoWCInclude(filename string) (IncludeResult, error) {
-	configDir, err := utils.ExpandPath("$HOME/.config/mango")
-	if err != nil {
-		return IncludeResult{}, err
-	}
+	configDir := filepath.Join(utils.XDGConfigHome(), "mango")
 
 	targetPath := filepath.Join(configDir, "dms", filename)
 	result := IncludeResult{}

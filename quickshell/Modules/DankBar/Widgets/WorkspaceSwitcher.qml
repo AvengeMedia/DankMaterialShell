@@ -340,7 +340,8 @@ Item {
 
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
             const moddedId = Paths.moddedAppId(keyBase);
-            const key = isActiveWs || !SettingsData.groupWorkspaceApps ? `${moddedId}_${i}` : moddedId;
+            const groupThisWs = SettingsData.groupWorkspaceApps && (!isActiveWs || SettingsData.groupActiveWorkspaceApps);
+            const key = groupThisWs ? moddedId : `${moddedId}_${i}`;
 
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell" || keyBase === "com.danklinux.dms";
@@ -1091,7 +1092,7 @@ Item {
                         }
                     }
 
-                    return (SettingsData.groupWorkspaceApps && !isActive) ? groupedCount : totalCount;
+                    return (SettingsData.groupWorkspaceApps && (!isActive || SettingsData.groupActiveWorkspaceApps)) ? groupedCount : totalCount;
                 }
 
                 readonly property real baseWidth: root.isVertical ? (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5) : (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2))
@@ -1884,6 +1885,12 @@ Item {
                     }
                 }
                 Connections {
+                    target: root
+                    function onCurrentWorkspaceChanged() {
+                        delegateRoot.updateAllData();
+                    }
+                }
+                Connections {
                     target: NiriService
                     enabled: CompositorService.isNiri
                     function onAllWorkspacesChanged() {
@@ -1905,6 +1912,12 @@ Item {
                         delegateRoot.updateAllData();
                     }
                     function onAppIdSubstitutionsChanged() {
+                        delegateRoot.updateAllData();
+                    }
+                    function onGroupWorkspaceAppsChanged() {
+                        delegateRoot.updateAllData();
+                    }
+                    function onGroupActiveWorkspaceAppsChanged() {
                         delegateRoot.updateAllData();
                     }
                 }

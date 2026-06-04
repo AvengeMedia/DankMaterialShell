@@ -173,6 +173,7 @@ Singleton {
     property int hyprlandLayoutGapsOverride: -1
     property int hyprlandLayoutRadiusOverride: -1
     property int hyprlandLayoutBorderSize: -1
+    property bool hyprlandResizeOnBorder: false
     property int mangoLayoutGapsOverride: -1
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
@@ -372,6 +373,7 @@ Singleton {
     property bool showWorkspaceApps: false
     property bool workspaceDragReorder: true
     property bool groupWorkspaceApps: true
+    property bool groupActiveWorkspaceApps: false
     property int maxWorkspaceIcons: 3
     property int workspaceAppIconSizeOffset: 0
     property bool workspaceFollowFocus: false
