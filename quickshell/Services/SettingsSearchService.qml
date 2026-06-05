@@ -157,6 +157,9 @@ Singleton {
             var item = settingsIndex[i];
             var t = translateItem(item);
             var sourceDescription = item.description || "";
+            var labelLower = _lowerVariants([item.label, t.label]);
+            var categoryLower = _lowerVariants([item.category, t.category]);
+            var descriptionLower = _lowerVariants([sourceDescription, t.description]);
             cache.push({
                 section: t.section,
                 label: t.label,
@@ -166,9 +169,14 @@ Singleton {
                 icon: t.icon,
                 description: t.description,
                 conditionKey: t.conditionKey,
-                labelSearch: _lowerVariants([item.label, t.label]),
-                categorySearch: _lowerVariants([item.category, t.category]),
-                descriptionSearch: _lowerVariants([sourceDescription, t.description])
+                isTab: String(t.section).startsWith("_tab_"),
+                labelSearch: labelLower,
+                categorySearch: categoryLower,
+                descriptionSearch: descriptionLower,
+                labelSquash: _squashVariants(labelLower),
+                categorySquash: _squashVariants(categoryLower),
+                descriptionSquash: _squashVariants(descriptionLower),
+                keywordsSquash: _squashVariants(t.keywords)
             });
         }
         _translatedCache = cache;
@@ -183,6 +191,22 @@ Singleton {
             var lower = String(value).toLowerCase();
             if (out.indexOf(lower) === -1)
                 out.push(lower);
+        }
+        return out;
+    }
+
+    function _squash(value) {
+        return String(value).toLowerCase().replace(/[^a-z0-9]+/g, "");
+    }
+
+    function _squashVariants(values) {
+        var out = [];
+        for (var i = 0; i < values.length; i++) {
+            if (!values[i])
+                continue;
+            var squashed = _squash(values[i]);
+            if (squashed && out.indexOf(squashed) === -1)
+                out.push(squashed);
         }
         return out;
     }
@@ -223,6 +247,7 @@ Singleton {
             return [];
 
         var queryLower = text.toLowerCase().trim();
+        var querySquash = _squash(queryLower);
         var queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
         var scored = [];
         var cache = _translatedCache;
@@ -233,21 +258,43 @@ Singleton {
             if (!checkCondition(entry))
                 continue;
 
-            var score = 0;
+            var labelScore = _bestFieldScore(entry.labelSearch, queryLower, 10000, 5000, 1000);
+            if (querySquash)
+                labelScore = Math.max(labelScore, _bestFieldScore(entry.labelSquash, querySquash, 9000, 4500, 900));
 
-            score = Math.max(score, _bestFieldScore(entry.labelSearch, queryLower, 10000, 5000, 1000));
+            var score = labelScore;
             score = Math.max(score, _bestFieldScore(entry.categorySearch, queryLower, 500, 500, 500));
             score = Math.max(score, _bestFieldScore(entry.descriptionSearch, queryLower, 250, 250, 250));
+            if (querySquash) {
+                score = Math.max(score, _bestFieldScore(entry.categorySquash, querySquash, 500, 500, 500));
+                score = Math.max(score, _bestFieldScore(entry.descriptionSquash, querySquash, 250, 250, 250));
+            }
 
             if (score === 0) {
                 var keywords = entry.keywords;
                 for (var k = 0; k < keywords.length; k++) {
-                    if (keywords[k].startsWith(queryLower)) {
-                        score = 800;
+                    var keyword = keywords[k];
+                    if (keyword === queryLower) {
+                        score = 900;
                         break;
                     }
-                    if (keywords[k].includes(queryLower) && score < 400) {
+                    if (keyword.startsWith(queryLower)) {
+                        score = Math.max(score, 800);
+                    } else if (keyword.includes(queryLower) && score < 400) {
                         score = 400;
+                    }
+                }
+            }
+
+            if (score === 0 && querySquash) {
+                var keywordsSquash = entry.keywordsSquash;
+                for (var ks = 0; ks < keywordsSquash.length; ks++) {
+                    if (keywordsSquash[ks] === querySquash) {
+                        score = Math.max(score, 850);
+                        break;
+                    }
+                    if (keywordsSquash[ks].startsWith(querySquash)) {
+                        score = Math.max(score, 750);
                     }
                 }
             }
@@ -281,12 +328,21 @@ Singleton {
             if (score > 0) {
                 scored.push({
                     item: entry,
-                    score: score
+                    score: score,
+                    labelScore: labelScore
                 });
             }
         }
 
-        scored.sort((a, b) => b.score - a.score);
+        scored.sort((a, b) => {
+            if (b.score !== a.score)
+                return b.score - a.score;
+            if (b.labelScore !== a.labelScore)
+                return b.labelScore - a.labelScore;
+            if (a.item.isTab !== b.item.isTab)
+                return a.item.isTab ? 1 : -1;
+            return a.item.label.length - b.item.label.length;
+        });
         return scored.slice(0, limit).map(s => s.item);
     }
 

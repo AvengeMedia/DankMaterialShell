@@ -1052,6 +1052,31 @@
     "conditionKey": "isNiri"
   },
   {
+    "section": "groupActiveWorkspaceApps",
+    "label": "Group Active Workspace",
+    "tabIndex": 4,
+    "category": "Workspaces",
+    "keywords": [
+      "active",
+      "app",
+      "application",
+      "apps",
+      "desktop",
+      "focused",
+      "group",
+      "grouped",
+      "icons",
+      "program",
+      "repeated",
+      "spaces",
+      "virtual",
+      "virtual desktops",
+      "workspace",
+      "workspaces"
+    ],
+    "description": "Also group repeated application icons on the active workspace"
+  },
+  {
     "section": "groupWorkspaceApps",
     "label": "Group Workspace Apps",
     "tabIndex": 4,
@@ -3900,6 +3925,30 @@
       "theme"
     ],
     "description": "Shadow elevation on popouts, OSDs, and dropdowns"
+  },
+  {
+    "section": "hyprlandResizeOnBorder",
+    "label": "Resize on Border",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "border",
+      "colors",
+      "drag",
+      "dragging",
+      "edges",
+      "hyprland",
+      "look",
+      "mouse",
+      "resize",
+      "scheme",
+      "style",
+      "their",
+      "theme",
+      "windows"
+    ],
+    "description": "Resize windows by dragging their edges with the mouse"
   },
   {
     "section": "runDmsMatugenTemplates",
@@ -7585,8 +7634,7 @@
       "rules",
       "window"
     ],
-    "icon": "select_window",
-    "conditionKey": "isNiri"
+    "icon": "select_window"
   },
   {
     "section": "audioInputDevices",
@@ -7692,60 +7740,873 @@
     "description": "Change the locale used for date and time formatting, independent of the interface language."
   },
   {
+    "section": "greeterUse24Hour",
+    "label": "24-hour clock",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "24hour",
+      "affect",
+      "clock",
+      "display manager",
+      "does",
+      "greetd",
+      "greeter",
+      "hour",
+      "login",
+      "main",
+      "time",
+      "watch"
+    ],
+    "description": "Greeter only — does not affect main clock"
+  },
+  {
+    "section": "greeterAutoLogin",
+    "label": "Auto-login on startup",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "after",
+      "auto",
+      "autologin",
+      "boot",
+      "display manager",
+      "effect",
+      "greetd",
+      "greeter",
+      "lock",
+      "lockscreen",
+      "login",
+      "next",
+      "password",
+      "reboot",
+      "screen",
+      "security",
+      "sign",
+      "skip",
+      "startup",
+      "sync",
+      "takes",
+      "unchanged",
+      "unlock",
+      "until"
+    ],
+    "description": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync."
+  },
+  {
+    "section": "greeterLockDateFormat",
+    "label": "Date Format",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "date",
+      "display manager",
+      "format",
+      "greetd",
+      "greeter",
+      "login",
+      "screen"
+    ],
+    "description": "Greeter only — format for the date on the login screen"
+  },
+  {
+    "section": "greeterDeps",
+    "label": "Dependencies & documentation",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "dependencies",
+      "display manager",
+      "documentation",
+      "greetd",
+      "greeter",
+      "login"
+    ],
+    "icon": "extension"
+  },
+  {
+    "section": "greeterEnableFprint",
+    "label": "Enable fingerprint at login",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "display manager",
+      "enable",
+      "fingerprint",
+      "fprintd",
+      "greetd",
+      "greeter",
+      "login"
+    ]
+  },
+  {
+    "section": "greeterEnableU2f",
+    "label": "Enable security key at login",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "display manager",
+      "enable",
+      "greetd",
+      "greeter",
+      "key",
+      "login",
+      "security",
+      "u2f"
+    ]
+  },
+  {
     "section": "_tab_31",
     "label": "Greeter",
     "tabIndex": 31,
-    "category": "Settings",
+    "category": "Greeter",
     "keywords": [
+      "display manager",
+      "greetd",
       "greeter",
-      "settings"
+      "login"
     ],
     "icon": "login"
+  },
+  {
+    "section": "greeterAppearance",
+    "label": "Greeter Appearance",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "appearance",
+      "display manager",
+      "font",
+      "greetd",
+      "greeter",
+      "login",
+      "screen",
+      "typography"
+    ],
+    "icon": "palette",
+    "description": "Font used on the login screen"
+  },
+  {
+    "section": "greeterBehavior",
+    "label": "Greeter Behavior",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "behavior",
+      "display manager",
+      "greetd",
+      "greeter",
+      "last",
+      "login",
+      "remember",
+      "select",
+      "session"
+    ],
+    "icon": "history",
+    "description": "Pre-select the last used session on the greeter"
+  },
+  {
+    "section": "greeterStatus",
+    "label": "Greeter Status",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "greetd",
+      "greeter",
+      "login",
+      "status"
+    ],
+    "icon": "info"
+  },
+  {
+    "section": "greeterFontFamily",
+    "label": "Greeter font",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "font",
+      "greetd",
+      "greeter",
+      "login",
+      "screen",
+      "typography"
+    ],
+    "description": "Font used on the login screen"
+  },
+  {
+    "section": "greeterAuth",
+    "label": "Login Authentication",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "authentication",
+      "display manager",
+      "fingerprint",
+      "fprintd",
+      "greetd",
+      "greeter",
+      "login"
+    ],
+    "icon": "fingerprint"
+  },
+  {
+    "section": "greeterPadHours",
+    "label": "Pad hours (02:00 vs 2:00)",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "(02:00",
+      "12hour",
+      "2:00)",
+      "display manager",
+      "greetd",
+      "greeter",
+      "hours",
+      "login",
+      "pad",
+      "time"
+    ]
+  },
+  {
+    "section": "greeterRememberLastSession",
+    "label": "Remember last session",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "greetd",
+      "greeter",
+      "last",
+      "login",
+      "remember",
+      "select",
+      "session"
+    ],
+    "description": "Pre-select the last used session on the greeter"
+  },
+  {
+    "section": "greeterRememberLastUser",
+    "label": "Remember last user",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "fill",
+      "greetd",
+      "greeter",
+      "last",
+      "login",
+      "remember",
+      "successful",
+      "user",
+      "username"
+    ],
+    "description": "Pre-fill the last successful username on the greeter"
+  },
+  {
+    "section": "greeterShowSeconds",
+    "label": "Show Seconds",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "greetd",
+      "greeter",
+      "login",
+      "seconds",
+      "show",
+      "time"
+    ]
+  },
+  {
+    "section": "greeterWallpaperFillMode",
+    "label": "Wallpaper fill mode",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "background",
+      "bg",
+      "desktop",
+      "display manager",
+      "fill",
+      "greetd",
+      "greeter",
+      "image",
+      "login",
+      "mode",
+      "picture",
+      "scaled",
+      "wallpaper"
+    ],
+    "description": "How the background image is scaled"
+  },
+  {
+    "section": "muxType",
+    "label": "Multiplexer",
+    "tabIndex": 32,
+    "category": "Multiplexers",
+    "keywords": [
+      "backend",
+      "multiplexer",
+      "multiplexers",
+      "mux",
+      "terminal",
+      "tmux",
+      "type",
+      "zellij"
+    ],
+    "icon": "terminal",
+    "description": "Terminal multiplexer backend to use"
   },
   {
     "section": "_tab_32",
     "label": "Multiplexers",
     "tabIndex": 32,
-    "category": "Settings",
+    "category": "Multiplexers",
     "keywords": [
       "multiplexers",
-      "settings"
+      "terminal",
+      "tmux",
+      "zellij"
     ],
     "icon": "terminal"
+  },
+  {
+    "section": "muxUseCustomCommand",
+    "label": "Terminal",
+    "tabIndex": 32,
+    "category": "Multiplexers",
+    "keywords": [
+      "command",
+      "custom",
+      "multiplexers",
+      "mux",
+      "override",
+      "script",
+      "terminal",
+      "tmux",
+      "zellij"
+    ],
+    "icon": "desktop_windows",
+    "description": "Override terminal with a custom command or script"
+  },
+  {
+    "section": "frameLauncherArcExtender",
+    "label": "Arc Extender",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "arc",
+      "border",
+      "center",
+      "connected",
+      "content",
+      "decoration",
+      "extended",
+      "extender",
+      "frame",
+      "launcher",
+      "start menu",
+      "surface",
+      "window"
+    ],
+    "description": "Use the extended surface for launcher content"
+  },
+  {
+    "section": "frameBorder",
+    "label": "Border",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "corner",
+      "decoration",
+      "frame",
+      "horizontal",
+      "panel",
+      "radius",
+      "rounding",
+      "statusbar",
+      "taskbar",
+      "thickness",
+      "topbar",
+      "vertical",
+      "window"
+    ],
+    "icon": "border_outer",
+    "description": "Horizontal and vertical bar thickness"
+  },
+  {
+    "section": "frameColor",
+    "label": "Border Color",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "color",
+      "colour",
+      "decoration",
+      "default",
+      "frame",
+      "hue",
+      "primary",
+      "surface",
+      "theme",
+      "tint",
+      "window"
+    ]
+  },
+  {
+    "section": "frameRounding",
+    "label": "Border Radius",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "corner",
+      "decoration",
+      "frame",
+      "radius",
+      "rounding",
+      "window"
+    ]
+  },
+  {
+    "section": "frameThickness",
+    "label": "Border Width",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "frame",
+      "size",
+      "thickness",
+      "width",
+      "window"
+    ]
+  },
+  {
+    "section": "frameConnectedOptions",
+    "label": "Connected Options",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "arcs",
+      "border",
+      "connected",
+      "curves",
+      "decoration",
+      "edge",
+      "expose",
+      "frame",
+      "gap",
+      "meet",
+      "notification",
+      "options",
+      "popout",
+      "reveal",
+      "surfaces",
+      "where",
+      "window"
+    ],
+    "icon": "blur_linear",
+    "description": "Reveal the arcs where surfaces meet the frame"
+  },
+  {
+    "section": "frameDisplays",
+    "label": "Display Assignment",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "assignment",
+      "border",
+      "decoration",
+      "display",
+      "frame",
+      "monitor",
+      "output",
+      "screen",
+      "window"
+    ],
+    "icon": "monitor"
+  },
+  {
+    "section": "frameEnable",
+    "label": "Enable Frame",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "around",
+      "border",
+      "connected",
+      "decoration",
+      "display",
+      "draw",
+      "enable",
+      "entire",
+      "frame",
+      "monitor",
+      "outline",
+      "output",
+      "picture",
+      "screen",
+      "window"
+    ],
+    "description": "Draw a connected picture-frame border around the entire display"
+  },
+  {
+    "section": "frameCloseGaps",
+    "label": "Expose the Arcs",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "arcs",
+      "border",
+      "connected",
+      "curves",
+      "decoration",
+      "edge",
+      "expose",
+      "frame",
+      "gap",
+      "meet",
+      "notification",
+      "popout",
+      "reveal",
+      "surfaces",
+      "where",
+      "window"
+    ],
+    "description": "Reveal the arcs where surfaces meet the frame"
   },
   {
     "section": "_tab_33",
     "label": "Frame",
     "tabIndex": 33,
-    "category": "Settings",
+    "category": "Frame",
     "keywords": [
+      "border",
+      "decoration",
       "frame",
-      "settings"
+      "window"
     ],
     "icon": "frame_source"
+  },
+  {
+    "section": "frameEnabled",
+    "label": "Frame",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "around",
+      "border",
+      "connected",
+      "decoration",
+      "display",
+      "draw",
+      "entire",
+      "frame",
+      "monitor",
+      "outline",
+      "output",
+      "picture",
+      "screen",
+      "window"
+    ],
+    "icon": "frame_source",
+    "description": "Draw a connected picture-frame border around the entire display"
+  },
+  {
+    "section": "frameBlurEnabled",
+    "label": "Frame Blur",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "background",
+      "blur",
+      "border",
+      "decoration",
+      "frame",
+      "frosted",
+      "glass",
+      "newer",
+      "quickshell",
+      "requires",
+      "transparency",
+      "version",
+      "window"
+    ],
+    "description": "Requires a newer version of Quickshell"
+  },
+  {
+    "section": "frameBarIntegration",
+    "label": "Integrations",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "during",
+      "frame",
+      "hide",
+      "integrations",
+      "niri",
+      "overview",
+      "show",
+      "window"
+    ],
+    "icon": "toolbar",
+    "description": "Show during Niri overview",
+    "conditionKey": "isNiri"
+  },
+  {
+    "section": "frameLauncherEmergeSide",
+    "label": "Launcher Emerge Side",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "border",
+      "bottom",
+      "connected",
+      "decoration",
+      "direction",
+      "edge",
+      "emerge",
+      "frame",
+      "launcher",
+      "modal",
+      "side",
+      "slides",
+      "start menu",
+      "top",
+      "window"
+    ],
+    "description": "Edge the launcher slides from"
+  },
+  {
+    "section": "frameMode",
+    "label": "Mode",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "connected",
+      "decoration",
+      "emerge",
+      "flush",
+      "frame",
+      "mode",
+      "panel",
+      "popout",
+      "separate",
+      "statusbar",
+      "surfaces",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "icon": "tune",
+    "description": "Surfaces emerge flush from the bar"
+  },
+  {
+    "section": "frameShowOnOverview",
+    "label": "Show on Overview",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "during",
+      "frame",
+      "hide",
+      "niri",
+      "overview",
+      "show",
+      "window"
+    ],
+    "description": "Show during Niri overview"
+  },
+  {
+    "section": "frameBarSize",
+    "label": "Size",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "bar",
+      "border",
+      "decoration",
+      "frame",
+      "height",
+      "horizontal",
+      "panel",
+      "size",
+      "statusbar",
+      "taskbar",
+      "thickness",
+      "topbar",
+      "vertical",
+      "width",
+      "window"
+    ],
+    "description": "Horizontal and vertical bar thickness"
+  },
+  {
+    "section": "frameModeSelector",
+    "label": "Surface Behavior",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "behavior",
+      "border",
+      "connected",
+      "decoration",
+      "emerge",
+      "flush",
+      "frame",
+      "mode",
+      "panel",
+      "popout",
+      "separate",
+      "statusbar",
+      "surface",
+      "surfaces",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "description": "Surfaces emerge flush from the bar"
+  },
+  {
+    "section": "frameOpacity",
+    "label": "Surface Opacity",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "frame",
+      "opacity",
+      "popup",
+      "surface",
+      "transparency",
+      "window"
+    ]
   },
   {
     "section": "_tab_34",
     "label": "Applications",
     "tabIndex": 34,
-    "category": "Settings",
+    "category": "Default Apps",
     "keywords": [
       "app",
       "applications",
       "apps",
+      "browser",
+      "default",
+      "handlers",
+      "mime",
       "program",
       "programs",
-      "settings"
+      "terminal"
     ],
     "icon": "apps"
+  },
+  {
+    "section": "createUserGreeter",
+    "label": "Allow greeter login access",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "access",
+      "accounts",
+      "allow",
+      "greeter",
+      "group",
+      "login",
+      "profile",
+      "sync",
+      "they",
+      "user",
+      "users"
+    ],
+    "description": "Add the new user to the %1 group so they can run dms greeter sync --profile."
+  },
+  {
+    "section": "createUser",
+    "label": "Create User",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "accounts",
+      "admin",
+      "create",
+      "group",
+      "profile",
+      "sudo",
+      "they",
+      "user",
+      "users",
+      "wheel"
+    ],
+    "icon": "person_add",
+    "description": "Add the new user to the %1 group so they can use sudo."
+  },
+  {
+    "section": "usersList",
+    "label": "Existing Users",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "accounts",
+      "existing",
+      "profile",
+      "user",
+      "users"
+    ],
+    "icon": "group"
+  },
+  {
+    "section": "createUserAdmin",
+    "label": "Grant administrator privileges",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "accounts",
+      "admin",
+      "administrator",
+      "grant",
+      "group",
+      "privileges",
+      "profile",
+      "sudo",
+      "they",
+      "user",
+      "users",
+      "wheel"
+    ],
+    "description": "Add the new user to the %1 group so they can use sudo."
   },
   {
     "section": "_tab_35",
     "label": "Users",
     "tabIndex": 35,
-    "category": "Settings",
+    "category": "Users",
     "keywords": [
-      "settings",
+      "accounts",
+      "profile",
+      "user",
       "users"
     ],
     "icon": "manage_accounts"
@@ -7754,11 +8615,27 @@
     "section": "_tab_36",
     "label": "Autostart Apps",
     "tabIndex": 36,
-    "category": "Settings",
+    "category": "Autostart",
     "keywords": [
       "apps",
       "autostart",
-      "settings"
+      "boot",
+      "launch",
+      "startup"
+    ],
+    "icon": "line_start"
+  },
+  {
+    "section": "autostartEntries",
+    "label": "Autostart Entries",
+    "tabIndex": 36,
+    "category": "Autostart",
+    "keywords": [
+      "autostart",
+      "boot",
+      "entries",
+      "launch",
+      "startup"
     ],
     "icon": "line_start"
   }

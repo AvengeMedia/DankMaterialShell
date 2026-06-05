@@ -91,6 +91,12 @@ CATEGORY_KEYWORDS = {
         "opacity",
     ],
     "Locale": ["locale", "language", "country"],
+    "Greeter": ["login", "greetd", "display manager"],
+    "Multiplexers": ["tmux", "zellij", "terminal"],
+    "Frame": ["window", "border", "decoration"],
+    "Default Apps": ["browser", "terminal", "handlers", "mime"],
+    "Users": ["accounts", "user", "profile"],
+    "Autostart": ["startup", "launch", "boot"],
 }
 
 TAB_INDEX_MAP = {
@@ -124,6 +130,12 @@ TAB_INDEX_MAP = {
     "WindowRulesTab.qml": 28,
     "AudioTab.qml": 29,
     "LocaleTab.qml": 30,
+    "GreeterTab.qml": 31,
+    "MuxTab.qml": 32,
+    "FrameTab.qml": 33,
+    "DefaultAppsTab.qml": 34,
+    "UsersTab.qml": 35,
+    "AutoStartTab.qml": 36,
 }
 
 TAB_CATEGORY_MAP = {
@@ -157,6 +169,12 @@ TAB_CATEGORY_MAP = {
     28: "Window Rules",
     29: "Audio",
     30: "Locale",
+    31: "Greeter",
+    32: "Multiplexers",
+    33: "Frame",
+    34: "Default Apps",
+    35: "Users",
+    36: "Autostart",
 }
 
 SEARCHABLE_COMPONENTS = [
