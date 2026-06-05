@@ -352,9 +352,11 @@ DankModal {
             break;
         case Qt.Key_P:
             if (!(event.modifiers & Qt.ControlModifier)) {
-                const idx = visibleActions.indexOf("poweroff");
-                startHold("poweroff", idx);
-                event.accepted = true;
+                if (visibleActions.includes("poweroff")) {
+                    const idx = visibleActions.indexOf("poweroff");
+                    startHold("poweroff", idx);
+                    event.accepted = true;
+                }
             } else {
                 selectedIndex = (selectedIndex - 1 + visibleActions.length) % visibleActions.length;
                 event.accepted = true;
@@ -373,28 +375,40 @@ DankModal {
             }
             break;
         case Qt.Key_R:
-            startHold("reboot", visibleActions.indexOf("reboot"));
-            event.accepted = true;
+            if (visibleActions.includes("reboot")) {
+                startHold("reboot", visibleActions.indexOf("reboot"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_X:
-            startHold("logout", visibleActions.indexOf("logout"));
-            event.accepted = true;
+            if (visibleActions.includes("logout")) {
+                startHold("logout", visibleActions.indexOf("logout"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_L:
-            startHold("lock", visibleActions.indexOf("lock"));
-            event.accepted = true;
+            if (visibleActions.includes("logout")) {
+                startHold("lock", visibleActions.indexOf("lock"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_S:
-            startHold("suspend", visibleActions.indexOf("suspend"));
-            event.accepted = true;
+            if (visibleActions.includes("suspend")) {
+                startHold("suspend", visibleActions.indexOf("suspend"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_H:
-            startHold("hibernate", visibleActions.indexOf("hibernate"));
-            event.accepted = true;
+            if (visibleActions.includes("hibernate")) {
+                startHold("hibernate", visibleActions.indexOf("hibernate"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_D:
-            startHold("restart", visibleActions.indexOf("restart"));
-            event.accepted = true;
+            if (visibleActions.includes("restart")) {
+                startHold("restart", visibleActions.indexOf("restart"));
+                event.accepted = true;
+            }
             break;
         }
     }
