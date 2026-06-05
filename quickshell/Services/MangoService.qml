@@ -33,6 +33,7 @@ Singleton {
     //           tags: [{ tag, state, clients, focused, urgent, layout }] }
     property var outputs: ({})
     property string activeOutput: ""
+    readonly property bool inOverview: isOutputInOverview(activeOutput)
     property int tagCount: 9
     property var displayScales: ({})
     property string currentKeyboardLayout: ""
@@ -171,6 +172,15 @@ Singleton {
         if (!output || !output.tags)
             return [];
         return output.tags.filter(tag => tag.state === 1).map(tag => tag.tag);
+    }
+
+    // mango reports active_tags=[0] (no real tag selected) while the overview is open.
+    function isOutputInOverview(outputName) {
+        const output = getOutputState(outputName);
+        if (!output)
+            return false;
+        const at = output.activeTags || [];
+        return at.length === 0 || at.every(t => t === 0);
     }
 
     function getTagsWithClients(outputName) {

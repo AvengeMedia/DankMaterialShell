@@ -1,6 +1,6 @@
 binds {
     // === System & Overview ===
-    Mod+D repeat=false { toggle-overview; }
+    Mod+O repeat=false { toggle-overview; }
     Mod+Tab repeat=false { toggle-overview; }
     Mod+Shift+Slash { show-hotkey-overlay; }
 

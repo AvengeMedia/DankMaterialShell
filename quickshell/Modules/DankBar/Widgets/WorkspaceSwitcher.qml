@@ -945,6 +945,53 @@ Item {
         spacing: Theme.spacingS
         flow: isVertical ? Flow.TopToBottom : Flow.LeftToRight
 
+        // mango reports active_tags=0 while the overview is open; surface it as a pill
+        Item {
+            id: overviewPill
+            visible: CompositorService.isMango && MangoService.inOverview
+            width: root.isVertical ? root.widgetHeight : overviewBg.width
+            height: root.isVertical ? overviewBg.height : root.widgetHeight
+
+            readonly property real labelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+
+            Rectangle {
+                id: overviewBg
+                anchors.centerIn: parent
+                width: root.isVertical ? Math.max(root.widgetHeight * 0.7, overviewContent.implicitWidth + Theme.spacingS) : (overviewContent.implicitWidth + Theme.spacingS * 2)
+                height: Math.max(root.widgetHeight * 0.5, overviewContent.implicitHeight + Theme.spacingXS)
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.primary, 0.18)
+
+                Row {
+                    id: overviewContent
+                    anchors.centerIn: parent
+                    spacing: Theme.spacingXS
+
+                    DankIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "grid_view"
+                        size: overviewPill.labelSize + 2
+                        color: Theme.primary
+                    }
+
+                    StyledText {
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: !root.isVertical
+                        text: I18n.tr("OVERVIEW")
+                        color: Theme.primary
+                        font.pixelSize: overviewPill.labelSize
+                        font.weight: Font.DemiBold
+                    }
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: Quickshell.execDetached(["mmsg", "dispatch", "toggleoverview"])
+            }
+        }
+
         Repeater {
             id: workspaceRepeater
             model: ScriptModel {
