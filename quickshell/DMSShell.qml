@@ -328,6 +328,16 @@ Item {
     }
 
     property bool hadRealScreen: true
+    property var previousRealScreenNames: []
+
+    function _getRealScreenNames() {
+        const names = [];
+        for (let i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name.length > 0)
+                names.push(Quickshell.screens[i].name);
+        }
+        return names;
+    }
 
     function _hasRealScreen() {
         for (let i = 0; i < Quickshell.screens.length; i++) {
@@ -353,14 +363,20 @@ Item {
         target: Quickshell
         function onScreensChanged() {
             const hasReal = root._hasRealScreen();
+            const currentNames = root._getRealScreenNames();
             log.info("Screens changed:", Quickshell.screens.length,
                      Quickshell.screens.map(s => "'" + s.name + "'").join(","),
                      "hasReal:", hasReal, "hadReal:", root.hadRealScreen);
-            if (!root.hadRealScreen && hasReal) {
-                log.info("Real screen reappeared after placeholder state, triggering surface recovery");
+            const fullReconnect = !root.hadRealScreen && hasReal;
+            const partialReconnect = root.previousRealScreenNames.length > 0
+                && currentNames.some(name => !root.previousRealScreenNames.includes(name));
+            if (fullReconnect || partialReconnect) {
+                log.info("Screen reconnect detected, triggering surface recovery",
+                         "full:", fullReconnect, "partial:", partialReconnect);
                 root.triggerSurfaceRecovery("screen-reconnect");
             }
             root.hadRealScreen = hasReal;
+            root.previousRealScreenNames = currentNames;
         }
     }
 
