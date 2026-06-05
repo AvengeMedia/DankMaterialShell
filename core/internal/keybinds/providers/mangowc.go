@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
@@ -228,11 +229,20 @@ func (m *MangoWCProvider) SetBind(key, action, description string, options map[s
 	}
 
 	normalizedKey := strings.ToLower(key)
+	prefix := "bind"
+	if existing, ok := existingBinds[normalizedKey]; ok && existing.Prefix != "" {
+		prefix = existing.Prefix
+	}
+	if optionPrefix := m.bindPrefixFromOptions(options); optionPrefix != "" {
+		prefix = optionPrefix
+	}
+
 	existingBinds[normalizedKey] = &mangowcOverrideBind{
 		Key:         key,
 		Action:      action,
 		Description: description,
 		Options:     options,
+		Prefix:      prefix,
 	}
 
 	return m.writeOverrideBinds(existingBinds)
@@ -246,7 +256,7 @@ func (m *MangoWCProvider) RemoveBind(key string) error {
 
 	normalizedKey := strings.ToLower(key)
 	delete(existingBinds, normalizedKey)
-	return m.writeOverrideBinds(existingBinds)
+	return m.writeOverrideBindsWithRemoved(existingBinds, map[string]bool{normalizedKey: true})
 }
 
 func (m *MangoWCProvider) ResetBind(key string) error {
@@ -258,6 +268,7 @@ type mangowcOverrideBind struct {
 	Action      string
 	Description string
 	Options     map[string]any
+	Prefix      string
 }
 
 func (m *MangoWCProvider) loadOverrideBinds() (map[string]*mangowcOverrideBind, error) {
@@ -272,60 +283,97 @@ func (m *MangoWCProvider) loadOverrideBinds() (map[string]*mangowcOverrideBind, 
 		return nil, err
 	}
 
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
+	var pendingComment string
+	for _, line := range strings.Split(string(data), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			pendingComment = ""
+			continue
+		}
+		if strings.HasPrefix(trimmed, "#") {
+			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+			if isMangoWCSectionComment(pendingComment) {
+				pendingComment = ""
+			}
 			continue
 		}
 
-		if !strings.HasPrefix(line, "bind") {
+		bind, ok := m.parseOverrideBindLine(line, pendingComment)
+		pendingComment = ""
+		if !ok || bind == nil {
 			continue
 		}
 
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) < 2 {
-			continue
-		}
-
-		content := strings.TrimSpace(parts[1])
-		commentParts := strings.SplitN(content, "#", 2)
-		bindContent := strings.TrimSpace(commentParts[0])
-
-		var comment string
-		if len(commentParts) > 1 {
-			comment = strings.TrimSpace(commentParts[1])
-		}
-
-		fields := strings.SplitN(bindContent, ",", 4)
-		if len(fields) < 3 {
-			continue
-		}
-
-		mods := strings.TrimSpace(fields[0])
-		keyName := strings.TrimSpace(fields[1])
-		command := strings.TrimSpace(fields[2])
-
-		var params string
-		if len(fields) > 3 {
-			params = strings.TrimSpace(fields[3])
-		}
-
-		keyStr := m.buildKeyString(mods, keyName)
-		normalizedKey := strings.ToLower(keyStr)
-		action := command
-		if params != "" {
-			action = command + " " + params
-		}
-
-		binds[normalizedKey] = &mangowcOverrideBind{
-			Key:         keyStr,
-			Action:      action,
-			Description: comment,
-		}
+		binds[strings.ToLower(bind.Key)] = bind
 	}
 
 	return binds, nil
+}
+
+func (m *MangoWCProvider) parseOverrideBindLine(line, precedingComment string) (*mangowcOverrideBind, bool) {
+	trimmed := strings.TrimSpace(line)
+	parts := strings.SplitN(trimmed, "=", 2)
+	if len(parts) < 2 {
+		return nil, false
+	}
+
+	prefix := strings.TrimSpace(parts[0])
+	if !m.isBindPrefix(prefix) {
+		return nil, false
+	}
+
+	content := strings.TrimSpace(parts[1])
+	commentParts := strings.SplitN(content, "#", 2)
+	bindContent := strings.TrimSpace(commentParts[0])
+
+	description := strings.TrimSpace(precedingComment)
+	if isMangoWCSectionComment(description) {
+		description = ""
+	}
+	if len(commentParts) > 1 {
+		description = strings.TrimSpace(commentParts[1])
+	}
+	if strings.HasPrefix(description, MangoWCHideComment) {
+		return nil, true
+	}
+
+	fields := strings.SplitN(bindContent, ",", 4)
+	if len(fields) < 3 {
+		return nil, false
+	}
+
+	mods := strings.TrimSpace(fields[0])
+	keyName := strings.TrimSpace(fields[1])
+	command := strings.TrimSpace(fields[2])
+
+	var params string
+	if len(fields) > 3 {
+		params = strings.TrimSpace(fields[3])
+	}
+
+	action := command
+	if params != "" {
+		action = command + " " + params
+	}
+
+	return &mangowcOverrideBind{
+		Key:         m.buildKeyString(mods, keyName),
+		Action:      action,
+		Description: description,
+		Prefix:      prefix,
+	}, true
+}
+
+func (m *MangoWCProvider) isBindPrefix(prefix string) bool {
+	if !strings.HasPrefix(prefix, "bind") {
+		return false
+	}
+	for _, ch := range strings.TrimPrefix(prefix, "bind") {
+		if !strings.ContainsRune("lsrp", ch) {
+			return false
+		}
+	}
+	return true
 }
 
 func (m *MangoWCProvider) buildKeyString(mods, key string) string {
@@ -362,21 +410,113 @@ func (m *MangoWCProvider) getBindSortPriority(action string) int {
 }
 
 func (m *MangoWCProvider) writeOverrideBinds(binds map[string]*mangowcOverrideBind) error {
+	return m.writeOverrideBindsWithRemoved(binds, nil)
+}
+
+func (m *MangoWCProvider) writeOverrideBindsWithRemoved(binds map[string]*mangowcOverrideBind, removed map[string]bool) error {
 	overridePath := m.GetOverridePath()
-	content := m.generateBindsContent(binds)
+	existingContent := ""
+	if data, err := os.ReadFile(overridePath); err == nil {
+		existingContent = string(data)
+	}
+
+	content := m.generatePreservedBindsContent(existingContent, binds, removed)
 	return os.WriteFile(overridePath, []byte(content), 0o644)
 }
 
-func (m *MangoWCProvider) generateBindsContent(binds map[string]*mangowcOverrideBind) string {
-	if len(binds) == 0 {
-		return ""
+func (m *MangoWCProvider) generatePreservedBindsContent(existingContent string, binds map[string]*mangowcOverrideBind, removed map[string]bool) string {
+	useStockScaffold := m.shouldUseStockScaffold(existingContent)
+	source := existingContent
+	if useStockScaffold {
+		source = m.stockBindsScaffold(binds)
 	}
 
+	remaining := make(map[string]*mangowcOverrideBind, len(binds))
+	for key, bind := range binds {
+		remaining[key] = bind
+	}
+	if useStockScaffold {
+		m.dropReplacedStockBinds(remaining)
+	}
+
+	var lines []string
+	for _, line := range strings.Split(source, "\n") {
+		templateBind, ok := m.parseOverrideBindLine(line, m.previousComment(lines))
+		if !ok || templateBind == nil {
+			lines = append(lines, line)
+			continue
+		}
+
+		normalizedKey := strings.ToLower(templateBind.Key)
+		m.dropPreviousDescriptionComment(&lines)
+
+		if bind, exists := remaining[normalizedKey]; exists {
+			if useStockScaffold && bind.Description == "" {
+				bind = m.copyBindWithDescription(bind, templateBind.Description)
+			}
+			m.writeBindLineToLines(&lines, bind)
+			delete(remaining, normalizedKey)
+			continue
+		}
+
+		if useStockScaffold && !removed[normalizedKey] {
+			m.writeBindLineToLines(&lines, templateBind)
+		}
+	}
+
+	if len(remaining) > 0 {
+		m.trimTrailingEmptyLines(&lines)
+		if len(lines) > 0 {
+			lines = append(lines, "")
+		}
+		lines = append(lines, "# === Custom Keybinds ===")
+		for _, bind := range m.sortedBinds(remaining) {
+			m.writeBindLineToLines(&lines, bind)
+		}
+	}
+
+	m.trimTrailingEmptyLines(&lines)
+	if len(lines) == 0 {
+		return ""
+	}
+	return strings.Join(lines, "\n") + "\n"
+}
+
+func (m *MangoWCProvider) shouldUseStockScaffold(content string) bool {
+	if strings.TrimSpace(content) == "" {
+		return true
+	}
+	if strings.Contains(content, "gesturebind=") && strings.Contains(content, "# ===") {
+		return false
+	}
+	return !strings.Contains(content, "gesturebind=") && (strings.Count(content, "\nbind=")+strings.Count(content, "\nbindl=")+strings.Count(content, "\nbinds=")+strings.Count(content, "\nbindr=")+strings.Count(content, "\nbindp=") >= 10 || strings.Contains(content, "dms ipc call"))
+}
+
+func (m *MangoWCProvider) stockBindsScaffold(binds map[string]*mangowcOverrideBind) string {
+	terminalCommand := "ghostty"
+	for _, key := range []string{"super+t", "super+return"} {
+		if bind, ok := binds[key]; ok {
+			command, params := m.parseAction(bind.Action)
+			if command == "spawn" && strings.TrimSpace(params) != "" && !strings.Contains(params, "dms ") {
+				terminalCommand = params
+				break
+			}
+		}
+	}
+	return strings.ReplaceAll(config.MangoBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
+}
+
+func (m *MangoWCProvider) dropReplacedStockBinds(binds map[string]*mangowcOverrideBind) {
+	if bind, ok := binds["super+j"]; ok && bind.Action == "switch_layout" {
+		delete(binds, "super+j")
+	}
+}
+
+func (m *MangoWCProvider) sortedBinds(binds map[string]*mangowcOverrideBind) []*mangowcOverrideBind {
 	bindList := make([]*mangowcOverrideBind, 0, len(binds))
 	for _, bind := range binds {
 		bindList = append(bindList, bind)
 	}
-
 	sort.Slice(bindList, func(i, j int) bool {
 		pi, pj := m.getBindSortPriority(bindList[i].Action), m.getBindSortPriority(bindList[j].Action)
 		if pi != pj {
@@ -384,13 +524,55 @@ func (m *MangoWCProvider) generateBindsContent(binds map[string]*mangowcOverride
 		}
 		return bindList[i].Key < bindList[j].Key
 	})
+	return bindList
+}
 
+func (m *MangoWCProvider) writeBindLineToLines(lines *[]string, bind *mangowcOverrideBind) {
 	var sb strings.Builder
-	for _, bind := range bindList {
-		m.writeBindLine(&sb, bind)
+	m.writeBindLine(&sb, bind)
+	text := strings.TrimSuffix(sb.String(), "\n")
+	if text == "" {
+		return
 	}
+	*lines = append(*lines, strings.Split(text, "\n")...)
+}
 
-	return sb.String()
+func (m *MangoWCProvider) previousComment(lines []string) string {
+	if len(lines) == 0 {
+		return ""
+	}
+	trimmed := strings.TrimSpace(lines[len(lines)-1])
+	if !strings.HasPrefix(trimmed, "#") {
+		return ""
+	}
+	comment := strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+	if isMangoWCSectionComment(comment) {
+		return ""
+	}
+	return comment
+}
+
+func (m *MangoWCProvider) dropPreviousDescriptionComment(lines *[]string) {
+	if len(*lines) == 0 {
+		return
+	}
+	trimmed := strings.TrimSpace((*lines)[len(*lines)-1])
+	if !strings.HasPrefix(trimmed, "#") || strings.HasPrefix(trimmed, "# ===") {
+		return
+	}
+	*lines = (*lines)[:len(*lines)-1]
+}
+
+func (m *MangoWCProvider) trimTrailingEmptyLines(lines *[]string) {
+	for len(*lines) > 0 && strings.TrimSpace((*lines)[len(*lines)-1]) == "" {
+		*lines = (*lines)[:len(*lines)-1]
+	}
+}
+
+func (m *MangoWCProvider) copyBindWithDescription(bind *mangowcOverrideBind, description string) *mangowcOverrideBind {
+	copy := *bind
+	copy.Description = description
+	return &copy
 }
 
 func (m *MangoWCProvider) writeBindLine(sb *strings.Builder, bind *mangowcOverrideBind) {
@@ -405,7 +587,12 @@ func (m *MangoWCProvider) writeBindLine(sb *strings.Builder, bind *mangowcOverri
 		sb.WriteString("\n")
 	}
 
-	sb.WriteString("bind=")
+	prefix := bind.Prefix
+	if prefix == "" {
+		prefix = "bind"
+	}
+	sb.WriteString(prefix)
+	sb.WriteString("=")
 	if mods == "" {
 		sb.WriteString("none")
 	} else {
@@ -422,6 +609,36 @@ func (m *MangoWCProvider) writeBindLine(sb *strings.Builder, bind *mangowcOverri
 	}
 
 	sb.WriteString("\n")
+}
+
+func (m *MangoWCProvider) bindPrefixFromOptions(options map[string]any) string {
+	if options == nil {
+		return ""
+	}
+	value, ok := options["flags"]
+	if !ok {
+		return ""
+	}
+	flags := ""
+	switch v := value.(type) {
+	case string:
+		flags = v
+	case fmt.Stringer:
+		flags = v.String()
+	default:
+		return ""
+	}
+	flags = strings.TrimSpace(flags)
+	if flags == "" {
+		return "bind"
+	}
+	var clean strings.Builder
+	for _, ch := range flags {
+		if strings.ContainsRune("lsrp", ch) && !strings.ContainsRune(clean.String(), ch) {
+			clean.WriteRune(ch)
+		}
+	}
+	return "bind" + clean.String()
 }
 
 func (m *MangoWCProvider) parseKeyString(keyStr string) (mods, key string) {

@@ -177,6 +177,7 @@ Singleton {
     property int mangoLayoutGapsOverride: -1
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
+    property bool mangoTrackpadNaturalScrolling: true
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false

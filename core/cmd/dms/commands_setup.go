@@ -294,7 +294,14 @@ func runSetup() error {
 
 	wm, wmSelected := promptCompositor()
 	terminal, terminalSelected := promptTerminal()
-	useSystemd := promptSystemd()
+	useSystemd := true
+	if wmSelected {
+		if wm == deps.WindowManagerMango {
+			useSystemd = false
+		} else {
+			useSystemd = promptSystemd()
+		}
+	}
 
 	if !wmSelected && !terminalSelected {
 		fmt.Println("No configurations selected. Exiting.")

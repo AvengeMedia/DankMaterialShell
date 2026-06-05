@@ -2434,6 +2434,17 @@ Item {
 
                     SettingsToggleRow {
                         tab: "theme"
+                        tags: ["mango", "touchpad", "trackpad", "natural", "scrolling"]
+                        settingKey: "mangoTrackpadNaturalScrolling"
+                        text: I18n.tr("Natural Touchpad Scrolling")
+                        description: I18n.tr("Invert touchpad scroll direction")
+                        visible: CompositorService.isMango
+                        checked: SettingsData.mangoTrackpadNaturalScrolling
+                        onToggled: checked => SettingsData.set("mangoTrackpadNaturalScrolling", checked)
+                    }
+
+                    SettingsToggleRow {
+                        tab: "theme"
                         tags: ["cursor", "hide", "typing"]
                         settingKey: "cursorHideWhenTyping"
                         text: I18n.tr("Hide When Typing")

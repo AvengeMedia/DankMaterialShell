@@ -92,6 +92,7 @@ Item {
             return root.screenName;
         }
     }
+    readonly property bool mangoOverviewActive: CompositorService.isMango && MangoService.isOutputInOverview(effectiveScreenName)
 
     readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(parentScreen) : null
     readonly property bool useExtWorkspace: {
@@ -160,7 +161,11 @@ Item {
             baseList = getHyprlandWorkspaces();
             break;
         case "dwl":
+            baseList = getDwlTags();
+            break;
         case "mango":
+            if (root.mangoOverviewActive)
+                return [];
             baseList = getDwlTags();
             break;
         case "sway":
@@ -977,7 +982,7 @@ Item {
                     StyledText {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: !root.isVertical
-                        text: I18n.tr("OVERVIEW")
+                        text: I18n.tr("Overview")
                         color: Theme.primary
                         font.pixelSize: overviewPill.labelSize
                         font.weight: Font.DemiBold
@@ -1115,7 +1120,7 @@ Item {
                         targetWorkspaceId = modelData?.id;
                     } else if (CompositorService.isHyprland) {
                         targetWorkspaceId = modelData?.id;
-                    } else if (CompositorService.isDwl) {
+                    } else if (root.isDwlLike) {
                         targetWorkspaceId = modelData?.tag;
                     } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                         targetWorkspaceId = modelData?.num;

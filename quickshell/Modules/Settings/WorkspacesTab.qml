@@ -189,7 +189,7 @@ Item {
                     settingKey: "dwlShowAllTags"
                     tags: ["dwl", "tags", "workspace"]
                     text: I18n.tr("Show All Tags")
-                    description: I18n.tr("Show all 9 tags instead of only occupied tags (DWL only)")
+                    description: I18n.tr("Show all 9 tags instead of only occupied tags")
                     checked: SettingsData.dwlShowAllTags
                     visible: CompositorService.isDwl || CompositorService.isMango
                     onToggled: checked => SettingsData.set("dwlShowAllTags", checked)

@@ -15,6 +15,10 @@ const (
 
 var MangoWCModSeparators = []rune{'+', ' '}
 
+func isMangoWCSectionComment(comment string) bool {
+	return strings.HasPrefix(strings.TrimSpace(comment), "===")
+}
+
 type MangoWCKeyBinding struct {
 	Mods    []string `json:"mods"`
 	Key     string   `json:"key"`
@@ -235,6 +239,9 @@ func (p *MangoWCParser) ParseKeys() []MangoWCKeyBinding {
 		}
 		if strings.HasPrefix(trimmed, "#") {
 			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+			if isMangoWCSectionComment(pendingComment) {
+				pendingComment = ""
+			}
 			continue
 		}
 		if !strings.HasPrefix(trimmed, "bind") {
@@ -414,6 +421,9 @@ func (p *MangoWCParser) parseFileWithSource(filePath string) ([]MangoWCKeyBindin
 
 		if strings.HasPrefix(trimmed, "#") {
 			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+			if isMangoWCSectionComment(pendingComment) {
+				pendingComment = ""
+			}
 			continue
 		}
 
@@ -483,7 +493,7 @@ func (p *MangoWCParser) parseDMSBindsDirectly(dmsBindsPath string) []MangoWCKeyB
 // line directly above) is the description: mango feeds inline comments to spawn
 // as argv, so DMS keeps descriptions on the line above; inline `#` is a fallback.
 func (p *MangoWCParser) getKeybindAtLineContent(line string, precedingComment string) *MangoWCKeyBinding {
-	bindMatch := regexp.MustCompile(`^(bind[lsr]*)\s*=\s*(.+)$`)
+	bindMatch := regexp.MustCompile(`^(bind[lsrp]*)\s*=\s*(.+)$`)
 	matches := bindMatch.FindStringSubmatch(line)
 	if len(matches) < 3 {
 		return nil
@@ -499,6 +509,9 @@ func (p *MangoWCParser) getKeybindAtLineContent(line string, precedingComment st
 	}
 	if comment == "" {
 		comment = strings.TrimSpace(precedingComment)
+		if isMangoWCSectionComment(comment) {
+			comment = ""
+		}
 	}
 
 	if strings.HasPrefix(comment, MangoWCHideComment) {

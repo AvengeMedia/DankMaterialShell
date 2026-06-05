@@ -21,12 +21,18 @@ Singleton {
     readonly property bool available: socketPath.length > 0
 
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation))
+    readonly property string configPath: configDir + "/mango/config.conf"
     readonly property string mangoDmsDir: configDir + "/mango/dms"
+    readonly property string bindsPath: mangoDmsDir + "/binds.conf"
+    readonly property string colorsPath: mangoDmsDir + "/colors.conf"
     readonly property string outputsPath: mangoDmsDir + "/outputs.conf"
     readonly property string layoutPath: mangoDmsDir + "/layout.conf"
     readonly property string cursorPath: mangoDmsDir + "/cursor.conf"
+    readonly property string windowRulesPath: mangoDmsDir + "/windowrules.conf"
 
     property int _lastGapValue: -1
+    property real _ignoreWatchedReloadUntil: 0
+    property real _lastWatchedReloadAt: 0
 
     // name -> { name, active, x, y, width, height, scale, layoutIndex,
     //           layoutSymbol, lastOpenSurface, kbLayout, keymode,
@@ -46,6 +52,55 @@ Singleton {
     // ── State sockets ──────────────────────────────────────────────────────
     // One connection per watch target; mango streams a fresh full snapshot on
     // every change, so each line is treated as the complete state.
+
+    FileView {
+        id: mangoConfigWatcher
+        path: CompositorService.isMango ? root.configPath : ""
+        watchChanges: CompositorService.isMango
+        onFileChanged: root.handleWatchedConfigChanged()
+    }
+
+    FileView {
+        id: mangoBindsWatcher
+        path: CompositorService.isMango ? root.bindsPath : ""
+        watchChanges: CompositorService.isMango
+        onFileChanged: root.handleWatchedConfigChanged()
+    }
+
+    FileView {
+        id: mangoColorsWatcher
+        path: CompositorService.isMango ? root.colorsPath : ""
+        watchChanges: CompositorService.isMango
+        onFileChanged: root.handleWatchedConfigChanged()
+    }
+
+    FileView {
+        id: mangoLayoutWatcher
+        path: CompositorService.isMango ? root.layoutPath : ""
+        watchChanges: CompositorService.isMango
+        onFileChanged: root.handleWatchedConfigChanged()
+    }
+
+    FileView {
+        id: mangoCursorWatcher
+        path: CompositorService.isMango ? root.cursorPath : ""
+        watchChanges: CompositorService.isMango
+        onFileChanged: root.handleWatchedConfigChanged()
+    }
+
+    FileView {
+        id: mangoOutputsWatcher
+        path: CompositorService.isMango ? root.outputsPath : ""
+        watchChanges: CompositorService.isMango
+        onFileChanged: root.handleWatchedConfigChanged()
+    }
+
+    FileView {
+        id: mangoWindowRulesWatcher
+        path: CompositorService.isMango ? root.windowRulesPath : ""
+        watchChanges: CompositorService.isMango
+        onFileChanged: root.handleWatchedConfigChanged()
+    }
 
     DankSocket {
         id: monitorsSocket
@@ -100,12 +155,14 @@ Singleton {
         for (const m of monitors) {
             if (!m.name)
                 continue;
+            const activeTags = m.active_tags || [];
+            const inOverview = activeTags.length === 0 || activeTags.every(t => t === 0);
             const tags = (m.tags || []).map(t => ({
                         // 0-based to match the legacy dwl tag model used by consumers
                         "tag": (t.index ?? 1) - 1,
-                        "state": t.is_urgent ? 2 : (t.is_active ? 1 : 0),
+                        "state": t.is_urgent ? 2 : (!inOverview && t.is_active ? 1 : 0),
                         "clients": t.client_count ?? 0,
-                        "focused": !!t.is_active,
+                        "focused": !inOverview && !!t.is_active,
                         "urgent": !!t.is_urgent,
                         "layout": t.layout ?? ""
                     }));
@@ -119,7 +176,8 @@ Singleton {
                 "scale": m.scale ?? 1.0,
                 "layoutIndex": m.layout_index ?? 0,
                 "layout": m.layout_index ?? 0,
-                "activeTags": m.active_tags || [],
+                "activeTags": activeTags,
+                "inOverview": inOverview,
                 "layoutSymbol": m.layout_symbol ?? "",
                 "lastOpenSurface": m.last_open_surface ?? "",
                 "keymode": m.keymode ?? "",
@@ -179,6 +237,8 @@ Singleton {
         const output = getOutputState(outputName);
         if (!output)
             return false;
+        if (output.inOverview !== undefined)
+            return output.inOverview;
         const at = output.activeTags || [];
         return at.length === 0 || at.every(t => t === 0);
     }
@@ -200,6 +260,8 @@ Singleton {
     function getVisibleTags(outputName) {
         const output = getOutputState(outputName);
         if (!output || !output.tags)
+            return [];
+        if (isOutputInOverview(outputName))
             return [];
         const visibleTags = new Set();
         output.tags.forEach(tag => {
@@ -336,10 +398,36 @@ Singleton {
 
     // ── Commands (mango verb IPC: mmsg dispatch <func>,<args>) ─────────────
 
-    function reloadConfig() {
+    function suppressWatchedConfigReloads(ms) {
+        root._ignoreWatchedReloadUntil = Math.max(root._ignoreWatchedReloadUntil, Date.now() + (ms || 1500));
+    }
+
+    function handleWatchedConfigChanged() {
+        if (!CompositorService.isMango || !root.available)
+            return;
+        const now = Date.now();
+        if (now < root._ignoreWatchedReloadUntil)
+            return;
+        if (now - root._lastWatchedReloadAt < 700)
+            return;
+        root._lastWatchedReloadAt = now;
+        root.reloadConfig(true, false);
+    }
+
+    function reloadConfig(showToast, suppressWatch) {
+        const shouldShowToast = showToast !== false;
+        const shouldSuppressWatch = suppressWatch !== false;
+        if (shouldSuppressWatch)
+            suppressWatchedConfigReloads(1500);
         Proc.runCommand("mango-reload", ["mmsg", "dispatch", "reload_config"], (output, exitCode) => {
-            if (exitCode !== 0)
+            if (exitCode !== 0) {
                 log.warn("mmsg reload_config failed:", output);
+                if (shouldShowToast)
+                    ToastService.showError(I18n.tr("mango: failed to reload config"), output || "", "", "mango-config");
+                return;
+            }
+            if (shouldShowToast)
+                ToastService.showInfo(I18n.tr("mango: config reloaded"), "", "", "mango-config");
         });
     }
 
@@ -538,17 +626,10 @@ borderpx=${borderSize}
         const themeName = settings.theme === "System Default" ? (SettingsData.systemDefaultCursorTheme || "") : settings.theme;
         const size = settings.size || 24;
         const hideTimeout = settings.mango?.cursorHideTimeout || 0;
-
-        const isDefaultConfig = !themeName && size === 24 && hideTimeout === 0;
-        if (isDefaultConfig) {
-            Proc.runCommand("mango-write-cursor", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
-                if (exitCode !== 0)
-                    log.warn("Failed to write cursor config:", output);
-            });
-            return;
-        }
+        const naturalScrolling = SettingsData.mangoTrackpadNaturalScrolling ? 1 : 0;
 
         let content = `# Auto-generated by DMS - do not edit manually
+trackpad_natural_scrolling=${naturalScrolling}
 cursor_size=${size}`;
 
         if (themeName)

@@ -520,6 +520,18 @@ func TestHyprlandConfigStructure(t *testing.T) {
 	assert.Contains(t, HyprlandLuaConfig, "input =")
 }
 
+func TestMangoConfigStructure(t *testing.T) {
+	assert.Contains(t, MangoConfig, "exec-once=dms run")
+	assert.NotContains(t, MangoConfig, "exec_once=dms run")
+	assert.Contains(t, MangoConfig, "source=./dms/binds.conf")
+	assert.Contains(t, MangoBindsConfig, "bind=SUPER,H,focusdir,left")
+	assert.Contains(t, MangoBindsConfig, "bind=SUPER,J,focusdir,down")
+	assert.Contains(t, MangoBindsConfig, "bind=SUPER,K,focusdir,up")
+	assert.Contains(t, MangoBindsConfig, "bind=SUPER,L,focusdir,right")
+	assert.Contains(t, MangoBindsConfig, "gesturebind=none,right,3,viewtoleft_have_client")
+	assert.Contains(t, MangoBindsConfig, "gesturebind=none,left,3,viewtoright_have_client")
+}
+
 func TestGhosttyConfigStructure(t *testing.T) {
 	assert.Contains(t, GhosttyConfig, "window-decoration = false")
 	assert.Contains(t, GhosttyConfig, "background-opacity = 1.0")
