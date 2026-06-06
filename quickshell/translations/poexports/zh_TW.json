@@ -1,6 +1,6 @@
 {
   "%1 (+%2 more)": {
-    "%1 (+%2 more)": ""
+    "%1 (+%2 more)": "%1（另有 %2 個）"
   },
   "%1 Animation Speed": {
     "%1 Animation Speed": "%1 動畫速度"
@@ -108,7 +108,7 @@
     "%1m ago": "%1 分鐘前"
   },
   "%command%": {
-    "%command%": ""
+    "%command%": "%command%"
   },
   "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": {
     "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "「替代」讓密鑰自行解鎖。「第二因素」需要先輸入密碼或指紋，然後再輸入密鑰。"
@@ -381,7 +381,7 @@
     "Active VPN": "啟用中的 VPN"
   },
   "Active in Column": {
-    "Active in Column": ""
+    "Active in Column": "欄中作用中"
   },
   "Active tile background and icon color": {
     "Active tile background and icon color": "啟用磚背景與圖示顏色"
@@ -417,7 +417,7 @@
     "Add Desktop Widget": "新增桌面小工具"
   },
   "Add Entry": {
-    "Add Entry": ""
+    "Add Entry": "新增項目"
   },
   "Add Printer": {
     "Add Printer": "新增印表機"
@@ -429,10 +429,10 @@
     "Add Widget": "新增部件"
   },
   "Add Widget to %1": {
-    "Add Widget to %1": ""
+    "Add Widget to %1": "新增小工具到 %1"
   },
   "Add Window Rule": {
-    "Add Window Rule": ""
+    "Add Window Rule": "新增視窗規則"
   },
   "Add a border around the dock": {
     "Add a border around the dock": "在 Dock 周圍新增邊框"
@@ -447,7 +447,7 @@
     "Add by Address": "按位址新增"
   },
   "Add match": {
-    "Add match": ""
+    "Add match": "新增匹配項"
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
@@ -456,7 +456,7 @@
     "Add the new user to the %1 group so they can use sudo.": ""
   },
   "Add to Autostart": {
-    "Add to Autostart": ""
+    "Add to Autostart": "新增到自動啟動"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": ""
@@ -567,22 +567,22 @@
     "Anonymous Identity (optional)": "匿名身分 (可選)"
   },
   "Any": {
-    "Any": ""
+    "Any": "任意"
   },
   "Any window": {
-    "Any window": ""
+    "Any window": "任意視窗"
   },
   "App Customizations": {
     "App Customizations": "應用程式自訂"
   },
   "App ID": {
-    "App ID": ""
+    "App ID": "應用程式 ID"
   },
   "App ID Substitutions": {
     "App ID Substitutions": "應用程式ID替換"
   },
   "App ID regex": {
-    "App ID regex": ""
+    "App ID regex": "應用程式 ID 正規表示式"
   },
   "App ID regex (e.g. ^firefox$)": {
     "App ID regex (e.g. ^firefox$)": "應用程式 ID 正規表示式 (例如：^firefox$)"
@@ -600,7 +600,7 @@
     "Appearance": "外觀"
   },
   "Application": {
-    "Application": ""
+    "Application": "應用程式"
   },
   "Application Dock": {
     "Application Dock": "應用程式 Dock"
@@ -609,7 +609,7 @@
     "Applications": "應用程式"
   },
   "Applications and commands to start automatically when you log in": {
-    "Applications and commands to start automatically when you log in": ""
+    "Applications and commands to start automatically when you log in": "登入時自動啟動的應用程式和命令"
   },
   "Apply Changes": {
     "Apply Changes": "套用變更"
@@ -636,7 +636,7 @@
     "Applying authentication changes…": "正在套用身份驗證變更…"
   },
   "Applying auto-login on startup…": {
-    "Applying auto-login on startup…": ""
+    "Applying auto-login on startup…": "正在套用開機自動登入..."
   },
   "Apps": {
     "Apps": "應用程式"
@@ -672,7 +672,7 @@
     "Arrange displays and configure resolution, refresh rate, and VRR": "排列顯示器並設定解析度、重新整理頻率和 VRR"
   },
   "At Startup": {
-    "At Startup": ""
+    "At Startup": "啟動時"
   },
   "At least one output must remain enabled": {
     "At least one output must remain enabled": "至少一個輸出必須保持啟用"
@@ -795,16 +795,16 @@
     "Auto-hide Dock": "自動隱藏 Dock"
   },
   "Auto-login": {
-    "Auto-login": ""
+    "Auto-login": "自動登入"
   },
   "Auto-login disabled": {
-    "Auto-login disabled": ""
+    "Auto-login disabled": "自動登入已停用"
   },
   "Auto-login enabled": {
-    "Auto-login enabled": ""
+    "Auto-login enabled": "自動登入已啟用"
   },
   "Auto-login on startup": {
-    "Auto-login on startup": ""
+    "Auto-login on startup": "開機自動登入"
   },
   "Auto-saving...": {
     "Auto-saving...": "自動保存..."
@@ -861,10 +861,10 @@
     "Automation": "自動化"
   },
   "Autostart Apps": {
-    "Autostart Apps": ""
+    "Autostart Apps": "自動啟動應用程式"
   },
   "Autostart Entries": {
-    "Autostart Entries": ""
+    "Autostart Entries": "自動啟動項目"
   },
   "Available": {
     "Available": "可用"
@@ -894,7 +894,7 @@
     "Back": "返回"
   },
   "Back to user list": {
-    "Back to user list": ""
+    "Back to user list": "返回使用者清單"
   },
   "Backend": {
     "Backend": "後端"
@@ -909,7 +909,7 @@
     "Background Blur": "背景模糊"
   },
   "Background Effect": {
-    "Background Effect": ""
+    "Background Effect": "背景效果"
   },
   "Background Opacity": {
     "Background Opacity": "背景不透明度"
@@ -1419,7 +1419,7 @@
     "Clipboard Manager": "剪貼簿管理"
   },
   "Clipboard Saved": {
-    "Clipboard Saved": ""
+    "Clipboard Saved": "已儲存剪貼簿"
   },
   "Clipboard sent": {
     "Clipboard sent": "剪貼簿已傳送"
@@ -1959,7 +1959,7 @@
     "DMS Settings": ""
   },
   "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": {
-    "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": ""
+    "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": "DMS 設定會寫入 Lua 快捷鍵。請加入 DMS include，讓編輯生效。"
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "DMS 捷徑"
@@ -2151,7 +2151,7 @@
     "Desktop": "桌面"
   },
   "Desktop Application": {
-    "Desktop Application": ""
+    "Desktop Application": "桌面應用程式"
   },
   "Desktop Clock": {
     "Desktop Clock": "桌面時鐘"
@@ -3660,10 +3660,10 @@
     "Hyprland Website": "Hyprland 網站"
   },
   "Hyprland conf mode": {
-    "Hyprland conf mode": ""
+    "Hyprland conf mode": "Hyprland conf 模式"
   },
   "Hyprland conf mode is read-only in Settings": {
-    "Hyprland conf mode is read-only in Settings": ""
+    "Hyprland conf mode is read-only in Settings": "Hyprland conf 模式在設定中為唯讀"
   },
   "Hyprland config include missing": {
     "Hyprland config include missing": ""
@@ -7362,16 +7362,16 @@
     "This device": "此裝置"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.": ""
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.": "目前安裝仍在使用 hyprland.conf。請先執行 dms setup 完成遷移，再編輯游標設定。"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": ""
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": "目前安裝仍在使用 hyprland.conf。請先執行 dms setup 完成遷移，再編輯顯示設定。"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": ""
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": "目前安裝仍在使用 hyprland.conf。請先執行 dms setup 完成遷移，再在設定中編輯快捷鍵。"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.": ""
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.": "目前安裝仍在使用 hyprland.conf。請先執行 dms setup 完成遷移，再在設定中編輯視窗規則。"
   },
   "This may take a few seconds": {
     "This may take a few seconds": "這可能需要幾秒鐘"
@@ -7860,7 +7860,7 @@
     "Use fingerprint authentication for the lock screen.": "使用指紋驗證鎖定螢幕。"
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
-    "Use keys 1-3 or arrows, Enter/Space to select": ""
+    "Use keys 1-3 or arrows, Enter/Space to select": "使用 1-3 或方向鍵選擇，按 Enter/Space 確認"
   },
   "Use light theme instead of dark theme": {
     "Use light theme instead of dark theme": "使用淺色主題而不是深色主題"
@@ -7896,7 +7896,7 @@
     "User": "使用者"
   },
   "User Window Rules (%1)": {
-    "User Window Rules (%1)": ""
+    "User Window Rules (%1)": "使用者視窗規則（%1）"
   },
   "User already exists": {
     "User already exists": ""
@@ -8007,7 +8007,7 @@
     "Vertical Tiling": "垂直平鋪"
   },
   "Very High": {
-    "Very High": ""
+    "Very High": "很高"
   },
   "Vibrant": {
     "Vibrant": "鮮豔"
@@ -8271,7 +8271,7 @@
     "Workspaces & Widgets": "工作區與小工具"
   },
   "Wrap the app command. %command% is replaced with the actual executable": {
-    "Wrap the app command. %command% is replaced with the actual executable": ""
+    "Wrap the app command. %command% is replaced with the actual executable": "包裝應用程式命令。%command% 會替換為實際可執行檔"
   },
   "Write:": {
     "Write:": "寫入："
@@ -8280,13 +8280,13 @@
     "X Axis": "X 軸"
   },
   "X-Ray": {
-    "X-Ray": ""
+    "X-Ray": "X-Ray"
   },
   "XWayland": {
-    "XWayland": ""
+    "XWayland": "XWayland"
   },
   "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
-    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": ""
+    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": "Xray 只模糊桌布（效率更高），也是開啟模糊時的預設模式。關閉 Xray 可改為一般的完整背景模糊，模糊視窗下方的所有內容（開銷更高）。"
   },
   "Y Axis": {
     "Y Axis": "Y 軸"
@@ -8313,16 +8313,16 @@
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "您需要設定以下其中一個環境變數並重新啟動 shell：\nQT_QPA_PLATFORMTHEME=gtk3 或\nQT_QPA_PLATFORMTHEME=qt6ct\n\nqt6ct 需要安裝 qt6ct-kde。"
   },
   "You'll enter your password at the greeter after the next reboot.": {
-    "You'll enter your password at the greeter after the next reboot.": ""
+    "You'll enter your password at the greeter after the next reboot.": "下次重新開機後，你需要在登入畫面輸入密碼。"
   },
   "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": {
-    "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": ""
+    "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": "下次重新開機後將略過登入畫面密碼。鎖定畫面和登出後登入仍需要密碼。"
   },
   "You're All Set!": {
     "You're All Set!": "一切就緒！"
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
-    "Your compositor does not support background blur (ext-background-effect-v1)": ""
+    "Your compositor does not support background blur (ext-background-effect-v1)": "你的合成器不支援背景模糊（ext-background-effect-v1）"
   },
   "Your system is up to date!": {
     "Your system is up to date!": "您的系統是最新版本！"
