@@ -118,6 +118,16 @@ Singleton {
         removeTaskProcess.running = true;
     }
 
+    function moveTask(taskId, direction) {
+        let cleanId = taskId.replace("task_", "");
+        moveTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1]; direction = int(sys.argv[2]); swapped = False\nfor k, v in data.items():\n    for i, item in enumerate(v):\n        if item['id'] == tid:\n            new_idx = i + direction\n            if 0 <= new_idx < len(v):\n                v[i], v[new_idx] = v[new_idx], v[i]\n                swapped = True\n            break\n    if swapped: break\nif swapped: json.dump(data, open(path, 'w'), indent=2)",
+            cleanId, direction.toString()
+        ];
+        moveTaskProcess.running = true;
+    }
+
     // Initialize on component completion
     Component.onCompleted: {
         detectKhalDateFormat();
@@ -148,6 +158,17 @@ Singleton {
     // Process for deleting tasks
     Process {
         id: removeTaskProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true;
+            }
+        }
+    }
+
+    // Process for moving tasks
+    Process {
+        id: moveTaskProcess
         running: false
         onExited: exitCode => {
             if (!localTasksProcess.running) {

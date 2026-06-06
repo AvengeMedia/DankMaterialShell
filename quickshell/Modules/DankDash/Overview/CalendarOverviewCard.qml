@@ -105,6 +105,13 @@ Rectangle {
     }
 
     onSelectedDateChanged: updateSelectedDateEvents()
+
+    onShowEventDetailsChanged: {
+        if (showEventDetails) {
+            taskInput.forceActiveFocus();
+        }
+    }
+
     Component.onCompleted: {
         loadEventsForMonth();
         updateSelectedDateEvents();
@@ -475,7 +482,7 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: Theme.spacingS + 6
-                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : Theme.spacingXS
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 88 : Theme.spacingXS
                     spacing: 2
 
                     StyledText {
@@ -515,7 +522,7 @@ Rectangle {
                     id: eventMouseArea
 
                     anchors.fill: parent
-                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : 0
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 88 : 0
                     hoverEnabled: true
                     cursorShape: (modelData.url || modelData.id.startsWith("task_")) ? Qt.PointingHandCursor : Qt.ArrowCursor
                     enabled: modelData.url !== "" || modelData.id.startsWith("task_")
@@ -528,6 +535,66 @@ Rectangle {
                             } else {
                                 root.closeDash();
                             }
+                        }
+                    }
+                }
+
+                // Up Button
+                Rectangle {
+                    id: upButton
+                    width: 24
+                    height: 24
+                    anchors.right: downButton.left
+                    anchors.rightMargin: Theme.spacingXS
+                    anchors.verticalCenter: parent.verticalCenter
+                    radius: Theme.cornerRadius
+                    color: upMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    visible: modelData.id.startsWith("task_")
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "arrow_upward"
+                        size: 14
+                        color: upMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    }
+
+                    MouseArea {
+                        id: upMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            CalendarService.moveTask(modelData.id, -1);
+                        }
+                    }
+                }
+
+                // Down Button
+                Rectangle {
+                    id: downButton
+                    width: 24
+                    height: 24
+                    anchors.right: deleteButton.left
+                    anchors.rightMargin: Theme.spacingXS
+                    anchors.verticalCenter: parent.verticalCenter
+                    radius: Theme.cornerRadius
+                    color: downMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    visible: modelData.id.startsWith("task_")
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "arrow_downward"
+                        size: 14
+                        color: downMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    }
+
+                    MouseArea {
+                        id: downMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            CalendarService.moveTask(modelData.id, 1);
                         }
                     }
                 }
@@ -599,7 +666,6 @@ Rectangle {
                     if (txt !== "") {
                         CalendarService.addTaskForDate(root.selectedDate, txt);
                         text = "";
-                        taskInput.focus = false;
                     }
                 }
             }
