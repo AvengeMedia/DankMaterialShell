@@ -75,7 +75,7 @@ var greeterSyncCmd = &cobra.Command{
 		auth, _ := cmd.Flags().GetBool("auth")
 		local, _ := cmd.Flags().GetBool("local")
 		profile, _ := cmd.Flags().GetBool("profile")
-		autologinOnly, _ := cmd.Flags().GetBool("autologin-only")
+		autologinOnly, _ := cmd.Flags().GetBool("autologin")
 		term, _ := cmd.Flags().GetBool("terminal")
 		if term {
 			if err := syncInTerminal(yes, auth, local, profile, autologinOnly); err != nil {
@@ -101,7 +101,7 @@ func init() {
 	greeterSyncCmd.Flags().BoolP("auth", "a", false, "Configure PAM for fingerprint and U2F (adds both if modules exist); overrides UI toggles")
 	greeterSyncCmd.Flags().BoolP("local", "l", false, "Developer mode: force greetd config to use a local DMS checkout path")
 	greeterSyncCmd.Flags().BoolP("profile", "p", false, "Sync only your per-user greeter slot (no sudo; for secondary accounts)")
-	greeterSyncCmd.Flags().Bool("autologin-only", false, "Apply only greeter auto-login on startup settings to greetd (no theme or auth sync)")
+	greeterSyncCmd.Flags().Bool("autologin", false, "Apply only greeter auto-login on startup settings to greetd (no theme or auth sync)")
 }
 
 var greeterEnableCmd = &cobra.Command{
@@ -544,7 +544,7 @@ func syncInTerminal(nonInteractive bool, forceAuth bool, local bool, profileOnly
 		syncFlags = append(syncFlags, "--profile")
 	}
 	if autologinOnly {
-		syncFlags = append(syncFlags, "--autologin-only")
+		syncFlags = append(syncFlags, "--autologin")
 	}
 	shellSyncCmd := "dms greeter sync"
 	if len(syncFlags) > 0 {

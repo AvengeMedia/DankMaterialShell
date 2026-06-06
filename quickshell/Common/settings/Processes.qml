@@ -361,7 +361,7 @@ Singleton {
     }
 
     function launchGreeterAutoLoginSyncTerminalFallback(details) {
-        ToastService.showWarning(I18n.tr("Opening terminal to update greetd"), I18n.tr("DMS needs administrator access. The terminal closes automatically when done.") + (details ? "\n\n" + details : ""), "dms greeter sync --autologin-only", "greeter-autologin-sync");
+        ToastService.showWarning(I18n.tr("Opening terminal to update greetd"), I18n.tr("DMS needs administrator access. The terminal closes automatically when done.") + (details ? "\n\n" + details : ""), "dms greeter sync --autologin", "greeter-autologin-sync");
         greeterAutoLoginSyncTerminalFallbackStderr = "";
         greeterAutoLoginSyncTerminalFallbackProcess.running = true;
     }
@@ -530,7 +530,7 @@ Singleton {
     }
 
     property var greeterAutoLoginSyncProcess: Process {
-        command: ["dms", "greeter", "sync", "--yes", "--autologin-only"]
+        command: ["dms", "greeter", "sync", "--yes", "--autologin"]
         running: false
 
         stdout: StdioCollector {
@@ -570,7 +570,7 @@ Singleton {
         onExited: exitCode => {
             const enabling = root.settingsRoot && root.settingsRoot.greeterAutoLogin;
             if (exitCode === 0) {
-                ToastService.showWarning(enabling ? I18n.tr("Applying auto-login on startup…") : I18n.tr("Disabling auto-login on startup…"), "", "dms greeter sync --autologin-only", "greeter-autologin-sync");
+                ToastService.showWarning(enabling ? I18n.tr("Applying auto-login on startup…") : I18n.tr("Disabling auto-login on startup…"), "", "dms greeter sync --autologin", "greeter-autologin-sync");
                 root.greeterAutoLoginSyncProcess.running = true;
                 return;
             }
@@ -580,7 +580,7 @@ Singleton {
     }
 
     property var greeterAutoLoginSyncTerminalFallbackProcess: Process {
-        command: ["dms", "greeter", "sync", "--terminal", "--yes", "--autologin-only"]
+        command: ["dms", "greeter", "sync", "--terminal", "--yes", "--autologin"]
         running: false
 
         stderr: StdioCollector {
@@ -592,7 +592,7 @@ Singleton {
                 root.greeterAutoLoginSyncSuccessToast("");
             } else {
                 let details = (root.greeterAutoLoginSyncTerminalFallbackStderr || "").trim();
-                ToastService.showError(I18n.tr("Couldn't open a terminal for the auto-login update.") + " (exit " + exitCode + ")", details, "dms greeter sync --autologin-only", "greeter-autologin-sync");
+                ToastService.showError(I18n.tr("Couldn't open a terminal for the auto-login update.") + " (exit " + exitCode + ")", details, "dms greeter sync --autologin", "greeter-autologin-sync");
             }
             root.finishGreeterAutoLoginSync();
         }
