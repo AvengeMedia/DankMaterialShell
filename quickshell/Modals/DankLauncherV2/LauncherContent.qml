@@ -363,7 +363,7 @@ FocusScope {
                         width: buttonContent.width + Theme.spacingM * 2
                         height: 28
                         radius: Theme.cornerRadius
-                        color: controller.searchMode === modelData.id || modeArea.containsMouse ? Theme.primaryContainer : "transparent"
+                        color: controller.searchMode === modelData.id ? Theme.primaryContainer : modeArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                         Row {
                             id: buttonContent
@@ -374,14 +374,14 @@ FocusScope {
                                 anchors.verticalCenter: parent.verticalCenter
                                 name: modelData.icon
                                 size: 14
-                                color: controller.searchMode === modelData.id ? Theme.primary : Theme.surfaceVariantText
+                                color: controller.searchMode === modelData.id ? Theme.primaryText : Theme.surfaceVariantText
                             }
 
                             StyledText {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: modelData.label
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: controller.searchMode === modelData.id ? Theme.primary : Theme.surfaceText
+                                color: controller.searchMode === modelData.id ? Theme.primaryText : Theme.surfaceText
                             }
                         }
 
@@ -636,7 +636,7 @@ FocusScope {
                                 width: chipContent.width + Theme.spacingM * 2
                                 height: sortDropdown.height
                                 radius: Theme.cornerRadius
-                                color: controller.fileSearchType === modelData.id || chipArea.containsMouse ? Theme.primaryContainer : "transparent"
+                                color: controller.fileSearchType === modelData.id ? Theme.primaryContainer : chipArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                                 Row {
                                     id: chipContent
@@ -647,14 +647,14 @@ FocusScope {
                                         anchors.verticalCenter: parent.verticalCenter
                                         name: modelData.icon
                                         size: 14
-                                        color: controller.fileSearchType === modelData.id ? Theme.primary : Theme.surfaceVariantText
+                                        color: controller.fileSearchType === modelData.id ? Theme.primaryText : Theme.surfaceVariantText
                                     }
 
                                     StyledText {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: modelData.label
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: controller.fileSearchType === modelData.id ? Theme.primary : Theme.surfaceText
+                                        color: controller.fileSearchType === modelData.id ? Theme.primaryText : Theme.surfaceVariantText
                                     }
                                 }
 
