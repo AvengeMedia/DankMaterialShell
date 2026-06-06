@@ -433,198 +433,442 @@ Rectangle {
             }
         }
 
-        DankListView {
+        Flickable {
+            id: flickableArea
             width: parent.width - Theme.spacingS * 2
             height: parent.height - (showEventDetails ? 40 + 42 : 28 + 18) - Theme.spacingS
             anchors.horizontalCenter: parent.horizontalCenter
-            model: selectedDateEvents
             visible: showEventDetails
             clip: true
-            spacing: Theme.spacingXS
+            contentWidth: width
+            contentHeight: listViewContainer.height
 
-            delegate: Rectangle {
-                width: parent ? parent.width : 0
-                height: eventContent.implicitHeight + Theme.spacingS
-                radius: Theme.cornerRadius
-                color: {
-                    if (modelData.url && eventMouseArea.containsMouse) {
-                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
-                    } else if (eventMouseArea.containsMouse) {
-                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06);
+            Item {
+                id: listViewContainer
+                width: parent.width
+                height: 100
+                
+                property var draggedItem: null
+                property bool orderChanged: false
+                
+                function resetAndLayout() {
+                    for (let i = 0; i < repeater.count; i++) {
+                        let item = repeater.itemAt(i);
+                        if (item) {
+                            item.visualIndex = i;
+                            item.isDragging = false;
+                            item.isEditing = false;
+                        }
                     }
-                    return Theme.nestedSurface;
+                    updateLayout();
                 }
-                border.color: {
-                    if (modelData.url && eventMouseArea.containsMouse) {
-                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
-                    } else if (eventMouseArea.containsMouse) {
-                        return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15);
+                
+                function updateLayout() {
+                    let items = [];
+                    for (let i = 0; i < repeater.count; i++) {
+                        let item = repeater.itemAt(i);
+                        if (item) {
+                            items.push(item);
+                        }
                     }
-                    return Theme.outlineMedium;
-                }
-                border.width: eventMouseArea.containsMouse ? 1 : Theme.layerOutlineWidth
-
-                Rectangle {
-                    width: 3
-                    height: parent.height - 6
-                    anchors.left: parent.left
-                    anchors.leftMargin: 3
-                    anchors.verticalCenter: parent.verticalCenter
-                    radius: Theme.cornerRadius
-                    color: modelData.id.startsWith("task_") ? (modelData.title.startsWith("✓") ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
-                    opacity: 0.8
-                }
-
-                Column {
-                    id: eventContent
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: Theme.spacingS + 6
-                    anchors.rightMargin: modelData.id.startsWith("task_") ? 88 : Theme.spacingXS
-                    spacing: 2
-
-                    StyledText {
-                        width: parent.width
-                        text: modelData.title
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: modelData.id.startsWith("task_") && modelData.title.startsWith("✓") ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
-                        font.weight: Font.Medium
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
+                    items.sort((a, b) => a.visualIndex - b.visualIndex);
+                    
+                    let currentY = 0;
+                    for (let i = 0; i < items.length; i++) {
+                        let item = items[i];
+                        if (item && !item.isDragging) {
+                            item.y = currentY;
+                        }
+                        if (item) {
+                            currentY += item.height + Theme.spacingXS;
+                        }
                     }
+                    listViewContainer.height = Math.max(0, currentY - Theme.spacingXS);
+                }
 
-                    StyledText {
-                        width: parent.width
-                        text: {
-                            if (!modelData || modelData.allDay) {
-                                return I18n.tr("All day");
-                            } else if (modelData.start && modelData.end) {
-                                const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
-                                const startTime = Qt.formatTime(modelData.start, timeFormat);
-                                if (modelData.start.toDateString() !== modelData.end.toDateString() || modelData.start.getTime() !== modelData.end.getTime()) {
-                                    return startTime + " – " + Qt.formatTime(modelData.end, timeFormat);
+                function checkAndReorder(dragged) {
+                    let items = [];
+                    for (let i = 0; i < repeater.count; i++) {
+                        let item = repeater.itemAt(i);
+                        if (item) {
+                            items.push(item);
+                        }
+                    }
+                    items.sort((a, b) => a.visualIndex - b.visualIndex);
+                    
+                    let draggedIdx = items.indexOf(dragged);
+                    if (draggedIdx === -1) return;
+                    
+                    // Helper to get target Y position without animation offsets
+                    function getTargetY(index) {
+                        let y = 0;
+                        for (let i = 0; i < index; i++) {
+                            y += items[i].height + Theme.spacingXS;
+                        }
+                        return y;
+                    }
+                    
+                    // Check item above
+                    if (draggedIdx > 0) {
+                        let above = items[draggedIdx - 1];
+                        let targetYAbove = getTargetY(draggedIdx - 1);
+                        if (above && dragged.y < (targetYAbove + above.height / 2)) {
+                            // Swap visualIndex
+                            let temp = dragged.visualIndex;
+                            dragged.visualIndex = above.visualIndex;
+                            above.visualIndex = temp;
+                            listViewContainer.orderChanged = true;
+                            updateLayout();
+                            return;
+                        }
+                    }
+                    
+                    // Check item below
+                    if (draggedIdx < items.length - 1) {
+                        let below = items[draggedIdx + 1];
+                        let targetYBelow = getTargetY(draggedIdx + 1);
+                        if (below && (dragged.y + dragged.height) > (targetYBelow + below.height / 2)) {
+                            // Swap visualIndex
+                            let temp = dragged.visualIndex;
+                            dragged.visualIndex = below.visualIndex;
+                            below.visualIndex = temp;
+                            listViewContainer.orderChanged = true;
+                            updateLayout();
+                            return;
+                        }
+                    }
+                }
+                
+                function saveNewOrder() {
+                    if (!orderChanged) return;
+                    
+                    let items = [];
+                    for (let i = 0; i < repeater.count; i++) {
+                        let item = repeater.itemAt(i);
+                        if (item) {
+                            items.push(item);
+                        }
+                    }
+                    items.sort((a, b) => a.visualIndex - b.visualIndex);
+                    
+                    let orderedIds = [];
+                    for (let i = 0; i < items.length; i++) {
+                        let tid = items[i].taskId;
+                        if (tid && tid.startsWith("task_")) {
+                            orderedIds.push(tid.replace("task_", ""));
+                        }
+                    }
+                    if (orderedIds.length > 0) {
+                        CalendarService.reorderTasksForDate(root.selectedDate, orderedIds);
+                    }
+                    orderChanged = false;
+                }
+
+                Repeater {
+                    id: repeater
+                    model: selectedDateEvents
+                    
+                    onModelChanged: {
+                        Qt.callLater(listViewContainer.resetAndLayout);
+                    }
+                    
+                    delegate: Rectangle {
+                        id: taskItem
+                        width: parent ? parent.width : 0
+                        height: isEditing ? 34 : (eventContent.implicitHeight + Theme.spacingS)
+                        radius: Theme.cornerRadius
+                        
+                        property int visualIndex: index
+                        property string taskId: modelData ? modelData.id : ""
+                        property bool isDragging: false
+                        property bool isEditing: false
+                        property real dragMouseOffsetY: 0
+                        
+                        color: isDragging ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : Theme.nestedSurface)
+                        border.color: isDragging ? Theme.primary : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : Theme.outlineMedium)
+                        border.width: (isDragging || eventMouseArea.containsMouse) ? 1 : Theme.layerOutlineWidth
+                        
+                        scale: isDragging ? 1.02 : 1.0
+                        z: isDragging ? 100 : visualIndex
+                        
+                        Behavior on scale { NumberAnimation { duration: 100 } }
+                        
+                        Behavior on y {
+                            id: yBehavior
+                            enabled: !taskItem.isDragging
+                            NumberAnimation {
+                                duration: 150
+                                easing.type: Easing.OutQuad
+                            }
+                        }
+                        
+                        Component.onCompleted: {
+                            visualIndex = index;
+                            listViewContainer.updateLayout();
+                        }
+                        
+                        onHeightChanged: {
+                            listViewContainer.updateLayout();
+                        }
+                        
+                        onIsEditingChanged: {
+                            if (isEditing) {
+                                editInput.forceActiveFocus();
+                                editInput.selectAll();
+                            }
+                        }
+
+                        Rectangle {
+                            width: 3
+                            height: parent.height - 6
+                            anchors.left: parent.left
+                            anchors.leftMargin: 3
+                            anchors.verticalCenter: parent.verticalCenter
+                            radius: Theme.cornerRadius
+                            color: modelData.id.startsWith("task_") ? (modelData.title.startsWith("✓") ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
+                            opacity: 0.8
+                        }
+
+                        // Drag Handle
+                        Rectangle {
+                            id: dragHandle
+                            width: 24
+                            height: 24
+                            anchors.left: parent.left
+                            anchors.leftMargin: 8
+                            anchors.verticalCenter: parent.verticalCenter
+                            radius: Theme.cornerRadius
+                            color: "transparent"
+                            visible: modelData.id.startsWith("task_") && !taskItem.isEditing
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: "drag_indicator"
+                                size: 14
+                                color: dragMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.3)
+                            }
+
+                            MouseArea {
+                                id: dragMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.SizeAllCursor
+                                
+                                onPressed: mouse => {
+                                    taskItem.isDragging = true;
+                                    listViewContainer.orderChanged = false;
+                                    let containerPos = taskItem.parent.mapFromItem(dragHandle, mouse.x, mouse.y);
+                                    taskItem.dragMouseOffsetY = containerPos.y - taskItem.y;
+                                    listViewContainer.draggedItem = taskItem;
+                                    mouse.accepted = true;
                                 }
-                                return startTime;
-                            }
-                            return "";
-                        }
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                        font.weight: Font.Normal
-                        visible: text !== "" && !modelData.id.startsWith("task_")
-                    }
-                }
-
-                // Main body MouseArea (declared before the delete button so delete sits on top)
-                MouseArea {
-                    id: eventMouseArea
-
-                    anchors.fill: parent
-                    anchors.rightMargin: modelData.id.startsWith("task_") ? 88 : 0
-                    hoverEnabled: true
-                    cursorShape: (modelData.url || modelData.id.startsWith("task_")) ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    enabled: modelData.url !== "" || modelData.id.startsWith("task_")
-                    onClicked: {
-                        if (modelData.id.startsWith("task_")) {
-                            CalendarService.toggleTask(modelData.id);
-                        } else if (modelData.url && modelData.url !== "") {
-                            if (Qt.openUrlExternally(modelData.url) === false) {
-                                log.warn("Failed to open URL: " + modelData.url);
-                            } else {
-                                root.closeDash();
+                                
+                                onPositionChanged: mouse => {
+                                    if (taskItem.isDragging) {
+                                        let containerPos = taskItem.parent.mapFromItem(dragHandle, mouse.x, mouse.y);
+                                        let newY = containerPos.y - taskItem.dragMouseOffsetY;
+                                        
+                                        let minY = 0;
+                                        let maxY = taskItem.parent.height - taskItem.height;
+                                        taskItem.y = Math.max(minY, Math.min(maxY, newY));
+                                        
+                                        listViewContainer.checkAndReorder(taskItem);
+                                        mouse.accepted = true;
+                                    }
+                                }
+                                
+                                onReleased: mouse => {
+                                    if (taskItem.isDragging) {
+                                        taskItem.isDragging = false;
+                                        listViewContainer.draggedItem = null;
+                                        if (listViewContainer.orderChanged) {
+                                            listViewContainer.saveNewOrder();
+                                        }
+                                    }
+                                    mouse.accepted = true;
+                                }
                             }
                         }
-                    }
-                }
 
-                // Up Button
-                Rectangle {
-                    id: upButton
-                    width: 24
-                    height: 24
-                    anchors.right: downButton.left
-                    anchors.rightMargin: Theme.spacingXS
-                    anchors.verticalCenter: parent.verticalCenter
-                    radius: Theme.cornerRadius
-                    color: upMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-                    visible: modelData.id.startsWith("task_")
+                        Column {
+                            id: eventContent
 
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "arrow_upward"
-                        size: 14
-                        color: upMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
-                    }
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.leftMargin: modelData.id.startsWith("task_") ? 36 : (Theme.spacingS + 6)
+                            anchors.rightMargin: modelData.id.startsWith("task_") ? 64 : Theme.spacingXS
+                            spacing: 2
+                            visible: !taskItem.isEditing
 
-                    MouseArea {
-                        id: upMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            CalendarService.moveTask(modelData.id, -1);
+                            StyledText {
+                                width: parent.width
+                                text: modelData.title
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: modelData.id.startsWith("task_") && modelData.title.startsWith("✓") ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
+                                font.weight: Font.Medium
+                                elide: Text.ElideRight
+                                maximumLineCount: 1
+                            }
+
+                            StyledText {
+                                width: parent.width
+                                text: {
+                                    if (!modelData || modelData.allDay) {
+                                        return I18n.tr("All day");
+                                    } else if (modelData.start && modelData.end) {
+                                        const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
+                                        const startTime = Qt.formatTime(modelData.start, timeFormat);
+                                        if (modelData.start.toDateString() !== modelData.end.toDateString() || modelData.start.getTime() !== modelData.end.getTime()) {
+                                            return startTime + " – " + Qt.formatTime(modelData.end, timeFormat);
+                                        }
+                                        return startTime;
+                                    }
+                                    return "";
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                font.weight: Font.Normal
+                                visible: text !== "" && !modelData.id.startsWith("task_")
+                            }
                         }
-                    }
-                }
 
-                // Down Button
-                Rectangle {
-                    id: downButton
-                    width: 24
-                    height: 24
-                    anchors.right: deleteButton.left
-                    anchors.rightMargin: Theme.spacingXS
-                    anchors.verticalCenter: parent.verticalCenter
-                    radius: Theme.cornerRadius
-                    color: downMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-                    visible: modelData.id.startsWith("task_")
+                        // Inline Edit Input Box
+                        Rectangle {
+                            id: editInputContainer
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.leftMargin: 36
+                            anchors.rightMargin: 64
+                            anchors.verticalCenter: parent.verticalCenter
+                            height: 28
+                            visible: taskItem.isEditing
+                            color: "transparent"
 
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "arrow_downward"
-                        size: 14
-                        color: downMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
-                    }
-
-                    MouseArea {
-                        id: downMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            CalendarService.moveTask(modelData.id, 1);
+                            TextInput {
+                                id: editInput
+                                anchors.fill: parent
+                                verticalAlignment: TextInput.AlignVCenter
+                                color: Theme.surfaceText
+                                font.pixelSize: Theme.fontSizeSmall
+                                selectByMouse: true
+                                clip: true
+                                
+                                text: {
+                                    if (!modelData) return "";
+                                    let title = modelData.title;
+                                    if (title.startsWith("✓ ") || title.startsWith("☐ ")) {
+                                        return title.substring(2);
+                                    }
+                                    return title;
+                                }
+                                
+                                onAccepted: {
+                                    let txt = text.trim();
+                                    if (txt !== "") {
+                                        CalendarService.editTask(modelData.id, txt);
+                                    }
+                                    taskItem.isEditing = false;
+                                }
+                                
+                                Keys.onEscapePressed: {
+                                    taskItem.isEditing = false;
+                                }
+                            }
                         }
-                    }
-                }
 
-                // Delete Button (declared after eventMouseArea to ensure it is rendered on top and captures clicks)
-                Rectangle {
-                    id: deleteButton
-                    width: 24
-                    height: 24
-                    anchors.right: parent.right
-                    anchors.rightMargin: Theme.spacingS
-                    anchors.verticalCenter: parent.verticalCenter
-                    radius: Theme.cornerRadius
-                    color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 0.15) : "transparent"
-                    visible: modelData.id.startsWith("task_")
+                        // Main body MouseArea (declared before the delete/edit buttons so they sit on top)
+                        MouseArea {
+                            id: eventMouseArea
 
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "delete"
-                        size: 14
-                        color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 1.0) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
-                    }
+                            anchors.fill: parent
+                            anchors.leftMargin: modelData.id.startsWith("task_") ? 36 : 6
+                            anchors.rightMargin: modelData.id.startsWith("task_") ? 64 : 0
+                            hoverEnabled: true
+                            cursorShape: (modelData.url || modelData.id.startsWith("task_")) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            enabled: (modelData.url !== "" || modelData.id.startsWith("task_")) && !taskItem.isEditing
+                            onClicked: {
+                                if (modelData.id.startsWith("task_")) {
+                                    CalendarService.toggleTask(modelData.id);
+                                } else if (modelData.url && modelData.url !== "") {
+                                    if (Qt.openUrlExternally(modelData.url) === false) {
+                                        log.warn("Failed to open URL: " + modelData.url);
+                                    } else {
+                                        root.closeDash();
+                                    }
+                                }
+                            }
+                        }
 
-                    MouseArea {
-                        id: deleteMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            CalendarService.removeTask(modelData.id);
+                        // Delete / Cancel Button
+                        Rectangle {
+                            id: deleteButton
+                            width: 24
+                            height: 24
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            radius: Theme.cornerRadius
+                            color: deleteMouseArea.containsMouse ? (taskItem.isEditing ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(0.9, 0.2, 0.2, 0.15)) : "transparent"
+                            visible: modelData.id.startsWith("task_")
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: taskItem.isEditing ? "close" : "delete"
+                                size: 14
+                                color: deleteMouseArea.containsMouse ? (taskItem.isEditing ? Theme.primary : Qt.rgba(0.9, 0.2, 0.2, 1.0)) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            }
+
+                            MouseArea {
+                                id: deleteMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (taskItem.isEditing) {
+                                        taskItem.isEditing = false;
+                                    } else {
+                                        CalendarService.removeTask(modelData.id);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Edit / Save Button
+                        Rectangle {
+                            id: editButton
+                            width: 24
+                            height: 24
+                            anchors.right: deleteButton.left
+                            anchors.rightMargin: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+                            radius: Theme.cornerRadius
+                            color: editMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                            visible: modelData.id.startsWith("task_")
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: taskItem.isEditing ? "check" : "edit"
+                                size: 14
+                                color: editMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            }
+
+                            MouseArea {
+                                id: editMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (taskItem.isEditing) {
+                                        let txt = editInput.text.trim();
+                                        if (txt !== "") {
+                                            CalendarService.editTask(modelData.id, txt);
+                                        }
+                                        taskItem.isEditing = false;
+                                    } else {
+                                        taskItem.isEditing = true;
+                                    }
+                                }
                         }
                     }
                 }

@@ -118,14 +118,24 @@ Singleton {
         removeTaskProcess.running = true;
     }
 
-    function moveTask(taskId, direction) {
-        let cleanId = taskId.replace("task_", "");
-        moveTaskProcess.command = [
+    function reorderTasksForDate(date, orderedIds) {
+        let dateKey = Qt.formatDate(date, "yyyy-MM-dd")
+        reorderTasksProcess.command = [
             "python", "-c",
-            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1]; direction = int(sys.argv[2]); swapped = False\nfor k, v in data.items():\n    for i, item in enumerate(v):\n        if item['id'] == tid:\n            new_idx = i + direction\n            if 0 <= new_idx < len(v):\n                v[i], v[new_idx] = v[new_idx], v[i]\n                swapped = True\n            break\n    if swapped: break\nif swapped: json.dump(data, open(path, 'w'), indent=2)",
-            cleanId, direction.toString()
-        ];
-        moveTaskProcess.running = true;
+            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; date = sys.argv[1]; ordered_ids = sys.argv[2].split(',') if sys.argv[2] else []; v = data.get(date, []); id_to_item = {item['id']: item for item in v}; new_v = [id_to_item[tid] for tid in ordered_ids if tid in id_to_item] + [item for item in v if item['id'] not in id_to_item]; data[date] = new_v; json.dump(data, open(path, 'w'), indent=2)",
+            dateKey, orderedIds.join(",")
+        ]
+        reorderTasksProcess.running = true
+    }
+
+    function editTask(taskId, newText) {
+        let cleanId = taskId.replace("task_", "")
+        editTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); [item.update({'text': sys.argv[2]}) for v in data.values() for item in v if item['id'] == tid]; json.dump(data, open(path, 'w'), indent=2)",
+            cleanId, newText
+        ]
+        editTaskProcess.running = true
     }
 
     // Initialize on component completion
@@ -166,9 +176,20 @@ Singleton {
         }
     }
 
-    // Process for moving tasks
+    // Process for reordering tasks
     Process {
-        id: moveTaskProcess
+        id: reorderTasksProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true;
+            }
+        }
+    }
+
+    // Process for editing tasks
+    Process {
+        id: editTaskProcess
         running: false
         onExited: exitCode => {
             if (!localTasksProcess.running) {
