@@ -15,6 +15,7 @@ DankModal {
 
     shouldBeVisible: false
     allowStacking: true
+    useOverlayLayer: true
     modalWidth: 420
     modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 200
 
