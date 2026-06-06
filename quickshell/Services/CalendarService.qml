@@ -9,7 +9,8 @@ import qs.Common
 Singleton {
     id: root
 
-    property bool khalAvailable: false
+    property bool khalAvailable: true // Always true to enable DMS calendar card UI
+    property bool khalInstalled: false // Tracks if khal is actually on the system
     property var eventsByDate: ({})
     property bool isLoading: false
     property string lastError: ""
@@ -50,7 +51,14 @@ Singleton {
     }
 
     function loadEvents(startDate, endDate) {
-        if (!root.khalAvailable) {
+        // Read local tasks from niri-calendar-todo
+        if (!localTasksProcess.running) {
+            localTasksProcess.running = true;
+        }
+
+        if (!root.khalInstalled) {
+            // If khal isn't installed, trigger change notification for local tasks
+            root.eventsByDateChanged();
             return;
         }
         if (eventsProcess.running) {
@@ -79,9 +87,147 @@ Singleton {
         return events.length > 0;
     }
 
+    // Task editing methods using clean, single-line Python scripts (no indentation or external helper file needed!)
+    function addTaskForDate(date, text) {
+        let dateKey = Qt.formatDate(date, "yyyy-MM-dd");
+        addTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, time, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); os.makedirs(os.path.dirname(path), exist_ok=True); data = json.load(open(path)) if os.path.exists(path) else {}; date, text = sys.argv[1], sys.argv[2]; item = {'id': str(int(time.time()*1000)) + '-dms', 'text': text, 'completed': False}; data.setdefault(date, []).append(item); json.dump(data, open(path, 'w'), indent=2)",
+            dateKey, text
+        ];
+        addTaskProcess.running = true;
+    }
+
+    function toggleTask(taskId) {
+        let cleanId = taskId.replace("task_", "");
+        toggleTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); [item.update({'completed': not item['completed']}) for v in data.values() for item in v if item['id'] == tid]; json.dump(data, open(path, 'w'), indent=2)",
+            cleanId
+        ];
+        toggleTaskProcess.running = true;
+    }
+
+    function removeTask(taskId) {
+        let cleanId = taskId.replace("task_", "");
+        removeTaskProcess.command = [
+            "python", "-c",
+            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); data = {k: [i for i in v if i['id'] != tid] for k, v in data.items()}; data = {k: v for k, v in data.items() if len(v) > 0}; json.dump(data, open(path, 'w'), indent=2)",
+            cleanId
+        ];
+        removeTaskProcess.running = true;
+    }
+
     // Initialize on component completion
     Component.onCompleted: {
         detectKhalDateFormat();
+    }
+
+    // Process for inserting tasks
+    Process {
+        id: addTaskProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true;
+            }
+        }
+    }
+
+    // Process for toggling task state
+    Process {
+        id: toggleTaskProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true;
+            }
+        }
+    }
+
+    // Process for deleting tasks
+    Process {
+        id: removeTaskProcess
+        running: false
+        onExited: exitCode => {
+            if (!localTasksProcess.running) {
+                localTasksProcess.running = true;
+            }
+        }
+    }
+
+    // Process for detecting local tasks
+    Process {
+        id: localTasksProcess
+        command: ["cat", Quickshell.env("HOME") + "/.config/niri-calendar-todo/tasks.json"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let text = this.text.trim();
+                if (!text || text === "") {
+                    // Clear task events if file is empty
+                    let newEventsByDate = Object.assign({}, root.eventsByDate);
+                    for (let dateKey in newEventsByDate) {
+                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"));
+                    }
+                    root.eventsByDate = newEventsByDate;
+                    return;
+                }
+                try {
+                    let parsed = JSON.parse(text);
+                    let newEventsByDate = Object.assign({}, root.eventsByDate);
+                    
+                    // Clear any existing task events to prevent duplicates
+                    for (let dateKey in newEventsByDate) {
+                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"));
+                    }
+
+                    for (let dateKey in parsed) {
+                        let taskList = parsed[dateKey];
+                        if (!newEventsByDate[dateKey]) {
+                            newEventsByDate[dateKey] = [];
+                        }
+                        
+                        for (let task of taskList) {
+                            let eventId = "task_" + task.id;
+                            if (newEventsByDate[dateKey].some(e => e.id === eventId)) {
+                                continue;
+                            }
+                            
+                            let parts = dateKey.split("-");
+                            let taskDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                            
+                            let eventObj = {
+                                "id": eventId,
+                                "title": (task.completed ? "✓ " : "☐ ") + task.text,
+                                "start": taskDate,
+                                "end": taskDate,
+                                "location": "",
+                                "description": "Task from your Planner",
+                                "url": "",
+                                "calendar": "Todo Planner",
+                                "color": "#10B981", // Pastel Green
+                                "allDay": true,
+                                "isMultiDay": false
+                            };
+                            newEventsByDate[dateKey].push(eventObj);
+                        }
+                    }
+                    
+                    // Re-sort within each date
+                    for (let dateKey in newEventsByDate) {
+                        newEventsByDate[dateKey].sort((a, b) => {
+                            return a.start.getTime() - b.start.getTime();
+                        });
+                    }
+                    
+                    root.eventsByDate = newEventsByDate;
+                } catch (error) {
+                    console.warn("Failed to parse local tasks JSON: " + error.toString());
+                }
+            }
+        }
     }
 
     // Process for detecting khal date format
@@ -119,9 +265,12 @@ Singleton {
         command: ["khal", "list", "today"]
         running: false
         onExited: exitCode => {
-            root.khalAvailable = (exitCode === 0);
-            if (exitCode === 0) {
+            root.khalInstalled = (exitCode === 0);
+            if (root.khalInstalled) {
                 loadCurrentMonth();
+            } else {
+                // If not installed, load local tasks anyway
+                loadEvents(root.lastStartDate || new Date(), root.lastEndDate || new Date());
             }
         }
     }

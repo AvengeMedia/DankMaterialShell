@@ -176,7 +176,7 @@ Rectangle {
                 text: {
                     const dateStr = Qt.formatDate(selectedDate, "MMM d");
                     if (selectedDateEvents && selectedDateEvents.length > 0) {
-                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 event") : selectedDateEvents.length + " " + I18n.tr("events");
+                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 task") : selectedDateEvents.length + " " + I18n.tr("tasks");
                         return dateStr + " • " + eventCount;
                     }
                     return dateStr;
@@ -416,10 +416,8 @@ Rectangle {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    if (CalendarService && CalendarService.khalAvailable && CalendarService.hasEventsForDate(dayDate)) {
-                                        root.selectedDate = dayDate;
-                                        root.showEventDetails = true;
-                                    }
+                                    root.selectedDate = dayDate;
+                                    root.showEventDetails = true;
                                 }
                             }
                         }
@@ -430,7 +428,7 @@ Rectangle {
 
         DankListView {
             width: parent.width - Theme.spacingS * 2
-            height: parent.height - (showEventDetails ? 40 : 28 + 18) - Theme.spacingS
+            height: parent.height - (showEventDetails ? 40 + 42 : 28 + 18) - Theme.spacingS
             anchors.horizontalCenter: parent.horizontalCenter
             model: selectedDateEvents
             visible: showEventDetails
@@ -466,7 +464,7 @@ Rectangle {
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     radius: Theme.cornerRadius
-                    color: Theme.primary
+                    color: modelData.id.startsWith("task_") ? (modelData.title.startsWith("✓") ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
                     opacity: 0.8
                 }
 
@@ -477,14 +475,14 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: Theme.spacingS + 6
-                    anchors.rightMargin: Theme.spacingXS
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : Theme.spacingXS
                     spacing: 2
 
                     StyledText {
                         width: parent.width
                         text: modelData.title
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
+                        color: modelData.id.startsWith("task_") && modelData.title.startsWith("✓") ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                         maximumLineCount: 1
@@ -508,25 +506,100 @@ Rectangle {
                         font.pixelSize: Theme.fontSizeSmall
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                         font.weight: Font.Normal
-                        visible: text !== ""
+                        visible: text !== "" && !modelData.id.startsWith("task_")
                     }
                 }
 
+                // Main body MouseArea (declared before the delete button so delete sits on top)
                 MouseArea {
                     id: eventMouseArea
 
                     anchors.fill: parent
+                    anchors.rightMargin: modelData.id.startsWith("task_") ? 32 : 0
                     hoverEnabled: true
-                    cursorShape: modelData.url ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    enabled: modelData.url !== ""
+                    cursorShape: (modelData.url || modelData.id.startsWith("task_")) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: modelData.url !== "" || modelData.id.startsWith("task_")
                     onClicked: {
-                        if (modelData.url && modelData.url !== "") {
+                        if (modelData.id.startsWith("task_")) {
+                            CalendarService.toggleTask(modelData.id);
+                        } else if (modelData.url && modelData.url !== "") {
                             if (Qt.openUrlExternally(modelData.url) === false) {
                                 log.warn("Failed to open URL: " + modelData.url);
                             } else {
                                 root.closeDash();
                             }
                         }
+                    }
+                }
+
+                // Delete Button (declared after eventMouseArea to ensure it is rendered on top and captures clicks)
+                Rectangle {
+                    id: deleteButton
+                    width: 24
+                    height: 24
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingS
+                    anchors.verticalCenter: parent.verticalCenter
+                    radius: Theme.cornerRadius
+                    color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 0.15) : "transparent"
+                    visible: modelData.id.startsWith("task_")
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "delete"
+                        size: 14
+                        color: deleteMouseArea.containsMouse ? Qt.rgba(0.9, 0.2, 0.2, 1.0) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    }
+
+                    MouseArea {
+                        id: deleteMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            CalendarService.removeTask(modelData.id);
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            width: parent.width - Theme.spacingS * 2
+            height: 34
+            anchors.horizontalCenter: parent.horizontalCenter
+            radius: Theme.cornerRadius
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
+            border.width: 1
+            visible: showEventDetails
+
+            TextInput {
+                id: taskInput
+                anchors.fill: parent
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                verticalAlignment: TextInput.AlignVCenter
+                color: Theme.surfaceText
+                font.pixelSize: Theme.fontSizeSmall
+                selectByMouse: true
+                clip: true
+
+                // Hint placeholder text
+                Text {
+                    text: I18n.tr("Add a task...")
+                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    visible: !taskInput.text && !taskInput.activeFocus
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                onAccepted: {
+                    let txt = text.trim();
+                    if (txt !== "") {
+                        CalendarService.addTaskForDate(root.selectedDate, txt);
+                        text = "";
+                        taskInput.focus = false;
                     }
                 }
             }
