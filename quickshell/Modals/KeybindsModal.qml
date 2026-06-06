@@ -14,8 +14,8 @@ DankModal {
     useOverlayLayer: true
     property real scrollStep: 60
     property var activeFlickable: null
-    property real _maxW: Math.min(Screen.width * 0.92, 1200)
-    property real _maxH: Math.min(Screen.height * 0.92, 900)
+    property real _maxW: Math.min(root.screenWidth * 0.92, 1200)
+    property real _maxH: Math.min(root.screenHeight * 0.92, 900)
     modalWidth: _maxW
     modalHeight: _maxH
     onBackgroundClicked: close()
