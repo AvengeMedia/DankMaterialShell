@@ -387,7 +387,7 @@ DankModal {
             }
             break;
         case Qt.Key_L:
-            if (visibleActions.includes("logout")) {
+            if (visibleActions.includes("lock")) {
                 startHold("lock", visibleActions.indexOf("lock"));
                 event.accepted = true;
             }
