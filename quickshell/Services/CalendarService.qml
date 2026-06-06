@@ -259,8 +259,14 @@ Singleton {
                     
                     // Re-sort within each date
                     for (let dateKey in newEventsByDate) {
-                        newEventsByDate[dateKey].sort((a, b) => {
-                            return a.start.getTime() - b.start.getTime();
+                        let list = newEventsByDate[dateKey];
+                        for (let idx = 0; idx < list.length; idx++) {
+                            list[idx]._origIdx = idx;
+                        }
+                        list.sort((a, b) => {
+                            let diff = a.start.getTime() - b.start.getTime();
+                            if (diff !== 0) return diff;
+                            return a._origIdx - b._origIdx;
                         });
                     }
                     
@@ -477,8 +483,14 @@ Singleton {
                 }
                 // Sort events by start time within each date
                 for (let dateKey in newEventsByDate) {
-                    newEventsByDate[dateKey].sort((a, b) => {
-                        return a.start.getTime() - b.start.getTime();
+                    let list = newEventsByDate[dateKey];
+                    for (let idx = 0; idx < list.length; idx++) {
+                        list[idx]._origIdx = idx;
+                    }
+                    list.sort((a, b) => {
+                        let diff = a.start.getTime() - b.start.getTime();
+                        if (diff !== 0) return diff;
+                        return a._origIdx - b._origIdx;
                     });
                 }
                 root.eventsByDate = newEventsByDate;

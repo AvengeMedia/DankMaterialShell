@@ -513,14 +513,12 @@ Rectangle {
                         if (draggedIdx === -1) break;
                         
                         let didSwap = false;
-                        let draggedCenterY = dragged.y + dragged.height / 2;
                         
                         // Check item above
                         if (draggedIdx > 0) {
                             let above = items[draggedIdx - 1];
                             let targetYAbove = getTargetY(draggedIdx - 1);
-                            let aboveCenterY = targetYAbove + above.height / 2;
-                            if (above && draggedCenterY < aboveCenterY) {
+                            if (above && dragged.y < (targetYAbove + above.height / 2)) {
                                 // Swap visualIndex
                                 let temp = dragged.visualIndex;
                                 dragged.visualIndex = above.visualIndex;
@@ -540,8 +538,7 @@ Rectangle {
                         if (!didSwap && draggedIdx < items.length - 1) {
                             let below = items[draggedIdx + 1];
                             let targetYBelow = getTargetY(draggedIdx + 1);
-                            let belowCenterY = targetYBelow + below.height / 2;
-                            if (below && draggedCenterY > belowCenterY) {
+                            if (below && (dragged.y + dragged.height) > (targetYBelow + below.height / 2)) {
                                 // Swap visualIndex
                                 let temp = dragged.visualIndex;
                                 dragged.visualIndex = below.visualIndex;
@@ -606,11 +603,22 @@ Rectangle {
                         height: isEditing ? 34 : (eventContent.implicitHeight + Theme.spacingS)
                         radius: Theme.cornerRadius
                         
+                        property int modelIndex: index
                         property int visualIndex: index
                         property string taskId: modelData ? modelData.id : ""
                         property bool isDragging: false
                         property bool isEditing: false
                         property real dragMouseOffsetY: 0
+                        
+                        onModelIndexChanged: {
+                            visualIndex = modelIndex;
+                        }
+                        
+                        onYChanged: {
+                            if (isDragging) {
+                                listViewContainer.checkAndReorder(taskItem);
+                            }
+                        }
                         
                         color: isDragging ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : Theme.nestedSurface)
                         border.color: isDragging ? Theme.primary : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : Theme.outlineMedium)
@@ -677,54 +685,43 @@ Rectangle {
                             }
 
                             MouseArea {
-                                id: dragMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.SizeAllCursor
-                                preventStealing: true
-                                
-                                onPressed: mouse => {
-                                    taskItem.isDragging = true;
-                                    listViewContainer.orderChanged = false;
-                                    let pressYInContainer = listViewContainer.mapFromItem(null, mouse.sceneX, mouse.sceneY).y;
-                                    taskItem.dragMouseOffsetY = pressYInContainer - taskItem.y;
-                                    listViewContainer.draggedItem = taskItem;
-                                    mouse.accepted = true;
-                                }
-                                
-                                onPositionChanged: mouse => {
-                                    if (taskItem.isDragging) {
-                                        let currentYInContainer = listViewContainer.mapFromItem(null, mouse.sceneX, mouse.sceneY).y;
-                                        let newY = currentYInContainer - taskItem.dragMouseOffsetY;
-                                        
-                                        let minY = 0;
-                                        let maxY = listViewContainer.height - taskItem.height;
-                                        taskItem.y = Math.max(minY, Math.min(maxY, newY));
-                                        
-                                        listViewContainer.checkAndReorder(taskItem);
-                                        mouse.accepted = true;
-                                    }
-                                }
-                                
-                                onReleased: mouse => {
-                                    if (taskItem.isDragging) {
-                                        taskItem.isDragging = false;
-                                        listViewContainer.draggedItem = null;
-                                        if (listViewContainer.orderChanged) {
-                                            listViewContainer.saveNewOrder();
-                                        }
-                                    }
-                                    mouse.accepted = true;
-                                }
+                                 id: dragMouseArea
+                                 anchors.fill: parent
+                                 hoverEnabled: true
+                                 cursorShape: Qt.SizeAllCursor
+                                 preventStealing: true
+                                 
+                                 drag.target: taskItem
+                                 drag.axis: Drag.YAxis
+                                 drag.minimumY: 0
+                                 drag.maximumY: listViewContainer.height - taskItem.height
+                                 
+                                 onPressed: {
+                                     taskItem.isDragging = true;
+                                     listViewContainer.orderChanged = false;
+                                     listViewContainer.draggedItem = taskItem;
+                                 }
+                                 
+                                 onPositionChanged: {
+                                     // Handled natively by MouseArea.drag
+                                 }
+                                 
+                                 onReleased: {
+                                     taskItem.isDragging = false;
+                                     listViewContainer.draggedItem = null;
+                                     if (listViewContainer.orderChanged) {
+                                         listViewContainer.saveNewOrder();
+                                     } else {
+                                         listViewContainer.updateLayout();
+                                     }
+                                 }
 
-                                onCanceled: {
-                                    if (taskItem.isDragging) {
-                                        taskItem.isDragging = false;
-                                        listViewContainer.draggedItem = null;
-                                        listViewContainer.resetAndLayout();
-                                    }
-                                }
-                            }
+                                 onCanceled: {
+                                     taskItem.isDragging = false;
+                                     listViewContainer.draggedItem = null;
+                                     listViewContainer.resetAndLayout();
+                                 }
+                             }
                         }
 
                         Column {
