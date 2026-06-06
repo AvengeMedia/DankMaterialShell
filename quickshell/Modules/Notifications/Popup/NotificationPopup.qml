@@ -727,6 +727,51 @@ PanelWindow {
                 }
             }
 
+            // Timeout progress bar: drains as the dismiss timer runs; inset by
+            // the corner radius and frozen while hovered or during exit.
+            Rectangle {
+                id: timeoutBar
+
+                readonly property bool active: SettingsData.notificationShowTimeoutBar && notificationData && notificationData.timer && notificationData.timer.interval > 0
+                property real progress: 1
+                readonly property real surfaceRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+
+                visible: active && progress > 0
+                anchors.left: parent.left
+                anchors.leftMargin: surfaceRadius
+                anchors.bottom: parent.bottom
+                width: Math.max(0, parent.width - surfaceRadius * 2) * progress
+                height: Math.max(2, Theme.snap(3, win.dpr))
+                radius: height / 2
+                z: 50
+                opacity: 0.9
+                color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.error : Theme.primary
+
+                NumberAnimation {
+                    id: progressAnim
+                    target: timeoutBar
+                    property: "progress"
+                    from: 1
+                    to: 0
+                    duration: (notificationData && notificationData.timer && notificationData.timer.interval > 0) ? notificationData.timer.interval : 5000
+                    running: timeoutBar.active && notificationData && notificationData.timer && notificationData.timer.running && !win.exiting
+                    easing.type: Easing.Linear
+                }
+
+                // Reset to full on every (re)start, including an in-place
+                // restart on a deduped notification (running stays true, so the
+                // bound animation alone wouldn't re-fire).
+                Connections {
+                    target: timeoutBar.active ? notificationData.timer : null
+                    function onRunningChanged() {
+                        if (notificationData && notificationData.timer && notificationData.timer.running && !win.exiting) {
+                            timeoutBar.progress = 1;
+                            progressAnim.restart();
+                        }
+                    }
+                }
+            }
+
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
