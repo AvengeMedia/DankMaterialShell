@@ -11,7 +11,7 @@ DankOSD {
     readonly property bool useVertical: isVerticalLayout
     readonly property var player: MprisController.activePlayer
 
-    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(280, Screen.width - Theme.spacingM * 2)
+    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(280, screenWidth - Theme.spacingM * 2)
     osdHeight: useVertical ? (Theme.iconSize * 2) : (40 + Theme.spacingS * 2)
     autoHideInterval: 3000
     enableMouseInteraction: true

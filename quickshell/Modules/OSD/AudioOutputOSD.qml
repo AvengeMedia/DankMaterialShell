@@ -9,7 +9,7 @@ DankOSD {
     property string deviceName: ""
     property string deviceIcon: "speaker"
 
-    osdWidth: Math.min(Math.max(120, Theme.iconSize + textMetrics.width + Theme.spacingS * 4), Screen.width - Theme.spacingM * 2)
+    osdWidth: Math.min(Math.max(120, Theme.iconSize + textMetrics.width + Theme.spacingS * 4), screenWidth - Theme.spacingM * 2)
     osdHeight: 40 + Theme.spacingS * 2
     autoHideInterval: 2500
     enableMouseInteraction: false
