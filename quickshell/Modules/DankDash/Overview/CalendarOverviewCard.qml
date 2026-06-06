@@ -442,6 +442,7 @@ Rectangle {
             clip: true
             contentWidth: width
             contentHeight: listViewContainer.height
+            interactive: listViewContainer.draggedItem === null
 
             Item {
                 id: listViewContainer
@@ -496,8 +497,7 @@ Rectangle {
                     }
                     items.sort((a, b) => a.visualIndex - b.visualIndex);
                     
-                    let draggedIdx = items.indexOf(dragged);
-                    if (draggedIdx === -1) return;
+                    let swapped = false;
                     
                     // Helper to get target Y position without animation offsets
                     function getTargetY(index) {
@@ -508,34 +508,62 @@ Rectangle {
                         return y;
                     }
                     
-                    // Check item above
-                    if (draggedIdx > 0) {
-                        let above = items[draggedIdx - 1];
-                        let targetYAbove = getTargetY(draggedIdx - 1);
-                        if (above && dragged.y < (targetYAbove + above.height / 2)) {
-                            // Swap visualIndex
-                            let temp = dragged.visualIndex;
-                            dragged.visualIndex = above.visualIndex;
-                            above.visualIndex = temp;
-                            listViewContainer.orderChanged = true;
-                            updateLayout();
-                            return;
+                    while (true) {
+                        let draggedIdx = items.indexOf(dragged);
+                        if (draggedIdx === -1) break;
+                        
+                        let didSwap = false;
+                        let draggedCenterY = dragged.y + dragged.height / 2;
+                        
+                        // Check item above
+                        if (draggedIdx > 0) {
+                            let above = items[draggedIdx - 1];
+                            let targetYAbove = getTargetY(draggedIdx - 1);
+                            let aboveCenterY = targetYAbove + above.height / 2;
+                            if (above && draggedCenterY < aboveCenterY) {
+                                // Swap visualIndex
+                                let temp = dragged.visualIndex;
+                                dragged.visualIndex = above.visualIndex;
+                                above.visualIndex = temp;
+                                
+                                // Swap in local array
+                                items[draggedIdx] = above;
+                                items[draggedIdx - 1] = dragged;
+                                
+                                listViewContainer.orderChanged = true;
+                                swapped = true;
+                                didSwap = true;
+                            }
+                        }
+                        
+                        // Check item below
+                        if (!didSwap && draggedIdx < items.length - 1) {
+                            let below = items[draggedIdx + 1];
+                            let targetYBelow = getTargetY(draggedIdx + 1);
+                            let belowCenterY = targetYBelow + below.height / 2;
+                            if (below && draggedCenterY > belowCenterY) {
+                                // Swap visualIndex
+                                let temp = dragged.visualIndex;
+                                dragged.visualIndex = below.visualIndex;
+                                below.visualIndex = temp;
+                                
+                                // Swap in local array
+                                items[draggedIdx] = below;
+                                items[draggedIdx + 1] = dragged;
+                                
+                                listViewContainer.orderChanged = true;
+                                swapped = true;
+                                didSwap = true;
+                            }
+                        }
+                        
+                        if (!didSwap) {
+                            break;
                         }
                     }
                     
-                    // Check item below
-                    if (draggedIdx < items.length - 1) {
-                        let below = items[draggedIdx + 1];
-                        let targetYBelow = getTargetY(draggedIdx + 1);
-                        if (below && (dragged.y + dragged.height) > (targetYBelow + below.height / 2)) {
-                            // Swap visualIndex
-                            let temp = dragged.visualIndex;
-                            dragged.visualIndex = below.visualIndex;
-                            below.visualIndex = temp;
-                            listViewContainer.orderChanged = true;
-                            updateLayout();
-                            return;
-                        }
+                    if (swapped) {
+                        updateLayout();
                     }
                 }
                 
@@ -595,7 +623,7 @@ Rectangle {
                         
                         Behavior on y {
                             id: yBehavior
-                            enabled: !taskItem.isDragging
+                            enabled: !taskItem.isDragging && listViewContainer.draggedItem === null
                             NumberAnimation {
                                 duration: 150
                                 easing.type: Easing.OutQuad
@@ -653,23 +681,24 @@ Rectangle {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.SizeAllCursor
+                                preventStealing: true
                                 
                                 onPressed: mouse => {
                                     taskItem.isDragging = true;
                                     listViewContainer.orderChanged = false;
-                                    let containerPos = taskItem.parent.mapFromItem(dragHandle, mouse.x, mouse.y);
-                                    taskItem.dragMouseOffsetY = containerPos.y - taskItem.y;
+                                    let pressYInContainer = listViewContainer.mapFromItem(null, mouse.sceneX, mouse.sceneY).y;
+                                    taskItem.dragMouseOffsetY = pressYInContainer - taskItem.y;
                                     listViewContainer.draggedItem = taskItem;
                                     mouse.accepted = true;
                                 }
                                 
                                 onPositionChanged: mouse => {
                                     if (taskItem.isDragging) {
-                                        let containerPos = taskItem.parent.mapFromItem(dragHandle, mouse.x, mouse.y);
-                                        let newY = containerPos.y - taskItem.dragMouseOffsetY;
+                                        let currentYInContainer = listViewContainer.mapFromItem(null, mouse.sceneX, mouse.sceneY).y;
+                                        let newY = currentYInContainer - taskItem.dragMouseOffsetY;
                                         
                                         let minY = 0;
-                                        let maxY = taskItem.parent.height - taskItem.height;
+                                        let maxY = listViewContainer.height - taskItem.height;
                                         taskItem.y = Math.max(minY, Math.min(maxY, newY));
                                         
                                         listViewContainer.checkAndReorder(taskItem);
@@ -686,6 +715,14 @@ Rectangle {
                                         }
                                     }
                                     mouse.accepted = true;
+                                }
+
+                                onCanceled: {
+                                    if (taskItem.isDragging) {
+                                        taskItem.isDragging = false;
+                                        listViewContainer.draggedItem = null;
+                                        listViewContainer.resetAndLayout();
+                                    }
                                 }
                             }
                         }
