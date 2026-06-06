@@ -41,7 +41,7 @@ Item {
             var fontName2 = availableFonts[j];
             if (fontName2.startsWith("."))
                 continue;
-            if (fontName2 === SettingsData.defaultMonoFontFamily)
+            if (fontName2 === Theme.defaultMonoFontFamily)
                 continue;
             var lowerName = fontName2.toLowerCase();
             if (lowerName.includes("mono") || lowerName.includes("code") || lowerName.includes("console") || lowerName.includes("terminal") || lowerName.includes("courier") || lowerName.includes("dejavu sans mono") || lowerName.includes("jetbrains") || lowerName.includes("fira") || lowerName.includes("hack") || lowerName.includes("source code") || lowerName.includes("ubuntu mono") || lowerName.includes("cascadia")) {

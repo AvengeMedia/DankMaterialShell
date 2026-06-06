@@ -125,6 +125,7 @@ const (
 	catConfigFiles
 	catServices
 	catEnvironment
+	catFonts
 )
 
 func (c category) String() string {
@@ -147,6 +148,8 @@ func (c category) String() string {
 		return "Services"
 	case catEnvironment:
 		return "Environment"
+	case catFonts:
+		return "Fonts"
 	default:
 		return "Unknown"
 	}
@@ -213,6 +216,7 @@ func runDoctor(cmd *cobra.Command, args []string) {
 		checkConfigurationFiles(),
 		checkSystemdServices(),
 		checkEnvironmentVars(),
+		checkFonts(),
 	)
 
 	switch {
@@ -1134,4 +1138,101 @@ func formatResultsPlain(results []checkResult) string {
 		ds.ErrorCount(), ds.WarningCount(), ds.OKCount())
 
 	return sb.String()
+}
+
+func checkFonts() []checkResult {
+	var results []checkResult
+	url := doctorDocsURL + "#fonts"
+
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return nil
+	}
+	settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
+
+	fontFamily := "Inter Variable"
+	monoFontFamily := "Fira Code"
+
+	if data, err := os.ReadFile(settingsPath); err == nil {
+		var settings struct {
+			FontFamily     string `json:"fontFamily"`
+			MonoFontFamily string `json:"monoFontFamily"`
+		}
+		if err := json.Unmarshal(data, &settings); err == nil {
+			if settings.FontFamily != "" {
+				fontFamily = settings.FontFamily
+			}
+			if settings.MonoFontFamily != "" {
+				monoFontFamily = settings.MonoFontFamily
+			}
+		}
+	}
+
+	if !utils.CommandExists("fc-list") {
+		results = append(results, checkResult{catFonts, "Fontconfig Tools", statusWarn, "fc-list not installed", "Cannot verify if fonts are cached.", url})
+		return results
+	}
+
+	// Retrieve font list
+	output, err := exec.Command("fc-list", ":", "family").Output()
+	if err != nil {
+		results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Failed to query font list", "Fontconfig cache query failed. Try running 'fc-cache -fv'.", url})
+		return results
+	}
+
+	outStr := string(output)
+	if len(strings.TrimSpace(outStr)) == 0 {
+		results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Cache is empty", "No fonts found in fontconfig cache. Try running 'fc-cache -fv'.", url})
+		return results
+	}
+
+	lowerFonts := strings.ToLower(outStr)
+
+	// Helper to check if a font exists
+	hasFont := func(name string) bool {
+		target := strings.ToLower(strings.TrimSpace(name))
+		if target == "" {
+			return false
+		}
+		for _, line := range strings.Split(lowerFonts, "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			// Each line can have comma-separated families
+			families := strings.Split(line, ",")
+			for _, fam := range families {
+				if strings.TrimSpace(fam) == target {
+					return true
+				}
+			}
+		}
+		return false
+	}
+
+	// Normal Font Check
+	if hasFont(fontFamily) {
+		results = append(results, checkResult{catFonts, "Normal Font", statusOK, fontFamily, "Available", url})
+	} else {
+		results = append(results, checkResult{
+			catFonts, "Normal Font", statusWarn,
+			fmt.Sprintf("'%s' not found", fontFamily),
+			"Font is not registered. Try running 'fc-cache -fv' or install the font.",
+			url,
+		})
+	}
+
+	// Monospace Font Check
+	if hasFont(monoFontFamily) {
+		results = append(results, checkResult{catFonts, "Monospace Font", statusOK, monoFontFamily, "Available", url})
+	} else {
+		results = append(results, checkResult{
+			catFonts, "Monospace Font", statusWarn,
+			fmt.Sprintf("'%s' not found", monoFontFamily),
+			"Font is not registered. Try running 'fc-cache -fv' or install the font.",
+			url,
+		})
+	}
+
+	return results
 }
