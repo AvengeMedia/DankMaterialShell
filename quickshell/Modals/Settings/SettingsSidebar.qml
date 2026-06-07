@@ -23,6 +23,7 @@ Rectangle {
     property bool searchActive: searchField.text.length > 0
     property int searchSelectedIndex: 0
     property int keyboardHighlightIndex: -1
+    readonly property int navigationStateDuration: Theme.currentAnimationSpeed === SettingsData.AnimationSpeed.None ? 0 : Anims.settingsNavigationStateDuration
 
     function focusSearch() {
         searchField.forceActiveFocus();
@@ -116,6 +117,12 @@ Rectangle {
                     "tabIndex": 3
                 },
                 {
+                    "id": "dankbar_appearance",
+                    "text": I18n.tr("Appearance"),
+                    "icon": "palette",
+                    "tabIndex": 6
+                },
+                {
                     "id": "dankbar_widgets",
                     "text": I18n.tr("Widgets"),
                     "icon": "widgets",
@@ -131,16 +138,10 @@ Rectangle {
         },
         {
             "id": "workspaces_widgets",
-            "text": I18n.tr("Workspaces & Widgets"),
+            "text": I18n.tr("Widgets & Notifications"),
             "icon": "dashboard",
             "collapsedByDefault": true,
             "children": [
-                {
-                    "id": "workspaces",
-                    "text": I18n.tr("Workspaces"),
-                    "icon": "view_module",
-                    "tabIndex": 4
-                },
                 {
                     "id": "media_player",
                     "text": I18n.tr("Media Player"),
@@ -186,6 +187,12 @@ Rectangle {
                     "tabIndex": 9
                 }
             ]
+        },
+        {
+            "id": "compositor",
+            "text": I18n.tr("Compositor"),
+            "icon": "layers",
+            "tabIndex": 4
         },
         {
             "id": "keybinds",
@@ -305,13 +312,6 @@ Rectangle {
                     "text": I18n.tr("Users"),
                     "icon": "manage_accounts",
                     "tabIndex": 35
-                },
-                {
-                    "id": "window_rules",
-                    "text": I18n.tr("Window Rules"),
-                    "icon": "select_window",
-                    "tabIndex": 28,
-                    "windowRulesCapable": true
                 }
             ]
         },
@@ -544,6 +544,8 @@ Rectangle {
             return -1;
 
         var normalized = name.toLowerCase().replace(/[_\-\s]/g, "");
+        if (normalized === "workspaces")
+            normalized = "compositor";
 
         for (var i = 0; i < categoryStructure.length; i++) {
             var cat = categoryStructure[i];
@@ -588,7 +590,7 @@ Rectangle {
         id: __m1
         font.pixelSize: Theme.fontSizeMedium
         font.weight: Font.Medium
-        text: I18n.tr("Workspaces & Widgets")
+        text: I18n.tr("Widgets & Notifications")
     }
     StyledTextMetrics {
         id: __m2
@@ -782,6 +784,7 @@ Rectangle {
                             id: resultRipple
                             rippleColor: root.searchSelectedIndex === resultDelegate.index ? Theme.buttonText : Theme.surfaceText
                             cornerRadius: resultDelegate.radius
+                            animationDuration: Anims.settingsNavigationRippleDuration
                         }
 
                         Row {
@@ -837,8 +840,9 @@ Rectangle {
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
+                                duration: root.navigationStateDuration
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: Anims.expressiveEffects
                             }
                         }
                     }
@@ -912,6 +916,7 @@ Rectangle {
                             id: categoryRipple
                             rippleColor: categoryRow.isActive ? Theme.buttonText : Theme.surfaceText
                             cornerRadius: categoryRow.radius
+                            animationDuration: Anims.settingsNavigationRippleDuration
                         }
 
                         Row {
@@ -967,8 +972,9 @@ Rectangle {
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
+                                duration: root.navigationStateDuration
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: Anims.expressiveEffects
                             }
                         }
                     }
@@ -1009,6 +1015,7 @@ Rectangle {
                                     id: childRipple
                                     rippleColor: childDelegate.isActive ? Theme.buttonText : Theme.surfaceText
                                     cornerRadius: childDelegate.radius
+                                    animationDuration: Anims.settingsNavigationRippleDuration
                                 }
 
                                 Row {
@@ -1049,8 +1056,9 @@ Rectangle {
 
                                 Behavior on color {
                                     ColorAnimation {
-                                        duration: Theme.shortDuration
-                                        easing.type: Theme.standardEasing
+                                        duration: root.navigationStateDuration
+                                        easing.type: Easing.BezierSpline
+                                        easing.bezierCurve: Anims.expressiveEffects
                                     }
                                 }
                             }

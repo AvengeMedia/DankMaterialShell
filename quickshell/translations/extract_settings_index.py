@@ -62,7 +62,20 @@ CATEGORY_KEYWORDS = {
     "Time & Weather": ["clock", "forecast", "date"],
     "Keyboard Shortcuts": ["keys", "bindings", "hotkey"],
     "Dank Bar": ["panel", "topbar", "statusbar"],
-    "Workspaces": ["virtual desktops", "spaces"],
+    "Compositor": [
+        "virtual desktops",
+        "spaces",
+        "window",
+        "rules",
+        "matching",
+        "floating",
+        "fullscreen",
+        "opacity",
+        "gaps",
+        "borders",
+        "corner rounding",
+        "overrides",
+    ],
     "Dock": ["taskbar", "launcher bar"],
     "Network": ["connectivity", "online"],
     "System": ["os", "linux"],
@@ -82,14 +95,6 @@ CATEGORY_KEYWORDS = {
     "Displays": ["monitor", "screen", "resolution"],
     "Desktop Widgets": ["conky", "desktop clock"],
     "Audio": ["sound", "volume", "speaker", "microphone", "headphones", "pipewire"],
-    "Window Rules": [
-        "window",
-        "rules",
-        "matching",
-        "floating",
-        "fullscreen",
-        "opacity",
-    ],
     "Locale": ["locale", "language", "country"],
     "Greeter": ["login", "greetd", "display manager"],
     "Multiplexers": ["tmux", "zellij", "terminal"],
@@ -104,8 +109,13 @@ TAB_INDEX_MAP = {
     "TimeWeatherTab.qml": 1,
     "KeybindsTab.qml": 2,
     "DankBarTab.qml": 3,
+    "CompositorTab.qml": 4,
+    "CompositorLayoutTab.qml": 4,
     "WorkspacesTab.qml": 4,
+    "WindowRulesTab.qml": 4,
     "DockTab.qml": 5,
+    "DankBarAppearanceTab.qml": 6,
+    "WorkspaceAppearanceCard.qml": 6,
     "NetworkTab.qml": 7,
     "PrinterTab.qml": 8,
     "LauncherTab.qml": 9,
@@ -127,7 +137,6 @@ TAB_INDEX_MAP = {
     "GammaControlTab.qml": 25,
     "DisplayWidgetsTab.qml": 26,
     "DesktopWidgetsTab.qml": 27,
-    "WindowRulesTab.qml": 28,
     "AudioTab.qml": 29,
     "LocaleTab.qml": 30,
     "GreeterTab.qml": 31,
@@ -143,8 +152,9 @@ TAB_CATEGORY_MAP = {
     1: "Time & Weather",
     2: "Keyboard Shortcuts",
     3: "Dank Bar",
-    4: "Workspaces",
+    4: "Compositor",
     5: "Dock",
+    6: "Dank Bar",
     7: "Network",
     8: "System",
     9: "Launcher",
@@ -166,7 +176,6 @@ TAB_CATEGORY_MAP = {
     25: "Displays",
     26: "Displays",
     27: "Desktop Widgets",
-    28: "Window Rules",
     29: "Audio",
     30: "Locale",
     31: "Greeter",
@@ -302,9 +311,9 @@ def extract_property(block, prop_name):
 
 def find_settings_components(content, filename):
     results = []
-    tab_index = TAB_INDEX_MAP.get(filename, -1)
+    file_tab_index = TAB_INDEX_MAP.get(filename, -1)
 
-    if tab_index == -1:
+    if file_tab_index == -1:
         return results
 
     for component in SEARCHABLE_COMPONENTS:
@@ -320,6 +329,11 @@ def find_settings_components(content, filename):
 
             if not setting_key:
                 continue
+
+            tab_index = file_tab_index
+            tab_raw = extract_property(block, "tab")
+            if tab_raw and tab_raw.strip("\"'") == "appearance":
+                tab_index = 6
 
             title_raw = extract_property(block, "title")
             text_raw = extract_property(block, "text")
@@ -489,7 +503,7 @@ def extract_settings_index(root_dir):
     seen_keys = set()
 
     for qml_file in settings_dir.glob("*.qml"):
-        if not qml_file.name.endswith("Tab.qml"):
+        if qml_file.name not in TAB_INDEX_MAP:
             continue
 
         with open(qml_file, "r", encoding="utf-8") as f:
@@ -501,6 +515,24 @@ def extract_settings_index(root_dir):
             if key not in seen_keys:
                 seen_keys.add(key)
                 all_entries.append(entry)
+
+    if "windowRules" not in seen_keys:
+        all_entries.append(
+            {
+                "section": "windowRules",
+                "label": "Window Rules",
+                "tabIndex": 4,
+                "category": "Compositor",
+                "keywords": enrich_keywords(
+                    "Window Rules",
+                    "Define compositor rules for window behavior",
+                    "Compositor",
+                    ["matching", "floating", "fullscreen", "opacity"],
+                ),
+                "icon": "select_window",
+                "description": "Define compositor rules for window behavior",
+            }
+        )
 
     return all_entries
 

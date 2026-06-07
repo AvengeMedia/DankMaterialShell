@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.Settings
+import qs.Widgets
 
 FocusScope {
     id: root
@@ -97,7 +98,24 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: WorkspacesTab {}
+            sourceComponent: CompositorTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: dankBarAppearanceLoader
+            anchors.fill: parent
+            active: root.currentIndex === 6
+            visible: active
+            focus: active
+
+            sourceComponent: DankBarAppearanceTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)
@@ -432,19 +450,36 @@ FocusScope {
 
         Loader {
             id: widgetsLoader
+
+            property bool loadedOnce: false
+
             anchors.fill: parent
-            active: root.currentIndex === 22
-            visible: active
-            focus: active
+            active: root.currentIndex === 22 || loadedOnce
+            visible: root.currentIndex === 22 && status === Loader.Ready
+            focus: visible
+            asynchronous: true
 
             sourceComponent: WidgetsTab {
                 parentModal: root.parentModal
             }
 
-            onActiveChanged: {
-                if (active && item)
+            onLoaded: {
+                loadedOnce = true;
+                if (visible && item)
                     Qt.callLater(() => item.forceActiveFocus());
             }
+            onVisibleChanged: {
+                if (visible && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        StyledText {
+            anchors.centerIn: parent
+            visible: root.currentIndex === 22 && widgetsLoader.status === Loader.Loading
+            text: I18n.tr("Loading...", "loading indicator")
+            color: Theme.surfaceVariantText
+            font.pixelSize: Theme.fontSizeMedium
         }
 
         Loader {
@@ -470,23 +505,6 @@ FocusScope {
             focus: active
 
             sourceComponent: DesktopWidgetsTab {
-                parentModal: root.parentModal
-            }
-
-            onActiveChanged: {
-                if (active && item)
-                    Qt.callLater(() => item.forceActiveFocus());
-            }
-        }
-
-        Loader {
-            id: windowRulesLoader
-            anchors.fill: parent
-            active: root.currentIndex === 28
-            visible: active
-            focus: active
-
-            sourceComponent: WindowRulesTab {
                 parentModal: root.parentModal
             }
 

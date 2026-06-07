@@ -25,12 +25,14 @@ Item {
     }
 
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
+    property int pluginCatalogRevision: 0
 
     DankTooltipV2 {
         id: sharedTooltip
     }
 
     property var baseWidgetDefinitions: {
+        pluginCatalogRevision;
         var coreWidgets = [
             {
                 "id": "layout",
@@ -272,6 +274,30 @@ Item {
         }
 
         return coreWidgets;
+    }
+
+    Connections {
+        target: PluginService
+
+        function onPluginDataChanged() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginListUpdated() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginLoaded() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginStateChanged() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginUnloaded() {
+            widgetsTab.pluginCatalogRevision++;
+        }
     }
 
     property var defaultLeftWidgets: [
