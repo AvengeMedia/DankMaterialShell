@@ -602,51 +602,51 @@ Rectangle {
                         width: parent ? parent.width : 0
                         height: isEditing ? 34 : (eventContent.implicitHeight + Theme.spacingS)
                         radius: Theme.cornerRadius
-                        
+
                         property int modelIndex: index
                         property int visualIndex: index
-                        property string taskId: modelData ? modelData.id : ""
+                        property string taskId: (modelData && modelData.id) ? modelData.id : ""
                         property bool isDragging: false
                         property bool isEditing: false
                         property real dragMouseOffsetY: 0
-                        
+
                         onModelIndexChanged: {
                             visualIndex = modelIndex;
                         }
-                        
+
                         onYChanged: {
                             if (isDragging) {
                                 listViewContainer.checkAndReorder(taskItem);
                             }
                         }
-                        
+
                         color: isDragging ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : Theme.nestedSurface)
                         border.color: isDragging ? Theme.primary : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : Theme.outlineMedium)
                         border.width: (isDragging || eventMouseArea.containsMouse) ? 1 : Theme.layerOutlineWidth
-                        
+
                         scale: isDragging ? 1.02 : 1.0
                         z: isDragging ? 100 : visualIndex
-                        
+
                         Behavior on scale { NumberAnimation { duration: 100 } }
-                        
+
                         Behavior on y {
                             id: yBehavior
-                            enabled: !taskItem.isDragging && listViewContainer.draggedItem === null
+                            enabled: !taskItem.isDragging
                             NumberAnimation {
                                 duration: 150
                                 easing.type: Easing.OutQuad
                             }
                         }
-                        
+
                         Component.onCompleted: {
                             visualIndex = index;
                             listViewContainer.updateLayout();
                         }
-                        
+
                         onHeightChanged: {
                             listViewContainer.updateLayout();
                         }
-                        
+
                         onIsEditingChanged: {
                             if (isEditing) {
                                 editInput.forceActiveFocus();
@@ -661,7 +661,7 @@ Rectangle {
                             anchors.leftMargin: 3
                             anchors.verticalCenter: parent.verticalCenter
                             radius: Theme.cornerRadius
-                            color: modelData.id.startsWith("task_") ? (modelData.title.startsWith("✓") ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
+                            color: (modelData && modelData.id && modelData.id.startsWith("task_")) ? (modelData.completed ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
                             opacity: 0.8
                         }
 
@@ -675,7 +675,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             radius: Theme.cornerRadius
                             color: "transparent"
-                            visible: modelData.id.startsWith("task_") && !taskItem.isEditing
+                            visible: modelData && modelData.id && modelData.id.startsWith("task_") && !taskItem.isEditing
 
                             DankIcon {
                                 anchors.centerIn: parent
@@ -690,22 +690,22 @@ Rectangle {
                                  hoverEnabled: true
                                  cursorShape: Qt.SizeAllCursor
                                  preventStealing: true
-                                 
+
                                  drag.target: taskItem
                                  drag.axis: Drag.YAxis
                                  drag.minimumY: 0
                                  drag.maximumY: listViewContainer.height - taskItem.height
-                                 
+
                                  onPressed: {
                                      taskItem.isDragging = true;
                                      listViewContainer.orderChanged = false;
                                      listViewContainer.draggedItem = taskItem;
                                  }
-                                 
+
                                  onPositionChanged: {
                                      // Handled natively by MouseArea.drag
                                  }
-                                 
+
                                  onReleased: {
                                      taskItem.isDragging = false;
                                      listViewContainer.draggedItem = null;
@@ -724,22 +724,42 @@ Rectangle {
                              }
                         }
 
+                        // Checkbox status icon
+                        Rectangle {
+                            id: checkboxContainer
+                            width: 24
+                            height: 24
+                            anchors.left: parent.left
+                            anchors.leftMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? (taskItem.isEditing ? 8 : 32) : 8
+                            anchors.verticalCenter: parent.verticalCenter
+                            radius: Theme.cornerRadius
+                            color: "transparent"
+                            visible: modelData && modelData.id && modelData.id.startsWith("task_")
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: (modelData && modelData.completed) ? "check_box" : "check_box_outline_blank"
+                                size: 16
+                                color: (modelData && modelData.completed) ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            }
+                        }
+
                         Column {
                             id: eventContent
 
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
-                            anchors.leftMargin: modelData.id.startsWith("task_") ? 36 : (Theme.spacingS + 6)
-                            anchors.rightMargin: modelData.id.startsWith("task_") ? 64 : Theme.spacingXS
+                            anchors.leftMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 60 : (Theme.spacingS + 6)
+                            anchors.rightMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 64 : Theme.spacingXS
                             spacing: 2
                             visible: !taskItem.isEditing
 
                             StyledText {
                                 width: parent.width
-                                text: modelData.title
+                                text: modelData ? modelData.title : ""
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: modelData.id.startsWith("task_") && modelData.title.startsWith("✓") ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
+                                color: (modelData && modelData.id && modelData.id.startsWith("task_") && modelData.completed) ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
                                 font.weight: Font.Medium
                                 elide: Text.ElideRight
                                 maximumLineCount: 1
@@ -763,7 +783,7 @@ Rectangle {
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                 font.weight: Font.Normal
-                                visible: text !== "" && !modelData.id.startsWith("task_")
+                                visible: text !== "" && modelData && modelData.id && !modelData.id.startsWith("task_")
                             }
                         }
 
@@ -787,24 +807,17 @@ Rectangle {
                                 font.pixelSize: Theme.fontSizeSmall
                                 selectByMouse: true
                                 clip: true
-                                
-                                text: {
-                                    if (!modelData) return "";
-                                    let title = modelData.title;
-                                    if (title.startsWith("✓ ") || title.startsWith("☐ ")) {
-                                        return title.substring(2);
-                                    }
-                                    return title;
-                                }
-                                
+
+                                text: modelData ? modelData.title : ""
+
                                 onAccepted: {
                                     let txt = text.trim();
-                                    if (txt !== "") {
+                                    if (txt !== "" && modelData && modelData.id) {
                                         CalendarService.editTask(modelData.id, txt);
                                     }
                                     taskItem.isEditing = false;
                                 }
-                                
+
                                 Keys.onEscapePressed: {
                                     taskItem.isEditing = false;
                                 }
@@ -816,15 +829,15 @@ Rectangle {
                             id: eventMouseArea
 
                             anchors.fill: parent
-                            anchors.leftMargin: modelData.id.startsWith("task_") ? 36 : 6
-                            anchors.rightMargin: modelData.id.startsWith("task_") ? 64 : 0
+                            anchors.leftMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 32 : 6
+                            anchors.rightMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 64 : 0
                             hoverEnabled: true
-                            cursorShape: (modelData.url || modelData.id.startsWith("task_")) ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            enabled: (modelData.url !== "" || modelData.id.startsWith("task_")) && !taskItem.isEditing
+                            cursorShape: (modelData && (modelData.url || (modelData.id && modelData.id.startsWith("task_")))) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            enabled: modelData && (modelData.url !== "" || (modelData.id && modelData.id.startsWith("task_"))) && !taskItem.isEditing
                             onClicked: {
-                                if (modelData.id.startsWith("task_")) {
+                                if (modelData && modelData.id && modelData.id.startsWith("task_")) {
                                     CalendarService.toggleTask(modelData.id);
-                                } else if (modelData.url && modelData.url !== "") {
+                                } else if (modelData && modelData.url && modelData.url !== "") {
                                     if (Qt.openUrlExternally(modelData.url) === false) {
                                         log.warn("Failed to open URL: " + modelData.url);
                                     } else {
@@ -844,7 +857,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             radius: Theme.cornerRadius
                             color: deleteMouseArea.containsMouse ? (taskItem.isEditing ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(0.9, 0.2, 0.2, 0.15)) : "transparent"
-                            visible: modelData.id.startsWith("task_")
+                            visible: modelData && modelData.id && modelData.id.startsWith("task_")
 
                             DankIcon {
                                 anchors.centerIn: parent
@@ -861,7 +874,7 @@ Rectangle {
                                 onClicked: {
                                     if (taskItem.isEditing) {
                                         taskItem.isEditing = false;
-                                    } else {
+                                    } else if (modelData && modelData.id) {
                                         CalendarService.removeTask(modelData.id);
                                     }
                                 }
@@ -878,7 +891,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             radius: Theme.cornerRadius
                             color: editMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-                            visible: modelData.id.startsWith("task_")
+                            visible: modelData && modelData.id && modelData.id.startsWith("task_")
 
                             DankIcon {
                                 anchors.centerIn: parent
@@ -895,7 +908,7 @@ Rectangle {
                                 onClicked: {
                                     if (taskItem.isEditing) {
                                         let txt = editInput.text.trim();
-                                        if (txt !== "") {
+                                        if (txt !== "" && modelData && modelData.id) {
                                             CalendarService.editTask(modelData.id, txt);
                                         }
                                         taskItem.isEditing = false;
@@ -903,6 +916,7 @@ Rectangle {
                                         taskItem.isEditing = true;
                                     }
                                 }
+                            }
                         }
                     }
                 }

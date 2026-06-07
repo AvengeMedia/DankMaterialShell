@@ -12,11 +12,17 @@ Singleton {
     property bool khalAvailable: true // Always true to enable DMS calendar card UI
     property bool khalInstalled: false // Tracks if khal is actually on the system
     property var eventsByDate: ({})
+    property var khalEventsByDate: ({})
+    property var taskEventsByDate: ({})
+    property var localTasks: ({})
     property bool isLoading: false
     property string lastError: ""
     property date lastStartDate
     property date lastEndDate
     property string khalDateFormat: "MM/dd/yyyy"
+
+    onKhalEventsByDateChanged: mergeEvents()
+    onTaskEventsByDateChanged: mergeEvents()
 
     function checkKhalAvailability() {
         if (!khalCheckProcess.running)
@@ -51,14 +57,7 @@ Singleton {
     }
 
     function loadEvents(startDate, endDate) {
-        // Read local tasks from niri-calendar-todo
-        if (!localTasksProcess.running) {
-            localTasksProcess.running = true;
-        }
-
         if (!root.khalInstalled) {
-            // If khal isn't installed, trigger change notification for local tasks
-            root.eventsByDateChanged();
             return;
         }
         if (eventsProcess.running) {
@@ -87,55 +86,201 @@ Singleton {
         return events.length > 0;
     }
 
-    // Task editing methods using clean, single-line Python scripts (no indentation or external helper file needed!)
+    // In-memory Task CRUD methods
+    function loadTasks(text) {
+        if (!text || text.trim() === "") {
+            root.localTasks = {};
+            root.taskEventsByDate = {};
+            return;
+        }
+        try {
+            root.localTasks = JSON.parse(text);
+            updateTaskEvents();
+        } catch (error) {
+            console.warn("Failed to parse local tasks JSON: " + error.toString());
+        }
+    }
+
+    function saveTasks() {
+        let dir = Quickshell.env("HOME") + "/.config/niri-calendar-todo";
+        Quickshell.execDetached(["mkdir", "-p", dir]);
+        tasksFileView.setText(JSON.stringify(root.localTasks, null, 2));
+    }
+
+    function updateTaskEvents() {
+        let newTaskEvents = {};
+        for (let dateKey in root.localTasks) {
+            let taskList = root.localTasks[dateKey] || [];
+            newTaskEvents[dateKey] = [];
+            for (let task of taskList) {
+                let eventId = "task_" + task.id;
+                let parts = dateKey.split("-");
+                let taskDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+
+                newTaskEvents[dateKey].push({
+                    "id": eventId,
+                    "title": task.text,
+                    "completed": !!task.completed,
+                    "start": taskDate,
+                    "end": taskDate,
+                    "location": "",
+                    "description": "Task from your Planner",
+                    "url": "",
+                    "calendar": "Todo Planner",
+                    "color": "#10B981", // Pastel Green
+                    "allDay": true,
+                    "isMultiDay": false
+                });
+            }
+        }
+        root.taskEventsByDate = newTaskEvents;
+    }
+
     function addTaskForDate(date, text) {
         let dateKey = Qt.formatDate(date, "yyyy-MM-dd");
-        addTaskProcess.command = [
-            "python", "-c",
-            "import json, sys, time, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); os.makedirs(os.path.dirname(path), exist_ok=True); data = json.load(open(path)) if os.path.exists(path) else {}; date, text = sys.argv[1], sys.argv[2]; item = {'id': str(int(time.time()*1000)) + '-dms', 'text': text, 'completed': False}; data.setdefault(date, []).append(item); json.dump(data, open(path, 'w'), indent=2)",
-            dateKey, text
-        ];
-        addTaskProcess.running = true;
+        let tasks = Object.assign({}, root.localTasks);
+        if (!tasks[dateKey]) {
+            tasks[dateKey] = [];
+        }
+        let taskId = (new Date().getTime()) + "-dms";
+        tasks[dateKey].push({
+            "id": taskId,
+            "text": text,
+            "completed": false
+        });
+        root.localTasks = tasks;
+        updateTaskEvents();
+        saveTasks();
     }
 
     function toggleTask(taskId) {
         let cleanId = taskId.replace("task_", "");
-        toggleTaskProcess.command = [
-            "python", "-c",
-            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); [item.update({'completed': not item['completed']}) for v in data.values() for item in v if item['id'] == tid]; json.dump(data, open(path, 'w'), indent=2)",
-            cleanId
-        ];
-        toggleTaskProcess.running = true;
+        let tasks = Object.assign({}, root.localTasks);
+        let updated = false;
+        for (let dateKey in tasks) {
+            let list = tasks[dateKey];
+            for (let item of list) {
+                if (item.id === cleanId) {
+                    item.completed = !item.completed;
+                    updated = true;
+                    break;
+                }
+            }
+            if (updated) break;
+        }
+        if (updated) {
+            root.localTasks = tasks;
+            updateTaskEvents();
+            saveTasks();
+        }
     }
 
     function removeTask(taskId) {
         let cleanId = taskId.replace("task_", "");
-        removeTaskProcess.command = [
-            "python", "-c",
-            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); data = {k: [i for i in v if i['id'] != tid] for k, v in data.items()}; data = {k: v for k, v in data.items() if len(v) > 0}; json.dump(data, open(path, 'w'), indent=2)",
-            cleanId
-        ];
-        removeTaskProcess.running = true;
+        let tasks = Object.assign({}, root.localTasks);
+        let updated = false;
+        for (let dateKey in tasks) {
+            let list = tasks[dateKey];
+            let filtered = list.filter(item => item.id !== cleanId);
+            if (filtered.length !== list.length) {
+                if (filtered.length === 0) {
+                    delete tasks[dateKey];
+                } else {
+                    tasks[dateKey] = filtered;
+                }
+                updated = true;
+                break;
+            }
+        }
+        if (updated) {
+            root.localTasks = tasks;
+            updateTaskEvents();
+            saveTasks();
+        }
     }
 
     function reorderTasksForDate(date, orderedIds) {
-        let dateKey = Qt.formatDate(date, "yyyy-MM-dd")
-        reorderTasksProcess.command = [
-            "python", "-c",
-            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; date = sys.argv[1]; ordered_ids = sys.argv[2].split(',') if sys.argv[2] else []; v = data.get(date, []); id_to_item = {item['id']: item for item in v}; new_v = [id_to_item[tid] for tid in ordered_ids if tid in id_to_item] + [item for item in v if item['id'] not in id_to_item]; data[date] = new_v; json.dump(data, open(path, 'w'), indent=2)",
-            dateKey, orderedIds.join(",")
-        ]
-        reorderTasksProcess.running = true
+        let dateKey = Qt.formatDate(date, "yyyy-MM-dd");
+        let tasks = Object.assign({}, root.localTasks);
+        let v = tasks[dateKey] || [];
+        let idToItem = {};
+        for (let item of v) {
+            idToItem[item.id] = item;
+        }
+        let newV = [];
+        for (let tid of orderedIds) {
+            if (idToItem[tid]) {
+                newV.push(idToItem[tid]);
+            }
+        }
+        let orderedSet = new Set(orderedIds);
+        for (let item of v) {
+            if (!orderedSet.has(item.id)) {
+                newV.push(item);
+            }
+        }
+        tasks[dateKey] = newV;
+        root.localTasks = tasks;
+        updateTaskEvents();
+        saveTasks();
     }
 
     function editTask(taskId, newText) {
-        let cleanId = taskId.replace("task_", "")
-        editTaskProcess.command = [
-            "python", "-c",
-            "import json, sys, os; path = os.path.expanduser('~/.config/niri-calendar-todo/tasks.json'); data = json.load(open(path)) if os.path.exists(path) else {}; tid = sys.argv[1].replace('task_', ''); [item.update({'text': sys.argv[2]}) for v in data.values() for item in v if item['id'] == tid]; json.dump(data, open(path, 'w'), indent=2)",
-            cleanId, newText
-        ]
-        editTaskProcess.running = true
+        let cleanId = taskId.replace("task_", "");
+        let tasks = Object.assign({}, root.localTasks);
+        let updated = false;
+        for (let dateKey in tasks) {
+            let list = tasks[dateKey];
+            for (let item of list) {
+                if (item.id === cleanId) {
+                    item.text = newText;
+                    updated = true;
+                    break;
+                }
+            }
+            if (updated) break;
+        }
+        if (updated) {
+            root.localTasks = tasks;
+            updateTaskEvents();
+            saveTasks();
+        }
+    }
+
+    function mergeEvents() {
+        let merged = {};
+
+        // Merge khal events
+        for (let dateKey in root.khalEventsByDate) {
+            merged[dateKey] = [].concat(root.khalEventsByDate[dateKey]);
+        }
+
+        // Merge task events
+        for (let dateKey in root.taskEventsByDate) {
+            if (!merged[dateKey]) {
+                merged[dateKey] = [];
+            }
+            for (let event of root.taskEventsByDate[dateKey]) {
+                if (!merged[dateKey].some(e => e.id === event.id)) {
+                    merged[dateKey].push(event);
+                }
+            }
+        }
+
+        // Sort events within each date
+        for (let dateKey in merged) {
+            let list = merged[dateKey];
+            for (let idx = 0; idx < list.length; idx++) {
+                list[idx]._origIdx = idx;
+            }
+            list.sort((a, b) => {
+                let diff = a.start.getTime() - b.start.getTime();
+                if (diff !== 0) return diff;
+                return a._origIdx - b._origIdx;
+            });
+        }
+
+        root.eventsByDate = merged;
     }
 
     // Initialize on component completion
@@ -143,138 +288,23 @@ Singleton {
         detectKhalDateFormat();
     }
 
-    // Process for inserting tasks
-    Process {
-        id: addTaskProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true;
-            }
+    // Atomic file view for tasks
+    FileView {
+        id: tasksFileView
+        path: Quickshell.env("HOME") + "/.config/niri-calendar-todo/tasks.json"
+        blockLoading: false
+        blockWrites: false
+        atomicWrites: true
+        watchChanges: true
+        printErrors: false
+
+        onLoaded: {
+            loadTasks(tasksFileView.text());
         }
-    }
 
-    // Process for toggling task state
-    Process {
-        id: toggleTaskProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true;
-            }
-        }
-    }
-
-    // Process for deleting tasks
-    Process {
-        id: removeTaskProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true;
-            }
-        }
-    }
-
-    // Process for reordering tasks
-    Process {
-        id: reorderTasksProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true;
-            }
-        }
-    }
-
-    // Process for editing tasks
-    Process {
-        id: editTaskProcess
-        running: false
-        onExited: exitCode => {
-            if (!localTasksProcess.running) {
-                localTasksProcess.running = true;
-            }
-        }
-    }
-
-    // Process for detecting local tasks
-    Process {
-        id: localTasksProcess
-        command: ["cat", Quickshell.env("HOME") + "/.config/niri-calendar-todo/tasks.json"]
-        running: false
-        
-        stdout: StdioCollector {
-            onStreamFinished: {
-                let text = this.text.trim();
-                if (!text || text === "") {
-                    // Clear task events if file is empty
-                    let newEventsByDate = Object.assign({}, root.eventsByDate);
-                    for (let dateKey in newEventsByDate) {
-                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"));
-                    }
-                    root.eventsByDate = newEventsByDate;
-                    return;
-                }
-                try {
-                    let parsed = JSON.parse(text);
-                    let newEventsByDate = Object.assign({}, root.eventsByDate);
-                    
-                    // Clear any existing task events to prevent duplicates
-                    for (let dateKey in newEventsByDate) {
-                        newEventsByDate[dateKey] = newEventsByDate[dateKey].filter(e => !e.id.startsWith("task_"));
-                    }
-
-                    for (let dateKey in parsed) {
-                        let taskList = parsed[dateKey];
-                        if (!newEventsByDate[dateKey]) {
-                            newEventsByDate[dateKey] = [];
-                        }
-                        
-                        for (let task of taskList) {
-                            let eventId = "task_" + task.id;
-                            if (newEventsByDate[dateKey].some(e => e.id === eventId)) {
-                                continue;
-                            }
-                            
-                            let parts = dateKey.split("-");
-                            let taskDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                            
-                            let eventObj = {
-                                "id": eventId,
-                                "title": (task.completed ? "✓ " : "☐ ") + task.text,
-                                "start": taskDate,
-                                "end": taskDate,
-                                "location": "",
-                                "description": "Task from your Planner",
-                                "url": "",
-                                "calendar": "Todo Planner",
-                                "color": "#10B981", // Pastel Green
-                                "allDay": true,
-                                "isMultiDay": false
-                            };
-                            newEventsByDate[dateKey].push(eventObj);
-                        }
-                    }
-                    
-                    // Re-sort within each date
-                    for (let dateKey in newEventsByDate) {
-                        let list = newEventsByDate[dateKey];
-                        for (let idx = 0; idx < list.length; idx++) {
-                            list[idx]._origIdx = idx;
-                        }
-                        list.sort((a, b) => {
-                            let diff = a.start.getTime() - b.start.getTime();
-                            if (diff !== 0) return diff;
-                            return a._origIdx - b._origIdx;
-                        });
-                    }
-                    
-                    root.eventsByDate = newEventsByDate;
-                } catch (error) {
-                    console.warn("Failed to parse local tasks JSON: " + error.toString());
-                }
-            }
+        onLoadFailed: {
+            root.localTasks = {};
+            root.taskEventsByDate = {};
         }
     }
 
@@ -317,7 +347,6 @@ Singleton {
             if (root.khalInstalled) {
                 loadCurrentMonth();
             } else {
-                // If not installed, load local tasks anyway
                 loadEvents(root.lastStartDate || new Date(), root.lastEndDate || new Date());
             }
         }
@@ -481,23 +510,11 @@ Singleton {
                         }
                     }
                 }
-                // Sort events by start time within each date
-                for (let dateKey in newEventsByDate) {
-                    let list = newEventsByDate[dateKey];
-                    for (let idx = 0; idx < list.length; idx++) {
-                        list[idx]._origIdx = idx;
-                    }
-                    list.sort((a, b) => {
-                        let diff = a.start.getTime() - b.start.getTime();
-                        if (diff !== 0) return diff;
-                        return a._origIdx - b._origIdx;
-                    });
-                }
-                root.eventsByDate = newEventsByDate;
+                root.khalEventsByDate = newEventsByDate;
                 root.lastError = "";
             } catch (error) {
                 root.lastError = "Failed to parse events JSON: " + error.toString();
-                root.eventsByDate = {};
+                root.khalEventsByDate = {};
             }
             // Reset for next run
             eventsProcess.rawOutput = "";
