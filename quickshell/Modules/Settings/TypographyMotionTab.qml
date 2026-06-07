@@ -226,13 +226,13 @@ Item {
                     text: I18n.tr("Monospace Font")
                     description: I18n.tr("Select monospace font for process list and technical displays")
                     options: root.fontsEnumerated ? root.cachedMonoFamilies : ["Default"]
-                    currentValue: SettingsData.monoFontFamily === SettingsData.defaultMonoFontFamily ? "Default" : (SettingsData.monoFontFamily || "Default")
+                    currentValue: SettingsData.monoFontFamily === Theme.defaultMonoFontFamily ? "Default" : (SettingsData.monoFontFamily || "Default")
                     enableFuzzySearch: true
                     popupWidthOffset: 100
                     maxPopupHeight: 400
                     onValueChanged: value => {
                         if (value === "Default")
-                            SettingsData.set("monoFontFamily", SettingsData.defaultMonoFontFamily);
+                            SettingsData.set("monoFontFamily", Theme.defaultMonoFontFamily);
                         else
                             SettingsData.set("monoFontFamily", value);
                     }

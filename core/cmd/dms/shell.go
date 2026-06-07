@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -192,6 +194,7 @@ func runShellInteractive(session bool) {
 		}
 	}()
 
+	ensureFontCache()
 	log.Infof("Spawning quickshell with -p %s", configPath)
 
 	cmd := exec.CommandContext(ctx, "qs", "-p", configPath)
@@ -227,8 +230,10 @@ func runShellInteractive(session bool) {
 
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	tracker := &stderrTracker{parent: os.Stderr}
+	cmd.Stderr = tracker
 
+	startTime := time.Now()
 	if err := cmd.Start(); err != nil {
 		log.Fatalf("Error starting quickshell: %v", err)
 	}
@@ -277,7 +282,9 @@ func runShellInteractive(session bool) {
 			case <-errChan:
 				cancel()
 				os.Remove(socketPath)
-				os.Exit(getProcessExitCode(cmd.ProcessState))
+				exitCode := getProcessExitCode(cmd.ProcessState)
+				logStartupFailure(startTime, exitCode, tracker)
+				os.Exit(exitCode)
 			case <-time.After(500 * time.Millisecond):
 			}
 
@@ -294,7 +301,9 @@ func runShellInteractive(session bool) {
 				cmd.Process.Signal(syscall.SIGTERM)
 			}
 			os.Remove(socketPath)
-			os.Exit(getProcessExitCode(cmd.ProcessState))
+			exitCode := getProcessExitCode(cmd.ProcessState)
+			logStartupFailure(startTime, exitCode, tracker)
+			os.Exit(exitCode)
 		}
 	}
 }
@@ -434,6 +443,7 @@ func runShellDaemon(session bool) {
 		}
 	}()
 
+	ensureFontCache()
 	log.Infof("Spawning quickshell with -p %s", configPath)
 
 	cmd := exec.CommandContext(ctx, "qs", "-p", configPath)
@@ -478,8 +488,10 @@ func runShellDaemon(session bool) {
 
 	cmd.Stdin = devNull
 	cmd.Stdout = devNull
-	cmd.Stderr = devNull
+	tracker := &stderrTracker{parent: devNull}
+	cmd.Stderr = tracker
 
+	startTime := time.Now()
 	if err := cmd.Start(); err != nil {
 		log.Fatalf("Error starting daemon: %v", err)
 	}
@@ -528,7 +540,9 @@ func runShellDaemon(session bool) {
 			case <-errChan:
 				cancel()
 				os.Remove(socketPath)
-				os.Exit(getProcessExitCode(cmd.ProcessState))
+				exitCode := getProcessExitCode(cmd.ProcessState)
+				logStartupFailure(startTime, exitCode, tracker)
+				os.Exit(exitCode)
 			case <-time.After(500 * time.Millisecond):
 			}
 
@@ -543,7 +557,9 @@ func runShellDaemon(session bool) {
 				cmd.Process.Signal(syscall.SIGTERM)
 			}
 			os.Remove(socketPath)
-			os.Exit(getProcessExitCode(cmd.ProcessState))
+			exitCode := getProcessExitCode(cmd.ProcessState)
+			logStartupFailure(startTime, exitCode, tracker)
+			os.Exit(exitCode)
 		}
 	}
 }
@@ -747,4 +763,134 @@ func printIPCHelp() {
 		slices.Sort(funcNames)
 		fmt.Printf("  %-16s %s\n", targetName, strings.Join(funcNames, ", "))
 	}
+}
+
+// ensureFontCache rebuilds the fontconfig cache if user-configured fonts are missing while skipping defaults
+func ensureFontCache() {
+	if _, err := exec.LookPath("fc-list"); err != nil {
+		return
+	}
+	if _, err := exec.LookPath("fc-cache"); err != nil {
+		return
+	}
+
+	var fontsToCheck []string
+
+	if configDir, err := os.UserConfigDir(); err == nil {
+		settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
+		if data, err := os.ReadFile(settingsPath); err == nil {
+			var settings struct {
+				FontFamily     string `json:"fontFamily"`
+				MonoFontFamily string `json:"monoFontFamily"`
+			}
+			if err := json.Unmarshal(data, &settings); err == nil {
+				if settings.FontFamily != "" && settings.FontFamily != "Inter Variable" {
+					fontsToCheck = append(fontsToCheck, settings.FontFamily)
+				}
+				if settings.MonoFontFamily != "" && settings.MonoFontFamily != "Fira Code" {
+					fontsToCheck = append(fontsToCheck, settings.MonoFontFamily)
+				}
+			}
+		}
+	}
+
+	if len(fontsToCheck) == 0 {
+		return
+	}
+
+	output, err := exec.Command("fc-list", ":", "family").Output()
+	if err != nil || len(strings.TrimSpace(string(output))) == 0 {
+		log.Warnf("Font cache appears empty or corrupt, rebuilding...")
+		rebuildFontCache()
+		return
+	}
+
+	cacheFonts := strings.ToLower(string(output))
+	var missing []string
+	for _, font := range fontsToCheck {
+		if !fontInCache(strings.ToLower(font), cacheFonts) {
+			missing = append(missing, font)
+		}
+	}
+
+	if len(missing) > 0 {
+		log.Warnf("Font(s) not found in cache: %s — rebuilding...", strings.Join(missing, ", "))
+		rebuildFontCache()
+	}
+}
+
+func fontInCache(target, cache string) bool {
+	for _, line := range strings.Split(cache, "\n") {
+		for _, fam := range strings.Split(strings.TrimSpace(line), ",") {
+			if strings.TrimSpace(fam) == target {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func rebuildFontCache() {
+	cmd := exec.Command("fc-cache", "-f")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		log.Warnf("Failed to rebuild font cache: %v\n%s", err, string(output))
+	} else {
+		log.Infof("Font cache rebuilt successfully")
+	}
+}
+
+type stderrTracker struct {
+	mu     sync.Mutex
+	buf    strings.Builder
+	parent io.Writer
+}
+
+func (s *stderrTracker) Write(p []byte) (n int, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.buf.Len() < 8192 {
+		s.buf.Write(p)
+	}
+	if s.parent != nil {
+		return s.parent.Write(p)
+	}
+	return len(p), nil
+}
+
+func (s *stderrTracker) String() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.buf.String()
+}
+
+// logStartupFailure logs diagnostic advice if qs crashes within 5s of launch.
+func logStartupFailure(startTime time.Time, exitCode int, tracker *stderrTracker) {
+	if time.Since(startTime) >= 5*time.Second || exitCode == 0 || exitCode > 128 {
+		return
+	}
+	if containsFontCrashSignature(tracker.String()) {
+		log.Errorf("DMS startup failed due to a potential font/rendering crash. Try running 'fc-cache -fv' and restarting DMS.")
+	} else {
+		log.Errorf("DMS startup failed (exit code %d). Run 'dms doctor' for more diagnostics.", exitCode)
+	}
+}
+
+func containsFontCrashSignature(logStr string) bool {
+	logStr = strings.ToLower(logStr)
+	signatures := []string{
+		"fontconfig",
+		"freetype",
+		"ft_load_glyph",
+		"ft_face",
+		"fc-list",
+		"fc-cache",
+		"glyph",
+		"typeface",
+	}
+	for _, sig := range signatures {
+		if strings.Contains(logStr, sig) {
+			return true
+		}
+	}
+	return false
 }

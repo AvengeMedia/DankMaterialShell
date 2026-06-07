@@ -594,6 +594,7 @@ function getValidKeys() {
 
 function set(root, key, value, saveFn, hooks) {
     if (!(key in SPEC)) return;
+    if (value === undefined || value === null) value = SPEC[key].def;
     root[key] = value;
     var hookName = SPEC[key].onChange;
     if (hookName && hooks && hooks[hookName]) {
