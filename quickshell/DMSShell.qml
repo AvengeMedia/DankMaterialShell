@@ -1140,6 +1140,7 @@ Item {
             id: powerMenuModal
 
             onPowerActionRequested: (action, title, message) => {
+                PopoutService.closeControlCenter();
                 switch (action) {
                 case "logout":
                     SessionService.logout();
@@ -1160,6 +1161,7 @@ Item {
             }
 
             onLockRequested: {
+                PopoutService.closeControlCenter();
                 lock.activate();
             }
 
