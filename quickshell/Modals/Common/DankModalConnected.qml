@@ -105,21 +105,26 @@ Item {
 
     property bool animationsEnabled: true
 
-    property string _chromeClaimId: ""
     property bool _fullSyncPending: false
-
-    function _nextChromeClaimId() {
-        return layerNamespace + ":modal:" + (new Date()).getTime() + ":" + Math.floor(Math.random() * 1000);
-    }
 
     function _currentScreenName() {
         return effectiveScreen ? effectiveScreen.name : "";
     }
 
-    function _publishModalChromeState(isClaim) {
-        const screenName = _currentScreenName();
-        if (!screenName)
-            return;
+    ConnectedModalChrome {
+        id: modalChrome
+        modalHandle: root.modalHandle
+        claimPrefix: root.layerNamespace + ":modal"
+        screenName: root._currentScreenName()
+        enabled: root.frameOwnsConnectedChrome
+        active: root.shouldBeVisible
+        presented: root.shouldBeVisible || contentWindow.visible
+        dockBlocked: root._dockBlocksEmergence
+        dockSide: root.resolvedConnectedBarSide
+        onRecoveryRequested: root._queueFullSync()
+    }
+
+    function _publishModalChromeState() {
         const state = {
             "visible": shouldBeVisible || contentWindow.visible,
             "barSide": resolvedConnectedBarSide,
@@ -132,25 +137,11 @@ Item {
             "omitStartConnector": false,
             "omitEndConnector": false
         };
-        if (isClaim)
-            ConnectedModeState.claimModalState(screenName, state, _chromeClaimId);
-        else
-            ConnectedModeState.updateModalState(screenName, state, _chromeClaimId);
+        return modalChrome.publish(state);
     }
 
     function _syncModalChromeState() {
-        if (!frameOwnsConnectedChrome) {
-            _releaseModalChrome();
-            return;
-        }
-        const isClaim = !_chromeClaimId;
-        if (!_chromeClaimId)
-            _chromeClaimId = _nextChromeClaimId();
-        _publishModalChromeState(isClaim);
-        if (_dockBlocksEmergence && (shouldBeVisible || contentWindow.visible))
-            ConnectedModeState.requestDockRetract(_chromeClaimId, _currentScreenName(), resolvedConnectedBarSide);
-        else
-            ConnectedModeState.releaseDockRetract(_chromeClaimId);
+        _publishModalChromeState();
     }
 
     property bool _animSyncQueued: false
@@ -187,32 +178,21 @@ Item {
     }
 
     function _syncModalAnim() {
-        if (!frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!frameOwnsConnectedChrome)
             return;
-        const screenName = _currentScreenName();
-        if (!screenName || !modalContainer)
+        if (!modalContainer)
             return;
-        ConnectedModeState.setModalAnim(screenName, modalContainer.animX, modalContainer.animY, _chromeClaimId);
+        modalChrome.updateAnim(modalContainer.animX, modalContainer.animY);
     }
 
     function _syncModalBody() {
-        if (!frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!frameOwnsConnectedChrome)
             return;
-        const screenName = _currentScreenName();
-        if (!screenName)
-            return;
-        ConnectedModeState.setModalBody(screenName, alignedX, alignedY, alignedWidth, alignedHeight, _chromeClaimId);
+        modalChrome.updateBody(alignedX, alignedY, alignedWidth, alignedHeight);
     }
 
     function _releaseModalChrome() {
-        if (!_chromeClaimId)
-            return;
-        ConnectedModeState.releaseDockRetract(_chromeClaimId);
-        const claimId = _chromeClaimId;
-        _chromeClaimId = "";
-        const screenName = _currentScreenName();
-        if (screenName)
-            ConnectedModeState.clearModalState(screenName, claimId);
+        modalChrome.release();
     }
 
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
@@ -222,8 +202,6 @@ Item {
     onAlignedYChanged: _queueBodySync()
     onAlignedWidthChanged: _queueBodySync()
     onAlignedHeightChanged: _queueBodySync()
-
-    Component.onDestruction: _releaseModalChrome()
 
     Connections {
         target: contentWindow
@@ -248,12 +226,12 @@ Item {
                 clickCatcher.screen = focusedScreen;
         }
 
+        ModalManager.openModal(modalHandle);
         if (Theme.isDirectionalEffect || root.useBackground) {
             if (!useSingleWindow)
                 clickCatcher.visible = true;
             contentWindow.visible = true;
         }
-        ModalManager.openModal(modalHandle);
 
         Qt.callLater(() => {
             animationsEnabled = true;
@@ -317,8 +295,12 @@ Item {
                     break;
                 }
             }
-            if (screenStillExists)
+            if (screenStillExists) {
+                if (root.shouldBeVisible)
+                    root._queueFullSync();
                 return;
+            }
+            root._releaseModalChrome();
             const newScreen = CompositorService.getFocusedScreen();
             if (newScreen) {
                 contentWindow.screen = newScreen;

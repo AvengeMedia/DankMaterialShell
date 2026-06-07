@@ -34,6 +34,11 @@ Item {
         targetWindow.BackgroundEffect.blurRegion = _active ? blurRegion : null;
     }
 
+    function _clear() {
+        if (targetWindow)
+            targetWindow.BackgroundEffect.blurRegion = null;
+    }
+
     // Force BackgroundEffect to re-publish the blur region on the current wl_surface.
     // Clearing first bypasses Quickshell's same-Region dedup in BackgroundEffect::setBlurRegion,
     // setting pendingBlurRegion=true so the next polish actually ships the region — needed
@@ -45,20 +50,56 @@ Item {
         targetWindow.BackgroundEffect.blurRegion = _active ? blurRegion : null;
     }
 
-    on_ActiveChanged: _apply()
-    onTargetWindowChanged: _apply()
+    function _scheduleLifecycleKick() {
+        lifecycleKickAction.restart();
+    }
+
+    function _runLifecycleKick() {
+        if (!targetWindow)
+            return;
+        if (targetWindow.visible)
+            kick();
+        else
+            _apply();
+    }
+
+    on_ActiveChanged: {
+        if (_active)
+            _scheduleLifecycleKick();
+        else
+            _clear();
+    }
+    onTargetWindowChanged: {
+        lifecycleKickAction.cancel();
+        _apply();
+    }
+
+    DeferredAction {
+        id: lifecycleKickAction
+        onTriggered: root._runLifecycleKick()
+    }
 
     Connections {
         target: root.targetWindow ?? null
         ignoreUnknownSignals: true
         function onVisibleChanged() {
             if (root.targetWindow && root.targetWindow.visible)
-                root._apply();
+                root._scheduleLifecycleKick();
+            else
+                root._clear();
+        }
+        function onResourcesLost() {
+            lifecycleKickAction.cancel();
+            root._clear();
+        }
+        function onWindowConnected() {
+            root._scheduleLifecycleKick();
         }
     }
 
-    Component.onCompleted: _apply()
+    Component.onCompleted: _scheduleLifecycleKick()
     Component.onDestruction: {
+        lifecycleKickAction.cancel();
         if (targetWindow)
             targetWindow.BackgroundEffect.blurRegion = null;
     }

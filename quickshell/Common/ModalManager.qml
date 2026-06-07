@@ -26,6 +26,11 @@ Singleton {
         });
     }
 
+    function isCurrentModal(modal, screenName) {
+        const name = screenName || modal?.effectiveScreen?.name || "unknown";
+        return currentModalsByScreen[name] === modal;
+    }
+
     function closeModal(modal) {
         const screenName = modal.effectiveScreen?.name ?? "unknown";
         if (currentModalsByScreen[screenName] === modal) {

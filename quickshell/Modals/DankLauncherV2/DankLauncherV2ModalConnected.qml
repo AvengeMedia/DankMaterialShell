@@ -232,21 +232,26 @@ Item {
         onTriggered: root._flushSync()
     }
 
-    property string _chromeClaimId: ""
     property bool _fullSyncPending: false
-
-    function _nextChromeClaimId() {
-        return "dms:launcher-v2:" + (new Date()).getTime() + ":" + Math.floor(Math.random() * 1000);
-    }
 
     function _currentScreenName() {
         return effectiveScreen ? effectiveScreen.name : "";
     }
 
-    function _publishModalChromeState(isClaim) {
-        const screenName = _currentScreenName();
-        if (!screenName)
-            return;
+    ConnectedModalChrome {
+        id: modalChrome
+        modalHandle: root.modalHandle
+        claimPrefix: "dms:launcher-v2"
+        screenName: root._currentScreenName()
+        enabled: root.frameOwnsConnectedChrome
+        active: root.spotlightOpen
+        presented: root.spotlightOpen || contentWindow.visible
+        dockBlocked: root._dockBlocksEmergence
+        dockSide: root.resolvedConnectedBarSide
+        onRecoveryRequested: root._queueFullSync()
+    }
+
+    function _publishModalChromeState() {
         const state = {
             "visible": spotlightOpen || contentWindow.visible,
             "barSide": resolvedConnectedBarSide,
@@ -259,25 +264,11 @@ Item {
             "omitStartConnector": false,
             "omitEndConnector": false
         };
-        if (isClaim)
-            ConnectedModeState.claimModalState(screenName, state, _chromeClaimId);
-        else
-            ConnectedModeState.updateModalState(screenName, state, _chromeClaimId);
+        return modalChrome.publish(state);
     }
 
     function _syncModalChromeState() {
-        if (!frameOwnsConnectedChrome) {
-            _releaseModalChrome();
-            return;
-        }
-        const isClaim = !_chromeClaimId;
-        if (!_chromeClaimId)
-            _chromeClaimId = _nextChromeClaimId();
-        _publishModalChromeState(isClaim);
-        if (_dockBlocksEmergence && (spotlightOpen || contentWindow.visible))
-            ConnectedModeState.requestDockRetract(_chromeClaimId, _currentScreenName(), resolvedConnectedBarSide);
-        else
-            ConnectedModeState.releaseDockRetract(_chromeClaimId);
+        _publishModalChromeState();
     }
 
     property bool _animSyncQueued: false
@@ -314,32 +305,21 @@ Item {
     }
 
     function _syncModalAnim() {
-        if (!frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!frameOwnsConnectedChrome)
             return;
-        const screenName = _currentScreenName();
-        if (!screenName || !contentContainer)
+        if (!contentContainer)
             return;
-        ConnectedModeState.setModalAnim(screenName, contentContainer.animX, contentContainer.animY, _chromeClaimId);
+        modalChrome.updateAnim(contentContainer.animX, contentContainer.animY);
     }
 
     function _syncModalBody() {
-        if (!frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!frameOwnsConnectedChrome)
             return;
-        const screenName = _currentScreenName();
-        if (!screenName)
-            return;
-        ConnectedModeState.setModalBody(screenName, _connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight, _chromeClaimId);
+        modalChrome.updateBody(_connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight);
     }
 
     function _releaseModalChrome() {
-        if (!_chromeClaimId)
-            return;
-        ConnectedModeState.releaseDockRetract(_chromeClaimId);
-        const claimId = _chromeClaimId;
-        _chromeClaimId = "";
-        const screenName = _currentScreenName();
-        if (screenName)
-            ConnectedModeState.clearModalState(screenName, claimId);
+        modalChrome.release();
     }
 
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
@@ -350,8 +330,6 @@ Item {
     onAlignedYChanged: _queueBodySync()
     onAlignedWidthChanged: _queueBodySync()
     onAlignedHeightChanged: _queueBodySync()
-
-    Component.onDestruction: _releaseModalChrome()
 
     Connections {
         target: contentWindow
@@ -579,13 +557,17 @@ Item {
                 }
             }
 
-            if (!needsReset)
+            if (!needsReset) {
+                if (root.spotlightOpen)
+                    root._queueFullSync();
                 return;
+            }
 
             const newScreen = CompositorService.getFocusedScreen() ?? Quickshell.screens[0];
             if (!newScreen)
                 return;
 
+            root._releaseModalChrome();
             root._windowEnabled = false;
             backgroundWindow.screen = newScreen;
             contentWindow.screen = newScreen;

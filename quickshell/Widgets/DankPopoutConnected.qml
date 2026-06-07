@@ -220,14 +220,20 @@ Item {
 
     function _publishConnectedChromeState(forceClaim, visibleOverride) {
         if (!root.frameOwnsConnectedChrome || !root.screen || !_chromeClaimId)
-            return;
+            return false;
+
+        const screenName = root.screen.name;
+        const isCurrent = PopoutManager.isCurrentPopout(popoutHandle, screenName);
+        if (!ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
+            if (!isCurrent)
+                return false;
+            forceClaim = true;
+        } else if (forceClaim && !isCurrent) {
+            return false;
+        }
 
         const state = _connectedChromeState(visibleOverride);
-        if (forceClaim || !ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
-            ConnectedModeState.claimPopout(_chromeClaimId, state);
-        } else {
-            ConnectedModeState.updatePopout(_chromeClaimId, state);
-        }
+        return forceClaim ? ConnectedModeState.claimPopout(_chromeClaimId, state) : ConnectedModeState.updatePopout(_chromeClaimId, state);
     }
 
     function _releaseConnectedChromeState() {
@@ -252,9 +258,12 @@ Item {
         }
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        if (!_chromeClaimId)
+        if (!_chromeClaimId) {
+            if (!PopoutManager.isCurrentPopout(popoutHandle, root.screen.name))
+                return;
             _chromeClaimId = _nextChromeClaimId();
-        _publishConnectedChromeState(contentWindow.visible && !ConnectedModeState.hasPopoutOwner(_chromeClaimId));
+        }
+        _publishConnectedChromeState(!ConnectedModeState.hasPopoutOwner(_chromeClaimId));
     }
 
     function _syncPopoutAnim(axis) {
@@ -267,6 +276,11 @@ Item {
         const syncY = axis === "y" && (barSide === "top" || barSide === "bottom");
         if (!syncX && !syncY)
             return;
+        if (!ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
+            if (root.screen && PopoutManager.isCurrentPopout(popoutHandle, root.screen.name))
+                _queueFullSync();
+            return;
+        }
         ConnectedModeState.setPopoutAnim(_chromeClaimId, syncX ? _connectedChromeAnimX() : undefined, syncY ? _connectedChromeAnimY() : undefined);
     }
 
@@ -275,6 +289,11 @@ Item {
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
+        if (!ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
+            if (root.screen && PopoutManager.isCurrentPopout(popoutHandle, root.screen.name))
+                _queueFullSync();
+            return;
+        }
         ConnectedModeState.setPopoutBody(_chromeClaimId, root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
     }
 
@@ -326,10 +345,13 @@ Item {
     Connections {
         target: contentWindow
         function onVisibleChanged() {
-            if (contentWindow.visible)
+            if (contentWindow.visible) {
+                if (!root._chromeClaimId)
+                    root._chromeClaimId = root._nextChromeClaimId();
                 root._publishConnectedChromeState(true);
-            else
+            } else {
                 root._releaseConnectedChromeState();
+            }
         }
     }
 
@@ -337,7 +359,7 @@ Item {
         target: SettingsData
         function onConnectedFrameModeActiveChanged() {
             if (root.frameOwnsConnectedChrome) {
-                if (contentWindow.visible || root.shouldBeVisible) {
+                if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name)) {
                     if (!root._chromeClaimId)
                         root._chromeClaimId = root._nextChromeClaimId();
                     root._publishConnectedChromeState(true);
@@ -348,6 +370,22 @@ Item {
         }
         function onFrameCloseGapsChanged() {
             root._syncPopoutChromeState();
+        }
+    }
+
+    Connections {
+        target: ConnectedModeState
+        function onPopoutOwnerIdChanged() {
+            if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name) && !ConnectedModeState.hasPopoutOwner(root._chromeClaimId))
+                root._queueFullSync();
+        }
+    }
+
+    Connections {
+        target: PopoutManager
+        function onPopoutChanged() {
+            if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name))
+                root._queueFullSync();
         }
     }
 
@@ -373,6 +411,7 @@ Item {
             contentWindow.visible = false;
         }
         _lastOpenedScreen = screen;
+        PopoutManager.showPopout(popoutHandle);
 
         if (contentContainer) {
             // Snap morph closed only on a fresh open; on screen-change re-open we stay at 1
@@ -408,7 +447,6 @@ Item {
         animationsEnabled = true;
         shouldBeVisible = true;
         if (shouldBeVisible && screen) {
-            PopoutManager.showPopout(popoutHandle);
             opened();
         }
     }
@@ -440,6 +478,8 @@ Item {
             }
             if (!screenStillExists) {
                 close();
+            } else {
+                root._queueFullSync();
             }
         }
     }

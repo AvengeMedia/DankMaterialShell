@@ -45,6 +45,7 @@ PanelWindow {
     readonly property int _windowRegionWidth: win._regionInt(win.width)
     readonly property int _windowRegionHeight: win._regionInt(win.height)
     readonly property string _screenName: win.targetScreen ? win.targetScreen.name : ""
+    readonly property int _surfaceRevision: Number(ConnectedModeState.surfaceRevisions[win._screenName] || 0)
     readonly property var _dockState: ConnectedModeState.dockStates[win._screenName] || ConnectedModeState.emptyDockState
     readonly property var _dockSlide: ConnectedModeState.dockSlides[win._screenName] || ({
             "x": 0,
@@ -150,6 +151,8 @@ PanelWindow {
     readonly property real _surfaceRadius: Theme.connectedSurfaceRadius
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
     readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
+    property bool _surfaceRefreshNeedsLayerRecreate: false
+    property bool _surfaceLayerRecoveryActive: false
 
     function _regionInt(value) {
         return Math.max(0, Math.round(Theme.px(value, win._dpr)));
@@ -1187,12 +1190,14 @@ PanelWindow {
         return (arcCorner === "topLeft" || arcCorner === "topRight") ? connectorY - r : connectorY + connectorHeight - r;
     }
 
-    function _buildBlur() {
+    function _buildBlur(forceRepublish) {
         try {
             if (!BlurService.enabled || !SettingsData.frameBlurEnabled || !win._frameActive || !win.visible) {
                 win.BackgroundEffect.blurRegion = null;
                 return;
             }
+            if (forceRepublish)
+                win.BackgroundEffect.blurRegion = null;
             win.BackgroundEffect.blurRegion = _staticBlurRegion;
         } catch (e) {
             win.log.warn("Failed to set blur region:", e);
@@ -1216,7 +1221,54 @@ PanelWindow {
         blurRebuildAction.schedule();
     }
     function _runBlurRebuild() {
-        _buildBlur();
+        _buildBlur(false);
+    }
+
+    function _republishFrameBlur() {
+        _buildBlur(true);
+    }
+
+    function _requestContentUpdate() {
+        try {
+            if (win.contentItem && typeof win.contentItem.update === "function")
+                win.contentItem.update();
+        } catch (e) {}
+    }
+
+    function _scheduleSurfaceRefresh(recreateLayer) {
+        if (recreateLayer)
+            _surfaceRefreshNeedsLayerRecreate = true;
+        surfaceRefreshAction.restart();
+    }
+
+    function _runSurfaceRefresh() {
+        if (!win.visible)
+            return;
+        if (_surfaceRefreshNeedsLayerRecreate) {
+            _surfaceRefreshNeedsLayerRecreate = false;
+            if (win._connectedActive && !win._disableLayer && (Theme.elevationEnabled || win._surfaceOpacity < 1)) {
+                _surfaceLayerRecoveryActive = true;
+                surfaceLayerRestoreAction.restart();
+            }
+        }
+        _requestContentUpdate();
+        _republishFrameBlur();
+    }
+
+    function _finishSurfaceLayerRecovery() {
+        _surfaceLayerRecoveryActive = false;
+        _requestContentUpdate();
+        _republishFrameBlur();
+    }
+
+    DeferredAction {
+        id: surfaceRefreshAction
+        onTriggered: win._runSurfaceRefresh()
+    }
+
+    DeferredAction {
+        id: surfaceLayerRestoreAction
+        onTriggered: win._finishSurfaceLayerRecovery()
     }
 
     Connections {
@@ -1263,14 +1315,41 @@ PanelWindow {
     onVisibleChanged: {
         if (visible) {
             win._scheduleBlurRebuild();
+            win._scheduleSurfaceRefresh(false);
         } else {
+            surfaceRefreshAction.cancel();
+            surfaceLayerRestoreAction.cancel();
+            _surfaceLayerRecoveryActive = false;
+            _surfaceRefreshNeedsLayerRecreate = false;
             _teardownBlur();
         }
     }
 
-    Component.onCompleted: win._scheduleBlurRebuild()
+    on_SurfaceRevisionChanged: win._scheduleSurfaceRefresh(false)
+
+    onResourcesLost: {
+        blurRebuildAction.cancel();
+        surfaceRefreshAction.cancel();
+        surfaceLayerRestoreAction.cancel();
+        _surfaceRefreshNeedsLayerRecreate = true;
+        if (win._connectedActive && !win._disableLayer && (Theme.elevationEnabled || win._surfaceOpacity < 1))
+            _surfaceLayerRecoveryActive = true;
+        win._teardownBlur();
+    }
+
+    onWindowConnected: {
+        win._scheduleSurfaceRefresh(true);
+        win._scheduleBlurRebuild();
+    }
+
+    Component.onCompleted: {
+        win._scheduleBlurRebuild();
+        win._scheduleSurfaceRefresh(false);
+    }
     Component.onDestruction: {
         blurRebuildAction.cancel();
+        surfaceRefreshAction.cancel();
+        surfaceLayerRestoreAction.cancel();
         win._teardownBlur();
     }
 
@@ -1290,7 +1369,7 @@ PanelWindow {
         visible: win._connectedActive
         opacity: win._surfaceOpacity
         // Skip FBO when disabled, invisible, or when neither elevation nor alpha blend is active
-        layer.enabled: win._connectedActive && !win._disableLayer && (Theme.elevationEnabled || win._surfaceOpacity < 1)
+        layer.enabled: win._connectedActive && !win._surfaceLayerRecoveryActive && !win._disableLayer && (Theme.elevationEnabled || win._surfaceOpacity < 1)
         layer.smooth: false
 
         layer.effect: MultiEffect {

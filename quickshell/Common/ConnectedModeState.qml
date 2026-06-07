@@ -38,6 +38,10 @@ Singleton {
     // Dock slide offsets — hot-path updates separated from full geometry state
     property var dockSlides: ({})
 
+    // Surfaces are keyed by screen.name. FrameWindow watches to refresh connected chrome
+    // after claim/release boundaries without tracking each animation frame
+    property var surfaceRevisions: ({})
+
     function _cloneDict(src) {
         const next = {};
         for (const k in src)
@@ -45,16 +49,31 @@ Singleton {
         return next;
     }
 
+    function _bumpSurfaceRevision(screenName) {
+        if (!screenName)
+            return;
+        const next = _cloneDict(surfaceRevisions);
+        next[screenName] = Number(next[screenName] || 0) + 1;
+        surfaceRevisions = next;
+    }
+
     function hasPopoutOwner(claimId) {
         return !!claimId && popoutOwnerId === claimId;
     }
 
     function claimPopout(claimId, state) {
-        if (!claimId)
+        if (!claimId || !state)
             return false;
 
+        const previousScreen = popoutScreen;
         popoutOwnerId = claimId;
-        return updatePopout(claimId, state);
+        const ok = updatePopout(claimId, state);
+        if (ok) {
+            if (previousScreen && previousScreen !== popoutScreen)
+                _bumpSurfaceRevision(previousScreen);
+            _bumpSurfaceRevision(popoutScreen);
+        }
+        return ok;
     }
 
     function updatePopout(claimId, state) {
@@ -91,6 +110,7 @@ Singleton {
         if (!hasPopoutOwner(claimId))
             return false;
 
+        const releasedScreen = popoutScreen;
         popoutOwnerId = "";
         popoutVisible = false;
         popoutBarSide = "top";
@@ -103,6 +123,7 @@ Singleton {
         popoutScreen = "";
         popoutOmitStartConnector = false;
         popoutOmitEndConnector = false;
+        _bumpSurfaceRevision(releasedScreen);
         return true;
     }
 
@@ -174,10 +195,13 @@ Singleton {
         const normalized = _normalizeDockState(state);
         if (_sameDockState(dockStates[screenName], normalized))
             return true;
+        const previous = dockStates[screenName] || emptyDockState;
 
         const next = _cloneDict(dockStates);
         next[screenName] = normalized;
         dockStates = next;
+        if (!!previous.reveal !== !!normalized.reveal)
+            _bumpSurfaceRevision(screenName);
         return true;
     }
 
@@ -195,6 +219,7 @@ Singleton {
             delete nextSlides[screenName];
             dockSlides = nextSlides;
         }
+        _bumpSurfaceRevision(screenName);
         return true;
     }
 
@@ -260,10 +285,13 @@ Singleton {
         const normalized = _normalizeNotificationState(state);
         if (_sameNotificationState(notificationStates[screenName], normalized))
             return true;
+        const previous = notificationStates[screenName] || emptyNotificationState;
 
         const next = _cloneDict(notificationStates);
         next[screenName] = normalized;
         notificationStates = next;
+        if (!!previous.visible !== !!normalized.visible)
+            _bumpSurfaceRevision(screenName);
         return true;
     }
 
@@ -274,6 +302,7 @@ Singleton {
         const next = _cloneDict(notificationStates);
         delete next[screenName];
         notificationStates = next;
+        _bumpSurfaceRevision(screenName);
         return true;
     }
 
@@ -330,18 +359,17 @@ Singleton {
             modalOwners = nextOwners;
         }
         const normalized = _normalizeModalState(state);
-        if (_sameModalState(modalStates[screenName], normalized))
-            return true;
         const next = _cloneDict(modalStates);
         next[screenName] = normalized;
         modalStates = next;
+        _bumpSurfaceRevision(screenName);
         return true;
     }
 
     function updateModalState(screenName, state, ownerId) {
         if (!screenName || !state)
             return false;
-        if (ownerId && modalOwners[screenName] && modalOwners[screenName] !== ownerId)
+        if (ownerId && modalOwners[screenName] !== ownerId)
             return false;
         const normalized = _normalizeModalState(state);
         if (_sameModalState(modalStates[screenName], normalized))
@@ -352,30 +380,50 @@ Singleton {
         return true;
     }
 
+    function hasModalOwner(screenName, ownerId) {
+        return !!screenName && !!ownerId && modalOwners[screenName] === ownerId;
+    }
+
+    function ensureModalState(screenName, state, ownerId) {
+        if (!screenName || !state || !ownerId)
+            return false;
+        const currentOwner = modalOwners[screenName] || "";
+        if (currentOwner && currentOwner !== ownerId)
+            return false;
+        if (!currentOwner)
+            return claimModalState(screenName, state, ownerId);
+        return updateModalState(screenName, state, ownerId);
+    }
+
     function setModalState(screenName, state) {
         return updateModalState(screenName, state, null);
     }
 
     function clearModalState(screenName, ownerId) {
-        if (!screenName || !modalStates[screenName])
+        if (!screenName)
             return false;
-        if (ownerId && modalOwners[screenName] && modalOwners[screenName] !== ownerId)
+        if (ownerId && modalOwners[screenName] !== ownerId)
+            return false;
+        if (!modalStates[screenName] && !modalOwners[screenName])
             return false;
 
-        const next = _cloneDict(modalStates);
-        delete next[screenName];
-        modalStates = next;
+        if (modalStates[screenName]) {
+            const next = _cloneDict(modalStates);
+            delete next[screenName];
+            modalStates = next;
+        }
 
         if (modalOwners[screenName]) {
             const nextOwners = _cloneDict(modalOwners);
             delete nextOwners[screenName];
             modalOwners = nextOwners;
         }
+        _bumpSurfaceRevision(screenName);
         return true;
     }
 
     function setModalAnim(screenName, animX, animY, ownerId) {
-        if (ownerId && modalOwners[screenName] && modalOwners[screenName] !== ownerId)
+        if (ownerId && modalOwners[screenName] !== ownerId)
             return false;
         const cur = screenName ? modalStates[screenName] : null;
         if (!cur)
@@ -394,7 +442,7 @@ Singleton {
     }
 
     function setModalBody(screenName, bodyX, bodyY, bodyW, bodyH, ownerId) {
-        if (ownerId && modalOwners[screenName] && modalOwners[screenName] !== ownerId)
+        if (ownerId && modalOwners[screenName] !== ownerId)
             return false;
         const cur = screenName ? modalStates[screenName] : null;
         if (!cur)
@@ -492,6 +540,9 @@ Singleton {
         const nextModalOwners = pruneKeyed(modalOwners);
         if (nextModalOwners !== null)
             modalOwners = nextModalOwners;
+        const nextSurfaceRevisions = pruneKeyed(surfaceRevisions);
+        if (nextSurfaceRevisions !== null)
+            surfaceRevisions = nextSurfaceRevisions;
 
         let retractChanged = false;
         const nextRetract = {};
@@ -512,7 +563,12 @@ Singleton {
     Connections {
         target: Quickshell
         function onScreensChanged() {
-            root._pruneToLiveScreens();
+            screenPruneAction.schedule();
         }
+    }
+
+    DeferredAction {
+        id: screenPruneAction
+        onTriggered: root._pruneToLiveScreens()
     }
 }
