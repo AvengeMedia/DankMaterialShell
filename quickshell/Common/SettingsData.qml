@@ -263,6 +263,8 @@ Singleton {
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property string frameMode: "connected"
     onFrameModeChanged: saveSettings()
+    property int frameBarEndInset: 0
+    onFrameBarEndInsetChanged: saveSettings()
     property var connectedFrameBarStyleBackups: ({})
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
     readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
