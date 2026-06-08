@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("CalendarService")
 
     property bool khalAvailable: true // Always true to enable DMS calendar card UI
     property bool khalInstalled: false // Tracks if khal is actually on the system
@@ -97,7 +99,7 @@ Singleton {
             root.localTasks = JSON.parse(text);
             updateTaskEvents();
         } catch (error) {
-            console.warn("Failed to parse local tasks JSON: " + error.toString());
+            log.warn("Failed to parse local tasks JSON: " + error.toString());
         }
     }
 
