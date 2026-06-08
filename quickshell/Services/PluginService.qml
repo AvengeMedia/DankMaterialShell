@@ -966,4 +966,65 @@ Singleton {
         }
         return result;
     }
+
+    IpcHandler {
+        target: "plugins"
+
+        // Re-runs the discovery pass over both user and system plugin
+        // directories. Useful when a plugin directory was added or removed
+        // at runtime and the FolderListModel watcher did not pick the
+        // change up.
+        function scan(): string {
+            root.scanPlugins();
+            return `SCAN_TRIGGERED: ${Object.keys(root.availablePlugins).length} known before debounce`;
+        }
+
+        // Re-reads a single plugin's manifest without restarting the
+        // shell. Picks up edits to plugin.json made after the plugin was
+        // already loaded once.
+        function rescan(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: rescan requires a pluginId";
+            const plugin = root.availablePlugins[pluginId];
+            if (!plugin)
+                return `ERROR: unknown pluginId '${pluginId}' (try 'list' first)`;
+            root.forceRescanPlugin(pluginId);
+            return `RESCAN_TRIGGERED: ${pluginId}`;
+        }
+
+        // Unloads and reloads a plugin in place. Lets a developer iterate
+        // on a plugin's QML without restarting the shell.
+        function reload(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: reload requires a pluginId";
+            if (!(pluginId in root.availablePlugins))
+                return `ERROR: unknown pluginId '${pluginId}'`;
+            root.reloadPlugin(pluginId);
+            return `RELOAD_TRIGGERED: ${pluginId}`;
+        }
+
+        // Returns one `<id>\t<loaded>\t<type>\t<name>` line per known
+        // plugin. Format is intentionally simple for easy parsing by
+        // external shell scripts or CLI management tools.
+        function list(): string {
+            const lines = [];
+            for (const id in root.availablePlugins) {
+                const p = root.availablePlugins[id];
+                lines.push(`${id}\t${p.loaded ? "loaded" : "unloaded"}\t${p.type || "unknown"}\t${p.name || ""}`);
+            }
+            return lines.join("\n");
+        }
+
+        // Returns `loaded|unloaded\ttype\terror` for a single plugin. Used
+        // by wrappers that want to poll after a `scan` or `reload`.
+        function status(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: status requires a pluginId";
+            const plugin = root.availablePlugins[pluginId];
+            if (!plugin)
+                return `unknown\t\t`;
+            const err = root.pluginLoadErrors[pluginId] || "";
+            return `${plugin.loaded ? "loaded" : "unloaded"}\t${plugin.type || ""}\t${err}`;
+        }
+    }
 }
