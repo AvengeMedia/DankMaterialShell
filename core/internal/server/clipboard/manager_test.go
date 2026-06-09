@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	bolt "go.etcd.io/bbolt"
 
 	mocks_wlcontext "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlcontext"
 )
@@ -271,6 +272,110 @@ func TestHandleGetEntry_MissingIDReturnsNullResult(t *testing.T) {
 	require.NoError(t, json.NewDecoder(conn.writeBuf).Decode(&resp))
 	assert.Empty(t, resp.Error)
 	assert.Nil(t, resp.Result)
+}
+
+func TestUnpinEntry_KeepsTopUnpinnedDuplicate(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	require.NoError(t, m.storeEntry(Entry{
+		Data:      []byte("saved content"),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   "saved content",
+		Size:      len("saved content"),
+		Timestamp: time.Now().Add(-time.Minute).Truncate(time.Second),
+		IsImage:   false,
+	}))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	pinnedID := history[0].ID
+	require.NoError(t, m.PinEntry(pinnedID))
+
+	pinnedEntry, err := m.GetEntry(pinnedID)
+	require.NoError(t, err)
+	require.True(t, pinnedEntry.Pinned)
+
+	// Bypass storeEntry to simulate legacy duplicate ordinary history entries.
+	insertLegacyUnpinnedDuplicate := func(timestamp time.Time) Entry {
+		duplicate := Entry{
+			Data:      pinnedEntry.Data,
+			MimeType:  pinnedEntry.MimeType,
+			Preview:   pinnedEntry.Preview,
+			Size:      pinnedEntry.Size,
+			Timestamp: timestamp,
+			IsImage:   pinnedEntry.IsImage,
+			Pinned:    false,
+		}
+		duplicate.Hash = computeHash(duplicate.Data)
+
+		require.NoError(t, m.db.Update(func(tx *bolt.Tx) error {
+			b := tx.Bucket([]byte("clipboard"))
+			id, err := b.NextSequence()
+			if err != nil {
+				return err
+			}
+			duplicate.ID = id
+
+			encoded, err := encodeEntry(duplicate)
+			if err != nil {
+				return err
+			}
+			return b.Put(itob(id), encoded)
+		}))
+
+		return duplicate
+	}
+
+	olderHistoryDuplicate := insertLegacyUnpinnedDuplicate(time.Now().Add(time.Hour))
+	topHistoryDuplicate := insertLegacyUnpinnedDuplicate(time.Now().Add(-time.Hour))
+	require.Greater(t, topHistoryDuplicate.ID, olderHistoryDuplicate.ID)
+	require.True(t, olderHistoryDuplicate.Timestamp.After(topHistoryDuplicate.Timestamp))
+
+	history = m.GetHistory()
+	require.Len(t, history, 3)
+	require.Equal(t, topHistoryDuplicate.ID, history[0].ID)
+	require.NoError(t, m.UnpinEntry(pinnedID))
+
+	history = m.GetHistory()
+	require.Len(t, history, 1)
+	assert.False(t, history[0].Pinned)
+	assert.Equal(t, pinnedEntry.Hash, history[0].Hash)
+	assert.Equal(t, topHistoryDuplicate.ID, history[0].ID)
+}
+
+func TestCreateHistoryEntryFromPinned_KeepsLatestUnpinnedDuplicate(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	require.NoError(t, m.storeEntry(Entry{
+		Data:      []byte("saved content"),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   "saved content",
+		Size:      len("saved content"),
+		Timestamp: time.Now().Add(-time.Minute).Truncate(time.Second),
+		IsImage:   false,
+	}))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	pinnedID := history[0].ID
+	require.NoError(t, m.PinEntry(pinnedID))
+
+	pinnedEntry, err := m.GetEntry(pinnedID)
+	require.NoError(t, err)
+	require.True(t, pinnedEntry.Pinned)
+	require.NoError(t, m.CreateHistoryEntryFromPinned(pinnedEntry))
+	firstDuplicate := m.GetHistory()[0]
+	require.NotEqual(t, pinnedID, firstDuplicate.ID)
+	require.NoError(t, m.CreateHistoryEntryFromPinned(pinnedEntry))
+	latestDuplicate := m.GetHistory()[0]
+
+	history = m.GetHistory()
+	require.Len(t, history, 2)
+	assert.Equal(t, latestDuplicate.ID, history[0].ID)
+	assert.False(t, history[0].Pinned)
+	assert.Equal(t, pinnedID, history[1].ID)
+	assert.True(t, history[1].Pinned)
+	assert.NotEqual(t, firstDuplicate.ID, latestDuplicate.ID)
 }
 
 func TestManager_ConcurrentSubscriberAccess(t *testing.T) {
