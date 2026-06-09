@@ -572,6 +572,7 @@ var SPEC = {
 
     builtInPluginSettings: { def: {} },
     clipboardEnterToPaste: { def: false },
+    clipboardVisibleEntryActions: { def: ["pin", "edit", "delete"] },
 
     launcherPluginVisibility: { def: {} },
     launcherPluginOrder: { def: [] },
