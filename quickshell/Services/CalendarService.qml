@@ -5,17 +5,26 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("CalendarService")
 
-    property bool khalAvailable: false
+    property bool khalAvailable: true // Always true to enable DMS calendar card UI
+    property bool khalInstalled: false // Tracks if khal is actually on the system
     property var eventsByDate: ({})
+    property var khalEventsByDate: ({})
+    property var taskEventsByDate: ({})
+    property var localTasks: ({})
     property bool isLoading: false
     property string lastError: ""
     property date lastStartDate
     property date lastEndDate
     property string khalDateFormat: "MM/dd/yyyy"
+
+    onKhalEventsByDateChanged: mergeEvents()
+    onTaskEventsByDateChanged: mergeEvents()
 
     function checkKhalAvailability() {
         if (!khalCheckProcess.running)
@@ -50,7 +59,7 @@ Singleton {
     }
 
     function loadEvents(startDate, endDate) {
-        if (!root.khalAvailable) {
+        if (!root.khalInstalled) {
             return;
         }
         if (eventsProcess.running) {
@@ -79,9 +88,230 @@ Singleton {
         return events.length > 0;
     }
 
+    // In-memory Task CRUD methods
+    function loadTasks(text) {
+        if (!text || text.trim() === "") {
+            root.localTasks = {};
+            root.taskEventsByDate = {};
+            return;
+        }
+        try {
+            root.localTasks = JSON.parse(text);
+            updateTaskEvents();
+        } catch (error) {
+            log.warn("Failed to parse local tasks JSON: " + error.toString());
+        }
+    }
+
+    function saveTasks() {
+        let dir = Quickshell.env("HOME") + "/.config/niri-calendar-todo";
+        Quickshell.execDetached(["mkdir", "-p", dir]);
+        tasksFileView.setText(JSON.stringify(root.localTasks, null, 2));
+    }
+
+    function updateTaskEvents() {
+        let newTaskEvents = {};
+        for (let dateKey in root.localTasks) {
+            let taskList = root.localTasks[dateKey] || [];
+            newTaskEvents[dateKey] = [];
+            for (let task of taskList) {
+                let eventId = "task_" + task.id;
+                let parts = dateKey.split("-");
+                let taskDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+
+                newTaskEvents[dateKey].push({
+                    "id": eventId,
+                    "title": task.text,
+                    "completed": !!task.completed,
+                    "start": taskDate,
+                    "end": taskDate,
+                    "location": "",
+                    "description": "Task from your Planner",
+                    "url": "",
+                    "calendar": "Todo Planner",
+                    "color": "#10B981" // Pastel Green
+                    ,
+                    "allDay": true,
+                    "isMultiDay": false
+                });
+            }
+        }
+        root.taskEventsByDate = newTaskEvents;
+    }
+
+    function addTaskForDate(date, text) {
+        let dateKey = Qt.formatDate(date, "yyyy-MM-dd");
+        let tasks = Object.assign({}, root.localTasks);
+        if (!tasks[dateKey]) {
+            tasks[dateKey] = [];
+        }
+        let taskId = (new Date().getTime()) + "-dms";
+        tasks[dateKey].push({
+            "id": taskId,
+            "text": text,
+            "completed": false
+        });
+        root.localTasks = tasks;
+        updateTaskEvents();
+        saveTasks();
+    }
+
+    function toggleTask(taskId) {
+        let cleanId = taskId.replace("task_", "");
+        let tasks = Object.assign({}, root.localTasks);
+        let updated = false;
+        for (let dateKey in tasks) {
+            let list = tasks[dateKey];
+            for (let item of list) {
+                if (item.id === cleanId) {
+                    item.completed = !item.completed;
+                    updated = true;
+                    break;
+                }
+            }
+            if (updated)
+                break;
+        }
+        if (updated) {
+            root.localTasks = tasks;
+            updateTaskEvents();
+            saveTasks();
+        }
+    }
+
+    function removeTask(taskId) {
+        let cleanId = taskId.replace("task_", "");
+        let tasks = Object.assign({}, root.localTasks);
+        let updated = false;
+        for (let dateKey in tasks) {
+            let list = tasks[dateKey];
+            let filtered = list.filter(item => item.id !== cleanId);
+            if (filtered.length !== list.length) {
+                if (filtered.length === 0) {
+                    delete tasks[dateKey];
+                } else {
+                    tasks[dateKey] = filtered;
+                }
+                updated = true;
+                break;
+            }
+        }
+        if (updated) {
+            root.localTasks = tasks;
+            updateTaskEvents();
+            saveTasks();
+        }
+    }
+
+    function reorderTasksForDate(date, orderedIds) {
+        let dateKey = Qt.formatDate(date, "yyyy-MM-dd");
+        let tasks = Object.assign({}, root.localTasks);
+        let v = tasks[dateKey] || [];
+        let idToItem = {};
+        for (let item of v) {
+            idToItem[item.id] = item;
+        }
+        let newV = [];
+        for (let tid of orderedIds) {
+            if (idToItem[tid]) {
+                newV.push(idToItem[tid]);
+            }
+        }
+        let orderedSet = new Set(orderedIds);
+        for (let item of v) {
+            if (!orderedSet.has(item.id)) {
+                newV.push(item);
+            }
+        }
+        tasks[dateKey] = newV;
+        root.localTasks = tasks;
+        updateTaskEvents();
+        saveTasks();
+    }
+
+    function editTask(taskId, newText) {
+        let cleanId = taskId.replace("task_", "");
+        let tasks = Object.assign({}, root.localTasks);
+        let updated = false;
+        for (let dateKey in tasks) {
+            let list = tasks[dateKey];
+            for (let item of list) {
+                if (item.id === cleanId) {
+                    item.text = newText;
+                    updated = true;
+                    break;
+                }
+            }
+            if (updated)
+                break;
+        }
+        if (updated) {
+            root.localTasks = tasks;
+            updateTaskEvents();
+            saveTasks();
+        }
+    }
+
+    function mergeEvents() {
+        let merged = {};
+
+        // Merge khal events
+        for (let dateKey in root.khalEventsByDate) {
+            merged[dateKey] = [].concat(root.khalEventsByDate[dateKey]);
+        }
+
+        // Merge task events
+        for (let dateKey in root.taskEventsByDate) {
+            if (!merged[dateKey]) {
+                merged[dateKey] = [];
+            }
+            for (let event of root.taskEventsByDate[dateKey]) {
+                if (!merged[dateKey].some(e => e.id === event.id)) {
+                    merged[dateKey].push(event);
+                }
+            }
+        }
+
+        // Sort events within each date
+        for (let dateKey in merged) {
+            let list = merged[dateKey];
+            for (let idx = 0; idx < list.length; idx++) {
+                list[idx]._origIdx = idx;
+            }
+            list.sort((a, b) => {
+                let diff = a.start.getTime() - b.start.getTime();
+                if (diff !== 0)
+                    return diff;
+                return a._origIdx - b._origIdx;
+            });
+        }
+
+        root.eventsByDate = merged;
+    }
+
     // Initialize on component completion
     Component.onCompleted: {
         detectKhalDateFormat();
+    }
+
+    // Atomic file view for tasks
+    FileView {
+        id: tasksFileView
+        path: Quickshell.env("HOME") + "/.config/niri-calendar-todo/tasks.json"
+        blockLoading: false
+        blockWrites: false
+        atomicWrites: true
+        watchChanges: true
+        printErrors: false
+
+        onLoaded: {
+            loadTasks(tasksFileView.text());
+        }
+
+        onLoadFailed: {
+            root.localTasks = {};
+            root.taskEventsByDate = {};
+        }
     }
 
     // Process for detecting khal date format
@@ -119,9 +349,11 @@ Singleton {
         command: ["khal", "list", "today"]
         running: false
         onExited: exitCode => {
-            root.khalAvailable = (exitCode === 0);
-            if (exitCode === 0) {
+            root.khalInstalled = (exitCode === 0);
+            if (root.khalInstalled) {
                 loadCurrentMonth();
+            } else {
+                loadEvents(root.lastStartDate || new Date(), root.lastEndDate || new Date());
             }
         }
     }
@@ -284,17 +516,11 @@ Singleton {
                         }
                     }
                 }
-                // Sort events by start time within each date
-                for (let dateKey in newEventsByDate) {
-                    newEventsByDate[dateKey].sort((a, b) => {
-                        return a.start.getTime() - b.start.getTime();
-                    });
-                }
-                root.eventsByDate = newEventsByDate;
+                root.khalEventsByDate = newEventsByDate;
                 root.lastError = "";
             } catch (error) {
                 root.lastError = "Failed to parse events JSON: " + error.toString();
-                root.eventsByDate = {};
+                root.khalEventsByDate = {};
             }
             // Reset for next run
             eventsProcess.rawOutput = "";
