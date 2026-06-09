@@ -242,6 +242,7 @@ Item {
         id: modalChrome
         modalHandle: root.modalHandle
         claimPrefix: "dms:launcher-v2"
+        surfaceKind: "launcher"
         screenName: root._currentScreenName()
         enabled: root.frameOwnsConnectedChrome
         active: root.spotlightOpen
@@ -252,17 +253,38 @@ Item {
     }
 
     function _publishModalChromeState() {
+        const presented = spotlightOpen || contentWindow.visible;
+        const phase = !presented ? "hidden" : (isClosing ? "closing" : (!contentWindow.visible ? "opening" : "open"));
+        const bodyRect = {
+            "x": _connectedChromeX,
+            "y": _connectedChromeY,
+            "width": _connectedChromeWidth,
+            "height": _connectedChromeHeight
+        };
+        const animationOffset = {
+            "x": contentContainer ? contentContainer.animX : 0,
+            "y": contentContainer ? contentContainer.animY : 0
+        };
         const state = {
-            "visible": spotlightOpen || contentWindow.visible,
+            "kind": "launcher",
+            "screenName": root._currentScreenName(),
+            "phase": phase,
+            "visible": presented,
+            "presented": presented,
             "barSide": resolvedConnectedBarSide,
+            "bodyRect": bodyRect,
+            "animationOffset": animationOffset,
+            "scale": 1,
+            "opacity": Theme.connectedSurfaceColor.a,
             "bodyX": _connectedChromeX,
             "bodyY": _connectedChromeY,
             "bodyW": _connectedChromeWidth,
             "bodyH": _connectedChromeHeight,
-            "animX": contentContainer ? contentContainer.animX : 0,
-            "animY": contentContainer ? contentContainer.animY : 0,
+            "animX": animationOffset.x,
+            "animY": animationOffset.y,
             "omitStartConnector": false,
-            "omitEndConnector": false
+            "omitEndConnector": false,
+            "dockRetractSide": root._dockBlocksEmergence ? resolvedConnectedBarSide : ""
         };
         return modalChrome.publish(state);
     }

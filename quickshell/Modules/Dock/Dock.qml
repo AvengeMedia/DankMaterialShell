@@ -186,13 +186,36 @@ Variants {
                 return;
             }
 
+            const presented = dock.visible && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps;
+            const phase = !presented ? "hidden" : ((!dock.reveal && (slideXAnimation.running || slideYAnimation.running)) ? "closing" : ((slideXAnimation.running || slideYAnimation.running) ? "opening" : "open"));
+            const bodyX = dock._dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x;
+            const bodyY = dock._dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y;
+            const bodyW = dock.hasApps ? dockBackground.width : 0;
+            const bodyH = dock.hasApps ? dockBackground.height : 0;
             ConnectedModeState.setDockState(dock._dockScreenName, {
-                "reveal": dock.visible && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps,
+                "kind": "dock",
+                "screenName": dock._dockScreenName,
+                "phase": phase,
+                "visible": presented,
+                "presented": presented,
+                "reveal": presented,
                 "barSide": dock.connectedBarSide,
-                "bodyX": dock._dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x,
-                "bodyY": dock._dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y,
-                "bodyW": dock.hasApps ? dockBackground.width : 0,
-                "bodyH": dock.hasApps ? dockBackground.height : 0,
+                "bodyRect": {
+                    "x": bodyX,
+                    "y": bodyY,
+                    "width": bodyW,
+                    "height": bodyH
+                },
+                "animationOffset": {
+                    "x": dockSlide.x,
+                    "y": dockSlide.y
+                },
+                "scale": 1,
+                "opacity": Theme.connectedSurfaceColor.a,
+                "bodyX": bodyX,
+                "bodyY": bodyY,
+                "bodyW": bodyW,
+                "bodyH": bodyH,
                 "slideX": dockSlide.x,
                 "slideY": dockSlide.y
             });

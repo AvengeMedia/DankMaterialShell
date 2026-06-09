@@ -115,6 +115,7 @@ Item {
         id: modalChrome
         modalHandle: root.modalHandle
         claimPrefix: root.layerNamespace + ":modal"
+        surfaceKind: "modal"
         screenName: root._currentScreenName()
         enabled: root.frameOwnsConnectedChrome
         active: root.shouldBeVisible
@@ -125,17 +126,38 @@ Item {
     }
 
     function _publishModalChromeState() {
+        const presented = shouldBeVisible || contentWindow.visible;
+        const phase = !presented ? "hidden" : (!shouldBeVisible && contentWindow.visible ? "closing" : (!contentWindow.visible ? "opening" : "open"));
+        const bodyRect = {
+            "x": alignedX,
+            "y": alignedY,
+            "width": alignedWidth,
+            "height": alignedHeight
+        };
+        const animationOffset = {
+            "x": modalContainer ? modalContainer.animX : 0,
+            "y": modalContainer ? modalContainer.animY : 0
+        };
         const state = {
-            "visible": shouldBeVisible || contentWindow.visible,
+            "kind": "modal",
+            "screenName": root._currentScreenName(),
+            "phase": phase,
+            "visible": presented,
+            "presented": presented,
             "barSide": resolvedConnectedBarSide,
+            "bodyRect": bodyRect,
+            "animationOffset": animationOffset,
+            "scale": 1,
+            "opacity": Theme.connectedSurfaceColor.a,
             "bodyX": alignedX,
             "bodyY": alignedY,
             "bodyW": alignedWidth,
             "bodyH": alignedHeight,
-            "animX": modalContainer ? modalContainer.animX : 0,
-            "animY": modalContainer ? modalContainer.animY : 0,
+            "animX": animationOffset.x,
+            "animY": animationOffset.y,
             "omitStartConnector": false,
-            "omitEndConnector": false
+            "omitEndConnector": false,
+            "dockRetractSide": root._dockBlocksEmergence ? resolvedConnectedBarSide : ""
         };
         return modalChrome.publish(state);
     }

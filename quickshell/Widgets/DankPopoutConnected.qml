@@ -38,8 +38,6 @@ Item {
     property bool fullHeightSurface: false
     property bool _primeContent: false
     property bool _resizeActive: false
-    property string _chromeClaimId: ""
-    property int _connectedChromeSerial: 0
     property real _chromeAnimTravelX: 1
     property real _chromeAnimTravelY: 1
     property bool _fullSyncQueued: false
@@ -98,6 +96,43 @@ Item {
         id: _syncTimer
         interval: 0
         onTriggered: root._flushSync()
+    }
+
+    ConnectedSurfaceLease {
+        id: chromeLease
+        claimPrefix: root.layerNamespace
+        screenName: root.screen ? root.screen.name : ""
+        enabled: root.frameOwnsConnectedChrome
+        active: contentWindow.visible || root.shouldBeVisible
+        presented: contentWindow.visible || root.shouldBeVisible
+        renewTokenOnRecovery: false
+        isCurrentOwner: function(name) {
+            return PopoutManager.isCurrentPopout(root.popoutHandle, name);
+        }
+        hasOwner: function(_name, ownerId) {
+            return ConnectedModeState.hasPopoutOwner(ownerId);
+        }
+        statePresent: function(name, ownerId) {
+            return ConnectedModeState.hasPopoutOwner(ownerId) && ConnectedModeState.hasSurfaceDescriptor(name, "popout", ownerId);
+        }
+        claimState: function(_name, state, ownerId) {
+            return ConnectedModeState.claimPopout(ownerId, state);
+        }
+        ensureState: function(_name, state, ownerId) {
+            if (!ConnectedModeState.hasPopoutOwner(ownerId))
+                return false;
+            return ConnectedModeState.updatePopout(ownerId, state);
+        }
+        releaseState: function(_name, ownerId) {
+            return ConnectedModeState.releasePopout(ownerId);
+        }
+        updateAnimationState: function(_name, ownerId, animX, animY) {
+            return ConnectedModeState.setPopoutAnim(ownerId, animX, animY);
+        }
+        updateBodyState: function(_name, ownerId, bodyX, bodyY, bodyW, bodyH) {
+            return ConnectedModeState.setPopoutBody(ownerId, bodyX, bodyY, bodyW, bodyH);
+        }
+        onRecoveryRequested: root._queueFullSync()
     }
 
     property var _lastOpenedScreen: null
@@ -169,11 +204,6 @@ Item {
         setBarContext(pos, bottomGap);
     }
 
-    function _nextChromeClaimId() {
-        _connectedChromeSerial += 1;
-        return layerNamespace + ":" + _connectedChromeSerial + ":" + (new Date()).getTime();
-    }
-
     function _captureChromeAnimTravel() {
         _chromeAnimTravelX = Math.max(1, Math.abs(contentContainer.offsetX));
         _chromeAnimTravelY = Math.max(1, Math.abs(contentContainer.offsetY));
@@ -203,15 +233,35 @@ Item {
 
     function _connectedChromeState(visibleOverride) {
         const visible = visibleOverride !== undefined ? !!visibleOverride : contentWindow.visible;
+        const presented = contentWindow.visible || root.shouldBeVisible;
+        const phase = root.isClosing ? "closing" : (!presented ? "hidden" : (!contentWindow.visible && root.shouldBeVisible ? "opening" : "open"));
+        const bodyRect = {
+            "x": root.alignedX,
+            "y": root.renderedAlignedY,
+            "width": root.alignedWidth,
+            "height": root.renderedAlignedHeight
+        };
+        const animationOffset = {
+            "x": _connectedChromeAnimX(),
+            "y": _connectedChromeAnimY()
+        };
         return {
+            "kind": "popout",
+            "screenName": root.screen ? root.screen.name : "",
+            "phase": phase,
             "visible": visible,
+            "presented": presented,
             "barSide": contentContainer.connectedBarSide,
+            "bodyRect": bodyRect,
+            "animationOffset": animationOffset,
+            "scale": 1,
+            "opacity": Theme.connectedSurfaceColor.a,
             "bodyX": root.alignedX,
             "bodyY": root.renderedAlignedY,
             "bodyW": root.alignedWidth,
             "bodyH": root.renderedAlignedHeight,
-            "animX": _connectedChromeAnimX(),
-            "animY": _connectedChromeAnimY(),
+            "animX": animationOffset.x,
+            "animY": animationOffset.y,
             "screen": root.screen ? root.screen.name : "",
             "omitStartConnector": root._closeGapOmitStartConnector(),
             "omitEndConnector": root._closeGapOmitEndConnector()
@@ -219,27 +269,13 @@ Item {
     }
 
     function _publishConnectedChromeState(forceClaim, visibleOverride) {
-        if (!root.frameOwnsConnectedChrome || !root.screen || !_chromeClaimId)
+        if (!root.frameOwnsConnectedChrome || !root.screen)
             return false;
-
-        const screenName = root.screen.name;
-        const isCurrent = PopoutManager.isCurrentPopout(popoutHandle, screenName);
-        if (!ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
-            if (!isCurrent)
-                return false;
-            forceClaim = true;
-        } else if (forceClaim && !isCurrent) {
-            return false;
-        }
-
-        const state = _connectedChromeState(visibleOverride);
-        return forceClaim ? ConnectedModeState.claimPopout(_chromeClaimId, state) : ConnectedModeState.updatePopout(_chromeClaimId, state);
+        return chromeLease.publish(_connectedChromeState(visibleOverride), !!forceClaim);
     }
 
     function _releaseConnectedChromeState() {
-        if (_chromeClaimId)
-            ConnectedModeState.releasePopout(_chromeClaimId);
-        _chromeClaimId = "";
+        chromeLease.release();
     }
 
     // ─── Exposed animation state for ConnectedModeState ────────────────────
@@ -258,16 +294,11 @@ Item {
         }
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        if (!_chromeClaimId) {
-            if (!PopoutManager.isCurrentPopout(popoutHandle, root.screen.name))
-                return;
-            _chromeClaimId = _nextChromeClaimId();
-        }
-        _publishConnectedChromeState(!ConnectedModeState.hasPopoutOwner(_chromeClaimId));
+        _publishConnectedChromeState(false);
     }
 
     function _syncPopoutAnim(axis) {
-        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!root.frameOwnsConnectedChrome || !chromeLease.claimId)
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
@@ -276,25 +307,15 @@ Item {
         const syncY = axis === "y" && (barSide === "top" || barSide === "bottom");
         if (!syncX && !syncY)
             return;
-        if (!ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
-            if (root.screen && PopoutManager.isCurrentPopout(popoutHandle, root.screen.name))
-                _queueFullSync();
-            return;
-        }
-        ConnectedModeState.setPopoutAnim(_chromeClaimId, syncX ? _connectedChromeAnimX() : undefined, syncY ? _connectedChromeAnimY() : undefined);
+        chromeLease.updateAnim(syncX ? _connectedChromeAnimX() : undefined, syncY ? _connectedChromeAnimY() : undefined);
     }
 
     function _syncPopoutBody() {
-        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!root.frameOwnsConnectedChrome || !chromeLease.claimId)
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        if (!ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
-            if (root.screen && PopoutManager.isCurrentPopout(popoutHandle, root.screen.name))
-                _queueFullSync();
-            return;
-        }
-        ConnectedModeState.setPopoutBody(_chromeClaimId, root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
+        chromeLease.updateBody(root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
     }
 
     property bool _animSyncQueued: false
@@ -345,13 +366,10 @@ Item {
     Connections {
         target: contentWindow
         function onVisibleChanged() {
-            if (contentWindow.visible) {
-                if (!root._chromeClaimId)
-                    root._chromeClaimId = root._nextChromeClaimId();
+            if (contentWindow.visible)
                 root._publishConnectedChromeState(true);
-            } else {
+            else
                 root._releaseConnectedChromeState();
-            }
         }
     }
 
@@ -359,11 +377,8 @@ Item {
         target: SettingsData
         function onConnectedFrameModeActiveChanged() {
             if (root.frameOwnsConnectedChrome) {
-                if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name)) {
-                    if (!root._chromeClaimId)
-                        root._chromeClaimId = root._nextChromeClaimId();
+                if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name))
                     root._publishConnectedChromeState(true);
-                }
             } else {
                 root._releaseConnectedChromeState();
             }
@@ -376,16 +391,17 @@ Item {
     Connections {
         target: ConnectedModeState
         function onPopoutOwnerIdChanged() {
-            if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name) && !ConnectedModeState.hasPopoutOwner(root._chromeClaimId))
-                root._queueFullSync();
+            chromeLease.checkOwnershipRecovery();
+        }
+        function onSurfaceDescriptorsChanged() {
+            chromeLease.checkStateRecovery();
         }
     }
 
     Connections {
         target: PopoutManager
         function onPopoutChanged() {
-            if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name))
-                root._queueFullSync();
+            chromeLease.requestRecovery();
         }
     }
 
@@ -422,10 +438,10 @@ Item {
         }
 
         if (root.frameOwnsConnectedChrome) {
-            _chromeClaimId = _nextChromeClaimId();
+            chromeLease.beginClaim();
             _publishConnectedChromeState(true, true);
         } else {
-            _chromeClaimId = "";
+            chromeLease.release();
         }
 
         if (screenChanged) {

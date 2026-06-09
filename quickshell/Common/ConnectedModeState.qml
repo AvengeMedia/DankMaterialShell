@@ -3,9 +3,140 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import "ConnectedSurfaceDescriptor.js" as SurfaceDescriptor
 
 Singleton {
     id: root
+
+    property var surfaceDescriptors: ({})
+
+    function _surfaceSlot(kind) {
+        return SurfaceDescriptor.slotForKind(kind);
+    }
+
+    function surfaceDescriptor(screenName, kind) {
+        const slot = _surfaceSlot(kind);
+        const screenDescriptors = screenName ? surfaceDescriptors[screenName] : null;
+        const descriptor = screenDescriptors && screenDescriptors[slot] ? screenDescriptors[slot] : SurfaceDescriptor.empty(kind, screenName);
+        let bodyRect = descriptor.bodyRect;
+        let animationOffset = descriptor.animationOffset;
+        if (slot === "popout" && popoutScreen === screenName) {
+            bodyRect = {
+                "x": popoutBodyX,
+                "y": popoutBodyY,
+                "width": popoutBodyW,
+                "height": popoutBodyH
+            };
+            animationOffset = {
+                "x": popoutAnimX,
+                "y": popoutAnimY
+            };
+        } else if (slot === "modal" && modalStates[screenName]) {
+            const modal = modalStates[screenName];
+            bodyRect = {
+                "x": modal.bodyX,
+                "y": modal.bodyY,
+                "width": modal.bodyW,
+                "height": modal.bodyH
+            };
+            animationOffset = {
+                "x": modal.animX,
+                "y": modal.animY
+            };
+        } else if (slot === "dock" && dockStates[screenName]) {
+            const dock = dockStates[screenName];
+            const slide = dockSlides[screenName] || {
+                "x": dock.slideX,
+                "y": dock.slideY
+            };
+            bodyRect = {
+                "x": dock.bodyX,
+                "y": dock.bodyY,
+                "width": dock.bodyW,
+                "height": dock.bodyH
+            };
+            animationOffset = {
+                "x": slide.x,
+                "y": slide.y
+            };
+        } else if (slot === "notification" && notificationStates[screenName]) {
+            const notification = notificationStates[screenName];
+            bodyRect = {
+                "x": notification.bodyX,
+                "y": notification.bodyY,
+                "width": notification.bodyW,
+                "height": notification.bodyH
+            };
+        }
+        return SurfaceDescriptor.normalize({
+            "bodyRect": bodyRect,
+            "animationOffset": animationOffset
+        }, descriptor);
+    }
+
+    function legacySurfaceState(screenName, kind) {
+        return SurfaceDescriptor.toLegacyState(surfaceDescriptor(screenName, kind));
+    }
+
+    function hasSurfaceDescriptor(screenName, kind, ownerId) {
+        const descriptor = surfaceDescriptor(screenName, kind);
+        return descriptor.phase !== "hidden" && (!ownerId || descriptor.ownerId === ownerId);
+    }
+
+    function _setSurfaceDescriptor(screenName, slotKind, state, ownerId) {
+        if (!screenName || !state)
+            return false;
+        const slot = _surfaceSlot(slotKind);
+        const currentScreen = surfaceDescriptors[screenName] || {};
+        const previous = currentScreen[slot] || SurfaceDescriptor.empty(state.kind || slotKind, screenName);
+        let normalized = SurfaceDescriptor.normalize(Object.assign({}, state, {
+            "ownerId": ownerId !== undefined ? ownerId : previous.ownerId,
+            "screenName": screenName,
+            "revision": previous.revision
+        }), previous);
+        if (SurfaceDescriptor.same(previous, normalized))
+            return true;
+        normalized = SurfaceDescriptor.withRevision(normalized, previous.revision + 1);
+        const nextScreen = _cloneDict(currentScreen);
+        nextScreen[slot] = normalized;
+        const next = _cloneDict(surfaceDescriptors);
+        next[screenName] = nextScreen;
+        surfaceDescriptors = next;
+        return true;
+    }
+
+    function _clearSurfaceDescriptor(screenName, kind, ownerId) {
+        if (!screenName)
+            return false;
+        const slot = _surfaceSlot(kind);
+        const currentScreen = surfaceDescriptors[screenName];
+        const current = currentScreen ? currentScreen[slot] : null;
+        if (!current || (ownerId && current.ownerId !== ownerId))
+            return false;
+        const nextScreen = _cloneDict(currentScreen);
+        delete nextScreen[slot];
+        const next = _cloneDict(surfaceDescriptors);
+        if (Object.keys(nextScreen).length > 0)
+            next[screenName] = nextScreen;
+        else
+            delete next[screenName];
+        surfaceDescriptors = next;
+        return true;
+    }
+
+    function _setSurfaceAnimation(screenName, kind, ownerId, x, y) {
+        const current = surfaceDescriptor(screenName, kind);
+        if (current.phase === "hidden" || (ownerId && current.ownerId !== ownerId))
+            return false;
+        return true;
+    }
+
+    function _setSurfaceBody(screenName, kind, ownerId, x, y, width, height) {
+        const current = surfaceDescriptor(screenName, kind);
+        if (current.phase === "hidden" || (ownerId && current.ownerId !== ownerId))
+            return false;
+        return true;
+    }
 
     readonly property var emptyDockState: ({
             "reveal": false,
@@ -69,8 +200,10 @@ Singleton {
         popoutOwnerId = claimId;
         const ok = updatePopout(claimId, state);
         if (ok) {
-            if (previousScreen && previousScreen !== popoutScreen)
+            if (previousScreen && previousScreen !== popoutScreen) {
+                _clearSurfaceDescriptor(previousScreen, "popout");
                 _bumpSurfaceRevision(previousScreen);
+            }
             _bumpSurfaceRevision(popoutScreen);
         }
         return ok;
@@ -103,6 +236,21 @@ Singleton {
         if (state.omitEndConnector !== undefined)
             popoutOmitEndConnector = !!state.omitEndConnector;
 
+        _setSurfaceDescriptor(popoutScreen, "popout", Object.assign({}, state, {
+            "kind": "popout",
+            "screenName": popoutScreen,
+            "visible": popoutVisible,
+            "presented": state.presented !== undefined ? !!state.presented : popoutVisible,
+            "barSide": popoutBarSide,
+            "bodyX": popoutBodyX,
+            "bodyY": popoutBodyY,
+            "bodyW": popoutBodyW,
+            "bodyH": popoutBodyH,
+            "animX": popoutAnimX,
+            "animY": popoutAnimY,
+            "omitStartConnector": popoutOmitStartConnector,
+            "omitEndConnector": popoutOmitEndConnector
+        }), claimId);
         return true;
     }
 
@@ -123,6 +271,7 @@ Singleton {
         popoutScreen = "";
         popoutOmitStartConnector = false;
         popoutOmitEndConnector = false;
+        _clearSurfaceDescriptor(releasedScreen, "popout", claimId);
         _bumpSurfaceRevision(releasedScreen);
         return true;
     }
@@ -140,6 +289,7 @@ Singleton {
             if (!isNaN(nextY) && popoutAnimY !== nextY)
                 popoutAnimY = nextY;
         }
+        _setSurfaceAnimation(popoutScreen, "popout", claimId, animX, animY);
         return true;
     }
 
@@ -166,6 +316,7 @@ Singleton {
             if (!isNaN(nextH) && popoutBodyH !== nextH)
                 popoutBodyH = nextH;
         }
+        _setSurfaceBody(popoutScreen, "popout", claimId, bodyX, bodyY, bodyW, bodyH);
         return true;
     }
 
@@ -193,13 +344,21 @@ Singleton {
             return false;
 
         const normalized = _normalizeDockState(state);
-        if (_sameDockState(dockStates[screenName], normalized))
-            return true;
+        const descriptorState = Object.assign({}, state, normalized, {
+            "kind": "dock",
+            "screenName": screenName,
+            "visible": normalized.reveal,
+            "presented": normalized.reveal,
+            "phase": normalized.reveal ? (state.phase || "open") : "hidden"
+        });
         const previous = dockStates[screenName] || emptyDockState;
-
-        const next = _cloneDict(dockStates);
-        next[screenName] = normalized;
-        dockStates = next;
+        const legacyChanged = !_sameDockState(dockStates[screenName], normalized);
+        if (legacyChanged) {
+            const next = _cloneDict(dockStates);
+            next[screenName] = normalized;
+            dockStates = next;
+        }
+        _setSurfaceDescriptor(screenName, "dock", descriptorState, "dock:" + screenName);
         if (!!previous.reveal !== !!normalized.reveal)
             _bumpSurfaceRevision(screenName);
         return true;
@@ -212,6 +371,7 @@ Singleton {
         const next = _cloneDict(dockStates);
         delete next[screenName];
         dockStates = next;
+        _clearSurfaceDescriptor(screenName, "dock");
 
         // Also clear corresponding slide
         if (dockSlides[screenName]) {
@@ -237,6 +397,7 @@ Singleton {
             "y": numY
         };
         dockSlides = next;
+        _setSurfaceAnimation(screenName, "dock", "dock:" + screenName, numX, numY);
         return true;
     }
 
@@ -283,13 +444,20 @@ Singleton {
             return false;
 
         const normalized = _normalizeNotificationState(state);
-        if (_sameNotificationState(notificationStates[screenName], normalized))
-            return true;
+        const descriptorState = Object.assign({}, state, normalized, {
+            "kind": "notification",
+            "screenName": screenName,
+            "presented": normalized.visible,
+            "phase": normalized.visible ? (state.phase || "open") : "hidden"
+        });
         const previous = notificationStates[screenName] || emptyNotificationState;
-
-        const next = _cloneDict(notificationStates);
-        next[screenName] = normalized;
-        notificationStates = next;
+        const legacyChanged = !_sameNotificationState(notificationStates[screenName], normalized);
+        if (legacyChanged) {
+            const next = _cloneDict(notificationStates);
+            next[screenName] = normalized;
+            notificationStates = next;
+        }
+        _setSurfaceDescriptor(screenName, "notification", descriptorState, "notification:" + screenName);
         if (!!previous.visible !== !!normalized.visible)
             _bumpSurfaceRevision(screenName);
         return true;
@@ -302,6 +470,7 @@ Singleton {
         const next = _cloneDict(notificationStates);
         delete next[screenName];
         notificationStates = next;
+        _clearSurfaceDescriptor(screenName, "notification");
         _bumpSurfaceRevision(screenName);
         return true;
     }
@@ -362,6 +531,10 @@ Singleton {
         const next = _cloneDict(modalStates);
         next[screenName] = normalized;
         modalStates = next;
+        _setSurfaceDescriptor(screenName, "modal", Object.assign({}, state, normalized, {
+            "kind": state.kind || "modal",
+            "screenName": screenName
+        }), ownerId || "");
         _bumpSurfaceRevision(screenName);
         return true;
     }
@@ -372,11 +545,16 @@ Singleton {
         if (ownerId && modalOwners[screenName] !== ownerId)
             return false;
         const normalized = _normalizeModalState(state);
-        if (_sameModalState(modalStates[screenName], normalized))
-            return true;
-        const next = _cloneDict(modalStates);
-        next[screenName] = normalized;
-        modalStates = next;
+        const descriptorState = Object.assign({}, state, normalized, {
+            "kind": state.kind || (surfaceDescriptor(screenName, "modal").kind || "modal"),
+            "screenName": screenName
+        });
+        if (!_sameModalState(modalStates[screenName], normalized)) {
+            const next = _cloneDict(modalStates);
+            next[screenName] = normalized;
+            modalStates = next;
+        }
+        _setSurfaceDescriptor(screenName, "modal", descriptorState, ownerId || modalOwners[screenName] || "");
         return true;
     }
 
@@ -418,6 +596,7 @@ Singleton {
             delete nextOwners[screenName];
             modalOwners = nextOwners;
         }
+        _clearSurfaceDescriptor(screenName, "modal", ownerId);
         _bumpSurfaceRevision(screenName);
         return true;
     }
@@ -438,6 +617,7 @@ Singleton {
             "animY": nay
         });
         modalStates = next;
+        _setSurfaceAnimation(screenName, "modal", ownerId, animX, animY);
         return true;
     }
 
@@ -461,6 +641,7 @@ Singleton {
             "bodyH": nh
         });
         modalStates = next;
+        _setSurfaceBody(screenName, "modal", ownerId, bodyX, bodyY, bodyW, bodyH);
         return true;
     }
 
@@ -543,6 +724,9 @@ Singleton {
         const nextSurfaceRevisions = pruneKeyed(surfaceRevisions);
         if (nextSurfaceRevisions !== null)
             surfaceRevisions = nextSurfaceRevisions;
+        const nextDescriptors = pruneKeyed(surfaceDescriptors);
+        if (nextDescriptors !== null)
+            surfaceDescriptors = nextDescriptors;
 
         let retractChanged = false;
         const nextRetract = {};

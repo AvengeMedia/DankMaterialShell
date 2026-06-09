@@ -513,13 +513,30 @@ QtObject {
             ConnectedModeState.clearNotificationState(screenName);
             return;
         }
+        const bodyRect = {
+            x: minX,
+            y: minY,
+            width: maxXEnd - minX,
+            height: maxYEnd - minY
+        };
         ConnectedModeState.setNotificationState(screenName, {
+            kind: "notification",
+            screenName: screenName,
+            phase: "open",
             visible: true,
+            presented: true,
             barSide: notifBarSide,
+            bodyRect: bodyRect,
+            animationOffset: {
+                x: 0,
+                y: 0
+            },
+            scale: 1,
+            opacity: Theme.connectedSurfaceColor.a,
             bodyX: minX,
             bodyY: minY,
-            bodyW: maxXEnd - minX,
-            bodyH: maxYEnd - minY,
+            bodyW: bodyRect.width,
+            bodyH: bodyRect.height,
             omitStartConnector: _notificationOmitStartConnector(),
             omitEndConnector: _notificationOmitEndConnector()
         });
