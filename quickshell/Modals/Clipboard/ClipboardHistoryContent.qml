@@ -36,8 +36,17 @@ FocusScope {
     signal instantCloseRequested
 
     onActiveTabChanged: {
+        if (activeTab === "saved" && pinnedCount === 0) {
+            activeTab = "recents";
+            return;
+        }
         ClipboardService.selectedIndex = 0;
         ClipboardService.keyboardNavigationActive = false;
+    }
+    onPinnedCountChanged: {
+        if (activeTab === "saved" && pinnedCount === 0) {
+            activeTab = "recents";
+        }
     }
     onSearchTextChanged: ClipboardService.searchText = searchText
 
