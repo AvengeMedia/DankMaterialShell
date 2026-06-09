@@ -149,8 +149,8 @@ Item {
                 listView: clipboardListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deleteEntry(modelData)
-                onPinRequested: clipboardContent.modal.pinEntry(modelData)
-                onUnpinRequested: clipboardContent.modal.unpinEntry(modelData)
+                onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
+                onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
             }
         }
@@ -223,8 +223,8 @@ Item {
                 listView: savedListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deletePinnedEntry(modelData)
-                onPinRequested: clipboardContent.modal.pinEntry(modelData)
-                onUnpinRequested: clipboardContent.modal.unpinEntry(modelData)
+                onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
+                onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
             }
         }
