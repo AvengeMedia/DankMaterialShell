@@ -129,7 +129,8 @@ Singleton {
                     "description": "Task from your Planner",
                     "url": "",
                     "calendar": "Todo Planner",
-                    "color": "#10B981", // Pastel Green
+                    "color": "#10B981" // Pastel Green
+                    ,
                     "allDay": true,
                     "isMultiDay": false
                 });
@@ -168,7 +169,8 @@ Singleton {
                     break;
                 }
             }
-            if (updated) break;
+            if (updated)
+                break;
         }
         if (updated) {
             root.localTasks = tasks;
@@ -240,7 +242,8 @@ Singleton {
                     break;
                 }
             }
-            if (updated) break;
+            if (updated)
+                break;
         }
         if (updated) {
             root.localTasks = tasks;
@@ -277,7 +280,8 @@ Singleton {
             }
             list.sort((a, b) => {
                 let diff = a.start.getTime() - b.start.getTime();
-                if (diff !== 0) return diff;
+                if (diff !== 0)
+                    return diff;
                 return a._origIdx - b._origIdx;
             });
         }

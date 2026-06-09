@@ -448,10 +448,10 @@ Rectangle {
                 id: listViewContainer
                 width: parent.width
                 height: 100
-                
+
                 property var draggedItem: null
                 property bool orderChanged: false
-                
+
                 function resetAndLayout() {
                     for (let i = 0; i < repeater.count; i++) {
                         let item = repeater.itemAt(i);
@@ -463,7 +463,7 @@ Rectangle {
                     }
                     updateLayout();
                 }
-                
+
                 function updateLayout() {
                     let items = [];
                     for (let i = 0; i < repeater.count; i++) {
@@ -473,7 +473,7 @@ Rectangle {
                         }
                     }
                     items.sort((a, b) => a.visualIndex - b.visualIndex);
-                    
+
                     let currentY = 0;
                     for (let i = 0; i < items.length; i++) {
                         let item = items[i];
@@ -496,9 +496,9 @@ Rectangle {
                         }
                     }
                     items.sort((a, b) => a.visualIndex - b.visualIndex);
-                    
+
                     let swapped = false;
-                    
+
                     // Helper to get target Y position without animation offsets
                     function getTargetY(index) {
                         let y = 0;
@@ -507,13 +507,14 @@ Rectangle {
                         }
                         return y;
                     }
-                    
+
                     while (true) {
                         let draggedIdx = items.indexOf(dragged);
-                        if (draggedIdx === -1) break;
-                        
+                        if (draggedIdx === -1)
+                            break;
+
                         let didSwap = false;
-                        
+
                         // Check item above
                         if (draggedIdx > 0) {
                             let above = items[draggedIdx - 1];
@@ -523,17 +524,17 @@ Rectangle {
                                 let temp = dragged.visualIndex;
                                 dragged.visualIndex = above.visualIndex;
                                 above.visualIndex = temp;
-                                
+
                                 // Swap in local array
                                 items[draggedIdx] = above;
                                 items[draggedIdx - 1] = dragged;
-                                
+
                                 listViewContainer.orderChanged = true;
                                 swapped = true;
                                 didSwap = true;
                             }
                         }
-                        
+
                         // Check item below
                         if (!didSwap && draggedIdx < items.length - 1) {
                             let below = items[draggedIdx + 1];
@@ -543,30 +544,31 @@ Rectangle {
                                 let temp = dragged.visualIndex;
                                 dragged.visualIndex = below.visualIndex;
                                 below.visualIndex = temp;
-                                
+
                                 // Swap in local array
                                 items[draggedIdx] = below;
                                 items[draggedIdx + 1] = dragged;
-                                
+
                                 listViewContainer.orderChanged = true;
                                 swapped = true;
                                 didSwap = true;
                             }
                         }
-                        
+
                         if (!didSwap) {
                             break;
                         }
                     }
-                    
+
                     if (swapped) {
                         updateLayout();
                     }
                 }
-                
+
                 function saveNewOrder() {
-                    if (!orderChanged) return;
-                    
+                    if (!orderChanged)
+                        return;
+
                     let items = [];
                     for (let i = 0; i < repeater.count; i++) {
                         let item = repeater.itemAt(i);
@@ -575,7 +577,7 @@ Rectangle {
                         }
                     }
                     items.sort((a, b) => a.visualIndex - b.visualIndex);
-                    
+
                     let orderedIds = [];
                     for (let i = 0; i < items.length; i++) {
                         let tid = items[i].taskId;
@@ -592,11 +594,11 @@ Rectangle {
                 Repeater {
                     id: repeater
                     model: selectedDateEvents
-                    
+
                     onModelChanged: {
                         Qt.callLater(listViewContainer.resetAndLayout);
                     }
-                    
+
                     delegate: Rectangle {
                         id: taskItem
                         width: parent ? parent.width : 0
@@ -627,7 +629,11 @@ Rectangle {
                         scale: isDragging ? 1.02 : 1.0
                         z: isDragging ? 100 : visualIndex
 
-                        Behavior on scale { NumberAnimation { duration: 100 } }
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: 100
+                            }
+                        }
 
                         Behavior on y {
                             id: yBehavior
@@ -685,43 +691,43 @@ Rectangle {
                             }
 
                             MouseArea {
-                                 id: dragMouseArea
-                                 anchors.fill: parent
-                                 hoverEnabled: true
-                                 cursorShape: Qt.SizeAllCursor
-                                 preventStealing: true
+                                id: dragMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.SizeAllCursor
+                                preventStealing: true
 
-                                 drag.target: taskItem
-                                 drag.axis: Drag.YAxis
-                                 drag.minimumY: 0
-                                 drag.maximumY: listViewContainer.height - taskItem.height
+                                drag.target: taskItem
+                                drag.axis: Drag.YAxis
+                                drag.minimumY: 0
+                                drag.maximumY: listViewContainer.height - taskItem.height
 
-                                 onPressed: {
-                                     taskItem.isDragging = true;
-                                     listViewContainer.orderChanged = false;
-                                     listViewContainer.draggedItem = taskItem;
-                                 }
+                                onPressed: {
+                                    taskItem.isDragging = true;
+                                    listViewContainer.orderChanged = false;
+                                    listViewContainer.draggedItem = taskItem;
+                                }
 
-                                 onPositionChanged: {
-                                     // Handled natively by MouseArea.drag
-                                 }
+                                onPositionChanged: {
+                                    // Handled natively by MouseArea.drag
+                                }
 
-                                 onReleased: {
-                                     taskItem.isDragging = false;
-                                     listViewContainer.draggedItem = null;
-                                     if (listViewContainer.orderChanged) {
-                                         listViewContainer.saveNewOrder();
-                                     } else {
-                                         listViewContainer.updateLayout();
-                                     }
-                                 }
+                                onReleased: {
+                                    taskItem.isDragging = false;
+                                    listViewContainer.draggedItem = null;
+                                    if (listViewContainer.orderChanged) {
+                                        listViewContainer.saveNewOrder();
+                                    } else {
+                                        listViewContainer.updateLayout();
+                                    }
+                                }
 
-                                 onCanceled: {
-                                     taskItem.isDragging = false;
-                                     listViewContainer.draggedItem = null;
-                                     listViewContainer.resetAndLayout();
-                                 }
-                             }
+                                onCanceled: {
+                                    taskItem.isDragging = false;
+                                    listViewContainer.draggedItem = null;
+                                    listViewContainer.resetAndLayout();
+                                }
+                            }
                         }
 
                         // Checkbox status icon
