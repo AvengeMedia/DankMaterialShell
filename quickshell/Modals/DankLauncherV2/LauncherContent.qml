@@ -374,14 +374,14 @@ FocusScope {
                                 anchors.verticalCenter: parent.verticalCenter
                                 name: modelData.icon
                                 size: 14
-                                color: controller.searchMode === modelData.id ? Theme.primaryText : Theme.surfaceVariantText
+                                color: controller.searchMode === modelData.id ? Theme.onPrimaryContainer : Theme.surfaceVariantText
                             }
 
                             StyledText {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: modelData.label
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: controller.searchMode === modelData.id ? Theme.primaryText : Theme.surfaceText
+                                color: controller.searchMode === modelData.id ? Theme.onPrimaryContainer : Theme.surfaceText
                             }
                         }
 
@@ -647,14 +647,14 @@ FocusScope {
                                         anchors.verticalCenter: parent.verticalCenter
                                         name: modelData.icon
                                         size: 14
-                                        color: controller.fileSearchType === modelData.id ? Theme.primaryText : Theme.surfaceVariantText
+                                        color: controller.fileSearchType === modelData.id ? Theme.onPrimaryContainer : Theme.surfaceVariantText
                                     }
 
                                     StyledText {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: modelData.label
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: controller.fileSearchType === modelData.id ? Theme.primaryText : Theme.surfaceVariantText
+                                        color: controller.fileSearchType === modelData.id ? Theme.onPrimaryContainer : Theme.surfaceVariantText
                                     }
                                 }
 
