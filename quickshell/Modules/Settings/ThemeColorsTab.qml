@@ -48,7 +48,6 @@ Item {
                 "grepPattern": "dms.cursor",
                 "includeLine": "require(\"dms.cursor\")"
             };
-        case "dwl":
         case "mango":
             return {
                 "configFile": configDir + "/mango/config.conf",
@@ -63,7 +62,7 @@ Item {
 
     function checkCursorIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl" && compositor !== "mango") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
             cursorIncludeStatus = {
                 "exists": false,
                 "included": false,
@@ -74,7 +73,7 @@ Item {
         }
 
         const filename = (compositor === "niri") ? "cursor.kdl" : ((compositor === "hyprland") ? "cursor.lua" : "cursor.conf");
-        const compositorArg = (compositor === "dwl" || compositor === "mango") ? "mangowc" : compositor;
+        const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
 
         checkingCursorInclude = true;
         Proc.runCommand("check-cursor-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
@@ -194,7 +193,7 @@ Item {
                 themeColorsTab.templateDetection = JSON.parse(output.trim());
             } catch (e) {}
         });
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango)
+        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
             checkCursorIncludeStatus();
     }
 
@@ -2016,7 +2015,7 @@ Item {
                 title: I18n.tr("Cursor Theme")
                 settingKey: "cursorTheme"
                 iconName: "mouse"
-                visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango
+                visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
 
                 Column {
                     width: parent.width
@@ -2181,8 +2180,6 @@ Item {
                                 return SettingsData.cursorSettings.niri?.hideAfterInactiveMs || 0;
                             if (CompositorService.isHyprland)
                                 return SettingsData.cursorSettings.hyprland?.inactiveTimeout || 0;
-                            if (CompositorService.isDwl)
-                                return SettingsData.cursorSettings.dwl?.cursorHideTimeout || 0;
                             if (CompositorService.isMango)
                                 return SettingsData.cursorSettings.mango?.cursorHideTimeout || 0;
                             return 0;
@@ -2201,10 +2198,6 @@ Item {
                                 if (!updated.hyprland)
                                     updated.hyprland = {};
                                 updated.hyprland.inactiveTimeout = newValue;
-                            } else if (CompositorService.isDwl) {
-                                if (!updated.dwl)
-                                    updated.dwl = {};
-                                updated.dwl.cursorHideTimeout = newValue;
                             } else if (CompositorService.isMango) {
                                 if (!updated.mango)
                                     updated.mango = {};

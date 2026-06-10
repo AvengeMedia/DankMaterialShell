@@ -15,7 +15,6 @@ Singleton {
 
     property bool isHyprland: false
     property bool isNiri: false
-    property bool isDwl: false
     property bool isMango: false
     property bool isSway: false
     property bool isScroll: false
@@ -97,12 +96,6 @@ Singleton {
                 return hyprlandMonitor.scale;
         }
 
-        if (isDwl && screen) {
-            const dwlScale = DwlService.getOutputScale(screen.name);
-            if (dwlScale !== undefined && dwlScale > 0)
-                return dwlScale;
-        }
-
         if (isMango && screen) {
             const mangoScale = MangoService.getOutputScale(screen.name);
             if (mangoScale !== undefined && mangoScale > 0)
@@ -121,9 +114,7 @@ Singleton {
         else if (isSway || isScroll || isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             screenName = focusedWs?.monitor?.name || "";
-        } else if (isDwl && DwlService.activeOutput)
-            screenName = DwlService.activeOutput;
-        else if (isMango && MangoService.activeOutput)
+        } else if (isMango && MangoService.activeOutput)
             screenName = MangoService.activeOutput;
 
         if (!screenName)
@@ -192,17 +183,7 @@ Singleton {
         Qt.callLater(() => {
             NiriService.generateNiriLayoutConfig();
             HyprlandService.generateLayoutConfig();
-            DwlService.generateLayoutConfig();
         });
-    }
-
-    Connections {
-        target: DwlService
-        function onStateChanged() {
-            if (isDwl && !isHyprland && !isNiri) {
-                scheduleSort();
-            }
-        }
     }
 
     Connections {
@@ -271,13 +252,7 @@ Singleton {
     function _specialWorkspaceNameFromMonitor(monitor) {
         if (!monitor)
             return "";
-        const candidates = [
-            monitor.activeSpecialWorkspace?.name,
-            monitor.specialWorkspace?.name,
-            monitor.lastIpcObject?.specialWorkspace?.name,
-            monitor.lastIpcObject?.specialWorkspace,
-            monitor.lastIpcObject?.activeSpecialWorkspace?.name
-        ];
+        const candidates = [monitor.activeSpecialWorkspace?.name, monitor.specialWorkspace?.name, monitor.lastIpcObject?.specialWorkspace?.name, monitor.lastIpcObject?.specialWorkspace, monitor.lastIpcObject?.activeSpecialWorkspace?.name];
         for (let i = 0; i < candidates.length; i++) {
             const normalized = _normalizeSpecialWorkspaceName(candidates[i]);
             if (normalized)
@@ -860,7 +835,6 @@ Singleton {
             Qt.callLater(() => {
                 NiriService.generateNiriLayoutConfig();
                 HyprlandService.generateLayoutConfig();
-                DwlService.generateLayoutConfig();
                 MangoService.generateLayoutConfig();
             });
         }
@@ -870,7 +844,6 @@ Singleton {
         if (mangoSignature && mangoSignature.length > 0) {
             isHyprland = false;
             isNiri = false;
-            isDwl = false;
             isMango = true;
             isSway = false;
             isScroll = false;
@@ -884,7 +857,6 @@ Singleton {
         if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !miracleSocket && !labwcPid) {
             isHyprland = true;
             isNiri = false;
-            isDwl = false;
             isMango = false;
             isSway = false;
             isScroll = false;
@@ -900,7 +872,6 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = true;
                     isHyprland = false;
-                    isDwl = false;
                     isMango = false;
                     isSway = false;
                     isScroll = false;
@@ -919,7 +890,6 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
-                    isDwl = false;
                     isSway = true;
                     isScroll = false;
                     isMiracle = false;
@@ -936,7 +906,6 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
-                    isDwl = false;
                     isMango = false;
                     isSway = false;
                     isScroll = false;
@@ -954,7 +923,6 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
-                    isDwl = false;
                     isMango = false;
                     isSway = false;
                     isScroll = true;
@@ -970,7 +938,6 @@ Singleton {
         if (labwcPid && labwcPid.length > 0) {
             isHyprland = false;
             isNiri = false;
-            isDwl = false;
             isMango = false;
             isSway = false;
             isScroll = false;
@@ -981,45 +948,15 @@ Singleton {
             return;
         }
 
-        if (DMSService.dmsAvailable) {
-            Qt.callLater(checkForDwl);
-        } else {
-            isHyprland = false;
-            isNiri = false;
-            isDwl = false;
-            isMango = false;
-            isSway = false;
-            isScroll = false;
-            isMiracle = false;
-            isLabwc = false;
-            compositor = "unknown";
-            log.warn("No compositor detected");
-        }
-    }
-
-    Connections {
-        target: DMSService
-        function onCapabilitiesReceived() {
-            if (!isHyprland && !isNiri && !isDwl && !isMango && !isLabwc) {
-                checkForDwl();
-            }
-        }
-    }
-
-    function checkForDwl() {
-        if (isMango)
-            return;
-        if (DMSService.apiVersion >= 12 && DMSService.capabilities.includes("dwl")) {
-            isHyprland = false;
-            isNiri = false;
-            isDwl = true;
-            isSway = false;
-            isScroll = false;
-            isMiracle = false;
-            isLabwc = false;
-            compositor = "dwl";
-            log.info("Detected DWL via DMS capability");
-        }
+        isHyprland = false;
+        isNiri = false;
+        isMango = false;
+        isSway = false;
+        isScroll = false;
+        isMiracle = false;
+        isLabwc = false;
+        compositor = "unknown";
+        log.warn("No compositor detected");
     }
 
     function powerOffMonitors() {
@@ -1027,8 +964,6 @@ Singleton {
             return NiriService.powerOffMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOff();
-        if (isDwl)
-            return _dwlPowerOffMonitors();
         if (isMango)
             return MangoService.powerOffMonitors();
         if (isSway || isScroll || isMiracle) {
@@ -1048,8 +983,6 @@ Singleton {
             return NiriService.powerOnMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOn();
-        if (isDwl)
-            return _dwlPowerOnMonitors();
         if (isMango)
             return MangoService.powerOnMonitors();
         if (isSway || isScroll || isMiracle) {
@@ -1062,33 +995,5 @@ Singleton {
             Quickshell.execDetached(["dms", "dpms", "on"]);
         }
         log.warn("Cannot power on monitors, unknown compositor");
-    }
-
-    function _dwlPowerOffMonitors() {
-        if (!Quickshell.screens || Quickshell.screens.length === 0) {
-            log.warn("No screens available for DWL power off");
-            return;
-        }
-
-        for (let i = 0; i < Quickshell.screens.length; i++) {
-            const screen = Quickshell.screens[i];
-            if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "dispatch", "disable_monitor," + screen.name]);
-            }
-        }
-    }
-
-    function _dwlPowerOnMonitors() {
-        if (!Quickshell.screens || Quickshell.screens.length === 0) {
-            log.warn("No screens available for DWL power on");
-            return;
-        }
-
-        for (let i = 0; i < Quickshell.screens.length; i++) {
-            const screen = Quickshell.screens[i];
-            if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "dispatch", "enable_monitor," + screen.name]);
-            }
-        }
     }
 }

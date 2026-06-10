@@ -489,9 +489,6 @@ Singleton {
                 "hideOnTouch": false,
                 "inactiveTimeout": 0
             },
-            "dwl": {
-                "cursorHideTimeout": 0
-            },
             "mango": {
                 "cursorHideTimeout": 0
             }
@@ -1224,8 +1221,6 @@ Singleton {
             NiriService.generateNiriLayoutConfig();
         if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
             HyprlandService.generateLayoutConfig();
-        if (CompositorService.isDwl && typeof DwlService !== "undefined")
-            DwlService.generateLayoutConfig();
         if (CompositorService.isMango && typeof MangoService !== "undefined")
             MangoService.generateLayoutConfig();
     }
@@ -2449,10 +2444,6 @@ Singleton {
         }
         if (CompositorService.isHyprland && typeof HyprlandService !== "undefined") {
             HyprlandService.generateCursorConfig();
-            return;
-        }
-        if (CompositorService.isDwl && typeof DwlService !== "undefined") {
-            DwlService.generateCursorConfig();
             return;
         }
         if (CompositorService.isMango && typeof MangoService !== "undefined") {

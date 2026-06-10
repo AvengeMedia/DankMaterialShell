@@ -14,13 +14,13 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("KeybindsService")
 
-    property bool available: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango
+    property bool available: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
     property string currentProvider: {
         if (CompositorService.isNiri)
             return "niri";
         if (CompositorService.isHyprland)
             return "hyprland";
-        if (CompositorService.isDwl || CompositorService.isMango)
+        if (CompositorService.isMango)
             return "mangowc";
         return "";
     }
@@ -30,7 +30,7 @@ Singleton {
             return "niri";
         if (CompositorService.isHyprland)
             return "hyprland";
-        if (CompositorService.isDwl || CompositorService.isMango)
+        if (CompositorService.isMango)
             return "mangowc";
         return "";
     }
@@ -290,13 +290,16 @@ Singleton {
                 configFile: mainConfigPath,
                 backupFile: backupPath,
                 fragmentFiles: [compositorConfigDir + "/dms/binds.lua", compositorConfigDir + "/dms/binds-user.lua"],
-                includes: [{
+                includes: [
+                    {
                         grepPattern: "dms.binds",
                         includeLine: "require(\"dms.binds\")"
-                    }, {
+                    },
+                    {
                         grepPattern: "dms.binds-user",
                         includeLine: "require(\"dms.binds-user\")"
-                    }]
+                    }
+                ]
             });
             break;
         case "mangowc":

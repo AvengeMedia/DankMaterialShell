@@ -153,7 +153,7 @@ Item {
                     text: I18n.tr("Follow Monitor Focus")
                     description: I18n.tr("Show workspaces of the currently focused monitor")
                     checked: SettingsData.workspaceFollowFocus
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
                     onToggled: checked => SettingsData.set("workspaceFollowFocus", checked)
                 }
 
@@ -193,7 +193,7 @@ Item {
                     text: I18n.tr("Show All Tags")
                     description: I18n.tr("Show all 9 tags instead of only occupied tags")
                     checked: SettingsData.dwlShowAllTags
-                    visible: CompositorService.isDwl || CompositorService.isMango
+                    visible: CompositorService.isMango
                     onToggled: checked => SettingsData.set("dwlShowAllTags", checked)
                 }
             }

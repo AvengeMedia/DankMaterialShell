@@ -37,10 +37,10 @@ Item {
             {
                 "id": "layout",
                 "text": I18n.tr("Layout"),
-                "description": I18n.tr("Display and switch DWL layouts"),
+                "description": I18n.tr("Display and switch MangoWC layouts"),
                 "icon": "view_quilt",
-                "enabled": (CompositorService.isDwl && DwlService.dwlAvailable) || (CompositorService.isMango && MangoService.available),
-                "warning": CompositorService.isMango ? (!MangoService.available ? I18n.tr("DWL service not available") : undefined) : (!CompositorService.isDwl ? I18n.tr("Requires DWL compositor") : (!DwlService.dwlAvailable ? I18n.tr("DWL service not available") : undefined))
+                "enabled": CompositorService.isMango && MangoService.available,
+                "warning": !CompositorService.isMango ? I18n.tr("Requires MangoWC compositor") : (!MangoService.available ? I18n.tr("Mango service not available") : undefined)
             },
             {
                 "id": "launcherButton",

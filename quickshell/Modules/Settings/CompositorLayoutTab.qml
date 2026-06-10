@@ -229,7 +229,7 @@ Item {
                 title: I18n.tr("MangoWC Layout Overrides")
                 settingKey: "mangoLayout"
                 iconName: "crop_square"
-                visible: CompositorService.isDwl || CompositorService.isMango
+                visible: CompositorService.isMango
 
                 SettingsToggleRow {
                     tags: ["mangowc", "mango", "gaps", "override"]

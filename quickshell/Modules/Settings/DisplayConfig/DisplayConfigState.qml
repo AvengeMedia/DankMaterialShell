@@ -1023,7 +1023,6 @@ Singleton {
             return parseNiriOutputs(content);
         case "hyprland":
             return parseHyprlandOutputs(content);
-        case "dwl":
         case "mango":
             return parseMangoOutputs(content);
         default:
@@ -1362,7 +1361,6 @@ Singleton {
                 "grepPattern": "dms.outputs",
                 "includeLine": "require(\"dms.outputs\")"
             };
-        case "dwl":
         case "mango":
             return {
                 "configFile": configDir + "/mango/config.conf",
@@ -1377,7 +1375,7 @@ Singleton {
 
     function checkIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl" && compositor !== "mango") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
             includeStatus = {
                 "exists": false,
                 "included": false,
@@ -1388,8 +1386,7 @@ Singleton {
         }
 
         const filename = (compositor === "niri") ? "outputs.kdl" : ((compositor === "hyprland") ? "outputs.lua" : "outputs.conf");
-        // mango and dwl both use outputs.conf under ~/.config/mango
-        const compositorArg = (compositor === "dwl" || compositor === "mango") ? "mangowc" : compositor;
+        const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
 
         checkingInclude = true;
         Proc.runCommand("check-outputs-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
@@ -1588,9 +1585,6 @@ Singleton {
             }
         case "mango":
             MangoService.generateOutputsConfig(outputsData, finish);
-            break;
-        case "dwl":
-            DwlService.generateOutputsConfig(outputsData, finish);
             break;
         default:
             WlrOutputService.applyOutputsConfig(outputsData, outputs);

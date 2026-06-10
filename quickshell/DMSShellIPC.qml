@@ -337,9 +337,6 @@ Item {
                 const focusedWs = I3.workspaces.values.find(ws => ws.focused === true);
                 return focusedWs?.monitor?.name || "";
             }
-            if (CompositorService.isDwl && DwlService.activeOutput) {
-                return DwlService.activeOutput;
-            }
             if (CompositorService.isMango && MangoService.activeOutput) {
                 return MangoService.activeOutput;
             }

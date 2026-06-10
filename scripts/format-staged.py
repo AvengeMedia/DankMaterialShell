@@ -195,6 +195,23 @@ def apply_edits(text, edits):
     return text
 
 
+def start_client(qmlls, root):
+    client = LspClient([qmlls])
+    client.request("initialize", {
+        "processId": os.getpid(),
+        "rootUri": root.as_uri(),
+        "workspaceFolders": [{"uri": root.as_uri(), "name": root.name}],
+        "capabilities": {
+            "textDocument": {
+                "formatting": {"dynamicRegistration": False},
+                "synchronization": {"dynamicRegistration": False},
+            },
+        },
+    })
+    client.notify("initialized", {})
+    return client
+
+
 def main():
     root = repo_root()
     files = staged_qml_files(root)
@@ -219,24 +236,11 @@ def main():
     if not qmllint:
         print("warning: qmllint with --json not found; skipping unused-import checks", file=sys.stderr)
 
-    client = LspClient([qmlls])
+    client = start_client(qmlls, root)
     changed = 0
     skipped = 0
     unused_by_file = {}
     try:
-        client.request("initialize", {
-            "processId": os.getpid(),
-            "rootUri": root.as_uri(),
-            "workspaceFolders": [{"uri": root.as_uri(), "name": root.name}],
-            "capabilities": {
-                "textDocument": {
-                    "formatting": {"dynamicRegistration": False},
-                    "synchronization": {"dynamicRegistration": False},
-                },
-            },
-        })
-        client.notify("initialized", {})
-
         for file in files:
             rel = file.relative_to(root)
             print(f"  {rel} ... ", end="", flush=True)
@@ -258,16 +262,21 @@ def main():
                     "textDocument": {"uri": uri},
                     "options": {"tabSize": TAB_SIZE, "insertSpaces": True},
                 })
-            except RuntimeError as exc:
-                # qmlls (qmlformat's DOM) refuses some valid files — notably
-                # "Cannot format invalid documents!" on constructs qmllint
-                # accepts. Don't let one file's formatter bug abort the commit.
+            except (RuntimeError, OSError) as exc:
+                # qmlls (qmlformat's DOM) chokes on some valid files: it refuses
+                # them ("Cannot format invalid documents!") or outright crashes
+                # (e.g. SIGABRT on a function declaration inside a property
+                # binding). Don't let one file's formatter bug abort the commit.
+                skipped += 1
+                if client.proc.poll() is not None:
+                    print("skipped (qmlls crashed on this file; restarting it)")
+                    client = start_client(qmlls, root)
+                    continue
                 client.notify("textDocument/didClose", {"textDocument": {"uri": uri}})
                 if "invalid document" in str(exc).lower():
-                    print("skipped (qmlls rejected as invalid;")
+                    print("skipped (qmlls rejected as invalid)")
                 else:
                     print(f"skipped ({exc})")
-                skipped += 1
                 continue
 
             client.notify("textDocument/didClose", {"textDocument": {"uri": uri}})

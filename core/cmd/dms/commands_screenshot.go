@@ -39,7 +39,7 @@ Modes:
   full        - Capture the focused output
   all         - Capture all outputs combined
   output      - Capture a specific output by name
-  window      - Capture the focused window (Hyprland/DWL)
+  window      - Capture the focused window (Hyprland/Mango)
   last        - Capture the last selected region
 
 Output format (--format):
@@ -97,7 +97,7 @@ If no previous region exists, falls back to interactive selection.`,
 var ssWindowCmd = &cobra.Command{
 	Use:   "window",
 	Short: "Capture the focused window",
-	Long:  `Capture the currently focused window. Supported on Hyprland and DWL.`,
+	Long:  `Capture the currently focused window. Supported on Hyprland and Mango.`,
 	Run:   runScreenshotWindow,
 }
 

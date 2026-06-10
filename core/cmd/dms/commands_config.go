@@ -72,7 +72,7 @@ func runResolveInclude(cmd *cobra.Command, args []string) {
 		result, err = checkHyprlandInclude(filename)
 	case "niri":
 		result, err = checkNiriInclude(filename)
-	case "mangowc", "dwl", "mango":
+	case "mangowc", "mango":
 		result, err = checkMangoWCInclude(filename)
 	default:
 		log.Fatalf("Unknown compositor: %s", compositor)
