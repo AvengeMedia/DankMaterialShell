@@ -60,6 +60,9 @@ FloatingWindow {
                 toplevel.activate();
                 return;
             }
+            hide();
+            show();
+            return;
         }
         show();
     }
@@ -94,6 +97,8 @@ FloatingWindow {
         if (visible && currentTab === 0 && searchField.visible)
             searchField.forceActiveFocus();
     }
+
+    onClosed: hide()
 
     onVisibleChanged: {
         if (!visible) {
