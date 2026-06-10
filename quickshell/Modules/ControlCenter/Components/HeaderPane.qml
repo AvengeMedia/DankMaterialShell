@@ -60,7 +60,7 @@ Rectangle {
             }
 
             Typography {
-                text: DgopService.uptime ? I18n.tr("up") + " " + DgopService.uptime.slice(3) : I18n.tr("Unknown")
+                text: DgopService.uptime ? I18n.tr("up", "uptime prefix, e.g. 'up 4h 2m'") + " " + DgopService.uptime.slice(3) : I18n.tr("Unknown")
                 style: Typography.Style.Caption
                 color: Theme.surfaceVariantText
             }

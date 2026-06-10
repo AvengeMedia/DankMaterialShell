@@ -80,6 +80,9 @@
   "%1 online": {
     "%1 online": "1％オンライン"
   },
+  "%1 tasks": {
+    "%1 tasks": ""
+  },
   "%1 update": {
     "%1 update": "更新 %1 件"
   },
@@ -134,9 +137,6 @@
   "1 device connected": {
     "1 device connected": "1台接続済み"
   },
-  "1 event": {
-    "1 event": "1件のイベント"
-  },
   "1 hour": {
     "1 hour": "1時間"
   },
@@ -151,6 +151,9 @@
   },
   "1 second": {
     "1 second": "1秒"
+  },
+  "1 task": {
+    "1 task": ""
   },
   "10 minutes": {
     "10 minutes": "10分"
@@ -199,9 +202,6 @@
   },
   "24-hour clock": {
     "24-hour clock": "24時間時計"
-  },
-  "24-hour format": {
-    "24-hour format": "24 時間形式"
   },
   "25 seconds": {
     "25 seconds": "25秒"
@@ -440,6 +440,9 @@
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
     "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "すべてのアプリ起動にカスタム接頭辞を追加します。これは 'uwsm-app'、'systemd-run'、その他のコマンドラッパーなどに使用できます。"
   },
+  "Add a task...": {
+    "Add a task...": ""
+  },
   "Add and configure widgets that appear on your desktop": {
     "Add and configure widgets that appear on your desktop": "デスクトップに表示されるウィジェットを追加および設定"
   },
@@ -509,6 +512,9 @@
   "Already on that session": {
     "Already on that session": ""
   },
+  "Also group repeated application icons on the active workspace": {
+    "Also group repeated application icons on the active workspace": ""
+  },
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: 戻る • F1/I: ファイル情報 • F10: ヘルプ • Esc: 閉じる"
   },
@@ -551,6 +557,9 @@
   "Analyzing configuration...": {
     "Analyzing configuration...": "設定を解析中..."
   },
+  "Anchor": {
+    "Anchor": ""
+  },
   "Animation Duration": {
     "Animation Duration": "アニメーション時間"
   },
@@ -566,9 +575,6 @@
   "Anonymous Identity (optional)": {
     "Anonymous Identity (optional)": "匿名 ID (オプション)"
   },
-  "Any": {
-    "Any": ""
-  },
   "Any window": {
     "Any window": ""
   },
@@ -577,6 +583,9 @@
   },
   "App ID": {
     "App ID": ""
+  },
+  "App ID (e.g. firefox)": {
+    "App ID (e.g. firefox)": ""
   },
   "App ID Substitutions": {
     "App ID Substitutions": "App ID 置換"
@@ -632,11 +641,11 @@
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "目の疲れを軽減するために、暖色系の色温度を適用します。以下の自動化設定で、いつアクティブにするか制御できます。"
   },
-  "Applying authentication changes…": {
-    "Applying authentication changes…": "認証の変更を適用中…"
+  "Applying authentication changes...": {
+    "Applying authentication changes...": ""
   },
-  "Applying auto-login on startup…": {
-    "Applying auto-login on startup…": ""
+  "Applying auto-login on startup...": {
+    "Applying auto-login on startup...": ""
   },
   "Apps": {
     "Apps": "アプリ"
@@ -931,6 +940,12 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "アクセントに焦点を絞ったバランスの取れたパレット(デフォルト)。"
+  },
+  "Bar": {
+    "Bar": ""
+  },
+  "Bar %1": {
+    "Bar %1": ""
   },
   "Bar Configurations": {
     "Bar Configurations": "バーの設定"
@@ -1265,14 +1280,11 @@
   "Checking for updates...": {
     "Checking for updates...": "更新を確認中..."
   },
-  "Checking whether sudo authentication is needed…": {
-    "Checking whether sudo authentication is needed…": "sudo 認証が必要か確認中…"
+  "Checking whether sudo authentication is needed...": {
+    "Checking whether sudo authentication is needed...": ""
   },
   "Checking...": {
     "Checking...": "確認中..."
-  },
-  "Checking…": {
-    "Checking…": "確認中…"
   },
   "Choose Color": {
     "Choose Color": "色を選んでください"
@@ -1637,8 +1649,8 @@
   "Connecting to Device": {
     "Connecting to Device": "デバイスに接続中"
   },
-  "Connecting to clipboard service…": {
-    "Connecting to clipboard service…": "クリップボードサービスに接続中…"
+  "Connecting to clipboard service...": {
+    "Connecting to clipboard service...": ""
   },
   "Connecting...": {
     "Connecting...": "接続中..."
@@ -1985,9 +1997,6 @@
   "DMS_SOCKET not available": {
     "DMS_SOCKET not available": "DMS_SOCKETが利用できません"
   },
-  "DWL service not available": {
-    "DWL service not available": "DWLサービスが利用できません"
-  },
   "Daily": {
     "Daily": "毎日"
   },
@@ -2228,8 +2237,8 @@
   "Disabling WiFi...": {
     "Disabling WiFi...": "WiFi を無効化中..."
   },
-  "Disabling auto-login on startup…": {
-    "Disabling auto-login on startup…": ""
+  "Disabling auto-login on startup...": {
+    "Disabling auto-login on startup...": ""
   },
   "Disc": {
     "Disc": "ディスク"
@@ -2294,8 +2303,8 @@
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "フルスクリーンアプリよりもすべての優先度を表示する"
   },
-  "Display and switch DWL layouts": {
-    "Display and switch DWL layouts": "DWL レイアウトの表示と切り替え"
+  "Display and switch MangoWC layouts": {
+    "Display and switch MangoWC layouts": ""
   },
   "Display application icons in workspace indicators": {
     "Display application icons in workspace indicators": "ワークスペース インジケーターにアプリのアイコンを表示"
@@ -2470,6 +2479,9 @@
   },
   "Edit clipboard text": {
     "Edit clipboard text": ""
+  },
+  "Editing changes on %1": {
+    "Editing changes on %1": ""
   },
   "Education": {
     "Education": "教育"
@@ -2975,11 +2987,11 @@
   "Failed to update sharing": {
     "Failed to update sharing": "共有設定の更新に失敗しました"
   },
-  "Failed to write Hyprland outputs config.": {
-    "Failed to write Hyprland outputs config.": ""
-  },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": ""
+  },
+  "Failed to write outputs config.": {
+    "Failed to write outputs config.": ""
   },
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "検証用の一時ファイル書き込みに失敗しました"
@@ -3101,8 +3113,20 @@
   "Float": {
     "Float": "フロート"
   },
+  "Float Anchor": {
+    "Float Anchor": ""
+  },
+  "Float X": {
+    "Float X": ""
+  },
+  "Float Y": {
+    "Float Y": ""
+  },
   "Floating": {
     "Floating": ""
+  },
+  "Floating Position": {
+    "Floating Position": ""
   },
   "Fluent": {
     "Fluent": " Fluent"
@@ -3136,9 +3160,6 @@
   },
   "Focused Window": {
     "Focused Window": "フォーカスされたウィンドウ"
-  },
-  "Focused monitor only": {
-    "Focused monitor only": "フォーカス中のモニターのみ"
   },
   "Fog": {
     "Fog": "霧"
@@ -3436,6 +3457,9 @@
   },
   "Group": {
     "Group": "グループ"
+  },
+  "Group Active Workspace": {
+    "Group Active Workspace": ""
   },
   "Group Workspace Apps": {
     "Group Workspace Apps": "ワークスペースのアプリをグループ化"
@@ -3797,6 +3821,9 @@
   "Inhibitable": {
     "Inhibitable": "抑制可能"
   },
+  "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
+    "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": ""
+  },
   "Initialised": {
     "Initialised": ""
   },
@@ -3898,6 +3925,9 @@
   },
   "Invert on mode change": {
     "Invert on mode change": "モード変更時に反転"
+  },
+  "Invert touchpad scroll direction": {
+    "Invert touchpad scroll direction": ""
   },
   "Iris Bloom": {
     "Iris Bloom": "Iris Bloom"
@@ -4222,6 +4252,12 @@
   },
   "Manages files and directories": {
     "Manages files and directories": "ファイルとディレクトリを管理します"
+  },
+  "Mango Options": {
+    "Mango Options": ""
+  },
+  "Mango service not available": {
+    "Mango service not available": ""
   },
   "MangoWC Layout Overrides": {
     "MangoWC Layout Overrides": "MangoWC レイアウト上書き"
@@ -4603,6 +4639,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "ネイティブ: プラットフォームレンダラー (FreeType)。"
+  },
+  "Natural Touchpad Scrolling": {
+    "Natural Touchpad Scrolling": ""
   },
   "Navigate": {
     "Navigate": "移動"
@@ -5132,9 +5171,6 @@
   "On-Demand": {
     "On-Demand": "オンデマンド"
   },
-  "On-Screen Displays": {
-    "On-Screen Displays": "オンスクリーンディスプレイ"
-  },
   "On-screen Displays": {
     "On-screen Displays": "オンスクリーンディスプレイ"
   },
@@ -5570,9 +5606,6 @@
   "Plugged In": {
     "Plugged In": "接続"
   },
-  "Plugged in": {
-    "Plugged in": "接続中"
-  },
   "Plugin": {
     "Plugin": "プラグイン"
   },
@@ -5915,8 +5948,8 @@
   "Refresh Weather": {
     "Refresh Weather": "天気を更新"
   },
-  "Refreshing…": {
-    "Refreshing…": ""
+  "Refreshing...": {
+    "Refreshing...": ""
   },
   "Regex": {
     "Regex": "正規表現"
@@ -6041,8 +6074,8 @@
   "Requires DMS server with sysupdate capability": {
     "Requires DMS server with sysupdate capability": "sysupdate 機能に対応した DMS サーバーが必要です"
   },
-  "Requires DWL compositor": {
-    "Requires DWL compositor": "DWLコンポジターが必要"
+  "Requires MangoWC compositor": {
+    "Requires MangoWC compositor": ""
   },
   "Requires a newer version of Quickshell": {
     "Requires a newer version of Quickshell": "より新しいバージョンの Quickshell が必要"
@@ -6073,6 +6106,12 @@
   },
   "Resize Widget": {
     "Resize Widget": "ウィジェットのサイズを変更"
+  },
+  "Resize on Border": {
+    "Resize on Border": ""
+  },
+  "Resize windows by dragging their edges with the mouse": {
+    "Resize windows by dragging their edges with the mouse": ""
   },
   "Resolution & Refresh": {
     "Resolution & Refresh": "解像度とリフレッシュレート"
@@ -6146,12 +6185,6 @@
   "Rounded corners for windows": {
     "Rounded corners for windows": "ウィンドウの角を丸くする"
   },
-  "Rounded corners for windows (border_radius)": {
-    "Rounded corners for windows (border_radius)": "ウィンドウの角を丸くする（border_radius）"
-  },
-  "Rounded corners for windows (decoration.rounding)": {
-    "Rounded corners for windows (decoration.rounding)": "ウィンドウの角を丸くする（decoration.rounding）"
-  },
   "Rule": {
     "Rule": "ルール"
   },
@@ -6188,8 +6221,8 @@
   "Running Apps Settings": {
     "Running Apps Settings": "実行中のアプリの設定"
   },
-  "Running greeter sync…": {
-    "Running greeter sync…": "Greeter 同期を実行中…"
+  "Running greeter sync...": {
+    "Running greeter sync...": ""
   },
   "Running in terminal": {
     "Running in terminal": "端末で実行中"
@@ -6800,8 +6833,8 @@
   "Show Workspace Apps": {
     "Show Workspace Apps": "ワークスペースアプリを表示"
   },
-  "Show all 9 tags instead of only occupied tags (DWL only)": {
-    "Show all 9 tags instead of only occupied tags (DWL only)": "占有タグのみではなく、9 つのタグをすべて表示 (DWL のみ)"
+  "Show all 9 tags instead of only occupied tags": {
+    "Show all 9 tags instead of only occupied tags": ""
   },
   "Show an outline ring around the focused workspace indicator": {
     "Show an outline ring around the focused workspace indicator": "フォーカス中のワークスペースインジケーターの周囲にアウトラインリングを表示"
@@ -7006,12 +7039,6 @@
   },
   "Space between windows": {
     "Space between windows": "ウィンドウ間の間隔"
-  },
-  "Space between windows (gappih/gappiv/gappoh/gappov)": {
-    "Space between windows (gappih/gappiv/gappoh/gappov)": "ウィンドウ間の間隔（gappih/gappiv/gappoh/gappov）"
-  },
-  "Space between windows (gaps_in and gaps_out)": {
-    "Space between windows (gaps_in and gaps_out)": "ウィンドウ間の間隔（gaps_in と gaps_out）"
   },
   "Spacer": {
     "Spacer": "間隔"
@@ -7234,6 +7261,9 @@
   },
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: ナビゲーション • ←→↑↓: グリッドナビゲーション • Enter/Space: 選択"
+  },
+  "Tags": {
+    "Tags": ""
   },
   "Tags: %1": {
     "Tags: %1": "タグ: %1"
@@ -7459,6 +7489,9 @@
   },
   "Title": {
     "Title": "タイトル"
+  },
+  "Title (optional)": {
+    "Title (optional)": ""
   },
   "Title regex (optional)": {
     "Title regex (optional)": "タイトルの正規表現（任意）"
@@ -7850,9 +7883,6 @@
   "Use custom window radius instead of theme radius": {
     "Use custom window radius instead of theme radius": "テーマ半径の代わりにカスタムウィンドウ半径を使用"
   },
-  "Use custom window rounding instead of theme radius": {
-    "Use custom window rounding instead of theme radius": "テーマ半径の代わりにカスタムウィンドウ丸みを使用"
-  },
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "デスクトップ壁紙を使用"
   },
@@ -7960,9 +7990,6 @@
   },
   "VPN configuration updated": {
     "VPN configuration updated": "VPN 設定を更新しました"
-  },
-  "VPN connections": {
-    "VPN connections": "VPN 接続"
   },
   "VPN deleted": {
     "VPN deleted": "VPN を削除しました"
@@ -8177,6 +8204,9 @@
   "Widgets": {
     "Widgets": "ウィジェット"
   },
+  "Widgets & Notifications": {
+    "Widgets & Notifications": ""
+  },
   "Widgets, layout, style": {
     "Widgets, layout, style": "ウィジェット、レイアウト、スタイル"
   },
@@ -8189,11 +8219,8 @@
   "Width of the widget outline in pixels": {
     "Width of the widget outline in pixels": ""
   },
-  "Width of window border (borderpx)": {
-    "Width of window border (borderpx)": "ウィンドウ境界線の幅（borderpx）"
-  },
-  "Width of window border (general.border_size)": {
-    "Width of window border (general.border_size)": "ウィンドウ境界線の幅（general.border_size）"
+  "Width of window border": {
+    "Width of window border": ""
   },
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "ウィンドウ境界線とフォーカスリングの幅"
@@ -8222,9 +8249,6 @@
   "Window Opening": {
     "Window Opening": "ウィンドウの開く動作"
   },
-  "Window Rounding": {
-    "Window Rounding": "ウィンドウの丸み"
-  },
   "Window Rules": {
     "Window Rules": "ウィンドウルール"
   },
@@ -8237,8 +8261,8 @@
   "Wipe": {
     "Wipe": "ワイプ"
   },
-  "Working…": {
-    "Working…": ""
+  "Working...": {
+    "Working...": ""
   },
   "Workspace": {
     "Workspace": "ワークスペース"
@@ -8267,14 +8291,14 @@
   "Workspaces": {
     "Workspaces": "ワークスペース"
   },
-  "Workspaces & Widgets": {
-    "Workspaces & Widgets": "ワークスペースとウィジェット"
-  },
   "Wrap the app command. %command% is replaced with the actual executable": {
     "Wrap the app command. %command% is replaced with the actual executable": ""
   },
   "Write:": {
     "Write:": "書き込み:"
+  },
+  "X": {
+    "X": ""
   },
   "X Axis": {
     "X Axis": "X 軸"
@@ -8287,6 +8311,9 @@
   },
   "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
     "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": ""
+  },
+  "Y": {
+    "Y": ""
   },
   "Y Axis": {
     "Y Axis": "Y 軸"
@@ -8393,9 +8420,6 @@
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": "例: scratch、/^tmp_.*/、build"
   },
-  "events": {
-    "events": "イベント"
-  },
   "ext": {
     "ext": "ext"
   },
@@ -8413,6 +8437,12 @@
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctlが利用できません- ロック統合のためにDMS socketの接続が必要です。"
+  },
+  "mango: config reloaded": {
+    "mango: config reloaded": ""
+  },
+  "mango: failed to reload config": {
+    "mango: failed to reload config": ""
   },
   "mangowc Discord Server": {
     "mangowc Discord Server": "mangowc Discord サーバー"

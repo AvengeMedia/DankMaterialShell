@@ -145,7 +145,7 @@ Item {
                     tags: ["hyprland", "gaps", "override"]
                     settingKey: "hyprlandLayoutGapsOverride"
                     text: I18n.tr("Window Gaps")
-                    description: I18n.tr("Space between windows (gaps_in and gaps_out)")
+                    description: I18n.tr("Space between windows") + " (gaps_in/gaps_out)"
                     visible: SettingsData.hyprlandLayoutGapsOverride >= 0
                     value: Math.max(0, SettingsData.hyprlandLayoutGapsOverride)
                     minimum: 0
@@ -159,7 +159,7 @@ Item {
                     tags: ["hyprland", "radius", "override", "rounding"]
                     settingKey: "hyprlandLayoutRadiusOverrideEnabled"
                     text: I18n.tr("Override Corner Radius")
-                    description: I18n.tr("Use custom window rounding instead of theme radius")
+                    description: I18n.tr("Use custom window radius instead of theme radius")
                     checked: SettingsData.hyprlandLayoutRadiusOverride >= 0
                     onToggled: checked => {
                         if (checked) {
@@ -173,8 +173,8 @@ Item {
                 SettingsSliderRow {
                     tags: ["hyprland", "radius", "override", "rounding"]
                     settingKey: "hyprlandLayoutRadiusOverride"
-                    text: I18n.tr("Window Rounding")
-                    description: I18n.tr("Rounded corners for windows (decoration.rounding)")
+                    text: I18n.tr("Window Corner Radius")
+                    description: I18n.tr("Rounded corners for windows") + " (decoration.rounding)"
                     visible: SettingsData.hyprlandLayoutRadiusOverride >= 0
                     value: Math.max(0, SettingsData.hyprlandLayoutRadiusOverride)
                     minimum: 0
@@ -203,7 +203,7 @@ Item {
                     tags: ["hyprland", "border", "override"]
                     settingKey: "hyprlandLayoutBorderSize"
                     text: I18n.tr("Border Size")
-                    description: I18n.tr("Width of window border (general.border_size)")
+                    description: I18n.tr("Width of window border") + " (general.border_size)"
                     visible: SettingsData.hyprlandLayoutBorderSize >= 0
                     value: Math.max(0, SettingsData.hyprlandLayoutBorderSize)
                     minimum: 0
@@ -251,7 +251,7 @@ Item {
                     tags: ["mangowc", "mango", "gaps", "override"]
                     settingKey: "mangoLayoutGapsOverride"
                     text: I18n.tr("Window Gaps")
-                    description: I18n.tr("Space between windows (gappih/gappiv/gappoh/gappov)")
+                    description: I18n.tr("Space between windows") + " (gappih/gappiv/gappoh/gappov)"
                     visible: SettingsData.mangoLayoutGapsOverride >= 0
                     value: Math.max(0, SettingsData.mangoLayoutGapsOverride)
                     minimum: 0
@@ -280,7 +280,7 @@ Item {
                     tags: ["mangowc", "mango", "radius", "override"]
                     settingKey: "mangoLayoutRadiusOverride"
                     text: I18n.tr("Window Corner Radius")
-                    description: I18n.tr("Rounded corners for windows (border_radius)")
+                    description: I18n.tr("Rounded corners for windows") + " (border_radius)"
                     visible: SettingsData.mangoLayoutRadiusOverride >= 0
                     value: Math.max(0, SettingsData.mangoLayoutRadiusOverride)
                     minimum: 0
@@ -309,7 +309,7 @@ Item {
                     tags: ["mangowc", "mango", "border", "override"]
                     settingKey: "mangoLayoutBorderSize"
                     text: I18n.tr("Border Size")
-                    description: I18n.tr("Width of window border (borderpx)")
+                    description: I18n.tr("Width of window border") + " (borderpx)"
                     visible: SettingsData.mangoLayoutBorderSize >= 0
                     value: Math.max(0, SettingsData.mangoLayoutBorderSize)
                     minimum: 0

@@ -335,32 +335,9 @@ FloatingWindow {
                     anchors.fill: parent
                     visible: root.isLoading
 
-                    Column {
+                    DankSpinner {
                         anchors.centerIn: parent
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "sync"
-                            size: 48
-                            color: Theme.primary
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            smoothTransform: root.isLoading
-
-                            RotationAnimator on rotation {
-                                from: 0
-                                to: 360
-                                duration: 1000
-                                loops: Animation.Infinite
-                                running: root.isLoading
-                            }
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Loading...", "loading indicator")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                        running: root.isLoading
                     }
                 }
 

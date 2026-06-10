@@ -643,41 +643,9 @@ Item {
                                                     height: NetworkService.networkWiredInfoLoading ? 40 : 0
                                                     visible: NetworkService.networkWiredInfoLoading
 
-                                                    Row {
+                                                    DankSpinner {
                                                         anchors.centerIn: parent
-                                                        spacing: Theme.spacingS
-
-                                                        DankIcon {
-                                                            id: wiredLoadIcon
-                                                            name: "sync"
-                                                            size: 16
-                                                            color: Theme.surfaceVariantText
-
-                                                            SequentialAnimation {
-                                                                running: NetworkService.networkWiredInfoLoading
-                                                                loops: Animation.Infinite
-                                                                OpacityAnimator {
-                                                                    target: wiredLoadIcon
-                                                                    to: 0.3
-                                                                    duration: 400
-                                                                    easing.type: Easing.InOutQuad
-                                                                }
-                                                                OpacityAnimator {
-                                                                    target: wiredLoadIcon
-                                                                    to: 1.0
-                                                                    duration: 400
-                                                                    easing.type: Easing.InOutQuad
-                                                                }
-                                                                onRunningChanged: if (!running)
-                                                                    wiredLoadIcon.opacity = 1.0
-                                                            }
-                                                        }
-
-                                                        StyledText {
-                                                            text: I18n.tr("Loading...")
-                                                            font.pixelSize: Theme.fontSizeSmall
-                                                            color: Theme.surfaceVariantText
-                                                        }
+                                                        size: 20
                                                     }
                                                 }
                                             }
@@ -1360,41 +1328,9 @@ Item {
                                                         height: NetworkService.networkInfoLoading ? 40 : 0
                                                         visible: NetworkService.networkInfoLoading
 
-                                                        Row {
+                                                        DankSpinner {
                                                             anchors.centerIn: parent
-                                                            spacing: Theme.spacingS
-
-                                                            DankIcon {
-                                                                id: wifiInfoLoadIcon
-                                                                name: "sync"
-                                                                size: 16
-                                                                color: Theme.surfaceVariantText
-
-                                                                SequentialAnimation {
-                                                                    running: NetworkService.networkInfoLoading
-                                                                    loops: Animation.Infinite
-                                                                    OpacityAnimator {
-                                                                        target: wifiInfoLoadIcon
-                                                                        to: 0.3
-                                                                        duration: 400
-                                                                        easing.type: Easing.InOutQuad
-                                                                    }
-                                                                    OpacityAnimator {
-                                                                        target: wifiInfoLoadIcon
-                                                                        to: 1.0
-                                                                        duration: 400
-                                                                        easing.type: Easing.InOutQuad
-                                                                    }
-                                                                    onRunningChanged: if (!running)
-                                                                        wifiInfoLoadIcon.opacity = 1.0
-                                                                }
-                                                            }
-
-                                                            StyledText {
-                                                                text: I18n.tr("Loading...")
-                                                                font.pixelSize: Theme.fontSizeSmall
-                                                                color: Theme.surfaceVariantText
-                                                            }
+                                                            size: 20
                                                         }
                                                     }
 
@@ -1849,41 +1785,9 @@ Item {
                                             height: VPNService.configLoading ? 40 : 0
                                             visible: VPNService.configLoading
 
-                                            Row {
+                                            DankSpinner {
                                                 anchors.centerIn: parent
-                                                spacing: Theme.spacingS
-
-                                                DankIcon {
-                                                    id: vpnLoadIcon
-                                                    name: "sync"
-                                                    size: 16
-                                                    color: Theme.surfaceVariantText
-
-                                                    SequentialAnimation {
-                                                        running: VPNService.configLoading
-                                                        loops: Animation.Infinite
-                                                        OpacityAnimator {
-                                                            target: vpnLoadIcon
-                                                            to: 0.3
-                                                            duration: 400
-                                                            easing.type: Easing.InOutQuad
-                                                        }
-                                                        OpacityAnimator {
-                                                            target: vpnLoadIcon
-                                                            to: 1.0
-                                                            duration: 400
-                                                            easing.type: Easing.InOutQuad
-                                                        }
-                                                        onRunningChanged: if (!running)
-                                                            vpnLoadIcon.opacity = 1.0
-                                                    }
-                                                }
-
-                                                StyledText {
-                                                    text: I18n.tr("Loading...")
-                                                    font.pixelSize: Theme.fontSizeSmall
-                                                    color: Theme.surfaceVariantText
-                                                }
+                                                size: 20
                                             }
                                         }
 

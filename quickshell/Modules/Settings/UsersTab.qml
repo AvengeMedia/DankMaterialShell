@@ -139,7 +139,7 @@ Item {
                     }
 
                     StyledText {
-                        text: UsersService.refreshing ? I18n.tr("Refreshing…") : ""
+                        text: UsersService.refreshing ? I18n.tr("Refreshing...") : ""
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         anchors.verticalCenter: parent.verticalCenter
@@ -474,7 +474,7 @@ Item {
                     spacing: Theme.spacingM
 
                     DankButton {
-                        text: root.operationPending ? I18n.tr("Working…") : I18n.tr("Create User")
+                        text: root.operationPending ? I18n.tr("Working...") : I18n.tr("Create User")
                         iconName: "person_add"
                         backgroundColor: Theme.primary
                         textColor: Theme.primaryText

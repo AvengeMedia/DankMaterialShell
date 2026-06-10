@@ -183,7 +183,7 @@ Rectangle {
                 text: {
                     const dateStr = Qt.formatDate(selectedDate, "MMM d");
                     if (selectedDateEvents && selectedDateEvents.length > 0) {
-                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 task") : selectedDateEvents.length + " " + I18n.tr("tasks");
+                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 task", "task count next to a date") : I18n.tr("%1 tasks", "task count next to a date, %1 is the number of tasks").arg(selectedDateEvents.length);
                         return dateStr + " • " + eventCount;
                     }
                     return dateStr;
@@ -775,7 +775,7 @@ Rectangle {
                                 width: parent.width
                                 text: {
                                     if (!modelData || modelData.allDay) {
-                                        return I18n.tr("All day");
+                                        return I18n.tr("All day", "calendar task with no specific time");
                                     } else if (modelData.start && modelData.end) {
                                         const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
                                         const startTime = Qt.formatTime(modelData.start, timeFormat);
@@ -950,9 +950,8 @@ Rectangle {
                 selectByMouse: true
                 clip: true
 
-                // Hint placeholder text
                 Text {
-                    text: I18n.tr("Add a task...")
+                    text: I18n.tr("Add a task...", "placeholder in the new-task input field")
                     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
                     visible: !taskInput.text && !taskInput.activeFocus
                     font.pixelSize: Theme.fontSizeSmall

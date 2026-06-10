@@ -98,12 +98,50 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: CompositorTab {}
+            sourceComponent: WorkspacesTab {}
 
             onActiveChanged: {
                 if (active && item)
                     Qt.callLater(() => item.forceActiveFocus());
             }
+        }
+
+        Loader {
+            id: compositorLayoutLoader
+            anchors.fill: parent
+            active: root.currentIndex === 37
+            visible: active
+            focus: active
+
+            sourceComponent: CompositorLayoutTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: windowRulesLoader
+
+            property bool loadedOnce: false
+
+            anchors.fill: parent
+            active: root.currentIndex === 38 || loadedOnce
+            visible: root.currentIndex === 38 && status === Loader.Ready
+            focus: visible
+            asynchronous: true
+
+            sourceComponent: WindowRulesTab {
+                pageActive: root.currentIndex === 38
+            }
+
+            onLoaded: loadedOnce = true
+        }
+
+        DankSpinner {
+            anchors.centerIn: parent
+            visible: root.currentIndex === 38 && windowRulesLoader.status === Loader.Loading
         }
 
         Loader {
@@ -388,7 +426,7 @@ FocusScope {
             }
         }
 
-		Loader {
+        Loader {
             id: defaultAppsLoader
             anchors.fill: parent
             active: root.currentIndex === 34
@@ -474,12 +512,9 @@ FocusScope {
             }
         }
 
-        StyledText {
+        DankSpinner {
             anchors.centerIn: parent
             visible: root.currentIndex === 22 && widgetsLoader.status === Loader.Loading
-            text: I18n.tr("Loading...", "loading indicator")
-            color: Theme.surfaceVariantText
-            font.pixelSize: Theme.fontSizeMedium
         }
 
         Loader {

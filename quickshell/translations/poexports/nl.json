@@ -80,6 +80,9 @@
   "%1 online": {
     "%1 online": "%1 online"
   },
+  "%1 tasks": {
+    "%1 tasks": ""
+  },
   "%1 update": {
     "%1 update": "%1 update"
   },
@@ -134,9 +137,6 @@
   "1 device connected": {
     "1 device connected": "1 apparaat verbonden"
   },
-  "1 event": {
-    "1 event": "1 afspraak"
-  },
   "1 hour": {
     "1 hour": "1 uur"
   },
@@ -151,6 +151,9 @@
   },
   "1 second": {
     "1 second": "1 seconde"
+  },
+  "1 task": {
+    "1 task": ""
   },
   "10 minutes": {
     "10 minutes": "10 minuten"
@@ -199,9 +202,6 @@
   },
   "24-hour clock": {
     "24-hour clock": "24-uursklok"
-  },
-  "24-hour format": {
-    "24-hour format": "24-uursnotatie"
   },
   "25 seconds": {
     "25 seconds": "25 seconden"
@@ -440,6 +440,9 @@
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
     "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Voeg een aangepast voorvoegsel toe aan alle applicatiestarts. Dit kan worden gebruikt voor zaken als 'uwsm-app', 'systemd-run' of andere opdrachtwrappers."
   },
+  "Add a task...": {
+    "Add a task...": ""
+  },
   "Add and configure widgets that appear on your desktop": {
     "Add and configure widgets that appear on your desktop": "Widgets toevoegen en configureren die op uw bureaublad verschijnen"
   },
@@ -509,6 +512,9 @@
   "Already on that session": {
     "Already on that session": ""
   },
+  "Also group repeated application icons on the active workspace": {
+    "Also group repeated application icons on the active workspace": ""
+  },
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Terug • F1/I: Bestandsinfo • F10: Hulp • Esc: Sluiten"
   },
@@ -551,6 +557,9 @@
   "Analyzing configuration...": {
     "Analyzing configuration...": "Configuratie analyseren..."
   },
+  "Anchor": {
+    "Anchor": ""
+  },
   "Animation Duration": {
     "Animation Duration": "Animatieduur"
   },
@@ -566,9 +575,6 @@
   "Anonymous Identity (optional)": {
     "Anonymous Identity (optional)": "Anonieme identiteit (optioneel)"
   },
-  "Any": {
-    "Any": ""
-  },
   "Any window": {
     "Any window": ""
   },
@@ -577,6 +583,9 @@
   },
   "App ID": {
     "App ID": ""
+  },
+  "App ID (e.g. firefox)": {
+    "App ID (e.g. firefox)": ""
   },
   "App ID Substitutions": {
     "App ID Substitutions": "App ID-vervangingen"
@@ -632,11 +641,11 @@
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Warme kleurtemperatuur toepassen om oogvermoeidheid te verminderen. Gebruik de automatiseringsinstellingen hieronder om te bepalen wanneer dit activeert."
   },
-  "Applying authentication changes…": {
-    "Applying authentication changes…": "Verificatiewijzigingen toepassen…"
+  "Applying authentication changes...": {
+    "Applying authentication changes...": ""
   },
-  "Applying auto-login on startup…": {
-    "Applying auto-login on startup…": ""
+  "Applying auto-login on startup...": {
+    "Applying auto-login on startup...": ""
   },
   "Apps": {
     "Apps": "Apps"
@@ -931,6 +940,12 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Gebalanceerd palet met gerichte accenten (standaard)."
+  },
+  "Bar": {
+    "Bar": ""
+  },
+  "Bar %1": {
+    "Bar %1": ""
   },
   "Bar Configurations": {
     "Bar Configurations": "Balkconfiguraties"
@@ -1265,14 +1280,11 @@
   "Checking for updates...": {
     "Checking for updates...": "Zoeken naar updates..."
   },
-  "Checking whether sudo authentication is needed…": {
-    "Checking whether sudo authentication is needed…": "Controleren of sudo-authenticatie vereist is…"
+  "Checking whether sudo authentication is needed...": {
+    "Checking whether sudo authentication is needed...": ""
   },
   "Checking...": {
     "Checking...": "Controleren..."
-  },
-  "Checking…": {
-    "Checking…": "Controleren…"
   },
   "Choose Color": {
     "Choose Color": "Kleur kiezen"
@@ -1637,8 +1649,8 @@
   "Connecting to Device": {
     "Connecting to Device": "Verbinden met apparaat"
   },
-  "Connecting to clipboard service…": {
-    "Connecting to clipboard service…": "Verbinden met klembord-service…"
+  "Connecting to clipboard service...": {
+    "Connecting to clipboard service...": ""
   },
   "Connecting...": {
     "Connecting...": "Verbinden..."
@@ -1985,9 +1997,6 @@
   "DMS_SOCKET not available": {
     "DMS_SOCKET not available": "DMS_SOCKET niet beschikbaar"
   },
-  "DWL service not available": {
-    "DWL service not available": "DWL-service niet beschikbaar"
-  },
   "Daily": {
     "Daily": "Dagelijks"
   },
@@ -2228,8 +2237,8 @@
   "Disabling WiFi...": {
     "Disabling WiFi...": "Wifi uitschakelen..."
   },
-  "Disabling auto-login on startup…": {
-    "Disabling auto-login on startup…": ""
+  "Disabling auto-login on startup...": {
+    "Disabling auto-login on startup...": ""
   },
   "Disc": {
     "Disc": "Schijf"
@@ -2294,8 +2303,8 @@
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "Alle prioriteiten over applicaties op volledig scherm tonen"
   },
-  "Display and switch DWL layouts": {
-    "Display and switch DWL layouts": "DWL-indelingen tonen en wisselen"
+  "Display and switch MangoWC layouts": {
+    "Display and switch MangoWC layouts": ""
   },
   "Display application icons in workspace indicators": {
     "Display application icons in workspace indicators": "Applicatiepictogrammen tonen in werkbladindicatoren"
@@ -2470,6 +2479,9 @@
   },
   "Edit clipboard text": {
     "Edit clipboard text": ""
+  },
+  "Editing changes on %1": {
+    "Editing changes on %1": ""
   },
   "Education": {
     "Education": "Onderwijs"
@@ -2975,11 +2987,11 @@
   "Failed to update sharing": {
     "Failed to update sharing": "Bijwerken van delen mislukt"
   },
-  "Failed to write Hyprland outputs config.": {
-    "Failed to write Hyprland outputs config.": ""
-  },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": ""
+  },
+  "Failed to write outputs config.": {
+    "Failed to write outputs config.": ""
   },
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "Schrijven van tijdelijk bestand voor validatie mislukt"
@@ -3101,8 +3113,20 @@
   "Float": {
     "Float": "Zweven"
   },
+  "Float Anchor": {
+    "Float Anchor": ""
+  },
+  "Float X": {
+    "Float X": ""
+  },
+  "Float Y": {
+    "Float Y": ""
+  },
   "Floating": {
     "Floating": ""
+  },
+  "Floating Position": {
+    "Floating Position": ""
   },
   "Fluent": {
     "Fluent": "Fluent"
@@ -3136,9 +3160,6 @@
   },
   "Focused Window": {
     "Focused Window": "Actieve venster"
-  },
-  "Focused monitor only": {
-    "Focused monitor only": "Alleen op actieve monitor"
   },
   "Fog": {
     "Fog": "Mist"
@@ -3436,6 +3457,9 @@
   },
   "Group": {
     "Group": "Groep"
+  },
+  "Group Active Workspace": {
+    "Group Active Workspace": ""
   },
   "Group Workspace Apps": {
     "Group Workspace Apps": "Werkblad-apps groeperen"
@@ -3797,6 +3821,9 @@
   "Inhibitable": {
     "Inhibitable": "Onderdrukbaar"
   },
+  "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
+    "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": ""
+  },
   "Initialised": {
     "Initialised": ""
   },
@@ -3898,6 +3925,9 @@
   },
   "Invert on mode change": {
     "Invert on mode change": "Omkeren bij moduswisseling"
+  },
+  "Invert touchpad scroll direction": {
+    "Invert touchpad scroll direction": ""
   },
   "Iris Bloom": {
     "Iris Bloom": "Irisbloei"
@@ -4222,6 +4252,12 @@
   },
   "Manages files and directories": {
     "Manages files and directories": "Beheert bestanden en mappen"
+  },
+  "Mango Options": {
+    "Mango Options": ""
+  },
+  "Mango service not available": {
+    "Mango service not available": ""
   },
   "MangoWC Layout Overrides": {
     "MangoWC Layout Overrides": "MangoWC-indelingsoverschrijvingen"
@@ -4603,6 +4639,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "Native: platform-renderer (FreeType)."
+  },
+  "Natural Touchpad Scrolling": {
+    "Natural Touchpad Scrolling": ""
   },
   "Navigate": {
     "Navigate": "Navigeren"
@@ -5132,9 +5171,6 @@
   "On-Demand": {
     "On-Demand": "Op aanvraag"
   },
-  "On-Screen Displays": {
-    "On-Screen Displays": "On-screen displays"
-  },
   "On-screen Displays": {
     "On-screen Displays": "On-screen displays"
   },
@@ -5570,9 +5606,6 @@
   "Plugged In": {
     "Plugged In": "Aangesloten"
   },
-  "Plugged in": {
-    "Plugged in": "Aangesloten"
-  },
   "Plugin": {
     "Plugin": "Plug-in"
   },
@@ -5915,8 +5948,8 @@
   "Refresh Weather": {
     "Refresh Weather": "Weer verversen"
   },
-  "Refreshing…": {
-    "Refreshing…": ""
+  "Refreshing...": {
+    "Refreshing...": ""
   },
   "Regex": {
     "Regex": "Regex"
@@ -6041,8 +6074,8 @@
   "Requires DMS server with sysupdate capability": {
     "Requires DMS server with sysupdate capability": "Vereist DMS-server met sysupdate-functionaliteit"
   },
-  "Requires DWL compositor": {
-    "Requires DWL compositor": "Vereist DWL-compositor"
+  "Requires MangoWC compositor": {
+    "Requires MangoWC compositor": ""
   },
   "Requires a newer version of Quickshell": {
     "Requires a newer version of Quickshell": "Vereist een nieuwere versie van Quickshell"
@@ -6073,6 +6106,12 @@
   },
   "Resize Widget": {
     "Resize Widget": "Widgetgrootte wijzigen"
+  },
+  "Resize on Border": {
+    "Resize on Border": ""
+  },
+  "Resize windows by dragging their edges with the mouse": {
+    "Resize windows by dragging their edges with the mouse": ""
   },
   "Resolution & Refresh": {
     "Resolution & Refresh": "Resolutie & Verversing"
@@ -6146,12 +6185,6 @@
   "Rounded corners for windows": {
     "Rounded corners for windows": "Afgeronde hoeken voor vensters"
   },
-  "Rounded corners for windows (border_radius)": {
-    "Rounded corners for windows (border_radius)": "Afgeronde hoeken voor vensters (border_radius)"
-  },
-  "Rounded corners for windows (decoration.rounding)": {
-    "Rounded corners for windows (decoration.rounding)": "Afgeronde hoeken voor vensters (decoration.rounding)"
-  },
   "Rule": {
     "Rule": "Regel"
   },
@@ -6188,8 +6221,8 @@
   "Running Apps Settings": {
     "Running Apps Settings": "Instellingen actieve apps"
   },
-  "Running greeter sync…": {
-    "Running greeter sync…": "Greeter-synchronisatie uitvoeren…"
+  "Running greeter sync...": {
+    "Running greeter sync...": ""
   },
   "Running in terminal": {
     "Running in terminal": "Wordt uitgevoerd in terminal"
@@ -6800,8 +6833,8 @@
   "Show Workspace Apps": {
     "Show Workspace Apps": "Werkblad-apps tonen"
   },
-  "Show all 9 tags instead of only occupied tags (DWL only)": {
-    "Show all 9 tags instead of only occupied tags (DWL only)": "Alle 9 tags tonen in plaats van alleen bezette tags (alleen DWL)"
+  "Show all 9 tags instead of only occupied tags": {
+    "Show all 9 tags instead of only occupied tags": ""
   },
   "Show an outline ring around the focused workspace indicator": {
     "Show an outline ring around the focused workspace indicator": "Toon een omlijningsring rond de indicator van het gefocuste werkblad"
@@ -7006,12 +7039,6 @@
   },
   "Space between windows": {
     "Space between windows": "Ruimte tussen vensters"
-  },
-  "Space between windows (gappih/gappiv/gappoh/gappov)": {
-    "Space between windows (gappih/gappiv/gappoh/gappov)": "Ruimte tussen vensters (gappih/gappiv/gappoh/gappov)"
-  },
-  "Space between windows (gaps_in and gaps_out)": {
-    "Space between windows (gaps_in and gaps_out)": "Ruimte tussen vensters (gaps_in en gaps_out)"
   },
   "Spacer": {
     "Spacer": "Afstandhouder"
@@ -7234,6 +7261,9 @@
   },
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Nav • ←→↑↓: Raster Nav • Enter/Spatie: Selecteren"
+  },
+  "Tags": {
+    "Tags": ""
   },
   "Tags: %1": {
     "Tags: %1": "Tags: %1"
@@ -7459,6 +7489,9 @@
   },
   "Title": {
     "Title": "Titel"
+  },
+  "Title (optional)": {
+    "Title (optional)": ""
   },
   "Title regex (optional)": {
     "Title regex (optional)": "Titel-regex (optioneel)"
@@ -7850,9 +7883,6 @@
   "Use custom window radius instead of theme radius": {
     "Use custom window radius instead of theme radius": "Gebruik aangepaste vensterradius in plaats van themaradius"
   },
-  "Use custom window rounding instead of theme radius": {
-    "Use custom window rounding instead of theme radius": "Aangepaste vensterronding gebruiken in plaats van themaradius"
-  },
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "Bureaubladachtergrond gebruiken"
   },
@@ -7960,9 +7990,6 @@
   },
   "VPN configuration updated": {
     "VPN configuration updated": "VPN-configuratie bijgewerkt"
-  },
-  "VPN connections": {
-    "VPN connections": "VPN-verbindingen"
   },
   "VPN deleted": {
     "VPN deleted": "VPN verwijderd"
@@ -8177,6 +8204,9 @@
   "Widgets": {
     "Widgets": "Widgets"
   },
+  "Widgets & Notifications": {
+    "Widgets & Notifications": ""
+  },
   "Widgets, layout, style": {
     "Widgets, layout, style": "Widgets, indeling, stijl"
   },
@@ -8189,11 +8219,8 @@
   "Width of the widget outline in pixels": {
     "Width of the widget outline in pixels": ""
   },
-  "Width of window border (borderpx)": {
-    "Width of window border (borderpx)": "Breedte van vensterrand (borderpx)"
-  },
-  "Width of window border (general.border_size)": {
-    "Width of window border (general.border_size)": "Breedte van vensterrand (general.border_size)"
+  "Width of window border": {
+    "Width of window border": ""
   },
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "Breedte van vensterrand en focusring"
@@ -8222,9 +8249,6 @@
   "Window Opening": {
     "Window Opening": "Venster openen"
   },
-  "Window Rounding": {
-    "Window Rounding": "Vensterronding"
-  },
   "Window Rules": {
     "Window Rules": "Vensterregels"
   },
@@ -8237,8 +8261,8 @@
   "Wipe": {
     "Wipe": "Vegen"
   },
-  "Working…": {
-    "Working…": ""
+  "Working...": {
+    "Working...": ""
   },
   "Workspace": {
     "Workspace": "Werkblad"
@@ -8267,14 +8291,14 @@
   "Workspaces": {
     "Workspaces": "Werkbladen"
   },
-  "Workspaces & Widgets": {
-    "Workspaces & Widgets": "Werkbladen & Widgets"
-  },
   "Wrap the app command. %command% is replaced with the actual executable": {
     "Wrap the app command. %command% is replaced with the actual executable": ""
   },
   "Write:": {
     "Write:": "Schrijven:"
+  },
+  "X": {
+    "X": ""
   },
   "X Axis": {
     "X Axis": "X-as"
@@ -8287,6 +8311,9 @@
   },
   "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
     "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": ""
+  },
+  "Y": {
+    "Y": ""
   },
   "Y Axis": {
     "Y Axis": "Y-as"
@@ -8393,9 +8420,6 @@
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": "bijv. scratch, /^tmp_.*/, build"
   },
-  "events": {
-    "events": "afspraken"
-  },
   "ext": {
     "ext": "ext"
   },
@@ -8413,6 +8437,12 @@
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl niet beschikbaar - vergrendelintegratie vereist DMS-socketverbinding"
+  },
+  "mango: config reloaded": {
+    "mango: config reloaded": ""
+  },
+  "mango: failed to reload config": {
+    "mango: failed to reload config": ""
   },
   "mangowc Discord Server": {
     "mangowc Discord Server": "mangowc Discord-server"

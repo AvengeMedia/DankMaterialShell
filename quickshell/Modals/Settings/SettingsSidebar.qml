@@ -102,6 +102,13 @@ Rectangle {
                     "icon": "volume_up",
                     "tabIndex": 15,
                     "soundsOnly": true
+                },
+                {
+                    "id": "compositor_layout",
+                    "text": CompositorService.isNiri ? "niri" : (CompositorService.isHyprland ? "Hyprland" : "MangoWC"),
+                    "icon": "crop_square",
+                    "tabIndex": 37,
+                    "layoutCapable": true
                 }
             ]
         },
@@ -127,6 +134,12 @@ Rectangle {
                     "text": I18n.tr("Widgets"),
                     "icon": "widgets",
                     "tabIndex": 22
+                },
+                {
+                    "id": "workspaces",
+                    "text": I18n.tr("Workspaces"),
+                    "icon": "view_module",
+                    "tabIndex": 4
                 },
                 {
                     "id": "frame",
@@ -187,12 +200,6 @@ Rectangle {
                     "tabIndex": 9
                 }
             ]
-        },
-        {
-            "id": "compositor",
-            "text": I18n.tr("Compositor"),
-            "icon": "layers",
-            "tabIndex": 4
         },
         {
             "id": "keybinds",
@@ -259,6 +266,13 @@ Rectangle {
                     "icon": "line_start",
                     "tabIndex": 36,
                     "autostartOnly": true
+                },
+                {
+                    "id": "window_rules",
+                    "text": I18n.tr("Window Rules"),
+                    "icon": "select_window",
+                    "tabIndex": 38,
+                    "windowRulesCapable": true
                 }
             ]
         },
@@ -371,6 +385,8 @@ Rectangle {
         if (item.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland)
             return false;
         if (item.windowRulesCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
+            return false;
+        if (item.layoutCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
             return false;
         if (item.niriOnly && !CompositorService.isNiri)
             return false;
@@ -544,8 +560,8 @@ Rectangle {
             return -1;
 
         var normalized = name.toLowerCase().replace(/[_\-\s]/g, "");
-        if (normalized === "workspaces")
-            normalized = "compositor";
+        if (normalized === "compositor")
+            normalized = "workspaces";
 
         for (var i = 0; i < categoryStructure.length; i++) {
             var cat = categoryStructure[i];

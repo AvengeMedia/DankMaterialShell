@@ -41,8 +41,8 @@ Item {
         SettingsData.barConfigs;
         const index = SettingsData.barConfigs.findIndex(config => config.id === selectedBarId);
         if (index < 0)
-            return I18n.tr("Bar");
-        return SettingsData.barConfigs[index].name || I18n.tr("Bar %1").arg(index + 1);
+            return I18n.tr("Bar", "fallback name for an unnamed bar");
+        return SettingsData.barConfigs[index].name || I18n.tr("Bar %1", "numbered name for an unnamed bar, %1 is its position").arg(index + 1);
     }
 
     property bool selectedBarIsVertical: {

@@ -62,20 +62,7 @@ CATEGORY_KEYWORDS = {
     "Time & Weather": ["clock", "forecast", "date"],
     "Keyboard Shortcuts": ["keys", "bindings", "hotkey"],
     "Dank Bar": ["panel", "topbar", "statusbar"],
-    "Compositor": [
-        "virtual desktops",
-        "spaces",
-        "window",
-        "rules",
-        "matching",
-        "floating",
-        "fullscreen",
-        "opacity",
-        "gaps",
-        "borders",
-        "corner rounding",
-        "overrides",
-    ],
+    "Applications": ["apps", "programs", "window", "rules", "matching", "floating"],
     "Dock": ["taskbar", "launcher bar"],
     "Network": ["connectivity", "online"],
     "System": ["os", "linux"],
@@ -109,10 +96,9 @@ TAB_INDEX_MAP = {
     "TimeWeatherTab.qml": 1,
     "KeybindsTab.qml": 2,
     "DankBarTab.qml": 3,
-    "CompositorTab.qml": 4,
-    "CompositorLayoutTab.qml": 4,
     "WorkspacesTab.qml": 4,
-    "WindowRulesTab.qml": 4,
+    "CompositorLayoutTab.qml": 37,
+    "WindowRulesTab.qml": 38,
     "DockTab.qml": 5,
     "DankBarAppearanceTab.qml": 6,
     "WorkspaceAppearanceCard.qml": 6,
@@ -152,7 +138,7 @@ TAB_CATEGORY_MAP = {
     1: "Time & Weather",
     2: "Keyboard Shortcuts",
     3: "Dank Bar",
-    4: "Compositor",
+    4: "Dank Bar",
     5: "Dock",
     6: "Dank Bar",
     7: "Network",
@@ -184,6 +170,8 @@ TAB_CATEGORY_MAP = {
     34: "Default Apps",
     35: "Users",
     36: "Autostart",
+    37: "Personalization",
+    38: "Applications",
 }
 
 SEARCHABLE_COMPONENTS = [
@@ -370,6 +358,8 @@ def find_settings_components(content, filename):
                     condition_key = "isNiri"
                 elif "CompositorService.isHyprland" in visible_raw:
                     condition_key = "isHyprland"
+                elif "CompositorService.isMango" in visible_raw:
+                    condition_key = "isMango"
                 elif "KeybindsService.available" in visible_raw:
                     condition_key = "keybindsAvailable"
                 elif "AudioService.soundsAvailable" in visible_raw:
@@ -436,6 +426,8 @@ def parse_tabs_from_sidebar(sidebar_file):
             ("hyprlandNiriOnly", "isHyprlandOrNiri"),
             ("clipboardOnly", "dmsConnected"),
             ("niriOnly", "isNiri"),
+            ("windowRulesCapable", "windowRulesCapable"),
+            ("layoutCapable", "layoutCapable"),
         ]:
             if f'"{qml_cond}": true' in snippet:
                 cond = key
@@ -521,16 +513,17 @@ def extract_settings_index(root_dir):
             {
                 "section": "windowRules",
                 "label": "Window Rules",
-                "tabIndex": 4,
-                "category": "Compositor",
+                "tabIndex": 38,
+                "category": "Applications",
                 "keywords": enrich_keywords(
                     "Window Rules",
                     "Define compositor rules for window behavior",
-                    "Compositor",
+                    "Applications",
                     ["matching", "floating", "fullscreen", "opacity"],
                 ),
                 "icon": "select_window",
                 "description": "Define compositor rules for window behavior",
+                "conditionKey": "windowRulesCapable",
             }
         )
 

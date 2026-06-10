@@ -189,6 +189,13 @@
     "comment": ""
   },
   {
+    "term": "%1 tasks",
+    "translation": "",
+    "context": "task count next to a date, %1 is the number of tasks",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 update",
     "translation": "",
     "context": "",
@@ -315,13 +322,6 @@
     "comment": ""
   },
   {
-    "term": "1 event",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "1 hour",
     "translation": "",
     "context": "wallpaper interval",
@@ -353,6 +353,13 @@
     "term": "1 second",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "1 task",
+    "translation": "",
+    "context": "task count next to a date",
     "reference": "",
     "comment": ""
   },
@@ -1022,6 +1029,13 @@
     "comment": ""
   },
   {
+    "term": "Add a task...",
+    "translation": "",
+    "context": "placeholder in the new-task input field",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Add and configure widgets that appear on your desktop",
     "translation": "",
     "context": "",
@@ -1136,7 +1150,7 @@
   {
     "term": "All day",
     "translation": "",
-    "context": "",
+    "context": "calendar task with no specific time",
     "reference": "",
     "comment": ""
   },
@@ -1177,6 +1191,13 @@
   },
   {
     "term": "Already on that session",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Also group repeated application icons on the active workspace",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1281,6 +1302,13 @@
     "comment": ""
   },
   {
+    "term": "Anchor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Animation Duration",
     "translation": "",
     "context": "",
@@ -1316,13 +1344,6 @@
     "comment": ""
   },
   {
-    "term": "Any",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Any window",
     "translation": "",
     "context": "",
@@ -1338,6 +1359,13 @@
   },
   {
     "term": "App ID",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "App ID (e.g. firefox)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1470,14 +1498,14 @@
     "comment": ""
   },
   {
-    "term": "Applying authentication changes…",
+    "term": "Applying authentication changes...",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Applying auto-login on startup…",
+    "term": "Applying auto-login on startup...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2166,6 +2194,20 @@
     "term": "Balanced palette with focused accents (default).",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar",
+    "translation": "",
+    "context": "fallback name for an unnamed bar",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar %1",
+    "translation": "",
+    "context": "numbered name for an unnamed bar, %1 is its position",
     "reference": "",
     "comment": ""
   },
@@ -2947,7 +2989,7 @@
     "comment": ""
   },
   {
-    "term": "Checking whether sudo authentication is needed…",
+    "term": "Checking whether sudo authentication is needed...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2955,13 +2997,6 @@
   },
   {
     "term": "Checking...",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Checking…",
     "translation": "",
     "context": "greeter status loading",
     "reference": "",
@@ -3815,7 +3850,7 @@
     "comment": ""
   },
   {
-    "term": "Connecting to clipboard service…",
+    "term": "Connecting to clipboard service...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4627,13 +4662,6 @@
     "comment": ""
   },
   {
-    "term": "DWL service not available",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Daily",
     "translation": "",
     "context": "",
@@ -5194,7 +5222,7 @@
     "comment": ""
   },
   {
-    "term": "Disabling auto-login on startup…",
+    "term": "Disabling auto-login on startup...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5348,7 +5376,7 @@
     "comment": ""
   },
   {
-    "term": "Display and switch DWL layouts",
+    "term": "Display and switch MangoWC layouts",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5755,6 +5783,13 @@
   },
   {
     "term": "Edit clipboard text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Editing changes on %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6937,14 +6972,14 @@
     "comment": ""
   },
   {
-    "term": "Failed to write Hyprland outputs config.",
+    "term": "Failed to write autostart entry",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Failed to write autostart entry",
+    "term": "Failed to write outputs config.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7231,7 +7266,35 @@
     "comment": ""
   },
   {
+    "term": "Float Anchor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Float X",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Float Y",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Floating",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Floating Position",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8002,6 +8065,13 @@
   },
   {
     "term": "Group",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Group Active Workspace",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8848,6 +8918,13 @@
     "comment": ""
   },
   {
+    "term": "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Initialised",
     "translation": "",
     "context": "",
@@ -9080,6 +9157,13 @@
   },
   {
     "term": "Invert on mode change",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Invert touchpad scroll direction",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9564,7 +9648,7 @@
   {
     "term": "Loading...",
     "translation": "",
-    "context": "loading indicator",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -9838,6 +9922,20 @@
     "term": "Manages files and directories",
     "translation": "",
     "context": "Manages files and directories",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Mango Options",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Mango service not available",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -10725,6 +10823,13 @@
   },
   {
     "term": "Native: platform renderer (FreeType).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Natural Touchpad Scrolling",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13776,7 +13881,7 @@
     "comment": ""
   },
   {
-    "term": "Refreshing…",
+    "term": "Refreshing...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14070,7 +14175,7 @@
     "comment": ""
   },
   {
-    "term": "Requires DWL compositor",
+    "term": "Requires MangoWC compositor",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14141,6 +14246,20 @@
   },
   {
     "term": "Resize Widget",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Resize on Border",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Resize windows by dragging their edges with the mouse",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14315,20 +14434,6 @@
     "comment": ""
   },
   {
-    "term": "Rounded corners for windows (border_radius)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Rounded corners for windows (decoration.rounding)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Rule",
     "translation": "",
     "context": "",
@@ -14413,7 +14518,7 @@
     "comment": ""
   },
   {
-    "term": "Running greeter sync…",
+    "term": "Running greeter sync...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15841,7 +15946,7 @@
     "comment": ""
   },
   {
-    "term": "Show all 9 tags instead of only occupied tags (DWL only)",
+    "term": "Show all 9 tags instead of only occupied tags",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16318,20 +16423,6 @@
   },
   {
     "term": "Space between windows",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Space between windows (gappih/gappiv/gappoh/gappov)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Space between windows (gaps_in and gaps_out)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16850,6 +16941,13 @@
   },
   {
     "term": "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tags",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17375,6 +17473,13 @@
   },
   {
     "term": "Title",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Title (optional)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18291,13 +18396,6 @@
     "comment": ""
   },
   {
-    "term": "Use custom window rounding instead of theme radius",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Use desktop wallpaper",
     "translation": "",
     "context": "",
@@ -19047,6 +19145,13 @@
     "comment": ""
   },
   {
+    "term": "Widgets & Notifications",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Widgets, layout, style",
     "translation": "",
     "context": "greeter dankbar description",
@@ -19075,14 +19180,7 @@
     "comment": ""
   },
   {
-    "term": "Width of window border (borderpx)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Width of window border (general.border_size)",
+    "term": "Width of window border",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19152,13 +19250,6 @@
     "comment": ""
   },
   {
-    "term": "Window Rounding",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Window Rules",
     "translation": "",
     "context": "",
@@ -19187,7 +19278,7 @@
     "comment": ""
   },
   {
-    "term": "Working…",
+    "term": "Working...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19257,13 +19348,6 @@
     "comment": ""
   },
   {
-    "term": "Workspaces & Widgets",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Wrap the app command. %command% is replaced with the actual executable",
     "translation": "",
     "context": "",
@@ -19274,6 +19358,13 @@
     "term": "Write:",
     "translation": "",
     "context": "disk write label",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "X",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -19300,6 +19391,13 @@
   },
   {
     "term": "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Y",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19551,13 +19649,6 @@
     "comment": ""
   },
   {
-    "term": "events",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "ext",
     "translation": "",
     "context": "",
@@ -19594,6 +19685,20 @@
   },
   {
     "term": "loginctl not available - lock integration requires DMS socket connection",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "mango: config reloaded",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "mango: failed to reload config",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19840,7 +19945,7 @@
   {
     "term": "up",
     "translation": "",
-    "context": "",
+    "context": "uptime prefix, e.g. 'up 4h 2m'",
     "reference": "",
     "comment": ""
   },

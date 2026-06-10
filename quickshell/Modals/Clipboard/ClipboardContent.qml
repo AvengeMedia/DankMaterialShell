@@ -128,7 +128,7 @@ Item {
             }
 
             StyledText {
-                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No recent clipboard entries found") : I18n.tr("Connecting to clipboard service…")
+                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No recent clipboard entries found") : I18n.tr("Connecting to clipboard service...")
                 anchors.centerIn: parent
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
@@ -202,7 +202,7 @@ Item {
             }
 
             StyledText {
-                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No saved clipboard entries") : I18n.tr("Connecting to clipboard service…")
+                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No saved clipboard entries") : I18n.tr("Connecting to clipboard service...")
                 anchors.centerIn: parent
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText

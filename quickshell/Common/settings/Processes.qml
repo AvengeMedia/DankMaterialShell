@@ -570,7 +570,7 @@ Singleton {
         onExited: exitCode => {
             const enabling = root.settingsRoot && root.settingsRoot.greeterAutoLogin;
             if (exitCode === 0) {
-                ToastService.showWarning(enabling ? I18n.tr("Applying auto-login on startup…") : I18n.tr("Disabling auto-login on startup…"), "", "dms greeter sync --autologin", "greeter-autologin-sync");
+                ToastService.showWarning(enabling ? I18n.tr("Applying auto-login on startup...") : I18n.tr("Disabling auto-login on startup..."), "", "dms greeter sync --autologin", "greeter-autologin-sync");
                 root.greeterAutoLoginSyncProcess.running = true;
                 return;
             }
@@ -645,7 +645,7 @@ Singleton {
         onExited: exitCode => {
             const err = (root.authApplySudoProbeStderr || "").trim();
             if (exitCode === 0) {
-                ToastService.showInfo(I18n.tr("Applying authentication changes…"), "", "", "auth-sync");
+                ToastService.showInfo(I18n.tr("Applying authentication changes..."), "", "", "auth-sync");
                 root.authApplyProcess.running = true;
                 return;
             }
