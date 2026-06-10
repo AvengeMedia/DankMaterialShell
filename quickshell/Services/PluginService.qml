@@ -967,60 +967,30 @@ Singleton {
         return result;
     }
 
-    // Plugin id validation regex: lowercase / digits / underscore / dash / colon, 1-64 chars.
-    // Used by IPC handlers to reject shell-injection / prototype-pollution payloads
-    // before they reach the plugin manifest filesystem lookup. QML JS regex literal.
     readonly property string _ipcIdPattern: "^[a-zA-Z0-9_\\-:]{1,64}$";
 
     IpcHandler {
-        // target renamed from "plugins" to "plugin-scan" to avoid collision
-        // with the existing IpcHandler in DMSShellIPC.qml:1180 which already
-        // registers `enable`/`disable`/`toggle`/`list`/`status` under "plugins".
-        // The split keeps both APIs discoverable without one shadowing the other.
         target: "plugin-scan"
 
-        // Re-runs the discovery pass over both user and system plugin
-        // directories. Useful when a plugin directory was added or removed
-        // at runtime and the FolderListModel watcher did not pick the
-        // change up.
-        //
-        // Fire-and-forget: the resyncDebounce coalesces
-        // resyncAll() for 120ms after the call. Scripts that want to read
-        // state after a scan must poll `list` / `status` until the count
-        // changes, or wait at least 200ms. The pre-debounce count is
-        // returned as a sanity check (must be > 0 for any plugin to
-        // exist at all).
         function scan(): string {
             root.scanPlugins();
             return `SCAN_TRIGGERED: ${Object.keys(root.availablePlugins).length} known before debounce`;
         }
 
-        // Re-reads a single plugin's manifest without restarting the
-        // shell. Picks up edits to plugin.json made after the plugin was
-        // already loaded once.
         function rescan(pluginId: string): string {
             if (!pluginId)
                 return "ERROR: rescan requires a pluginId";
-            // Sanitize id to a safe charset. Rejects shell-injection
-            // and prototype-pollution payloads (`__proto__`, `constructor`).
             if (!new RegExp(root._ipcIdPattern).test(pluginId))
                 return `ERROR: invalid pluginId '${pluginId}' (allowed: [a-zA-Z0-9_\\-:]{1,64})`;
-            // Do NOT capture the plugin object — re-read inside
-            // forceRescanPlugin instead. _onManifestParsed can mutate
-            // availablePlugins from a parallel resyncDebounce tick, so a
-            // captured ref would see stale manifestPath.
             if (!(pluginId in root.availablePlugins))
                 return `ERROR: unknown pluginId '${pluginId}' (try 'list' first)`;
             root.forceRescanPlugin(pluginId);
             return `RESCAN_TRIGGERED: ${pluginId}`;
         }
 
-        // Unloads and reloads a plugin in place. Lets a developer iterate
-        // on a plugin's QML without restarting the shell.
         function reload(pluginId: string): string {
             if (!pluginId)
                 return "ERROR: reload requires a pluginId";
-            // Same id sanitization as rescan.
             if (!new RegExp(root._ipcIdPattern).test(pluginId))
                 return `ERROR: invalid pluginId '${pluginId}' (allowed: [a-zA-Z0-9_\\-:]{1,64})`;
             if (!(pluginId in root.availablePlugins))
@@ -1029,13 +999,6 @@ Singleton {
             return `RELOAD_TRIGGERED: ${pluginId}`;
         }
 
-        // Returns one `<id>\t<loaded>\t<type>\t<name>` line per known
-        // plugin, capped at 256 entries. Format is intentionally simple
-        // for easy parsing by external shell scripts or CLI management
-        // tools. The 256-entry cap prevents runaway string allocation if a
-        // hostile / buggy plugin mass-creates entries. A header line
-        // (`# count=N returned=M`) precedes the rows so callers can
-        // detect truncation.
         function list(): string {
             const ids = Object.keys(root.availablePlugins);
             const cap = 256;
@@ -1043,14 +1006,9 @@ Singleton {
             const lines = [];
             for (let i = 0; i < n; i++) {
                 const id = ids[i];
-                // Skip ids that fail the regex (defensive: ids in
-                // availablePlugins come from filesystem, not user input,
-                // but a buggy plugin.json could break the invariant).
                 if (!new RegExp(root._ipcIdPattern).test(id))
                     continue;
                 const p = root.availablePlugins[id];
-                // Sanitize \t and \n in user-controlled fields
-                // (name) so callers can rely on TSV structure.
                 const safeName = String(p.name || "").replace(/[\t\n\r]/g, " ");
                 lines.push(`${id}\t${p.loaded ? "loaded" : "unloaded"}\t${p.type || "unknown"}\t${safeName}`);
             }
@@ -1058,21 +1016,15 @@ Singleton {
             return header + "\n" + lines.join("\n");
         }
 
-        // Returns `loaded|unloaded\ttype\terror` for a single plugin. Used
-        // by wrappers that want to poll after a `scan` or `reload`.
-        // Use ERROR: prefix for unknown id (matches the rest of
-        // the handlers). Empty trailing field indicates "no error".
         function status(pluginId: string): string {
             if (!pluginId)
                 return "ERROR: status requires a pluginId";
-            // Sanitize id.
             if (!new RegExp(root._ipcIdPattern).test(pluginId))
                 return `ERROR: invalid pluginId '${pluginId}'`;
             const plugin = root.availablePlugins[pluginId];
             if (!plugin)
                 return `ERROR: unknown pluginId '${pluginId}'`;
             const err = root.pluginLoadErrors[pluginId] || "";
-            // Sanitize \t in error message.
             const safeErr = String(err).replace(/[\t\n\r]/g, " ");
             return `${plugin.loaded ? "loaded" : "unloaded"}\t${plugin.type || ""}\t${safeErr}`;
         }
