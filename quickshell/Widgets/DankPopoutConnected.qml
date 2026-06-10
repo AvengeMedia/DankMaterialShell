@@ -5,7 +5,6 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
-import "../Common/ConnectorGeometry.js" as ConnectorGeometry
 
 Item {
     id: root
@@ -568,6 +567,20 @@ Item {
         return Math.abs(value - bound) <= Math.max(1, Theme.hairline(root.dpr) * 2);
     }
 
+    // Snap a frame-perpendicular position flush to the frame bound when it
+    // lands within the connector radius: a gap smaller than the radius cannot
+    // form the close-gap arc and renders as a pinched wedge instead.
+    function _snapNearFrameBound(value, minBound, maxBound, minIsFrame, maxIsFrame) {
+        if (!root.usesConnectedSurfaceChrome || !root.closeFrameGapsActive)
+            return value;
+        const snapDist = Theme.connectedCornerRadius;
+        if (maxIsFrame && value < maxBound && maxBound - value < snapDist && maxBound - value <= value - minBound)
+            return maxBound;
+        if (minIsFrame && value > minBound && value - minBound < snapDist)
+            return minBound;
+        return value;
+    }
+
     function _closeGapClampedToFrameSide(side) {
         if (!root.closeFrameGapsActive)
             return false;
@@ -714,9 +727,11 @@ Item {
                 return Math.max(edgeGapLeft, Math.min(screenWidth - popupWidth - popupGap, anchorX - popupWidth));
             default:
                 const rawX = triggerX + (triggerWidth / 2) - (popupWidth / 2);
-                const minX = Math.max(edgeGapLeft, adjacentBarClearance(adjacentBarInfo.leftBar));
-                const maxX = screenWidth - popupWidth - Math.max(edgeGapRight, adjacentBarClearance(adjacentBarInfo.rightBar));
-                return Math.max(minX, Math.min(maxX, rawX));
+                const clearLeft = adjacentBarClearance(adjacentBarInfo.leftBar);
+                const clearRight = adjacentBarClearance(adjacentBarInfo.rightBar);
+                const minX = Math.max(edgeGapLeft, clearLeft);
+                const maxX = screenWidth - popupWidth - Math.max(edgeGapRight, clearRight);
+                return _snapNearFrameBound(Math.max(minX, Math.min(maxX, rawX)), minX, maxX, edgeGapLeft >= clearLeft, edgeGapRight >= clearRight);
             }
         })(), dpr)
 
@@ -735,9 +750,11 @@ Item {
                 return Math.max(popupGap, Math.min(screenHeight - popupHeight - edgeGapBottom, anchorY));
             default:
                 const rawY = triggerY - (popupHeight / 2);
-                const minY = Math.max(edgeGapTop, adjacentBarClearance(adjacentBarInfo.topBar));
-                const maxY = screenHeight - popupHeight - Math.max(edgeGapBottom, adjacentBarClearance(adjacentBarInfo.bottomBar));
-                return Math.max(minY, Math.min(maxY, rawY));
+                const clearTop = adjacentBarClearance(adjacentBarInfo.topBar);
+                const clearBottom = adjacentBarClearance(adjacentBarInfo.bottomBar);
+                const minY = Math.max(edgeGapTop, clearTop);
+                const maxY = screenHeight - popupHeight - Math.max(edgeGapBottom, clearBottom);
+                return _snapNearFrameBound(Math.max(minY, Math.min(maxY, rawY)), minY, maxY, edgeGapTop >= clearTop, edgeGapBottom >= clearBottom);
             }
         })(), dpr)
 
@@ -1024,22 +1041,13 @@ Item {
 
                     ElevationShadow {
                         id: shadowSource
-                        readonly property real connectorExtent: root.usesConnectedSurfaceChrome ? Theme.connectedCornerRadius : 0
-                        readonly property real extraLeft: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                        readonly property real extraRight: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                        readonly property real extraTop: root.usesConnectedSurfaceChrome && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
-                        readonly property real extraBottom: root.usesConnectedSurfaceChrome && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
-                        readonly property real bodyX: extraLeft
-                        readonly property real bodyY: extraTop
-                        readonly property real bodyWidth: rollOutAdjuster.baseWidth
-                        readonly property real bodyHeight: rollOutAdjuster.baseHeight
-
-                        width: rollOutAdjuster.baseWidth + extraLeft + extraRight
-                        height: rollOutAdjuster.baseHeight + extraTop + extraBottom
+                        visible: !root.usesConnectedSurfaceChrome
+                        width: rollOutAdjuster.baseWidth
+                        height: rollOutAdjuster.baseHeight
                         opacity: contentWrapper.publishedOpacity
                         scale: contentWrapper.scale
-                        x: contentWrapper.x - extraLeft
-                        y: contentWrapper.y - extraTop
+                        x: contentWrapper.x
+                        y: contentWrapper.y
                         level: root.shadowLevel
                         direction: root.effectiveShadowDirection
                         fallbackOffset: root.shadowFallbackOffset
@@ -1051,49 +1059,53 @@ Item {
                         targetColor: contentContainer.surfaceColor
                         borderColor: contentContainer.surfaceBorderColor
                         borderWidth: contentContainer.surfaceBorderWidth
-                        useCustomSource: root.usesConnectedSurfaceChrome
                         shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !root.frameOwnsConnectedChrome
+                    }
 
-                        Item {
+                    // Local connected chrome (body + connector fillets joined to
+                    // the bar edge) and its shadow as one SDF quad — no FBO.
+                    Item {
+                        id: localChrome
+                        visible: root.usesLocalConnectedSurfaceChrome
+
+                        readonly property real extraLeft: (contentContainer.barTop || contentContainer.barBottom) ? Theme.connectedCornerRadius : 0
+                        readonly property real extraTop: (contentContainer.barLeft || contentContainer.barRight) ? Theme.connectedCornerRadius : 0
+
+                        readonly property bool shadowsOn: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                        readonly property real shadowBlurPx: root.shadowLevel && root.shadowLevel.blurPx !== undefined ? root.shadowLevel.blurPx : 0
+                        readonly property real shadowSpreadPx: root.shadowLevel && root.shadowLevel.spreadPx !== undefined ? root.shadowLevel.spreadPx : 0
+                        readonly property real shadowOffsetX: Theme.elevationOffsetXFor(root.shadowLevel, root.effectiveShadowDirection, root.shadowFallbackOffset)
+                        readonly property real shadowOffsetY: Theme.elevationOffsetYFor(root.shadowLevel, root.effectiveShadowDirection, root.shadowFallbackOffset)
+                        readonly property color shadowTint: Theme.elevationShadowColor(root.shadowLevel)
+                        readonly property var ambient: Theme.elevationAmbient(root.shadowLevel)
+                        readonly property real pad: shadowsOn ? Math.ceil(Math.max(shadowBlurPx + shadowSpreadPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)), ambient.blurPx + ambient.spreadPx) + 2) : 0
+
+                        width: rollOutAdjuster.baseWidth + extraLeft * 2
+                        height: rollOutAdjuster.baseHeight + extraTop * 2
+                        opacity: contentWrapper.publishedOpacity
+                        scale: contentWrapper.scale
+                        x: contentWrapper.x - extraLeft
+                        y: contentWrapper.y - extraTop
+
+                        ShaderEffect {
                             anchors.fill: parent
-                            visible: root.usesLocalConnectedSurfaceChrome
-                            clip: false
+                            // Shadow overflow pads every side except the bar
+                            // edge, where the silhouette must end flush.
+                            anchors.topMargin: contentContainer.barTop ? 0 : -localChrome.pad
+                            anchors.bottomMargin: contentContainer.barBottom ? 0 : -localChrome.pad
+                            anchors.leftMargin: contentContainer.barLeft ? 0 : -localChrome.pad
+                            anchors.rightMargin: contentContainer.barRight ? 0 : -localChrome.pad
+                            fragmentShader: Qt.resolvedUrl("../Shaders/qsb/connected_chrome.frag.qsb")
 
-                            Rectangle {
-                                x: shadowSource.bodyX
-                                y: shadowSource.bodyY
-                                width: shadowSource.bodyWidth
-                                height: shadowSource.bodyHeight
-                                topLeftRadius: contentContainer.surfaceTopLeftRadius
-                                topRightRadius: contentContainer.surfaceTopRightRadius
-                                bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
-                                bottomRightRadius: contentContainer.surfaceBottomRightRadius
-                                color: contentContainer.surfaceColor
-                            }
-
-                            ConnectedCorner {
-                                visible: root.usesConnectedSurfaceChrome
-                                barSide: contentContainer.connectedBarSide
-                                placement: "left"
-                                spacing: 0
-                                connectorRadius: Theme.connectedCornerRadius
-                                color: contentContainer.surfaceColor
-                                dpr: root.dpr
-                                x: Theme.snap(ConnectorGeometry.connectorX(contentContainer.connectedBarSide, shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                                y: Theme.snap(ConnectorGeometry.connectorY(contentContainer.connectedBarSide, shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                            }
-
-                            ConnectedCorner {
-                                visible: root.usesConnectedSurfaceChrome
-                                barSide: contentContainer.connectedBarSide
-                                placement: "right"
-                                spacing: 0
-                                connectorRadius: Theme.connectedCornerRadius
-                                color: contentContainer.surfaceColor
-                                dpr: root.dpr
-                                x: Theme.snap(ConnectorGeometry.connectorX(contentContainer.connectedBarSide, shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                                y: Theme.snap(ConnectorGeometry.connectorY(contentContainer.connectedBarSide, shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                            }
+                            property real widthPx: width
+                            property real heightPx: height
+                            property vector4d surfaceColor: Qt.vector4d(contentContainer.surfaceColor.r, contentContainer.surfaceColor.g, contentContainer.surfaceColor.b, contentContainer.surfaceColor.a)
+                            property vector4d shadowColor: Qt.vector4d(localChrome.shadowTint.r, localChrome.shadowTint.g, localChrome.shadowTint.b, localChrome.shadowsOn ? localChrome.shadowTint.a : 0)
+                            property vector4d shadowParam: Qt.vector4d(Math.max(0, localChrome.shadowBlurPx), localChrome.shadowSpreadPx, localChrome.shadowOffsetX, localChrome.shadowOffsetY)
+                            property vector4d ambientParam: Qt.vector4d(localChrome.ambient.blurPx, localChrome.ambient.spreadPx, localChrome.shadowsOn ? localChrome.ambient.alpha : 0, 0)
+                            property vector4d bodyRect: Qt.vector4d((contentContainer.barLeft ? 0 : localChrome.pad) + localChrome.extraLeft, (contentContainer.barTop ? 0 : localChrome.pad) + localChrome.extraTop, rollOutAdjuster.baseWidth, rollOutAdjuster.baseHeight)
+                            property vector4d cornerRadius: Qt.vector4d(contentContainer.surfaceTopLeftRadius, contentContainer.surfaceTopRightRadius, contentContainer.surfaceBottomRightRadius, contentContainer.surfaceBottomLeftRadius)
+                            property vector4d edgeParam: Qt.vector4d(contentContainer.barTop ? 0 : (contentContainer.barBottom ? 1 : (contentContainer.barLeft ? 2 : 3)), Theme.connectedCornerRadius, 0, 0)
                         }
                     }
 

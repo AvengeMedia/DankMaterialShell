@@ -1,12 +1,10 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
-import qs.Widgets
 import "../../Common/ConnectorGeometry.js" as ConnectorGeometry
 import "../../Common/ConnectedSurfaceGeometry.js" as SurfaceGeometry
 
@@ -70,11 +68,8 @@ PanelWindow {
     readonly property real _ccr: Theme.connectedCornerRadius
 
     readonly property bool _popoutHorizontal: SurfaceGeometry.isHorizontal(win._popoutDescriptor.barSide)
-    readonly property bool _notifHorizontal: ConnectorGeometry.isHorizontal(win._notifState.barSide)
     readonly property bool _modalHorizontal: ConnectorGeometry.isHorizontal(win._modalState.barSide)
-    readonly property bool _dockHorizontal: ConnectorGeometry.isHorizontal(win._dockState.barSide)
     readonly property var _popoutBodyGeometry: SurfaceGeometry.animatedBodyRect(win._popoutDescriptor, win._dpr)
-    readonly property var _popoutStaticBodyGeometry: SurfaceGeometry.bodyRect(win._popoutDescriptor, win._dpr)
     readonly property var _modalBodyGeometry: SurfaceGeometry.animatedBodyRect(win._modalDescriptor, win._dpr)
     readonly property var _notifBodyGeometry: SurfaceGeometry.bodyRect(win._notifDescriptor, win._dpr)
     readonly property var _dockBodyGeometry: SurfaceGeometry.translatedBodyRect(win._dockDescriptor, win._dpr)
@@ -97,12 +92,6 @@ PanelWindow {
         return Math.max(0, Math.min(win._ccr, bodyRadius, maxConnectorRadius));
     }
 
-    readonly property real _popoutFillOverlapXValue: win._popoutHorizontal ? win._seamOverlap : 0
-    readonly property real _popoutFillOverlapYValue: (win._popoutState.barSide === "left" || win._popoutState.barSide === "right") ? win._seamOverlap : 0
-    readonly property real _dockFillOverlapXValue: win._dockHorizontal ? win._seamOverlap : 0
-    readonly property real _dockFillOverlapYValue: (win._dockState.barSide === "left" || win._dockState.barSide === "right") ? win._seamOverlap : 0
-    readonly property real _dockJoinOverlapXValue: ConnectorGeometry.isVertical(win._dockState.barSide) ? win._seamOverlap : 0
-    readonly property real _dockJoinOverlapYValue: ConnectorGeometry.isHorizontal(win._dockState.barSide) ? win._seamOverlap : 0
     readonly property real _notifSideUnderlapValue: ConnectorGeometry.isVertical(win._notifState.barSide) ? win._seamOverlap : 0
     readonly property real _notifStartUnderlapValue: win._notifState.omitStartConnector ? win._seamOverlap : 0
     readonly property real _notifEndUnderlapValue: win._notifState.omitEndConnector ? win._seamOverlap : 0
@@ -118,7 +107,6 @@ PanelWindow {
     readonly property real _effectivePopoutFarEndCcr: win._popoutRadii.farEnd
     readonly property real _effectivePopoutMaxCcr: Math.max(win._effectivePopoutStartCcr, win._effectivePopoutEndCcr)
     readonly property real _effectivePopoutFarExtent: Math.max(win._effectivePopoutFarStartCcr, win._effectivePopoutFarEndCcr)
-    readonly property var _popoutChromeGeometry: SurfaceGeometry.chromeBounds(win._popoutStaticBodyGeometry, win._popoutDescriptor.barSide, win._effectivePopoutStartCcr, win._effectivePopoutEndCcr, 0, win._dpr)
     readonly property var _notifNearRadii: SurfaceGeometry.connectorRadii(win._notifDescriptor, win._notifBodyGeometry, win._ccr, win._surfaceRadius, win._dpr, true)
     readonly property var _notifFarRadii: SurfaceGeometry.connectorRadii(win._notifDescriptor, win._notifBodyScene(), win._ccr, win._surfaceRadius, win._dpr, true)
     readonly property real _effectiveNotifCcr: win._notifNearRadii.near
@@ -137,20 +125,16 @@ PanelWindow {
     readonly property real _effectiveModalFarStartCcr: win._modalRadii.farStart
     readonly property real _effectiveModalFarEndCcr: win._modalRadii.farEnd
     readonly property real _effectiveModalFarExtent: Math.max(win._effectiveModalFarStartCcr, win._effectiveModalFarEndCcr)
-    readonly property var _dockChromeGeometry: SurfaceGeometry.chromeBounds(win._dockBodyGeometry, win._dockDescriptor.barSide, win._dockConnectorRadiusValue, win._dockConnectorRadiusValue, 0, win._dpr)
     readonly property color _surfaceColor: Theme.connectedSurfaceColor
-    readonly property real _surfaceOpacity: _surfaceColor.a
-    readonly property color _opaqueSurfaceColor: Qt.rgba(_surfaceColor.r, _surfaceColor.g, _surfaceColor.b, 1)
     readonly property real _surfaceRadius: Theme.connectedSurfaceRadius
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
     readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
-    // The connected silhouette is drawn directly as one translucent Shape; the
-    // full-output layer/FBO is allocated only when it must source the elevation
-    // shadow. Translucency no longer needs a flatten (single primitive).
+    // Both elevation states render through the SDF shader; this only toggles
+    // the shadow term inside it.
     readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && !win._disableLayer
     // Active surfaces packed into four fixed SDF-shader slots. Each near (bar)
     // edge is clamped to the cutout edge so the smooth-min connector attaches
-    // there; connR (the smin radius) is the connector fillet.
+    // there; the per-corner smin radius is that corner's junction fillet.
     readonly property var _sdfSlots: {
         const T = win.cutoutTopInset;
         const L = win.cutoutLeftInset;
@@ -177,44 +161,54 @@ PanelWindow {
             if (i < src.length) {
                 const s = src[i];
                 const b = clampNear(s.side, s.body);
-                // smin radius = the near connector fillet only; an omitted
-                // connector contributes no flare (its corner just rounds).
-                const connR = Math.max(s.radii.startCr, s.radii.endCr);
                 const active = b.width > 0 && b.height > 0 ? 1 : 0;
-                // A bar-side corner is sharp only where its connector is present;
-                // an omitted connector (farStart/farEnd set) keeps that corner
-                // rounded. Far corners always round. (start=left/top, end=right/bottom.)
-                const bodyR = s.radii.surfaceRadius;
+                // Map start/end (left/top, right/bottom) onto corners
+                // (tl,tr,br,bl): bar-side corners take their near connector
+                // fillet, far corners always take the far fillet so a body
+                // meeting a perpendicular border joins with an arc (smin is
+                // inert when nothing is within k). A bar-side corner is sharp
+                // where its connector is present; an omitted connector makes
+                // its far corner sharp instead (the far-cap join).
+                const sc = s.radii.startCr, ec = s.radii.endCr;
+                // Clamp the far fillet to the body extent so it cannot flare
+                // back across a shallow body into the bar mid-animation.
+                const extent = (s.side === "top" || s.side === "bottom") ? b.height : b.width;
+                const fc = Math.min(s.radii.farCr, extent);
                 const omitS = s.radii.farStartCr > 0;
                 const omitE = s.radii.farEndCr > 0;
-                let tl = bodyR, tr = bodyR, br = bodyR, bl = bodyR;
+                const bodyR = s.radii.surfaceRadius;
+                const nearS = omitS ? bodyR : 0, nearE = omitE ? bodyR : 0;
+                const farS = omitS ? 0 : bodyR, farE = omitE ? 0 : bodyR;
+                // An omitted bar-side corner sits flush against the border, so
+                // it keeps a nonzero fillet (a zero k hard-joins the coincident
+                // edges and shows a half-coverage hairline along the seam).
+                const kS = omitS ? fc : sc, kE = omitE ? fc : ec;
+                let ks, cr;
                 if (s.side === "top") {
-                    if (!omitS) tl = 0;
-                    if (!omitE) tr = 0;
+                    ks = [kS, kE, fc, fc];
+                    cr = [nearS, nearE, farE, farS];
                 } else if (s.side === "bottom") {
-                    if (!omitS) bl = 0;
-                    if (!omitE) br = 0;
+                    ks = [fc, fc, kE, kS];
+                    cr = [farS, farE, nearE, nearS];
                 } else if (s.side === "left") {
-                    if (!omitS) tl = 0;
-                    if (!omitE) bl = 0;
+                    ks = [kS, fc, fc, kE];
+                    cr = [nearS, farS, farE, nearE];
                 } else {
-                    if (!omitS) tr = 0;
-                    if (!omitE) br = 0;
+                    ks = [fc, kS, kE, fc];
+                    cr = [farS, nearS, nearE, farE];
                 }
                 out.push({
                     "rect": Qt.vector4d(b.x, b.y, b.width, b.height),
-                    "corner": Qt.vector4d(tl, tr, br, bl),
-                    "param": Qt.vector4d(connR, active, 0, 0)
+                    "corner": Qt.vector4d(cr[0], cr[1], cr[2], cr[3]),
+                    "k": Qt.vector4d(ks[0], ks[1], ks[2], ks[3]),
+                    "param": Qt.vector4d(active, 0, 0, 0)
                 });
             } else {
-                out.push({"rect": Qt.vector4d(0, 0, 0, 0), "corner": Qt.vector4d(0, 0, 0, 0), "param": Qt.vector4d(0, 0, 0, 0)});
+                out.push({"rect": Qt.vector4d(0, 0, 0, 0), "corner": Qt.vector4d(0, 0, 0, 0), "k": Qt.vector4d(0, 0, 0, 0), "param": Qt.vector4d(0, 0, 0, 0)});
             }
         }
         return out;
     }
-    property bool _surfaceRefreshNeedsLayerRecreate: false
-    property bool _surfaceLayerRecoveryActive: false
-
     function _regionInt(value) {
         return Math.max(0, Math.round(Theme.px(value, win._dpr)));
     }
@@ -1067,96 +1061,14 @@ PanelWindow {
         return Math.max(0, Math.min(win._effectiveModalCcr, extent - win._surfaceRadius));
     }
 
-    function _popoutArcVisible() {
-        if (!_popoutBodyBlurAnchor._active || _popoutBodyBlurAnchor.width <= 0 || _popoutBodyBlurAnchor.height <= 0)
-            return false;
-        return win._popoutArcExtent >= win._ccr * (1 + win._ccr * 0.02);
-    }
-
     function _popoutBlurCapThickness() {
         const extent = win._popoutArcExtent;
         return Math.max(0, Math.min(win._effectivePopoutMaxCcr, extent - win._surfaceRadius));
     }
 
-    function _popoutChromeX() {
-        return win._popoutChromeGeometry.x;
-    }
-
-    function _popoutChromeY() {
-        return win._popoutChromeGeometry.y;
-    }
-
-    function _popoutChromeWidth() {
-        return win._popoutChromeGeometry.width;
-    }
-
-    function _popoutChromeHeight() {
-        return win._popoutChromeGeometry.height;
-    }
-
-    function _popoutClipX() {
-        return _popoutBodyBlurAnchor.x - win._popoutChromeX() - win._popoutFillOverlapXValue;
-    }
-
-    function _popoutClipY() {
-        return _popoutBodyBlurAnchor.y - win._popoutChromeY() - win._popoutFillOverlapYValue;
-    }
-
-    function _popoutClipWidth() {
-        return _popoutBodyBlurAnchor.width + win._popoutFillOverlapXValue * 2;
-    }
-
-    function _popoutClipHeight() {
-        return _popoutBodyBlurAnchor.height + win._popoutFillOverlapYValue * 2;
-    }
-
-    function _popoutShapeBodyOffsetX() {
-        const side = win._popoutState.barSide;
-        if (ConnectorGeometry.isHorizontal(side))
-            return win._effectivePopoutStartCcr;
-        return side === "right" ? win._effectivePopoutFarExtent : 0;
-    }
-
-    function _popoutShapeBodyOffsetY() {
-        const side = win._popoutState.barSide;
-        if (ConnectorGeometry.isHorizontal(side))
-            return side === "bottom" ? win._effectivePopoutFarExtent : 0;
-        return win._effectivePopoutStartCcr;
-    }
-
-    function _popoutShapeWidth() {
-        const side = win._popoutState.barSide;
-        if (ConnectorGeometry.isHorizontal(side))
-            return win._popoutClipWidth() + win._effectivePopoutStartCcr + win._effectivePopoutEndCcr;
-        return win._popoutClipWidth() + win._effectivePopoutFarExtent;
-    }
-
-    function _popoutShapeHeight() {
-        const side = win._popoutState.barSide;
-        if (ConnectorGeometry.isHorizontal(side))
-            return win._popoutClipHeight() + win._effectivePopoutFarExtent;
-        return win._popoutClipHeight() + win._effectivePopoutStartCcr + win._effectivePopoutEndCcr;
-    }
-
-    function _popoutBodyXInClip() {
-        return (win._popoutState.barSide === "left" ? _popoutBodyBlurAnchor._dxClamp : 0) - win._popoutFillOverlapXValue;
-    }
-
-    function _popoutBodyYInClip() {
-        return (win._popoutState.barSide === "top" ? _popoutBodyBlurAnchor._dyClamp : 0) - win._popoutFillOverlapYValue;
-    }
-
-    function _popoutBodyFullWidth() {
-        return win._popoutState.bodyW + win._popoutFillOverlapXValue * 2;
-    }
-
-    function _popoutBodyFullHeight() {
-        return win._popoutState.bodyH + win._popoutFillOverlapYValue * 2;
-    }
-
     // Active connected surfaces fed to the unified silhouette path. Raw animated
     // body rects (no seam/fill overlap); the builder anchors each to the cutout
-    // edge. Connector radii match what each ConnectedShape would receive.
+    // edge. Connector radii use the same per-surface helpers as the blur regions.
     function _unifiedSurfaces() {
         const arr = [];
         const p = win._popoutBodyGeometry;
@@ -1165,6 +1077,7 @@ PanelWindow {
                 "side": win._popoutDescriptor.barSide,
                 "body": {"x": p.x, "y": p.y, "width": p.width, "height": p.height},
                 "radii": {
+                    "farCr": win._effectivePopoutFarCcr,
                     "startCr": win._effectivePopoutStartCcr,
                     "endCr": win._effectivePopoutEndCcr,
                     "farStartCr": win._effectivePopoutFarStartCcr,
@@ -1178,6 +1091,7 @@ PanelWindow {
                 "side": win._modalDescriptor.barSide,
                 "body": {"x": m.x, "y": m.y, "width": m.width, "height": m.height},
                 "radii": {
+                    "farCr": win._effectiveModalFarCcr,
                     "startCr": win._effectiveModalStartCcr,
                     "endCr": win._effectiveModalEndCcr,
                     "farStartCr": win._effectiveModalFarStartCcr,
@@ -1191,6 +1105,7 @@ PanelWindow {
                 "side": win._notifDescriptor.barSide,
                 "body": {"x": n.x, "y": n.y, "width": n.width, "height": n.height},
                 "radii": {
+                    "farCr": win._effectiveNotifFarCcr,
                     "startCr": win._effectiveNotifStartCcr,
                     "endCr": win._effectiveNotifEndCcr,
                     "farStartCr": win._effectiveNotifFarStartCcr,
@@ -1204,6 +1119,7 @@ PanelWindow {
                 "side": win._dockDescriptor.barSide,
                 "body": {"x": dk.x, "y": dk.y, "width": dk.width, "height": dk.height},
                 "radii": {
+                    "farCr": win._dockConnectorRadiusValue,
                     "startCr": win._dockConnectorRadiusValue,
                     "endCr": win._dockConnectorRadiusValue,
                     "farStartCr": 0,
@@ -1212,38 +1128,6 @@ PanelWindow {
                 }
             });
         return arr;
-    }
-
-    function _dockChromeX() {
-        return win._dockChromeGeometry.x;
-    }
-
-    function _dockChromeY() {
-        return win._dockChromeGeometry.y;
-    }
-
-    function _dockChromeWidth() {
-        return win._dockChromeGeometry.width;
-    }
-
-    function _dockChromeHeight() {
-        return win._dockChromeGeometry.height;
-    }
-
-    function _dockBodyXInChrome() {
-        return (ConnectorGeometry.isHorizontal(win._dockState.barSide) ? win._dockConnectorRadiusValue : 0) - win._dockFillOverlapXValue;
-    }
-
-    function _dockBodyYInChrome() {
-        return ((win._dockState.barSide === "left" || win._dockState.barSide === "right") ? win._dockConnectorRadiusValue : 0) - win._dockFillOverlapYValue;
-    }
-
-    function _dockJoinOverlapXOffset() {
-        return win._dockState.barSide === "left" ? -win._dockJoinOverlapXValue : 0;
-    }
-
-    function _dockJoinOverlapYOffset() {
-        return win._dockState.barSide === "top" ? -win._dockJoinOverlapYValue : 0;
     }
 
     function _farConnectorBarSide(sourceSide, placement) {
@@ -1317,28 +1201,13 @@ PanelWindow {
         } catch (e) {}
     }
 
-    function _scheduleSurfaceRefresh(recreateLayer) {
-        if (recreateLayer)
-            _surfaceRefreshNeedsLayerRecreate = true;
+    function _scheduleSurfaceRefresh() {
         surfaceRefreshAction.restart();
     }
 
     function _runSurfaceRefresh() {
         if (!win.visible)
             return;
-        if (_surfaceRefreshNeedsLayerRecreate) {
-            _surfaceRefreshNeedsLayerRecreate = false;
-            if (win._elevationShadow) {
-                _surfaceLayerRecoveryActive = true;
-                surfaceLayerRestoreAction.restart();
-            }
-        }
-        _requestContentUpdate();
-        _republishFrameBlur();
-    }
-
-    function _finishSurfaceLayerRecovery() {
-        _surfaceLayerRecoveryActive = false;
         _requestContentUpdate();
         _republishFrameBlur();
     }
@@ -1346,11 +1215,6 @@ PanelWindow {
     DeferredAction {
         id: surfaceRefreshAction
         onTriggered: win._runSurfaceRefresh()
-    }
-
-    DeferredAction {
-        id: surfaceLayerRestoreAction
-        onTriggered: win._finishSurfaceLayerRecovery()
     }
 
     Connections {
@@ -1397,41 +1261,33 @@ PanelWindow {
     onVisibleChanged: {
         if (visible) {
             win._scheduleBlurRebuild();
-            win._scheduleSurfaceRefresh(false);
+            win._scheduleSurfaceRefresh();
         } else {
             surfaceRefreshAction.cancel();
-            surfaceLayerRestoreAction.cancel();
-            _surfaceLayerRecoveryActive = false;
-            _surfaceRefreshNeedsLayerRecreate = false;
             _teardownBlur();
         }
     }
 
-    on_SurfaceRevisionChanged: win._scheduleSurfaceRefresh(false)
+    on_SurfaceRevisionChanged: win._scheduleSurfaceRefresh()
 
     onResourcesLost: {
         blurRebuildAction.cancel();
         surfaceRefreshAction.cancel();
-        surfaceLayerRestoreAction.cancel();
-        _surfaceRefreshNeedsLayerRecreate = true;
-        if (win._elevationShadow)
-            _surfaceLayerRecoveryActive = true;
         win._teardownBlur();
     }
 
     onWindowConnected: {
-        win._scheduleSurfaceRefresh(true);
+        win._scheduleSurfaceRefresh();
         win._scheduleBlurRebuild();
     }
 
     Component.onCompleted: {
         win._scheduleBlurRebuild();
-        win._scheduleSurfaceRefresh(false);
+        win._scheduleSurfaceRefresh();
     }
     Component.onDestruction: {
         blurRebuildAction.cancel();
         surfaceRefreshAction.cancel();
-        surfaceLayerRestoreAction.cancel();
         win._teardownBlur();
     }
 
@@ -1445,258 +1301,41 @@ PanelWindow {
         cutoutRadius: win.cutoutRadius
     }
 
-    Item {
-        id: _connectedSurfaceLayer
+    // The entire connected silhouette (frame ring + every active chrome) as one
+    // SDF in a fragment shader. Analytic fwidth AA → crisp at any scale, no FBO;
+    // the smooth-min radius is the connector. The elevation shadow is derived
+    // from the same distance field, so elevation-on needs no grouping layer.
+    ShaderEffect {
         anchors.fill: parent
         visible: win._connectedActive
-        // Elevation-off draws the silhouette directly at the surface color, so
-        // group opacity is 1. Elevation-on draws children opaque and applies the
-        // surface alpha to the whole group beneath the shadow.
-        opacity: win._elevationShadow ? win._surfaceOpacity : 1
-        // FBO is allocated only to source the elevation shadow.
-        layer.enabled: win._elevationShadow && !win._surfaceLayerRecoveryActive
-        layer.smooth: false
+        fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/connected_arc.frag.qsb")
 
-        layer.effect: MultiEffect {
-            readonly property var level: Theme.elevationLevel2
-            readonly property real _shadowBlur: Theme.elevationEnabled ? (level && level.blurPx !== undefined ? level.blurPx : 0) : 0
-            readonly property real _shadowSpread: Theme.elevationEnabled ? (level && level.spreadPx !== undefined ? level.spreadPx : 0) : 0
-
-            autoPaddingEnabled: true
-            blurEnabled: false
-            maskEnabled: false
-
-            shadowEnabled: !win._disableLayer && Theme.elevationEnabled
-            shadowBlur: Math.max(0, Math.min(1, _shadowBlur / Math.max(1, Theme.elevationBlurMax)))
-            shadowScale: 1 + (2 * _shadowSpread) / Math.max(1, Math.min(_connectedSurfaceLayer.width, _connectedSurfaceLayer.height))
-            shadowHorizontalOffset: Theme.elevationOffsetXFor(level, Theme.elevationLightDirection, 4)
-            shadowVerticalOffset: Theme.elevationOffsetYFor(level, Theme.elevationLightDirection, 4)
-            shadowColor: Theme.elevationShadowColor(level)
-            shadowOpacity: 1
-        }
-
-        // Elevation-off: the entire connected silhouette (frame ring + every
-        // active chrome) as one SDF in a fragment shader. Analytic fwidth AA →
-        // crisp at any scale, no FBO; the smooth-min radius is the connector.
-        ShaderEffect {
-            anchors.fill: parent
-            visible: win._connectedActive && !win._elevationShadow
-            fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/connected_arc.frag.qsb")
-
-            property real widthPx: width
-            property real heightPx: height
-            property real cutoutRadius: win.cutoutRadius
-            property vector4d cutout: Qt.vector4d(win.cutoutLeftInset, win.cutoutTopInset, win.width - win.cutoutRightInset, win.height - win.cutoutBottomInset)
-            property vector4d surfaceColor: Qt.vector4d(win._surfaceColor.r, win._surfaceColor.g, win._surfaceColor.b, win._surfaceColor.a)
-            property vector4d chromeRect0: win._sdfSlots[0].rect
-            property vector4d chromeCorner0: win._sdfSlots[0].corner
-            property vector4d chromeParam0: win._sdfSlots[0].param
-            property vector4d chromeRect1: win._sdfSlots[1].rect
-            property vector4d chromeCorner1: win._sdfSlots[1].corner
-            property vector4d chromeParam1: win._sdfSlots[1].param
-            property vector4d chromeRect2: win._sdfSlots[2].rect
-            property vector4d chromeCorner2: win._sdfSlots[2].corner
-            property vector4d chromeParam2: win._sdfSlots[2].param
-            property vector4d chromeRect3: win._sdfSlots[3].rect
-            property vector4d chromeCorner3: win._sdfSlots[3].corner
-            property vector4d chromeParam3: win._sdfSlots[3].param
-        }
-
-        // Elevation-on: opaque children flattened in the FBO so the MultiEffect
-        // can derive one shadow; the layer applies the surface alpha.
-        FrameBorder {
-            anchors.fill: parent
-            visible: win._elevationShadow
-            borderColor: win._opaqueSurfaceColor
-            cutoutTopInset: win.cutoutTopInset
-            cutoutBottomInset: win.cutoutBottomInset
-            cutoutLeftInset: win.cutoutLeftInset
-            cutoutRightInset: win.cutoutRightInset
-            cutoutRadius: win.cutoutRadius
-        }
-
-        Item {
-            id: _connectedChrome
-            anchors.fill: parent
-            visible: win._elevationShadow
-
-            Item {
-                id: _popoutChrome
-                visible: win._popoutState.visible && win._popoutState.screen === win._screenName
-                x: win._popoutChromeX()
-                y: win._popoutChromeY()
-                width: win._popoutChromeWidth()
-                height: win._popoutChromeHeight()
-
-                Item {
-                    id: _popoutClip
-                    x: win._popoutClipX() - win._popoutShapeBodyOffsetX()
-                    y: win._popoutClipY() - win._popoutShapeBodyOffsetY()
-                    width: win._popoutShapeWidth()
-                    height: win._popoutShapeHeight()
-                    clip: true
-
-                    ConnectedShape {
-                        id: _popoutShape
-                        visible: _popoutBodyBlurAnchor._active && _popoutBodyBlurAnchor.width > 0 && _popoutBodyBlurAnchor.height > 0
-                        barSide: win._popoutState.barSide
-                        bodyWidth: win._popoutClipWidth()
-                        bodyHeight: win._popoutClipHeight()
-                        connectorRadius: win._effectivePopoutCcr
-                        startConnectorRadius: win._effectivePopoutStartCcr
-                        endConnectorRadius: win._effectivePopoutEndCcr
-                        farStartConnectorRadius: win._effectivePopoutFarStartCcr
-                        farEndConnectorRadius: win._effectivePopoutFarEndCcr
-                        surfaceRadius: win._surfaceRadius
-                        fillColor: win._opaqueSurfaceColor
-                        x: 0
-                        y: 0
-                    }
-                }
-            }
-
-            Item {
-                id: _dockChrome
-                visible: _dockBodyBlurAnchor._active
-                x: win._dockChromeX()
-                y: win._dockChromeY()
-                width: win._dockChromeWidth()
-                height: win._dockChromeHeight()
-
-                Rectangle {
-                    id: _dockFill
-                    x: win._dockBodyXInChrome() + win._dockJoinOverlapXOffset()
-                    y: win._dockBodyYInChrome() + win._dockJoinOverlapYOffset()
-                    width: _dockBodyBlurAnchor.width + win._dockFillOverlapXValue * 2 + win._dockJoinOverlapXValue
-                    height: _dockBodyBlurAnchor.height + win._dockFillOverlapYValue * 2 + win._dockJoinOverlapYValue
-                    color: win._opaqueSurfaceColor
-                    z: 1
-
-                    readonly property string _dockSide: win._dockState.barSide
-                    readonly property real _dockRadius: win._dockBodyBlurRadiusValue
-                    topLeftRadius: (_dockSide === "top" || _dockSide === "left") ? 0 : _dockRadius
-                    topRightRadius: (_dockSide === "top" || _dockSide === "right") ? 0 : _dockRadius
-                    bottomLeftRadius: (_dockSide === "bottom" || _dockSide === "left") ? 0 : _dockRadius
-                    bottomRightRadius: (_dockSide === "bottom" || _dockSide === "right") ? 0 : _dockRadius
-                }
-
-                ConnectedCorner {
-                    id: _connDockLeft
-                    visible: _dockBodyBlurAnchor._active
-                    barSide: win._dockState.barSide
-                    placement: "left"
-                    spacing: 0
-                    connectorRadius: win._dockConnectorRadiusValue
-                    color: win._opaqueSurfaceColor
-                    dpr: win._dpr
-                    x: Theme.snap(_dockLeftConnectorBlurAnchor.x - _dockChrome.x, win._dpr)
-                    y: Theme.snap(_dockLeftConnectorBlurAnchor.y - _dockChrome.y, win._dpr)
-                }
-
-                ConnectedCorner {
-                    id: _connDockRight
-                    visible: _dockBodyBlurAnchor._active
-                    barSide: win._dockState.barSide
-                    placement: "right"
-                    spacing: 0
-                    connectorRadius: win._dockConnectorRadiusValue
-                    color: win._opaqueSurfaceColor
-                    dpr: win._dpr
-                    x: Theme.snap(_dockRightConnectorBlurAnchor.x - _dockChrome.x, win._dpr)
-                    y: Theme.snap(_dockRightConnectorBlurAnchor.y - _dockChrome.y, win._dpr)
-                }
-            }
-        }
-
-        Item {
-            id: _notifChrome
-            visible: win._elevationShadow && _notifBodySceneBlurAnchor._active
-
-            readonly property string _notifSide: win._notifState.barSide
-            readonly property bool _isHoriz: _notifSide === "top" || _notifSide === "bottom"
-            readonly property real _startCcr: win._effectiveNotifStartCcr
-            readonly property real _endCcr: win._effectiveNotifEndCcr
-            readonly property real _farExtent: win._effectiveNotifFarExtent
-            readonly property real _bodyW: Theme.snap(_notifBodySceneBlurAnchor.width, win._dpr)
-            readonly property real _bodyH: Theme.snap(_notifBodySceneBlurAnchor.height, win._dpr)
-            readonly property var _geometry: SurfaceGeometry.chromeBounds(_notifBodySceneBlurAnchor, _notifSide, _startCcr, _endCcr, _farExtent, win._dpr)
-
-            z: _isHoriz ? 0 : -1
-            x: _geometry.x
-            y: _geometry.y
-            width: _geometry.width
-            height: _geometry.height
-
-            ConnectedShape {
-                visible: _notifBodySceneBlurAnchor._active && _notifBodySceneBlurAnchor.width > 0 && _notifBodySceneBlurAnchor.height > 0
-                barSide: _notifChrome._notifSide
-                bodyWidth: _notifChrome._bodyW
-                bodyHeight: _notifChrome._bodyH
-                connectorRadius: win._effectiveNotifCcr
-                startConnectorRadius: _notifChrome._startCcr
-                endConnectorRadius: _notifChrome._endCcr
-                farStartConnectorRadius: win._effectiveNotifFarStartCcr
-                farEndConnectorRadius: win._effectiveNotifFarEndCcr
-                surfaceRadius: win._surfaceRadius
-                fillColor: win._opaqueSurfaceColor
-                x: 0
-                y: 0
-            }
-        }
-
-        // Bar-side-bounded clip so modal chrome retracts behind the bar on exit
-        // instead of sliding over bar widgets (mirrors the popout `_popoutClip`).
-        Item {
-            id: _modalClip
-            visible: win._elevationShadow && _modalBodyBlurAnchor._active
-            z: 1
-
-            readonly property string _modalSide: win._modalState.barSide
-            readonly property real _inset: _modalBodyBlurAnchor._active && win.screen ? SettingsData.frameEdgeInsetForSide(win.screen, _modalSide) : 0
-            readonly property real _topBound: _modalSide === "top" ? _inset : 0
-            readonly property real _bottomBound: _modalSide === "bottom" ? (win.height - _inset) : win.height
-            readonly property real _leftBound: _modalSide === "left" ? _inset : 0
-            readonly property real _rightBound: _modalSide === "right" ? (win.width - _inset) : win.width
-
-            x: _leftBound
-            y: _topBound
-            width: Math.max(0, _rightBound - _leftBound)
-            height: Math.max(0, _bottomBound - _topBound)
-            clip: true
-
-            Item {
-                id: _modalChrome
-
-                readonly property string _modalSide: win._modalState.barSide
-                readonly property bool _isHoriz: _modalSide === "top" || _modalSide === "bottom"
-                readonly property real _startCcr: win._effectiveModalStartCcr
-                readonly property real _endCcr: win._effectiveModalEndCcr
-                readonly property real _farExtent: win._effectiveModalFarExtent
-                readonly property real _bodyW: Theme.snap(_modalBodyBlurAnchor.width, win._dpr)
-                readonly property real _bodyH: Theme.snap(_modalBodyBlurAnchor.height, win._dpr)
-                readonly property var _geometry: SurfaceGeometry.chromeBounds(_modalBodyBlurAnchor, _modalSide, _startCcr, _endCcr, _farExtent, win._dpr)
-
-                x: Theme.snap(_geometry.x - _modalClip.x, win._dpr)
-                y: Theme.snap(_geometry.y - _modalClip.y, win._dpr)
-                width: _geometry.width
-                height: _geometry.height
-
-                ConnectedShape {
-                    visible: _modalBodyBlurAnchor._active && _modalChrome._bodyW > 0 && _modalChrome._bodyH > 0
-                    barSide: _modalChrome._modalSide
-                    bodyWidth: _modalChrome._bodyW
-                    bodyHeight: _modalChrome._bodyH
-                    connectorRadius: win._effectiveModalCcr
-                    startConnectorRadius: _modalChrome._startCcr
-                    endConnectorRadius: _modalChrome._endCcr
-                    farStartConnectorRadius: win._effectiveModalFarStartCcr
-                    farEndConnectorRadius: win._effectiveModalFarEndCcr
-                    surfaceRadius: win._surfaceRadius
-                    fillColor: win._opaqueSurfaceColor
-                    x: 0
-                    y: 0
-                }
-            }
-        }
+        readonly property var _level: Theme.elevationLevel2
+        readonly property color _shadowTint: Theme.elevationShadowColor(_level)
+        readonly property var _ambient: Theme.elevationAmbient(_level)
+        property real widthPx: width
+        property real heightPx: height
+        property real cutoutRadius: win.cutoutRadius
+        property vector4d cutout: Qt.vector4d(win.cutoutLeftInset, win.cutoutTopInset, win.width - win.cutoutRightInset, win.height - win.cutoutBottomInset)
+        property vector4d surfaceColor: Qt.vector4d(win._surfaceColor.r, win._surfaceColor.g, win._surfaceColor.b, win._surfaceColor.a)
+        property vector4d shadowColor: Qt.vector4d(_shadowTint.r, _shadowTint.g, _shadowTint.b, win._elevationShadow ? _shadowTint.a : 0)
+        property vector4d shadowParam: Qt.vector4d(Math.max(0, _level.blurPx), Math.max(0, _level.spreadPx), Theme.elevationOffsetXFor(_level, Theme.elevationLightDirection, 4), Theme.elevationOffsetYFor(_level, Theme.elevationLightDirection, 4))
+        property vector4d ambientParam: Qt.vector4d(_ambient.blurPx, _ambient.spreadPx, win._elevationShadow ? _ambient.alpha : 0, 0)
+        property vector4d chromeRect0: win._sdfSlots[0].rect
+        property vector4d chromeCorner0: win._sdfSlots[0].corner
+        property vector4d chromeK0: win._sdfSlots[0].k
+        property vector4d chromeParam0: win._sdfSlots[0].param
+        property vector4d chromeRect1: win._sdfSlots[1].rect
+        property vector4d chromeCorner1: win._sdfSlots[1].corner
+        property vector4d chromeK1: win._sdfSlots[1].k
+        property vector4d chromeParam1: win._sdfSlots[1].param
+        property vector4d chromeRect2: win._sdfSlots[2].rect
+        property vector4d chromeCorner2: win._sdfSlots[2].corner
+        property vector4d chromeK2: win._sdfSlots[2].k
+        property vector4d chromeParam2: win._sdfSlots[2].param
+        property vector4d chromeRect3: win._sdfSlots[3].rect
+        property vector4d chromeCorner3: win._sdfSlots[3].corner
+        property vector4d chromeK3: win._sdfSlots[3].k
+        property vector4d chromeParam3: win._sdfSlots[3].param
     }
 }

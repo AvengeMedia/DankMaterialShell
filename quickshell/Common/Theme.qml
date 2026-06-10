@@ -911,6 +911,19 @@ Singleton {
         }
         return Qt.rgba(r, g, b, alpha);
     }
+    // Non-directional ambient layer of the M3 two-part shadow model (key +
+    // ambient). Derived from the key level so user intensity/opacity settings
+    // scale both layers together.
+    function elevationAmbient(level) {
+        const blur = (level && level.blurPx !== undefined) ? Math.max(0, level.blurPx) : 0;
+        const alpha = ((level && level.alpha !== undefined) ? level.alpha : 0.3) * 0.5;
+        return {
+            blurPx: blur * 1.75,
+            spreadPx: 1,
+            alpha: alpha
+        };
+    }
+
     function elevationTintOpacity(level) {
         if (!level)
             return 0;

@@ -130,7 +130,7 @@ Item {
             borderColor: volumePanel.border.color
             borderWidth: volumePanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+            shadowEnabled: Theme.elevationEnabled
         }
 
         MouseArea {
@@ -272,7 +272,7 @@ Item {
             borderColor: audioDevicesPanel.border.color
             borderWidth: audioDevicesPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+            shadowEnabled: Theme.elevationEnabled
         }
 
         MouseArea {
@@ -444,7 +444,7 @@ Item {
             borderColor: playersPanel.border.color
             borderWidth: playersPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+            shadowEnabled: Theme.elevationEnabled
         }
 
         MouseArea {
