@@ -17,6 +17,7 @@ Item {
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
     readonly property alias backgroundWindow: contentWindow
+    readonly property alias contentWindow: contentWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -758,31 +759,21 @@ Item {
             }
         })(), dpr)
 
-    readonly property real triggeringBarLeftExclusion: (effectiveBarPosition === SettingsData.Position.Left && barWidth > 0) ? Math.max(0, barX + barWidth) : 0
-    readonly property real triggeringBarTopExclusion: (effectiveBarPosition === SettingsData.Position.Top && barHeight > 0) ? Math.max(0, barY + barHeight) : 0
-    readonly property real triggeringBarRightExclusion: (effectiveBarPosition === SettingsData.Position.Right && barWidth > 0) ? Math.max(0, screenWidth - barX) : 0
-    readonly property real triggeringBarBottomExclusion: (effectiveBarPosition === SettingsData.Position.Bottom && barHeight > 0) ? Math.max(0, screenHeight - barY) : 0
+    readonly property real maskX: _dismissZone.x
+    readonly property real maskY: _dismissZone.y
+    readonly property real maskWidth: _dismissZone.width
+    readonly property real maskHeight: _dismissZone.height
 
-    readonly property real maskX: {
-        const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
-        return Math.max(triggeringBarLeftExclusion, adjacentLeftBar);
-    }
-
-    readonly property real maskY: {
-        const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
-        return Math.max(triggeringBarTopExclusion, adjacentTopBar);
-    }
-
-    readonly property real maskWidth: {
-        const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
-        const rightExclusion = Math.max(triggeringBarRightExclusion, adjacentRightBar);
-        return Math.max(100, screenWidth - maskX - rightExclusion);
-    }
-
-    readonly property real maskHeight: {
-        const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
-        const bottomExclusion = Math.max(triggeringBarBottomExclusion, adjacentBottomBar);
-        return Math.max(100, screenHeight - maskY - bottomExclusion);
+    DismissZone {
+        id: _dismissZone
+        barPosition: root.effectiveBarPosition
+        barX: root.barX
+        barY: root.barY
+        barWidth: root.barWidth
+        barHeight: root.barHeight
+        screenWidth: root.screenWidth
+        screenHeight: root.screenHeight
+        adjacentBarInfo: root.adjacentBarInfo
     }
 
     PanelWindow {
@@ -814,17 +805,7 @@ Item {
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (PopoutManager.screenshotActive)
-                return WlrKeyboardFocus.None;
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldBeVisible)
-                return WlrKeyboardFocus.None;
-            if (CompositorService.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible, customKeyboardFocus)
 
         readonly property bool _fullHeight: root.fullHeightSurface
         anchors {

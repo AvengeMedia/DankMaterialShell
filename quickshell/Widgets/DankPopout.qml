@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Hyprland
 import qs.Common
 import qs.Services
 
@@ -50,6 +51,24 @@ Item {
     readonly property var contentLoader: impl.item ? impl.item.contentLoader : _fallbackContentLoader
     readonly property var overlayLoader: impl.item ? impl.item.overlayLoader : _fallbackOverlayLoader
     readonly property var backgroundWindow: impl.item ? impl.item.backgroundWindow : null
+    readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
+
+    // On Hyprland the OnDemand content surface only receives keyboard focus
+    // through a grab; everywhere else Exclusive focus covers this. Both
+    // popout windows plus every bar are whitelisted so clicks on them are
+    // delivered normally (dismiss MouseAreas, widget-to-widget transfer)
+    // instead of being consumed clearing the grab.
+    HyprlandFocusGrab {
+        windows: {
+            const list = [];
+            if (root.contentWindow)
+                list.push(root.contentWindow);
+            if (root.backgroundWindow && root.backgroundWindow !== root.contentWindow)
+                list.push(root.backgroundWindow);
+            return list.concat(KeyboardFocus.barWindows);
+        }
+        active: KeyboardFocus.wantsGrab(root.shouldBeVisible, root.customKeyboardFocus)
+    }
 
     Loader {
         id: _fallbackContentLoader

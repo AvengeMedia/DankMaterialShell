@@ -164,8 +164,6 @@ Item {
         openedFromOverview = false;
         keyboardActive = true;
         ModalManager.openModal(modalHandle);
-        if (useHyprlandFocusGrab)
-            focusGrab.active = true;
         _ensureContentLoadedAndInitialize(query || "", mode || "");
     }
 
@@ -201,7 +199,6 @@ Item {
         contentVisible = false;
         keyboardActive = false;
         spotlightOpen = false;
-        focusGrab.active = false;
         ModalManager.closeModal(modalHandle);
         closeCleanupTimer.start();
     }
@@ -231,7 +228,7 @@ Item {
     HyprlandFocusGrab {
         id: focusGrab
         windows: [launcherWindow]
-        active: false
+        active: root.useHyprlandFocusGrab && root.keyboardActive
         onCleared: {
             if (spotlightOpen)
                 hide();
@@ -337,7 +334,7 @@ Item {
         WlrLayershell.namespace: "dms:spotlight"
         WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : (keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None)
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(keyboardActive, null)
 
         anchors {
             top: true

@@ -509,15 +509,7 @@ Item {
             "error": true
         })
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldHaveFocus)
-                return WlrKeyboardFocus.None;
-            if (root.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldHaveFocus, customKeyboardFocus)
 
         anchors {
             left: true

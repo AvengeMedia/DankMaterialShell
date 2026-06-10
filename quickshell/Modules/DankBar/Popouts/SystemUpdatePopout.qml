@@ -38,15 +38,7 @@ DankPopout {
 
     backgroundInteractive: !anyModalOpen
 
-    customKeyboardFocus: {
-        if (!shouldBeVisible)
-            return WlrKeyboardFocus.None;
-        if (anyModalOpen)
-            return WlrKeyboardFocus.None;
-        if (CompositorService.useHyprlandFocusGrab)
-            return WlrKeyboardFocus.OnDemand;
-        return WlrKeyboardFocus.Exclusive;
-    }
+    customKeyboardFocus: anyModalOpen ? WlrKeyboardFocus.None : null
 
     Connections {
         target: SystemUpdateService

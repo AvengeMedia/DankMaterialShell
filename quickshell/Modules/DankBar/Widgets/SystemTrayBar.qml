@@ -980,21 +980,13 @@ BasePill {
         screen: root.parentScreen
         WlrLayershell.layer: root.barUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (PopoutManager.screenshotActive)
-                return WlrKeyboardFocus.None;
-            if (!root.menuOpen)
-                return WlrKeyboardFocus.None;
-            if (CompositorService.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(root.menuOpen, null)
         WlrLayershell.namespace: "dms:tray-overflow-menu"
         color: "transparent"
 
         HyprlandFocusGrab {
-            windows: [overflowMenu]
-            active: CompositorService.useHyprlandFocusGrab && root.useOverflowPopup && root.menuOpen
+            windows: [overflowMenu].concat(KeyboardFocus.barWindows)
+            active: root.useOverflowPopup && KeyboardFocus.wantsGrab(root.menuOpen, null)
         }
 
         Connections {
@@ -1051,32 +1043,21 @@ BasePill {
                 "leftBar": 0,
                 "rightBar": 0
             })
-        readonly property real effectiveBarSize: root.barThickness + root.barSpacing
+        readonly property real maskX: _overflowDismissZone.x
+        readonly property real maskY: _overflowDismissZone.y
+        readonly property real maskWidth: _overflowDismissZone.width
+        readonly property real maskHeight: _overflowDismissZone.height
 
-        readonly property real maskX: {
-            const triggeringBarX = (barPosition === 2) ? effectiveBarSize : 0;
-            const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
-            return Math.max(triggeringBarX, adjacentLeftBar);
-        }
-
-        readonly property real maskY: {
-            const triggeringBarY = (barPosition === 0) ? effectiveBarSize : 0;
-            const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
-            return Math.max(triggeringBarY, adjacentTopBar);
-        }
-
-        readonly property real maskWidth: {
-            const triggeringBarRight = (barPosition === 3) ? effectiveBarSize : 0;
-            const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
-            const rightExclusion = Math.max(triggeringBarRight, adjacentRightBar);
-            return Math.max(100, width - maskX - rightExclusion);
-        }
-
-        readonly property real maskHeight: {
-            const triggeringBarBottom = (barPosition === 1) ? effectiveBarSize : 0;
-            const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
-            const bottomExclusion = Math.max(triggeringBarBottom, adjacentBottomBar);
-            return Math.max(100, height - maskY - bottomExclusion);
+        DismissZone {
+            id: _overflowDismissZone
+            barPosition: overflowMenu.barPosition
+            barX: overflowMenu.barX
+            barY: overflowMenu.barY
+            barWidth: overflowMenu.barWidth
+            barHeight: overflowMenu.barHeight
+            screenWidth: overflowMenu.width
+            screenHeight: overflowMenu.height
+            adjacentBarInfo: overflowMenu.adjacentBarInfo
         }
 
         mask: Region {
@@ -1444,20 +1425,12 @@ BasePill {
                 screen: menuRoot.parentScreen
                 WlrLayershell.layer: root.barUsesOverlayLayer ? WlrLayershell.Overlay : WlrLayershell.Top
                 WlrLayershell.exclusiveZone: -1
-                WlrLayershell.keyboardFocus: {
-                    if (PopoutManager.screenshotActive)
-                        return WlrKeyboardFocus.None;
-                    if (!menuRoot.showMenu)
-                        return WlrKeyboardFocus.None;
-                    if (CompositorService.useHyprlandFocusGrab)
-                        return WlrKeyboardFocus.OnDemand;
-                    return WlrKeyboardFocus.Exclusive;
-                }
+                WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(menuRoot.showMenu, null)
                 color: "transparent"
 
                 HyprlandFocusGrab {
-                    windows: [menuWindow]
-                    active: CompositorService.useHyprlandFocusGrab && menuRoot.showMenu
+                    windows: [menuWindow].concat(KeyboardFocus.barWindows)
+                    active: KeyboardFocus.wantsGrab(menuRoot.showMenu, null)
                 }
 
                 anchors {
@@ -1496,32 +1469,21 @@ BasePill {
                         "leftBar": 0,
                         "rightBar": 0
                     })
-                readonly property real effectiveBarSize: root.barThickness + root.barSpacing
+                readonly property real maskX: _menuDismissZone.x
+                readonly property real maskY: _menuDismissZone.y
+                readonly property real maskWidth: _menuDismissZone.width
+                readonly property real maskHeight: _menuDismissZone.height
 
-                readonly property real maskX: {
-                    const triggeringBarX = (barPosition === 2) ? effectiveBarSize : 0;
-                    const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
-                    return Math.max(triggeringBarX, adjacentLeftBar);
-                }
-
-                readonly property real maskY: {
-                    const triggeringBarY = (barPosition === 0) ? effectiveBarSize : 0;
-                    const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
-                    return Math.max(triggeringBarY, adjacentTopBar);
-                }
-
-                readonly property real maskWidth: {
-                    const triggeringBarRight = (barPosition === 3) ? effectiveBarSize : 0;
-                    const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
-                    const rightExclusion = Math.max(triggeringBarRight, adjacentRightBar);
-                    return Math.max(100, width - maskX - rightExclusion);
-                }
-
-                readonly property real maskHeight: {
-                    const triggeringBarBottom = (barPosition === 1) ? effectiveBarSize : 0;
-                    const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
-                    const bottomExclusion = Math.max(triggeringBarBottom, adjacentBottomBar);
-                    return Math.max(100, height - maskY - bottomExclusion);
+                DismissZone {
+                    id: _menuDismissZone
+                    barPosition: menuWindow.barPosition
+                    barX: menuWindow.barX
+                    barY: menuWindow.barY
+                    barWidth: menuWindow.barWidth
+                    barHeight: menuWindow.barHeight
+                    screenWidth: menuWindow.width
+                    screenHeight: menuWindow.height
+                    adjacentBarInfo: menuWindow.adjacentBarInfo
                 }
 
                 mask: Region {

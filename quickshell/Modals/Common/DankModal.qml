@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Hyprland
 import qs.Common
 import qs.Services
 
@@ -51,6 +52,22 @@ Item {
         objectName: "modalFocusScope"
         focus: true
         anchors.fill: parent
+    }
+
+    // One focus grab for every modal; on Hyprland this is what delivers
+    // keyboard focus to the OnDemand surface, identically in both modes.
+    // The clickCatcher is whitelisted so an outside click is delivered to
+    // it (closing the modal) instead of being consumed clearing the grab.
+    HyprlandFocusGrab {
+        windows: {
+            const list = [];
+            if (root.contentWindow)
+                list.push(root.contentWindow);
+            if (root.clickCatcher)
+                list.push(root.clickCatcher);
+            return list;
+        }
+        active: KeyboardFocus.wantsGrab(root.shouldHaveFocus, root.customKeyboardFocus)
     }
     readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
     readonly property var clickCatcher: impl.item ? impl.item.clickCatcher : null
