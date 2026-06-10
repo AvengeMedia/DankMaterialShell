@@ -753,8 +753,45 @@ Item {
                         }
                     }
 
-                    TextInput {
+                    FocusScope {
                         id: passwordField
+
+                        property string text: root.passwordBuffer
+                        property int cursorPosition: text.length
+
+                        signal accepted()
+
+                        function clampCursorPosition() {
+                            cursorPosition = Math.max(0, Math.min(cursorPosition, text.length));
+                        }
+
+                        function clear() {
+                            text = "";
+                            cursorPosition = 0;
+                        }
+
+                        function insertText(value) {
+                            if (value.length === 0)
+                                return;
+                            clampCursorPosition();
+                            text = text.slice(0, cursorPosition) + value + text.slice(cursorPosition);
+                            cursorPosition += value.length;
+                        }
+
+                        function backspace() {
+                            clampCursorPosition();
+                            if (cursorPosition === 0)
+                                return;
+                            text = text.slice(0, cursorPosition - 1) + text.slice(cursorPosition);
+                            cursorPosition -= 1;
+                        }
+
+                        function isPrintableText(value) {
+                            if (value.length === 0)
+                                return false;
+                            const code = value.charCodeAt(0);
+                            return code >= 0x20 && code !== 0x7f;
+                        }
 
                         anchors.fill: parent
                         anchors.leftMargin: lockIconContainer.width + Theme.spacingM * 2
@@ -781,7 +818,6 @@ Item {
                         focus: true
                         enabled: !demoMode
                         activeFocusOnTab: !demoMode
-                        echoMode: parent.showPassword ? TextInput.Normal : TextInput.Password
                         onTextChanged: {
                             if (!demoMode) {
                                 root.passwordBuffer = text;
@@ -809,12 +845,31 @@ Item {
                                     return;
                                 }
                                 clear();
+                                event.accepted = true;
+                                return;
                             }
 
                             if (pam.passwd.active) {
                                 log.debug("PAM is active, ignoring input");
                                 event.accepted = true;
                                 return;
+                            }
+
+                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                accepted();
+                                event.accepted = true;
+                                return;
+                            }
+
+                            if (event.key === Qt.Key_Backspace) {
+                                backspace();
+                                event.accepted = true;
+                                return;
+                            }
+
+                            if (isPrintableText(event.text)) {
+                                insertText(event.text);
+                                event.accepted = true;
                             }
                         }
 
@@ -847,6 +902,17 @@ Item {
                                         passwordField.forceActiveFocus();
                                     }
                                 });
+                            }
+                        }
+
+                        Connections {
+                            target: root
+
+                            function onPasswordBufferChanged() {
+                                if (passwordField.text === root.passwordBuffer)
+                                    return;
+                                passwordField.text = root.passwordBuffer;
+                                passwordField.cursorPosition = passwordField.text.length;
                             }
                         }
                     }
