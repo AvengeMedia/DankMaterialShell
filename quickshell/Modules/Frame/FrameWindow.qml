@@ -225,6 +225,9 @@ PanelWindow {
         return Math.max(0, Math.min(requested, maxRadius));
     }
 
+    // Pins every surface blur region to zero while frame blur cannot be
+    // consumed, so animations stop dirtying the region tree.
+    readonly property bool _blurSurfacesActive: BlurService.enabled && SettingsData.frameBlurEnabled && win._frameActive
     readonly property int _blurCutoutCompensation: SettingsData.frameOpacity <= 0.2 ? 1 : 0
     readonly property int _blurCutoutLeft: Math.max(0, win.cutoutLeftInset - win._blurCutoutCompensation)
     readonly property int _blurCutoutTop: Math.max(0, win.cutoutTopInset - win._blurCutoutCompensation)
@@ -236,625 +239,17 @@ PanelWindow {
         return Math.max(0, Math.min(requested, maxRadius));
     }
 
-    // Invisible items providing scene coordinates for blur Region anchors
-    Item {
-        id: _blurCutout
-        x: win._blurCutoutLeft
-        y: win._blurCutoutTop
-        width: Math.max(0, win._blurCutoutRight - win._blurCutoutLeft)
-        height: Math.max(0, win._blurCutoutBottom - win._blurCutoutTop)
-    }
-
-    Item {
-        id: _popoutBodyBlurAnchor
-        visible: false
-
-        readonly property bool _active: win._popoutDescriptor.visible
-        readonly property real _dyClamp: win._popoutBodyGeometry.dy
-        readonly property real _dxClamp: win._popoutBodyGeometry.dx
-
-        x: _active ? win._popoutBodyGeometry.x : 0
-        y: _active ? win._popoutBodyGeometry.y : 0
-        width: _active ? win._popoutBodyGeometry.width : 0
-        height: _active ? win._popoutBodyGeometry.height : 0
-    }
-
-    Item {
-        id: _dockBodyBlurAnchor
-        visible: false
-
-        readonly property bool _active: win._connectedActive && win._dockDescriptor.visible && win._dockBodyGeometry.width > 0 && win._dockBodyGeometry.height > 0
-
-        x: _active ? win._dockBodyGeometry.x : 0
-        y: _active ? win._dockBodyGeometry.y : 0
-        width: _active ? win._dockBodyGeometry.width : 0
-        height: _active ? win._dockBodyGeometry.height : 0
-    }
-
-    Item {
-        id: _popoutBodyBlurCap
-        opacity: 0
-
-        readonly property string _side: win._popoutState.barSide
-        readonly property real _capThickness: win._popoutBlurCapThickness()
-        readonly property bool _active: _popoutBodyBlurAnchor._active && _capThickness > 0 && _popoutBodyBlurAnchor.width > 0 && _popoutBodyBlurAnchor.height > 0
-        readonly property real _capWidth: (_side === "left" || _side === "right") ? Math.min(_capThickness, _popoutBodyBlurAnchor.width) : _popoutBodyBlurAnchor.width
-        readonly property real _capHeight: (_side === "top" || _side === "bottom") ? Math.min(_capThickness, _popoutBodyBlurAnchor.height) : _popoutBodyBlurAnchor.height
-
-        x: !_active ? 0 : (_side === "right" ? _popoutBodyBlurAnchor.x + _popoutBodyBlurAnchor.width - _capWidth : _popoutBodyBlurAnchor.x)
-        y: !_active ? 0 : (_side === "bottom" ? _popoutBodyBlurAnchor.y + _popoutBodyBlurAnchor.height - _capHeight : _popoutBodyBlurAnchor.y)
-        width: _active ? _capWidth : 0
-        height: _active ? _capHeight : 0
-    }
-
-    Item {
-        id: _dockBodyBlurCap
-        opacity: 0
-
-        readonly property string _side: win._dockState.barSide
-        readonly property bool _active: _dockBodyBlurAnchor._active && _dockBodyBlurAnchor.width > 0 && _dockBodyBlurAnchor.height > 0
-        readonly property real _capWidth: (_side === "left" || _side === "right") ? Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.width) : _dockBodyBlurAnchor.width
-        readonly property real _capHeight: (_side === "top" || _side === "bottom") ? Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.height) : _dockBodyBlurAnchor.height
-
-        x: !_active ? 0 : (_side === "right" ? _dockBodyBlurAnchor.x + _dockBodyBlurAnchor.width - _capWidth : _dockBodyBlurAnchor.x)
-        y: !_active ? 0 : (_side === "bottom" ? _dockBodyBlurAnchor.y + _dockBodyBlurAnchor.height - _capHeight : _dockBodyBlurAnchor.y)
-        width: _active ? _capWidth : 0
-        height: _active ? _capHeight : 0
-    }
-
-    Item {
-        id: _popoutLeftConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._popoutConnectorRadiusLeft
-        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "left", 0, _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _popoutRightConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._popoutConnectorRadiusRight
-        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "right", 0, _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _popoutLeftConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _popoutLeftConnectorBlurAnchor.width > 0 && _popoutLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutState.barSide, "left")
-        readonly property real _radius: win._popoutConnectorRadiusLeft
-
-        x: _active ? win._connectorCutoutX(_popoutLeftConnectorBlurAnchor.x, _popoutLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_popoutLeftConnectorBlurAnchor.y, _popoutLeftConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _popoutRightConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _popoutRightConnectorBlurAnchor.width > 0 && _popoutRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutState.barSide, "right")
-        readonly property real _radius: win._popoutConnectorRadiusRight
-
-        x: _active ? win._connectorCutoutX(_popoutRightConnectorBlurAnchor.x, _popoutRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_popoutRightConnectorBlurAnchor.y, _popoutRightConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _popoutFarStartConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._effectivePopoutFarStartCcr
-        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farConnectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "left", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _popoutFarStartBodyBlurCap
-        opacity: 0
-
-        readonly property real _radius: win._effectivePopoutFarStartCcr
-        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "left", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _popoutFarEndBodyBlurCap
-        opacity: 0
-
-        readonly property real _radius: win._effectivePopoutFarEndCcr
-        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "right", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _popoutFarEndConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._effectivePopoutFarEndCcr
-        readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farConnectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "right", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _popoutFarStartConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _popoutFarStartConnectorBlurAnchor.width > 0 && _popoutFarStartConnectorBlurAnchor.height > 0
-        readonly property string _barSide: win._farConnectorBarSide(win._popoutState.barSide, "left")
-        readonly property string _placement: win._farConnectorPlacement(win._popoutState.barSide, "left")
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
-        readonly property real _radius: win._effectivePopoutFarStartCcr
-
-        x: _active ? win._connectorCutoutX(_popoutFarStartConnectorBlurAnchor.x, _popoutFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_popoutFarStartConnectorBlurAnchor.y, _popoutFarStartConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _popoutFarEndConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _popoutFarEndConnectorBlurAnchor.width > 0 && _popoutFarEndConnectorBlurAnchor.height > 0
-        readonly property string _barSide: win._farConnectorBarSide(win._popoutState.barSide, "right")
-        readonly property string _placement: win._farConnectorPlacement(win._popoutState.barSide, "right")
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
-        readonly property real _radius: win._effectivePopoutFarEndCcr
-
-        x: _active ? win._connectorCutoutX(_popoutFarEndConnectorBlurAnchor.x, _popoutFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_popoutFarEndConnectorBlurAnchor.y, _popoutFarEndConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _dockLeftConnectorBlurAnchor
-        opacity: 0
-
-        readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadiusValue > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._dockDescriptor.barSide, win._dockBodyGeometry, "left", 0, win._dockConnectorRadiusValue, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _dockRightConnectorBlurAnchor
-        opacity: 0
-
-        readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadiusValue > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._dockDescriptor.barSide, win._dockBodyGeometry, "right", 0, win._dockConnectorRadiusValue, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _dockLeftConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _dockLeftConnectorBlurAnchor.width > 0 && _dockLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "left")
-
-        x: _active ? win._connectorCutoutX(_dockLeftConnectorBlurAnchor.x, _dockLeftConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadiusValue) : 0
-        y: _active ? win._connectorCutoutY(_dockLeftConnectorBlurAnchor.y, _dockLeftConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadiusValue) : 0
-        width: _active ? win._dockConnectorRadiusValue * 2 : 0
-        height: _active ? win._dockConnectorRadiusValue * 2 : 0
-    }
-
-    Item {
-        id: _dockRightConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _dockRightConnectorBlurAnchor.width > 0 && _dockRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "right")
-
-        x: _active ? win._connectorCutoutX(_dockRightConnectorBlurAnchor.x, _dockRightConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadiusValue) : 0
-        y: _active ? win._connectorCutoutY(_dockRightConnectorBlurAnchor.y, _dockRightConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadiusValue) : 0
-        width: _active ? win._dockConnectorRadiusValue * 2 : 0
-        height: _active ? win._dockConnectorRadiusValue * 2 : 0
-    }
-
-    Item {
+    // Blur regions bind rounded integer pixels directly: equal rounded values
+    // suppress Changed during sub-pixel motion, and inactive children pin to
+    // all-zero so the region build skips them.
+    QtObject {
         id: _notifBodyBlurAnchor
-        visible: false
 
-        readonly property bool _active: win._frameActive && win._notifDescriptor.visible && win._notifBodyGeometry.width > 0 && win._notifBodyGeometry.height > 0
-
-        x: _active ? win._notifBodyGeometry.x : 0
-        y: _active ? win._notifBodyGeometry.y : 0
-        width: _active ? win._notifBodyGeometry.width : 0
-        height: _active ? win._notifBodyGeometry.height : 0
-    }
-
-    Item {
-        id: _modalBodyBlurAnchor
-        visible: false
-
-        readonly property bool _active: win._frameActive && win._modalDescriptor.visible && win._modalBodyGeometry.width > 0 && win._modalBodyGeometry.height > 0
-        readonly property real _dyClamp: win._modalBodyGeometry.dy
-        readonly property real _dxClamp: win._modalBodyGeometry.dx
-
-        x: _active ? win._modalBodyGeometry.x : 0
-        y: _active ? win._modalBodyGeometry.y : 0
-        width: _active ? win._modalBodyGeometry.width : 0
-        height: _active ? win._modalBodyGeometry.height : 0
-    }
-
-    Item {
-        id: _modalBodyBlurCap
-        opacity: 0
-
-        readonly property string _side: win._modalState.barSide
-        readonly property real _capThickness: win._modalBlurCapThickness()
-        readonly property bool _active: _modalBodyBlurAnchor._active && _capThickness > 0 && _modalBodyBlurAnchor.width > 0 && _modalBodyBlurAnchor.height > 0
-        readonly property real _capWidth: (_side === "left" || _side === "right") ? Math.min(_capThickness, _modalBodyBlurAnchor.width) : _modalBodyBlurAnchor.width
-        readonly property real _capHeight: (_side === "top" || _side === "bottom") ? Math.min(_capThickness, _modalBodyBlurAnchor.height) : _modalBodyBlurAnchor.height
-
-        x: !_active ? 0 : (_side === "right" ? _modalBodyBlurAnchor.x + _modalBodyBlurAnchor.width - _capWidth : _modalBodyBlurAnchor.x)
-        y: !_active ? 0 : (_side === "bottom" ? _modalBodyBlurAnchor.y + _modalBodyBlurAnchor.height - _capHeight : _modalBodyBlurAnchor.y)
-        width: _active ? _capWidth : 0
-        height: _active ? _capHeight : 0
-    }
-
-    Item {
-        id: _modalLeftConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._modalConnectorRadiusLeft
-        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "left", 0, _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _modalRightConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._modalConnectorRadiusRight
-        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "right", 0, _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _modalLeftConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _modalLeftConnectorBlurAnchor.width > 0 && _modalLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "left")
-        readonly property real _radius: win._modalConnectorRadiusLeft
-
-        x: _active ? win._connectorCutoutX(_modalLeftConnectorBlurAnchor.x, _modalLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_modalLeftConnectorBlurAnchor.y, _modalLeftConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _modalRightConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _modalRightConnectorBlurAnchor.width > 0 && _modalRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "right")
-        readonly property real _radius: win._modalConnectorRadiusRight
-
-        x: _active ? win._connectorCutoutX(_modalRightConnectorBlurAnchor.x, _modalRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_modalRightConnectorBlurAnchor.y, _modalRightConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _modalFarStartConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._effectiveModalFarStartCcr
-        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farConnectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "left", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _modalFarStartBodyBlurCap
-        opacity: 0
-
-        readonly property real _radius: win._effectiveModalFarStartCcr
-        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "left", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _modalFarEndBodyBlurCap
-        opacity: 0
-
-        readonly property real _radius: win._effectiveModalFarEndCcr
-        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "right", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _modalFarEndConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._effectiveModalFarEndCcr
-        readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farConnectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "right", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _modalFarStartConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _modalFarStartConnectorBlurAnchor.width > 0 && _modalFarStartConnectorBlurAnchor.height > 0
-        readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "left")
-        readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "left")
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
-        readonly property real _radius: win._effectiveModalFarStartCcr
-
-        x: _active ? win._connectorCutoutX(_modalFarStartConnectorBlurAnchor.x, _modalFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_modalFarStartConnectorBlurAnchor.y, _modalFarStartConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _modalFarEndConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _modalFarEndConnectorBlurAnchor.width > 0 && _modalFarEndConnectorBlurAnchor.height > 0
-        readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "right")
-        readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "right")
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
-        readonly property real _radius: win._effectiveModalFarEndCcr
-
-        x: _active ? win._connectorCutoutX(_modalFarEndConnectorBlurAnchor.x, _modalFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_modalFarEndConnectorBlurAnchor.y, _modalFarEndConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _notifBodySceneBlurAnchor
-        visible: false
-
-        readonly property bool _active: _notifBodyBlurAnchor._active
-        readonly property var _scene: _active ? win._notifBodyScene() : null
-
-        x: _scene ? Theme.snap(_scene.x, win._dpr) : 0
-        y: _scene ? Theme.snap(_scene.y, win._dpr) : 0
-        width: _scene ? Theme.snap(_scene.width, win._dpr) : 0
-        height: _scene ? Theme.snap(_scene.height, win._dpr) : 0
-    }
-
-    Item {
-        id: _notifBodyBlurCap
-        opacity: 0
-
-        readonly property string _side: win._notifState.barSide
-        readonly property real _capRadius: win._effectiveNotifMaxCcr
-        readonly property bool _active: _notifBodySceneBlurAnchor._active && _notifBodySceneBlurAnchor.width > 0 && _notifBodySceneBlurAnchor.height > 0 && _capRadius > 0
-        readonly property real _capWidth: (_side === "left" || _side === "right") ? Math.min(_capRadius, _notifBodySceneBlurAnchor.width) : _notifBodySceneBlurAnchor.width
-        readonly property real _capHeight: (_side === "top" || _side === "bottom") ? Math.min(_capRadius, _notifBodySceneBlurAnchor.height) : _notifBodySceneBlurAnchor.height
-
-        x: !_active ? 0 : (_side === "right" ? _notifBodySceneBlurAnchor.x + _notifBodySceneBlurAnchor.width - _capWidth : _notifBodySceneBlurAnchor.x)
-        y: !_active ? 0 : (_side === "bottom" ? _notifBodySceneBlurAnchor.y + _notifBodySceneBlurAnchor.height - _capHeight : _notifBodySceneBlurAnchor.y)
-        width: _active ? _capWidth : 0
-        height: _active ? _capHeight : 0
-    }
-
-    Item {
-        id: _notifLeftConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._notifConnectorRadiusLeft
-        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "left", 0, _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _notifRightConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._notifConnectorRadiusRight
-        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.connectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "right", 0, _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _notifLeftConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _notifLeftConnectorBlurAnchor.width > 0 && _notifLeftConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "left")
-        readonly property real _radius: win._notifConnectorRadiusLeft
-
-        x: _active ? win._connectorCutoutX(_notifLeftConnectorBlurAnchor.x, _notifLeftConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_notifLeftConnectorBlurAnchor.y, _notifLeftConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _notifRightConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _notifRightConnectorBlurAnchor.width > 0 && _notifRightConnectorBlurAnchor.height > 0
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "right")
-        readonly property real _radius: win._notifConnectorRadiusRight
-
-        x: _active ? win._connectorCutoutX(_notifRightConnectorBlurAnchor.x, _notifRightConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_notifRightConnectorBlurAnchor.y, _notifRightConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _notifFarStartConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._effectiveNotifFarStartCcr
-        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farConnectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "left", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _notifFarStartBodyBlurCap
-        opacity: 0
-
-        readonly property real _radius: win._effectiveNotifFarStartCcr
-        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "left", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _notifFarEndBodyBlurCap
-        opacity: 0
-
-        readonly property real _radius: win._effectiveNotifFarEndCcr
-        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "right", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _notifFarEndConnectorBlurAnchor
-        opacity: 0
-
-        readonly property real _radius: win._effectiveNotifFarEndCcr
-        readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
-        readonly property var _rect: SurfaceGeometry.farConnectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "right", _radius, win._dpr)
-
-        x: _active ? _rect.x : 0
-        y: _active ? _rect.y : 0
-        width: _active ? _rect.width : 0
-        height: _active ? _rect.height : 0
-    }
-
-    Item {
-        id: _notifFarStartConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _notifFarStartConnectorBlurAnchor.width > 0 && _notifFarStartConnectorBlurAnchor.height > 0
-        readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "left")
-        readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "left")
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
-        readonly property real _radius: win._effectiveNotifFarStartCcr
-
-        x: _active ? win._connectorCutoutX(_notifFarStartConnectorBlurAnchor.x, _notifFarStartConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_notifFarStartConnectorBlurAnchor.y, _notifFarStartConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
-    }
-
-    Item {
-        id: _notifFarEndConnectorCutout
-        opacity: 0
-
-        readonly property bool _active: _notifFarEndConnectorBlurAnchor.width > 0 && _notifFarEndConnectorBlurAnchor.height > 0
-        readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "right")
-        readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "right")
-        readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
-        readonly property real _radius: win._effectiveNotifFarEndCcr
-
-        x: _active ? win._connectorCutoutX(_notifFarEndConnectorBlurAnchor.x, _notifFarEndConnectorBlurAnchor.width, _arcCorner, _radius) : 0
-        y: _active ? win._connectorCutoutY(_notifFarEndConnectorBlurAnchor.y, _notifFarEndConnectorBlurAnchor.height, _arcCorner, _radius) : 0
-        width: _active ? _radius * 2 : 0
-        height: _active ? _radius * 2 : 0
+        readonly property bool _active: win._blurSurfacesActive && win._notifDescriptor.visible && win._notifBodyGeometry.width > 0 && win._notifBodyGeometry.height > 0
+        readonly property int x: _active ? Math.round(win._notifBodyGeometry.x) : 0
+        readonly property int y: _active ? Math.round(win._notifBodyGeometry.y) : 0
+        readonly property int width: _active ? Math.round(win._notifBodyGeometry.width) : 0
+        readonly property int height: _active ? Math.round(win._notifBodyGeometry.height) : 0
     }
 
     Region {
@@ -866,170 +261,574 @@ PanelWindow {
 
         // Frame cutout (always active when frame is on)
         Region {
-            item: _blurCutout
+            id: _blurCutout
             intersection: Intersection.Subtract
             radius: win._blurCutoutRadius
+            x: win._blurCutoutLeft
+            y: win._blurCutoutTop
+            width: Math.max(0, win._blurCutoutRight - win._blurCutoutLeft)
+            height: Math.max(0, win._blurCutoutBottom - win._blurCutoutTop)
         }
 
         Region {
-            item: _popoutBodyBlurAnchor
+            id: _popoutBodyBlurAnchor
+
+            readonly property bool _active: win._blurSurfacesActive && win._popoutDescriptor.visible
+
             radius: win._surfaceRadius
+            x: _active ? Math.round(win._popoutBodyGeometry.x) : 0
+            y: _active ? Math.round(win._popoutBodyGeometry.y) : 0
+            width: _active ? Math.round(win._popoutBodyGeometry.width) : 0
+            height: _active ? Math.round(win._popoutBodyGeometry.height) : 0
         }
         Region {
-            item: _popoutBodyBlurCap
+            id: _popoutBodyBlurCap
+
+            readonly property string _side: win._popoutState.barSide
+            readonly property real _capThickness: win._popoutBlurCapThickness()
+            readonly property bool _active: _popoutBodyBlurAnchor._active && _capThickness > 0 && _popoutBodyBlurAnchor.width > 0 && _popoutBodyBlurAnchor.height > 0
+            readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(_capThickness, _popoutBodyBlurAnchor.width)) : _popoutBodyBlurAnchor.width
+            readonly property int _capHeight: (_side === "top" || _side === "bottom") ? Math.round(Math.min(_capThickness, _popoutBodyBlurAnchor.height)) : _popoutBodyBlurAnchor.height
+
+            x: !_active ? 0 : (_side === "right" ? _popoutBodyBlurAnchor.x + _popoutBodyBlurAnchor.width - _capWidth : _popoutBodyBlurAnchor.x)
+            y: !_active ? 0 : (_side === "bottom" ? _popoutBodyBlurAnchor.y + _popoutBodyBlurAnchor.height - _capHeight : _popoutBodyBlurAnchor.y)
+            width: _active ? _capWidth : 0
+            height: _active ? _capHeight : 0
         }
         Region {
-            item: _popoutLeftConnectorBlurAnchor
+            id: _popoutLeftConnectorBlurAnchor
+
+            readonly property real _radius: win._popoutConnectorRadiusLeft
+            readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "left", 0, _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _popoutLeftConnectorCutout
+                id: _popoutLeftConnectorCutout
+
+                readonly property bool _active: _popoutLeftConnectorBlurAnchor.width > 0 && _popoutLeftConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutState.barSide, "left")
+                readonly property real _radius: win._popoutConnectorRadiusLeft
+
                 intersection: Intersection.Subtract
                 radius: win._popoutConnectorRadiusLeft
+                x: _active ? Math.round(win._connectorCutoutX(_popoutLeftConnectorBlurAnchor.x, _popoutLeftConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_popoutLeftConnectorBlurAnchor.y, _popoutLeftConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _popoutRightConnectorBlurAnchor
+            id: _popoutRightConnectorBlurAnchor
+
+            readonly property real _radius: win._popoutConnectorRadiusRight
+            readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "right", 0, _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _popoutRightConnectorCutout
+                id: _popoutRightConnectorCutout
+
+                readonly property bool _active: _popoutRightConnectorBlurAnchor.width > 0 && _popoutRightConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutState.barSide, "right")
+                readonly property real _radius: win._popoutConnectorRadiusRight
+
                 intersection: Intersection.Subtract
                 radius: win._popoutConnectorRadiusRight
+                x: _active ? Math.round(win._connectorCutoutX(_popoutRightConnectorBlurAnchor.x, _popoutRightConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_popoutRightConnectorBlurAnchor.y, _popoutRightConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _popoutFarStartBodyBlurCap
+            id: _popoutFarStartBodyBlurCap
+
+            readonly property real _radius: win._effectivePopoutFarStartCcr
+            readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "left", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
         }
         Region {
-            item: _popoutFarEndBodyBlurCap
+            id: _popoutFarEndBodyBlurCap
+
+            readonly property real _radius: win._effectivePopoutFarEndCcr
+            readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "right", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
         }
         Region {
-            item: _popoutFarStartConnectorBlurAnchor
+            id: _popoutFarStartConnectorBlurAnchor
+
+            readonly property real _radius: win._effectivePopoutFarStartCcr
+            readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farConnectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "left", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _popoutFarStartConnectorCutout
+                id: _popoutFarStartConnectorCutout
+
+                readonly property bool _active: _popoutFarStartConnectorBlurAnchor.width > 0 && _popoutFarStartConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._popoutState.barSide, "left")
+                readonly property string _placement: win._farConnectorPlacement(win._popoutState.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: win._effectivePopoutFarStartCcr
+
                 intersection: Intersection.Subtract
                 radius: win._effectivePopoutFarStartCcr
+                x: _active ? Math.round(win._connectorCutoutX(_popoutFarStartConnectorBlurAnchor.x, _popoutFarStartConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_popoutFarStartConnectorBlurAnchor.y, _popoutFarStartConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _popoutFarEndConnectorBlurAnchor
+            id: _popoutFarEndConnectorBlurAnchor
+
+            readonly property real _radius: win._effectivePopoutFarEndCcr
+            readonly property bool _active: _popoutBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farConnectorRect(win._popoutDescriptor.barSide, win._popoutBodyGeometry, "right", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _popoutFarEndConnectorCutout
+                id: _popoutFarEndConnectorCutout
+
+                readonly property bool _active: _popoutFarEndConnectorBlurAnchor.width > 0 && _popoutFarEndConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._popoutState.barSide, "right")
+                readonly property string _placement: win._farConnectorPlacement(win._popoutState.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: win._effectivePopoutFarEndCcr
+
                 intersection: Intersection.Subtract
                 radius: win._effectivePopoutFarEndCcr
+                x: _active ? Math.round(win._connectorCutoutX(_popoutFarEndConnectorBlurAnchor.x, _popoutFarEndConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_popoutFarEndConnectorBlurAnchor.y, _popoutFarEndConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
 
         Region {
-            item: _dockBodyBlurAnchor
+            id: _dockBodyBlurAnchor
+
+            readonly property bool _active: win._blurSurfacesActive && win._connectedActive && win._dockDescriptor.visible && win._dockBodyGeometry.width > 0 && win._dockBodyGeometry.height > 0
+
             radius: win._dockBodyBlurRadiusValue
+            x: _active ? Math.round(win._dockBodyGeometry.x) : 0
+            y: _active ? Math.round(win._dockBodyGeometry.y) : 0
+            width: _active ? Math.round(win._dockBodyGeometry.width) : 0
+            height: _active ? Math.round(win._dockBodyGeometry.height) : 0
         }
         Region {
-            item: _dockBodyBlurCap
+            id: _dockBodyBlurCap
+
+            readonly property string _side: win._dockState.barSide
+            readonly property bool _active: _dockBodyBlurAnchor._active && _dockBodyBlurAnchor.width > 0 && _dockBodyBlurAnchor.height > 0
+            readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.width)) : _dockBodyBlurAnchor.width
+            readonly property int _capHeight: (_side === "top" || _side === "bottom") ? Math.round(Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.height)) : _dockBodyBlurAnchor.height
+
+            x: !_active ? 0 : (_side === "right" ? _dockBodyBlurAnchor.x + _dockBodyBlurAnchor.width - _capWidth : _dockBodyBlurAnchor.x)
+            y: !_active ? 0 : (_side === "bottom" ? _dockBodyBlurAnchor.y + _dockBodyBlurAnchor.height - _capHeight : _dockBodyBlurAnchor.y)
+            width: _active ? _capWidth : 0
+            height: _active ? _capHeight : 0
         }
         Region {
-            item: _dockLeftConnectorBlurAnchor
+            id: _dockLeftConnectorBlurAnchor
+
+            readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadiusValue > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._dockDescriptor.barSide, win._dockBodyGeometry, "left", 0, win._dockConnectorRadiusValue, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _dockLeftConnectorCutout
+                id: _dockLeftConnectorCutout
+
+                readonly property bool _active: _dockLeftConnectorBlurAnchor.width > 0 && _dockLeftConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "left")
+
                 intersection: Intersection.Subtract
                 radius: win._dockConnectorRadiusValue
+                x: _active ? Math.round(win._connectorCutoutX(_dockLeftConnectorBlurAnchor.x, _dockLeftConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadiusValue)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_dockLeftConnectorBlurAnchor.y, _dockLeftConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadiusValue)) : 0
+                width: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
+                height: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
             }
         }
         Region {
-            item: _dockRightConnectorBlurAnchor
+            id: _dockRightConnectorBlurAnchor
+
+            readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadiusValue > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._dockDescriptor.barSide, win._dockBodyGeometry, "right", 0, win._dockConnectorRadiusValue, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _dockRightConnectorCutout
+                id: _dockRightConnectorCutout
+
+                readonly property bool _active: _dockRightConnectorBlurAnchor.width > 0 && _dockRightConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "right")
+
                 intersection: Intersection.Subtract
                 radius: win._dockConnectorRadiusValue
+                x: _active ? Math.round(win._connectorCutoutX(_dockRightConnectorBlurAnchor.x, _dockRightConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadiusValue)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_dockRightConnectorBlurAnchor.y, _dockRightConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadiusValue)) : 0
+                width: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
+                height: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
             }
         }
 
         Region {
-            item: _notifBodySceneBlurAnchor
+            id: _notifBodySceneBlurAnchor
+
+            readonly property bool _active: _notifBodyBlurAnchor._active
+            readonly property var _scene: _active ? win._notifBodyScene() : null
+
             radius: win._surfaceRadius
+            x: _scene ? Math.round(_scene.x) : 0
+            y: _scene ? Math.round(_scene.y) : 0
+            width: _scene ? Math.round(_scene.width) : 0
+            height: _scene ? Math.round(_scene.height) : 0
         }
         Region {
-            item: _notifBodyBlurCap
+            id: _notifBodyBlurCap
+
+            readonly property string _side: win._notifState.barSide
+            readonly property real _capRadius: win._effectiveNotifMaxCcr
+            readonly property bool _active: _notifBodySceneBlurAnchor._active && _notifBodySceneBlurAnchor.width > 0 && _notifBodySceneBlurAnchor.height > 0 && _capRadius > 0
+            readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(_capRadius, _notifBodySceneBlurAnchor.width)) : _notifBodySceneBlurAnchor.width
+            readonly property int _capHeight: (_side === "top" || _side === "bottom") ? Math.round(Math.min(_capRadius, _notifBodySceneBlurAnchor.height)) : _notifBodySceneBlurAnchor.height
+
+            x: !_active ? 0 : (_side === "right" ? _notifBodySceneBlurAnchor.x + _notifBodySceneBlurAnchor.width - _capWidth : _notifBodySceneBlurAnchor.x)
+            y: !_active ? 0 : (_side === "bottom" ? _notifBodySceneBlurAnchor.y + _notifBodySceneBlurAnchor.height - _capHeight : _notifBodySceneBlurAnchor.y)
+            width: _active ? _capWidth : 0
+            height: _active ? _capHeight : 0
         }
         Region {
-            item: _notifLeftConnectorBlurAnchor
+            id: _notifLeftConnectorBlurAnchor
+
+            readonly property real _radius: win._notifConnectorRadiusLeft
+            readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "left", 0, _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _notifLeftConnectorCutout
+                id: _notifLeftConnectorCutout
+
+                readonly property bool _active: _notifLeftConnectorBlurAnchor.width > 0 && _notifLeftConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "left")
+                readonly property real _radius: win._notifConnectorRadiusLeft
+
                 intersection: Intersection.Subtract
                 radius: win._notifConnectorRadiusLeft
+                x: _active ? Math.round(win._connectorCutoutX(_notifLeftConnectorBlurAnchor.x, _notifLeftConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_notifLeftConnectorBlurAnchor.y, _notifLeftConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _notifRightConnectorBlurAnchor
+            id: _notifRightConnectorBlurAnchor
+
+            readonly property real _radius: win._notifConnectorRadiusRight
+            readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "right", 0, _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _notifRightConnectorCutout
+                id: _notifRightConnectorCutout
+
+                readonly property bool _active: _notifRightConnectorBlurAnchor.width > 0 && _notifRightConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "right")
+                readonly property real _radius: win._notifConnectorRadiusRight
+
                 intersection: Intersection.Subtract
                 radius: win._notifConnectorRadiusRight
+                x: _active ? Math.round(win._connectorCutoutX(_notifRightConnectorBlurAnchor.x, _notifRightConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_notifRightConnectorBlurAnchor.y, _notifRightConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _notifFarStartBodyBlurCap
+            id: _notifFarStartBodyBlurCap
+
+            readonly property real _radius: win._effectiveNotifFarStartCcr
+            readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "left", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
         }
         Region {
-            item: _notifFarEndBodyBlurCap
+            id: _notifFarEndBodyBlurCap
+
+            readonly property real _radius: win._effectiveNotifFarEndCcr
+            readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "right", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
         }
         Region {
-            item: _notifFarStartConnectorBlurAnchor
+            id: _notifFarStartConnectorBlurAnchor
+
+            readonly property real _radius: win._effectiveNotifFarStartCcr
+            readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farConnectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "left", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _notifFarStartConnectorCutout
+                id: _notifFarStartConnectorCutout
+
+                readonly property bool _active: _notifFarStartConnectorBlurAnchor.width > 0 && _notifFarStartConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "left")
+                readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: win._effectiveNotifFarStartCcr
+
                 intersection: Intersection.Subtract
                 radius: win._effectiveNotifFarStartCcr
+                x: _active ? Math.round(win._connectorCutoutX(_notifFarStartConnectorBlurAnchor.x, _notifFarStartConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_notifFarStartConnectorBlurAnchor.y, _notifFarStartConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _notifFarEndConnectorBlurAnchor
+            id: _notifFarEndConnectorBlurAnchor
+
+            readonly property real _radius: win._effectiveNotifFarEndCcr
+            readonly property bool _active: _notifBodySceneBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farConnectorRect(win._notifDescriptor.barSide, _notifBodySceneBlurAnchor, "right", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _notifFarEndConnectorCutout
+                id: _notifFarEndConnectorCutout
+
+                readonly property bool _active: _notifFarEndConnectorBlurAnchor.width > 0 && _notifFarEndConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "right")
+                readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: win._effectiveNotifFarEndCcr
+
                 intersection: Intersection.Subtract
                 radius: win._effectiveNotifFarEndCcr
+                x: _active ? Math.round(win._connectorCutoutX(_notifFarEndConnectorBlurAnchor.x, _notifFarEndConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_notifFarEndConnectorBlurAnchor.y, _notifFarEndConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
 
         Region {
-            item: _modalBodyBlurAnchor
+            id: _modalBodyBlurAnchor
+
+            readonly property bool _active: win._blurSurfacesActive && win._modalDescriptor.visible && win._modalBodyGeometry.width > 0 && win._modalBodyGeometry.height > 0
+
             radius: win._surfaceRadius
+            x: _active ? Math.round(win._modalBodyGeometry.x) : 0
+            y: _active ? Math.round(win._modalBodyGeometry.y) : 0
+            width: _active ? Math.round(win._modalBodyGeometry.width) : 0
+            height: _active ? Math.round(win._modalBodyGeometry.height) : 0
         }
         Region {
-            item: _modalBodyBlurCap
+            id: _modalBodyBlurCap
+
+            readonly property string _side: win._modalState.barSide
+            readonly property real _capThickness: win._modalBlurCapThickness()
+            readonly property bool _active: _modalBodyBlurAnchor._active && _capThickness > 0 && _modalBodyBlurAnchor.width > 0 && _modalBodyBlurAnchor.height > 0
+            readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(_capThickness, _modalBodyBlurAnchor.width)) : _modalBodyBlurAnchor.width
+            readonly property int _capHeight: (_side === "top" || _side === "bottom") ? Math.round(Math.min(_capThickness, _modalBodyBlurAnchor.height)) : _modalBodyBlurAnchor.height
+
+            x: !_active ? 0 : (_side === "right" ? _modalBodyBlurAnchor.x + _modalBodyBlurAnchor.width - _capWidth : _modalBodyBlurAnchor.x)
+            y: !_active ? 0 : (_side === "bottom" ? _modalBodyBlurAnchor.y + _modalBodyBlurAnchor.height - _capHeight : _modalBodyBlurAnchor.y)
+            width: _active ? _capWidth : 0
+            height: _active ? _capHeight : 0
         }
         Region {
-            item: _modalLeftConnectorBlurAnchor
+            id: _modalLeftConnectorBlurAnchor
+
+            readonly property real _radius: win._modalConnectorRadiusLeft
+            readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "left", 0, _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _modalLeftConnectorCutout
+                id: _modalLeftConnectorCutout
+
+                readonly property bool _active: _modalLeftConnectorBlurAnchor.width > 0 && _modalLeftConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "left")
+                readonly property real _radius: win._modalConnectorRadiusLeft
+
                 intersection: Intersection.Subtract
                 radius: win._modalConnectorRadiusLeft
+                x: _active ? Math.round(win._connectorCutoutX(_modalLeftConnectorBlurAnchor.x, _modalLeftConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_modalLeftConnectorBlurAnchor.y, _modalLeftConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _modalRightConnectorBlurAnchor
+            id: _modalRightConnectorBlurAnchor
+
+            readonly property real _radius: win._modalConnectorRadiusRight
+            readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "right", 0, _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _modalRightConnectorCutout
+                id: _modalRightConnectorCutout
+
+                readonly property bool _active: _modalRightConnectorBlurAnchor.width > 0 && _modalRightConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "right")
+                readonly property real _radius: win._modalConnectorRadiusRight
+
                 intersection: Intersection.Subtract
                 radius: win._modalConnectorRadiusRight
+                x: _active ? Math.round(win._connectorCutoutX(_modalRightConnectorBlurAnchor.x, _modalRightConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_modalRightConnectorBlurAnchor.y, _modalRightConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _modalFarStartBodyBlurCap
+            id: _modalFarStartBodyBlurCap
+
+            readonly property real _radius: win._effectiveModalFarStartCcr
+            readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "left", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
         }
         Region {
-            item: _modalFarEndBodyBlurCap
+            id: _modalFarEndBodyBlurCap
+
+            readonly property real _radius: win._effectiveModalFarEndCcr
+            readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farBodyCapRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "right", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
         }
         Region {
-            item: _modalFarStartConnectorBlurAnchor
+            id: _modalFarStartConnectorBlurAnchor
+
+            readonly property real _radius: win._effectiveModalFarStartCcr
+            readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farConnectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "left", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _modalFarStartConnectorCutout
+                id: _modalFarStartConnectorCutout
+
+                readonly property bool _active: _modalFarStartConnectorBlurAnchor.width > 0 && _modalFarStartConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "left")
+                readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: win._effectiveModalFarStartCcr
+
                 intersection: Intersection.Subtract
                 radius: win._effectiveModalFarStartCcr
+                x: _active ? Math.round(win._connectorCutoutX(_modalFarStartConnectorBlurAnchor.x, _modalFarStartConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_modalFarStartConnectorBlurAnchor.y, _modalFarStartConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
         Region {
-            item: _modalFarEndConnectorBlurAnchor
+            id: _modalFarEndConnectorBlurAnchor
+
+            readonly property real _radius: win._effectiveModalFarEndCcr
+            readonly property bool _active: _modalBodyBlurAnchor._active && _radius > 0
+            readonly property var _rect: SurfaceGeometry.farConnectorRect(win._modalDescriptor.barSide, win._modalBodyGeometry, "right", _radius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
             Region {
-                item: _modalFarEndConnectorCutout
+                id: _modalFarEndConnectorCutout
+
+                readonly property bool _active: _modalFarEndConnectorBlurAnchor.width > 0 && _modalFarEndConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "right")
+                readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: win._effectiveModalFarEndCcr
+
                 intersection: Intersection.Subtract
                 radius: win._effectiveModalFarEndCcr
+                x: _active ? Math.round(win._connectorCutoutX(_modalFarEndConnectorBlurAnchor.x, _modalFarEndConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_modalFarEndConnectorBlurAnchor.y, _modalFarEndConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
             }
         }
     }
