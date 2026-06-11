@@ -20,6 +20,8 @@ PanelWindow {
     property var centerWidgetsModel
     property var rightWidgetsModel
 
+    readonly property bool barRevealed: inputMask.showing
+
     property var controlCenterButtonRef: null
     property var clockButtonRef: null
     property var systemUpdateButtonRef: null
