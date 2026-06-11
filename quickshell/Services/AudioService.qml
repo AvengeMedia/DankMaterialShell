@@ -58,6 +58,8 @@ Singleton {
         return SessionData.deviceMaxVolumes[name] ?? 100;
     }
 
+    readonly property int wheelVolumeStep: 5
+
     signal micMuteChanged
     signal audioOutputCycled(string deviceName, string deviceIcon)
     signal deviceAliasChanged(string nodeName, string newAlias)
@@ -831,6 +833,28 @@ EOFCONFIG
 
         root.sink.audio.muted = !root.sink.audio.muted;
         return root.sink.audio.muted ? "Audio muted" : "Audio unmuted";
+    }
+
+    function handleNodeVolumeWheel(node, wheelEvent) {
+        if (!node?.audio)
+            return;
+
+        SessionData.suppressOSDTemporarily();
+        const delta = wheelEvent.angleDelta.y;
+        if (delta === 0)
+            return;
+
+        const current = Math.round(node.audio.volume * 100);
+        const maxVol = getMaxVolumePercent(node);
+        const newVolume = delta > 0 ? Math.min(maxVol, current + root.wheelVolumeStep) : Math.max(0, current - root.wheelVolumeStep);
+
+        node.audio.muted = false;
+        node.audio.volume = newVolume / 100;
+
+        if (node === sink) {
+            playVolumeChangeSoundIfEnabled();
+        }
+        wheelEvent.accepted = true;
     }
 
     function setMicVolume(percentage) {
