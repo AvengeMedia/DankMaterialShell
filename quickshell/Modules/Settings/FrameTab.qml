@@ -205,6 +205,9 @@ Item {
                     tags: ["frame", "border", "color", "theme", "primary", "surface", "default"]
                     text: I18n.tr("Border Color")
                     model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: {
                         const fc = SettingsData.frameColor;
                         if (!fc || fc === "default")
