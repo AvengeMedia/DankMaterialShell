@@ -59,8 +59,13 @@ QtObject {
             return;
         }
         const selectedEntry = entries[ClipboardService.selectedIndex];
-        if (modal.activeTab === "saved") {
+        if (selectedEntry.pinned) {
             modal.unpinEntry(selectedEntry);
+            return;
+        }
+        const pinnedDuplicate = ClipboardService.getPinnedEntryByHash(selectedEntry.hash);
+        if (pinnedDuplicate) {
+            modal.unpinEntry(pinnedDuplicate);
         } else {
             modal.pinEntry(selectedEntry);
         }

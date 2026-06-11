@@ -388,11 +388,15 @@ Singleton {
         return "text";
     }
 
-    function hashedPinnedEntry(entryHash) {
+    function getPinnedEntryByHash(entryHash) {
         if (!entryHash) {
-            return false;
+            return null;
         }
-        return pinnedEntries.some(pinnedEntry => pinnedEntry.hash === entryHash);
+        return internalEntries.find(entry => entry.pinned && entry.hash === entryHash) || null;
+    }
+
+    function hashedPinnedEntry(entryHash) {
+        return getPinnedEntryByHash(entryHash) !== null;
     }
 
     onClipboardAvailableChanged: {

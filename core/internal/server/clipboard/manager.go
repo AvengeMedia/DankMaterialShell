@@ -935,7 +935,7 @@ func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
 		Pinned:    false,
 	}
 
-	if err := m.storeEntryWithoutDedup(newEntry); err != nil {
+	if err := m.storeEntry(newEntry); err != nil {
 		return err
 	}
 
@@ -943,36 +943,6 @@ func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
 	m.notifySubscribers()
 
 	return nil
-}
-
-func (m *Manager) storeEntryWithoutDedup(entry Entry) error {
-	if m.db == nil {
-		return fmt.Errorf("database not available")
-	}
-
-	entry.Hash = computeHash(entry.Data)
-
-	return m.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("clipboard"))
-
-		id, err := b.NextSequence()
-		if err != nil {
-			return err
-		}
-
-		entry.ID = id
-
-		encoded, err := encodeEntry(entry)
-		if err != nil {
-			return err
-		}
-
-		if err := b.Put(itob(id), encoded); err != nil {
-			return err
-		}
-
-		return m.trimLengthInTx(b)
-	})
 }
 
 func (m *Manager) ClearHistory() {
@@ -1651,6 +1621,37 @@ func (m *Manager) UnpinEntry(id uint64) error {
 		entry, err := decodeEntry(v)
 		if err != nil {
 			return err
+		}
+
+		if entry.Pinned {
+			currentKey := itob(id)
+			var keepKey []byte
+			var deleteKeys [][]byte
+
+			c := b.Cursor()
+			for k, v := c.Last(); k != nil; k, v = c.Prev() {
+				if bytes.Equal(k, currentKey) || extractHash(v) != entry.Hash {
+					continue
+				}
+				duplicate, err := decodeEntryMeta(v)
+				if err == nil && !duplicate.Pinned {
+					key := append([]byte(nil), k...)
+					if keepKey == nil {
+						keepKey = key
+					} else {
+						deleteKeys = append(deleteKeys, key)
+					}
+				}
+			}
+
+			if keepKey != nil {
+				for _, key := range deleteKeys {
+					if err := b.Delete(key); err != nil {
+						return err
+					}
+				}
+				return b.Delete(currentKey)
+			}
 		}
 
 		entry.Pinned = false

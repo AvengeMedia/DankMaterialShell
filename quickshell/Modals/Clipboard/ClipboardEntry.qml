@@ -15,13 +15,14 @@ Rectangle {
 
     signal copyRequested
     signal deleteRequested
-    signal pinRequested
-    signal unpinRequested
+    signal pinRequested(var targetEntry)
+    signal unpinRequested(var targetEntry)
     signal editRequested
 
     readonly property string entryType: modal ? modal.getEntryType(entry) : "text"
     readonly property string entryPreview: modal ? modal.getEntryPreview(entry) : ""
-    readonly property bool hasPinnedDuplicate: !entry.pinned && ClipboardService.hashedPinnedEntry(entry.hash)
+    readonly property var pinnedDuplicateEntry: !entry.pinned ? ClipboardService.getPinnedEntryByHash(entry.hash) : null
+    readonly property bool effectivePinned: entry.pinned || pinnedDuplicateEntry !== null
 
     radius: Theme.cornerRadius
     color: {
@@ -66,9 +67,19 @@ Rectangle {
         DankActionButton {
             iconName: "push_pin"
             iconSize: Theme.iconSize - 6
-            iconColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primary : Theme.surfaceText
-            backgroundColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primarySelected : "transparent"
-            onClicked: entry.pinned ? unpinRequested() : pinRequested()
+            iconColor: effectivePinned ? Theme.primary : Theme.surfaceText
+            backgroundColor: effectivePinned ? Theme.primarySelected : "transparent"
+            onClicked: {
+                if (entry.pinned) {
+                    unpinRequested(entry);
+                    return;
+                }
+                if (pinnedDuplicateEntry) {
+                    unpinRequested(pinnedDuplicateEntry);
+                    return;
+                }
+                pinRequested(entry);
+            }
         }
 
         DankActionButton {
