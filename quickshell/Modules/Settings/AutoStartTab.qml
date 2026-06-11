@@ -722,7 +722,7 @@ Item {
 
             SettingsCard {
                 width: parent.width
-                iconName: "system_tray"
+                iconName: "handyman"
                 title: I18n.tr("Tray Icon Fix")
                 visible: DesktopService.isSystemd
 

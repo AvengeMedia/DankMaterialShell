@@ -2681,7 +2681,7 @@ Item {
                             spacing: Theme.spacingS
 
                             DankIcon {
-                                name: "folder"
+                                name: "settings"
                                 size: 16
                                 color: Theme.primary
                                 anchors.verticalCenter: parent.verticalCenter

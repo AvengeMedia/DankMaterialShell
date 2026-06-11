@@ -1754,6 +1754,9 @@ Item {
                     text: I18n.tr("Y Axis")
                     description: I18n.tr("Action performed when scrolling vertically on the bar")
                     model: CompositorService.isNiri ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")] : [I18n.tr("None"), I18n.tr("Workspace")]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: {
                         switch (selectedBarConfig?.scrollYBehavior || "workspace") {
                         case "none":
@@ -1792,6 +1795,9 @@ Item {
                     description: I18n.tr("Action performed when scrolling horizontally on the bar")
                     visible: CompositorService.isNiri
                     model: [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: {
                         switch (selectedBarConfig?.scrollXBehavior || "column") {
                         case "none":

@@ -90,7 +90,7 @@ Column {
                 property real originalY: y
 
                 width: itemsList.width
-                height: 70
+                height: Math.max(70, textColumn.implicitHeight + 32)
                 z: held ? 2 : 1
 
                 Rectangle {
@@ -123,6 +123,7 @@ Column {
                     }
 
                     Column {
+                        id: textColumn
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingM * 3 + 40 + Theme.iconSize
                         anchors.right: actionButtons.left
@@ -137,6 +138,7 @@ Column {
                             color: modelData.enabled ? Theme.surfaceText : Theme.outline
                             elide: Text.ElideRight
                             width: parent.width
+                            wrapMode: Text.WordWrap
                         }
 
                         StyledText {

@@ -1271,6 +1271,7 @@ Item {
                 tags: ["blur", "layer", "niri", "compositor"]
                 title: I18n.tr("Blur Wallpaper Layer")
                 settingKey: "blurWallpaper"
+                iconName: "blur_on"
                 visible: CompositorService.isNiri
 
                 SettingsToggleRow {
