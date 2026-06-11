@@ -1960,6 +1960,528 @@ func (_c *MockBackend_UpdateVPNConfig_Call) RunAndReturn(run func(string, map[st
 	return _c
 }
 
+// ActivateCellularConnection provides a mock function with given fields: uuid
+func (_m *MockBackend) ActivateCellularConnection(uuid string) error {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ActivateCellularConnection")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type MockBackend_ActivateCellularConnection_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) ActivateCellularConnection(uuid interface{}) *MockBackend_ActivateCellularConnection_Call {
+	return &MockBackend_ActivateCellularConnection_Call{Call: _e.mock.On("ActivateCellularConnection", uuid)}
+}
+
+func (_c *MockBackend_ActivateCellularConnection_Call) Run(run func(uuid string)) *MockBackend_ActivateCellularConnection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_ActivateCellularConnection_Call) Return(_a0 error) *MockBackend_ActivateCellularConnection_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+// ConnectCellular provides a mock function with given fields: uuid
+func (_m *MockBackend) ConnectCellular(uuid string) error {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ConnectCellular")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type MockBackend_ConnectCellular_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) ConnectCellular(uuid interface{}) *MockBackend_ConnectCellular_Call {
+	return &MockBackend_ConnectCellular_Call{Call: _e.mock.On("ConnectCellular", uuid)}
+}
+
+// DisconnectCellular provides a mock function with given fields:
+func (_m *MockBackend) DisconnectCellular() error {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectCellular")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type MockBackend_DisconnectCellular_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) DisconnectCellular() *MockBackend_DisconnectCellular_Call {
+	return &MockBackend_DisconnectCellular_Call{Call: _e.mock.On("DisconnectCellular")}
+}
+
+// DisconnectCellularDevice provides a mock function with given fields: device
+func (_m *MockBackend) DisconnectCellularDevice(device string) error {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectCellularDevice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type MockBackend_DisconnectCellularDevice_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) DisconnectCellularDevice(device interface{}) *MockBackend_DisconnectCellularDevice_Call {
+	return &MockBackend_DisconnectCellularDevice_Call{Call: _e.mock.On("DisconnectCellularDevice", device)}
+}
+
+// GetCellularConnections provides a mock function with given fields:
+func (_m *MockBackend) GetCellularConnections() ([]network.CellularConnection, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularConnections")
+	}
+
+	var r0 []network.CellularConnection
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]network.CellularConnection, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []network.CellularConnection); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.CellularConnection)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_GetCellularConnections_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) GetCellularConnections() *MockBackend_GetCellularConnections_Call {
+	return &MockBackend_GetCellularConnections_Call{Call: _e.mock.On("GetCellularConnections")}
+}
+
+// GetCellularDevices provides a mock function with given fields:
+func (_m *MockBackend) GetCellularDevices() []network.CellularDevice {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularDevices")
+	}
+
+	var r0 []network.CellularDevice
+	if rf, ok := ret.Get(0).(func() []network.CellularDevice); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.CellularDevice)
+		}
+	}
+
+	return r0
+}
+
+type MockBackend_GetCellularDevices_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) GetCellularDevices() *MockBackend_GetCellularDevices_Call {
+	return &MockBackend_GetCellularDevices_Call{Call: _e.mock.On("GetCellularDevices")}
+}
+
+// GetCellularEnabled provides a mock function with given fields:
+func (_m *MockBackend) GetCellularEnabled() (bool, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularEnabled")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (bool, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_GetCellularEnabled_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) GetCellularEnabled() *MockBackend_GetCellularEnabled_Call {
+	return &MockBackend_GetCellularEnabled_Call{Call: _e.mock.On("GetCellularEnabled")}
+}
+
+// GetCellularNetworkDetails provides a mock function with given fields: uuid
+func (_m *MockBackend) GetCellularNetworkDetails(uuid string) (*network.CellularNetworkInfoResponse, error) {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularNetworkDetails")
+	}
+
+	var r0 *network.CellularNetworkInfoResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*network.CellularNetworkInfoResponse, error)); ok {
+		return rf(uuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) *network.CellularNetworkInfoResponse); ok {
+		r0 = rf(uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*network.CellularNetworkInfoResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_GetCellularNetworkDetails_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) GetCellularNetworkDetails(uuid interface{}) *MockBackend_GetCellularNetworkDetails_Call {
+	return &MockBackend_GetCellularNetworkDetails_Call{Call: _e.mock.On("GetCellularNetworkDetails", uuid)}
+}
+
+// GetCellularProfile provides a mock function with given fields: uuidOrName
+func (_m *MockBackend) GetCellularProfile(uuidOrName string) (*network.CellularProfile, error) {
+	ret := _m.Called(uuidOrName)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularProfile")
+	}
+
+	var r0 *network.CellularProfile
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*network.CellularProfile, error)); ok {
+		return rf(uuidOrName)
+	}
+	if rf, ok := ret.Get(0).(func(string) *network.CellularProfile); ok {
+		r0 = rf(uuidOrName)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*network.CellularProfile)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuidOrName)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_GetCellularProfile_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) GetCellularProfile(uuidOrName interface{}) *MockBackend_GetCellularProfile_Call {
+	return &MockBackend_GetCellularProfile_Call{Call: _e.mock.On("GetCellularProfile", uuidOrName)}
+}
+
+// ListActiveCellular provides a mock function with given fields:
+func (_m *MockBackend) ListActiveCellular() ([]network.CellularActive, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListActiveCellular")
+	}
+
+	var r0 []network.CellularActive
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]network.CellularActive, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []network.CellularActive); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.CellularActive)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_ListActiveCellular_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) ListActiveCellular() *MockBackend_ListActiveCellular_Call {
+	return &MockBackend_ListActiveCellular_Call{Call: _e.mock.On("ListActiveCellular")}
+}
+
+// ListCellularProfiles provides a mock function with given fields:
+func (_m *MockBackend) ListCellularProfiles() ([]network.CellularProfile, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListCellularProfiles")
+	}
+
+	var r0 []network.CellularProfile
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]network.CellularProfile, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []network.CellularProfile); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.CellularProfile)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_ListCellularProfiles_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) ListCellularProfiles() *MockBackend_ListCellularProfiles_Call {
+	return &MockBackend_ListCellularProfiles_Call{Call: _e.mock.On("ListCellularProfiles")}
+}
+
+// SetCellularEnabled provides a mock function with given fields: enabled
+func (_m *MockBackend) SetCellularEnabled(enabled bool) error {
+	ret := _m.Called(enabled)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetCellularEnabled")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(bool) error); ok {
+		r0 = rf(enabled)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type MockBackend_SetCellularEnabled_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) SetCellularEnabled(enabled interface{}) *MockBackend_SetCellularEnabled_Call {
+	return &MockBackend_SetCellularEnabled_Call{Call: _e.mock.On("SetCellularEnabled", enabled)}
+}
+
+// UpdateCellularProfile provides a mock function with given fields: uuid, updates
+func (_m *MockBackend) UpdateCellularProfile(uuid string, updates map[string]interface{}) error {
+	ret := _m.Called(uuid, updates)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateCellularProfile")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, map[string]interface{}) error); ok {
+		r0 = rf(uuid, updates)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type MockBackend_UpdateCellularProfile_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) UpdateCellularProfile(uuid interface{}, updates interface{}) *MockBackend_UpdateCellularProfile_Call {
+	return &MockBackend_UpdateCellularProfile_Call{Call: _e.mock.On("UpdateCellularProfile", uuid, updates)}
+}
+
+// GetSIMStatus provides a mock function with given fields: device
+func (_m *MockBackend) GetSIMStatus(device string) (*network.CellularDevice, error) {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSIMStatus")
+	}
+
+	var r0 *network.CellularDevice
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*network.CellularDevice, error)); ok {
+		return rf(device)
+	}
+	if rf, ok := ret.Get(0).(func(string) *network.CellularDevice); ok {
+		r0 = rf(device)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*network.CellularDevice)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(device)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_GetSIMStatus_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) GetSIMStatus(device interface{}) *MockBackend_GetSIMStatus_Call {
+	return &MockBackend_GetSIMStatus_Call{Call: _e.mock.On("GetSIMStatus", device)}
+}
+
+// SubmitSIMPin provides a mock function with given fields: device, pin
+func (_m *MockBackend) SubmitSIMPin(device string, pin string) error {
+	ret := _m.Called(device, pin)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SubmitSIMPin")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(device, pin)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type MockBackend_SubmitSIMPin_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) SubmitSIMPin(device interface{}, pin interface{}) *MockBackend_SubmitSIMPin_Call {
+	return &MockBackend_SubmitSIMPin_Call{Call: _e.mock.On("SubmitSIMPin", device, pin)}
+}
+
+// GetSIMPinTriesLeft provides a mock function with given fields: device
+func (_m *MockBackend) GetSIMPinTriesLeft(device string) (int, error) {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSIMPinTriesLeft")
+	}
+
+	var r0 int
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (int, error)); ok {
+		return rf(device)
+	}
+	if rf, ok := ret.Get(0).(func(string) int); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(device)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type MockBackend_GetSIMPinTriesLeft_Call struct {
+	*mock.Call
+}
+
+func (_e *MockBackend_Expecter) GetSIMPinTriesLeft(device interface{}) *MockBackend_GetSIMPinTriesLeft_Call {
+	return &MockBackend_GetSIMPinTriesLeft_Call{Call: _e.mock.On("GetSIMPinTriesLeft", device)}
+}
+
 // NewMockBackend creates a new instance of MockBackend. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockBackend(t interface {

@@ -79,6 +79,34 @@ func HandleRequest(conn net.Conn, req models.Request, manager *Manager) {
 		handleSetVPNCredentials(conn, req, manager)
 	case "network.wifi.setAutoconnect":
 		handleSetWiFiAutoconnect(conn, req, manager)
+	case "network.cellular.enabled":
+		handleGetCellularEnabled(conn, req, manager)
+	case "network.cellular.enable":
+		handleEnableCellular(conn, req, manager)
+	case "network.cellular.disable":
+		handleDisableCellular(conn, req, manager)
+	case "network.cellular.devices":
+		handleGetCellularDevices(conn, req, manager)
+	case "network.cellular.connections":
+		handleGetCellularConnections(conn, req, manager)
+	case "network.cellular.connect":
+		handleConnectCellular(conn, req, manager)
+	case "network.cellular.disconnect":
+		handleDisconnectCellular(conn, req, manager)
+	case "network.cellular.info":
+		handleGetCellularNetworkInfo(conn, req, manager)
+	case "network.cellular.profiles":
+		handleListCellularProfiles(conn, req, manager)
+	case "network.cellular.active":
+		handleListActiveCellular(conn, req, manager)
+	case "network.cellular.updateProfile":
+		handleUpdateCellularProfile(conn, req, manager)
+	case "network.cellular.simStatus":
+		handleGetSIMStatus(conn, req, manager)
+	case "network.cellular.submitPin":
+		handleSubmitSIMPin(conn, req, manager)
+	case "network.cellular.pinTriesLeft":
+		handleGetSIMPinTriesLeft(conn, req, manager)
 	default:
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
@@ -627,4 +655,202 @@ func handleSetVPNCredentials(conn net.Conn, req models.Request, manager *Manager
 	}
 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "VPN credentials set"})
+}
+
+func handleGetCellularEnabled(conn net.Conn, req models.Request, manager *Manager) {
+	enabled, err := manager.GetCellularEnabled()
+	if err != nil {
+		log.Warnf("handleGetCellularEnabled: failed to get state: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to get cellular state: %v", err))
+		return
+	}
+	models.Respond(conn, req.ID, map[string]bool{"enabled": enabled})
+}
+
+func handleEnableCellular(conn net.Conn, req models.Request, manager *Manager) {
+	if err := manager.SetCellularEnabled(true); err != nil {
+		log.Warnf("handleEnableCellular: failed to enable: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to enable cellular: %v", err))
+		return
+	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "Cellular enabled"})
+}
+
+func handleDisableCellular(conn net.Conn, req models.Request, manager *Manager) {
+	if err := manager.SetCellularEnabled(false); err != nil {
+		log.Warnf("handleDisableCellular: failed to disable: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to disable cellular: %v", err))
+		return
+	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "Cellular disabled"})
+}
+
+func handleGetCellularDevices(conn net.Conn, req models.Request, manager *Manager) {
+	devices := manager.GetCellularDevices()
+	models.Respond(conn, req.ID, devices)
+}
+
+func handleGetCellularConnections(conn net.Conn, req models.Request, manager *Manager) {
+	connections, err := manager.GetCellularConnections()
+	if err != nil {
+		log.Warnf("handleGetCellularConnections: failed to get connections: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to get cellular connections: %v", err))
+		return
+	}
+	models.Respond(conn, req.ID, connections)
+}
+
+func handleConnectCellular(conn net.Conn, req models.Request, manager *Manager) {
+	uuid, err := params.String(req.Params, "uuid")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := manager.ConnectCellular(uuid); err != nil {
+		log.Warnf("handleConnectCellular: failed to connect: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to connect cellular: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "Cellular connection activated"})
+}
+
+func handleDisconnectCellular(conn net.Conn, req models.Request, manager *Manager) {
+	if err := manager.DisconnectCellular(); err != nil {
+		log.Warnf("handleDisconnectCellular: failed to disconnect: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to disconnect cellular: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "Cellular disconnected"})
+}
+
+func handleGetCellularNetworkInfo(conn net.Conn, req models.Request, manager *Manager) {
+	uuid, err := params.String(req.Params, "uuid")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	info, err := manager.GetCellularNetworkInfoDetailed(uuid)
+	if err != nil {
+		log.Warnf("handleGetCellularNetworkInfo: failed to get info: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to get cellular info: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, info)
+}
+
+func handleListCellularProfiles(conn net.Conn, req models.Request, manager *Manager) {
+	profiles, err := manager.ListCellularProfiles()
+	if err != nil {
+		log.Warnf("handleListCellularProfiles: failed to list profiles: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to list cellular profiles: %v", err))
+		return
+	}
+	models.Respond(conn, req.ID, profiles)
+}
+
+func handleListActiveCellular(conn net.Conn, req models.Request, manager *Manager) {
+	active, err := manager.ListActiveCellular()
+	if err != nil {
+		log.Warnf("handleListActiveCellular: failed to list active: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to list active cellular: %v", err))
+		return
+	}
+	models.Respond(conn, req.ID, active)
+}
+
+func handleUpdateCellularProfile(conn net.Conn, req models.Request, manager *Manager) {
+	connUUID, err := params.String(req.Params, "uuid")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	updates := make(map[string]any)
+
+	if name, ok := models.Get[string](req, "name"); ok {
+		updates["name"] = name
+	}
+	if autoconnect, ok := models.Get[bool](req, "autoconnect"); ok {
+		updates["autoconnect"] = autoconnect
+	}
+	if apn, ok := models.Get[string](req, "apn"); ok {
+		updates["apn"] = apn
+	}
+	if username, ok := models.Get[string](req, "username"); ok {
+		updates["username"] = username
+	}
+	if password, ok := models.Get[string](req, "password"); ok {
+		updates["password"] = password
+	}
+
+	if len(updates) == 0 {
+		models.RespondError(conn, req.ID, "no updates provided")
+		return
+	}
+
+	if err := manager.UpdateCellularProfile(connUUID, updates); err != nil {
+		log.Warnf("handleUpdateCellularProfile: failed to update: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to update cellular profile: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "Cellular profile updated"})
+}
+
+func handleGetSIMStatus(conn net.Conn, req models.Request, manager *Manager) {
+	device, err := params.String(req.Params, "device")
+	if err != nil {
+		device = "" // Use first available device if not specified
+	}
+
+	status, err := manager.GetSIMStatus(device)
+	if err != nil {
+		log.Warnf("handleGetSIMStatus: failed to get status: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to get SIM status: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, status)
+}
+
+func handleSubmitSIMPin(conn net.Conn, req models.Request, manager *Manager) {
+	device, err := params.String(req.Params, "device")
+	if err != nil {
+		device = "" // Use first available device
+	}
+
+	pin, err := params.String(req.Params, "pin")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := manager.SubmitSIMPin(device, pin); err != nil {
+		log.Warnf("handleSubmitSIMPin: failed to submit PIN: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to submit SIM PIN: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "SIM PIN submitted"})
+}
+
+func handleGetSIMPinTriesLeft(conn net.Conn, req models.Request, manager *Manager) {
+	device, err := params.String(req.Params, "device")
+	if err != nil {
+		device = "" // Use first available device
+	}
+
+	tries, err := manager.GetSIMPinTriesLeft(device)
+	if err != nil {
+		log.Warnf("handleGetSIMPinTriesLeft: failed to get tries left: %v", err)
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to get PIN tries left: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, map[string]int{"triesLeft": tries})
 }

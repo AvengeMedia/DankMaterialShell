@@ -97,3 +97,67 @@ func (b *SystemdNetworkdBackend) DisconnectWiFiDevice(device string) error {
 func (b *SystemdNetworkdBackend) GetWiFiDevices() []WiFiDevice {
 	return nil
 }
+
+func (b *SystemdNetworkdBackend) GetCellularEnabled() (bool, error) {
+	return false, fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) SetCellularEnabled(enabled bool) error {
+	return fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) GetCellularDevices() []CellularDevice {
+	return []CellularDevice{}
+}
+
+func (b *SystemdNetworkdBackend) GetCellularConnections() ([]CellularConnection, error) {
+	return nil, fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) GetCellularNetworkDetails(uuid string) (*CellularNetworkInfoResponse, error) {
+	return nil, fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) ConnectCellular(uuid string) error {
+	return fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) DisconnectCellular() error {
+	return fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) DisconnectCellularDevice(device string) error {
+	return fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) ActivateCellularConnection(uuid string) error {
+	return fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) ListCellularProfiles() ([]CellularProfile, error) {
+	return []CellularProfile{}, nil
+}
+
+func (b *SystemdNetworkdBackend) ListActiveCellular() ([]CellularActive, error) {
+	return []CellularActive{}, nil
+}
+
+func (b *SystemdNetworkdBackend) GetCellularProfile(uuidOrName string) (*CellularProfile, error) {
+	return nil, fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) UpdateCellularProfile(uuid string, updates map[string]any) error {
+	return fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) GetSIMStatus(device string) (*CellularDevice, error) {
+	return nil, fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) SubmitSIMPin(device string, pin string) error {
+	return fmt.Errorf("cellular not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) GetSIMPinTriesLeft(device string) (int, error) {
+	return 0, fmt.Errorf("cellular not supported by networkd backend")
+}
