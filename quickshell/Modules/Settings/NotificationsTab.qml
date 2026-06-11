@@ -274,6 +274,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "notificationShowTimeoutBar"
+                    tags: ["notification", "timeout", "progress", "bar", "timer", "countdown"]
+                    text: I18n.tr("Timeout Progress Bar")
+                    description: I18n.tr("Show a bar that drains as the popup's auto-dismiss timer runs")
+                    checked: SettingsData.notificationShowTimeoutBar
+                    onToggled: checked => SettingsData.set("notificationShowTimeoutBar", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "notificationDedupeEnabled"
                     tags: ["notification", "duplicate", "dedupe", "stack", "coalesce", "repeat"]
                     text: I18n.tr("Suppress Duplicate Notifications")
