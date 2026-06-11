@@ -966,4 +966,67 @@ Singleton {
         }
         return result;
     }
+
+    readonly property string _ipcIdPattern: "^[a-zA-Z0-9_\\-:]{1,64}$";
+
+    IpcHandler {
+        target: "plugin-scan"
+
+        function scan(): string {
+            root.scanPlugins();
+            return `SCAN_TRIGGERED: ${Object.keys(root.availablePlugins).length} known before debounce`;
+        }
+
+        function rescan(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: rescan requires a pluginId";
+            if (!new RegExp(root._ipcIdPattern).test(pluginId))
+                return `ERROR: invalid pluginId '${pluginId}' (allowed: [a-zA-Z0-9_\\-:]{1,64})`;
+            if (!(pluginId in root.availablePlugins))
+                return `ERROR: unknown pluginId '${pluginId}' (try 'list' first)`;
+            root.forceRescanPlugin(pluginId);
+            return `RESCAN_TRIGGERED: ${pluginId}`;
+        }
+
+        function reload(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: reload requires a pluginId";
+            if (!new RegExp(root._ipcIdPattern).test(pluginId))
+                return `ERROR: invalid pluginId '${pluginId}' (allowed: [a-zA-Z0-9_\\-:]{1,64})`;
+            if (!(pluginId in root.availablePlugins))
+                return `ERROR: unknown pluginId '${pluginId}'`;
+            root.reloadPlugin(pluginId);
+            return `RELOAD_TRIGGERED: ${pluginId}`;
+        }
+
+        function list(): string {
+            const ids = Object.keys(root.availablePlugins);
+            const cap = 256;
+            const n = Math.min(ids.length, cap);
+            const lines = [];
+            for (let i = 0; i < n; i++) {
+                const id = ids[i];
+                if (!new RegExp(root._ipcIdPattern).test(id))
+                    continue;
+                const p = root.availablePlugins[id];
+                const safeName = String(p.name || "").replace(/[\t\n\r]/g, " ");
+                lines.push(`${id}\t${p.loaded ? "loaded" : "unloaded"}\t${p.type || "unknown"}\t${safeName}`);
+            }
+            const header = `# count=${ids.length} returned=${n}${ids.length > n ? " (truncated, see cap)" : ""}`;
+            return header + "\n" + lines.join("\n");
+        }
+
+        function status(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: status requires a pluginId";
+            if (!new RegExp(root._ipcIdPattern).test(pluginId))
+                return `ERROR: invalid pluginId '${pluginId}'`;
+            const plugin = root.availablePlugins[pluginId];
+            if (!plugin)
+                return `ERROR: unknown pluginId '${pluginId}'`;
+            const err = root.pluginLoadErrors[pluginId] || "";
+            const safeErr = String(err).replace(/[\t\n\r]/g, " ");
+            return `${plugin.loaded ? "loaded" : "unloaded"}\t${plugin.type || ""}\t${safeErr}`;
+        }
+    }
 }
