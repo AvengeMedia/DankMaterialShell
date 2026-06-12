@@ -28,7 +28,7 @@ Rectangle {
     readonly property bool showPinAction: visibleEntryActions.includes("pin")
     readonly property bool showEditAction: visibleEntryActions.includes("edit")
     readonly property bool showDeleteAction: visibleEntryActions.includes("delete")
-    readonly property bool showPinnedIndicator: hasPinnedDuplicate && !showPinAction
+    readonly property bool showPinnedIndicator: !showPinAction && effectivePinned
     readonly property bool showAnyAction: showPinAction || showEditAction || showDeleteAction || showPinnedIndicator
 
     radius: Theme.cornerRadius
@@ -78,7 +78,15 @@ Rectangle {
             iconColor: Theme.primary
             backgroundColor: Theme.primarySelected
             visible: root.showPinnedIndicator
-            onClicked: unpinRequested(pinnedDuplicateEntry)
+            onClicked: {
+                if (entry.pinned) {
+                    unpinRequested(entry);
+                    return;
+                }
+                if (pinnedDuplicateEntry) {
+                    unpinRequested(pinnedDuplicateEntry);
+                }
+            }
         }
 
         DankActionButton {
