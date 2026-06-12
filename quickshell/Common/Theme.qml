@@ -449,6 +449,7 @@ Singleton {
                 "primary": getMatugenColor("primary", "#42a5f5"),
                 "primaryText": getMatugenColor("on_primary", "#ffffff"),
                 "primaryContainer": getMatugenColor("primary_container", "#1976d2"),
+                "onPrimaryContainer": getMatugenColor("on_primary_container", "#cfe5ff"),
                 "secondary": getMatugenColor("secondary", "#8ab4f8"),
                 "tertiary": getMatugenColor("tertiary", "#efb8c8"),
                 "surface": getMatugenColor("surface", "#1a1c1e"),
@@ -522,6 +523,7 @@ Singleton {
     property color primary: currentThemeData.primary
     property color primaryText: currentThemeData.primaryText
     property color primaryContainer: currentThemeData.primaryContainer
+    property color onPrimaryContainer: currentThemeData.onPrimaryContainer
     property color secondary: currentThemeData.secondary
     property color tertiary: currentThemeData.tertiary || currentThemeData.secondary
     property color surface: currentThemeData.surface
