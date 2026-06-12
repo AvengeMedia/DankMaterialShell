@@ -28,7 +28,7 @@ Rectangle {
     readonly property bool showPinAction: visibleEntryActions.includes("pin")
     readonly property bool showEditAction: visibleEntryActions.includes("edit")
     readonly property bool showDeleteAction: visibleEntryActions.includes("delete")
-    readonly property bool showPinnedIndicator: !showPinAction && effectivePinned
+    readonly property bool showPinnedIndicator: hasPinnedDuplicate && !showPinAction
     readonly property bool showAnyAction: showPinAction || showEditAction || showDeleteAction || showPinnedIndicator
 
     radius: Theme.cornerRadius
@@ -72,20 +72,17 @@ Rectangle {
         spacing: Theme.spacingXS
         visible: root.showAnyAction
 
-        DankActionButton {
-            iconName: "push_pin"
-            iconSize: Theme.iconSize - 6
-            iconColor: Theme.primary
-            backgroundColor: Theme.primarySelected
+        Item {
+            width: 40
+            height: 40
             visible: root.showPinnedIndicator
-            onClicked: {
-                if (entry.pinned) {
-                    unpinRequested(entry);
-                    return;
-                }
-                if (pinnedDuplicateEntry) {
-                    unpinRequested(pinnedDuplicateEntry);
-                }
+
+            // Status indicator only; the Pin action remains hidden.
+            DankIcon {
+                anchors.centerIn: parent
+                name: "push_pin"
+                size: Theme.iconSize - 6
+                color: Theme.primary
             }
         }
 
