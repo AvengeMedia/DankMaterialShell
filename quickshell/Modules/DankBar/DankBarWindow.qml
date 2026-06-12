@@ -286,9 +286,6 @@ PanelWindow {
 
     readonly property bool isVertical: axis.isVertical
 
-    property bool gothCornersEnabled: barConfig?.gothCornersEnabled ?? false
-    property real wingtipsRadius: barConfig?.gothCornerRadiusOverride ? (barConfig?.gothCornerRadiusValue ?? 12) : Theme.cornerRadius
-    readonly property real _wingR: Math.max(0, wingtipsRadius)
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
@@ -300,24 +297,29 @@ PanelWindow {
     }
     readonly property real _dpr: CompositorService.getScreenScale(barWindow.screen)
 
+    property string screenName: modelData.name
+
+    readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(screenName)
+    readonly property bool usesFrameBarChrome: CompositorService.frameWindowVisibleForScreen(screenName)
+    readonly property var renderBarConfig: SettingsData.effectiveBarConfigForRender(barConfig, usesFrameBarChrome)
+
+    property bool gothCornersEnabled: renderBarConfig?.gothCornersEnabled ?? false
+    property real wingtipsRadius: renderBarConfig?.gothCornerRadiusOverride ? (renderBarConfig?.gothCornerRadiusValue ?? 12) : Theme.cornerRadius
+    readonly property real _wingR: Math.max(0, wingtipsRadius)
+
     // Shadow buffer: extra window space for shadow to render beyond bar bounds
-    readonly property bool _shadowActive: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || (barConfig?.shadowIntensity ?? 0) > 0
+    readonly property bool _shadowActive: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || (renderBarConfig?.shadowIntensity ?? 0) > 0
     readonly property real _shadowBuffer: {
         if (!_shadowActive)
             return 0;
-        const hasOverride = (barConfig?.shadowIntensity ?? 0) > 0;
+        const hasOverride = (renderBarConfig?.shadowIntensity ?? 0) > 0;
         if (hasOverride) {
-            const blur = (barConfig.shadowIntensity ?? 0) * 0.2;
+            const blur = (renderBarConfig.shadowIntensity ?? 0) * 0.2;
             const offset = blur * 0.5;
             return Theme.snap(Math.max(16, blur + offset + 8), _dpr);
         }
         return Theme.snap(Theme.elevationRenderPadding(Theme.elevationLevel2, "top", 4, 8, 16), _dpr);
     }
-
-    property string screenName: modelData.name
-
-    readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(screenName)
-    readonly property bool usesFrameBarChrome: CompositorService.frameWindowVisibleForScreen(screenName)
 
     // Flatten/spacing collapse for maximized windows is only for frame-integrated layout.
     // When the bar draws its own pill, keep rounded corners and spacing like the dock.
@@ -554,8 +556,8 @@ PanelWindow {
     }
 
     screen: modelData
-    implicitHeight: !isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
-    implicitWidth: isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
+    implicitHeight: !isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((renderBarConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
+    implicitWidth: isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((renderBarConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
     color: "transparent"
 
     Component.onCompleted: {
@@ -952,7 +954,7 @@ PanelWindow {
                         id: barBackground
                         barWindow: barWindow
                         axis: axis
-                        barConfig: barWindow.barConfig
+                        barConfig: barWindow.renderBarConfig
                     }
 
                     MouseArea {

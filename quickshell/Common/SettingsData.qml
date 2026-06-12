@@ -1650,6 +1650,15 @@ Singleton {
         };
     }
 
+    function effectiveBarConfigForRender(config, usesFrameBarChrome) {
+        if (!config || !connectedFrameModeActive || usesFrameBarChrome)
+            return config;
+        const backup = connectedFrameBarStyleBackups[config.id];
+        if (!backup)
+            return config;
+        return Object.assign({}, config, backup);
+    }
+
     // Single entry point for connected-mode settings state.
     //   !active → restore backups
     function _reconcileConnectedFrameBarStyles() {
