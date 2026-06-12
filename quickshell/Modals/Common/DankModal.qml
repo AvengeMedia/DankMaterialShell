@@ -54,10 +54,7 @@ Item {
         anchors.fill: parent
     }
 
-    // One focus grab for every modal; on Hyprland this is what delivers
-    // keyboard focus to the OnDemand surface, identically in both modes.
-    // The full-surface content window receives outside clicks itself, so an
-    // outside click closes the modal instead of being consumed by the grab.
+    // Hyprland OnDemand grab delivers keyboard focus to the modal content surface.
     HyprlandFocusGrab {
         windows: root.contentWindow ? [root.contentWindow] : []
         active: KeyboardFocus.wantsGrab(root.shouldHaveFocus, root.customKeyboardFocus)
@@ -105,8 +102,6 @@ Item {
         }
     }
 
-    // Defer Loader source-component swap until impl is fully closed; avoids
-    // tearing down a modal mid-animation when frame mode is toggled.
     function _maybeResolveBackend() {
         if (_resolvedBackend === _desiredBackend)
             return;

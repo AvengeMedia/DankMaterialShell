@@ -1,9 +1,6 @@
 #version 450
 
-// Popout-local connected chrome as a signed-distance field: the body rounded
-// rect smooth-unioned against the bar-edge half-plane, so the connector
-// fillets form analytically. Key + ambient shadows sample the same field;
-// shadow is masked outside the silhouette.
+// Popout-local connected chrome body + bar-edge connector as one SDF.
 
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
@@ -22,7 +19,6 @@ layout(std140, binding = 0) uniform buf {
     vec4 edgeParam;     // x = bar side (0 top, 1 bottom, 2 left, 3 right), y = fillet k
 } ubuf;
 
-// Per-corner rounded box. r = (topLeft, topRight, bottomRight, bottomLeft).
 float sdRoundBox4(vec2 p, vec2 c, vec2 hs, vec4 r) {
     p -= c;
     float rr = (p.x >= 0.0) ? (p.y >= 0.0 ? r.z : r.y) : (p.y >= 0.0 ? r.w : r.x);
@@ -31,7 +27,6 @@ float sdRoundBox4(vec2 p, vec2 c, vec2 hs, vec4 r) {
     return min(max(q.x, q.y), 0.0) + length(max(q, vec2(0.0))) - rr;
 }
 
-// Circular smooth-min: blends two SDFs with a fillet of radius k.
 float smin(float a, float b, float k) {
     if (k <= 0.0)
         return min(a, b);
@@ -39,8 +34,6 @@ float smin(float a, float b, float k) {
 }
 
 float sceneDist(vec2 px) {
-    // Bar edge as a half-plane whose interior lies off-item, on the bar's
-    // side; only its fillet contribution is visible.
     float side = ubuf.edgeParam.x;
     float dEdge = side < 0.5 ? px.y
                 : side < 1.5 ? (ubuf.heightPx - px.y)

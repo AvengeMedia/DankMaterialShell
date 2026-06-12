@@ -30,7 +30,6 @@ Item {
     property string _pendingMode: ""
     readonly property bool unloadContentOnClose: SettingsData.dankLauncherV2UnloadOnClose
 
-    // Animation state — matches DankPopout/DankModal pattern
     property bool animationsEnabled: true
     property bool _motionActive: false
     property real _frozenMotionX: 0
@@ -108,8 +107,6 @@ Item {
         return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
     }
 
-    // frameEdgeInsetForSide is the full inset; do not add frameBarSize.
-    // Positions the modal flush to the emerge side, centered on the cross axis.
     readonly property var _connectedModalPos: {
         const fallback = {
             "x": (screenWidth - modalWidth) / 2,
@@ -175,8 +172,6 @@ Item {
     readonly property int effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
     readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
 
-    // Shadow padding for the content window (render padding only, no motion padding).
-    // Zeroed when frame owns the chrome and Wayland clips past the bar edge
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (!frameOwnsConnectedChrome && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
@@ -203,13 +198,11 @@ Item {
     }
     readonly property real contentSurfaceHeight: launcherArcExtenderActive ? _connectedChromeHeight : alignedHeight
 
-    // Where the content container sits inside the full-surface content window (screen coordinates)
     readonly property real _ccX: _connectedChromeX
     readonly property real _ccY: _connectedChromeY
 
     signal dialogClosed
 
-    // Coalesce per-channel dirty bits; one ConnectedModeState write per tick.
     Timer {
         id: _syncTimer
         interval: 0
@@ -365,8 +358,6 @@ Item {
             return;
         contentVisible = true;
         spotlightContent.closeTransientUi?.();
-        // NOTE: forceActiveFocus() is deliberately NOT called here.
-        // It is deferred to after animation starts to avoid compositor IPC stalls.
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = query;
@@ -404,10 +395,8 @@ Item {
         isClosing = false;
         openedFromOverview = false;
 
-        // Disable animations so the snap is instant
         animationsEnabled = false;
 
-        // Freeze the collapsed offsets (they depend on height which could change)
         _frozenMotionX = contentContainer ? contentContainer.collapsedMotionX : 0;
         _frozenMotionY = contentContainer ? contentContainer.collapsedMotionY : (Theme.isDirectionalEffect ? Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1) : -Theme.effectAnimOffset);
 
@@ -416,24 +405,19 @@ Item {
             contentWindow.screen = focusedScreen;
         }
 
-        // _motionActive = false ensures motionX/Y snap to frozen collapsed position
         _motionActive = false;
 
-        // Make windows visible but do NOT request keyboard focus yet
         ModalManager.openModal(modalHandle);
         spotlightOpen = true;
         contentWindow.visible = true;
 
-        // Load content and initialize (but no forceActiveFocus — that's deferred)
         _ensureContentLoadedAndInitialize(query || "", mode || "");
 
-        // Frame 1: enable animations and trigger enter motion
+        // Defer focus until after enter motion starts (avoids compositor IPC stalls).
         Qt.callLater(() => {
             root.animationsEnabled = true;
             root._motionActive = true;
 
-            // Frame 2: request keyboard focus + activate search field
-            // Double-deferred to avoid compositor IPC competing with animation frames
             Qt.callLater(() => {
                 root.keyboardActive = true;
                 if (root.spotlightContent && root.spotlightContent.searchField)
@@ -456,11 +440,9 @@ Item {
         spotlightContent?.closeTransientUi?.();
         openedFromOverview = false;
         isClosing = true;
-        // For directional effects, defer contentVisible=false so content stays rendered during exit slide
         if (!Theme.isDirectionalEffect)
             contentVisible = false;
 
-        // Trigger exit animation — Behaviors will animate motionX/Y to frozen collapsed position
         _motionActive = false;
 
         keyboardActive = false;
@@ -612,8 +594,6 @@ Item {
             }
         }
 
-        // Dismissable area: everything except the bar/dock strips, so bar
-        // widgets stay clickable for widget-to-widget transfer.
         Item {
             id: dismissArea
             visible: false
@@ -712,7 +692,6 @@ Item {
                 return -Math.max((root.shadowPad || 0) + Theme.effectAnimOffset, 40);
             }
 
-            // openProgress: 0 = closed (at frozenMotion, scaleCollapsed), 1 = open (at 0, scale 1).
             QtObject {
                 id: morph
                 property real openProgress: root._motionActive ? 1 : 0
@@ -771,7 +750,6 @@ Item {
                     width: contentContainer.width
                     height: contentContainer.height
 
-                    // Shadow mirrors contentWrapper position/scale/opacity
                     ElevationShadow {
                         id: launcherShadowLayer
                         width: parent.width
@@ -789,7 +767,6 @@ Item {
                         shadowEnabled: !root.frameOwnsConnectedChrome && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                     }
 
-                    // contentWrapper moves inside static contentContainer — DankPopout pattern
                     Item {
                         id: contentWrapper
                         width: parent.width

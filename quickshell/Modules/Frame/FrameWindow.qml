@@ -92,8 +92,6 @@ PanelWindow {
     readonly property real _notifStartUnderlapValue: win._notifDescriptor.omitStartConnector ? win._seamOverlap : 0
     readonly property real _notifEndUnderlapValue: win._notifDescriptor.omitEndConnector ? win._seamOverlap : 0
 
-    // Theme.snap rounds to integer pixel: equal rounded values suppress
-    // downstream Changed during sub-pixel morph jitter.
     readonly property var _popoutRadii: SurfaceGeometry.connectorRadii(win._popoutDescriptor, win._popoutBodyGeometry, win._ccr, win._surfaceRadius, win._dpr, false)
     readonly property real _effectivePopoutCcr: win._popoutRadii.near
     readonly property real _effectivePopoutFarCcr: win._popoutRadii.far
@@ -125,12 +123,8 @@ PanelWindow {
     readonly property real _surfaceRadius: Theme.connectedSurfaceRadius
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
     readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
-    // Both elevation states render through the SDF shader; this only toggles
-    // the shadow term inside it.
     readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && !win._disableLayer
-    // Active surfaces packed into four fixed SDF-shader slots. Each near (bar)
-    // edge is clamped to the cutout edge so the smooth-min connector attaches
-    // there; the per-corner smin radius is that corner's junction fillet.
+    // Pack active connected surfaces into four fixed SDF slots (near edges clamp to cutout).
     readonly property var _sdfSlots: {
         const T = win.cutoutTopInset;
         const L = win.cutoutLeftInset;
@@ -158,16 +152,7 @@ PanelWindow {
                 const s = src[i];
                 const b = clampNear(s.side, s.body);
                 const active = b.width > 0 && b.height > 0 ? 1 : 0;
-                // Map start/end (left/top, right/bottom) onto corners
-                // (tl,tr,br,bl): bar-side corners take their near connector
-                // fillet, far corners always take the far fillet so a body
-                // meeting a perpendicular border joins with an arc (smin is
-                // inert when nothing is within k). A bar-side corner is sharp
-                // where its connector is present; an omitted connector makes
-                // its far corner sharp instead (the far-cap join).
                 const sc = s.radii.startCr, ec = s.radii.endCr;
-                // Clamp the far fillet to the body extent so it cannot flare
-                // back across a shallow body into the bar mid-animation.
                 const extent = (s.side === "top" || s.side === "bottom") ? b.height : b.width;
                 const fc = Math.min(s.radii.farCr, extent);
                 const omitS = s.radii.farStartCr > 0;
@@ -175,9 +160,6 @@ PanelWindow {
                 const bodyR = s.radii.surfaceRadius;
                 const nearS = omitS ? bodyR : 0, nearE = omitE ? bodyR : 0;
                 const farS = omitS ? 0 : bodyR, farE = omitE ? 0 : bodyR;
-                // An omitted bar-side corner sits flush against the border, so
-                // it keeps a nonzero fillet (a zero k hard-joins the coincident
-                // edges and shows a half-coverage hairline along the seam).
                 const kS = omitS ? fc : sc, kE = omitE ? fc : ec;
                 let ks, cr;
                 if (s.side === "top") {
@@ -221,8 +203,6 @@ PanelWindow {
         return Math.max(0, Math.min(requested, maxRadius));
     }
 
-    // Pins every surface blur region to zero while frame blur cannot be
-    // consumed, so animations stop dirtying the region tree.
     readonly property bool _blurSurfacesActive: BlurService.enabled && SettingsData.frameBlurEnabled && win._frameActive
     readonly property int _blurCutoutCompensation: SettingsData.frameOpacity <= 0.2 ? 1 : 0
     readonly property int _blurCutoutLeft: Math.max(0, win.cutoutLeftInset - win._blurCutoutCompensation)
@@ -235,9 +215,6 @@ PanelWindow {
         return Math.max(0, Math.min(requested, maxRadius));
     }
 
-    // Blur regions bind rounded integer pixels directly: equal rounded values
-    // suppress Changed during sub-pixel motion, and inactive children pin to
-    // all-zero so the region build skips them.
     QtObject {
         id: _notifBodyBlurAnchor
 
@@ -255,7 +232,6 @@ PanelWindow {
         width: win._windowRegionWidth
         height: win._windowRegionHeight
 
-        // Frame cutout (always active when frame is on)
         Region {
             id: _blurCutout
             intersection: Intersection.Subtract
@@ -829,7 +805,6 @@ PanelWindow {
         }
     }
 
-    // Notif body scene rect, accounting for start/end/side underlaps per bar orientation.
     function _notifBodyScene() {
         const isHoriz = SurfaceGeometry.isHorizontal(win._notifDescriptor.barSide);
         const start = win._notifStartUnderlapValue;
@@ -861,9 +836,6 @@ PanelWindow {
         return Math.max(0, Math.min(win._effectivePopoutMaxCcr, extent - win._surfaceRadius));
     }
 
-    // Active connected surfaces fed to the unified silhouette path. Raw animated
-    // body rects (no seam/fill overlap); the builder anchors each to the cutout
-    // edge. Connector radii use the same per-surface helpers as the blur regions.
     function _unifiedSurfaces() {
         const arr = [];
         const p = win._popoutBodyGeometry;
@@ -971,8 +943,6 @@ PanelWindow {
         } catch (e) {}
     }
 
-    // Coalesce bursts of settings-change signals into a single _buildBlur() call
-    // on the next event loop tick.
     DeferredAction {
         id: blurRebuildAction
         onTriggered: win._runBlurRebuild()
@@ -1096,10 +1066,6 @@ PanelWindow {
         cutoutRadius: win.cutoutRadius
     }
 
-    // The entire connected silhouette (frame ring + every active chrome) as one
-    // SDF in a fragment shader. Analytic fwidth AA → crisp at any scale, no FBO;
-    // the smooth-min radius is the connector. The elevation shadow is derived
-    // from the same distance field, so elevation-on needs no grouping layer.
     ShaderEffect {
         anchors.fill: parent
         visible: win._connectedActive

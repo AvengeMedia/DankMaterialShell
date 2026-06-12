@@ -53,7 +53,6 @@ Item {
             "rightBar": 0
         })
     property var screen: null
-    // Connected resize uses one full-screen surface; body-sized regions are masks.
     readonly property bool useBackgroundWindow: false
     readonly property var effectivePopoutLayer: LayerShell.fromEnv("DMS_POPOUT_LAYER", root.triggerUsesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
         "allow": ["top", "overlay"],
@@ -91,7 +90,6 @@ Item {
     signal popoutClosed
     signal backgroundClicked
 
-    // Coalesce per-channel dirty bits; one ConnectedModeState write per tick.
     Timer {
         id: _syncTimer
         interval: 0
@@ -278,11 +276,9 @@ Item {
         chromeLease.release();
     }
 
-    // ─── Exposed animation state for ConnectedModeState ────────────────────
     readonly property real contentAnimX: contentContainer.animX
     readonly property real contentAnimY: contentContainer.animY
 
-    // ─── ConnectedModeState sync ────────────────────────────────────────────
     function _syncPopoutChromeState() {
         if (!root.frameOwnsConnectedChrome) {
             _releaseConnectedChromeState();
@@ -422,16 +418,12 @@ Item {
 
         const screenChanged = _lastOpenedScreen !== null && _lastOpenedScreen !== screen;
         if (screenChanged) {
-            // Hide on this tick so Qt actually tears down the wl_surface; the show
-            // gets deferred below so the unmap is processed before the remap.
             contentWindow.visible = false;
         }
         _lastOpenedScreen = screen;
         PopoutManager.showPopout(popoutHandle);
 
         if (contentContainer) {
-            // Snap morph closed only on a fresh open; on screen-change re-open we stay at 1
-            // because shouldBeVisible doesn't change and won't drive morph back to 1.
             if (!shouldBeVisible)
                 morph.openProgress = 0;
             _captureChromeAnimTravel();
@@ -445,11 +437,7 @@ Item {
         }
 
         if (screenChanged) {
-            // Defer the show one event-loop tick. Qt coalesces a synchronous
-            // false→true visibility flip into a no-op, leaving WindowBlur committed
-            // to the previous screen's wl_surface. Splitting the flip across ticks
-            // forces a real surface destroy+create so BackgroundEffect.surfaceCreated
-            // fires and the blur region republishes on the new surface.
+            // Unmap/remap wl_surface across ticks so blur republishes on the new screen.
             Qt.callLater(() => {
                 if (!root.shouldBeVisible)
                     return;
@@ -568,9 +556,7 @@ Item {
         return Math.abs(value - bound) <= Math.max(1, Theme.hairline(root.dpr) * 2);
     }
 
-    // Snap a frame-perpendicular position flush to the frame bound when it
-    // lands within the connector radius: a gap smaller than the radius cannot
-    // form the close-gap arc and renders as a pinched wedge instead.
+    // Snap positions within connector radius flush to the frame edge (avoids pinched arcs).
     function _snapNearFrameBound(value, minBound, maxBound, minIsFrame, maxIsFrame) {
         if (!root.usesConnectedSurfaceChrome || !root.closeFrameGapsActive)
             return value;
@@ -637,7 +623,6 @@ Item {
     property real renderedAlignedY: alignedY
     property real renderedAlignedHeight: alignedHeight
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
-    // Snap rendered geometry while the entrance morph runs so it doesn't ride a second animation (side-bar ramp).
     readonly property bool _settlingToOpen: fullHeightSurface && shouldBeVisible && morphAnim.running
 
     Behavior on renderedAlignedY {
@@ -687,8 +672,6 @@ Item {
             return 0;
         if (!root.usesConnectedSurfaceChrome)
             return exclusion;
-        // In a shared frame corner, the adjacent connected bar already occupies
-        // one rounded-corner radius before the popout's own connector begins.
         return exclusion + Theme.connectedCornerRadius * 2;
     }
 
@@ -721,10 +704,8 @@ Item {
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Left:
-                // bar on left: left side is bar-adjacent (popupGap), right side is frame-perpendicular (edgeGap)
                 return Math.max(popupGap, Math.min(screenWidth - popupWidth - edgeGapRight, anchorX));
             case SettingsData.Position.Right:
-                // bar on right: right side is bar-adjacent (popupGap), left side is frame-perpendicular (edgeGap)
                 return Math.max(edgeGapLeft, Math.min(screenWidth - popupWidth - popupGap, anchorX - popupWidth));
             default:
                 const rawX = triggerX + (triggerWidth / 2) - (popupWidth / 2);
@@ -744,10 +725,8 @@ Item {
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Bottom:
-                // bar on bottom: bottom side is bar-adjacent (popupGap), top side is frame-perpendicular (edgeGap)
                 return Math.max(edgeGapTop, Math.min(screenHeight - popupHeight - popupGap, anchorY - popupHeight));
             case SettingsData.Position.Top:
-                // bar on top: top side is bar-adjacent (popupGap), bottom side is frame-perpendicular (edgeGap)
                 return Math.max(popupGap, Math.min(screenHeight - popupHeight - edgeGapBottom, anchorY));
             default:
                 const rawY = triggerY - (popupHeight / 2);
@@ -790,8 +769,6 @@ Item {
             readonly property real s: Math.min(1, contentContainer.scaleValue)
             readonly property bool trackBlurFromBarEdge: root.usesConnectedSurfaceChrome
 
-            // Connected chrome clips to the bar edge, so its blur grows from
-            // that same edge instead of translating through the bar before settling.
             readonly property real _dyClamp: (contentContainer.barTop || contentContainer.barBottom) ? Math.max(-contentContainer.height, Math.min(contentContainer.animY, contentContainer.height)) : 0
             readonly property real _dxClamp: (contentContainer.barLeft || contentContainer.barRight) ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width)) : 0
 
@@ -827,7 +804,6 @@ Item {
 
         Region {
             id: contentInputMask
-            // Use bar-aware mask so bar widget clicks pass through when a popout is open.
             item: (shouldBeVisible && backgroundInteractive) ? backgroundDismissalMask : contentMaskRect
         }
 
@@ -938,7 +914,6 @@ Item {
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
 
-            // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
             QtObject {
                 id: morph
                 property real openProgress: 0
@@ -985,7 +960,6 @@ Item {
 
                 clip: shouldClip
 
-                // Bound the clipping strictly to the bar side, allowing massive overflow on the other 3 sides for shadows
                 x: shouldClip ? (contentContainer.barLeft ? -connectedClipAllowance : -clipOversize) : 0
                 y: shouldClip ? (contentContainer.barTop ? -connectedClipAllowance : -clipOversize) : 0
 
@@ -1043,8 +1017,6 @@ Item {
                         shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !root.frameOwnsConnectedChrome
                     }
 
-                    // Local connected chrome (body + connector fillets joined to
-                    // the bar edge) and its shadow as one SDF quad — no FBO.
                     Item {
                         id: localChrome
                         visible: root.usesLocalConnectedSurfaceChrome
@@ -1070,8 +1042,6 @@ Item {
 
                         ShaderEffect {
                             anchors.fill: parent
-                            // Shadow overflow pads every side except the bar
-                            // edge, where the silhouette must end flush.
                             anchors.topMargin: contentContainer.barTop ? 0 : -localChrome.pad
                             anchors.bottomMargin: contentContainer.barBottom ? 0 : -localChrome.pad
                             anchors.leftMargin: contentContainer.barLeft ? 0 : -localChrome.pad
@@ -1144,8 +1114,6 @@ Item {
                         Connections {
                             target: contentWindow
                             function onVisibleChanged() {
-                                // open() flips contentWindow.visible to rebind the layer surface to
-                                // a new screen; don't deactivate the wrapper while still open.
                                 if (!contentWindow.visible && !root.shouldBeVisible)
                                     contentWrapper._renderActive = false;
                             }

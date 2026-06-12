@@ -31,7 +31,6 @@ Item {
     property bool closeOnBackgroundClick: true
     property string animationType: "scale"
 
-    // Opposite side from the launcher by default; subclasses may override
     property string preferredConnectedBarSide: SettingsData.frameModalEmergeSide
 
     readonly property bool frameConnectedMode: SettingsData.frameEnabled && Theme.isConnectedEffect && !!effectiveScreen && SettingsData.isScreenInPreferences(effectiveScreen, SettingsData.frameScreenPreferences)
@@ -94,7 +93,6 @@ Item {
     signal dialogClosed
     signal backgroundClicked
 
-    // Coalesce per-channel dirty bits; one ConnectedModeState write per tick.
     Timer {
         id: _syncTimer
         interval: 0
@@ -342,7 +340,6 @@ Item {
         return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
     }
 
-    // frameEdgeInsetForSide is the full inset; do not add frameBarSize
     readonly property real _connectedAlignedX: {
         switch (resolvedConnectedBarSide) {
         case "top":
@@ -471,12 +468,9 @@ Item {
             }
         }
 
-        // Reveal frame: when the frame owns the connected chrome, the content
-        // must only become visible inside the modal's final footprint so it
-        // emerges in step with the chrome growing from the bar edge (the old
-        // two-window layout got this for free from the window boundary).
         Item {
             id: connectedReveal
+            // Clip to final footprint while frame-owned chrome grows from the bar edge.
             x: root.alignedX
             y: root.alignedY
             width: root.alignedWidth
@@ -512,7 +506,6 @@ Item {
                 readonly property real customDistRight: root.screenWidth - customAnchorX
                 readonly property real customDistTop: customAnchorY
                 readonly property real customDistBottom: root.screenHeight - customAnchorY
-                // Connected emergence: travel from the resolved bar edge, matching DankPopout cadence.
                 readonly property real connectedEmergenceTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
                 readonly property real connectedEmergenceTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
                 readonly property real offsetX: {
@@ -580,7 +573,6 @@ Item {
                                 return directionalTravel;
                             return 0;
                         default:
-                            // Default to sliding down from top when centered
                             return -Math.max(directionalTravel, root.screenHeight * 0.24);
                         }
                     }
@@ -603,7 +595,6 @@ Item {
 
                 readonly property real computedScaleCollapsed: root.animationScaleCollapsed
 
-                // openProgress: 0 = closed (at frozenMotionOffset, scaleCollapsed), 1 = open (at 0, scale 1).
                 QtObject {
                     id: morph
                     property real openProgress: root.shouldBeVisible ? 1 : 0

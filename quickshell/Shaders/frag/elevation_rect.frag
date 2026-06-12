@@ -1,10 +1,6 @@
 #version 450
 
-// Standalone elevation surface as a signed-distance field: one quad draws the
-// rounded-rect fill, its border, and the M3 two-part shadow (directional key +
-// non-directional ambient) analytically — no FBO, no blur passes. The shadow
-// is masked to outside the silhouette, so translucent fills never get
-// interior darkening.
+// Standalone rounded rect with border and M3 elevation shadow as one SDF.
 
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
@@ -24,7 +20,6 @@ layout(std140, binding = 0) uniform buf {
     vec4 ambientParam;  // ambient: x = blur px, y = spread px, z = alpha
 } ubuf;
 
-// Per-corner rounded box. r = (topLeft, topRight, bottomRight, bottomLeft).
 float sdRoundBox4(vec2 p, vec2 c, vec2 hs, vec4 r) {
     p -= c;
     float rr = (p.x >= 0.0) ? (p.y >= 0.0 ? r.z : r.y) : (p.y >= 0.0 ? r.w : r.x);
@@ -43,7 +38,6 @@ void main() {
     float d = rectDist(px);
     float fw = max(fwidth(d), 1e-4);
     float cov = 1.0 - smoothstep(-fw, fw, d);
-    // Qt Rectangle semantics: border band on the rim, fill inset inside it.
     float covInner = 1.0 - smoothstep(-fw, fw, d + ubuf.borderWidth);
     vec4 col = vec4(ubuf.fillColor.rgb, 1.0) * (ubuf.fillColor.a * covInner)
              + vec4(ubuf.borderColor.rgb, 1.0) * (ubuf.borderColor.a * max(0.0, cov - covInner));

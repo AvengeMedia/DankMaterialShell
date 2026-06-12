@@ -19,7 +19,6 @@ Item {
     property color borderColor: "transparent"
     property real borderWidth: 0
 
-    // Rounded-rect geometry within the item; defaults fill the item.
     property real sourceX: 0
     property real sourceY: 0
     property real sourceWidth: width
@@ -36,8 +35,6 @@ Item {
     readonly property var _ambient: Theme.elevationAmbient(level)
     readonly property real _pad: shadowEnabled ? Math.ceil(Math.max(shadowBlurPx + shadowSpreadPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)), _ambient.blurPx + _ambient.spreadPx) + 2) : 0
 
-    // Fill + border + key/ambient shadows drawn analytically on one oversized
-    // quad — no FBO, no blur passes.
     ShaderEffect {
         anchors.fill: parent
         anchors.margins: -root._pad

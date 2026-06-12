@@ -53,11 +53,7 @@ Item {
     readonly property var backgroundWindow: impl.item ? impl.item.backgroundWindow : null
     readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
 
-    // On Hyprland the OnDemand content surface only receives keyboard focus
-    // through a grab; everywhere else Exclusive focus covers this. Both
-    // popout windows plus every bar are whitelisted so clicks on them are
-    // delivered normally (dismiss MouseAreas, widget-to-widget transfer)
-    // instead of being consumed clearing the grab.
+    // Hyprland OnDemand grab: whitelist popout surfaces and bars so dismiss clicks still land.
     HyprlandFocusGrab {
         windows: {
             const list = [];
@@ -146,8 +142,6 @@ Item {
         return _usesConnectedBackendForScreen(targetScreen) ? connectedComp : standaloneComp;
     }
 
-    // Defer Loader source-component swap until impl is fully closed; avoids
-    // tearing down a popout mid-animation when frame mode is toggled.
     function _maybeResolveBackend() {
         _resolveBackendForScreen(screen);
     }

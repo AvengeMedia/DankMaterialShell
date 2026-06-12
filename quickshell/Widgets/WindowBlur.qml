@@ -52,10 +52,7 @@ Item {
             targetWindow.BackgroundEffect.blurRegion = null;
     }
 
-    // Force BackgroundEffect to re-publish the blur region on the current wl_surface.
-    // Clearing first bypasses Quickshell's same-Region dedup in BackgroundEffect::setBlurRegion,
-    // setting pendingBlurRegion=true so the next polish actually ships the region — needed
-    // when the underlying surface has been remapped (e.g. PanelWindow.screen change).
+    // Re-publish blur region after wl_surface remaps (e.g. screen change).
     function kick() {
         if (!targetWindow)
             return;

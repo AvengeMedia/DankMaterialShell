@@ -131,7 +131,6 @@ Singleton {
             "slideY": 0
         })
 
-    // Popout state (updated by DankPopout when connectedFrameModeActive)
     property string popoutOwnerId: ""
     property bool popoutVisible: false
     property string popoutBarSide: "top"
@@ -145,14 +144,10 @@ Singleton {
     property bool popoutOmitStartConnector: false
     property bool popoutOmitEndConnector: false
 
-    // Dock state (updated by Dock when connectedFrameModeActive), keyed by screen.name
     property var dockStates: ({})
 
-    // Dock slide offsets — hot-path updates separated from full geometry state
     property var dockSlides: ({})
 
-    // Surfaces are keyed by screen.name. FrameWindow watches to refresh connected chrome
-    // after claim/release boundaries without tracking each animation frame
     property var surfaceRevisions: ({})
 
     function _cloneDict(src) {
@@ -353,7 +348,6 @@ Singleton {
         dockStates = next;
         _clearSurfaceDescriptor(screenName, "dock");
 
-        // Also clear corresponding slide
         if (dockSlides[screenName]) {
             const nextSlides = _cloneDict(dockSlides);
             delete nextSlides[screenName];
@@ -454,7 +448,6 @@ Singleton {
         return true;
     }
 
-    // DankModal / DankLauncherV2Modal State
     readonly property var emptyModalState: ({
             "visible": false,
             "barSide": "bottom",
@@ -655,9 +648,6 @@ Singleton {
         return false;
     }
 
-    // Prune state for screens that are no longer connected. Stale entries
-    // accumulate across hotplug cycles otherwise — Frame's per-screen
-    // FrameInstance doesn't notice when its peer dicts go orphan.
     function _pruneToLiveScreens() {
         const live = {};
         const screens = Quickshell.screens || [];

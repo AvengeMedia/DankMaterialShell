@@ -1,7 +1,6 @@
 import QtQuick
 import qs.Common
 
-// Defines the screen area (excluding bars) that dismisses popouts
 QtObject {
     id: root
 

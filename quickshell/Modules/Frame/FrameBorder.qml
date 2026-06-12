@@ -3,10 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 
-// Frame perimeter ring: the full window rectangle with a rounded-rectangle
-// cutout, rendered as a signed-distance field with analytic antialiasing.
-// One primitive: no full-output mask textures, no corner double-blend, crisp
-// edges at any scale without an FBO.
+// Frame perimeter ring with rounded cutout (SDF).
 Item {
     id: root
 

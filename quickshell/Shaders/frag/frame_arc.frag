@@ -1,8 +1,6 @@
 #version 450
 
-// Frame perimeter ring as a signed-distance field: the window rectangle minus
-// a rounded-rectangle cutout. Antialiasing is analytic via fwidth -> crisp at
-// any scale, no FBO and no mask textures.
+// Frame perimeter ring with rounded cutout as one SDF.
 
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
