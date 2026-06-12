@@ -1639,7 +1639,7 @@ Item {
                 SettingsControlledByFrame {
                     visible: themeColorsTab.connectedFrameModeActive
                     parentModal: themeColorsTab.parentModal
-                    settingLabel: I18n.tr("Transparency")
+                    settingLabel: I18n.tr("Surface Opacity")
                     reason: I18n.tr("Managed by Frame in Connected Mode")
                 }
 
@@ -1647,8 +1647,8 @@ Item {
                     tab: "theme"
                     tags: ["surface", "popup", "transparency", "opacity", "modal"]
                     settingKey: "popupTransparency"
-                    text: I18n.tr("Transparency")
-                    description: I18n.tr("Controls opacity of all popouts, modals, and their content layers")
+                    text: I18n.tr("Surface Opacity")
+                    description: I18n.tr("Controls opacity of shell surfaces, popouts, and modals")
                     visible: !themeColorsTab.connectedFrameModeActive
                     value: Math.round(SettingsData.popupTransparency * 100)
                     minimum: 0
@@ -1671,6 +1671,113 @@ Item {
                     defaultValue: 12
                     onSliderValueChanged: newValue => SettingsData.setCornerRadius(newValue)
                 }
+            }
+
+            SettingsCard {
+                tab: "theme"
+                tags: ["blur", "background", "transparency", "glass", "frosted"]
+                title: I18n.tr("Background Blur")
+                settingKey: "blurEnabled"
+                iconName: "blur_on"
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["blur", "background", "transparency", "glass", "frosted"]
+                    settingKey: "blurEnabled"
+                    text: I18n.tr("Background Blur")
+                    description: !BlurService.available ? I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.")
+                    checked: SettingsData.blurEnabled ?? false
+                    enabled: BlurService.available
+                    onToggled: checked => SettingsData.set("blurEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["blur", "foreground", "layers", "contrast", "glass", "frosted"]
+                    settingKey: "blurForegroundLayers"
+                    text: I18n.tr("Foreground Layers")
+                    description: I18n.tr("Show foreground surfaces on blurred panels for stronger contrast")
+                    checked: SettingsData.blurForegroundLayers ?? true
+                    visible: BlurService.available && (SettingsData.blurEnabled ?? false)
+                    enabled: BlurService.available
+                    onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["blur", "foreground", "layers", "outline", "border", "cards", "widgets", "notifications", "control center"]
+                    settingKey: "blurLayerOutlineOpacity"
+                    text: I18n.tr("Layer Outline Opacity")
+                    description: I18n.tr("Controls outlines around blurred foreground cards, pills, and notification cards")
+                    visible: BlurService.available && (SettingsData.blurEnabled ?? false)
+                    value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
+                    minimum: 0
+                    maximum: 40
+                    unit: "%"
+                    defaultValue: 12
+                    onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
+                }
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["blur", "border", "outline", "edge"]
+                    settingKey: "blurBorderColor"
+                    text: I18n.tr("Blur Border Color")
+                    description: I18n.tr("Border color around blurred surfaces")
+                    visible: SettingsData.blurEnabled
+                    options: [I18n.tr("Outline", "blur border color"), I18n.tr("Primary", "blur border color"), I18n.tr("Secondary", "blur border color"), I18n.tr("Text Color", "blur border color"), I18n.tr("Custom", "blur border color")]
+                    currentValue: {
+                        switch (SettingsData.blurBorderColor) {
+                        case "primary":
+                            return I18n.tr("Primary", "blur border color");
+                        case "secondary":
+                            return I18n.tr("Secondary", "blur border color");
+                        case "surfaceText":
+                            return I18n.tr("Text Color", "blur border color");
+                        case "custom":
+                            return I18n.tr("Custom", "blur border color");
+                        default:
+                            return I18n.tr("Outline", "blur border color");
+                        }
+                    }
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Primary", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "primary");
+                        } else if (value === I18n.tr("Secondary", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "secondary");
+                        } else if (value === I18n.tr("Text Color", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "surfaceText");
+                        } else if (value === I18n.tr("Custom", "blur border color")) {
+                            SettingsData.set("blurBorderColor", "custom");
+                            openBlurBorderColorPicker();
+                        } else {
+                            SettingsData.set("blurBorderColor", "outline");
+                        }
+                    }
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["blur", "border", "opacity"]
+                    settingKey: "blurBorderOpacity"
+                    text: I18n.tr("Blur Border Opacity")
+                    description: I18n.tr("Controls the outer edge of protocol-blurred windows")
+                    visible: SettingsData.blurEnabled
+                    value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 35
+                    onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
+                }
+            }
+
+            SettingsCard {
+                tab: "theme"
+                tags: ["elevation", "shadow", "lift", "m3", "material"]
+                title: I18n.tr("Shadows")
+                settingKey: "m3ElevationEnabled"
+                iconName: "layers"
 
                 SettingsToggleRow {
                     tab: "theme"
@@ -1702,7 +1809,7 @@ Item {
                     tags: ["elevation", "shadow", "opacity", "transparency", "m3"]
                     settingKey: "m3ElevationOpacity"
                     text: I18n.tr("Shadow Opacity")
-                    description: I18n.tr("Controls the transparency of the shadow")
+                    description: I18n.tr("Controls the opacity of the shadow")
                     value: SettingsData.m3ElevationOpacity ?? 30
                     minimum: 0
                     maximum: 100
@@ -1853,105 +1960,6 @@ Item {
                     checked: SettingsData.barElevationEnabled ?? true
                     visible: SettingsData.m3ElevationEnabled ?? true
                     onToggled: checked => SettingsData.set("barElevationEnabled", checked)
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["blur", "background", "transparency", "glass", "frosted"]
-                title: I18n.tr("Background Blur")
-                settingKey: "blurEnabled"
-                iconName: "blur_on"
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["blur", "background", "transparency", "glass", "frosted"]
-                    settingKey: "blurEnabled"
-                    text: I18n.tr("Background Blur")
-                    description: !BlurService.available ? I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.")
-                    checked: SettingsData.blurEnabled ?? false
-                    enabled: BlurService.available
-                    onToggled: checked => SettingsData.set("blurEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["blur", "foreground", "layers", "contrast", "glass", "frosted"]
-                    settingKey: "blurForegroundLayers"
-                    text: I18n.tr("Foreground Layers")
-                    description: I18n.tr("Show foreground surfaces on blurred panels for stronger contrast")
-                    checked: SettingsData.blurForegroundLayers ?? true
-                    visible: BlurService.available && (SettingsData.blurEnabled ?? false)
-                    enabled: BlurService.available
-                    onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["blur", "foreground", "layers", "outline", "border", "cards", "widgets", "notifications", "control center"]
-                    settingKey: "blurLayerOutlineOpacity"
-                    text: I18n.tr("Layer Outline Opacity")
-                    description: I18n.tr("Controls outlines around blurred foreground cards, pills, and notification cards")
-                    visible: BlurService.available && (SettingsData.blurEnabled ?? false)
-                    value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
-                    minimum: 0
-                    maximum: 40
-                    unit: "%"
-                    defaultValue: 12
-                    onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["blur", "border", "outline", "edge"]
-                    settingKey: "blurBorderColor"
-                    text: I18n.tr("Blur Border Color")
-                    description: I18n.tr("Border color around blurred surfaces")
-                    visible: SettingsData.blurEnabled
-                    options: [I18n.tr("Outline", "blur border color"), I18n.tr("Primary", "blur border color"), I18n.tr("Secondary", "blur border color"), I18n.tr("Text Color", "blur border color"), I18n.tr("Custom", "blur border color")]
-                    currentValue: {
-                        switch (SettingsData.blurBorderColor) {
-                        case "primary":
-                            return I18n.tr("Primary", "blur border color");
-                        case "secondary":
-                            return I18n.tr("Secondary", "blur border color");
-                        case "surfaceText":
-                            return I18n.tr("Text Color", "blur border color");
-                        case "custom":
-                            return I18n.tr("Custom", "blur border color");
-                        default:
-                            return I18n.tr("Outline", "blur border color");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Primary", "blur border color")) {
-                            SettingsData.set("blurBorderColor", "primary");
-                        } else if (value === I18n.tr("Secondary", "blur border color")) {
-                            SettingsData.set("blurBorderColor", "secondary");
-                        } else if (value === I18n.tr("Text Color", "blur border color")) {
-                            SettingsData.set("blurBorderColor", "surfaceText");
-                        } else if (value === I18n.tr("Custom", "blur border color")) {
-                            SettingsData.set("blurBorderColor", "custom");
-                            openBlurBorderColorPicker();
-                        } else {
-                            SettingsData.set("blurBorderColor", "outline");
-                        }
-                    }
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["blur", "border", "opacity"]
-                    settingKey: "blurBorderOpacity"
-                    text: I18n.tr("Blur Border Opacity")
-                    description: I18n.tr("Controls the outer edge of protocol-blurred windows")
-                    visible: SettingsData.blurEnabled
-                    value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 35
-                    onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
                 }
             }
 

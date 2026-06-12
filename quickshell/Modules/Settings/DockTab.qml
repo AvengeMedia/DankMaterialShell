@@ -643,19 +643,19 @@ Item {
             SettingsControlledByFrame {
                 visible: root.connectedFrameModeActive
                 parentModal: root.parentModal
-                settingLabel: I18n.tr("Dock margin, transparency, and border")
+                settingLabel: I18n.tr("Dock margin, opacity, and border")
                 reason: I18n.tr("Managed by Frame in Connected Mode")
             }
 
             SettingsCard {
                 width: parent.width
                 iconName: "opacity"
-                title: I18n.tr("Transparency")
+                title: I18n.tr("Opacity")
                 settingKey: "dockTransparency"
                 visible: !root.connectedFrameModeActive
 
                 SettingsSliderRow {
-                    text: I18n.tr("Dock Transparency")
+                    text: I18n.tr("Dock Opacity")
                     value: Math.round(SettingsData.dockTransparency * 100)
                     minimum: 0
                     maximum: 100

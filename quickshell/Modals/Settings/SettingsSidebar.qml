@@ -105,8 +105,8 @@ Rectangle {
                 },
                 {
                     "id": "compositor_layout",
-                    "text": CompositorService.isNiri ? "niri" : (CompositorService.isHyprland ? "Hyprland" : "MangoWC"),
-                    "icon": "crop_square",
+                    "text": CompositorService.isNiri ? "Niri" : (CompositorService.isHyprland ? "Hyprland" : "MangoWC"),
+                    "icon": "layers",
                     "tabIndex": 37,
                     "layoutCapable": true
                 }
@@ -118,16 +118,16 @@ Rectangle {
             "icon": "toolbar",
             "children": [
                 {
-                    "id": "dankbar_settings",
-                    "text": I18n.tr("Settings"),
-                    "icon": "tune",
-                    "tabIndex": 3
-                },
-                {
                     "id": "dankbar_appearance",
                     "text": I18n.tr("Appearance"),
                     "icon": "palette",
                     "tabIndex": 6
+                },
+                {
+                    "id": "dankbar_settings",
+                    "text": I18n.tr("Settings"),
+                    "icon": "tune",
+                    "tabIndex": 3
                 },
                 {
                     "id": "dankbar_widgets",

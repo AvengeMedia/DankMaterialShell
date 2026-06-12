@@ -58,6 +58,7 @@
       "targetable",
       "wallpaper"
     ],
+    "icon": "blur_on",
     "description": "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.",
     "conditionKey": "isNiri"
   },
@@ -728,21 +729,6 @@
     "icon": "dashboard"
   },
   {
-    "section": "_tab_3",
-    "label": "Dank Bar",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "dank",
-      "panel",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "icon": "toolbar"
-  },
-  {
     "section": "barDisplay",
     "label": "Display Assignment",
     "tabIndex": 3,
@@ -777,30 +763,19 @@
     "icon": "vertical_align_center"
   },
   {
-    "section": "barSpacing",
-    "label": "Spacing",
+    "section": "_tab_3",
+    "label": "Settings",
     "tabIndex": 3,
     "category": "Dank Bar",
     "keywords": [
       "bar",
-      "between",
       "dank",
-      "edges",
-      "gap",
-      "gaps",
-      "margin",
-      "margins",
-      "padding",
       "panel",
-      "screen",
-      "space",
-      "spacing",
+      "settings",
       "statusbar",
-      "taskbar",
       "topbar"
     ],
-    "icon": "space_bar",
-    "description": "Space between the bar and screen edges"
+    "icon": "tune"
   },
   {
     "section": "barUseOverlayLayer",
@@ -1529,6 +1504,19 @@
     ]
   },
   {
+    "section": "dockTransparency",
+    "label": "Opacity",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "launcher bar",
+      "opacity",
+      "taskbar"
+    ],
+    "icon": "opacity"
+  },
+  {
     "section": "dockTrashFileManager",
     "label": "Open Trash With",
     "tabIndex": 5,
@@ -1746,23 +1734,6 @@
     "icon": "space_bar"
   },
   {
-    "section": "dockTransparency",
-    "label": "Transparency",
-    "tabIndex": 5,
-    "category": "Dock",
-    "keywords": [
-      "alpha",
-      "dock",
-      "launcher bar",
-      "opacity",
-      "taskbar",
-      "translucent",
-      "transparency",
-      "transparent"
-    ],
-    "icon": "opacity"
-  },
-  {
     "section": "dockTrash",
     "label": "Trash",
     "tabIndex": 5,
@@ -1797,21 +1768,6 @@
       "wayland"
     ],
     "description": "Place the dock on the Wayland overlay layer"
-  },
-  {
-    "section": "_tab_6",
-    "label": "Appearance",
-    "tabIndex": 6,
-    "category": "Dank Bar",
-    "keywords": [
-      "appearance",
-      "bar",
-      "dank",
-      "panel",
-      "statusbar",
-      "topbar"
-    ],
-    "icon": "palette"
   },
   {
     "section": "barBorder",
@@ -1861,6 +1817,21 @@
     ],
     "icon": "rounded_corner",
     "description": "Remove corner rounding from the bar"
+  },
+  {
+    "section": "_tab_6",
+    "label": "Dank Bar",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "toolbar"
   },
   {
     "section": "barAppearance",
@@ -1983,6 +1954,25 @@
     "description": "Use a fixed shadow direction for this bar"
   },
   {
+    "section": "barTransparency",
+    "label": "Opacity",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "background",
+      "bar",
+      "controls",
+      "dank",
+      "opacity",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "opacity",
+    "description": "Controls opacity of the bar background"
+  },
+  {
     "section": "barShadow",
     "label": "Shadow Override",
     "tabIndex": 6,
@@ -2001,6 +1991,32 @@
     ],
     "icon": "layers",
     "description": "Override the global shadow with per-bar settings"
+  },
+  {
+    "section": "barSpacing",
+    "label": "Spacing",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "between",
+      "dank",
+      "edges",
+      "gap",
+      "gaps",
+      "margin",
+      "margins",
+      "padding",
+      "panel",
+      "screen",
+      "space",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "space_bar",
+    "description": "Space between the bar and screen edges"
   },
   {
     "section": "trayIconTint",
@@ -2029,28 +2045,6 @@
     ],
     "icon": "filter_b_and_w",
     "description": "Controls how much original icon color is removed before applying tint"
-  },
-  {
-    "section": "barTransparency",
-    "label": "Transparency",
-    "tabIndex": 6,
-    "category": "Dank Bar",
-    "keywords": [
-      "alpha",
-      "background",
-      "bar",
-      "dank",
-      "opacity",
-      "panel",
-      "statusbar",
-      "taskbar",
-      "topbar",
-      "translucent",
-      "transparency",
-      "transparent"
-    ],
-    "icon": "opacity",
-    "description": "Opacity of the bar background"
   },
   {
     "section": "barWidgetOutline",
@@ -3792,7 +3786,6 @@
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
-      "alpha",
       "appearance",
       "colors",
       "controls",
@@ -3804,11 +3797,9 @@
       "shadow",
       "style",
       "theme",
-      "translucent",
-      "transparency",
-      "transparent"
+      "transparency"
     ],
-    "description": "Controls the transparency of the shadow"
+    "description": "Controls the opacity of the shadow"
   },
   {
     "section": "m3ElevationEnabled",
@@ -3833,7 +3824,33 @@
       "style",
       "theme"
     ],
+    "icon": "layers",
     "description": "Material inspired shadows and elevation on modals, popouts, and dialogs"
+  },
+  {
+    "section": "popupTransparency",
+    "label": "Surface Opacity",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "controls",
+      "look",
+      "modal",
+      "modals",
+      "opacity",
+      "popouts",
+      "popup",
+      "scheme",
+      "shell",
+      "style",
+      "surface",
+      "surfaces",
+      "theme",
+      "transparency"
+    ],
+    "description": "Controls opacity of shell surfaces, popouts, and modals"
   },
   {
     "section": "syncModeWithPortal",
@@ -3965,35 +3982,6 @@
     ],
     "icon": "palette",
     "description": "Select the palette algorithm used for wallpaper-based colors"
-  },
-  {
-    "section": "popupTransparency",
-    "label": "Transparency",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "alpha",
-      "appearance",
-      "colors",
-      "content",
-      "controls",
-      "layers",
-      "look",
-      "modal",
-      "modals",
-      "opacity",
-      "popouts",
-      "popup",
-      "scheme",
-      "style",
-      "surface",
-      "their",
-      "theme",
-      "translucent",
-      "transparency",
-      "transparent"
-    ],
-    "description": "Controls opacity of all popouts, modals, and their content layers"
   },
   {
     "section": "matugenTemplateVscode",
@@ -4562,6 +4550,27 @@
       "startup"
     ],
     "description": "Automatically lock the screen when DMS starts"
+  },
+  {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "automatic",
+      "automatically",
+      "before",
+      "lock",
+      "login",
+      "password",
+      "prepares",
+      "screen",
+      "security",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "lockScreenNotificationMode",
@@ -5471,6 +5480,26 @@
     "icon": "dashboard"
   },
   {
+    "section": "notificationBodyFontSize",
+    "label": "Body Font Size",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "body",
+      "font",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "size",
+      "text",
+      "toast"
+    ],
+    "description": "Set the font size for notification body text (htmlBody)"
+  },
+  {
     "section": "notificationCompactMode",
     "label": "Compact",
     "tabIndex": 17,
@@ -5867,22 +5896,19 @@
     "keywords": [
       "alert",
       "alerts",
-      "appear",
-      "choose",
-      "location",
+      "font",
       "messages",
       "notif",
       "notification",
       "notifications",
-      "popup",
       "popups",
-      "position",
-      "screen",
-      "toast",
-      "where"
+      "size",
+      "summary",
+      "text",
+      "toast"
     ],
     "icon": "notifications",
-    "description": "Choose where notification popups appear on screen"
+    "description": "Set the font size for notification summary text"
   },
   {
     "section": "notificationRules",
@@ -6033,6 +6059,26 @@
     "description": "Hide notification content until expanded; popups show collapsed by default"
   },
   {
+    "section": "notificationSummaryFontSize",
+    "label": "Summary Font Size",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "font",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "size",
+      "summary",
+      "text",
+      "toast"
+    ],
+    "description": "Set the font size for notification summary text"
+  },
+  {
     "section": "notificationDedupeEnabled",
     "label": "Suppress Duplicate Notifications",
     "tabIndex": 17,
@@ -6053,6 +6099,32 @@
       "suppress",
       "toast"
     ]
+  },
+  {
+    "section": "notificationShowTimeoutBar",
+    "label": "Timeout Progress Bar",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alerts",
+      "bar",
+      "countdown",
+      "drains",
+      "messages",
+      "notification",
+      "notifications",
+      "panel",
+      "popup",
+      "progress",
+      "show",
+      "statusbar",
+      "taskbar",
+      "timeout",
+      "timer",
+      "toast",
+      "topbar"
+    ],
+    "description": "Show a bar that drains as the popup"
   },
   {
     "section": "osdAlwaysShowValue",
@@ -6698,27 +6770,6 @@
     "description": "Gradually fade the screen before locking with a configurable grace period"
   },
   {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "automatically",
-      "before",
-      "energy",
-      "lock",
-      "power",
-      "prepares",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
-  },
-  {
     "section": "fadeToLockGracePeriod",
     "label": "Lock fade grace period",
     "tabIndex": 21,
@@ -7118,6 +7169,36 @@
       "system"
     ],
     "description": "Maximum number of entries that can be saved"
+  },
+  {
+    "section": "clipboardVisibleEntryActions",
+    "label": "Visible Entry Actions",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "action",
+      "actions",
+      "appear",
+      "buttons",
+      "choose",
+      "clipboard",
+      "cliphist",
+      "copy",
+      "delete",
+      "density",
+      "edit",
+      "entries",
+      "entry",
+      "hide",
+      "history",
+      "linux",
+      "os",
+      "paste",
+      "pin",
+      "system",
+      "visible"
+    ],
+    "description": "Choose which action buttons appear on clipboard entries"
   },
   {
     "section": "_tab_24",
@@ -8399,7 +8480,7 @@
       "topbar",
       "window"
     ],
-    "icon": "crop_square",
+    "icon": "layers",
     "description": "Use custom gaps instead of bar spacing",
     "conditionKey": "isNiri"
   },

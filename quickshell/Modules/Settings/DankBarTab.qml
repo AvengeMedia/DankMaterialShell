@@ -796,18 +796,81 @@ Item {
                 }
             }
 
+            SettingsCard {
+                tab: "appearance"
+                iconName: "opacity"
+                title: I18n.tr("Opacity")
+                settingKey: "barTransparency"
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
+
+                SettingsSliderRow {
+                    id: barTransparencySlider
+                    visible: !SettingsData.frameEnabled
+                    text: I18n.tr("Bar Opacity")
+                    description: I18n.tr("Controls opacity of the bar background")
+                    value: (selectedBarConfig?.transparency ?? 1.0) * 100
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            transparency: finalValue / 100
+                        });
+                    }
+
+                    Binding {
+                        target: barTransparencySlider
+                        property: "value"
+                        value: (selectedBarConfig?.transparency ?? 1.0) * 100
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: widgetTransparencySlider
+                    text: I18n.tr("Widget Opacity")
+                    description: I18n.tr("Controls opacity of widget backgrounds")
+                    value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            widgetTransparency: finalValue / 100
+                        });
+                    }
+
+                    Binding {
+                        target: widgetTransparencySlider
+                        property: "value"
+                        value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsControlledByFrame {
+                    visible: SettingsData.frameEnabled
+                    parentModal: dankBarTab.parentModal
+                    settingLabel: I18n.tr("Bar Opacity")
+                    reason: I18n.tr("Managed by Frame")
+                }
+            }
+
             SettingsControlledByFrame {
-                visible: !dankBarTab.appearanceOnly && SettingsData.frameEnabled
+                visible: dankBarTab.appearanceOnly && SettingsData.frameEnabled
                 parentModal: dankBarTab.parentModal
                 settingLabel: I18n.tr("Bar spacing and size")
                 reason: I18n.tr("Managed by Frame")
             }
 
             SettingsCard {
+                tab: "appearance"
                 iconName: "space_bar"
                 title: I18n.tr("Spacing")
                 settingKey: "barSpacing"
-                visible: !dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !SettingsData.frameEnabled
+                visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !SettingsData.frameEnabled
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
@@ -953,68 +1016,6 @@ Item {
                             restoreMode: Binding.RestoreBinding
                         }
                     }
-                }
-            }
-
-            SettingsCard {
-                tab: "appearance"
-                iconName: "opacity"
-                title: I18n.tr("Transparency")
-                settingKey: "barTransparency"
-                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
-
-                SettingsSliderRow {
-                    id: barTransparencySlider
-                    visible: !SettingsData.frameEnabled
-                    text: I18n.tr("Bar Transparency")
-                    description: I18n.tr("Opacity of the bar background")
-                    value: (selectedBarConfig?.transparency ?? 1.0) * 100
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            transparency: finalValue / 100
-                        });
-                    }
-
-                    Binding {
-                        target: barTransparencySlider
-                        property: "value"
-                        value: (selectedBarConfig?.transparency ?? 1.0) * 100
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsSliderRow {
-                    id: widgetTransparencySlider
-                    text: I18n.tr("Widget Transparency")
-                    description: I18n.tr("Opacity of widget backgrounds")
-                    value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            widgetTransparency: finalValue / 100
-                        });
-                    }
-
-                    Binding {
-                        target: widgetTransparencySlider
-                        property: "value"
-                        value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsControlledByFrame {
-                    visible: SettingsData.frameEnabled
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar Transparency")
-                    reason: I18n.tr("Managed by Frame")
                 }
             }
 
@@ -1358,7 +1359,7 @@ Item {
                 SettingsSliderRow {
                     id: borderOpacitySlider
                     text: I18n.tr("Opacity")
-                    description: I18n.tr("Transparency of the border")
+                    description: I18n.tr("Controls opacity of the border")
                     value: (selectedBarConfig?.borderOpacity ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -1453,7 +1454,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetOutlineOpacitySlider
                     text: I18n.tr("Opacity")
-                    description: I18n.tr("Transparency of the widget outline")
+                    description: I18n.tr("Controls opacity of the widget outline")
                     value: (selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -1562,7 +1563,7 @@ Item {
                 SettingsSliderRow {
                     visible: shadowCard.shadowActive
                     text: I18n.tr("Opacity")
-                    description: I18n.tr("Transparency of the shadow layer")
+                    description: I18n.tr("Controls opacity of the shadow layer")
                     minimum: 10
                     maximum: 100
                     unit: "%"

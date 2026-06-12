@@ -23,9 +23,9 @@ Item {
             SettingsCard {
                 width: parent.width
                 tags: ["niri", "layout", "gaps", "radius", "window", "border"]
-                title: I18n.tr("Niri Layout Overrides").replace("Niri", "niri")
+                title: I18n.tr("Niri Layout Overrides")
                 settingKey: "niriLayout"
-                iconName: "crop_square"
+                iconName: "layers"
                 visible: CompositorService.isNiri
 
                 SettingsToggleRow {
