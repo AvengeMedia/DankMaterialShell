@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Clipboard
 import qs.Modals.Common
@@ -11,11 +10,6 @@ DankModal {
     id: clipboardHistoryModal
 
     layerNamespace: "dms:clipboard"
-
-    HyprlandFocusGrab {
-        windows: [clipboardHistoryModal.contentWindow]
-        active: clipboardHistoryModal.useHyprlandFocusGrab && clipboardHistoryModal.shouldHaveFocus
-    }
 
     function toggle() {
         if (shouldBeVisible) {
@@ -64,6 +58,7 @@ DankModal {
     readonly property bool clipboardAvailable: ClipboardService.clipboardAvailable
 
     visible: false
+    keepContentLoaded: true
     modalWidth: ClipboardConstants.modalWidth
     modalHeight: ClipboardConstants.modalHeight
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)

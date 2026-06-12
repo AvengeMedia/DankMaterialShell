@@ -23,6 +23,7 @@ Item {
     property bool conditionVisible: true
     property bool _visibilityOverride: false
     property bool _visibilityOverrideValue: true
+    readonly property bool _barRevealed: blurBarWindow?.barRevealed ?? true
 
     readonly property bool effectiveVisible: {
         if (_visibilityOverride)
@@ -122,6 +123,11 @@ Item {
             conditionVisible = true;
     }
 
+    on_BarRevealedChanged: {
+        if (_barRevealed && visibilityCommand && !_visibilityOverride)
+            checkVisibility();
+    }
+
     onVisibilityIntervalChanged: {
         if (visibilityInterval > 0 && visibilityCommand) {
             visibilityTimer.restart();
@@ -134,7 +140,7 @@ Item {
         id: visibilityTimer
         interval: root.visibilityInterval * 1000
         repeat: true
-        running: root.visibilityInterval > 0 && root.visibilityCommand !== ""
+        running: root.visibilityInterval > 0 && root.visibilityCommand !== "" && root._barRevealed && !root._visibilityOverride
         onTriggered: root.checkVisibility()
     }
 

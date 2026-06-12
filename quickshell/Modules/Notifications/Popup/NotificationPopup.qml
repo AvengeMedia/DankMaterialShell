@@ -641,21 +641,15 @@ PanelWindow {
             shadowOffsetY: content.shadowOffsetY
             shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
             shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
-            layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
-            layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
-            sourceRect.anchors.fill: undefined
-            sourceRect.x: content.shadowRenderPadding + content.cardInset
-            sourceRect.y: content.shadowRenderPadding + content.cardInset
-            sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
-            sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
-            sourceRect.radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
-            sourceRect.color: win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface
-            sourceRect.antialiasing: true
-            sourceRect.layer.enabled: false
-            sourceRect.layer.textureSize: Qt.size(0, 0)
-            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
-            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
+            sourceX: content.shadowRenderPadding + content.cardInset
+            sourceY: content.shadowRenderPadding + content.cardInset
+            sourceWidth: Math.max(0, content.width - (content.cardInset * 2))
+            sourceHeight: Math.max(0, content.height - (content.cardInset * 2))
+            targetRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+            targetColor: win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface
+            borderColor: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
+            borderWidth: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
         }
 
         // Keep critical accent outside shadow rendering so connected mode still shows it.

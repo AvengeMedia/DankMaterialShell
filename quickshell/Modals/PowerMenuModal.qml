@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -12,11 +11,6 @@ DankModal {
 
     layerNamespace: "dms:power-menu"
     keepPopoutsOpen: true
-
-    HyprlandFocusGrab {
-        windows: [root.contentWindow]
-        active: root.useHyprlandFocusGrab && root.shouldHaveFocus
-    }
 
     property int selectedIndex: 0
     property int selectedRow: 0

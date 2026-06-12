@@ -80,6 +80,7 @@ Item {
 
     readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     readonly property bool useBackgroundDarken: !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
+    readonly property bool useSingleWindow: CompositorService.isHyprland || useBackgroundDarken
     readonly property bool usesOverlayLayer: useBackgroundDarken || SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
     readonly property var effectiveLauncherLayer: LayerShell.fromEnv("DMS_MODAL_LAYER", root.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
         "allow": ["top", "overlay"],
@@ -172,8 +173,6 @@ Item {
 
         keyboardActive = true;
         ModalManager.openModal(modalHandle);
-        if (useHyprlandFocusGrab)
-            focusGrab.active = true;
 
         _ensureContentLoadedAndInitialize(query || "", mode || "");
     }
@@ -211,7 +210,6 @@ Item {
 
         keyboardActive = false;
         spotlightOpen = false;
-        focusGrab.active = false;
         ModalManager.closeModal(modalHandle);
 
         closeCleanupTimer.start();
@@ -262,7 +260,7 @@ Item {
     HyprlandFocusGrab {
         id: focusGrab
         windows: [launcherWindow]
-        active: false
+        active: root.useHyprlandFocusGrab && root.keyboardActive
 
         onCleared: {
             if (spotlightOpen) {
@@ -306,8 +304,9 @@ Item {
     PanelWindow {
         id: clickCatcher
         screen: launcherWindow.screen
-        visible: (spotlightOpen || isClosing) && !root.useBackgroundDarken
+        visible: (spotlightOpen || isClosing) && !root.useSingleWindow
         color: "transparent"
+        updatesEnabled: false
 
         WlrLayershell.namespace: "dms:spotlight:clickcatcher"
         WlrLayershell.layer: root.effectiveLauncherLayer
@@ -373,24 +372,24 @@ Item {
         WlrLayershell.namespace: "dms:spotlight"
         WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : (keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None)
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(keyboardActive, null)
 
         anchors {
             top: true
             left: true
-            right: root.useBackgroundDarken
-            bottom: root.useBackgroundDarken
+            right: root.useSingleWindow
+            bottom: root.useSingleWindow
         }
 
         WlrLayershell.margins {
-            left: root.useBackgroundDarken ? 0 : root.windowX
-            top: root.useBackgroundDarken ? 0 : root.windowY
+            left: root.useSingleWindow ? 0 : root.windowX
+            top: root.useSingleWindow ? 0 : root.windowY
             right: 0
             bottom: 0
         }
 
-        implicitWidth: root.useBackgroundDarken ? 0 : root.windowWidth
-        implicitHeight: root.useBackgroundDarken ? 0 : root.windowHeight
+        implicitWidth: root.useSingleWindow ? 0 : root.windowWidth
+        implicitHeight: root.useSingleWindow ? 0 : root.windowHeight
 
         mask: Region {
             item: launcherInputMask
@@ -400,15 +399,15 @@ Item {
             id: launcherInputMask
             visible: false
             color: "transparent"
-            x: root.useBackgroundDarken ? 0 : modalContainer.x
-            y: root.useBackgroundDarken ? 0 : modalContainer.y
-            width: root.useBackgroundDarken ? launcherWindow.width : modalContainer.width
-            height: root.useBackgroundDarken ? launcherWindow.height : modalContainer.height
+            x: root.useSingleWindow ? 0 : modalContainer.x
+            y: root.useSingleWindow ? 0 : modalContainer.y
+            width: root.useSingleWindow ? launcherWindow.width : modalContainer.width
+            height: root.useSingleWindow ? launcherWindow.height : modalContainer.height
         }
 
         MouseArea {
             anchors.fill: parent
-            enabled: root.useBackgroundDarken && spotlightOpen
+            enabled: root.useSingleWindow && spotlightOpen
             z: -2
             onClicked: root.hide()
         }
@@ -432,12 +431,22 @@ Item {
 
         Item {
             id: modalContainer
-            x: root.useBackgroundDarken ? root.alignedX : root.contentX
-            y: root.useBackgroundDarken ? root.alignedY : root.contentY
+            x: root.useSingleWindow ? root.alignedX : root.contentX
+            y: root.useSingleWindow ? root.alignedY : root.contentY
             width: root.alignedWidth
             height: root.alignedHeight
             visible: _renderActive
             z: 0
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: spotlightOpen
+                hoverEnabled: false
+                acceptedButtons: Qt.AllButtons
+                onPressed: mouse.accepted = true
+                onClicked: mouse.accepted = true
+                z: -1
+            }
 
             property bool _renderActive: contentVisible
             property real publishedScale: contentVisible ? 1 : 0.96

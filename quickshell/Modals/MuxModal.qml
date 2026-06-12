@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell
 import qs.Common
@@ -43,12 +42,6 @@ DankModal {
         function onSessionsChanged() {
             updateFilteredSessions();
         }
-    }
-
-    HyprlandFocusGrab {
-        id: grab
-        windows: [muxModal.contentWindow]
-        active: CompositorService.isHyprland && muxModal.shouldHaveFocus
     }
 
     function toggle() {

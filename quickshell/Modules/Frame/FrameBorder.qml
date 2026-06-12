@@ -1,9 +1,9 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Effects
 import qs.Common
 
+// Frame perimeter ring with rounded cutout (SDF).
 Item {
     id: root
 
@@ -16,39 +16,14 @@ Item {
     required property real cutoutRadius
     property color borderColor: Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
 
-    Rectangle {
-        id: borderRect
-
+    ShaderEffect {
         anchors.fill: parent
-        // Bake frameOpacity into the color alpha rather than using the `opacity` property
-        color: root.borderColor
+        fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/frame_arc.frag.qsb")
 
-        layer.enabled: true
-        layer.effect: MultiEffect {
-            maskSource: cutoutMask
-            maskEnabled: true
-            maskInverted: true
-            maskThresholdMin: 0.5
-            maskSpreadAtMin: 1
-        }
-    }
-
-    Item {
-        id: cutoutMask
-
-        anchors.fill: parent
-        layer.enabled: true
-        visible: false
-
-        Rectangle {
-            anchors {
-                fill: parent
-                topMargin: root.cutoutTopInset
-                bottomMargin: root.cutoutBottomInset
-                leftMargin: root.cutoutLeftInset
-                rightMargin: root.cutoutRightInset
-            }
-            radius: root.cutoutRadius
-        }
+        property real widthPx: width
+        property real heightPx: height
+        property real cutoutRadius: root.cutoutRadius
+        property vector4d cutout: Qt.vector4d(root.cutoutLeftInset, root.cutoutTopInset, root.width - root.cutoutRightInset, root.height - root.cutoutBottomInset)
+        property vector4d surfaceColor: Qt.vector4d(root.borderColor.r, root.borderColor.g, root.borderColor.b, root.borderColor.a)
     }
 }

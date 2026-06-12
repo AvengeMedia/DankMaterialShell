@@ -9,6 +9,8 @@ PanelWindow {
     id: barWindow
     readonly property var log: Log.scoped("DankBarWindow")
 
+    Component.onDestruction: KeyboardFocus.unregisterBarWindow(barWindow)
+
     required property var rootWindow
     required property var barConfig
     property var modelData: item
@@ -17,6 +19,8 @@ PanelWindow {
     property var leftWidgetsModel
     property var centerWidgetsModel
     property var rightWidgetsModel
+
+    readonly property bool barRevealed: inputMask.showing
 
     property var controlCenterButtonRef: null
     property var clockButtonRef: null
@@ -555,6 +559,7 @@ PanelWindow {
     color: "transparent"
 
     Component.onCompleted: {
+        KeyboardFocus.registerBarWindow(barWindow);
         updateGpuTempConfig();
         _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
@@ -956,8 +961,13 @@ PanelWindow {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                         onClicked: {
                             const screenName = barWindow.screen?.name;
-                            if (screenName && PopoutManager.currentPopoutsByScreen[screenName])
+                            if (!screenName)
+                                return;
+                            if (PopoutManager.currentPopoutsByScreen[screenName])
                                 PopoutManager.closeAllPopouts();
+                            if (ModalManager.currentModalsByScreen[screenName])
+                                ModalManager.closeAllModalsExcept(null);
+                            TrayMenuManager.closeAllMenus();
                         }
                     }
 

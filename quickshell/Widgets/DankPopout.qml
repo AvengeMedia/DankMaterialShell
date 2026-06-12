@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Hyprland
 import qs.Common
 import qs.Services
 
@@ -50,6 +51,20 @@ Item {
     readonly property var contentLoader: impl.item ? impl.item.contentLoader : _fallbackContentLoader
     readonly property var overlayLoader: impl.item ? impl.item.overlayLoader : _fallbackOverlayLoader
     readonly property var backgroundWindow: impl.item ? impl.item.backgroundWindow : null
+    readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
+
+    // Hyprland OnDemand grab: whitelist popout surfaces and bars so dismiss clicks still land.
+    HyprlandFocusGrab {
+        windows: {
+            const list = [];
+            if (root.contentWindow)
+                list.push(root.contentWindow);
+            if (root.backgroundWindow && root.backgroundWindow !== root.contentWindow)
+                list.push(root.backgroundWindow);
+            return list.concat(KeyboardFocus.barWindows);
+        }
+        active: KeyboardFocus.wantsGrab(root.shouldBeVisible, root.customKeyboardFocus)
+    }
 
     Loader {
         id: _fallbackContentLoader
@@ -127,8 +142,6 @@ Item {
         return _usesConnectedBackendForScreen(targetScreen) ? connectedComp : standaloneComp;
     }
 
-    // Defer Loader source-component swap until impl is fully closed; avoids
-    // tearing down a popout mid-animation when frame mode is toggled.
     function _maybeResolveBackend() {
         _resolveBackendForScreen(screen);
     }

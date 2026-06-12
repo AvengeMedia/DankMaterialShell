@@ -1,7 +1,6 @@
 import QtQml
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -27,11 +26,6 @@ DankModal {
         });
         if (!Object.keys(KeybindsService.cheatsheet).length && KeybindsService.cheatsheetAvailable)
             KeybindsService.loadCheatsheet();
-    }
-
-    HyprlandFocusGrab {
-        windows: [root.contentWindow]
-        active: root.useHyprlandFocusGrab && root.shouldHaveFocus
     }
 
     function scrollDown() {

@@ -16,6 +16,11 @@ Item {
     property real blurWidth: 0
     property real blurHeight: 0
     property real blurRadius: 0
+    property bool clipEnabled: false
+    property real clipX: blurX
+    property real clipY: blurY
+    property real clipWidth: blurWidth
+    property real clipHeight: blurHeight
 
     readonly property bool _active: blurEnabled && BlurService.enabled && !!targetWindow
 
@@ -26,6 +31,14 @@ Item {
         width: root.blurWidth
         height: root.blurHeight
         radius: root.blurRadius
+
+        Region {
+            intersection: Intersection.Intersect
+            x: root.clipEnabled ? root.clipX : root.blurX
+            y: root.clipEnabled ? root.clipY : root.blurY
+            width: root.clipEnabled ? root.clipWidth : root.blurWidth
+            height: root.clipEnabled ? root.clipHeight : root.blurHeight
+        }
     }
 
     function _apply() {
@@ -39,10 +52,7 @@ Item {
             targetWindow.BackgroundEffect.blurRegion = null;
     }
 
-    // Force BackgroundEffect to re-publish the blur region on the current wl_surface.
-    // Clearing first bypasses Quickshell's same-Region dedup in BackgroundEffect::setBlurRegion,
-    // setting pendingBlurRegion=true so the next polish actually ships the region — needed
-    // when the underlying surface has been remapped (e.g. PanelWindow.screen change).
+    // Re-publish blur region after wl_surface remaps (e.g. screen change).
     function kick() {
         if (!targetWindow)
             return;

@@ -31,7 +31,7 @@ Rectangle {
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
     clip: false
-    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !BlurService.enabled
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
 
     ElevationShadow {
         id: shadowLayer
