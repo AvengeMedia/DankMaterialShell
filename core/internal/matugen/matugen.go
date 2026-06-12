@@ -811,17 +811,17 @@ func refreshGTK4() {
 
 	var toggle string
 	if current == "prefer-dark" {
-		toggle = "default"
+		toggle = "prefer-light"
 	} else {
 		toggle = "prefer-dark"
 	}
 
-	if err := utils.GsettingsSet("org.gnome.desktop.interface", "color-scheme", toggle); err != nil {
+	if err := utils.DconfSet("org.gnome.desktop.interface", "color-scheme", toggle); err != nil {
 		log.Warnf("Failed to toggle color-scheme for GTK4 refresh: %v", err)
 		return
 	}
 	time.Sleep(50 * time.Millisecond)
-	if err := utils.GsettingsSet("org.gnome.desktop.interface", "color-scheme", current); err != nil {
+	if err := utils.DconfSet("org.gnome.desktop.interface", "color-scheme", current); err != nil {
 		log.Warnf("Failed to restore color-scheme for GTK4 refresh: %v", err)
 	}
 }
@@ -868,10 +868,10 @@ func signalByName(name string, sig syscall.Signal) {
 func syncColorScheme(mode ColorMode) {
 	scheme := "prefer-dark"
 	if mode == ColorModeLight {
-		scheme = "default"
+		scheme = "prefer-light"
 	}
 
-	if err := utils.GsettingsSet("org.gnome.desktop.interface", "color-scheme", scheme); err != nil {
+	if err := utils.DconfSet("org.gnome.desktop.interface", "color-scheme", scheme); err != nil {
 		log.Warnf("Failed to sync color-scheme: %v", err)
 	}
 }

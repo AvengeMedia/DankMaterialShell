@@ -29,3 +29,13 @@ func GsettingsSet(schema, key, value string) error {
 	}
 	return exec.Command("dconf", "write", dconfPath(schema, key), "'"+value+"'").Run()
 }
+
+// DconfSet writes a value using dconf write, falling back to gsettings.
+// Prefer this for settings like color-scheme where dconf is more universally
+// available (e.g. on niri, NixOS) and does not require GSettings schema setup.
+func DconfSet(schema, key, value string) error {
+	if err := exec.Command("dconf", "write", dconfPath(schema, key), "'"+value+"'").Run(); err == nil {
+		return nil
+	}
+	return exec.Command("gsettings", "set", schema, key, value).Run()
+}
