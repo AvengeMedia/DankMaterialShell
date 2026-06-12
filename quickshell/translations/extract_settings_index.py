@@ -546,6 +546,7 @@ def main():
     output_path = script_dir / "settings_search_index.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(all_entries, f, indent=2, ensure_ascii=False)
+        f.write("\n")
 
     print(f"Found {len(settings_entries)} searchable settings")
     print(f"Found {len(tab_entries)} tab entries")
