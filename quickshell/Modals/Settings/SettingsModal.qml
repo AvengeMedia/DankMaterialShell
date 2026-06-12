@@ -53,20 +53,21 @@ FloatingWindow {
         visible = !visible;
     }
 
+    function setTabIndex(tabIndex: int) {
+        if (tabIndex < 0)
+            return;
+        currentTabIndex = tabIndex;
+        sidebar.autoExpandForTab(tabIndex);
+    }
+
     function showWithTab(tabIndex: int) {
-        if (tabIndex >= 0) {
-            currentTabIndex = tabIndex;
-            sidebar.autoExpandForTab(tabIndex);
-        }
+        setTabIndex(tabIndex);
         visible = true;
     }
 
     function showWithTabName(tabName: string) {
         var idx = sidebar.resolveTabIndex(tabName);
-        if (idx >= 0) {
-            currentTabIndex = idx;
-            sidebar.autoExpandForTab(idx);
-        }
+        setTabIndex(idx);
         visible = true;
     }
 
