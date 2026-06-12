@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell.Wayland
 import qs.Common
 import qs.Modals.Clipboard
 import qs.Modals.Common
@@ -95,6 +96,35 @@ DankPopout {
         id: clearConfirmDialog
         confirmButtonText: I18n.tr("Clear All")
         confirmButtonColor: Theme.primary
+        onShouldBeVisibleChanged: {
+            if (shouldBeVisible) {
+                root.customKeyboardFocus = WlrKeyboardFocus.None;
+                selectedButton = 0;
+                keyboardNavigation = true;
+                return;
+            }
+            root.customKeyboardFocus = null;
+            Qt.callLater(function () {
+                if (!root.shouldBeVisible || !root.contentLoader.item) {
+                    return;
+                }
+                root.contentLoader.item.forceActiveFocus();
+                if (root.contentLoader.item.searchField) {
+                    root.contentLoader.item.searchField.forceActiveFocus();
+                }
+            });
+        }
+        Connections {
+            target: clearConfirmDialog.modalFocusScope.Keys
+            function onPressed(event) {
+                if (!clearConfirmDialog.shouldBeVisible || event.key !== Qt.Key_Backtab) {
+                    return;
+                }
+                clearConfirmDialog.selectedButton = clearConfirmDialog.selectedButton === -1 ? 1 : (clearConfirmDialog.selectedButton - 1 + 2) % 2;
+                clearConfirmDialog.keyboardNavigation = true;
+                event.accepted = true;
+            }
+        }
     }
 
     content: Component {

@@ -82,6 +82,15 @@ FocusScope {
         ClipboardService.clearAll();
     }
 
+    function confirmClearAll() {
+        const hasPinned = pinnedCount > 0;
+        const message = hasPinned ? I18n.tr("This will delete all unpinned entries. %1 pinned entries will be kept.").arg(pinnedCount) : I18n.tr("This will permanently delete all clipboard history.");
+        clearConfirmDialog.show(I18n.tr("Clear History?"), message, function () {
+            clearAll();
+            hide();
+        }, function () {});
+    }
+
     function getEntryPreview(entry) {
         return ClipboardService.getEntryPreview(entry);
     }
@@ -135,7 +144,6 @@ FocusScope {
             id: historyContent
             anchors.fill: parent
             modal: root
-            clearConfirmDialog: root.clearConfirmDialog
         }
     }
 
