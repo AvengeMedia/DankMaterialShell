@@ -125,8 +125,6 @@ QtObject {
             if (!ClipboardService.keyboardNavigationActive) {
                 ClipboardService.keyboardNavigationActive = true;
                 ClipboardService.selectedIndex = 0;
-            } else if (ClipboardService.selectedIndex === 0) {
-                ClipboardService.keyboardNavigationActive = false;
             } else {
                 selectPrevious();
             }
@@ -155,8 +153,6 @@ QtObject {
                 if (!ClipboardService.keyboardNavigationActive) {
                     ClipboardService.keyboardNavigationActive = true;
                     ClipboardService.selectedIndex = 0;
-                } else if (ClipboardService.selectedIndex === 0) {
-                    ClipboardService.keyboardNavigationActive = false;
                 } else {
                     selectPrevious();
                 }
