@@ -1,6 +1,10 @@
 [templates.dmsgtk3]
 input_path = 'SHELL_DIR/matugen/templates/gtk-light-colors.css'
-output_path = 'CONFIG_DIR/gtk-3.0/dank-colors.css'
+output_path = 'DATA_DIR/themes/adw-gtk3/gtk-3.0/dank-colors.css'
+post_hook = '''
+sed -i.backup '/\/\* BEGIN DMS OVERRIDE \*\//,/\/\* END DMS OVERRIDE \*\//d' 'DATA_DIR/themes/adw-gtk3/gtk-3.0/gtk.css';
+cat 'DATA_DIR/themes/adw-gtk3/gtk-3.0/dank-colors.css' >> 'DATA_DIR/themes/adw-gtk3/gtk-3.0/gtk.css'
+'''
 
 [templates.dmsgtk4]
 input_path = 'SHELL_DIR/matugen/templates/gtk-colors.css'
