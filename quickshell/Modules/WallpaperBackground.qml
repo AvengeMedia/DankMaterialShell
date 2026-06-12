@@ -84,22 +84,10 @@ Variants {
 
             readonly property bool transitioning: transitionAnimation.running
             property bool effectActive: false
-            property bool _renderSettling: true
-            property bool _overviewBlurSettling: false
             property bool useNextForEffect: false
             property string pendingWallpaper: ""
             property string _deferredSource: ""
             readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
-
-            Connections {
-                target: currentWallpaper
-                function onStatusChanged() {
-                    if (currentWallpaper.status !== Image.Ready && currentWallpaper.status !== Image.Error)
-                        return;
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
-                }
-            }
 
             function _recheckScreenScale() {
                 const newScale = CompositorService.getScreenScale(modelData);
@@ -110,31 +98,9 @@ Variants {
             }
 
             Connections {
-                target: wallpaperWindow
-                function onWidthChanged() {
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
-                }
-                function onHeightChanged() {
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
-                }
-            }
-
-            Connections {
-                target: Quickshell
-                function onScreensChanged() {
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
-                }
-            }
-
-            Connections {
                 target: NiriService
                 function onDisplayScalesChanged() {
                     root._recheckScreenScale();
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
                 }
             }
 
@@ -142,29 +108,6 @@ Variants {
                 target: WlrOutputService
                 function onWlrOutputAvailableChanged() {
                     root._recheckScreenScale();
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
-                }
-            }
-
-            Connections {
-                target: NiriService
-                function onInOverviewChanged() {
-                    root._overviewBlurSettling = true;
-                    overviewBlurSettleTimer.restart();
-                }
-            }
-
-            Connections {
-                target: SettingsData
-                function onBlurWallpaperOnOverviewChanged() {
-                    root._overviewBlurSettling = true;
-                    overviewBlurSettleTimer.restart();
-                }
-
-                function onWallpaperFillModeChanged() {
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
                 }
             }
 
@@ -181,26 +124,22 @@ Variants {
                 }
             }
 
-            Connections {
-                target: IdleService
-                function onIsShellLockedChanged() {
-                    if (!IdleService.isShellLocked) {
-                        root._renderSettling = true;
-                        renderSettleTimer.restart();
-                    }
-                }
-            }
+            function handleTransitionLoadError(failedSource) {
+                log.warn("failed to load candidate wallpaper for", modelData.name + ":", failedSource);
+                transitionDelayTimer.stop();
+                transitionAnimation.stop();
+                root.useNextForEffect = false;
+                root.effectActive = false;
+                root.transitionProgress = 0.0;
+                currentWallpaper.layer.enabled = false;
+                nextWallpaper.layer.enabled = false;
+                nextWallpaper.source = "";
 
-            Timer {
-                id: renderSettleTimer
-                interval: 1000
-                onTriggered: root._renderSettling = false
-            }
-
-            Timer {
-                id: overviewBlurSettleTimer
-                interval: 150
-                onTriggered: root._overviewBlurSettling = false
+                if (!root.pendingWallpaper)
+                    return;
+                const pending = root.pendingWallpaper;
+                root.pendingWallpaper = "";
+                Qt.callLater(() => root.changeWallpaper(pending, true));
             }
 
             function getFillMode(modeName) {
@@ -227,11 +166,6 @@ Variants {
             }
 
             Component.onCompleted: {
-                wallpaperWindow.updatesEnabled = Qt.binding(() => !root.source || root.effectActive || root._renderSettling || root.overviewBlurActive || root._overviewBlurSettling || root.pendingWallpaper !== "" || root._deferredSource !== "" || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
-
-                if (!source) {
-                    root._renderSettling = false;
-                }
                 isInitialized = true;
             }
 
@@ -262,8 +196,6 @@ Variants {
                 transitionAnimation.stop();
                 root.transitionProgress = 0.0;
                 root.effectActive = false;
-                root._renderSettling = true;
-                renderSettleTimer.restart();
                 root.screenScale = CompositorService.getScreenScale(modelData);
                 currentWallpaper.source = newSource;
                 nextWallpaper.source = "";
@@ -328,9 +260,6 @@ Variants {
                     break;
                 }
 
-                root._renderSettling = true;
-                renderSettleTimer.restart();
-
                 nextWallpaper.source = newPath;
 
                 if (nextWallpaper.status === Image.Ready)
@@ -339,7 +268,7 @@ Variants {
 
             Loader {
                 anchors.fill: parent
-                active: !root.source || root.isColorSource
+                active: !root.source || root.isColorSource || currentWallpaper.status === Image.Error
                 asynchronous: true
 
                 sourceComponent: DankBackdrop {
@@ -364,6 +293,12 @@ Variants {
                 cache: true
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
                 fillMode: root.getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
+
+                onStatusChanged: {
+                    if (status === Image.Error) {
+                        log.warn("failed to load active wallpaper for", modelData.name + ":", source);
+                    }
+                }
             }
 
             Image {
@@ -380,11 +315,13 @@ Variants {
                 fillMode: root.getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
 
                 onStatusChanged: {
+                    if (status === Image.Error) {
+                        root.handleTransitionLoadError(source);
+                        return;
+                    }
                     if (status !== Image.Ready)
                         return;
                     if (root.actualTransitionType === "none") {
-                        root._renderSettling = true;
-                        renderSettleTimer.restart();
                         currentWallpaper.source = source;
                         nextWallpaper.source = "";
                         root.transitionProgress = 0.0;
@@ -632,8 +569,6 @@ Variants {
                     root.transitionProgress = 0.0;
                     currentWallpaper.layer.enabled = false;
                     nextWallpaper.layer.enabled = false;
-                    root._renderSettling = true;
-                    renderSettleTimer.restart();
                     root.effectActive = false;
 
                     if (!root.pendingWallpaper)

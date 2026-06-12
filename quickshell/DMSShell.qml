@@ -64,27 +64,15 @@ Item {
         }
     }
 
-    property bool wallpaperSurfacesLoaded: true
-
     Loader {
         id: blurredWallpaperBackgroundLoader
-        active: root.wallpaperSurfacesLoaded && SettingsData.blurredWallpaperLayer && CompositorService.isNiri
+        active: SettingsData.blurredWallpaperLayer && CompositorService.isNiri
         asynchronous: false
 
         sourceComponent: BlurredWallpaperBackground {}
     }
 
-    DeferredAction {
-        id: wallpaperSurfaceReloadAction
-        onTriggered: root.wallpaperSurfacesLoaded = true
-    }
-
-    Loader {
-        id: wallpaperBackgroundLoader
-        active: root.wallpaperSurfacesLoaded
-        asynchronous: false
-        sourceComponent: WallpaperBackground {}
-    }
+    WallpaperBackground {}
 
     DesktopWidgetLayer {}
 
@@ -396,11 +384,6 @@ Item {
             if (root.frameSurfacesLoaded) {
                 root.frameSurfacesLoaded = false;
                 frameSurfaceReloadAction.schedule();
-            }
-
-            if (root.wallpaperSurfacesLoaded) {
-                root.wallpaperSurfacesLoaded = false;
-                wallpaperSurfaceReloadAction.schedule();
             }
 
             root.dockEnabled = false;
