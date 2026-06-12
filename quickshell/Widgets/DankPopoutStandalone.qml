@@ -589,15 +589,19 @@ Item {
             id: popoutBlur
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: root.fluidStandaloneActive
             readonly property real op: Math.max(0, Math.min(1, (morph.openProgress - 0.08) * 1.6))
-            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : root.shouldBeVisible
+            readonly property bool revealClipActive: root.fluidStandaloneActive
 
-            blurX: trackBlurFromBarEdge ? contentContainer.x + contentContainer.revealX : contentContainer.x + contentContainer.width * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
-            blurY: trackBlurFromBarEdge ? contentContainer.y + contentContainer.revealY : contentContainer.y + contentContainer.height * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealWidth : contentContainer.width * s * op) : 0
-            blurHeight: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealHeight : contentContainer.height * s * op) : 0
+            blurX: revealClipActive ? contentContainer.x : contentContainer.x + contentContainer.width * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
+            blurY: revealClipActive ? contentContainer.y : contentContainer.y + contentContainer.height * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+            blurWidth: root.shouldBeVisible ? (revealClipActive ? contentContainer.width : contentContainer.width * s * op) : 0
+            blurHeight: root.shouldBeVisible ? (revealClipActive ? contentContainer.height : contentContainer.height * s * op) : 0
             blurRadius: Theme.cornerRadius
+            clipEnabled: revealClipActive
+            clipX: contentContainer.x + contentContainer.revealX
+            clipY: contentContainer.y + contentContainer.revealY
+            clipWidth: root.shouldBeVisible ? contentContainer.revealWidth : 0
+            clipHeight: root.shouldBeVisible ? contentContainer.revealHeight : 0
         }
 
         WlrLayershell.namespace: root.layerNamespace
@@ -702,6 +706,8 @@ Item {
             QtObject {
                 id: morph
                 property real openProgress: 0
+                onOpenProgressChanged: if (root.fluidStandaloneActive)
+                    root._kickBlurCommit()
                 Behavior on openProgress {
                     enabled: root.animationsEnabled
                     NumberAnimation {

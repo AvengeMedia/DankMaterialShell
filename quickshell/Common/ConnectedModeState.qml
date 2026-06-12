@@ -74,10 +74,6 @@ Singleton {
         }, descriptor);
     }
 
-    function legacySurfaceState(screenName, kind) {
-        return SurfaceDescriptor.toLegacyState(surfaceDescriptor(screenName, kind));
-    }
-
     function hasSurfaceDescriptor(screenName, kind, ownerId) {
         const descriptor = surfaceDescriptor(screenName, kind);
         return descriptor.phase !== "hidden" && (!ownerId || descriptor.ownerId === ownerId);
@@ -121,20 +117,6 @@ Singleton {
         else
             delete next[screenName];
         surfaceDescriptors = next;
-        return true;
-    }
-
-    function _setSurfaceAnimation(screenName, kind, ownerId, x, y) {
-        const current = surfaceDescriptor(screenName, kind);
-        if (current.phase === "hidden" || (ownerId && current.ownerId !== ownerId))
-            return false;
-        return true;
-    }
-
-    function _setSurfaceBody(screenName, kind, ownerId, x, y, width, height) {
-        const current = surfaceDescriptor(screenName, kind);
-        if (current.phase === "hidden" || (ownerId && current.ownerId !== ownerId))
-            return false;
         return true;
     }
 
@@ -289,7 +271,6 @@ Singleton {
             if (!isNaN(nextY) && popoutAnimY !== nextY)
                 popoutAnimY = nextY;
         }
-        _setSurfaceAnimation(popoutScreen, "popout", claimId, animX, animY);
         return true;
     }
 
@@ -316,7 +297,6 @@ Singleton {
             if (!isNaN(nextH) && popoutBodyH !== nextH)
                 popoutBodyH = nextH;
         }
-        _setSurfaceBody(popoutScreen, "popout", claimId, bodyX, bodyY, bodyW, bodyH);
         return true;
     }
 
@@ -352,8 +332,8 @@ Singleton {
             "phase": normalized.reveal ? (state.phase || "open") : "hidden"
         });
         const previous = dockStates[screenName] || emptyDockState;
-        const legacyChanged = !_sameDockState(dockStates[screenName], normalized);
-        if (legacyChanged) {
+        const stateChanged = !_sameDockState(dockStates[screenName], normalized);
+        if (stateChanged) {
             const next = _cloneDict(dockStates);
             next[screenName] = normalized;
             dockStates = next;
@@ -397,7 +377,6 @@ Singleton {
             "y": numY
         };
         dockSlides = next;
-        _setSurfaceAnimation(screenName, "dock", "dock:" + screenName, numX, numY);
         return true;
     }
 
@@ -451,8 +430,8 @@ Singleton {
             "phase": normalized.visible ? (state.phase || "open") : "hidden"
         });
         const previous = notificationStates[screenName] || emptyNotificationState;
-        const legacyChanged = !_sameNotificationState(notificationStates[screenName], normalized);
-        if (legacyChanged) {
+        const stateChanged = !_sameNotificationState(notificationStates[screenName], normalized);
+        if (stateChanged) {
             const next = _cloneDict(notificationStates);
             next[screenName] = normalized;
             notificationStates = next;
@@ -573,10 +552,6 @@ Singleton {
         return updateModalState(screenName, state, ownerId);
     }
 
-    function setModalState(screenName, state) {
-        return updateModalState(screenName, state, null);
-    }
-
     function clearModalState(screenName, ownerId) {
         if (!screenName)
             return false;
@@ -617,7 +592,6 @@ Singleton {
             "animY": nay
         });
         modalStates = next;
-        _setSurfaceAnimation(screenName, "modal", ownerId, animX, animY);
         return true;
     }
 
@@ -641,7 +615,6 @@ Singleton {
             "bodyH": nh
         });
         modalStates = next;
-        _setSurfaceBody(screenName, "modal", ownerId, bodyX, bodyY, bodyW, bodyH);
         return true;
     }
 

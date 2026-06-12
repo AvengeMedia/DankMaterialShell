@@ -747,16 +747,36 @@ Variants {
                         onHeightChanged: dock._syncDockChromeState()
                     }
 
-                    ConnectedShape {
+                    Item {
+                        id: dockConnectedChrome
                         visible: Theme.isConnectedEffect && dock.reveal && !SettingsData.connectedFrameModeActive
-                        barSide: dock.connectedBarSide
-                        bodyWidth: dockBackground.width
-                        bodyHeight: dockBackground.height
-                        connectorRadius: Theme.connectedCornerRadius
-                        surfaceRadius: dock.surfaceRadius
-                        fillColor: dock.surfaceColor
-                        x: dockBackground.x - bodyX
-                        y: dockBackground.y - bodyY
+                        readonly property real extraLeft: dock.isVertical ? 0 : Theme.connectedCornerRadius
+                        readonly property real extraTop: dock.isVertical ? Theme.connectedCornerRadius : 0
+                        readonly property real bodyRadius: dock.surfaceRadius
+                        readonly property bool barTop: dock.connectedBarSide === "top"
+                        readonly property bool barBottom: dock.connectedBarSide === "bottom"
+                        readonly property bool barLeft: dock.connectedBarSide === "left"
+                        readonly property bool barRight: dock.connectedBarSide === "right"
+
+                        x: dockBackground.x - extraLeft
+                        y: dockBackground.y - extraTop
+                        width: dockBackground.width + extraLeft * 2
+                        height: dockBackground.height + extraTop * 2
+
+                        ShaderEffect {
+                            anchors.fill: parent
+                            fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/connected_chrome.frag.qsb")
+
+                            property real widthPx: width
+                            property real heightPx: height
+                            property vector4d surfaceColor: Qt.vector4d(dock.surfaceColor.r, dock.surfaceColor.g, dock.surfaceColor.b, dock.surfaceColor.a)
+                            property vector4d shadowColor: Qt.vector4d(0, 0, 0, 0)
+                            property vector4d shadowParam: Qt.vector4d(0, 0, 0, 0)
+                            property vector4d ambientParam: Qt.vector4d(0, 0, 0, 0)
+                            property vector4d bodyRect: Qt.vector4d(dockConnectedChrome.extraLeft, dockConnectedChrome.extraTop, dockBackground.width, dockBackground.height)
+                            property vector4d cornerRadius: Qt.vector4d(dockConnectedChrome.barTop || dockConnectedChrome.barLeft ? 0 : dockConnectedChrome.bodyRadius, dockConnectedChrome.barTop || dockConnectedChrome.barRight ? 0 : dockConnectedChrome.bodyRadius, dockConnectedChrome.barBottom || dockConnectedChrome.barRight ? 0 : dockConnectedChrome.bodyRadius, dockConnectedChrome.barBottom || dockConnectedChrome.barLeft ? 0 : dockConnectedChrome.bodyRadius)
+                            property vector4d edgeParam: Qt.vector4d(dockConnectedChrome.barTop ? 0 : (dockConnectedChrome.barBottom ? 1 : (dockConnectedChrome.barLeft ? 2 : 3)), Theme.connectedCornerRadius, 0, 0)
+                        }
                     }
 
                     Shape {

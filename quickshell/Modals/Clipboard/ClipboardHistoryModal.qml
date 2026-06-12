@@ -58,6 +58,7 @@ DankModal {
     readonly property bool clipboardAvailable: ClipboardService.clipboardAvailable
 
     visible: false
+    keepContentLoaded: true
     modalWidth: ClipboardConstants.modalWidth
     modalHeight: ClipboardConstants.modalHeight
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)

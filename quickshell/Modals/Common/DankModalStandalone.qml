@@ -205,6 +205,7 @@ Item {
         id: clickCatcher
         visible: false
         color: "transparent"
+        updatesEnabled: false
 
         WlrLayershell.namespace: root.layerNamespace + ":clickcatcher"
         WlrLayershell.layer: WlrLayershell.Top

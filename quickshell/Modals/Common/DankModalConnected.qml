@@ -87,10 +87,8 @@ Item {
     property real frozenMotionOffsetX: 0
     property real frozenMotionOffsetY: 0
     readonly property alias contentWindow: contentWindow
-    readonly property alias clickCatcher: clickCatcher
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
     readonly property bool useBackground: false
-    readonly property bool useSingleWindow: CompositorService.isHyprland
 
     signal opened
     signal dialogClosed
@@ -244,22 +242,16 @@ Item {
         const focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen) {
             contentWindow.screen = focusedScreen;
-            if (!useSingleWindow)
-                clickCatcher.screen = focusedScreen;
         }
 
         ModalManager.openModal(modalHandle);
         if (Theme.isDirectionalEffect || root.useBackground) {
-            if (!useSingleWindow)
-                clickCatcher.visible = true;
             contentWindow.visible = true;
         }
 
         Qt.callLater(() => {
             animationsEnabled = true;
             shouldBeVisible = true;
-            if (!useSingleWindow && !clickCatcher.visible)
-                clickCatcher.visible = true;
             if (!contentWindow.visible)
                 contentWindow.visible = true;
             opened();
@@ -286,8 +278,6 @@ Item {
         ModalManager.closeModal(modalHandle);
         closeTimer.stop();
         contentWindow.visible = false;
-        if (!useSingleWindow)
-            clickCatcher.visible = false;
         dialogClosed();
         Qt.callLater(() => animationsEnabled = true);
     }
@@ -326,8 +316,6 @@ Item {
             const newScreen = CompositorService.getFocusedScreen();
             if (newScreen) {
                 contentWindow.screen = newScreen;
-                if (!useSingleWindow)
-                    clickCatcher.screen = newScreen;
             }
         }
     }
@@ -339,29 +327,12 @@ Item {
             if (shouldBeVisible)
                 return;
             contentWindow.visible = false;
-            if (!useSingleWindow)
-                clickCatcher.visible = false;
             dialogClosed();
         }
     }
 
-    // shadowRenderPadding is zeroed when frame owns the chrome
-    // Wayland then clips any content translating past
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
-    readonly property real shadowRenderPadding: (!frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
-    readonly property real shadowMotionPadding: {
-        if (frameOwnsConnectedChrome)
-            return 0;
-        if (animationType === "slide")
-            return 30;
-        if (Theme.isDirectionalEffect)
-            return Math.max(Math.max(0, animationOffset), Math.max(alignedWidth, alignedHeight) * 0.9);
-        if (Theme.isDepthEffect)
-            return Math.max(Math.max(0, animationOffset), Math.max(alignedWidth, alignedHeight) * 0.35);
-        return Math.max(0, animationOffset);
-    }
-    readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
 
@@ -435,57 +406,6 @@ Item {
         })(), dpr)
 
     PanelWindow {
-        id: clickCatcher
-        visible: false
-        color: "transparent"
-
-        WlrLayershell.namespace: root.layerNamespace + ":clickcatcher"
-        WlrLayershell.layer: WlrLayershell.Top
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
-        }
-
-        mask: Region {
-            item: Rectangle {
-                x: root.alignedX
-                y: root.alignedY
-                width: root.alignedWidth
-                height: root.alignedHeight
-            }
-            intersection: Intersection.Xor
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: !root.useSingleWindow && root.closeOnBackgroundClick && root.shouldBeVisible
-            onClicked: root.backgroundClicked()
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            z: -1
-            color: "black"
-            opacity: (!root.useSingleWindow && root.useBackground) ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
-            visible: opacity > 0
-
-            Behavior on opacity {
-                enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
-                NumberAnimation {
-                    duration: Math.round(Theme.variantDuration(root.animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-        }
-    }
-
-    PanelWindow {
         id: contentWindow
         visible: false
         color: "transparent"
@@ -494,8 +414,8 @@ Item {
             targetWindow: contentWindow
             blurEnabled: root.effectiveBlurEnabled && !root.frameOwnsConnectedChrome
             readonly property real s: Math.min(1, modalContainer.scaleValue)
-            blurX: modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
-            blurY: modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
+            blurX: connectedReveal.x + modalContainer.x + modalContainer.width * (1 - s) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
+            blurY: connectedReveal.y + modalContainer.y + modalContainer.height * (1 - s) * 0.5 + Theme.snap(modalContainer.animY, root.dpr)
             blurWidth: (root.shouldBeVisible && !root.frameOwnsConnectedChrome) ? modalContainer.width * s : 0
             blurHeight: (root.shouldBeVisible && !root.frameOwnsConnectedChrome) ? modalContainer.height * s : 0
             blurRadius: root.effectiveCornerRadius
@@ -514,22 +434,9 @@ Item {
         anchors {
             left: true
             top: true
-            right: root.useSingleWindow
-            bottom: root.useSingleWindow
+            right: true
+            bottom: true
         }
-
-        readonly property real actualMarginLeft: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
-        readonly property real actualMarginTop: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
-
-        WlrLayershell.margins {
-            left: actualMarginLeft
-            top: actualMarginTop
-            right: 0
-            bottom: 0
-        }
-
-        implicitWidth: root.useSingleWindow ? 0 : root.alignedWidth + (shadowBuffer * 2)
-        implicitHeight: root.useSingleWindow ? 0 : root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
             if (visible)
@@ -542,7 +449,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            enabled: root.useSingleWindow && root.closeOnBackgroundClick && root.shouldBeVisible
+            enabled: root.closeOnBackgroundClick && root.shouldBeVisible
             z: -2
             onClicked: root.backgroundClicked()
         }
@@ -551,7 +458,7 @@ Item {
             anchors.fill: parent
             z: -1
             color: "black"
-            opacity: (root.useSingleWindow && root.useBackground) ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
+            opacity: root.useBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
             visible: opacity > 0
 
             Behavior on opacity {
@@ -564,250 +471,263 @@ Item {
             }
         }
 
+        // Reveal frame: when the frame owns the connected chrome, the content
+        // must only become visible inside the modal's final footprint so it
+        // emerges in step with the chrome growing from the bar edge (the old
+        // two-window layout got this for free from the window boundary).
         Item {
-            id: modalContainer
-            x: (root.useSingleWindow ? root.alignedX : (root.alignedX - contentWindow.actualMarginLeft)) + Theme.snap(animX, root.dpr)
-            y: (root.useSingleWindow ? root.alignedY : (root.alignedY - contentWindow.actualMarginTop)) + Theme.snap(animY, root.dpr)
-
+            id: connectedReveal
+            x: root.alignedX
+            y: root.alignedY
             width: root.alignedWidth
             height: root.alignedHeight
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: root.useSingleWindow && root.shouldBeVisible
-                hoverEnabled: false
-                acceptedButtons: Qt.AllButtons
-                onPressed: mouse.accepted = true
-                onClicked: mouse.accepted = true
-                z: -1
-            }
-
-            readonly property bool slide: root.animationType === "slide"
-            readonly property bool directionalEffect: Theme.isDirectionalEffect
-            readonly property bool depthEffect: Theme.isDepthEffect
-            readonly property real directionalTravel: Math.max(root.animationOffset, Math.max(root.alignedWidth, root.alignedHeight) * 0.8)
-            readonly property real depthTravel: Math.max(root.animationOffset * 0.8, 36)
-            readonly property real customAnchorX: root.alignedX + root.alignedWidth * 0.5
-            readonly property real customAnchorY: root.alignedY + root.alignedHeight * 0.5
-            readonly property real customDistLeft: customAnchorX
-            readonly property real customDistRight: root.screenWidth - customAnchorX
-            readonly property real customDistTop: customAnchorY
-            readonly property real customDistBottom: root.screenHeight - customAnchorY
-            // Connected emergence: travel from the resolved bar edge, matching DankPopout cadence.
-            readonly property real connectedEmergenceTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
-            readonly property real connectedEmergenceTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
-            readonly property real offsetX: {
-                if (root.frameOwnsConnectedChrome) {
-                    switch (root.resolvedConnectedBarSide) {
-                    case "left":
-                        return -connectedEmergenceTravelX;
-                    case "right":
-                        return connectedEmergenceTravelX;
-                    }
-                    return 0;
-                }
-                if (slide && !directionalEffect && !depthEffect)
-                    return 15;
-                if (directionalEffect) {
-                    switch (root.positioning) {
-                    case "top-right":
-                        return 0;
-                    case "custom":
-                        if (customDistLeft <= customDistRight && customDistLeft <= customDistTop && customDistLeft <= customDistBottom)
-                            return -directionalTravel;
-                        if (customDistRight <= customDistTop && customDistRight <= customDistBottom)
-                            return directionalTravel;
-                        return 0;
-                    default:
-                        return 0;
-                    }
-                }
-                if (depthEffect) {
-                    switch (root.positioning) {
-                    case "top-right":
-                        return 0;
-                    case "custom":
-                        if (customDistLeft <= customDistRight && customDistLeft <= customDistTop && customDistLeft <= customDistBottom)
-                            return -depthTravel;
-                        if (customDistRight <= customDistTop && customDistRight <= customDistBottom)
-                            return depthTravel;
-                        return 0;
-                    default:
-                        return 0;
-                    }
-                }
-                return 0;
-            }
-            readonly property real offsetY: {
-                if (root.frameOwnsConnectedChrome) {
-                    switch (root.resolvedConnectedBarSide) {
-                    case "top":
-                        return -connectedEmergenceTravelY;
-                    case "bottom":
-                        return connectedEmergenceTravelY;
-                    }
-                    return 0;
-                }
-                if (slide && !directionalEffect && !depthEffect)
-                    return -30;
-                if (directionalEffect) {
-                    switch (root.positioning) {
-                    case "top-right":
-                        return -Math.max(directionalTravel * 0.65, 96);
-                    case "custom":
-                        if (customDistTop <= customDistBottom && customDistTop <= customDistLeft && customDistTop <= customDistRight)
-                            return -directionalTravel;
-                        if (customDistBottom <= customDistLeft && customDistBottom <= customDistRight)
-                            return directionalTravel;
-                        return 0;
-                    default:
-                        // Default to sliding down from top when centered
-                        return -Math.max(directionalTravel, root.screenHeight * 0.24);
-                    }
-                }
-                if (depthEffect) {
-                    switch (root.positioning) {
-                    case "top-right":
-                        return -depthTravel * 0.75;
-                    case "custom":
-                        if (customDistTop <= customDistBottom && customDistTop <= customDistLeft && customDistTop <= customDistRight)
-                            return -depthTravel;
-                        if (customDistBottom <= customDistLeft && customDistBottom <= customDistRight)
-                            return depthTravel;
-                        return depthTravel * 0.45;
-                    default:
-                        return -depthTravel;
-                    }
-                }
-                return root.animationOffset;
-            }
-
-            readonly property real computedScaleCollapsed: root.animationScaleCollapsed
-
-            // openProgress: 0 = closed (at frozenMotionOffset, scaleCollapsed), 1 = open (at 0, scale 1).
-            QtObject {
-                id: morph
-                property real openProgress: root.shouldBeVisible ? 1 : 0
-                Behavior on openProgress {
-                    enabled: root.animationsEnabled
-                    NumberAnimation {
-                        duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                    }
-                }
-            }
-
-            readonly property real animX: root.frozenMotionOffsetX * (1 - morph.openProgress)
-            readonly property real animY: root.frozenMotionOffsetY * (1 - morph.openProgress)
-            readonly property real scaleValue: computedScaleCollapsed + (1.0 - computedScaleCollapsed) * morph.openProgress
-
-            onAnimXChanged: if (root.frameOwnsConnectedChrome)
-                root._queueAnimSync()
-            onAnimYChanged: if (root.frameOwnsConnectedChrome)
-                root._queueAnimSync()
+            clip: root.frameOwnsConnectedChrome
 
             Item {
-                id: contentContainer
-                anchors.centerIn: parent
-                width: parent.width
-                height: parent.height
-                clip: false
+                id: modalContainer
+                x: Theme.snap(animX, root.dpr)
+                y: Theme.snap(animY, root.dpr)
+
+                width: root.alignedWidth
+                height: root.alignedHeight
+
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: root.shouldBeVisible
+                    hoverEnabled: false
+                    acceptedButtons: Qt.AllButtons
+                    onPressed: mouse.accepted = true
+                    onClicked: mouse.accepted = true
+                    z: -1
+                }
+
+                readonly property bool slide: root.animationType === "slide"
+                readonly property bool directionalEffect: Theme.isDirectionalEffect
+                readonly property bool depthEffect: Theme.isDepthEffect
+                readonly property real directionalTravel: Math.max(root.animationOffset, Math.max(root.alignedWidth, root.alignedHeight) * 0.8)
+                readonly property real depthTravel: Math.max(root.animationOffset * 0.8, 36)
+                readonly property real customAnchorX: root.alignedX + root.alignedWidth * 0.5
+                readonly property real customAnchorY: root.alignedY + root.alignedHeight * 0.5
+                readonly property real customDistLeft: customAnchorX
+                readonly property real customDistRight: root.screenWidth - customAnchorX
+                readonly property real customDistTop: customAnchorY
+                readonly property real customDistBottom: root.screenHeight - customAnchorY
+                // Connected emergence: travel from the resolved bar edge, matching DankPopout cadence.
+                readonly property real connectedEmergenceTravelX: Math.max(root.animationOffset, root.alignedWidth + Theme.spacingL)
+                readonly property real connectedEmergenceTravelY: Math.max(root.animationOffset, root.alignedHeight + Theme.spacingL)
+                readonly property real offsetX: {
+                    if (root.frameOwnsConnectedChrome) {
+                        switch (root.resolvedConnectedBarSide) {
+                        case "left":
+                            return -connectedEmergenceTravelX;
+                        case "right":
+                            return connectedEmergenceTravelX;
+                        }
+                        return 0;
+                    }
+                    if (slide && !directionalEffect && !depthEffect)
+                        return 15;
+                    if (directionalEffect) {
+                        switch (root.positioning) {
+                        case "top-right":
+                            return 0;
+                        case "custom":
+                            if (customDistLeft <= customDistRight && customDistLeft <= customDistTop && customDistLeft <= customDistBottom)
+                                return -directionalTravel;
+                            if (customDistRight <= customDistTop && customDistRight <= customDistBottom)
+                                return directionalTravel;
+                            return 0;
+                        default:
+                            return 0;
+                        }
+                    }
+                    if (depthEffect) {
+                        switch (root.positioning) {
+                        case "top-right":
+                            return 0;
+                        case "custom":
+                            if (customDistLeft <= customDistRight && customDistLeft <= customDistTop && customDistLeft <= customDistBottom)
+                                return -depthTravel;
+                            if (customDistRight <= customDistTop && customDistRight <= customDistBottom)
+                                return depthTravel;
+                            return 0;
+                        default:
+                            return 0;
+                        }
+                    }
+                    return 0;
+                }
+                readonly property real offsetY: {
+                    if (root.frameOwnsConnectedChrome) {
+                        switch (root.resolvedConnectedBarSide) {
+                        case "top":
+                            return -connectedEmergenceTravelY;
+                        case "bottom":
+                            return connectedEmergenceTravelY;
+                        }
+                        return 0;
+                    }
+                    if (slide && !directionalEffect && !depthEffect)
+                        return -30;
+                    if (directionalEffect) {
+                        switch (root.positioning) {
+                        case "top-right":
+                            return -Math.max(directionalTravel * 0.65, 96);
+                        case "custom":
+                            if (customDistTop <= customDistBottom && customDistTop <= customDistLeft && customDistTop <= customDistRight)
+                                return -directionalTravel;
+                            if (customDistBottom <= customDistLeft && customDistBottom <= customDistRight)
+                                return directionalTravel;
+                            return 0;
+                        default:
+                            // Default to sliding down from top when centered
+                            return -Math.max(directionalTravel, root.screenHeight * 0.24);
+                        }
+                    }
+                    if (depthEffect) {
+                        switch (root.positioning) {
+                        case "top-right":
+                            return -depthTravel * 0.75;
+                        case "custom":
+                            if (customDistTop <= customDistBottom && customDistTop <= customDistLeft && customDistTop <= customDistRight)
+                                return -depthTravel;
+                            if (customDistBottom <= customDistLeft && customDistBottom <= customDistRight)
+                                return depthTravel;
+                            return depthTravel * 0.45;
+                        default:
+                            return -depthTravel;
+                        }
+                    }
+                    return root.animationOffset;
+                }
+
+                readonly property real computedScaleCollapsed: root.animationScaleCollapsed
+
+                // openProgress: 0 = closed (at frozenMotionOffset, scaleCollapsed), 1 = open (at 0, scale 1).
+                QtObject {
+                    id: morph
+                    property real openProgress: root.shouldBeVisible ? 1 : 0
+                    Behavior on openProgress {
+                        enabled: root.animationsEnabled
+                        NumberAnimation {
+                            duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                        }
+                    }
+                }
+
+                readonly property real animX: root.frozenMotionOffsetX * (1 - morph.openProgress)
+                readonly property real animY: root.frozenMotionOffsetY * (1 - morph.openProgress)
+                readonly property real scaleValue: computedScaleCollapsed + (1.0 - computedScaleCollapsed) * morph.openProgress
+
+                onAnimXChanged: if (root.frameOwnsConnectedChrome)
+                    root._queueAnimSync()
+                onAnimYChanged: if (root.frameOwnsConnectedChrome)
+                    root._queueAnimSync()
 
                 Item {
-                    id: animatedContent
-                    anchors.fill: parent
+                    id: contentContainer
+                    anchors.centerIn: parent
+                    width: parent.width
+                    height: parent.height
                     clip: false
 
-                    property real publishedOpacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (root.shouldBeVisible ? 1 : 0)
-
-                    opacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (root.shouldBeVisible ? 1 : 0)
-                    scale: modalContainer.scaleValue
-                    transformOrigin: Item.Center
-
-                    Behavior on opacity {
-                        enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
-                        NumberAnimation {
-                            duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                        }
-                    }
-
-                    Behavior on publishedOpacity {
-                        enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
-                        NumberAnimation {
-                            duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                        }
-                    }
-
-                    ElevationShadow {
-                        id: modalShadowLayer
+                    Item {
+                        id: animatedContent
                         anchors.fill: parent
-                        level: root.shadowLevel
-                        fallbackOffset: root.shadowFallbackOffset
-                        targetRadius: root.effectiveCornerRadius
-                        targetColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBackgroundColor
-                        borderColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBorderColor
-                        borderWidth: root.frameOwnsConnectedChrome ? 0 : root.effectiveBorderWidth
-                        shadowEnabled: !root.frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: root.effectiveCornerRadius
-                        color: "transparent"
-                        border.color: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? "transparent" : BlurService.borderColor
-                        border.width: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? 0 : BlurService.borderWidth
-                        z: 100
-                    }
-
-                    FocusScope {
-                        anchors.fill: parent
-                        focus: root.shouldBeVisible
                         clip: false
 
-                        Item {
-                            id: directContentWrapper
+                        property real publishedOpacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (root.shouldBeVisible ? 1 : 0)
+
+                        opacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (root.shouldBeVisible ? 1 : 0)
+                        scale: modalContainer.scaleValue
+                        transformOrigin: Item.Center
+
+                        Behavior on opacity {
+                            enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
+                            NumberAnimation {
+                                duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                            }
+                        }
+
+                        Behavior on publishedOpacity {
+                            enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
+                            NumberAnimation {
+                                duration: Math.round(Theme.variantDuration(animationDuration, root.shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                            }
+                        }
+
+                        ElevationShadow {
+                            id: modalShadowLayer
                             anchors.fill: parent
-                            visible: root.directContent !== null
-                            focus: true
+                            level: root.shadowLevel
+                            fallbackOffset: root.shadowFallbackOffset
+                            targetRadius: root.effectiveCornerRadius
+                            targetColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBackgroundColor
+                            borderColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBorderColor
+                            borderWidth: root.frameOwnsConnectedChrome ? 0 : root.effectiveBorderWidth
+                            shadowEnabled: !root.frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: root.effectiveCornerRadius
+                            color: "transparent"
+                            border.color: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? "transparent" : BlurService.borderColor
+                            border.width: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? 0 : BlurService.borderWidth
+                            z: 100
+                        }
+
+                        FocusScope {
+                            anchors.fill: parent
+                            focus: root.shouldBeVisible
                             clip: false
 
-                            Component.onCompleted: {
-                                if (root.directContent) {
-                                    root.directContent.parent = directContentWrapper;
-                                    root.directContent.anchors.fill = directContentWrapper;
-                                    Qt.callLater(() => root.directContent.forceActiveFocus());
-                                }
-                            }
+                            Item {
+                                id: directContentWrapper
+                                anchors.fill: parent
+                                visible: root.directContent !== null
+                                focus: true
+                                clip: false
 
-                            Connections {
-                                target: root
-                                function onDirectContentChanged() {
+                                Component.onCompleted: {
                                     if (root.directContent) {
                                         root.directContent.parent = directContentWrapper;
                                         root.directContent.anchors.fill = directContentWrapper;
                                         Qt.callLater(() => root.directContent.forceActiveFocus());
                                     }
                                 }
+
+                                Connections {
+                                    target: root
+                                    function onDirectContentChanged() {
+                                        if (root.directContent) {
+                                            root.directContent.parent = directContentWrapper;
+                                            root.directContent.anchors.fill = directContentWrapper;
+                                            Qt.callLater(() => root.directContent.forceActiveFocus());
+                                        }
+                                    }
+                                }
                             }
-                        }
 
-                        Loader {
-                            id: contentLoader
-                            anchors.fill: parent
-                            active: root.directContent === null && (root.keepContentLoaded || root.shouldBeVisible || contentWindow.visible)
-                            asynchronous: false
-                            focus: true
-                            clip: false
-                            visible: root.directContent === null
+                            Loader {
+                                id: contentLoader
+                                anchors.fill: parent
+                                active: root.directContent === null && (root.keepContentLoaded || root.shouldBeVisible || contentWindow.visible)
+                                asynchronous: false
+                                focus: true
+                                clip: false
+                                visible: root.directContent === null
 
-                            onLoaded: {
-                                if (item) {
-                                    Qt.callLater(() => item.forceActiveFocus());
+                                onLoaded: {
+                                    if (item) {
+                                        Qt.callLater(() => item.forceActiveFocus());
+                                    }
                                 }
                             }
                         }

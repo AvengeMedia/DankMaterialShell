@@ -788,9 +788,9 @@ Item {
             blurEnabled: root.effectiveSurfaceBlurEnabled && !root.frameOwnsConnectedChrome
 
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: root.usesConnectedSurfaceChrome || Theme.isDirectionalEffect
+            readonly property bool trackBlurFromBarEdge: root.usesConnectedSurfaceChrome
 
-            // Directional popouts clip to the bar edge, so the blur needs to grow from
+            // Connected chrome clips to the bar edge, so its blur grows from
             // that same edge instead of translating through the bar before settling.
             readonly property real _dyClamp: (contentContainer.barTop || contentContainer.barBottom) ? Math.max(-contentContainer.height, Math.min(contentContainer.animY, contentContainer.height)) : 0
             readonly property real _dxClamp: (contentContainer.barLeft || contentContainer.barRight) ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width)) : 0

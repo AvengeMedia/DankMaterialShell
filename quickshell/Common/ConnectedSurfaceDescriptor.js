@@ -157,23 +157,3 @@ function same(a, b, threshold) {
         && a.omitEndConnector === b.omitEndConnector
         && a.dockRetractSide === b.dockRetractSide;
 }
-
-function toLegacyState(descriptor) {
-    var d = normalize(descriptor);
-    return {
-        "visible": d.visible,
-        "reveal": d.visible,
-        "barSide": d.barSide,
-        "bodyX": d.bodyRect.x,
-        "bodyY": d.bodyRect.y,
-        "bodyW": d.bodyRect.width,
-        "bodyH": d.bodyRect.height,
-        "animX": d.animationOffset.x,
-        "animY": d.animationOffset.y,
-        "slideX": d.animationOffset.x,
-        "slideY": d.animationOffset.y,
-        "screen": d.screenName,
-        "omitStartConnector": d.omitStartConnector,
-        "omitEndConnector": d.omitEndConnector
-    };
-}

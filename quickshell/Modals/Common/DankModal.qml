@@ -56,21 +56,13 @@ Item {
 
     // One focus grab for every modal; on Hyprland this is what delivers
     // keyboard focus to the OnDemand surface, identically in both modes.
-    // The clickCatcher is whitelisted so an outside click is delivered to
-    // it (closing the modal) instead of being consumed clearing the grab.
+    // The full-surface content window receives outside clicks itself, so an
+    // outside click closes the modal instead of being consumed by the grab.
     HyprlandFocusGrab {
-        windows: {
-            const list = [];
-            if (root.contentWindow)
-                list.push(root.contentWindow);
-            if (root.clickCatcher)
-                list.push(root.clickCatcher);
-            return list;
-        }
+        windows: root.contentWindow ? [root.contentWindow] : []
         active: KeyboardFocus.wantsGrab(root.shouldHaveFocus, root.customKeyboardFocus)
     }
     readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
-    readonly property var clickCatcher: impl.item ? impl.item.clickCatcher : null
     readonly property var effectiveScreen: impl.item ? impl.item.effectiveScreen : null
     readonly property real screenWidth: impl.item ? impl.item.screenWidth : 1920
     readonly property real screenHeight: impl.item ? impl.item.screenHeight : 1080

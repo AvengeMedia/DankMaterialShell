@@ -203,25 +203,9 @@ Item {
     }
     readonly property real contentSurfaceHeight: launcherArcExtenderActive ? _connectedChromeHeight : alignedHeight
 
-    // For directional/depth: window extends from screen top (content slides within)
-    // For standard: small window tightly around the modal + shadow padding
-    readonly property bool _needsExtendedWindow: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) || Theme.isDepthEffect
-    // Content window geometry
-    readonly property real _cwMarginLeft: Theme.snap(alignedX - shadowPad, dpr)
-    readonly property real _cwMarginTop: launcherArcExtenderActive ? _connectedChromeY : (_needsExtendedWindow ? 0 : Theme.snap(alignedY - shadowPad, dpr))
-    readonly property real _cwWidth: alignedWidth + shadowPad * 2
-    readonly property real _cwHeight: {
-        if (launcherArcExtenderActive)
-            return _connectedChromeHeight;
-        if (Theme.isDirectionalEffect && !Theme.isConnectedEffect)
-            return screenHeight + shadowPad;
-        if (Theme.isDepthEffect)
-            return alignedY + alignedHeight + shadowPad;
-        return alignedHeight + shadowPad * 2;
-    }
-    // Where the content container sits inside the content window
-    readonly property real _ccX: shadowPad
-    readonly property real _ccY: launcherArcExtenderActive ? 0 : (_needsExtendedWindow ? alignedY : shadowPad)
+    // Where the content container sits inside the full-surface content window (screen coordinates)
+    readonly property real _ccX: _connectedChromeX
+    readonly property real _ccY: _connectedChromeY
 
     signal dialogClosed
 
@@ -429,7 +413,6 @@ Item {
 
         var focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen) {
-            backgroundWindow.screen = focusedScreen;
             contentWindow.screen = focusedScreen;
         }
 
@@ -439,7 +422,6 @@ Item {
         // Make windows visible but do NOT request keyboard focus yet
         ModalManager.openModal(modalHandle);
         spotlightOpen = true;
-        backgroundWindow.visible = true;
         contentWindow.visible = true;
 
         // Load content and initialize (but no forceActiveFocus — that's deferred)
@@ -519,7 +501,6 @@ Item {
             isClosing = false;
             contentVisible = false;
             contentWindow.visible = false;
-            backgroundWindow.visible = false;
             if (root.unloadContentOnClose)
                 launcherContentLoader.active = false;
             dialogClosed();
@@ -588,78 +569,10 @@ Item {
 
             root._releaseModalChrome();
             root._windowEnabled = false;
-            backgroundWindow.screen = newScreen;
             contentWindow.screen = newScreen;
             Qt.callLater(() => {
                 root._windowEnabled = true;
             });
-        }
-    }
-
-    PanelWindow {
-        id: backgroundWindow
-        visible: false
-        color: "transparent"
-
-        readonly property real _topMargin: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
-        readonly property real _bottomMargin: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
-        readonly property real _leftMargin: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
-        readonly property real _rightMargin: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
-
-        WlrLayershell.namespace: "dms:spotlight:bg"
-        WlrLayershell.layer: root.effectiveLauncherLayer
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        WlrLayershell.margins {
-            top: backgroundWindow._topMargin
-            bottom: backgroundWindow._bottomMargin
-            left: backgroundWindow._leftMargin
-            right: backgroundWindow._rightMargin
-        }
-
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
-        }
-
-        mask: Region {
-            item: (spotlightOpen || isClosing) ? bgFullScreenMask : null
-
-            Region {
-                item: bgContentHole
-                intersection: Intersection.Subtract
-            }
-        }
-
-        Item {
-            id: bgFullScreenMask
-            anchors.fill: parent
-        }
-
-        Item {
-            id: bgContentHole
-            visible: false
-            x: root._cwMarginLeft + contentContainer.x - backgroundWindow._leftMargin
-            y: root._cwMarginTop + contentContainer.y - backgroundWindow._topMargin
-            width: root.alignedWidth
-            height: root.contentSurfaceHeight
-        }
-
-        Rectangle {
-            id: backgroundDarken
-            anchors.fill: parent
-            color: "black"
-            opacity: 0
-            visible: false
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: spotlightOpen
-            onClicked: root.hide()
         }
     }
 
@@ -687,18 +600,28 @@ Item {
         anchors {
             left: true
             top: true
+            right: true
+            bottom: true
         }
-
-        WlrLayershell.margins {
-            left: root._cwMarginLeft
-            top: root._cwMarginTop
-        }
-
-        implicitWidth: root._cwWidth
-        implicitHeight: root._cwHeight
 
         mask: Region {
-            item: contentInputMask
+            item: (root.spotlightOpen || root.isClosing) ? dismissArea : contentInputMask
+
+            Region {
+                item: (root.spotlightOpen || root.isClosing) ? contentInputMask : null
+            }
+        }
+
+        // Dismissable area: everything except the bar/dock strips, so bar
+        // widgets stay clickable for widget-to-widget transfer.
+        Item {
+            id: dismissArea
+            visible: false
+            anchors.fill: parent
+            anchors.topMargin: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
+            anchors.bottomMargin: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
+            anchors.leftMargin: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
+            anchors.rightMargin: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
         }
 
         Item {
@@ -710,15 +633,30 @@ Item {
             height: root.contentSurfaceHeight
         }
 
+        MouseArea {
+            anchors.fill: dismissArea
+            enabled: root.spotlightOpen
+            z: -2
+            onClicked: root.hide()
+        }
+
         Item {
             id: contentContainer
 
-            // For directional/depth: contentContainer is at alignedY from window top (window starts at screen top)
-            // For standard: contentContainer is at shadowPad from window top (window starts near modal)
             x: root._ccX
             y: root._ccY
             width: root.alignedWidth
             height: root.contentSurfaceHeight
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.spotlightOpen
+                hoverEnabled: false
+                acceptedButtons: Qt.AllButtons
+                onPressed: mouse.accepted = true
+                onClicked: mouse.accepted = true
+                z: -1
+            }
 
             readonly property int dockEdge: typeof SettingsData !== "undefined" ? SettingsData.dockPosition : 1
             readonly property bool dockTop: dockEdge === 0

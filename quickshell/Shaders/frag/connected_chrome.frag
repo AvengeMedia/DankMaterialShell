@@ -2,9 +2,8 @@
 
 // Popout-local connected chrome as a signed-distance field: the body rounded
 // rect smooth-unioned against the bar-edge half-plane, so the connector
-// fillets form analytically — the SDF twin of the old ConnectedShape +
-// ConnectedCorner + MultiEffect FBO. Key + ambient shadows sample the same
-// field; shadow is masked outside the silhouette.
+// fillets form analytically. Key + ambient shadows sample the same field;
+// shadow is masked outside the silhouette.
 
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;

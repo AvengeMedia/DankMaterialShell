@@ -84,14 +84,14 @@ Item {
     readonly property real alignedX: Theme.snap(modalX, dpr)
     readonly property real alignedY: Theme.snap(modalY, dpr)
 
-    // Extra headroom above the window for the slide-in animation
+    // Extra headroom above the content for the slide-in animation
     readonly property real _animHeadroom: 16
     readonly property real windowX: Math.max(0, Theme.snap(alignedX - shadowPad, dpr))
     readonly property real windowY: Math.max(0, Theme.snap(alignedY - shadowPad - _animHeadroom, dpr))
     readonly property real contentX: Theme.snap(alignedX - windowX, dpr)
     readonly property real contentY: Theme.snap(alignedY - windowY, dpr)
-    readonly property real windowWidth: alignedWidth + contentX + shadowPad
     readonly property real _animatedContentH: Theme.snap(_contentImplicitH, dpr)
+    readonly property real windowWidth: alignedWidth + contentX + shadowPad
     readonly property real windowHeight: _animatedContentH + contentY + shadowPad + _animHeadroom
 
     readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -114,6 +114,7 @@ Item {
         }
     }
     readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
+    readonly property bool useSingleWindow: CompositorService.isHyprland || useBackgroundDarken
 
     signal dialogClosed
 
@@ -267,8 +268,9 @@ Item {
     PanelWindow {
         id: clickCatcher
         screen: launcherWindow.screen
-        visible: (spotlightOpen || isClosing) && !root.useBackgroundDarken
+        visible: (spotlightOpen || isClosing) && !root.useSingleWindow
         color: "transparent"
+        updatesEnabled: false
 
         WlrLayershell.namespace: "dms:spotlight:clickcatcher"
         WlrLayershell.layer: root.effectiveLauncherLayer
@@ -339,19 +341,19 @@ Item {
         anchors {
             top: true
             left: true
-            right: root.useBackgroundDarken
-            bottom: root.useBackgroundDarken
+            right: root.useSingleWindow
+            bottom: root.useSingleWindow
         }
 
         WlrLayershell.margins {
-            left: root.useBackgroundDarken ? 0 : root.windowX
-            top: root.useBackgroundDarken ? 0 : root.windowY
+            left: root.useSingleWindow ? 0 : root.windowX
+            top: root.useSingleWindow ? 0 : root.windowY
             right: 0
             bottom: 0
         }
 
-        implicitWidth: root.useBackgroundDarken ? 0 : root.windowWidth
-        implicitHeight: root.useBackgroundDarken ? 0 : root.windowHeight
+        implicitWidth: root.useSingleWindow ? 0 : root.windowWidth
+        implicitHeight: root.useSingleWindow ? 0 : root.windowHeight
 
         mask: Region {
             item: inputMask
@@ -361,15 +363,15 @@ Item {
             id: inputMask
             visible: false
             color: "transparent"
-            x: root.useBackgroundDarken ? 0 : modalContainer.x
-            y: root.useBackgroundDarken ? 0 : modalContainer.y + modalContainer.slideOffset
-            width: root.useBackgroundDarken ? launcherWindow.width : root.alignedWidth
-            height: root.useBackgroundDarken ? launcherWindow.height : root._contentImplicitH
+            x: root.useSingleWindow ? 0 : modalContainer.x
+            y: root.useSingleWindow ? 0 : modalContainer.y + modalContainer.slideOffset
+            width: root.useSingleWindow ? launcherWindow.width : root.alignedWidth
+            height: root.useSingleWindow ? launcherWindow.height : root._contentImplicitH
         }
 
         MouseArea {
             anchors.fill: parent
-            enabled: root.useBackgroundDarken && spotlightOpen
+            enabled: root.useSingleWindow && spotlightOpen
             z: -2
             onClicked: root.hide()
         }
@@ -393,12 +395,22 @@ Item {
 
         Item {
             id: modalContainer
-            x: root.useBackgroundDarken ? root.alignedX : root.contentX
-            y: root.useBackgroundDarken ? root.alignedY : root.contentY
+            x: root.useSingleWindow ? root.alignedX : root.contentX
+            y: root.useSingleWindow ? root.alignedY : root.contentY
             width: root.alignedWidth
             height: root._animatedContentH
             visible: _renderActive
             z: 0
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: spotlightOpen
+                hoverEnabled: false
+                acceptedButtons: Qt.AllButtons
+                onPressed: mouse.accepted = true
+                onClicked: mouse.accepted = true
+                z: -1
+            }
 
             property bool _renderActive: contentVisible
             property real slideOffset: contentVisible ? 0 : -root._animHeadroom

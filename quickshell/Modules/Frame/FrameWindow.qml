@@ -49,10 +49,6 @@ PanelWindow {
     readonly property var _dockDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "dock")
     readonly property var _notifDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "notification")
     readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
-    readonly property var _popoutState: ConnectedModeState.legacySurfaceState(win._screenName, "popout")
-    readonly property var _dockState: ConnectedModeState.legacySurfaceState(win._screenName, "dock")
-    readonly property var _notifState: ConnectedModeState.legacySurfaceState(win._screenName, "notification")
-    readonly property var _modalState: ConnectedModeState.legacySurfaceState(win._screenName, "modal")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
     readonly property string _barSide: {
@@ -68,7 +64,7 @@ PanelWindow {
     readonly property real _ccr: Theme.connectedCornerRadius
 
     readonly property bool _popoutHorizontal: SurfaceGeometry.isHorizontal(win._popoutDescriptor.barSide)
-    readonly property bool _modalHorizontal: ConnectorGeometry.isHorizontal(win._modalState.barSide)
+    readonly property bool _modalHorizontal: SurfaceGeometry.isHorizontal(win._modalDescriptor.barSide)
     readonly property var _popoutBodyGeometry: SurfaceGeometry.animatedBodyRect(win._popoutDescriptor, win._dpr)
     readonly property var _modalBodyGeometry: SurfaceGeometry.animatedBodyRect(win._modalDescriptor, win._dpr)
     readonly property var _notifBodyGeometry: SurfaceGeometry.bodyRect(win._notifDescriptor, win._dpr)
@@ -86,15 +82,15 @@ PanelWindow {
     readonly property real _dockConnectorRadiusValue: {
         if (!_dockBodyBlurAnchor._active)
             return win._ccr;
-        const thickness = (win._dockState.barSide === "left" || win._dockState.barSide === "right") ? _dockBodyBlurAnchor.width : _dockBodyBlurAnchor.height;
+        const thickness = SurfaceGeometry.isVertical(win._dockDescriptor.barSide) ? _dockBodyBlurAnchor.width : _dockBodyBlurAnchor.height;
         const bodyRadius = win._dockBodyBlurRadiusValue;
         const maxConnectorRadius = Math.max(0, thickness - bodyRadius - win._seamOverlap);
         return Math.max(0, Math.min(win._ccr, bodyRadius, maxConnectorRadius));
     }
 
-    readonly property real _notifSideUnderlapValue: ConnectorGeometry.isVertical(win._notifState.barSide) ? win._seamOverlap : 0
-    readonly property real _notifStartUnderlapValue: win._notifState.omitStartConnector ? win._seamOverlap : 0
-    readonly property real _notifEndUnderlapValue: win._notifState.omitEndConnector ? win._seamOverlap : 0
+    readonly property real _notifSideUnderlapValue: SurfaceGeometry.isVertical(win._notifDescriptor.barSide) ? win._seamOverlap : 0
+    readonly property real _notifStartUnderlapValue: win._notifDescriptor.omitStartConnector ? win._seamOverlap : 0
+    readonly property real _notifEndUnderlapValue: win._notifDescriptor.omitEndConnector ? win._seamOverlap : 0
 
     // Theme.snap rounds to integer pixel: equal rounded values suppress
     // downstream Changed during sub-pixel morph jitter.
@@ -284,7 +280,7 @@ PanelWindow {
         Region {
             id: _popoutBodyBlurCap
 
-            readonly property string _side: win._popoutState.barSide
+            readonly property string _side: win._popoutDescriptor.barSide
             readonly property real _capThickness: win._popoutBlurCapThickness()
             readonly property bool _active: _popoutBodyBlurAnchor._active && _capThickness > 0 && _popoutBodyBlurAnchor.width > 0 && _popoutBodyBlurAnchor.height > 0
             readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(_capThickness, _popoutBodyBlurAnchor.width)) : _popoutBodyBlurAnchor.width
@@ -311,7 +307,7 @@ PanelWindow {
                 id: _popoutLeftConnectorCutout
 
                 readonly property bool _active: _popoutLeftConnectorBlurAnchor.width > 0 && _popoutLeftConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutState.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutDescriptor.barSide, "left")
                 readonly property real _radius: win._popoutConnectorRadiusLeft
 
                 intersection: Intersection.Subtract
@@ -338,7 +334,7 @@ PanelWindow {
                 id: _popoutRightConnectorCutout
 
                 readonly property bool _active: _popoutRightConnectorBlurAnchor.width > 0 && _popoutRightConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutState.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._popoutDescriptor.barSide, "right")
                 readonly property real _radius: win._popoutConnectorRadiusRight
 
                 intersection: Intersection.Subtract
@@ -389,8 +385,8 @@ PanelWindow {
                 id: _popoutFarStartConnectorCutout
 
                 readonly property bool _active: _popoutFarStartConnectorBlurAnchor.width > 0 && _popoutFarStartConnectorBlurAnchor.height > 0
-                readonly property string _barSide: win._farConnectorBarSide(win._popoutState.barSide, "left")
-                readonly property string _placement: win._farConnectorPlacement(win._popoutState.barSide, "left")
+                readonly property string _barSide: win._farConnectorBarSide(win._popoutDescriptor.barSide, "left")
+                readonly property string _placement: win._farConnectorPlacement(win._popoutDescriptor.barSide, "left")
                 readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
                 readonly property real _radius: win._effectivePopoutFarStartCcr
 
@@ -418,8 +414,8 @@ PanelWindow {
                 id: _popoutFarEndConnectorCutout
 
                 readonly property bool _active: _popoutFarEndConnectorBlurAnchor.width > 0 && _popoutFarEndConnectorBlurAnchor.height > 0
-                readonly property string _barSide: win._farConnectorBarSide(win._popoutState.barSide, "right")
-                readonly property string _placement: win._farConnectorPlacement(win._popoutState.barSide, "right")
+                readonly property string _barSide: win._farConnectorBarSide(win._popoutDescriptor.barSide, "right")
+                readonly property string _placement: win._farConnectorPlacement(win._popoutDescriptor.barSide, "right")
                 readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
                 readonly property real _radius: win._effectivePopoutFarEndCcr
 
@@ -446,7 +442,7 @@ PanelWindow {
         Region {
             id: _dockBodyBlurCap
 
-            readonly property string _side: win._dockState.barSide
+            readonly property string _side: win._dockDescriptor.barSide
             readonly property bool _active: _dockBodyBlurAnchor._active && _dockBodyBlurAnchor.width > 0 && _dockBodyBlurAnchor.height > 0
             readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.width)) : _dockBodyBlurAnchor.width
             readonly property int _capHeight: (_side === "top" || _side === "bottom") ? Math.round(Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.height)) : _dockBodyBlurAnchor.height
@@ -471,7 +467,7 @@ PanelWindow {
                 id: _dockLeftConnectorCutout
 
                 readonly property bool _active: _dockLeftConnectorBlurAnchor.width > 0 && _dockLeftConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockDescriptor.barSide, "left")
 
                 intersection: Intersection.Subtract
                 radius: win._dockConnectorRadiusValue
@@ -496,7 +492,7 @@ PanelWindow {
                 id: _dockRightConnectorCutout
 
                 readonly property bool _active: _dockRightConnectorBlurAnchor.width > 0 && _dockRightConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockState.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockDescriptor.barSide, "right")
 
                 intersection: Intersection.Subtract
                 radius: win._dockConnectorRadiusValue
@@ -522,7 +518,7 @@ PanelWindow {
         Region {
             id: _notifBodyBlurCap
 
-            readonly property string _side: win._notifState.barSide
+            readonly property string _side: win._notifDescriptor.barSide
             readonly property real _capRadius: win._effectiveNotifMaxCcr
             readonly property bool _active: _notifBodySceneBlurAnchor._active && _notifBodySceneBlurAnchor.width > 0 && _notifBodySceneBlurAnchor.height > 0 && _capRadius > 0
             readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(_capRadius, _notifBodySceneBlurAnchor.width)) : _notifBodySceneBlurAnchor.width
@@ -549,7 +545,7 @@ PanelWindow {
                 id: _notifLeftConnectorCutout
 
                 readonly property bool _active: _notifLeftConnectorBlurAnchor.width > 0 && _notifLeftConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifDescriptor.barSide, "left")
                 readonly property real _radius: win._notifConnectorRadiusLeft
 
                 intersection: Intersection.Subtract
@@ -576,7 +572,7 @@ PanelWindow {
                 id: _notifRightConnectorCutout
 
                 readonly property bool _active: _notifRightConnectorBlurAnchor.width > 0 && _notifRightConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifState.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._notifDescriptor.barSide, "right")
                 readonly property real _radius: win._notifConnectorRadiusRight
 
                 intersection: Intersection.Subtract
@@ -627,8 +623,8 @@ PanelWindow {
                 id: _notifFarStartConnectorCutout
 
                 readonly property bool _active: _notifFarStartConnectorBlurAnchor.width > 0 && _notifFarStartConnectorBlurAnchor.height > 0
-                readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "left")
-                readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "left")
+                readonly property string _barSide: win._farConnectorBarSide(win._notifDescriptor.barSide, "left")
+                readonly property string _placement: win._farConnectorPlacement(win._notifDescriptor.barSide, "left")
                 readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
                 readonly property real _radius: win._effectiveNotifFarStartCcr
 
@@ -656,8 +652,8 @@ PanelWindow {
                 id: _notifFarEndConnectorCutout
 
                 readonly property bool _active: _notifFarEndConnectorBlurAnchor.width > 0 && _notifFarEndConnectorBlurAnchor.height > 0
-                readonly property string _barSide: win._farConnectorBarSide(win._notifState.barSide, "right")
-                readonly property string _placement: win._farConnectorPlacement(win._notifState.barSide, "right")
+                readonly property string _barSide: win._farConnectorBarSide(win._notifDescriptor.barSide, "right")
+                readonly property string _placement: win._farConnectorPlacement(win._notifDescriptor.barSide, "right")
                 readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
                 readonly property real _radius: win._effectiveNotifFarEndCcr
 
@@ -684,7 +680,7 @@ PanelWindow {
         Region {
             id: _modalBodyBlurCap
 
-            readonly property string _side: win._modalState.barSide
+            readonly property string _side: win._modalDescriptor.barSide
             readonly property real _capThickness: win._modalBlurCapThickness()
             readonly property bool _active: _modalBodyBlurAnchor._active && _capThickness > 0 && _modalBodyBlurAnchor.width > 0 && _modalBodyBlurAnchor.height > 0
             readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(_capThickness, _modalBodyBlurAnchor.width)) : _modalBodyBlurAnchor.width
@@ -711,7 +707,7 @@ PanelWindow {
                 id: _modalLeftConnectorCutout
 
                 readonly property bool _active: _modalLeftConnectorBlurAnchor.width > 0 && _modalLeftConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalDescriptor.barSide, "left")
                 readonly property real _radius: win._modalConnectorRadiusLeft
 
                 intersection: Intersection.Subtract
@@ -738,7 +734,7 @@ PanelWindow {
                 id: _modalRightConnectorCutout
 
                 readonly property bool _active: _modalRightConnectorBlurAnchor.width > 0 && _modalRightConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalState.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._modalDescriptor.barSide, "right")
                 readonly property real _radius: win._modalConnectorRadiusRight
 
                 intersection: Intersection.Subtract
@@ -789,8 +785,8 @@ PanelWindow {
                 id: _modalFarStartConnectorCutout
 
                 readonly property bool _active: _modalFarStartConnectorBlurAnchor.width > 0 && _modalFarStartConnectorBlurAnchor.height > 0
-                readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "left")
-                readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "left")
+                readonly property string _barSide: win._farConnectorBarSide(win._modalDescriptor.barSide, "left")
+                readonly property string _placement: win._farConnectorPlacement(win._modalDescriptor.barSide, "left")
                 readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
                 readonly property real _radius: win._effectiveModalFarStartCcr
 
@@ -818,8 +814,8 @@ PanelWindow {
                 id: _modalFarEndConnectorCutout
 
                 readonly property bool _active: _modalFarEndConnectorBlurAnchor.width > 0 && _modalFarEndConnectorBlurAnchor.height > 0
-                readonly property string _barSide: win._farConnectorBarSide(win._modalState.barSide, "right")
-                readonly property string _placement: win._farConnectorPlacement(win._modalState.barSide, "right")
+                readonly property string _barSide: win._farConnectorBarSide(win._modalDescriptor.barSide, "right")
+                readonly property string _placement: win._farConnectorPlacement(win._modalDescriptor.barSide, "right")
                 readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
                 readonly property real _radius: win._effectiveModalFarEndCcr
 
@@ -835,7 +831,7 @@ PanelWindow {
 
     // Notif body scene rect, accounting for start/end/side underlaps per bar orientation.
     function _notifBodyScene() {
-        const isHoriz = ConnectorGeometry.isHorizontal(win._notifState.barSide);
+        const isHoriz = SurfaceGeometry.isHorizontal(win._notifDescriptor.barSide);
         const start = win._notifStartUnderlapValue;
         const end = win._notifEndUnderlapValue;
         const side = win._notifSideUnderlapValue;
@@ -848,7 +844,7 @@ PanelWindow {
             };
         }
         return {
-            "x": _notifBodyBlurAnchor.x - (win._notifState.barSide === "left" ? side : 0),
+            "x": _notifBodyBlurAnchor.x - (win._notifDescriptor.barSide === "left" ? side : 0),
             "y": _notifBodyBlurAnchor.y - start,
             "width": _notifBodyBlurAnchor.width + side,
             "height": _notifBodyBlurAnchor.height + start + end
@@ -871,7 +867,7 @@ PanelWindow {
     function _unifiedSurfaces() {
         const arr = [];
         const p = win._popoutBodyGeometry;
-        if (win._popoutDescriptor.visible && win._popoutState.screen === win._screenName && p.width > 0 && p.height > 0)
+        if (win._popoutDescriptor.visible && win._popoutDescriptor.screenName === win._screenName && p.width > 0 && p.height > 0)
             arr.push({
                 "side": win._popoutDescriptor.barSide,
                 "body": {"x": p.x, "y": p.y, "width": p.width, "height": p.height},
