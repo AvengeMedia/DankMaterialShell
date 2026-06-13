@@ -140,6 +140,27 @@ Item {
                 }
 
                 SettingsSliderRow {
+                    id: barEndInsetSlider
+                    settingKey: "frameBarEndInset"
+                    tags: ["frame", "bar", "end", "inset", "widget", "padding", "edge"]
+                    text: I18n.tr("Widget End Inset")
+                    description: I18n.tr("Extra space between edge widgets and the frame corners")
+                    unit: "px"
+                    minimum: 0
+                    maximum: 20
+                    step: 1
+                    defaultValue: 0
+                    value: SettingsData.frameBarEndInset
+                    onSliderDragFinished: v => SettingsData.set("frameBarEndInset", v)
+
+                    Binding {
+                        target: barEndInsetSlider
+                        property: "value"
+                        value: SettingsData.frameBarEndInset
+                    }
+                }
+
+                SettingsSliderRow {
                     id: opacitySlider
                     settingKey: "frameOpacity"
                     tags: ["frame", "border", "surface", "popup", "opacity", "transparency"]

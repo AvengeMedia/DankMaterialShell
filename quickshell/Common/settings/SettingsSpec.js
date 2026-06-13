@@ -589,7 +589,8 @@ var SPEC = {
     frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
-    frameMode: { def: "connected" }
+    frameMode: { def: "connected" },
+    frameBarEndInset: { def: 0 }
 };
 
 function getValidKeys() {
