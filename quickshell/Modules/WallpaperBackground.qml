@@ -32,6 +32,8 @@ Variants {
 
         color: "transparent"
 
+        updatesEnabled: root.renderActive || root._settleFrames > 0
+
         mask: Region {
             item: Item {}
         }
@@ -88,6 +90,57 @@ Variants {
             property string pendingWallpaper: ""
             property string _deferredSource: ""
             readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
+            readonly property var backingWindow: Window.window
+            readonly property bool renderActive: !source || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
+            property int _settleFrames: 3
+
+            function invalidate() {
+                _settleFrames = 3;
+                backingWindow?.update();
+            }
+
+            onRenderActiveChanged: invalidate()
+            onBackingWindowChanged: invalidate()
+
+            Connections {
+                target: root.backingWindow
+                function onFrameSwapped() {
+                    if (root._settleFrames > 0)
+                        root._settleFrames--;
+                }
+                function onVisibleChanged() {
+                    root.invalidate();
+                }
+                function onWidthChanged() {
+                    root.invalidate();
+                }
+                function onHeightChanged() {
+                    root.invalidate();
+                }
+            }
+
+            Connections {
+                target: Quickshell
+                function onScreensChanged() {
+                    root.invalidate();
+                }
+            }
+
+            Connections {
+                target: SettingsData
+                function onWallpaperFillModeChanged() {
+                    root.invalidate();
+                }
+            }
+
+            Connections {
+                target: IdleService
+                function onIsShellLockedChanged() {
+                    if (IdleService.isShellLocked)
+                        return;
+                    root.invalidate();
+                }
+            }
 
             function _recheckScreenScale() {
                 const newScale = CompositorService.getScreenScale(modelData);
@@ -101,6 +154,7 @@ Variants {
                 target: NiriService
                 function onDisplayScalesChanged() {
                     root._recheckScreenScale();
+                    root.invalidate();
                 }
             }
 
@@ -108,6 +162,7 @@ Variants {
                 target: WlrOutputService
                 function onWlrOutputAvailableChanged() {
                     root._recheckScreenScale();
+                    root.invalidate();
                 }
             }
 
