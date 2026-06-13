@@ -866,7 +866,27 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: mouse => {
+                if (mouse.button === Qt.RightButton) {
+                    mouse.accepted = true;
+                }
+            }
+            onWheel: wheelEvent => {
+                const delta = wheelEvent.angleDelta.y;
+                if (delta !== 0) {
+                    AudioService.cycleAudioOutputDirection(delta < 0);
+                    wheelEvent.accepted = true;
+                }
+            }
+            onClicked: mouse => {
+                if (mouse.button === Qt.RightButton) {
+                    if (AudioService.sink?.audio) {
+                        SessionData.suppressOSDTemporarily();
+                        AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
+                    }
+                    return;
+                }
                 if (devicesExpanded) {
                     const sinks = AudioService.getAvailableSinks();
                     if (sinks && sinks.length > 1) {

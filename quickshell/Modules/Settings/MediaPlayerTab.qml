@@ -113,6 +113,13 @@ Item {
                         }
                     }
                 }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Device list scroll volume")
+                    description: I18n.tr("Allow adjusting device volume by scrolling on the right half of items in the device list")
+                    checked: SettingsData.audioDeviceScrollVolumeEnabled
+                    onToggled: checked => SettingsData.set("audioDeviceScrollVolumeEnabled", checked)
+                }
             }
         }
     }
