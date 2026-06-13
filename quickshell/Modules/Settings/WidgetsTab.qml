@@ -460,7 +460,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "hideWhenIdle"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems", "hideWhenIdle"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -803,6 +803,12 @@ Item {
                     item.barShowOverflowBadge = widget.barShowOverflowBadge;
                 if (widget.trayUseInlineExpansion !== undefined)
                     item.trayUseInlineExpansion = widget.trayUseInlineExpansion;
+                if (widget.trayPopupSingleLine !== undefined)
+                    item.trayPopupSingleLine = widget.trayPopupSingleLine;
+                if (widget.trayAutoOverflow !== undefined)
+                    item.trayAutoOverflow = widget.trayAutoOverflow;
+                if (widget.trayMaxVisibleItems !== undefined)
+                    item.trayMaxVisibleItems = widget.trayMaxVisibleItems;
                 if (widget.hideWhenIdle !== undefined)
                     item.hideWhenIdle = widget.hideWhenIdle;
             }
