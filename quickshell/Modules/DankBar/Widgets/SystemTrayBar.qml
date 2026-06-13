@@ -22,6 +22,9 @@ BasePill {
     property bool isAtBottom: false
     property bool isAutoHideBar: false
     property bool useOverflowPopup: !widgetData?.trayUseInlineExpansion
+    property bool useSingleLineOverflowPopup: widgetData?.trayPopupSingleLine ?? true
+    property bool useAutomaticOverflow: widgetData?.trayAutoOverflow ?? true
+    property int configuredMaxVisibleItems: widgetData?.trayMaxVisibleItems ?? 0
     readonly property var hiddenTrayIds: {
         const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
         return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
@@ -146,12 +149,32 @@ BasePill {
 
     readonly property var allSortedTrayItems: sortByPreferredOrder(allTrayItems, _trayOrderTrigger)
     readonly property var allSortedTrayItemKeys: allSortedTrayItems.map(item => getTrayItemKey(item))
-    readonly property var mainBarItemsRaw: allSortedTrayItems.filter(item => !SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property var visibleSortedTrayItems: allSortedTrayItems.filter(item => !SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property int automaticVisibleItemLimit: {
+        if (!root.useAutomaticOverflow)
+            return root.visibleSortedTrayItems.length;
+
+        const explicitLimit = Number(root.configuredMaxVisibleItems || 0);
+        if (explicitLimit > 0)
+            return Math.max(1, Math.min(root.visibleSortedTrayItems.length, explicitLimit));
+
+        const screenPrimary = root.isVerticalOrientation ? (root.parentScreen?.height || 0) : (root.parentScreen?.width || 0);
+        const scale = (typeof CompositorService !== "undefined" && CompositorService.getScreenScale) ? Math.max(1, CompositorService.getScreenScale(root.parentScreen)) : 1;
+        const logicalPrimary = screenPrimary > 0 ? (screenPrimary / scale) : 1920;
+        const maxTrayShare = root.isVerticalOrientation ? 0.30 : 0.18;
+        const itemSize = Math.max(1, root.trayItemSize);
+        const slots = Math.floor((logicalPrimary * maxTrayShare) / itemSize);
+        return Math.max(2, Math.min(10, Math.min(root.visibleSortedTrayItems.length, slots)));
+    }
+    readonly property var mainBarItemsRaw: visibleSortedTrayItems.slice(0, automaticVisibleItemLimit)
     readonly property var mainBarItems: mainBarItemsRaw.map((item, idx) => ({
                 key: getTrayItemKey(item),
                 item: item
             }))
-    readonly property var hiddenBarItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property var hiddenBarItems: {
+        const visibleKeys = root.mainBarItemsRaw.map(item => root.getTrayItemKey(item));
+        return root.allSortedTrayItems.filter(item => visibleKeys.indexOf(root.getTrayItemKey(item)) === -1);
+    }
     readonly property string trayIconTintMode: {
         const configuredMode = SettingsData.systemTrayIconTintMode || "none";
         switch (configuredMode) {
@@ -219,6 +242,10 @@ BasePill {
 
         const fromKey = mainBarItems[visibleFromIndex]?.key ?? null;
         const toKey = mainBarItems[visibleToIndex]?.key ?? null;
+        moveTrayItemKeyInFullOrder(fromKey, toKey);
+    }
+
+    function moveTrayItemKeyInFullOrder(fromKey, toKey) {
         if (!fromKey || !toKey)
             return;
 
@@ -235,8 +262,10 @@ BasePill {
 
     property int draggedIndex: -1
     property int dropTargetIndex: -1
+    property int popupDraggedIndex: -1
+    property int popupDropTargetIndex: -1
     property bool suppressShiftAnimation: false
-    readonly property bool hasHiddenItems: allTrayItems.length > mainBarItems.length
+    readonly property bool hasHiddenItems: hiddenBarItems.length > 0
     readonly property bool inlineExpanded: hasHiddenItems && !useOverflowPopup && menuOpen
     visible: allTrayItems.length > 0
     opacity: allTrayItems.length > 0 ? 1 : 0
@@ -1136,19 +1165,36 @@ BasePill {
             id: menuContainer
             objectName: "overflowMenuContainer"
 
+            readonly property bool popupUsesVerticalLine: root.useSingleLineOverflowPopup && root.isVerticalOrientation
+
             readonly property real rawWidth: {
                 const itemCount = root.hiddenBarItems.length;
-                const cols = Math.min(5, itemCount);
+                if (itemCount === 0)
+                    return 0;
+                if (popupUsesVerticalLine)
+                    return root.trayItemSize + 4 + Theme.spacingS * 2;
+                const cols = root.useSingleLineOverflowPopup ? itemCount : Math.min(5, itemCount);
                 const itemSize = root.trayItemSize + 4;
                 const spacing = 2;
-                return cols * itemSize + (cols - 1) * spacing + Theme.spacingS * 2;
+                const desiredWidth = cols * itemSize + (cols - 1) * spacing + Theme.spacingS * 2;
+                if (!root.useSingleLineOverflowPopup)
+                    return desiredWidth;
+                const maxWidth = Math.max(itemSize + Theme.spacingS * 2, overflowMenu.maskWidth - 20);
+                return Math.min(desiredWidth, maxWidth);
             }
             readonly property real rawHeight: {
                 const itemCount = root.hiddenBarItems.length;
-                const cols = Math.min(5, itemCount);
-                const rows = Math.ceil(itemCount / cols);
+                if (itemCount === 0)
+                    return 0;
                 const itemSize = root.trayItemSize + 4;
                 const spacing = 2;
+                if (popupUsesVerticalLine) {
+                    const desiredHeight = itemCount * itemSize + (itemCount - 1) * spacing + Theme.spacingS * 2;
+                    const maxHeight = Math.max(itemSize + Theme.spacingS * 2, overflowMenu.maskHeight - 20);
+                    return Math.min(desiredHeight, maxHeight);
+                }
+                const cols = root.useSingleLineOverflowPopup ? itemCount : Math.min(5, itemCount);
+                const rows = Math.ceil(itemCount / cols);
                 return rows * itemSize + (rows - 1) * spacing + Theme.spacingS * 2;
             }
 
@@ -1230,76 +1276,190 @@ BasePill {
                 z: 100
             }
 
-            Grid {
-                id: menuGrid
+            Flickable {
                 anchors.centerIn: parent
-                columns: Math.min(5, root.hiddenBarItems.length)
-                spacing: 2
-                rowSpacing: 2
+                width: parent.width - Theme.spacingS * 2
+                height: parent.height - Theme.spacingS * 2
+                contentWidth: menuGrid.implicitWidth
+                contentHeight: menuGrid.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
+                clip: true
+                interactive: root.useSingleLineOverflowPopup && (menuContainer.popupUsesVerticalLine ? contentHeight > height : contentWidth > width)
 
-                Repeater {
-                    model: root.hiddenBarItems
+                Grid {
+                    id: menuGrid
+                    anchors.verticalCenter: menuContainer.popupUsesVerticalLine ? undefined : parent.verticalCenter
+                    anchors.horizontalCenter: menuContainer.popupUsesVerticalLine ? parent.horizontalCenter : undefined
+                    columns: menuContainer.popupUsesVerticalLine ? 1 : (root.useSingleLineOverflowPopup ? root.hiddenBarItems.length : Math.min(5, root.hiddenBarItems.length))
+                    spacing: 2
+                    rowSpacing: 2
 
-                    delegate: Rectangle {
-                        property var trayItem: modelData
-                        property string iconSource: root.trayIconSourceFor(trayItem)
+                    Repeater {
+                        model: root.hiddenBarItems
 
-                        width: root.trayItemSize + 4
-                        height: root.trayItemSize + 4
-                        radius: Theme.cornerRadius
-                        color: itemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0)
+                        delegate: Rectangle {
+                            id: overflowItemRoot
+                            property var trayItem: modelData
+                            property string itemKey: root.getTrayItemKey(trayItem)
+                            property string iconSource: root.trayIconSourceFor(trayItem)
 
-                        IconImage {
-                            id: menuIconImg
-                            anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                            source: parent.iconSource
-                            asynchronous: true
-                            smooth: true
-                            mipmap: true
-                            visible: status === Image.Ready
-                            layer.enabled: root.trayIconTintEnabled
-                            layer.effect: MultiEffect {
-                                saturation: root.trayIconSaturation
-                                colorization: root.trayIconColorization
-                                colorizationColor: root.trayIconTintColor
+                            width: root.trayItemSize + 4
+                            height: root.trayItemSize + 4
+                            z: popupDragHandler.dragging ? 100 : 0
+                            radius: Theme.cornerRadius
+                            color: itemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0)
+                            border.width: popupDragHandler.dragging ? 2 : 0
+                            border.color: Theme.primary
+                            opacity: popupDragHandler.dragging ? 0.8 : 1.0
+
+                            property real shiftOffset: {
+                                if (root.popupDraggedIndex < 0)
+                                    return 0;
+                                if (index === root.popupDraggedIndex)
+                                    return 0;
+                                const dragIdx = root.popupDraggedIndex;
+                                const dropIdx = root.popupDropTargetIndex;
+                                const shiftAmount = root.trayItemSize + 6;
+                                if (dropIdx < 0)
+                                    return 0;
+                                if (dragIdx < dropIdx && index > dragIdx && index <= dropIdx)
+                                    return -shiftAmount;
+                                if (dragIdx > dropIdx && index >= dropIdx && index < dragIdx)
+                                    return shiftAmount;
+                                return 0;
                             }
-                        }
 
-                        StyledText {
-                            anchors.centerIn: parent
-                            visible: !menuIconImg.visible
-                            text: {
-                                const itemId = trayItem?.id || "";
-                                if (!itemId)
-                                    return "?";
-                                return itemId.charAt(0).toUpperCase();
+                            transform: Translate {
+                                x: !menuContainer.popupUsesVerticalLine ? overflowItemRoot.shiftOffset + (popupDragHandler.dragging ? popupDragHandler.dragAxisOffset : 0) : 0
+                                y: menuContainer.popupUsesVerticalLine ? overflowItemRoot.shiftOffset + (popupDragHandler.dragging ? popupDragHandler.dragAxisOffset : 0) : 0
+                                Behavior on x {
+                                    enabled: !root.suppressShiftAnimation && !menuContainer.popupUsesVerticalLine
+                                    NumberAnimation {
+                                        duration: 150
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+                                Behavior on y {
+                                    enabled: !root.suppressShiftAnimation && menuContainer.popupUsesVerticalLine
+                                    NumberAnimation {
+                                        duration: 150
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
                             }
-                            font.pixelSize: 10
-                            color: Theme.widgetTextColor
-                        }
 
-                        MouseArea {
-                            id: itemArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            acceptedButtons: Qt.LeftButton | Qt.RightButton
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: mouse => {
-                                if (!trayItem)
-                                    return;
-                                if (mouse.button === Qt.LeftButton && !trayItem.onlyMenu) {
-                                    trayItem.activate();
-                                    root.menuOpen = false;
-                                    return;
+                            Item {
+                                id: popupDragHandler
+                                anchors.fill: parent
+                                property bool dragging: false
+                                property point dragStartPos: Qt.point(0, 0)
+                                property real dragAxisOffset: 0
+                                property bool longPressing: false
+
+                                Timer {
+                                    id: popupLongPressTimer
+                                    interval: 400
+                                    repeat: false
+                                    onTriggered: popupDragHandler.longPressing = true
                                 }
-                                if (!trayItem.hasMenu) {
-                                    const gp = itemArea.mapToGlobal(mouse.x, mouse.y);
-                                    root.callContextMenuFallback(trayItem.id, Math.round(gp.x), Math.round(gp.y));
-                                    return;
+                            }
+
+                            IconImage {
+                                id: menuIconImg
+                                anchors.centerIn: parent
+                                width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                                height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                                source: parent.iconSource
+                                asynchronous: true
+                                smooth: true
+                                mipmap: true
+                                visible: status === Image.Ready
+                                layer.enabled: root.trayIconTintEnabled
+                                layer.effect: MultiEffect {
+                                    saturation: root.trayIconSaturation
+                                    colorization: root.trayIconColorization
+                                    colorizationColor: root.trayIconTintColor
                                 }
-                                root.showForTrayItem(trayItem, menuContainer, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+                            }
+
+                            StyledText {
+                                anchors.centerIn: parent
+                                visible: !menuIconImg.visible
+                                text: {
+                                    const itemId = trayItem?.id || "";
+                                    if (!itemId)
+                                        return "?";
+                                    return itemId.charAt(0).toUpperCase();
+                                }
+                                font.pixelSize: 10
+                                color: Theme.widgetTextColor
+                            }
+
+                            MouseArea {
+                                id: itemArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                cursorShape: popupDragHandler.longPressing ? Qt.DragMoveCursor : Qt.PointingHandCursor
+                                onPressed: mouse => {
+                                    if (mouse.button === Qt.LeftButton) {
+                                        popupDragHandler.dragStartPos = Qt.point(mouse.x, mouse.y);
+                                        popupLongPressTimer.start();
+                                    }
+                                }
+                                onReleased: mouse => {
+                                    popupLongPressTimer.stop();
+                                    const wasDragging = popupDragHandler.dragging;
+                                    const didReorder = wasDragging && root.popupDropTargetIndex >= 0 && root.popupDropTargetIndex !== root.popupDraggedIndex;
+
+                                    if (didReorder) {
+                                        const fromItem = root.hiddenBarItems[root.popupDraggedIndex];
+                                        const toItem = root.hiddenBarItems[root.popupDropTargetIndex];
+                                        root.suppressShiftAnimation = true;
+                                        root.moveTrayItemKeyInFullOrder(root.getTrayItemKey(fromItem), root.getTrayItemKey(toItem));
+                                        Qt.callLater(() => root.suppressShiftAnimation = false);
+                                    }
+
+                                    popupDragHandler.longPressing = false;
+                                    popupDragHandler.dragging = false;
+                                    popupDragHandler.dragAxisOffset = 0;
+                                    root.popupDraggedIndex = -1;
+                                    root.popupDropTargetIndex = -1;
+                                }
+                                onPositionChanged: mouse => {
+                                    const axisDelta = menuContainer.popupUsesVerticalLine ? (mouse.y - popupDragHandler.dragStartPos.y) : (mouse.x - popupDragHandler.dragStartPos.x);
+                                    if (popupDragHandler.longPressing && !popupDragHandler.dragging && Math.abs(axisDelta) > 5) {
+                                        popupDragHandler.dragging = true;
+                                        root.popupDraggedIndex = index;
+                                        root.popupDropTargetIndex = index;
+                                    }
+                                    if (!popupDragHandler.dragging)
+                                        return;
+
+                                    popupDragHandler.dragAxisOffset = axisDelta;
+                                    const itemSize = root.trayItemSize + 6;
+                                    const slotOffset = Math.round(axisDelta / itemSize);
+                                    const newTargetIndex = Math.max(0, Math.min(root.hiddenBarItems.length - 1, index + slotOffset));
+                                    if (newTargetIndex !== root.popupDropTargetIndex)
+                                        root.popupDropTargetIndex = newTargetIndex;
+                                }
+                                onClicked: mouse => {
+                                    if (popupDragHandler.dragging)
+                                        return;
+                                    if (!trayItem)
+                                        return;
+                                    if (mouse.button === Qt.LeftButton && !trayItem.onlyMenu) {
+                                        trayItem.activate();
+                                        root.menuOpen = false;
+                                        return;
+                                    }
+                                    if (!trayItem.hasMenu) {
+                                        const gp = itemArea.mapToGlobal(mouse.x, mouse.y);
+                                        root.callContextMenuFallback(trayItem.id, Math.round(gp.x), Math.round(gp.y));
+                                        return;
+                                    }
+                                    root.showForTrayItem(trayItem, menuContainer, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+                                }
                             }
                         }
                     }
