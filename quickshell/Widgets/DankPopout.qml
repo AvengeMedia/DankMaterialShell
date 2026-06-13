@@ -24,6 +24,7 @@ Item {
     property list<real> animationExitCurve: Theme.variantPopoutExitCurve
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
+    property bool hoverDismissEnabled: false
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
@@ -82,6 +83,8 @@ Item {
     readonly property real alignedY: impl.item ? impl.item.alignedY : 0
     readonly property real alignedWidth: impl.item ? impl.item.alignedWidth : 0
     readonly property real alignedHeight: impl.item ? impl.item.alignedHeight : 0
+    readonly property real renderedAlignedY: impl.item ? (impl.item.renderedAlignedY ?? impl.item.alignedY) : 0
+    readonly property real renderedAlignedHeight: impl.item ? (impl.item.renderedAlignedHeight ?? impl.item.alignedHeight) : 0
     readonly property real maskX: impl.item ? impl.item.maskX : 0
     readonly property real maskY: impl.item ? impl.item.maskY : 0
     readonly property real maskWidth: impl.item ? impl.item.maskWidth : 0
@@ -172,6 +175,32 @@ Item {
             impl.item.close();
     }
 
+    function cancelHoverDismiss() {
+        if (impl.item?.cancelHoverDismiss)
+            impl.item.cancelHoverDismiss();
+    }
+
+    function closeFromHoverDismiss() {
+        hoverDismissEnabled = false;
+        if (impl.item) {
+            impl.item.animationsEnabled = true;
+            impl.item.animationDuration = Math.round(Theme.expressiveDurations.expressiveDefaultSpatial);
+            impl.item.animationExitCurve = Theme.expressiveCurves.expressiveDefaultSpatial;
+        }
+        if (dashVisible !== undefined) {
+            dashVisible = false;
+            return;
+        }
+        if (notificationHistoryVisible !== undefined) {
+            notificationHistoryVisible = false;
+            return;
+        }
+        if (impl.item)
+            impl.item.close();
+        else
+            close();
+    }
+
     function toggle() {
         (shouldBeVisible || _pendingOpen) ? close() : open();
     }
@@ -208,6 +237,20 @@ Item {
     function updateSurfacePosition() {
         if (impl.item && typeof impl.item.updateSurfacePosition === "function")
             impl.item.updateSurfacePosition();
+    }
+
+    function containsGlobalPoint(gx, gy) {
+        if (!screen)
+            return false;
+        const presented = shouldBeVisible || (impl.item?.isClosing ?? false);
+        if (!presented)
+            return false;
+        const padding = 24;
+        const x = alignedX - padding;
+        const y = renderedAlignedY - padding;
+        const w = alignedWidth + padding * 2;
+        const h = renderedAlignedHeight + padding * 2;
+        return gx >= x && gx <= x + w && gy >= y && gy <= y + h;
     }
 
     Loader {
@@ -261,6 +304,7 @@ Item {
         it.screen = Qt.binding(() => root.screen);
         it.effectiveBarPosition = Qt.binding(() => root.effectiveBarPosition);
         it.effectiveBarBottomGap = Qt.binding(() => root.effectiveBarBottomGap);
+        it.hoverDismissEnabled = Qt.binding(() => root.hoverDismissEnabled);
 
         it.shouldBeVisible = root.shouldBeVisible;
         if (root._primeContent && typeof it.primeContent === "function")

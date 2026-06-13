@@ -999,7 +999,8 @@ Singleton {
             "shadowOpacity": 60,
             "shadowColorMode": "default",
             "shadowCustomColor": "#000000",
-            "clickThrough": false
+            "clickThrough": false,
+            "hoverPopouts": false
         }
     ]
 
