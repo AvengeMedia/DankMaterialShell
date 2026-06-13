@@ -392,8 +392,7 @@ Singleton {
     function toggleSettingsWithTab(tabName: string) {
         if (settingsModal) {
             var idx = settingsModal.resolveTabIndex(tabName);
-            if (idx >= 0)
-                settingsModal.currentTabIndex = idx;
+            settingsModal.setTabIndex(idx);
             settingsModal.toggle();
             return;
         }
@@ -433,8 +432,7 @@ Singleton {
                     return;
                 }
                 var idx = settingsModal.resolveTabIndex(tabName);
-                if (idx >= 0)
-                    settingsModal.currentTabIndex = idx;
+                settingsModal.setTabIndex(idx);
                 toplevel.activate();
                 return;
             }
@@ -466,12 +464,11 @@ Singleton {
         if (_settingsWantsToggle) {
             _settingsWantsToggle = false;
             if (_settingsPendingTabIndex >= 0) {
-                settingsModal.currentTabIndex = _settingsPendingTabIndex;
+                settingsModal?.setTabIndex(_settingsPendingTabIndex);
                 _settingsPendingTabIndex = -1;
             } else if (_settingsPendingTab) {
                 var idx = settingsModal?.resolveTabIndex(_settingsPendingTab) ?? -1;
-                if (idx >= 0)
-                    settingsModal.currentTabIndex = idx;
+                settingsModal?.setTabIndex(idx);
                 _settingsPendingTab = "";
             }
             settingsModal?.toggle();

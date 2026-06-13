@@ -2119,6 +2119,25 @@
     "conditionKey": "dmsConnected"
   },
   {
+    "section": "networkStatus",
+    "label": "Network Status",
+    "tabIndex": 7,
+    "category": "Network",
+    "keywords": [
+      "connection",
+      "connectivity",
+      "ethernet",
+      "internet",
+      "network",
+      "online",
+      "status",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "lan"
+  },
+  {
     "section": "_tab_8",
     "label": "Printers",
     "tabIndex": 8,
@@ -7302,7 +7321,8 @@
       "screen",
       "widgets"
     ],
-    "icon": "widgets"
+    "icon": "widgets",
+    "conditionKey": "dmsConnected"
   },
   {
     "section": "_tab_27",
@@ -8901,5 +8921,93 @@
     "icon": "select_window",
     "description": "Define compositor rules for window behavior",
     "conditionKey": "windowRulesCapable"
+  },
+  {
+    "section": "_tab_39",
+    "label": "Ethernet",
+    "tabIndex": 39,
+    "category": "Network",
+    "keywords": [
+      "connectivity",
+      "ethernet",
+      "network",
+      "online"
+    ],
+    "icon": "settings_ethernet"
+  },
+  {
+    "section": "networkEthernet",
+    "label": "Ethernet",
+    "tabIndex": 39,
+    "category": "Network",
+    "keywords": [
+      "adapters",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "network",
+      "online",
+      "wired"
+    ],
+    "icon": "settings_ethernet"
+  },
+  {
+    "section": "_tab_40",
+    "label": "WiFi",
+    "tabIndex": 40,
+    "category": "Network",
+    "keywords": [
+      "connectivity",
+      "network",
+      "online",
+      "wifi"
+    ],
+    "icon": "wifi"
+  },
+  {
+    "section": "networkWifi",
+    "label": "WiFi",
+    "tabIndex": 40,
+    "category": "Network",
+    "keywords": [
+      "adapter",
+      "connectivity",
+      "network",
+      "online",
+      "radio",
+      "ssid",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ]
+  },
+  {
+    "section": "_tab_41",
+    "label": "VPN",
+    "tabIndex": 41,
+    "category": "Network",
+    "keywords": [
+      "connectivity",
+      "network",
+      "online",
+      "vpn"
+    ],
+    "icon": "vpn_key"
+  },
+  {
+    "section": "networkVpn",
+    "label": "VPN",
+    "tabIndex": 41,
+    "category": "Network",
+    "keywords": [
+      "connectivity",
+      "import",
+      "network",
+      "online",
+      "openvpn",
+      "profiles",
+      "vpn",
+      "wireguard"
+    ]
   }
 ]
