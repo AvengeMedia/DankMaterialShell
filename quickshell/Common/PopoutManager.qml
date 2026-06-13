@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import Quickshell
 import QtQuick
+import qs.Common
 
 Singleton {
     id: root
@@ -16,8 +17,76 @@ Singleton {
     signal popoutOpening
     signal popoutChanged
 
+    property real hoverCursorGlobalX: 0
+    property real hoverCursorGlobalY: 0
+
+    function updateHoverCursor(gx, gy) {
+        hoverCursorGlobalX = gx;
+        hoverCursorGlobalY = gy;
+    }
+
+    function cursorOverBar(gx, gy, padding) {
+        const pad = padding !== undefined ? padding : 16;
+        const bars = KeyboardFocus.barWindows || [];
+        for (let i = 0; i < bars.length; i++) {
+            const w = bars[i];
+            if (!w?.visible)
+                continue;
+            if (typeof w.containsGlobalPoint === "function") {
+                if (w.containsGlobalPoint(gx, gy, pad))
+                    return true;
+                continue;
+            }
+            const item = w.contentItem;
+            if (!item || typeof item.mapToItem !== "function")
+                continue;
+            const topLeft = item.mapToItem(null, 0, 0);
+            if (!topLeft)
+                continue;
+            if (gx >= topLeft.x - pad && gx < topLeft.x + item.width + pad && gy >= topLeft.y - pad && gy < topLeft.y + item.height + pad)
+                return true;
+        }
+        return false;
+    }
+
+    function _isPopoutPresented(popout) {
+        if (!popout)
+            return false;
+        try {
+            if (popout.dashVisible !== undefined)
+                return !!popout.dashVisible;
+            if (popout.notificationHistoryVisible !== undefined)
+                return !!popout.notificationHistoryVisible;
+            return !!(popout.shouldBeVisible || popout.isClosing);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function _openPopout(popout) {
+        if (popout.dashVisible !== undefined) {
+            if (popout.dashVisible && !popout.shouldBeVisible && !popout.isClosing)
+                popout.dashVisible = false;
+            popout.dashVisible = true;
+            return;
+        }
+        if (popout.notificationHistoryVisible !== undefined) {
+            popout.notificationHistoryVisible = true;
+            return;
+        }
+        popout.open();
+    }
+
     function _closePopout(popout) {
         try {
+            if (popout?.hoverDismissEnabled) {
+                if (typeof popout.closeFromHoverDismiss === "function") {
+                    popout.closeFromHoverDismiss();
+                    return;
+                }
+            }
+            if (popout.hoverDismissEnabled !== undefined)
+                popout.hoverDismissEnabled = false;
             switch (true) {
             case popout.dashVisible !== undefined:
                 popout.dashVisible = false;
@@ -89,7 +158,26 @@ Singleton {
                 continue;
             _closePopout(popout);
         }
-        currentPopoutsByScreen = {};
+        // Keep map entries until each popout's close animation finishes (hidePopout).
+    }
+
+    function closePopoutForScreen(screen) {
+        if (!screen)
+            return;
+        const screenName = screen.name;
+        const popout = currentPopoutsByScreen[screenName];
+        if (!popout || _isStale(popout)) {
+            currentPopoutsByScreen[screenName] = null;
+            currentPopoutTriggers[screenName] = null;
+            return;
+        }
+        _closePopout(popout);
+    }
+
+    function cancelHoverDismiss(screen) {
+        const popout = getActivePopout(screen);
+        if (popout?.cancelHoverDismiss)
+            popout.cancelHoverDismiss();
     }
 
     function getActivePopout(screen) {
@@ -106,6 +194,8 @@ Singleton {
     function requestPopout(popout, tabIndex, triggerSource) {
         if (!popout || !popout.screen)
             return;
+        if (popout.hoverDismissEnabled !== undefined)
+            popout.hoverDismissEnabled = false;
         screenshotActive = false;
         const screenName = popout.screen.name;
         const currentPopout = currentPopoutsByScreen[screenName];
@@ -181,16 +271,81 @@ Singleton {
             ModalManager.closeAllModalsExcept(null);
         }
 
-        if (movedFromOtherScreen) {
-            popout.open();
-        } else {
-            if (popout.dashVisible !== undefined) {
-                popout.dashVisible = true;
-            } else if (popout.notificationHistoryVisible !== undefined) {
-                popout.notificationHistoryVisible = true;
+        _openPopout(popout);
+    }
+
+    function requestHoverPopout(popout, tabIndex, triggerSource) {
+        if (!popout || !popout.screen)
+            return;
+        screenshotActive = false;
+        const screenName = popout.screen.name;
+        const currentPopout = currentPopoutsByScreen[screenName];
+        const triggerId = triggerSource !== undefined ? triggerSource : tabIndex;
+
+        const willOpen = !(currentPopout === popout && _isPopoutPresented(popout) && triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId);
+        if (willOpen)
+            popoutOpening();
+
+        let movedFromOtherScreen = false;
+        for (const otherScreenName in currentPopoutsByScreen) {
+            if (otherScreenName === screenName)
+                continue;
+            const otherPopout = currentPopoutsByScreen[otherScreenName];
+            if (!otherPopout)
+                continue;
+
+            if (_isStale(otherPopout)) {
+                currentPopoutsByScreen[otherScreenName] = null;
+                currentPopoutTriggers[otherScreenName] = null;
+                continue;
+            }
+
+            if (otherPopout === popout) {
+                movedFromOtherScreen = true;
+                currentPopoutsByScreen[otherScreenName] = null;
+                currentPopoutTriggers[otherScreenName] = null;
+                continue;
+            }
+
+            _closePopout(otherPopout);
+        }
+
+        if (currentPopout && currentPopout !== popout) {
+            if (_isStale(currentPopout)) {
+                currentPopoutsByScreen[screenName] = null;
+                currentPopoutTriggers[screenName] = null;
             } else {
-                popout.open();
+                _closePopout(currentPopout);
             }
         }
+
+        if (currentPopout === popout && _isPopoutPresented(popout) && !movedFromOtherScreen) {
+            if (triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId)
+                return;
+
+            if (tabIndex !== undefined && popout.currentTabIndex !== undefined)
+                popout.currentTabIndex = tabIndex;
+            if (popout.updateSurfacePosition)
+                popout.updateSurfacePosition();
+            currentPopoutTriggers[screenName] = triggerId;
+            if (popout.hoverDismissEnabled !== undefined)
+                popout.hoverDismissEnabled = true;
+            return;
+        }
+
+        currentPopoutTriggers[screenName] = triggerId;
+        currentPopoutsByScreen[screenName] = popout;
+        popoutChanged();
+
+        if (tabIndex !== undefined && popout.currentTabIndex !== undefined)
+            popout.currentTabIndex = tabIndex;
+
+        if (currentPopout !== popout)
+            ModalManager.closeAllModalsExcept(null);
+
+        if (popout.hoverDismissEnabled !== undefined)
+            popout.hoverDismissEnabled = true;
+
+        _openPopout(popout);
     }
 }

@@ -13,6 +13,7 @@ PanelWindow {
     WlrLayershell.namespace: layerNamespace
 
     property bool isVisible: false
+    property bool hoverDismissEnabled: false
     property var targetScreen: null
     property var modelData: null
     property bool triggerUsesOverlayLayer: false
@@ -39,6 +40,24 @@ PanelWindow {
         isVisible = false;
     }
 
+    function hideFromHoverDismiss() {
+        hoverDismissEnabled = false;
+        slideAnimation.duration = Math.round(Theme.expressiveDurations.expressiveDefaultSpatial);
+        hide();
+    }
+
+    function cancelHoverDismiss() {
+        hoverDismissTracker.cancelPending();
+    }
+
+    function containsGlobalPoint(gx, gy) {
+        if (!isVisible || !modelData)
+            return false;
+        const padding = 24;
+        const topLeft = slideContainer.mapToItem(null, 0, 0);
+        return gx >= topLeft.x - padding && gx < topLeft.x + slideContainer.width + padding && gy >= topLeft.y - padding && gy < topLeft.y + slideContainer.height + padding;
+    }
+
     function toggle() {
         if (isVisible) {
             hide();
@@ -59,6 +78,27 @@ PanelWindow {
     implicitHeight: modelData ? modelData.height : 800
 
     color: "transparent"
+
+    MouseArea {
+        anchors.fill: parent
+        z: -1
+        acceptedButtons: Qt.NoButton
+        hoverEnabled: true
+        onPositionChanged: mouse => {
+            const gp = mapToItem(null, mouse.x, mouse.y);
+            PopoutManager.updateHoverCursor(gp.x, gp.y);
+        }
+    }
+
+    HoverDismissTracker {
+        id: hoverDismissTracker
+        anchors.fill: parent
+        enabled: root.hoverDismissEnabled && root.isVisible
+        shouldDismiss: function () {
+            return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
+        }
+        onDismissRequested: root.hideFromHoverDismiss()
+    }
 
     readonly property bool slideoutBlurActive: root.visible && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
@@ -104,8 +144,10 @@ PanelWindow {
                 easing.type: Easing.OutCubic
 
                 onRunningChanged: {
-                    if (!running && !root.isVisible) {
-                        root.mappedVisible = false;
+                    if (!running) {
+                        if (!root.isVisible)
+                            root.mappedVisible = false;
+                        slideAnimation.duration = 450;
                     }
                 }
             }

@@ -1922,4 +1922,53 @@ BasePill {
             return;
         currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj);
     }
+
+    function _trayLayoutRoot() {
+        const contentChildren = root.visualContent?.children;
+        if (!contentChildren || contentChildren.length === 0)
+            return null;
+        const contentRoot = contentChildren[0];
+        return contentRoot?.layoutLoader?.item || null;
+    }
+
+    function _trayHitAtGlobalPoint(gx, gy) {
+        if (!root.visible || root.width <= 0 || root.height <= 0)
+            return null;
+        const local = root.mapFromItem(null, gx, gy);
+        if (local.x < 0 || local.y < 0 || local.x > root.width || local.y > root.height)
+            return null;
+        const layout = _trayLayoutRoot();
+        if (!layout)
+            return null;
+        const layoutLocal = layout.mapFromItem(null, gx, gy);
+        const children = layout.children || [];
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            if (!child.visible || child.width <= 0 || child.height <= 0)
+                continue;
+            if (layoutLocal.x < child.x || layoutLocal.x >= child.x + child.width)
+                continue;
+            if (layoutLocal.y < child.y || layoutLocal.y >= child.y + child.height)
+                continue;
+            if (child.trayItem)
+                return child;
+        }
+        return null;
+    }
+
+    function hoverTriggerAtGlobalPoint(gx, gy) {
+        const hit = _trayHitAtGlobalPoint(gx, gy);
+        if (!hit?.trayItem?.hasMenu)
+            return "";
+        return "tray-" + (hit.trayItem.id || hit.itemKey || "");
+    }
+
+    function openHoverAtGlobalPoint(gx, gy) {
+        const hit = _trayHitAtGlobalPoint(gx, gy);
+        if (!hit?.trayItem?.hasMenu)
+            return false;
+        const anchor = hit.children?.length > 0 ? hit.children[0] : hit;
+        showForTrayItem(hit.trayItem, anchor, parentScreen, isAtBottom, isVerticalOrientation, axis);
+        return true;
+    }
 }

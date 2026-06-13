@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -35,6 +36,21 @@ Item {
     property bool shouldBeVisible: false
     property bool isClosing: false
     property bool animationsEnabled: true
+    property bool hoverDismissEnabled: false
+
+    function cancelHoverDismiss() {
+        hoverDismissTracker.cancelPending();
+    }
+
+    function closeFromHoverDismiss() {
+        if (isClosing || !shouldBeVisible)
+            return;
+        if (popoutHandle?.closeFromHoverDismiss)
+            popoutHandle.closeFromHoverDismiss();
+        else
+            close();
+    }
+
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
@@ -584,6 +600,27 @@ Item {
         visible: false
         color: "transparent"
         readonly property bool closeVisualActive: root.shouldBeVisible || root.isClosing
+
+        MouseArea {
+            anchors.fill: parent
+            z: -1
+            acceptedButtons: Qt.NoButton
+            hoverEnabled: true
+            onPositionChanged: mouse => {
+                const gp = mapToItem(null, mouse.x, mouse.y);
+                PopoutManager.updateHoverCursor(gp.x, gp.y);
+            }
+        }
+
+        HoverDismissTracker {
+            id: hoverDismissTracker
+            anchors.fill: parent
+            enabled: root.hoverDismissEnabled && root.shouldBeVisible
+            shouldDismiss: function () {
+                return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
+            }
+            onDismissRequested: root.closeFromHoverDismiss()
+        }
 
         WindowBlur {
             id: popoutBlur

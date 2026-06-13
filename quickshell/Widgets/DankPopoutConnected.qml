@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -407,6 +408,20 @@ Item {
     onFrameOwnsConnectedChromeChanged: _syncPopoutChromeState()
 
     property bool animationsEnabled: true
+    property bool hoverDismissEnabled: false
+
+    function cancelHoverDismiss() {
+        hoverDismissTracker.cancelPending();
+    }
+
+    function closeFromHoverDismiss() {
+        if (isClosing || !shouldBeVisible)
+            return;
+        if (popoutHandle?.closeFromHoverDismiss)
+            popoutHandle.closeFromHoverDismiss();
+        else
+            close();
+    }
 
     function open() {
         if (!screen)
@@ -760,6 +775,27 @@ Item {
         screen: root.screen
         visible: false
         color: "transparent"
+
+        MouseArea {
+            anchors.fill: parent
+            z: -1
+            acceptedButtons: Qt.NoButton
+            hoverEnabled: true
+            onPositionChanged: mouse => {
+                const gp = mapToItem(null, mouse.x, mouse.y);
+                PopoutManager.updateHoverCursor(gp.x, gp.y);
+            }
+        }
+
+        HoverDismissTracker {
+            id: hoverDismissTracker
+            anchors.fill: parent
+            enabled: root.hoverDismissEnabled && root.shouldBeVisible
+            shouldDismiss: function () {
+                return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
+            }
+            onDismissRequested: root.closeFromHoverDismiss()
+        }
 
         WindowBlur {
             id: popoutBlur

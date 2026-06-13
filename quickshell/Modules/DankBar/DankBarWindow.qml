@@ -709,6 +709,14 @@ PanelWindow {
     readonly property var _rightSection: topBarContent ? (barWindow.isVertical ? topBarContent.vRightSection : topBarContent.hRightSection) : null
     readonly property real _revealProgress: topBarSlide.x + topBarSlide.y
 
+    function containsGlobalPoint(gx, gy, padding) {
+        const pad = padding !== undefined ? padding : 16;
+        if (!inputMask.showing)
+            return false;
+        const topLeft = inputMask.mapToItem(null, 0, 0);
+        return gx >= topLeft.x - pad && gx < topLeft.x + inputMask.width + pad && gy >= topLeft.y - pad && gy < topLeft.y + inputMask.height + pad;
+    }
+
     function sectionRect(section, isCenter, _dep) {
         if (!section)
             return {
@@ -1010,7 +1018,7 @@ PanelWindow {
                             }
                         }
 
-                        onWheel: wheel => {
+                        function processWheel(wheel) {
                             if (!(barConfig?.scrollEnabled ?? true) || actionInProgress) {
                                 wheel.accepted = false;
                                 return;
@@ -1079,6 +1087,8 @@ PanelWindow {
 
                             wheel.accepted = false;
                         }
+
+                        onWheel: wheel => processWheel(wheel)
                     }
 
                     DankBarContent {
@@ -1089,6 +1099,36 @@ PanelWindow {
                         leftWidgetsModel: barWindow.leftWidgetsModel
                         centerWidgetsModel: barWindow.centerWidgetsModel
                         rightWidgetsModel: barWindow.rightWidgetsModel
+                    }
+
+                    MouseArea {
+                        id: hoverPopoutArea
+                        anchors.fill: parent
+                        z: 1
+                        hoverEnabled: barConfig?.hoverPopouts ?? false
+                        enabled: hoverPopoutArea.hoverEnabled && !barWindow.clickThroughEnabled
+                        acceptedButtons: Qt.NoButton
+                        propagateComposedEvents: true
+
+                        property real lastGlobalX: 0
+                        property real lastGlobalY: 0
+
+                        onPositionChanged: mouse => {
+                            const gp = mapToItem(null, mouse.x, mouse.y);
+                            lastGlobalX = gp.x;
+                            lastGlobalY = gp.y;
+                            topBarContent.checkHoverPopout(gp.x, gp.y);
+                        }
+
+                        onWheel: wheel => scrollArea.processWheel(wheel)
+
+                        onContainsMouseChanged: {
+                            if (containsMouse)
+                                return;
+                            if (topBarContent.cursorOverHoverChain(lastGlobalX, lastGlobalY))
+                                return;
+                            topBarContent.closeHoverSurfaces();
+                        }
                     }
                 }
             }
