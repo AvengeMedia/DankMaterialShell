@@ -390,7 +390,11 @@ Item {
                                     }
                                 }
                                 onWheel: wheelEvent => {
-                                    AudioService.handleNodeVolumeWheel(modelData, wheelEvent);
+                                    if (SettingsData.audioDeviceScrollVolumeEnabled && wheelEvent.x >= deviceMouseArea.width / 2) {
+                                        AudioService.handleNodeVolumeWheel(modelData, wheelEvent);
+                                    } else {
+                                        wheelEvent.accepted = false;
+                                    }
                                 }
                                 onClicked: mouse => {
                                     if (mouse.button === Qt.RightButton) {

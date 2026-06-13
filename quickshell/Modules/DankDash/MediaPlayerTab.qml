@@ -873,7 +873,11 @@ Item {
                 }
             }
             onWheel: wheelEvent => {
-                AudioService.handleNodeVolumeWheel(AudioService.sink, wheelEvent);
+                const delta = wheelEvent.angleDelta.y;
+                if (delta !== 0) {
+                    AudioService.cycleAudioOutputDirection(delta < 0);
+                    wheelEvent.accepted = true;
+                }
             }
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) {

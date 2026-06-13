@@ -58,7 +58,7 @@ Singleton {
         return SessionData.deviceMaxVolumes[name] ?? 100;
     }
 
-    readonly property int wheelVolumeStep: 5
+    readonly property int wheelVolumeStep: SettingsData.audioWheelScrollAmount
 
     signal micMuteChanged
     signal audioOutputCycled(string deviceName, string deviceIcon)
@@ -158,19 +158,28 @@ Singleton {
         return false;
     }
 
-    function cycleAudioOutput() {
+    function cycleAudioOutputDirection(forward) {
         const sinks = getAvailableSinks();
         if (sinks.length < 2)
             return null;
 
         const currentName = root.sink?.name ?? "";
         const currentIndex = sinks.findIndex(s => s.name === currentName);
-        const nextIndex = (currentIndex + 1) % sinks.length;
+        let nextIndex;
+        if (forward) {
+            nextIndex = (currentIndex + 1) % sinks.length;
+        } else {
+            nextIndex = (currentIndex - 1 + sinks.length) % sinks.length;
+        }
         const nextSink = sinks[nextIndex];
         setDefaultSinkByName(nextSink.name);
         const name = displayName(nextSink);
         audioOutputCycled(name, sinkIcon(nextSink));
         return name;
+    }
+
+    function cycleAudioOutput() {
+        return cycleAudioOutputDirection(true);
     }
 
     function getDeviceAlias(nodeName) {
