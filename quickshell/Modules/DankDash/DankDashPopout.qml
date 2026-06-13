@@ -108,9 +108,6 @@ DankPopout {
                 MprisController.setActivePlayer(player);
                 root.__hideDropdowns();
             }
-            onDeviceSelected: device => {
-                root.__hideDropdowns();
-            }
         }
     }
 
