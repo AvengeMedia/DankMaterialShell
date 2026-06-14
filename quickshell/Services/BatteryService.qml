@@ -105,8 +105,18 @@ Singleton {
     readonly property bool isLowBattery: batteryAvailable && batteryLevel <= SettingsData.batteryLowThreshold
 
     property bool _hasNotifiedLowBattery: false
+    property bool _hasNotifiedChargeLimit: false
 
     onBatteryLevelChanged: {
+        if (isCharging && batteryLevel >= SettingsData.batteryChargeLimit) {
+            if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
+                _hasNotifiedChargeLimit = true;
+                ToastService.showInfo(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), "", "battery-charge-limit");
+            }
+        } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
+            _hasNotifiedChargeLimit = false;
+        }
+
         if (isCharging || !isLowBattery) {
             _hasNotifiedLowBattery = false;
             return;
@@ -129,6 +139,8 @@ Singleton {
     onIsChargingChanged: {
         if (isCharging) {
             _hasNotifiedLowBattery = false;
+        } else {
+            _hasNotifiedChargeLimit = false;
         }
     }
 

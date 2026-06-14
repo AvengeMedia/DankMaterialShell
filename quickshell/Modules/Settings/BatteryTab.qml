@@ -206,6 +206,14 @@ done
                     }
                 }
 
+                SettingsToggleRow {
+                    settingKey: "batteryNotifyChargeLimit"
+                    text: I18n.tr("Notify when limit is reached")
+                    description: I18n.tr("Show a notification when battery reaches the charge limit.")
+                    checked: SettingsData.batteryNotifyChargeLimit
+                    onToggled: checked => SettingsData.set("batteryNotifyChargeLimit", checked)
+                }
+
                 Rectangle {
                     width: parent.width
                     height: 1

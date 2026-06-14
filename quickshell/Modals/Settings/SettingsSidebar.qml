@@ -149,6 +149,12 @@ Rectangle {
                     "tabIndex": 16
                 },
                 {
+                    "id": "battery",
+                    "text": I18n.tr("Battery"),
+                    "icon": "battery_charging_full",
+                    "tabIndex": 37
+                },
+                {
                     "id": "notifications",
                     "text": I18n.tr("Notifications"),
                     "icon": "notifications",
@@ -165,12 +171,6 @@ Rectangle {
                     "text": I18n.tr("Desktop Widgets"),
                     "icon": "widgets",
                     "tabIndex": 27
-                },
-                {
-                    "id": "battery",
-                    "text": I18n.tr("Battery"),
-                    "icon": "battery_charging_full",
-                    "tabIndex": 37
                 }
             ]
         },
