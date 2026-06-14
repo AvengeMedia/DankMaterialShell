@@ -16,6 +16,7 @@ FocusScope {
 
     property string mode: "history"
     property string searchText: ClipboardService.searchText
+    property string activeFilter: ClipboardService.activeFilter
 
     readonly property bool clipboardAvailable: ClipboardService.clipboardAvailable
     readonly property bool wtypeAvailable: ClipboardService.wtypeAvailable
@@ -49,6 +50,11 @@ FocusScope {
         }
     }
     onSearchTextChanged: ClipboardService.searchText = searchText
+
+    onActiveFilterChanged: {
+        ClipboardService.activeFilter = activeFilter;
+        ClipboardService.updateFilteredModel();
+    }
 
     function hide() {
         closeRequested();
