@@ -555,9 +555,9 @@ Singleton {
     property string batteryProfileName: ""
     property int batteryPostLockMonitorTimeout: 0
     property int batteryChargeLimit: 100
-    property bool batteryNotifyChargeLimit: true
+    property bool batteryNotifyChargeLimit: false
     property int batteryLowThreshold: 20
-    property bool batteryNotifyLow: true
+    property bool batteryNotifyLow: false
     property bool batteryAutoPowerSaver: false
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
