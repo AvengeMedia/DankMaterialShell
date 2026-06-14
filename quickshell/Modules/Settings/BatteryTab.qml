@@ -240,6 +240,19 @@ done
                     onToggled: checked => SettingsData.set("batteryNotifyLow", checked)
                 }
 
+                SettingsButtonGroupRow {
+                    settingKey: "batteryNotificationType"
+                    text: I18n.tr("Notification Type")
+                    description: I18n.tr("Choose how to be notified about battery alerts.")
+                    model: [I18n.tr("Toast Overlay"), I18n.tr("System Notification")]
+                    currentIndex: SettingsData.batteryNotificationType
+                    onSelectionChanged: (index, selected) => {
+                        if (selected) {
+                            SettingsData.set("batteryNotificationType", index);
+                        }
+                    }
+                }
+
                 SettingsToggleRow {
                     settingKey: "batteryAutoPowerSaver"
                     text: I18n.tr("Auto Power Saver")

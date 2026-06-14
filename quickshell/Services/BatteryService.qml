@@ -107,11 +107,23 @@ Singleton {
     property bool _hasNotifiedLowBattery: false
     property bool _hasNotifiedChargeLimit: false
 
+    function sendAlert(title, message, isWarning, category) {
+        if (SettingsData.batteryNotificationType === 1) {
+            Quickshell.execDetached(["notify-send", "-u", isWarning ? "critical" : "normal", "-a", "DMS", "-i", isWarning ? "battery-caution" : "battery-charging", title, message]);
+        } else {
+            if (isWarning) {
+                ToastService.showWarning(title, message, "", category);
+            } else {
+                ToastService.showInfo(title, message, "", category);
+            }
+        }
+    }
+
     onBatteryLevelChanged: {
         if (isCharging && batteryLevel >= SettingsData.batteryChargeLimit) {
             if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
                 _hasNotifiedChargeLimit = true;
-                ToastService.showInfo(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), "", "battery-charge-limit");
+                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), false, "battery-charge-limit");
             }
         } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
             _hasNotifiedChargeLimit = false;
@@ -125,7 +137,7 @@ Singleton {
         if (!isCharging && isLowBattery) {
             if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
                 _hasNotifiedLowBattery = true;
-                ToastService.showWarning(I18n.tr("Low Battery"), I18n.tr("Battery is at %1%").arg(batteryLevel), "", "battery-low");
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1%").arg(batteryLevel), true, "battery-low");
             }
 
             if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {

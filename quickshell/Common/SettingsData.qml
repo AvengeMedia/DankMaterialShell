@@ -558,6 +558,7 @@ Singleton {
     property bool batteryNotifyChargeLimit: false
     property int batteryLowThreshold: 20
     property bool batteryNotifyLow: false
+    property int batteryNotificationType: 0
     property bool batteryAutoPowerSaver: false
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
