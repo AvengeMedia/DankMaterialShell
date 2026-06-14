@@ -165,6 +165,12 @@ Rectangle {
                     "text": I18n.tr("Desktop Widgets"),
                     "icon": "widgets",
                     "tabIndex": 27
+                },
+                {
+                    "id": "battery",
+                    "text": I18n.tr("Battery"),
+                    "icon": "battery_charging_full",
+                    "tabIndex": 37
                 }
             ]
         },

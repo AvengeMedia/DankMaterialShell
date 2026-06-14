@@ -102,7 +102,35 @@ Singleton {
 
     // Is the system plugged in (Is not running on battery)
     readonly property bool isPluggedIn: !UPower.onBattery
-    readonly property bool isLowBattery: batteryAvailable && batteryLevel <= 20
+    readonly property bool isLowBattery: batteryAvailable && batteryLevel <= SettingsData.batteryLowThreshold
+
+    property bool _hasNotifiedLowBattery: false
+
+    onBatteryLevelChanged: {
+        if (isCharging || !isLowBattery) {
+            _hasNotifiedLowBattery = false;
+            return;
+        }
+
+        if (!isCharging && isLowBattery) {
+            if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
+                _hasNotifiedLowBattery = true;
+                ToastService.showWarning(I18n.tr("Low Battery"), I18n.tr("Battery is at %1%").arg(batteryLevel), "", "battery-low");
+            }
+
+            if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
+                if (PowerProfileWatcher.currentProfile !== PowerProfile.PowerSaver) {
+                    PowerProfileWatcher.applyProfile(PowerProfile.PowerSaver);
+                }
+            }
+        }
+    }
+
+    onIsChargingChanged: {
+        if (isCharging) {
+            _hasNotifiedLowBattery = false;
+        }
+    }
 
     onIsPluggedInChanged: {
         if (suppressSound || !batteryAvailable) {

@@ -605,5 +605,20 @@ FocusScope {
                     Qt.callLater(() => item.forceActiveFocus());
             }
         }
+
+        Loader {
+            id: batteryLoader
+            anchors.fill: parent
+            active: root.currentIndex === 37
+            visible: active
+            focus: active
+
+            sourceComponent: BatteryTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
     }
 }
