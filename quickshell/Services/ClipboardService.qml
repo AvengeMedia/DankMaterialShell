@@ -23,6 +23,7 @@ Singleton {
     property int pinnedCount: 0
     property int totalCount: 0
     property string searchText: ""
+    property string activeFilter: "all"
     property int selectedIndex: 0
     property bool keyboardNavigationActive: false
     property int refCount: 0
