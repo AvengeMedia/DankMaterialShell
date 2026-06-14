@@ -51,46 +51,46 @@ Singleton {
     }
 
     function updateFilteredModel() {
-    let filtered = internalEntries;
+        let filtered = internalEntries;
 
-    if (activeFilter !== "all") {
-        filtered = filtered.filter(entry =>
-            getEntryType(entry) === activeFilter
-        );
+        if (activeFilter !== "all") {
+            filtered = filtered.filter(entry =>
+                getEntryType(entry) === activeFilter
+            );
+        }
+
+        const query = searchText.trim();
+
+        if (query.length > 0) {
+            const lowerQuery = query.toLowerCase();
+            filtered = filtered.filter(entry =>
+                entry.preview.toLowerCase().includes(lowerQuery)
+            );
+        }
+
+        filtered.sort((a, b) => {
+            if (a.pinned !== b.pinned)
+                return b.pinned ? 1 : -1;
+            return b.id - a.id;
+        });
+
+        clipboardEntries = filtered;
+        unpinnedEntries = filtered.filter(e => !e.pinned);
+        pinnedEntries = filtered.filter(e => e.pinned);
+        totalCount = clipboardEntries.length;
+
+        const activeCount = Math.max(unpinnedEntries.length, pinnedEntries.length);
+
+        if (activeCount === 0) {
+            keyboardNavigationActive = false;
+            selectedIndex = 0;
+            return;
+        }
+
+        if (selectedIndex >= activeCount) {
+            selectedIndex = activeCount - 1;
+        }
     }
-
-    const query = searchText.trim();
-
-    if (query.length > 0) {
-        const lowerQuery = query.toLowerCase();
-        filtered = filtered.filter(entry =>
-            entry.preview.toLowerCase().includes(lowerQuery)
-        );
-    }
-
-    filtered.sort((a, b) => {
-        if (a.pinned !== b.pinned)
-            return b.pinned ? 1 : -1;
-        return b.id - a.id;
-    });
-
-    clipboardEntries = filtered;
-    unpinnedEntries = filtered.filter(e => !e.pinned);
-    pinnedEntries = filtered.filter(e => e.pinned);
-    totalCount = clipboardEntries.length;
-
-    const activeCount = Math.max(unpinnedEntries.length, pinnedEntries.length);
-
-    if (activeCount === 0) {
-        keyboardNavigationActive = false;
-        selectedIndex = 0;
-        return;
-    }
-
-    if (selectedIndex >= activeCount) {
-        selectedIndex = activeCount - 1;
-    }
-}
 
     function refresh() {
         if (!clipboardAvailable) {

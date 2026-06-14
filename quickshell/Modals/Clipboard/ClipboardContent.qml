@@ -30,6 +30,8 @@ Item {
             showKeyboardHints: modal.showKeyboardHints
             activeTab: modal.activeTab
             pinnedCount: modal.pinnedCount
+            activeFilter: modal.activeFilter
+            onFilterChanged: filter => modal.activeFilter = filter
             onKeyboardHintsToggled: modal.showKeyboardHints = !modal.showKeyboardHints
             onTabChanged: tabName => modal.activeTab = tabName
             onClearAllClicked: modal.confirmClearAll()
