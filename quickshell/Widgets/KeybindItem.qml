@@ -720,7 +720,7 @@ Item {
                                     mods.push("Shift");
                             }
 
-                            const key = KeyUtils.xkbKeyFromQtKey(qtKey);
+                            const key = KeyUtils.xkbKeyFromQtKey(qtKey, !!(event.modifiers & Qt.KeypadModifier));
                             if (!key) {
                                 log.warn("Unknown key:", event.key, "mods:", event.modifiers);
                                 return;
