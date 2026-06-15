@@ -698,6 +698,12 @@ Item {
                             case Qt.Key_Shift:
                             case Qt.Key_Alt:
                             case Qt.Key_Meta:
+                            // Lock keys are toggles, not useful bind targets; ignore
+                            // them so toggling NumLock to pick the numpad keysym
+                            // (KP_7 vs KP_Home) doesn't get captured as the bind.
+                            case Qt.Key_NumLock:
+                            case Qt.Key_CapsLock:
+                            case Qt.Key_ScrollLock:
                                 return;
                             }
 
