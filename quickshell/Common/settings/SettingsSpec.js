@@ -264,8 +264,13 @@ var SPEC = {
     notificationSummaryFontSize: { def: 0 },
     notificationBodyFontSize: { def: 0 },
     notepadShowLineNumbers: { def: false },
+    notepadAutoSave: { def: false },
+    notepadSlideoutSide: { def: "right" },
+    notepadDefaultMode: { def: "slideout" },
     notepadTransparencyOverride: { def: -1 },
     notepadLastCustomTransparency: { def: 0.7 },
+    notepadUseCompositorGap: { def: false },
+    notepadEdgeGap: { def: 0 },
 
     soundsEnabled: { def: true },
     useSystemSoundTheme: { def: false },

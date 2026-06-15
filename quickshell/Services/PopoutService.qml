@@ -789,21 +789,65 @@ Singleton {
         networkInfoModal?.close();
     }
 
-    function openNotepad() {
+    function openNotepadSlideout() {
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.show();
         }
     }
 
+    function openNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            openNotepadPopout();
+            return;
+        }
+        openNotepadSlideout();
+    }
+
     function closeNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            notepadPopout?.hide();
+            return;
+        }
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.hide();
         }
     }
 
     function toggleNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            toggleNotepadPopout();
+            return;
+        }
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.toggle();
+        }
+    }
+
+    property var notepadPopout: null
+    property var notepadPopoutLoader: null
+    property bool _notepadPopoutWantsOpen: false
+
+    function openNotepadPopout() {
+        if (notepadPopout) {
+            notepadPopout.show();
+        } else if (notepadPopoutLoader) {
+            _notepadPopoutWantsOpen = true;
+            notepadPopoutLoader.active = true;
+        }
+    }
+
+    function _onNotepadPopoutLoaded() {
+        if (_notepadPopoutWantsOpen && notepadPopout) {
+            _notepadPopoutWantsOpen = false;
+            notepadPopout.show();
+        }
+    }
+
+    function toggleNotepadPopout() {
+        if (notepadPopout) {
+            notepadPopout.toggle();
+        } else {
+            openNotepadPopout();
         }
     }
 }

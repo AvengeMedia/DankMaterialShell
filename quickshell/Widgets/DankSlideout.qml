@@ -20,17 +20,22 @@ PanelWindow {
     property bool expandable: false
     property bool expandedWidth: false
     property real expandedWidthValue: 960
+    property real edgeGap: 0
+    property string slideEdge: "right"
+    readonly property bool slideFromLeft: slideEdge === "left"
     property Component content: null
     property string title: ""
     property alias container: contentContainer
     property real customTransparency: -1
     property bool mappedVisible: false
     signal aboutToHide
+    signal revealed
 
     function show() {
         mappedVisible = true;
         Qt.callLater(() => {
             isVisible = true;
+            revealed();
         });
     }
 
@@ -52,9 +57,9 @@ PanelWindow {
 
     anchors.top: true
     anchors.bottom: true
-    anchors.right: true
+    anchors.right: !root.slideFromLeft
+    anchors.left: root.slideFromLeft
 
-    // Expandable: fixed max surface width; strip width is slideContainer only (keeps blur/mask aligned).
     implicitWidth: expandable ? expandedWidthValue : slideoutWidth
     implicitHeight: modelData ? modelData.height : 800
 
@@ -69,14 +74,15 @@ PanelWindow {
     readonly property real dpr: CompositorService.getScreenScale(root.screen)
     readonly property real alignedWidth: Theme.px(expandable && expandedWidth ? expandedWidthValue : slideoutWidth, dpr)
     readonly property real alignedHeight: Theme.px(modelData ? modelData.height : 800, dpr)
+    readonly property real alignedEdgeGap: Theme.px(edgeGap, dpr)
     readonly property real slideoutSlideSnapX: Theme.snap(slideContainer.slideOffset, dpr)
 
     mask: Region {
         item: Rectangle {
-            x: root.width - slideContainer.width
-            y: 0
+            x: root.slideFromLeft ? root.alignedEdgeGap : (root.width - slideContainer.width - root.alignedEdgeGap)
+            y: root.alignedEdgeGap
             width: slideContainer.width
-            height: root.height
+            height: root.height - root.alignedEdgeGap * 2
         }
     }
 
@@ -84,16 +90,21 @@ PanelWindow {
         id: slideContainer
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.right: parent.right
+        anchors.right: root.slideFromLeft ? undefined : parent.right
+        anchors.left: root.slideFromLeft ? parent.left : undefined
+        anchors.topMargin: root.alignedEdgeGap
+        anchors.bottomMargin: root.alignedEdgeGap
+        anchors.rightMargin: root.alignedEdgeGap
+        anchors.leftMargin: root.alignedEdgeGap
         width: root.alignedWidth
-        height: root.alignedHeight
+        height: root.alignedHeight - root.alignedEdgeGap * 2
 
-        property real slideOffset: root.alignedWidth
+        property real slideOffset: root.slideFromLeft ? -root.alignedWidth : root.alignedWidth
 
         Connections {
             target: root
             function onIsVisibleChanged() {
-                slideContainer.slideOffset = root.isVisible ? 0 : slideContainer.width;
+                slideContainer.slideOffset = root.isVisible ? 0 : (root.slideFromLeft ? -slideContainer.width : slideContainer.width);
             }
         }
 
@@ -111,7 +122,6 @@ PanelWindow {
             }
         }
 
-        // Expandable only; mask/blur bind to slideContainer geometry so they track this animation.
         Behavior on width {
             enabled: root.expandable
             NumberAnimation {
@@ -217,7 +227,6 @@ PanelWindow {
         }
     }
 
-    // Blur region from slideContainer (not layered contentRect); position uses x + slideoutSlideSnapX, not mapToItem(root).
     WindowBlur {
         targetWindow: root
         blurX: root.slideoutBlurActive ? slideContainer.x + root.slideoutSlideSnapX : 0

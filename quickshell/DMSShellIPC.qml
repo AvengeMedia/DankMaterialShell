@@ -373,6 +373,10 @@ Item {
         }
 
         function open(): string {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                PopoutService.openNotepadPopout();
+                return "NOTEPAD_OPEN_SUCCESS";
+            }
             var instance = getActiveNotepadInstance();
             if (instance) {
                 instance.show();
@@ -391,6 +395,10 @@ Item {
         }
 
         function toggle(): string {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                PopoutService.toggleNotepadPopout();
+                return "NOTEPAD_TOGGLE_SUCCESS";
+            }
             var instance = getActiveNotepadInstance();
             if (instance) {
                 instance.toggle();
