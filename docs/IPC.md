@@ -6,6 +6,18 @@ DankMaterialShell provides comprehensive IPC (Inter-Process Communication) funct
 dms ipc call <target> <function> [parameters...]
 ```
 
+## Discovering IPC commands
+
+List all available targets and functions while DMS is running:
+
+```bash
+dms ipc list
+dms ipc          # same
+dms ipc --help   # same, plus usage text
+```
+
+Live listing requires DMS to be running. If listing fails, use this document or the [Keybinds & IPC docs](https://danklinux.com/docs/dankmaterialshell/keybinds-ipc) as an offline reference.
+
 ## Target: `audio`
 
 Audio system control and information.
@@ -707,7 +719,7 @@ File browser controls for selecting wallpapers and profile images.
   - Both browsers support common image formats (jpg, jpeg, png, bmp, gif, webp)
 
 ### Target: `color-picker`
-Color picker modal control.
+In-shell color picker modal for theme and settings color selection.
 
 **Functions:**
 - `open` - Show color picker modal
@@ -717,6 +729,14 @@ Color picker modal control.
 - `closeInstant` - Hide color picker modal without animation
 - `toggle` - Toggle color picker modal visibility
 - `toggleInstant` - Toggle color picker modal visibility without animation on hide
+
+**Note:** This controls the in-shell modal. To pick a pixel from the screen via CLI, use `dms color pick` instead (see [Color Picker CLI](https://danklinux.com/docs/dankmaterialshell/cli-color-picker)).
+
+**Examples:**
+```bash
+dms ipc call color-picker toggle
+dms ipc call color-picker openColor "#3f51b5"
+```
 
 ### Target: `hypr`
 Hyprland-specific controls including keybinds cheatsheet and workspace overview (Hyprland only).
