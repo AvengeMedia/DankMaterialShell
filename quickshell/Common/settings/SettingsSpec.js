@@ -37,6 +37,7 @@ var SPEC = {
 
     firstDayOfWeek: { def: -1 },
     showWeekNumber: { def: false },
+    calendarBackend: { def: "auto" },
     use24HourClock: { def: true },
     showSeconds: { def: false },
     padHours12Hour: { def: false },

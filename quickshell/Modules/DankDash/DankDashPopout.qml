@@ -227,6 +227,13 @@ DankPopout {
                     return;
                 }
 
+                if (root.currentTabIndex === 0 && overviewLoader.item?.handleKeyEvent) {
+                    if (overviewLoader.item.handleKeyEvent(event)) {
+                        event.accepted = true;
+                        return;
+                    }
+                }
+
                 if (root.currentTabIndex === 1 && mediaLoader.item?.handleKeyEvent) {
                     if (mediaLoader.item.handleKeyEvent(event)) {
                         event.accepted = true;
@@ -356,6 +363,7 @@ DankPopout {
                         sourceComponent: Component {
                             OverviewTab {
                                 onCloseDash: root.dashVisible = false
+                                onNavFocusRequested: mainContainer.forceActiveFocus()
                                 onSwitchToWeatherTab: {
                                     if (SettingsData.weatherEnabled) {
                                         root.currentTabIndex = 3;

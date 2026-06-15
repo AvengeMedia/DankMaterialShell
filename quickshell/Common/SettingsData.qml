@@ -182,6 +182,7 @@ Singleton {
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
+    property string calendarBackend: "auto"
     property bool use24HourClock: true
     property bool showSeconds: false
     property bool padHours12Hour: false
