@@ -103,15 +103,18 @@ Item {
     }
 
     function _applySocketPath(path) {
-        if (path === socketPath) {
-            if (socketFound && !connected)
-                requestSocket.connected = true;
+        const changed = path !== socketPath;
+        if (changed)
+            log.info("dankcal socket discovered:", path);
+        if (!changed && connected)
             return;
-        }
-        log.info("dankcal socket discovered:", path);
+        socketPath = path;
+        _reconnect();
+    }
+
+    function _reconnect() {
         requestSocket.connected = false;
         subscribeSocket.connected = false;
-        socketPath = path;
         Qt.callLater(() => requestSocket.connected = true);
     }
 
