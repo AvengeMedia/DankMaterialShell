@@ -497,6 +497,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, hCenterSection.x > 0 ? hCenterSection.x : parent.width / 3)
             }
 
             Binding {
@@ -529,6 +530,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, hCenterSection.x > 0 ? parent.width - (hCenterSection.x + hCenterSection.width) : parent.width / 3)
             }
 
             Binding {
@@ -561,6 +563,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, hRightSection.x > 0 ? hRightSection.x - (hLeftSection.x + hLeftSection.width) : parent.width / 3)
             }
 
             Binding {
@@ -600,6 +603,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, vCenterSection.y > 0 ? vCenterSection.y : parent.height / 3)
             }
 
             Binding {
@@ -633,6 +637,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, vRightSection.y > 0 ? vRightSection.y - (vLeftSection.y + vLeftSection.height) : parent.height / 3)
             }
 
             Binding {
@@ -667,6 +672,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, vCenterSection.y > 0 ? parent.height - (vCenterSection.y + vCenterSection.height) : parent.height / 3)
             }
 
             Binding {
