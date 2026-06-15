@@ -8,14 +8,21 @@ Rectangle {
     id: root
     readonly property var log: Log.scoped("CalendarOverviewCard")
 
+    LayoutMirroring.enabled: I18n.isRtl
+    LayoutMirroring.childrenInherit: true
+
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
 
     property bool showEventDetails: false
     property date selectedDate: systemClock.date
     property var selectedDateEvents: []
     property bool hasEvents: selectedDateEvents && selectedDateEvents.length > 0
+    property var detailEvent: null
+    property bool showEditor: false
+    property var editorEvent: null
 
     signal closeDash
+    signal navFocusRequested
 
     function weekStartQt() {
         if (SettingsData.firstDayOfWeek >= 7 || SettingsData.firstDayOfWeek < 0) {
@@ -79,7 +86,7 @@ Rectangle {
     }
 
     function updateSelectedDateEvents() {
-        if (CalendarService && CalendarService.khalAvailable) {
+        if (CalendarService && CalendarService.calendarAvailable) {
             const events = CalendarService.getEventsForDate(selectedDate);
             selectedDateEvents = events;
         } else {
@@ -88,7 +95,7 @@ Rectangle {
     }
 
     function loadEventsForMonth() {
-        if (!CalendarService || !CalendarService.khalAvailable) {
+        if (!CalendarService || !CalendarService.calendarAvailable) {
             return;
         }
 
@@ -104,11 +111,83 @@ Rectangle {
         CalendarService.loadEvents(startDate, endDate);
     }
 
+    function goToToday() {
+        const now = systemClock.date;
+        calendarGrid.selectedDate = now;
+        calendarGrid.displayDate = now;
+        root.selectedDate = now;
+        loadEventsForMonth();
+    }
+
+    function moveSelection(days) {
+        let d = new Date(calendarGrid.selectedDate);
+        d.setDate(d.getDate() + days);
+        calendarGrid.selectedDate = d;
+        root.selectedDate = d;
+        if (d.getMonth() !== calendarGrid.displayDate.getMonth() || d.getFullYear() !== calendarGrid.displayDate.getFullYear()) {
+            calendarGrid.displayDate = d;
+            loadEventsForMonth();
+        }
+    }
+
+    function shiftMonth(delta) {
+        let d = new Date(calendarGrid.displayDate);
+        d.setMonth(d.getMonth() + delta);
+        calendarGrid.displayDate = d;
+        loadEventsForMonth();
+    }
+
+    function handleKeyEvent(event) {
+        if (showEventDetails) {
+            if (event.key === Qt.Key_Escape) {
+                showEventDetails = false;
+                return true;
+            }
+            return false;
+        }
+        switch (event.key) {
+        case Qt.Key_Left:
+        case Qt.Key_H:
+            moveSelection(I18n.isRtl ? 1 : -1);
+            return true;
+        case Qt.Key_Right:
+        case Qt.Key_L:
+            moveSelection(I18n.isRtl ? -1 : 1);
+            return true;
+        case Qt.Key_Up:
+        case Qt.Key_K:
+            moveSelection(-7);
+            return true;
+        case Qt.Key_Down:
+        case Qt.Key_J:
+            moveSelection(7);
+            return true;
+        case Qt.Key_PageUp:
+            shiftMonth(-1);
+            return true;
+        case Qt.Key_PageDown:
+            shiftMonth(1);
+            return true;
+        case Qt.Key_T:
+            goToToday();
+            return true;
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+        case Qt.Key_Space:
+            root.selectedDate = calendarGrid.selectedDate;
+            showEventDetails = true;
+            return true;
+        }
+        return false;
+    }
+
     onSelectedDateChanged: updateSelectedDateEvents()
 
     onShowEventDetailsChanged: {
         if (showEventDetails) {
             taskInput.forceActiveFocus();
+        } else {
+            navFocusRequested();
         }
     }
 
@@ -122,8 +201,8 @@ Rectangle {
             updateSelectedDateEvents();
         }
 
-        function onKhalAvailableChanged() {
-            if (CalendarService && CalendarService.khalAvailable) {
+        function onCalendarAvailableChanged() {
+            if (CalendarService && CalendarService.calendarAvailable) {
                 loadEventsForMonth();
             }
             updateSelectedDateEvents();
@@ -142,6 +221,55 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: Theme.spacingM
         spacing: Theme.spacingS
+
+        Rectangle {
+            id: dankWarning
+            width: parent.width
+            visible: CalendarService && CalendarService.dankNeedsLaunch
+            height: visible ? Math.max(28, warningRow.implicitHeight) + Theme.spacingS : 0
+            radius: Theme.cornerRadius
+            color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
+            border.color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.35)
+            border.width: 1
+
+            Row {
+                id: warningRow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                spacing: Theme.spacingS
+
+                DankIcon {
+                    name: "warning"
+                    size: 16
+                    color: Theme.warning
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    width: parent.width - 16 - Theme.spacingS - (launchButton.visible ? launchButton.width + Theme.spacingS : 0)
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: (CalendarService && CalendarService.dankBinaryExists) ? I18n.tr("DankCalendar isn't running") : I18n.tr("DankCalendar isn't installed")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    horizontalAlignment: Text.AlignLeft
+                    wrapMode: Text.Wrap
+                }
+
+                DankButton {
+                    id: launchButton
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: CalendarService && CalendarService.dankBinaryExists
+                    text: I18n.tr("Launch")
+                    buttonHeight: 26
+                    backgroundColor: Theme.primary
+                    textColor: Theme.primaryText
+                    onClicked: CalendarService.launchDankCalendar()
+                }
+            }
+        }
 
         Item {
             width: parent.width
@@ -173,11 +301,40 @@ Rectangle {
                 }
             }
 
+            Rectangle {
+                width: 32
+                height: 32
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS
+                radius: Theme.cornerRadius
+                visible: CalendarService && CalendarService.canCreateEvents
+                color: addEventArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: "event"
+                    size: 16
+                    color: Theme.primary
+                }
+
+                MouseArea {
+                    id: addEventArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.editorEvent = null;
+                        root.showEditor = true;
+                    }
+                }
+            }
+
             StyledText {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: 32 + Theme.spacingS * 2
-                anchors.rightMargin: Theme.spacingS
+                anchors.rightMargin: (CalendarService && CalendarService.canCreateEvents) ? 32 + Theme.spacingS * 2 : Theme.spacingS
                 height: 40
                 anchors.verticalCenter: parent.verticalCenter
                 text: {
@@ -229,7 +386,7 @@ Rectangle {
             }
 
             StyledText {
-                width: parent.width - 56
+                width: parent.width - 84
                 height: 28
                 text: calendarGrid.displayDate.toLocaleDateString(I18n.locale(), "MMMM yyyy")
                 font.pixelSize: Theme.fontSizeMedium
@@ -237,6 +394,28 @@ Rectangle {
                 font.weight: Font.Medium
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+            }
+
+            Rectangle {
+                width: 28
+                height: 28
+                radius: Theme.cornerRadius
+                color: todayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: "today"
+                    size: 14
+                    color: Theme.primary
+                }
+
+                MouseArea {
+                    id: todayArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.goToToday()
+                }
             }
 
             Rectangle {
@@ -388,6 +567,8 @@ Rectangle {
                                 height: width
                                 color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : dayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                                 radius: Theme.cornerRadius
+                                border.color: (isSelected && !isToday) ? Theme.primary : "transparent"
+                                border.width: (isSelected && !isToday) ? 1 : 0
 
                                 StyledText {
                                     anchors.centerIn: parent
@@ -397,21 +578,31 @@ Rectangle {
                                     font.weight: isToday ? Font.Medium : Font.Normal
                                 }
 
-                                Rectangle {
+                                Row {
                                     anchors.bottom: parent.bottom
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    anchors.bottomMargin: 4
-                                    width: 12
-                                    height: 2
-                                    radius: Theme.cornerRadius
-                                    visible: CalendarService && CalendarService.khalAvailable && CalendarService.hasEventsForDate(dayDate)
-                                    color: isToday ? Qt.lighter(Theme.primary, 1.3) : Theme.primary
-                                    opacity: isToday ? 0.9 : 0.7
+                                    anchors.bottomMargin: 3
+                                    spacing: 2
+                                    visible: CalendarService && CalendarService.calendarAvailable && CalendarService.hasEventsForDate(dayDate)
 
-                                    Behavior on opacity {
-                                        NumberAnimation {
-                                            duration: Theme.shortDuration
-                                            easing.type: Theme.standardEasing
+                                    Repeater {
+                                        model: {
+                                            const evs = CalendarService.getEventsForDate(dayDate);
+                                            const seen = [];
+                                            for (let i = 0; i < evs.length && seen.length < 3; i++) {
+                                                const c = (evs[i].color && evs[i].color.length) ? evs[i].color : "primary";
+                                                if (seen.indexOf(c) === -1)
+                                                    seen.push(c);
+                                            }
+                                            return seen;
+                                        }
+
+                                        Rectangle {
+                                            width: 5
+                                            height: 5
+                                            radius: 2.5
+                                            color: modelData === "primary" ? (isToday ? Qt.lighter(Theme.primary, 1.3) : Theme.primary) : modelData
+                                            opacity: isToday ? 0.95 : 0.8
                                         }
                                     }
                                 }
@@ -423,6 +614,7 @@ Rectangle {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
+                                    calendarGrid.selectedDate = dayDate;
                                     root.selectedDate = dayDate;
                                     root.showEventDetails = true;
                                 }
@@ -622,7 +814,15 @@ Rectangle {
                             }
                         }
 
-                        color: isDragging ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : Theme.nestedSurface)
+                        readonly property bool isTask: modelData && modelData.id && modelData.id.startsWith("task_")
+                        readonly property color accentColor: {
+                            if (isTask)
+                                return modelData.completed ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary;
+                            return (modelData && modelData.color && modelData.color.length) ? modelData.color : Theme.primary;
+                        }
+                        readonly property color surfaceColor: isDragging ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : Theme.nestedSurface)
+
+                        color: surfaceColor
                         border.color: isDragging ? Theme.primary : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : Theme.outlineMedium)
                         border.width: (isDragging || eventMouseArea.containsMouse) ? 1 : Theme.layerOutlineWidth
 
@@ -660,15 +860,22 @@ Rectangle {
                             }
                         }
 
-                        Rectangle {
-                            width: 3
-                            height: parent.height - 6
+                        Item {
+                            id: accentClip
+                            width: 4
+                            clip: true
+                            anchors.top: parent.top
+                            anchors.bottom: parent.bottom
                             anchors.left: parent.left
-                            anchors.leftMargin: 3
-                            anchors.verticalCenter: parent.verticalCenter
-                            radius: Theme.cornerRadius
-                            color: (modelData && modelData.id && modelData.id.startsWith("task_")) ? (modelData.completed ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary) : Theme.primary
-                            opacity: 0.8
+
+                            Rectangle {
+                                width: taskItem.width
+                                height: taskItem.height
+                                radius: taskItem.radius
+                                color: taskItem.accentColor
+                                anchors.top: parent.top
+                                anchors.left: parent.left
+                            }
                         }
 
                         // Drag Handle
@@ -767,6 +974,7 @@ Rectangle {
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: (modelData && modelData.id && modelData.id.startsWith("task_") && modelData.completed) ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
                                 font.weight: Font.Medium
+                                horizontalAlignment: Text.AlignLeft
                                 elide: Text.ElideRight
                                 maximumLineCount: 1
                             }
@@ -774,21 +982,24 @@ Rectangle {
                             StyledText {
                                 width: parent.width
                                 text: {
-                                    if (!modelData || modelData.allDay) {
-                                        return I18n.tr("All day", "calendar task with no specific time");
-                                    } else if (modelData.start && modelData.end) {
+                                    if (!modelData)
+                                        return "";
+                                    const cal = (modelData.calendar && modelData.calendar.length) ? " · " + modelData.calendar : "";
+                                    if (modelData.allDay)
+                                        return I18n.tr("All day", "calendar task with no specific time") + cal;
+                                    if (modelData.start && modelData.end) {
                                         const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
                                         const startTime = Qt.formatTime(modelData.start, timeFormat);
-                                        if (modelData.start.toDateString() !== modelData.end.toDateString() || modelData.start.getTime() !== modelData.end.getTime()) {
-                                            return startTime + " – " + Qt.formatTime(modelData.end, timeFormat);
-                                        }
-                                        return startTime;
+                                        if (modelData.start.toDateString() !== modelData.end.toDateString() || modelData.start.getTime() !== modelData.end.getTime())
+                                            return startTime + " – " + Qt.formatTime(modelData.end, timeFormat) + cal;
+                                        return startTime + cal;
                                     }
                                     return "";
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                 font.weight: Font.Normal
+                                horizontalAlignment: Text.AlignLeft
                                 visible: text !== "" && modelData && modelData.id && !modelData.id.startsWith("task_")
                             }
                         }
@@ -824,8 +1035,9 @@ Rectangle {
                                     taskItem.isEditing = false;
                                 }
 
-                                Keys.onEscapePressed: {
+                                Keys.onEscapePressed: event => {
                                     taskItem.isEditing = false;
+                                    event.accepted = true;
                                 }
                             }
                         }
@@ -838,18 +1050,15 @@ Rectangle {
                             anchors.leftMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 32 : 6
                             anchors.rightMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 64 : 0
                             hoverEnabled: true
-                            cursorShape: (modelData && (modelData.url || (modelData.id && modelData.id.startsWith("task_")))) ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            enabled: modelData && (modelData.url !== "" || (modelData.id && modelData.id.startsWith("task_"))) && !taskItem.isEditing
+                            cursorShape: modelData ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            enabled: modelData && !taskItem.isEditing
                             onClicked: {
                                 if (modelData && modelData.id && modelData.id.startsWith("task_")) {
                                     CalendarService.toggleTask(modelData.id);
-                                } else if (modelData && modelData.url && modelData.url !== "") {
-                                    if (Qt.openUrlExternally(modelData.url) === false) {
-                                        log.warn("Failed to open URL: " + modelData.url);
-                                    } else {
-                                        root.closeDash();
-                                    }
+                                    return;
                                 }
+                                if (modelData)
+                                    root.detailEvent = modelData;
                             }
                         }
 
@@ -953,7 +1162,7 @@ Rectangle {
                 Text {
                     text: I18n.tr("Add a task...", "placeholder in the new-task input field")
                     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
-                    visible: !taskInput.text && !taskInput.activeFocus
+                    visible: taskInput.text.length === 0
                     font.pixelSize: Theme.fontSizeSmall
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -965,6 +1174,52 @@ Rectangle {
                         text = "";
                     }
                 }
+
+                Keys.onEscapePressed: event => {
+                    root.showEventDetails = false;
+                    event.accepted = true;
+                }
+            }
+        }
+    }
+
+    Loader {
+        anchors.fill: parent
+        z: 1000
+        active: root.detailEvent !== null
+
+        sourceComponent: CalendarEventDetail {
+            eventData: root.detailEvent
+            canEdit: CalendarService && CalendarService.canCreateEvents && root.detailEvent && !root.detailEvent.readOnly && !(root.detailEvent.id && root.detailEvent.id.startsWith("task_"))
+            onCloseRequested: root.detailEvent = null
+            onEditRequested: {
+                root.editorEvent = root.detailEvent;
+                root.detailEvent = null;
+                root.showEditor = true;
+            }
+            onDeleteRequested: {
+                if (root.detailEvent && root.detailEvent.id)
+                    CalendarService.deleteEvent(root.detailEvent.id, null);
+                root.detailEvent = null;
+            }
+        }
+    }
+
+    Loader {
+        anchors.fill: parent
+        z: 1000
+        active: root.showEditor
+
+        sourceComponent: CalendarEventEditor {
+            eventData: root.editorEvent
+            initialDate: root.selectedDate
+            onCloseRequested: {
+                root.showEditor = false;
+                root.editorEvent = null;
+            }
+            onSaved: {
+                root.showEditor = false;
+                root.editorEvent = null;
             }
         }
     }

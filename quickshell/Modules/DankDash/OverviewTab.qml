@@ -14,6 +14,11 @@ Item {
     signal switchToWeatherTab
     signal switchToMediaTab
     signal closeDash
+    signal navFocusRequested
+
+    function handleKeyEvent(event) {
+        return calendarCard.handleKeyEvent(event);
+    }
 
     Item {
         anchors.fill: parent
@@ -54,12 +59,14 @@ Item {
 
         // Calendar - bottom middle (wider and taller)
         CalendarOverviewCard {
+            id: calendarCard
             x: parent.width * 0.2 - Theme.spacingM
             y: 100 + Theme.spacingM
             width: parent.width * 0.6
             height: 300
 
             onCloseDash: root.closeDash()
+            onNavFocusRequested: root.navFocusRequested()
         }
 
         // Media - bottom right (narrow and taller)

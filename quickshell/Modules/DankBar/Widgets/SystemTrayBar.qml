@@ -1179,11 +1179,12 @@ BasePill {
         }
 
         function updatePosition() {
-            const globalPos = root.mapToGlobal(0, 0);
-            const screenX = screen.x || 0;
-            const screenY = screen.y || 0;
-            const relativeX = globalPos.x - screenX;
-            const relativeY = globalPos.y - screenY;
+            // Window-local maps directly to screen-local because the bar window spans the
+            // full screen edge; this avoids mixing mapToGlobal with a separately-tracked
+            // screen.x/.y origin, which desync on non-primary monitors and after DPMS/hotplug.
+            const localPos = root.mapToItem(null, 0, 0);
+            const relativeX = localPos.x;
+            const relativeY = localPos.y;
 
             if (root.isVerticalOrientation) {
                 const edge = root.axis?.edge;
@@ -1722,11 +1723,13 @@ BasePill {
                             anchorPos = Qt.point(targetX, targetY);
                         }
                     } else {
-                        const globalPos = targetItem.mapToGlobal(0, 0);
-                        const screenX = screen.x || 0;
-                        const screenY = screen.y || 0;
-                        const relativeX = globalPos.x - screenX;
-                        const relativeY = globalPos.y - screenY;
+                        // Window-local maps directly to screen-local because the bar window spans
+                        // the full screen edge; this avoids mixing mapToGlobal with a separately-
+                        // tracked screen.x/.y origin, which desync on non-primary monitors and after
+                        // DPMS/hotplug.
+                        const localPos = targetItem.mapToItem(null, 0, 0);
+                        const relativeX = localPos.x;
+                        const relativeY = localPos.y;
 
                         if (menuRoot.isVertical) {
                             const edge = menuRoot.axis?.edge;
