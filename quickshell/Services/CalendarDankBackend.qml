@@ -52,7 +52,7 @@ Item {
 
     Process {
         id: binaryCheck
-        command: ["sh", "-c", "command -v dankcal"]
+        command: ["sh", "-c", "command -v dcal"]
         running: false
         onExited: code => {
             root.binaryExists = (code === 0);
@@ -97,7 +97,7 @@ Item {
     function launch() {
         if (!binaryExists)
             return;
-        Quickshell.execDetached(["dankcal", "run", "-d", "--hidden"]);
+        Quickshell.execDetached(["dcal", "run", "-d", "--hidden"]);
         if (enabled && !connected)
             discoverProcess.running = true;
     }
