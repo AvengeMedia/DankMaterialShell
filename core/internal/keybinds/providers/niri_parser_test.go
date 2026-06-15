@@ -71,6 +71,101 @@ func TestNormalizeKDLBraces(t *testing.T) {
 	}
 }
 
+func TestQuoteLeadingUnderscoreIdents(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		out  string
+	}{
+		{"leading underscore node", `_JAVA_AWT_WM_NONREPARENTING "1"`, `"_JAVA_AWT_WM_NONREPARENTING" "1"`},
+		{"mid underscore untouched", `XDG_CURRENT_DESKTOP "niri"`, `XDG_CURRENT_DESKTOP "niri"`},
+		{"indented node", "environment {\n  _FOO \"1\"\n}", "environment {\n  \"_FOO\" \"1\"\n}"},
+		{"underscore in string", `spawn "_not_a_node"`, `spawn "_not_a_node"`},
+		{"underscore in line comment", "// _comment\n_FOO \"1\"", "// _comment\n\"_FOO\" \"1\""},
+		{"underscore in block comment", "/* _x */ _FOO \"1\"", "/* _x */ \"_FOO\" \"1\""},
+		{"block comment abuts node", `/* x */_FOO "1"`, `/* x */"_FOO" "1"`},
+		{"slashdash before node", `/-_FOO "1"`, `/-"_FOO" "1"`},
+		{"node after closing paren", "node (u8)_v", `node (u8)"_v"`},
+		{"node before brace without space", "_FOO{ }", `"_FOO"{ }`},
+		{"lone underscore", `_ "x"`, `"_" "x"`},
+		{"property value", "node key=_val", `node key="_val"`},
+		{"no underscores", "node child", "node child"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := quoteLeadingUnderscoreIdents(tc.in)
+			if got != tc.out {
+				t.Errorf("quoteLeadingUnderscoreIdents(%q) = %q, want %q", tc.in, got, tc.out)
+			}
+		})
+	}
+}
+
+func TestNiriParseLeadingUnderscoreEnvironment(t *testing.T) {
+	tmpDir := t.TempDir()
+	configFile := filepath.Join(tmpDir, "config.kdl")
+
+	// A leading-underscore environment node (a common Java/tiling-WM fix) must
+	// not abort parsing of the rest of the config — keybinds still have to load.
+	content := `environment {
+    XDG_CURRENT_DESKTOP "niri"
+    _JAVA_AWT_WM_NONREPARENTING "1"
+}
+binds {
+    Mod+Q { close-window; }
+    Mod+KP_Home { focus-workspace 1; }
+}
+`
+	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed on config with leading-underscore env node: %v", err)
+	}
+
+	if len(result.Section.Keybinds) != 2 {
+		t.Errorf("Expected 2 keybinds, got %d", len(result.Section.Keybinds))
+	}
+
+	foundClose := false
+	for _, kb := range result.Section.Keybinds {
+		if kb.Action == "close-window" {
+			foundClose = true
+		}
+	}
+	if !foundClose {
+		t.Error("close-window keybind not found — leading-underscore env node broke parsing")
+	}
+}
+
+func TestNiriParseSlashdashLeadingUnderscore(t *testing.T) {
+	tmpDir := t.TempDir()
+	configFile := filepath.Join(tmpDir, "config.kdl")
+
+	// A slashdashed leading-underscore node must not abort parsing either.
+	content := `environment {
+    /-_JAVA_AWT_WM_NONREPARENTING "1"
+}
+binds {
+    Mod+Q { close-window; }
+}
+`
+	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed on config with slashdashed leading-underscore node: %v", err)
+	}
+
+	if len(result.Section.Keybinds) != 1 {
+		t.Errorf("Expected 1 keybind, got %d", len(result.Section.Keybinds))
+	}
+}
+
 func TestNiriParseKeyCombo(t *testing.T) {
 	tests := []struct {
 		combo        string
