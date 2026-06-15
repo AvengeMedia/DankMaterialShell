@@ -102,7 +102,10 @@ TAB_INDEX_MAP = {
     "DockTab.qml": 5,
     "DankBarAppearanceTab.qml": 6,
     "WorkspaceAppearanceCard.qml": 6,
-    "NetworkTab.qml": 7,
+    "NetworkStatusTab.qml": 7,
+    "NetworkEthernetTab.qml": 39,
+    "NetworkWifiTab.qml": 40,
+    "NetworkVpnTab.qml": 41,
     "PrinterTab.qml": 8,
     "LauncherTab.qml": 9,
     "ThemeColorsTab.qml": 10,
@@ -172,6 +175,9 @@ TAB_CATEGORY_MAP = {
     36: "Autostart",
     37: "Personalization",
     38: "Applications",
+    39: "Network",
+    40: "Network",
+    41: "Network",
 }
 
 SEARCHABLE_COMPONENTS = [
