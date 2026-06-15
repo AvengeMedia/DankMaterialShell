@@ -16,6 +16,8 @@ PanelWindow {
     property var targetScreen: null
     property var modelData: null
     property bool triggerUsesOverlayLayer: false
+    // Drop off the Overlay layer (back to Top) while an overlay modal
+    property bool suppressOverlayLayer: false
     property real slideoutWidth: 480
     property bool expandable: false
     property bool expandedWidth: false
@@ -67,7 +69,7 @@ PanelWindow {
 
     readonly property bool slideoutBlurActive: root.visible && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
-    WlrLayershell.layer: (triggerUsesOverlayLayer || CompositorService.framePeerSurfacesUseOverlayForScreen(modelData)) ? WlrLayershell.Overlay : WlrLayershell.Top
+    WlrLayershell.layer: (!suppressOverlayLayer && (triggerUsesOverlayLayer || CompositorService.framePeerSurfacesUseOverlayForScreen(modelData))) ? WlrLayershell.Overlay : WlrLayershell.Top
     WlrLayershell.exclusiveZone: 0
     WlrLayershell.keyboardFocus: isVisible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 

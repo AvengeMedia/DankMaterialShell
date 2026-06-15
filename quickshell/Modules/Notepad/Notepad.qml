@@ -44,6 +44,12 @@ Item {
         service: NotepadStorageService
     }
 
+    // In connected frame mode the slideout sits on the Overlay layer
+    onFileDialogOpenChanged: {
+        if (slideout)
+            slideout.suppressOverlayLayer = fileDialogOpen;
+    }
+
     Connections {
         target: slideout
         enabled: slideout !== null
