@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -76,6 +77,63 @@ func TestHandleRefresh(t *testing.T) {
 	assert.Equal(t, 1, resp.ID)
 	assert.NotNil(t, resp.Result)
 	assert.True(t, resp.Result.Success)
+}
+
+func TestHandleActions(t *testing.T) {
+	cases := []struct {
+		name   string
+		method string
+		params map[string]any
+	}{
+		{"connect", "tailscale.connect", nil},
+		{"disconnect", "tailscale.disconnect", nil},
+		{"setExitNode", "tailscale.setExitNode", map[string]any{"id": "nABC123"}},
+		{"clearExitNode", "tailscale.setExitNode", map[string]any{"id": ""}},
+		{"setAllowLanAccess", "tailscale.setAllowLanAccess", map[string]any{"enabled": true}},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			m := handlerTestManager()
+			defer m.Close()
+
+			buf := &bytes.Buffer{}
+			conn := &mockConn{Buffer: buf}
+
+			req := models.Request{ID: 1, Method: tc.method, Params: tc.params}
+			HandleRequest(conn, req, m)
+
+			var resp models.Response[models.SuccessResult]
+			require.NoError(t, json.NewDecoder(buf).Decode(&resp))
+			assert.Equal(t, 1, resp.ID)
+			assert.Empty(t, resp.Error)
+			require.NotNil(t, resp.Result)
+			assert.True(t, resp.Result.Success)
+		})
+	}
+}
+
+func TestHandleAction_BackendError(t *testing.T) {
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			return nil, fmt.Errorf("backend rejected edit")
+		},
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	buf := &bytes.Buffer{}
+	conn := &mockConn{Buffer: buf}
+
+	req := models.Request{ID: 1, Method: "tailscale.connect"}
+	HandleRequest(conn, req, m)
+
+	var resp models.Response[models.SuccessResult]
+	require.NoError(t, json.NewDecoder(buf).Decode(&resp))
+	assert.Nil(t, resp.Result)
+	assert.Contains(t, resp.Error, "backend rejected edit")
 }
 
 func TestHandleRequest_UnknownMethod(t *testing.T) {
