@@ -317,63 +317,67 @@ Item {
                     }
                 }
 
-                RowLayout {
-                    id: bannerActions
+                Item {
                     Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignRight
-                    spacing: Theme.spacingS
+                    Layout.preferredHeight: 32
 
-                    StyledRect {
-                        readonly property real actionWidth: Math.min(keepText.implicitWidth + Theme.spacingM * 2, Math.max(104, (bannerActions.width - bannerActions.spacing) / 2))
-                        Layout.preferredWidth: actionWidth
-                        Layout.preferredHeight: 32
-                        radius: Theme.cornerRadius
-                        color: "transparent"
-                        border.color: Theme.outlineMedium
-                        border.width: 1
+                    Row {
+                        id: bannerActions
+                        anchors.right: parent.right
+                        spacing: Theme.spacingS
 
-                        StateLayer {
-                            anchors.fill: parent
-                            cornerRadius: parent.radius
-                            stateColor: Theme.surfaceText
-                            onClicked: root.resolveConflictKeepEdits()
+                        readonly property real available: parent.width
+
+                        StyledRect {
+                            width: Math.min(keepText.implicitWidth + Theme.spacingM * 2, Math.max(104, (bannerActions.available - bannerActions.spacing) / 2))
+                            height: 32
+                            radius: Theme.cornerRadius
+                            color: "transparent"
+                            border.color: Theme.outlineMedium
+                            border.width: 1
+
+                            StateLayer {
+                                anchors.fill: parent
+                                cornerRadius: parent.radius
+                                stateColor: Theme.surfaceText
+                                onClicked: root.resolveConflictKeepEdits()
+                            }
+
+                            StyledText {
+                                id: keepText
+                                anchors.centerIn: parent
+                                width: parent.width - Theme.spacingM
+                                text: I18n.tr("Keep My Edits")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                            }
                         }
 
-                        StyledText {
-                            id: keepText
-                            anchors.centerIn: parent
-                            width: parent.width - Theme.spacingM
-                            text: I18n.tr("Keep My Edits")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            horizontalAlignment: Text.AlignHCenter
-                            elide: Text.ElideRight
-                        }
-                    }
+                        StyledRect {
+                            width: Math.min(reloadText.implicitWidth + Theme.spacingM * 2, Math.max(116, (bannerActions.available - bannerActions.spacing) / 2))
+                            height: 32
+                            radius: Theme.cornerRadius
+                            color: Theme.primary
 
-                    StyledRect {
-                        readonly property real actionWidth: Math.min(reloadText.implicitWidth + Theme.spacingM * 2, Math.max(116, (bannerActions.width - bannerActions.spacing) / 2))
-                        Layout.preferredWidth: actionWidth
-                        Layout.preferredHeight: 32
-                        radius: Theme.cornerRadius
-                        color: Theme.primary
+                            StateLayer {
+                                anchors.fill: parent
+                                cornerRadius: parent.radius
+                                stateColor: Theme.background
+                                onClicked: root.resolveConflictReload()
+                            }
 
-                        StateLayer {
-                            anchors.fill: parent
-                            cornerRadius: parent.radius
-                            stateColor: Theme.background
-                            onClicked: root.resolveConflictReload()
-                        }
-
-                        StyledText {
-                            id: reloadText
-                            anchors.centerIn: parent
-                            width: parent.width - Theme.spacingM
-                            text: I18n.tr("Reload From Disk")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.background
-                            horizontalAlignment: Text.AlignHCenter
-                            elide: Text.ElideRight
+                            StyledText {
+                                id: reloadText
+                                anchors.centerIn: parent
+                                width: parent.width - Theme.spacingM
+                                text: I18n.tr("Reload From Disk")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.background
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                            }
                         }
                     }
                 }

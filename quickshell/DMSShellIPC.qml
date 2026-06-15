@@ -386,6 +386,10 @@ Item {
         }
 
         function close(): string {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                PopoutService.notepadPopout?.hide();
+                return "NOTEPAD_CLOSE_SUCCESS";
+            }
             var instance = getActiveNotepadInstance();
             if (instance) {
                 instance.hide();

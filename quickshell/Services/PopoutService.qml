@@ -789,9 +789,38 @@ Singleton {
         networkInfoModal?.close();
     }
 
+    function closeNotepadSlideouts() {
+        for (var i = 0; i < notepadSlideouts.length; i++) {
+            if (notepadSlideouts[i] && notepadSlideouts[i].isVisible)
+                notepadSlideouts[i].hide();
+        }
+    }
+
     function openNotepadSlideout() {
+        notepadPopout?.hide();
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.show();
+        }
+    }
+
+    // Keep the notepad in a single presentation for default modes
+    Connections {
+        target: SettingsData
+        function onNotepadDefaultModeChanged() {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                var hadSlideout = false;
+                for (var i = 0; i < root.notepadSlideouts.length; i++) {
+                    if (root.notepadSlideouts[i] && root.notepadSlideouts[i].isVisible) {
+                        hadSlideout = true;
+                        root.notepadSlideouts[i].hide();
+                    }
+                }
+                if (hadSlideout)
+                    root.openNotepadPopout();
+            } else if (root.notepadPopout && root.notepadPopout.visible) {
+                root.notepadPopout.hide();
+                root.openNotepadSlideout();
+            }
         }
     }
 
@@ -828,6 +857,7 @@ Singleton {
     property bool _notepadPopoutWantsOpen: false
 
     function openNotepadPopout() {
+        closeNotepadSlideouts();
         if (notepadPopout) {
             notepadPopout.show();
         } else if (notepadPopoutLoader) {
@@ -845,6 +875,8 @@ Singleton {
 
     function toggleNotepadPopout() {
         if (notepadPopout) {
+            if (!notepadPopout.visible)
+                closeNotepadSlideouts();
             notepadPopout.toggle();
         } else {
             openNotepadPopout();

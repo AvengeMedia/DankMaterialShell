@@ -1096,6 +1096,11 @@ Item {
             edgeGap: SettingsData.notepadEffectiveEdgeGap
             slideEdge: SettingsData.notepadSlideoutSide
 
+            onIsVisibleChanged: {
+                if (isVisible)
+                    PopoutService.notepadPopout?.hide();
+            }
+
             content: Component {
                 Notepad {
                     slideout: notepadSlideout
