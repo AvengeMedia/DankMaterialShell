@@ -572,6 +572,7 @@ Singleton {
     property bool soundVolumeChanged: true
     property bool soundPluggedIn: true
     property bool soundLogin: false
+    property bool muteSoundsWhenMediaPlaying: true
 
     property int acMonitorTimeout: 0
     property int acLockTimeout: 0
