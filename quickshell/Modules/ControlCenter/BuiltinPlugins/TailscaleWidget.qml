@@ -25,7 +25,14 @@ PluginComponent {
     }
     ccWidgetIsActive: TailscaleService.connected
 
-    onCcWidgetToggled: {}
+    onCcWidgetToggled: {
+        if (!TailscaleService.available)
+            return;
+        if (TailscaleService.connected)
+            TailscaleService.disconnectTailscale(null);
+        else
+            TailscaleService.connectTailscale(null);
+    }
 
     ccDetailContent: Component {
         Rectangle {
@@ -87,6 +94,122 @@ PluginComponent {
                         id: headerColumn
                         width: parent.width
                         spacing: Theme.spacingS
+
+                        // Connection status + connect/disconnect. Always shown
+                        // (when available) so the connection can be toggled from
+                        // the detail, including while disconnected.
+                        RowLayout {
+                            width: parent.width
+                            spacing: Theme.spacingS
+
+                            Column {
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignVCenter
+                                spacing: 1
+
+                                StyledText {
+                                    text: TailscaleService.connected ? I18n.tr("Connected", "Tailscale connection status: connected") : I18n.tr("Disconnected", "Tailscale connection status: disconnected")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                }
+
+                                StyledText {
+                                    visible: TailscaleService.connected && TailscaleService.tailnetName.length > 0
+                                    text: TailscaleService.tailnetName
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    width: parent.width
+                                    elide: Text.ElideRight
+                                }
+                            }
+
+                            Rectangle {
+                                id: connButton
+                                Layout.alignment: Qt.AlignVCenter
+                                height: 28
+                                radius: 14
+                                width: connButtonRow.implicitWidth + Theme.spacingM * 2
+
+                                readonly property bool isConnected: TailscaleService.connected
+                                color: isConnected ? (connButtonArea.containsMouse ? Theme.errorHover : Theme.surfaceLight) : (connButtonArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight)
+
+                                Row {
+                                    id: connButtonRow
+                                    anchors.centerIn: parent
+                                    spacing: Theme.spacingXS
+
+                                    DankIcon {
+                                        name: connButton.isConnected ? "link_off" : "link"
+                                        size: Theme.fontSizeSmall
+                                        color: connButton.isConnected ? Theme.surfaceText : Theme.primary
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    StyledText {
+                                        text: connButton.isConnected ? I18n.tr("Disconnect", "Tailscale disconnect button") : I18n.tr("Connect", "Tailscale connect button")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Font.Medium
+                                        color: connButton.isConnected ? Theme.surfaceText : Theme.primary
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: connButtonArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (TailscaleService.connected)
+                                            TailscaleService.disconnectTailscale(null);
+                                        else
+                                            TailscaleService.connectTailscale(null);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Connection controls: exit node picker + LAN access.
+                        // Only meaningful while the backend is connected.
+                        Column {
+                            id: controlsColumn
+                            width: parent.width
+                            spacing: Theme.spacingS
+                            visible: TailscaleService.connected
+
+                            readonly property string noneLabel: I18n.tr("None", "Tailscale exit node: none selected")
+
+                            DankDropdown {
+                                width: parent.width
+                                text: I18n.tr("Exit node", "Tailscale exit node selector label")
+                                currentValue: TailscaleService.currentExitNode ? TailscaleService.currentExitNode.hostname : controlsColumn.noneLabel
+                                options: {
+                                    const opts = [controlsColumn.noneLabel];
+                                    for (const p of TailscaleService.exitNodeOptions)
+                                        opts.push(p.hostname);
+                                    return opts;
+                                }
+                                onValueChanged: value => {
+                                    if (value === controlsColumn.noneLabel) {
+                                        TailscaleService.clearExitNode(null);
+                                        return;
+                                    }
+                                    const peer = TailscaleService.exitNodeOptions.find(p => p.hostname === value);
+                                    if (peer)
+                                        TailscaleService.setExitNode(peer.id, null);
+                                }
+                            }
+
+                            DankToggle {
+                                width: parent.width
+                                text: I18n.tr("Allow LAN access", "Tailscale allow LAN access toggle")
+                                description: I18n.tr("Reach local network devices while using an exit node", "Tailscale allow LAN access description")
+                                visible: TailscaleService.currentExitNode !== null
+                                checked: TailscaleService.exitNodeAllowLanAccess
+                                onToggled: value => TailscaleService.setAllowLanAccess(value, null)
+                            }
+                        }
 
                         // Search bar + refresh button
                         RowLayout {
