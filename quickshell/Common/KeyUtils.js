@@ -126,7 +126,40 @@ const KEY_MAP = {
     161: "exclamdown"
 };
 
-function xkbKeyFromQtKey(qk) {
+// Numpad (keypad) keys. Qt reuses the same Qt::Key_* values for the numpad and
+// the main rows/nav cluster; only Qt.KeypadModifier distinguishes them. niri and
+// the other compositors bind against the xkb KP_* keysym names, so we must emit
+// those instead of the collapsed twin. With NumLock off the numpad sends the
+// navigation keysyms (KP_Home, KP_End, ...); with NumLock on it sends KP_0..KP_9
+// (handled by the digit range in xkbKeyFromQtKey). Operators/Enter are the same
+// in both states.
+const KP_MAP = {
+    16777232: "KP_Home",
+    16777235: "KP_Up",
+    16777238: "KP_Prior",
+    16777234: "KP_Left",
+    16777227: "KP_Begin",
+    16777236: "KP_Right",
+    16777233: "KP_End",
+    16777237: "KP_Down",
+    16777239: "KP_Next",
+    16777222: "KP_Insert",
+    16777223: "KP_Delete",
+    16777221: "KP_Enter",
+    43: "KP_Add",
+    45: "KP_Subtract",
+    42: "KP_Multiply",
+    47: "KP_Divide",
+    46: "KP_Decimal"
+};
+
+function xkbKeyFromQtKey(qk, isKeypad) {
+    if (isKeypad) {
+        if (qk >= 48 && qk <= 57)
+            return "KP_" + (qk - 48);
+        if (KP_MAP[qk])
+            return KP_MAP[qk];
+    }
     if (qk >= 65 && qk <= 90)
         return String.fromCharCode(qk);
     if (qk >= 97 && qk <= 122)
