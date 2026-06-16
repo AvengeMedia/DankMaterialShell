@@ -64,9 +64,10 @@ func NewManager() (*Manager, error) {
 	m := &Manager{
 		backend: backend,
 		state: &NetworkState{
-			NetworkStatus: StatusDisconnected,
-			Preference:    PreferenceAuto,
-			WiFiNetworks:  []WiFiNetwork{},
+			NetworkStatus:     StatusDisconnected,
+			Preference:        PreferenceAuto,
+			WiFiNetworks:      []WiFiNetwork{},
+			SavedWiFiNetworks: []WiFiNetwork{},
 		},
 		stateMutex: sync.RWMutex{},
 
@@ -120,6 +121,7 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.WiFiBSSID = backendState.WiFiBSSID
 	m.state.WiFiSignal = backendState.WiFiSignal
 	m.state.WiFiNetworks = backendState.WiFiNetworks
+	m.state.SavedWiFiNetworks = backendState.SavedWiFiNetworks
 	m.state.WiFiDevices = backendState.WiFiDevices
 	m.state.WiredConnections = backendState.WiredConnections
 	m.state.VPNProfiles = backendState.VPNProfiles
@@ -156,6 +158,7 @@ func (m *Manager) snapshotState() NetworkState {
 	defer m.stateMutex.RUnlock()
 	s := *m.state
 	s.WiFiNetworks = append([]WiFiNetwork(nil), m.state.WiFiNetworks...)
+	s.SavedWiFiNetworks = append([]WiFiNetwork(nil), m.state.SavedWiFiNetworks...)
 	s.WiFiDevices = append([]WiFiDevice(nil), m.state.WiFiDevices...)
 	s.WiredConnections = append([]WiredConnection(nil), m.state.WiredConnections...)
 	s.EthernetDevices = append([]EthernetDevice(nil), m.state.EthernetDevices...)
@@ -211,6 +214,9 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 	if len(old.WiFiNetworks) != len(new.WiFiNetworks) {
 		return true
 	}
+	if len(old.SavedWiFiNetworks) != len(new.SavedWiFiNetworks) {
+		return true
+	}
 	if len(old.WiFiDevices) != len(new.WiFiDevices) {
 		return true
 	}
@@ -234,6 +240,23 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 			return true
 		}
 		if oldNet.Autoconnect != newNet.Autoconnect {
+			return true
+		}
+	}
+
+	for i := range old.SavedWiFiNetworks {
+		oldNet := &old.SavedWiFiNetworks[i]
+		newNet := &new.SavedWiFiNetworks[i]
+		if oldNet.SSID != newNet.SSID {
+			return true
+		}
+		if oldNet.Connected != newNet.Connected {
+			return true
+		}
+		if oldNet.Autoconnect != newNet.Autoconnect {
+			return true
+		}
+		if oldNet.OutOfRange != newNet.OutOfRange {
 			return true
 		}
 	}

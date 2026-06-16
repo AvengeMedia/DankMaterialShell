@@ -41,6 +41,7 @@ Singleton {
     property string tailnetName: ""
     property var selfNode: null
     property var peers: []
+    property bool exitNodeAllowLanAccess: false
 
     property bool available: false
     property bool stateInitialized: false
@@ -55,6 +56,19 @@ Singleton {
     }
 
     readonly property var onlinePeers: allPeersList.filter(p => p.online)
+
+    // Peers that may be used as an exit node (offered && approved). Self is
+    // excluded: a node can never route through itself, and tailscaled rejects it.
+    readonly property var exitNodeOptions: allPeersList.filter(p => p && p.exitNodeOption && p !== selfNode)
+
+    // The currently selected exit node, or null if none is in use.
+    readonly property var currentExitNode: {
+        for (const p of allPeersList) {
+            if (p && p.exitNode)
+                return p;
+        }
+        return null;
+    }
 
     readonly property var myPeers: {
         if (!selfNode)
@@ -141,6 +155,7 @@ Singleton {
         tailnetName = data.tailnetName || "";
         selfNode = data.self || null;
         peers = data.peers || [];
+        exitNodeAllowLanAccess = data.exitNodeAllowLanAccess || false;
     }
 
     function refresh(callback) {
@@ -150,6 +165,45 @@ Singleton {
             if (callback)
                 callback(response);
         });
+    }
+
+    // sendAction issues a state-changing request. The backend refreshes and
+    // broadcasts on success, so subscribers update without an extra getStatus.
+    function sendAction(method, params, callback) {
+        if (!available)
+            return;
+        DMSService.sendRequest(method, params, response => {
+            if (response.error) {
+                root.log.warn(method + " failed: " + response.error);
+                ToastService.showError(I18n.tr("Tailscale action failed", "Toast shown when a Tailscale write action is rejected"), response.error);
+            }
+            if (callback)
+                callback(response);
+        });
+    }
+
+    function connectTailscale(callback) {
+        sendAction("tailscale.connect", null, callback);
+    }
+
+    function disconnectTailscale(callback) {
+        sendAction("tailscale.disconnect", null, callback);
+    }
+
+    function setExitNode(id, callback) {
+        sendAction("tailscale.setExitNode", {
+            "id": id || ""
+        }, callback);
+    }
+
+    function clearExitNode(callback) {
+        setExitNode("", callback);
+    }
+
+    function setAllowLanAccess(enabled, callback) {
+        sendAction("tailscale.setAllowLanAccess", {
+            "enabled": enabled
+        }, callback);
     }
 
     function isMine(peer) {
