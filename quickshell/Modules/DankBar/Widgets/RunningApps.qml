@@ -18,6 +18,14 @@ BasePill {
 
     property var widgetData: null
     property var hoveredItem: null
+
+    onHoveredItemChanged: {
+        if (hoveredItem)
+            return;
+        if (tooltipLoader.item)
+            tooltipLoader.item.hide();
+        tooltipLoader.active = false;
+    }
     property var topBar: null
     property bool isAutoHideBar: false
     property Item windowRoot: (Window.window ? Window.window.contentItem : null)
@@ -235,6 +243,11 @@ BasePill {
 
                 delegate: Item {
                     id: delegateItem
+
+                    Component.onDestruction: {
+                        if (root.hoveredItem === delegateItem)
+                            root.hoveredItem = null;
+                    }
 
                     property bool isGrouped: root._groupByApp
                     property var groupData: isGrouped ? modelData : null
@@ -461,14 +474,8 @@ BasePill {
                             }
                         }
                         onExited: {
-                            if (root.hoveredItem === delegateItem) {
+                            if (root.hoveredItem === delegateItem)
                                 root.hoveredItem = null;
-                                if (tooltipLoader.item) {
-                                    tooltipLoader.item.hide();
-                                }
-
-                                tooltipLoader.active = false;
-                            }
                         }
                     }
                 }
@@ -490,6 +497,11 @@ BasePill {
 
                 delegate: Item {
                     id: delegateItem
+
+                    Component.onDestruction: {
+                        if (root.hoveredItem === delegateItem)
+                            root.hoveredItem = null;
+                    }
 
                     property bool isGrouped: root._groupByApp
                     property var groupData: isGrouped ? modelData : null
@@ -715,14 +727,8 @@ BasePill {
                             }
                         }
                         onExited: {
-                            if (root.hoveredItem === delegateItem) {
+                            if (root.hoveredItem === delegateItem)
                                 root.hoveredItem = null;
-                                if (tooltipLoader.item) {
-                                    tooltipLoader.item.hide();
-                                }
-
-                                tooltipLoader.active = false;
-                            }
                         }
                     }
                 }
