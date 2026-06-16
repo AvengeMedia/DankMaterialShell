@@ -282,6 +282,7 @@ var SPEC = {
     soundNewNotification: { def: true },
     soundVolumeChanged: { def: true },
     soundPluggedIn: { def: true },
+    muteSoundsWhenMediaPlaying: { def: true },
 
     acMonitorTimeout: { def: 0 },
     acLockTimeout: { def: 0 },

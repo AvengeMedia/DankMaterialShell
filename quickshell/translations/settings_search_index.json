@@ -8883,6 +8883,30 @@
     "icon": "settings_ethernet"
   },
   {
+    "section": "networkSavedWifi",
+    "label": "Saved Networks",
+    "tabIndex": 40,
+    "category": "Network",
+    "keywords": [
+      "autoconnect",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "forget",
+      "internet",
+      "known",
+      "network",
+      "networks",
+      "online",
+      "saved",
+      "ssid",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "bookmark"
+  },
+  {
     "section": "networkWifi",
     "label": "WiFi",
     "tabIndex": 40,

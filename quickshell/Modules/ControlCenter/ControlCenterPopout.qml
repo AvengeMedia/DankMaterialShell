@@ -93,7 +93,7 @@ DankPopout {
     shouldBeVisible: false
 
     property bool credentialsPromptOpen: NetworkService.credentialsRequested
-    property bool wifiPasswordModalOpen: PopoutService.wifiPasswordModal?.visible ?? false
+    property bool wifiPasswordModalOpen: PopoutService.wifiPasswordModal?.shouldBeVisible ?? false
     property bool polkitModalOpen: PopoutService.polkitAuthModal?.visible ?? false
     property bool anyModalOpen: credentialsPromptOpen || wifiPasswordModalOpen || polkitModalOpen || powerMenuOpen
 

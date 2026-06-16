@@ -756,8 +756,11 @@ Singleton {
     function showWifiPasswordModal(ssid) {
         if (wifiPasswordModalLoader)
             wifiPasswordModalLoader.active = true;
-        if (wifiPasswordModal)
+        if (wifiPasswordModal) {
             wifiPasswordModal.show(ssid);
+        } else {
+            Qt.callLater(() => wifiPasswordModal?.show(ssid));
+        }
     }
 
     function showWifiQRCodeModal(ssid) {
@@ -770,8 +773,11 @@ Singleton {
     function showHiddenNetworkModal() {
         if (wifiPasswordModalLoader)
             wifiPasswordModalLoader.active = true;
-        if (wifiPasswordModal)
+        if (wifiPasswordModal) {
             wifiPasswordModal.showHidden();
+        } else {
+            Qt.callLater(() => wifiPasswordModal?.showHidden());
+        }
     }
 
     function hideWifiPasswordModal() {

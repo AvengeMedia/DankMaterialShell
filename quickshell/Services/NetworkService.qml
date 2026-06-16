@@ -54,6 +54,7 @@ Singleton {
     property bool changingPreference: activeService?.changingPreference ?? false
     property string targetPreference: activeService?.targetPreference ?? ""
     property var savedWifiNetworks: activeService?.savedWifiNetworks ?? []
+    readonly property int savedWifiStateApiVersion: activeService?.savedWifiStateApiVersion ?? 26
     property string connectionStatus: activeService?.connectionStatus ?? ""
     property string lastConnectionError: activeService?.lastConnectionError ?? ""
     property bool passwordDialogShouldReopen: activeService?.passwordDialogShouldReopen ?? false
@@ -177,6 +178,12 @@ Singleton {
     function scanWifiNetworks() {
         if (activeService && activeService.scanWifiNetworks) {
             activeService.scanWifiNetworks();
+        }
+    }
+
+    function refreshSavedWifiNetworks() {
+        if (activeService && activeService.refreshSavedWifiNetworks) {
+            activeService.refreshSavedWifiNetworks();
         }
     }
 

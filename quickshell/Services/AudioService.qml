@@ -589,38 +589,42 @@ EOFCONFIG
         return MprisController.activePlayer?.isPlaying ?? false;
     }
 
+    function shouldMuteForMedia() {
+        return SettingsData.muteSoundsWhenMediaPlaying && isMediaPlaying();
+    }
+
     function playVolumeChangeSound() {
-        if (!soundsAvailable || !volumeChangeSound || notificationsAudioMuted || isMediaPlaying())
+        if (!soundsAvailable || !volumeChangeSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         volumeChangeSound.play();
     }
 
     function playPowerPlugSound() {
-        if (!soundsAvailable || !powerPlugSound || notificationsAudioMuted || isMediaPlaying())
+        if (!soundsAvailable || !powerPlugSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         powerPlugSound.play();
     }
 
     function playPowerUnplugSound() {
-        if (!soundsAvailable || !powerUnplugSound || notificationsAudioMuted || isMediaPlaying())
+        if (!soundsAvailable || !powerUnplugSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         powerUnplugSound.play();
     }
 
     function playNormalNotificationSound() {
-        if (!soundsAvailable || !normalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || isMediaPlaying())
+        if (!soundsAvailable || !normalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || shouldMuteForMedia())
             return;
         normalNotificationSound.play();
     }
 
     function playCriticalNotificationSound() {
-        if (!soundsAvailable || !criticalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || isMediaPlaying())
+        if (!soundsAvailable || !criticalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || shouldMuteForMedia())
             return;
         criticalNotificationSound.play();
     }
 
     function playLoginSound() {
-        if (!soundsAvailable || !loginSound || notificationsAudioMuted || isMediaPlaying()) {
+        if (!soundsAvailable || !loginSound || notificationsAudioMuted || shouldMuteForMedia()) {
             return;
         }
         loginSound.play();
