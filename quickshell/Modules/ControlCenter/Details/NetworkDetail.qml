@@ -721,7 +721,7 @@ Rectangle {
 
             DankActionButton {
                 id: qrCodeButton
-                visible: modelData.secured && modelData.saved
+                visible: modelData.secured && modelData.saved && !(modelData.enterprise || false)
                 anchors.right: parent.right
                 anchors.rightMargin: optionsButton.width + pinWifiRow.width + 3 * Theme.spacingM + Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter

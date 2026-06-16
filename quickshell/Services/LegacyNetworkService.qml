@@ -142,9 +142,11 @@ Singleton {
 
     readonly property var savedConnections: wifiNetworks.filter(n => n.saved).map(n => ({
                 "ssid": n.ssid,
-                "saved": true
+                "saved": true,
+                "outOfRange": false
             }))
     readonly property var savedWifiNetworks: savedConnections
+    readonly property int savedWifiStateApiVersion: 26
     readonly property var ssidToConnectionName: {
         const map = {};
         for (const n of wifiNetworks) {

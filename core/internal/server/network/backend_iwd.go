@@ -80,6 +80,10 @@ func (b *IWDBackend) Initialize() error {
 		return fmt.Errorf("failed to discover iwd devices: %w", err)
 	}
 
+	if err := b.updateSavedWiFiNetworks(); err != nil {
+		log.Warnf("Failed to get initial saved WiFi networks: %v", err)
+	}
+
 	if err := b.updateState(); err != nil {
 		conn.Close()
 		return fmt.Errorf("failed to get initial state: %w", err)
@@ -145,6 +149,7 @@ func (b *IWDBackend) GetCurrentState() (*BackendState, error) {
 
 	state := *b.state
 	state.WiFiNetworks = append([]WiFiNetwork(nil), b.state.WiFiNetworks...)
+	state.SavedWiFiNetworks = append([]WiFiNetwork(nil), b.state.SavedWiFiNetworks...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
 	state.WiFiDevices = b.getWiFiDevicesLocked()
 
