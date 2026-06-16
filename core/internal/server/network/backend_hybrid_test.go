@@ -27,6 +27,19 @@ func TestHybridIwdNetworkdBackend_GetCurrentState_MergesState(t *testing.T) {
 	wifi.state.WiFiBSSID = "00:11:22:33:44:55"
 	wifi.state.WiFiSignal = 75
 	wifi.state.WiFiDevice = "wlan0"
+	wifi.state.SavedWiFiNetworks = []WiFiNetwork{
+		{
+			SSID:        "TestNetwork",
+			Saved:       true,
+			Autoconnect: true,
+			Connected:   true,
+		},
+		{
+			SSID:       "AwayNetwork",
+			Saved:      true,
+			OutOfRange: true,
+		},
+	}
 
 	l3.state.WiFiIP = "192.168.1.100"
 	l3.state.EthernetConnected = false
@@ -42,6 +55,9 @@ func TestHybridIwdNetworkdBackend_GetCurrentState_MergesState(t *testing.T) {
 	assert.True(t, state.WiFiConnected)
 	assert.False(t, state.EthernetConnected)
 	assert.Equal(t, StatusWiFi, state.NetworkStatus)
+	assert.Len(t, state.SavedWiFiNetworks, 2)
+	assert.Equal(t, "TestNetwork", state.SavedWiFiNetworks[0].SSID)
+	assert.True(t, state.SavedWiFiNetworks[1].OutOfRange)
 }
 
 func TestHybridIwdNetworkdBackend_GetCurrentState_EthernetPriority(t *testing.T) {

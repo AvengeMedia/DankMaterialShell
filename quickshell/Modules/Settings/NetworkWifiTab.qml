@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import qs.Common
 import qs.Modules.Settings.Widgets
@@ -16,6 +17,7 @@ Item {
 
     Component.onCompleted: {
         NetworkService.addRef();
+        Qt.callLater(() => NetworkService.refreshSavedWifiNetworks());
     }
 
     Component.onDestruction: {
@@ -40,6 +42,7 @@ Item {
                 id: root
 
                 property string expandedWifiSsid: ""
+                property string expandedSavedWifiSsid: ""
                 property int maxPinnedWifiNetworks: 3
 
                 function normalizePinList(value) {
@@ -83,6 +86,79 @@ Item {
                 iconName: "wifi"
                 settingKey: "networkWifi"
                 tags: ["wifi", "wi-fi", "wireless", "network", "ssid", "adapter", "radio"]
+
+                function visibleWifiBySsid(ssid) {
+                    const networks = NetworkService.wifiNetworks || [];
+                    return networks.find(network => network.ssid === ssid) || null;
+                }
+
+                function mergedSavedWifiNetworks() {
+                    const saved = NetworkService.savedWifiNetworks || [];
+                    const supportsSavedWifiState = DMSService.apiVersion >= NetworkService.savedWifiStateApiVersion;
+                    const result = [];
+                    const seen = new Set();
+
+                    for (const network of saved) {
+                        if (!network?.ssid || seen.has(network.ssid))
+                            continue;
+                        const isOutOfRange = supportsSavedWifiState ? network.outOfRange === true : false;
+                        const visibleNetwork = !isOutOfRange ? visibleWifiBySsid(network.ssid) : null;
+                        if (visibleNetwork) {
+                            result.push(Object.assign({}, network, visibleNetwork, {
+                                saved: true,
+                                autoconnect: network.autoconnect ?? visibleNetwork.autoconnect,
+                                hidden: (network.hidden || false) || (visibleNetwork.hidden || false),
+                                outOfRange: false
+                            }));
+                        } else {
+                            result.push(Object.assign({}, network, {
+                                saved: true,
+                                outOfRange: isOutOfRange
+                            }));
+                        }
+                        seen.add(network.ssid);
+                    }
+
+                    return result;
+                }
+
+                function sortedSavedWifiNetworks() {
+                    const ssid = NetworkService.currentWifiSSID;
+                    const pinnedList = root.getPinnedWifiNetworks();
+                    let sorted = root.mergedSavedWifiNetworks();
+
+                    sorted.sort((a, b) => {
+                        const aPinnedIndex = pinnedList.indexOf(a.ssid);
+                        const bPinnedIndex = pinnedList.indexOf(b.ssid);
+                        if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
+                            if (aPinnedIndex === -1)
+                                return 1;
+                            if (bPinnedIndex === -1)
+                                return -1;
+                            return aPinnedIndex - bPinnedIndex;
+                        }
+                        if (a.ssid === ssid)
+                            return -1;
+                        if (b.ssid === ssid)
+                            return 1;
+                        if ((a.outOfRange || false) !== (b.outOfRange || false))
+                            return (a.outOfRange || false) ? 1 : -1;
+                        if ((a.signal || 0) !== (b.signal || 0))
+                            return (b.signal || 0) - (a.signal || 0);
+                        return (a.ssid || "").localeCompare(b.ssid || "");
+                    });
+                    return sorted;
+                }
+
+                function showForgetNetworkConfirm(ssid) {
+                    forgetNetworkConfirm.showWithOptions({
+                        title: I18n.tr("Forget Network"),
+                        message: I18n.tr("Forget \"%1\"?").arg(ssid),
+                        confirmText: I18n.tr("Forget"),
+                        confirmColor: Theme.error,
+                        onConfirm: () => NetworkService.forgetWifiNetwork(ssid)
+                    });
+                }
 
                 Column {
                     id: wifiSection
@@ -563,7 +639,7 @@ Item {
                                                 DankActionButton {
                                                     iconName: "qr_code"
                                                     buttonSize: 28
-                                                    visible: modelData.secured && modelData.saved
+                                                    visible: modelData.secured && modelData.saved && !(modelData.enterprise || false)
                                                     onClicked: {
                                                         PopoutService.showWifiQRCodeModal(modelData.ssid);
                                                     }
@@ -584,13 +660,7 @@ Item {
                                                     iconColor: Theme.error
                                                     visible: modelData.saved || isConnected
                                                     onClicked: {
-                                                        forgetNetworkConfirm.showWithOptions({
-                                                            title: I18n.tr("Forget Network"),
-                                                            message: I18n.tr("Forget \"%1\"?").arg(modelData.ssid),
-                                                            confirmText: I18n.tr("Forget"),
-                                                            confirmColor: Theme.error,
-                                                            onConfirm: () => NetworkService.forgetWifiNetwork(modelData.ssid)
-                                                        });
+                                                        root.showForgetNetworkConfirm(modelData.ssid);
                                                     }
                                                 }
                                             }
@@ -749,6 +819,421 @@ Item {
                                                 }
                                             }
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            SettingsCard {
+                id: savedWifiCard
+
+                readonly property var savedNetworks: root.sortedSavedWifiNetworks()
+
+                width: parent.width
+                title: I18n.tr("Saved Networks")
+                iconName: "bookmark"
+                settingKey: "networkSavedWifi"
+                tags: ["wifi", "wi-fi", "wireless", "network", "saved", "known", "ssid", "autoconnect", "forget"]
+                collapsible: true
+                expanded: false
+                visible: savedNetworks.length > 0
+
+                headerActions: [
+                    StyledText {
+                        text: savedWifiCard.savedNetworks.length
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                ]
+
+                Column {
+                    width: parent.width
+                    spacing: 4
+
+                    Repeater {
+                        model: savedWifiCard.expanded ? savedWifiCard.savedNetworks : []
+
+                        delegate: Rectangle {
+                            id: savedWifiDelegate
+
+                            required property var modelData
+                            required property int index
+
+                            readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+                            readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
+                            readonly property bool isOutOfRange: modelData.outOfRange || false
+                            readonly property bool isExpanded: !isOutOfRange && root.expandedSavedWifiSsid === modelData.ssid
+
+                            width: parent.width
+                            height: isExpanded ? 56 + savedWifiExpandedContent.height : 56
+                            radius: Theme.cornerRadius
+                            color: savedWifiMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                            border.width: isConnected ? 2 : 0
+                            border.color: Theme.primary
+                            clip: true
+
+                            Behavior on height {
+                                NumberAnimation {
+                                    duration: 150
+                                    easing.type: Easing.OutQuad
+                                }
+                            }
+
+                            Column {
+                                anchors.fill: parent
+                                spacing: 0
+
+                                Item {
+                                    width: parent.width
+                                    height: 56
+
+                                    Row {
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: Theme.spacingM
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.right: savedWifiActions.left
+                                        anchors.rightMargin: Theme.spacingS
+                                        spacing: Theme.spacingS
+
+                                        DankIcon {
+                                            name: {
+                                                if (isOutOfRange)
+                                                    return "wifi_off";
+                                                const s = modelData.signal || 0;
+                                                if (s >= 50)
+                                                    return "wifi";
+                                                if (s >= 25)
+                                                    return "wifi_2_bar";
+                                                return "wifi_1_bar";
+                                            }
+                                            size: 20
+                                            color: isConnected ? Theme.primary : Theme.surfaceText
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Column {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            spacing: 2
+                                            width: parent.width - 20 - Theme.spacingS
+
+                                            Row {
+                                                anchors.left: parent.left
+                                                spacing: Theme.spacingXS
+                                                width: parent.width
+
+                                                StyledText {
+                                                    text: modelData.ssid || I18n.tr("Unknown")
+                                                    font.pixelSize: Theme.fontSizeMedium
+                                                    color: isConnected ? Theme.primary : Theme.surfaceText
+                                                    font.weight: isConnected ? Font.Medium : Font.Normal
+                                                    elide: Text.ElideRight
+                                                    width: Math.max(0, parent.width - (savedWifiHiddenIcon.visible ? savedWifiHiddenIcon.width + Theme.spacingXS : 0))
+                                                }
+
+                                                DankIcon {
+                                                    id: savedWifiHiddenIcon
+                                                    name: "visibility_off"
+                                                    size: 14
+                                                    color: Theme.surfaceVariantText
+                                                    visible: modelData.hidden || false
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+                                            }
+
+                                            StyledText {
+                                                text: {
+                                                    const parts = [isConnected ? I18n.tr("Connected") : (modelData.secured ? I18n.tr("Secured") : I18n.tr("Open"))];
+                                                    parts.push(isOutOfRange ? I18n.tr("Unavailable") : (modelData.signal || 0) + "%");
+                                                    if (modelData.hidden || false)
+                                                        parts.push(I18n.tr("Hidden"));
+                                                    return parts.join(" • ");
+                                                }
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: isConnected ? Theme.primary : Theme.surfaceVariantText
+                                                width: parent.width
+                                                elide: Text.ElideRight
+                                            }
+                                        }
+                                    }
+
+                                    Row {
+                                        id: savedWifiActions
+                                        anchors.right: parent.right
+                                        anchors.rightMargin: Theme.spacingS
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: Theme.spacingXS
+
+                                        Rectangle {
+                                            width: 28
+                                            height: 28
+                                            radius: 14
+                                            color: savedWifiExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                            visible: !isOutOfRange
+
+                                            DankIcon {
+                                                anchors.centerIn: parent
+                                                name: isExpanded ? "expand_less" : "expand_more"
+                                                size: 18
+                                                color: Theme.surfaceText
+                                            }
+
+                                            MouseArea {
+                                                id: savedWifiExpandBtn
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: {
+                                                    if (isExpanded) {
+                                                        root.expandedSavedWifiSsid = "";
+                                                    } else {
+                                                        root.expandedSavedWifiSsid = modelData.ssid;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        DankActionButton {
+                                            iconName: "qr_code"
+                                            buttonSize: 28
+                                            visible: modelData.secured && !(modelData.enterprise || false)
+                                            onClicked: {
+                                                PopoutService.showWifiQRCodeModal(modelData.ssid);
+                                            }
+                                        }
+
+                                        DankActionButton {
+                                            iconName: "push_pin"
+                                            buttonSize: 28
+                                            iconColor: isPinned ? Theme.primary : Theme.surfaceVariantText
+                                            onClicked: {
+                                                root.toggleWifiPin(modelData.ssid);
+                                            }
+                                        }
+
+                                        DankActionButton {
+                                            id: savedWifiMoreButton
+                                            iconName: "more_horiz"
+                                            buttonSize: 28
+                                            onClicked: {
+                                                if (savedWifiMenu.visible) {
+                                                    savedWifiMenu.close();
+                                                    return;
+                                                }
+                                                savedWifiMenu.popup(savedWifiMoreButton, -savedWifiMenu.width + savedWifiMoreButton.width, savedWifiMoreButton.height + Theme.spacingXS);
+                                            }
+                                        }
+                                    }
+
+                                    MouseArea {
+                                        id: savedWifiMouseArea
+                                        anchors.fill: parent
+                                        anchors.rightMargin: savedWifiActions.width + Theme.spacingM
+                                        hoverEnabled: true
+                                        cursorShape: isOutOfRange ? Qt.ArrowCursor : Qt.PointingHandCursor
+                                        onClicked: {
+                                            if (isOutOfRange)
+                                                return;
+                                            if (isExpanded) {
+                                                root.expandedSavedWifiSsid = "";
+                                            } else {
+                                                root.expandedSavedWifiSsid = modelData.ssid;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    id: savedWifiExpandedContent
+                                    width: parent.width
+                                    visible: isExpanded
+
+                                    Rectangle {
+                                        width: parent.width - Theme.spacingM * 2
+                                        height: 1
+                                        x: Theme.spacingM
+                                        color: Theme.outlineLight
+                                    }
+
+                                    Item {
+                                        width: parent.width
+                                        height: savedWifiDetailsColumn.implicitHeight + Theme.spacingM * 2
+
+                                        Column {
+                                            id: savedWifiDetailsColumn
+                                            anchors.fill: parent
+                                            anchors.margins: Theme.spacingM
+                                            spacing: Theme.spacingS
+
+                                            Flow {
+                                                width: parent.width
+                                                spacing: Theme.spacingXS
+
+                                                Repeater {
+                                                    model: {
+                                                        const fields = [];
+                                                        const net = modelData;
+                                                        if (!net)
+                                                            return fields;
+
+                                                        fields.push({
+                                                            label: I18n.tr("Signal"),
+                                                            value: (net.signal || 0) + "%"
+                                                        });
+                                                        if (net.frequency)
+                                                            fields.push({
+                                                                label: I18n.tr("Frequency"),
+                                                                value: (net.frequency / 1000).toFixed(1) + " GHz"
+                                                            });
+                                                        if (net.channel)
+                                                            fields.push({
+                                                                label: I18n.tr("Channel"),
+                                                                value: String(net.channel)
+                                                            });
+                                                        if (net.rate)
+                                                            fields.push({
+                                                                label: I18n.tr("Rate"),
+                                                                value: net.rate + " Mbps"
+                                                            });
+                                                        if (net.mode)
+                                                            fields.push({
+                                                                label: I18n.tr("Mode"),
+                                                                value: net.mode
+                                                            });
+                                                        if (net.bssid)
+                                                            fields.push({
+                                                                label: I18n.tr("BSSID"),
+                                                                value: net.bssid
+                                                            });
+                                                        fields.push({
+                                                            label: I18n.tr("Security"),
+                                                            value: net.secured ? (net.enterprise ? I18n.tr("Enterprise") : I18n.tr("WPA/WPA2")) : I18n.tr("Open")
+                                                        });
+
+                                                        return fields;
+                                                    }
+
+                                                    delegate: Rectangle {
+                                                        required property var modelData
+                                                        required property int index
+
+                                                        width: savedWifiFieldContent.width + Theme.spacingM * 2
+                                                        height: 32
+                                                        radius: Theme.cornerRadius - 2
+                                                        color: Theme.surfaceContainerHigh
+                                                        border.width: 1
+                                                        border.color: Theme.outlineLight
+
+                                                        Row {
+                                                            id: savedWifiFieldContent
+                                                            anchors.centerIn: parent
+                                                            spacing: Theme.spacingXS
+
+                                                            StyledText {
+                                                                text: modelData.label + ":"
+                                                                font.pixelSize: Theme.fontSizeSmall
+                                                                color: Theme.surfaceVariantText
+                                                                anchors.verticalCenter: parent.verticalCenter
+                                                            }
+
+                                                            StyledText {
+                                                                text: modelData.value
+                                                                font.pixelSize: Theme.fontSizeSmall
+                                                                color: Theme.surfaceText
+                                                                font.weight: Font.Medium
+                                                                anchors.verticalCenter: parent.verticalCenter
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Menu {
+                                id: savedWifiMenu
+                                width: 170
+                                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+                                background: Rectangle {
+                                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                                    radius: Theme.cornerRadius
+                                    border.width: 0
+                                }
+
+                                MenuItem {
+                                    text: isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
+                                    height: isOutOfRange ? 0 : 32
+                                    visible: !isOutOfRange
+
+                                    contentItem: StyledText {
+                                        text: parent.text
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceText
+                                        leftPadding: Theme.spacingS
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+
+                                    background: Rectangle {
+                                        color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                                        radius: Theme.cornerRadius / 2
+                                    }
+
+                                    onTriggered: {
+                                        if (isConnected) {
+                                            NetworkService.disconnectWifi();
+                                            return;
+                                        }
+                                        NetworkService.connectToWifi(modelData.ssid);
+                                    }
+                                }
+
+                                MenuItem {
+                                    text: modelData.autoconnect ? I18n.tr("Disable Autoconnect") : I18n.tr("Enable Autoconnect")
+                                    height: DMSService.apiVersion > 13 ? 32 : 0
+                                    visible: DMSService.apiVersion > 13
+
+                                    contentItem: StyledText {
+                                        text: parent.text
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceText
+                                        leftPadding: Theme.spacingS
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+
+                                    background: Rectangle {
+                                        color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                                        radius: Theme.cornerRadius / 2
+                                    }
+
+                                    onTriggered: {
+                                        NetworkService.setWifiAutoconnect(modelData.ssid, !(modelData.autoconnect || false));
+                                    }
+                                }
+
+                                MenuItem {
+                                    text: I18n.tr("Forget Network")
+                                    height: 32
+
+                                    contentItem: StyledText {
+                                        text: parent.text
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.error
+                                        leftPadding: Theme.spacingS
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+
+                                    background: Rectangle {
+                                        color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
+                                        radius: Theme.cornerRadius / 2
+                                    }
+
+                                    onTriggered: {
+                                        root.showForgetNetworkConfirm(modelData.ssid);
                                     }
                                 }
                             }
