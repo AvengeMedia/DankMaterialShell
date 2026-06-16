@@ -134,6 +134,9 @@
   "1 day": {
     "1 day": "1 dia"
   },
+  "1 day before": {
+    "1 day before": ""
+  },
   "1 device connected": {
     "1 device connected": "1 dispositivo conectado"
   },
@@ -142,6 +145,9 @@
   },
   "1 hour 30 minutes": {
     "1 hour 30 minutes": ""
+  },
+  "1 hour before": {
+    "1 hour before": ""
   },
   "1 minute": {
     "1 minute": "1 minuto"
@@ -154,6 +160,9 @@
   },
   "1 task": {
     "1 task": ""
+  },
+  "10 min before": {
+    "10 min before": ""
   },
   "10 minutes": {
     "10 minutes": "10 minutos"
@@ -172,6 +181,9 @@
   },
   "15 min": {
     "15 min": ""
+  },
+  "15 min before": {
+    "15 min before": ""
   },
   "15 minutes": {
     "15 minutes": ""
@@ -230,6 +242,9 @@
   "30 min": {
     "30 min": ""
   },
+  "30 min before": {
+    "30 min before": ""
+  },
   "30 minutes": {
     "30 minutes": ""
   },
@@ -253,6 +268,9 @@
   },
   "45 seconds": {
     "45 seconds": ""
+  },
+  "5 min before": {
+    "5 min before": ""
   },
   "5 minutes": {
     "5 minutes": "5 minutos"
@@ -449,8 +467,14 @@
   "Add by Address": {
     "Add by Address": ""
   },
+  "Add location": {
+    "Add location": ""
+  },
   "Add match": {
     "Add match": ""
+  },
+  "Add notes": {
+    "Add notes": ""
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
@@ -499,6 +523,9 @@
   },
   "Allow": {
     "Allow": ""
+  },
+  "Allow adjusting device volume by scrolling on the right half of items in the device list": {
+    "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
   },
   "Allow clicks to pass through the widget": {
     "Allow clicks to pass through the widget": ""
@@ -686,6 +713,9 @@
   "At least one output must remain enabled": {
     "At least one output must remain enabled": ""
   },
+  "At start": {
+    "At start": ""
+  },
   "Attach": {
     "Attach": ""
   },
@@ -776,14 +806,23 @@
   "Auto (Wide)": {
     "Auto (Wide)": "Auto (Ancho)"
   },
+  "Auto Compositor Gaps": {
+    "Auto Compositor Gaps": ""
+  },
   "Auto Location": {
     "Auto Location": "Localización automática"
+  },
+  "Auto Overflow": {
+    "Auto Overflow": ""
   },
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "Márgenes automáticos en pop‑ups"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": ""
+  },
+  "Auto saved": {
+    "Auto saved": ""
   },
   "Auto-Clear After": {
     "Auto-Clear After": "Limpiar automáticamente despues"
@@ -814,6 +853,9 @@
   },
   "Auto-login on startup": {
     "Auto-login on startup": ""
+  },
+  "Auto-save to disk": {
+    "Auto-save to disk": ""
   },
   "Auto-saving...": {
     "Auto-saving...": "Guardando automáticamente..."
@@ -865,6 +907,9 @@
   },
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "Bloquear pantalla cuando el sistema se vaya a suspender"
+  },
+  "Automatically save changes to opened files as you type": {
+    "Automatically save changes to opened files as you type": ""
   },
   "Automation": {
     "Automation": ""
@@ -949,6 +994,9 @@
   },
   "Bar Configurations": {
     "Bar Configurations": "Configuración de barras"
+  },
+  "Bar Opacity": {
+    "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": ""
@@ -1052,11 +1100,17 @@
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": ""
+  },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Aplicar desenfoque en la vista general de niri"
   },
   "Body": {
     "Body": ""
+  },
+  "Body Font Size": {
+    "Body Font Size": ""
   },
   "Bold": {
     "Bold": ""
@@ -1177,6 +1231,9 @@
   },
   "Calendar": {
     "Calendar": ""
+  },
+  "Calendar Backend": {
+    "Calendar Backend": ""
   },
   "Camera": {
     "Camera": "Cámara"
@@ -1342,6 +1399,9 @@
   },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": ""
+  },
+  "Choose which action buttons appear on clipboard entries": {
+    "Choose which action buttons appear on clipboard entries": ""
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Elija qué pantallas muestran este widget"
@@ -1703,6 +1763,24 @@
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "Controla la opacidad de todas las ventanas emergentes, modales y sus capas de contenido."
   },
+  "Controls opacity of shell surfaces, popouts, and modals": {
+    "Controls opacity of shell surfaces, popouts, and modals": ""
+  },
+  "Controls opacity of the bar background": {
+    "Controls opacity of the bar background": ""
+  },
+  "Controls opacity of the border": {
+    "Controls opacity of the border": ""
+  },
+  "Controls opacity of the shadow layer": {
+    "Controls opacity of the shadow layer": ""
+  },
+  "Controls opacity of the widget outline": {
+    "Controls opacity of the widget outline": ""
+  },
+  "Controls opacity of widget backgrounds": {
+    "Controls opacity of widget backgrounds": ""
+  },
   "Controls outlines around blurred foreground cards, pills, and notification cards": {
     "Controls outlines around blurred foreground cards, pills, and notification cards": ""
   },
@@ -1711,6 +1789,9 @@
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": ""
+  },
+  "Controls the opacity of the shadow": {
+    "Controls the opacity of the shadow": ""
   },
   "Controls the outer edge of protocol-blurred windows": {
     "Controls the outer edge of protocol-blurred windows": ""
@@ -1816,6 +1897,12 @@
   },
   "Critical Priority": {
     "Critical Priority": "Prioridad Crítica"
+  },
+  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
+    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
+  },
+  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
+    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": ""
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
     "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": ""
@@ -2012,6 +2099,15 @@
   "DankBar": {
     "DankBar": "DankBar"
   },
+  "DankCalendar": {
+    "DankCalendar": ""
+  },
+  "DankCalendar isn't installed": {
+    "DankCalendar isn't installed": ""
+  },
+  "DankCalendar isn't running": {
+    "DankCalendar isn't running": ""
+  },
   "DankMaterialShell is ready to use": {
     "DankMaterialShell is ready to use": "DankMaterialShell está listo para utilizarse"
   },
@@ -2077,6 +2173,9 @@
   },
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": ""
+  },
+  "Default Mode": {
+    "Default Mode": ""
   },
   "Default Opens": {
     "Default Opens": ""
@@ -2194,6 +2293,9 @@
   },
   "Device connections": {
     "Device connections": "Conexiones de dispositivos"
+  },
+  "Device list scroll volume": {
+    "Device list scroll volume": ""
   },
   "Device names updated": {
     "Device names updated": ""
@@ -2369,11 +2471,17 @@
   "Dock & Launcher": {
     "Dock & Launcher": "Dock y Lanzador"
   },
+  "Dock Opacity": {
+    "Dock Opacity": ""
+  },
   "Dock Transparency": {
     "Dock Transparency": "Transparencia del dock"
   },
   "Dock Visibility": {
     "Dock Visibility": "Visibilidad del dock"
+  },
+  "Dock margin, opacity, and border": {
+    "Dock margin, opacity, and border": ""
   },
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": ""
@@ -2465,6 +2573,9 @@
   "Edge the launcher slides from": {
     "Edge the launcher slides from": ""
   },
+  "Edit": {
+    "Edit": ""
+  },
   "Edit App": {
     "Edit App": ""
   },
@@ -2479,6 +2590,9 @@
   },
   "Edit clipboard text": {
     "Edit clipboard text": ""
+  },
+  "Edit event": {
+    "Edit event": ""
   },
   "Editing changes on %1": {
     "Editing changes on %1": ""
@@ -2597,6 +2711,9 @@
   "End": {
     "End": "Final"
   },
+  "End must be after start": {
+    "End must be after start": ""
+  },
   "Enlarge on Hover": {
     "Enlarge on Hover": ""
   },
@@ -2680,6 +2797,9 @@
   },
   "Ethernet": {
     "Ethernet": "Ethernet"
+  },
+  "Event title": {
+    "Event title": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": ""
@@ -3028,6 +3148,9 @@
   },
   "File Manager": {
     "File Manager": ""
+  },
+  "File changed on disk": {
+    "File changed on disk": ""
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
@@ -3839,6 +3962,9 @@
   "Insert your security key...": {
     "Insert your security key...": ""
   },
+  "Inset the Notepad from screen edges using the compositor's configured gaps": {
+    "Inset the Notepad from screen edges using the compositor's configured gaps": ""
+  },
   "Install": {
     "Install": "Instalar"
   },
@@ -3946,6 +4072,12 @@
   },
   "Keep Changes": {
     "Keep Changes": "Mantener cambios"
+  },
+  "Keep My Edits": {
+    "Keep My Edits": ""
+  },
+  "Keep in Bar": {
+    "Keep in Bar": ""
   },
   "Keep typing": {
     "Keep typing": ""
@@ -4274,6 +4406,9 @@
   "Manual Gap Size": {
     "Manual Gap Size": "Tamaño de separación manual"
   },
+  "Manual Gaps": {
+    "Manual Gaps": ""
+  },
   "Manual Show/Hide": {
     "Manual Show/Hide": "Mostrar/Ocultar manualmente"
   },
@@ -4357,6 +4492,9 @@
   },
   "Max Running Apps (0 = Unlimited)": {
     "Max Running Apps (0 = Unlimited)": ""
+  },
+  "Max Visible": {
+    "Max Visible": ""
   },
   "Max Volume": {
     "Max Volume": ""
@@ -4706,6 +4844,9 @@
   "New York, NY": {
     "New York, NY": "New York, NY"
   },
+  "New event": {
+    "New event": ""
+  },
   "New group name...": {
     "New group name...": ""
   },
@@ -4841,6 +4982,9 @@
   "No brightness devices available": {
     "No brightness devices available": "No hay dispositivos de brillo disponibles"
   },
+  "No calendar source available": {
+    "No calendar source available": ""
+  },
   "No changes": {
     "No changes": "Sin cambios"
   },
@@ -4967,6 +5111,9 @@
   "No recent clipboard entries found": {
     "No recent clipboard entries found": ""
   },
+  "No reminder": {
+    "No reminder": ""
+  },
   "No results": {
     "No results": ""
   },
@@ -5030,6 +5177,9 @@
   "No window rules configured": {
     "No window rules configured": ""
   },
+  "No writable calendar available": {
+    "No writable calendar available": ""
+  },
   "Noise": {
     "Noise": ""
   },
@@ -5090,8 +5240,14 @@
   "Notepad Font Settings": {
     "Notepad Font Settings": "Ajustes del bloc de notas"
   },
+  "Notepad Settings": {
+    "Notepad Settings": ""
+  },
   "Notepad Slideout": {
     "Notepad Slideout": "Bloc de notas"
+  },
+  "Notes": {
+    "Notes": ""
   },
   "Nothing": {
     "Nothing": ""
@@ -5215,6 +5371,9 @@
   },
   "Open Frame": {
     "Open Frame": ""
+  },
+  "Open From": {
+    "Open From": ""
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": ""
@@ -5459,6 +5618,9 @@
   "Paste": {
     "Paste": ""
   },
+  "Path copied to clipboard": {
+    "Path copied to clipboard": ""
+  },
   "Path to a video file or folder containing videos": {
     "Path to a video file or folder containing videos": ""
   },
@@ -5644,6 +5806,9 @@
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": ""
+  },
+  "Popout": {
+    "Popout": ""
   },
   "Popout Shadows": {
     "Popout Shadows": ""
@@ -5966,6 +6131,9 @@
   "Release": {
     "Release": ""
   },
+  "Reload From Disk": {
+    "Reload From Disk": ""
+  },
   "Reload Plugin": {
     "Reload Plugin": "Reiniciar complemento"
   },
@@ -5986,6 +6154,9 @@
   },
   "Remember last user": {
     "Remember last user": ""
+  },
+  "Reminder": {
+    "Reminder": ""
   },
   "Remove": {
     "Remove": "Remover"
@@ -6287,6 +6458,9 @@
   "Saving...": {
     "Saving...": ""
   },
+  "Saving…": {
+    "Saving…": ""
+  },
   "Scale": {
     "Scale": "Escala"
   },
@@ -6575,6 +6749,12 @@
   "Set notification rules": {
     "Set notification rules": ""
   },
+  "Set the font size for notification body text (htmlBody)": {
+    "Set the font size for notification body text (htmlBody)": ""
+  },
+  "Set the font size for notification summary text": {
+    "Set the font size for notification summary text": ""
+  },
   "Setting": {
     "Setting": ""
   },
@@ -6833,6 +7013,9 @@
   "Show Workspace Apps": {
     "Show Workspace Apps": "Mostrar aplicaciones en el espacio de trabajo"
   },
+  "Show a bar that drains as the popup's auto-dismiss timer runs": {
+    "Show a bar that drains as the popup's auto-dismiss timer runs": ""
+  },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": ""
   },
@@ -6974,6 +7157,9 @@
   "Silence notifications": {
     "Silence notifications": ""
   },
+  "Single-Line Popup": {
+    "Single-Line Popup": ""
+  },
   "Size": {
     "Size": "Tamaño"
   },
@@ -6997,6 +7183,9 @@
   },
   "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": {
     "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": ""
+  },
+  "Slideout": {
+    "Slideout": ""
   },
   "Small": {
     "Small": ""
@@ -7123,6 +7312,9 @@
   },
   "Summary": {
     "Summary": ""
+  },
+  "Summary Font Size": {
+    "Summary Font Size": ""
   },
   "Sunrise": {
     "Sunrise": "Amanecer"
@@ -7472,6 +7664,9 @@
   "Timed Out": {
     "Timed Out": "Tiempo agotado"
   },
+  "Timeout Progress Bar": {
+    "Timeout Progress Bar": ""
+  },
   "Timeout for critical priority notifications": {
     "Timeout for critical priority notifications": "Tiempo de espera para notificaciones de prioridad crítica"
   },
@@ -7492,6 +7687,9 @@
   },
   "Title (optional)": {
     "Title (optional)": ""
+  },
+  "Title is required": {
+    "Title is required": ""
   },
   "Title regex (optional)": {
     "Title regex (optional)": ""
@@ -7832,6 +8030,9 @@
   "Use Grid Layout": {
     "Use Grid Layout": "Usar diseño en cuadrícula"
   },
+  "Use HH:MM time format": {
+    "Use HH:MM time format": ""
+  },
   "Use IP Location": {
     "Use IP Location": "Usar la localización de la IP"
   },
@@ -7970,8 +8171,14 @@
   "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
     "Uses the spotlight-bar IPC action and always opens the minimal bar.": ""
   },
+  "Using DankCalendar%1": {
+    "Using DankCalendar%1": ""
+  },
   "Using global monospace font from Settings → Personalization": {
     "Using global monospace font from Settings → Personalization": ""
+  },
+  "Using khal": {
+    "Using khal": ""
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": ""
@@ -8059,6 +8266,9 @@
   },
   "Visibility": {
     "Visibility": "Visibilidad"
+  },
+  "Visible Entry Actions": {
+    "Visible Entry Actions": ""
   },
   "Visual Effects": {
     "Visual Effects": ""
@@ -8182,6 +8392,9 @@
   },
   "Widget Management": {
     "Widget Management": "Gestión de widgets"
+  },
+  "Widget Opacity": {
+    "Widget Opacity": ""
   },
   "Widget Outline": {
     "Widget Outline": "Contorno en widgets"
@@ -8425,6 +8638,9 @@
   },
   "featured": {
     "featured": ""
+  },
+  "khal": {
+    "khal": ""
   },
   "last seen %1": {
     "last seen %1": ""

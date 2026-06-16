@@ -134,6 +134,9 @@
   "1 day": {
     "1 day": "1 день"
   },
+  "1 day before": {
+    "1 day before": ""
+  },
   "1 device connected": {
     "1 device connected": "1 устройство подключено"
   },
@@ -142,6 +145,9 @@
   },
   "1 hour 30 minutes": {
     "1 hour 30 minutes": "1 час 30 минут"
+  },
+  "1 hour before": {
+    "1 hour before": ""
   },
   "1 minute": {
     "1 minute": "1 минута"
@@ -154,6 +160,9 @@
   },
   "1 task": {
     "1 task": ""
+  },
+  "10 min before": {
+    "10 min before": ""
   },
   "10 minutes": {
     "10 minutes": "10 минут"
@@ -172,6 +181,9 @@
   },
   "15 min": {
     "15 min": "15 мин"
+  },
+  "15 min before": {
+    "15 min before": ""
   },
   "15 minutes": {
     "15 minutes": "15 минут"
@@ -230,6 +242,9 @@
   "30 min": {
     "30 min": "30 мин"
   },
+  "30 min before": {
+    "30 min before": ""
+  },
   "30 minutes": {
     "30 minutes": "30 минут"
   },
@@ -253,6 +268,9 @@
   },
   "45 seconds": {
     "45 seconds": "45 секунд"
+  },
+  "5 min before": {
+    "5 min before": ""
   },
   "5 minutes": {
     "5 minutes": "5 минут"
@@ -449,8 +467,14 @@
   "Add by Address": {
     "Add by Address": "Добавить по адресу"
   },
+  "Add location": {
+    "Add location": ""
+  },
   "Add match": {
     "Add match": ""
+  },
+  "Add notes": {
+    "Add notes": ""
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Добавить нового пользователя в группу %1, чтобы он мог запустить dms greeter sync --profile."
@@ -499,6 +523,9 @@
   },
   "Allow": {
     "Allow": "Разрешить"
+  },
+  "Allow adjusting device volume by scrolling on the right half of items in the device list": {
+    "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
   },
   "Allow clicks to pass through the widget": {
     "Allow clicks to pass through the widget": "Разрешить клики проходить сквозь виджет"
@@ -686,6 +713,9 @@
   "At least one output must remain enabled": {
     "At least one output must remain enabled": "Как минимум один выход должен оставаться включённым"
   },
+  "At start": {
+    "At start": ""
+  },
   "Attach": {
     "Attach": "Подключить"
   },
@@ -776,14 +806,23 @@
   "Auto (Wide)": {
     "Auto (Wide)": "Авто (широкий)"
   },
+  "Auto Compositor Gaps": {
+    "Auto Compositor Gaps": ""
+  },
   "Auto Location": {
     "Auto Location": "Автоматическое Определение Местоположения"
+  },
+  "Auto Overflow": {
+    "Auto Overflow": ""
   },
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "Авто Всплывающее Отступы"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "Включён автоматический режим. Ручной выбор профиля отключён."
+  },
+  "Auto saved": {
+    "Auto saved": ""
   },
   "Auto-Clear After": {
     "Auto-Clear After": "Автоочистка через"
@@ -814,6 +853,9 @@
   },
   "Auto-login on startup": {
     "Auto-login on startup": ""
+  },
+  "Auto-save to disk": {
+    "Auto-save to disk": ""
   },
   "Auto-saving...": {
     "Auto-saving...": "Автосохранение..."
@@ -865,6 +907,9 @@
   },
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "Автоматически блокировать экран при подготовке системы к приостановке"
+  },
+  "Automatically save changes to opened files as you type": {
+    "Automatically save changes to opened files as you type": ""
   },
   "Automation": {
     "Automation": "Автоматизация"
@@ -949,6 +994,9 @@
   },
   "Bar Configurations": {
     "Bar Configurations": "Конфигурации бара"
+  },
+  "Bar Opacity": {
+    "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": "Тени панели"
@@ -1052,11 +1100,17 @@
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "Размывать фон за барами, всплывающими окнами, модальными окнами и уведомлениями. Требуется поддержка и настройка композитора."
   },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": ""
+  },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Размытие обоев при открытом обзоре Niri"
   },
   "Body": {
     "Body": "Заголовок"
+  },
+  "Body Font Size": {
+    "Body Font Size": ""
   },
   "Bold": {
     "Bold": "Полужирный"
@@ -1177,6 +1231,9 @@
   },
   "Calendar": {
     "Calendar": "Календарь"
+  },
+  "Calendar Backend": {
+    "Calendar Backend": ""
   },
   "Camera": {
     "Camera": "Камера"
@@ -1342,6 +1399,9 @@
   },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": ""
+  },
+  "Choose which action buttons appear on clipboard entries": {
+    "Choose which action buttons appear on clipboard entries": ""
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Выбрать, на каких дисплеях показывать этот виджет"
@@ -1703,6 +1763,24 @@
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "Контролирует непрозрачность всех всплывающих окон, модальных окон и их слоев контента"
   },
+  "Controls opacity of shell surfaces, popouts, and modals": {
+    "Controls opacity of shell surfaces, popouts, and modals": ""
+  },
+  "Controls opacity of the bar background": {
+    "Controls opacity of the bar background": ""
+  },
+  "Controls opacity of the border": {
+    "Controls opacity of the border": ""
+  },
+  "Controls opacity of the shadow layer": {
+    "Controls opacity of the shadow layer": ""
+  },
+  "Controls opacity of the widget outline": {
+    "Controls opacity of the widget outline": ""
+  },
+  "Controls opacity of widget backgrounds": {
+    "Controls opacity of widget backgrounds": ""
+  },
   "Controls outlines around blurred foreground cards, pills, and notification cards": {
     "Controls outlines around blurred foreground cards, pills, and notification cards": "Управляет контурами вокруг размытых карточек переднего плана, плашек и карточек уведомлений"
   },
@@ -1711,6 +1789,9 @@
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": "Управляет базовым радиусом размытия и смещением теней"
+  },
+  "Controls the opacity of the shadow": {
+    "Controls the opacity of the shadow": ""
   },
   "Controls the outer edge of protocol-blurred windows": {
     "Controls the outer edge of protocol-blurred windows": "Управляет внешним краем окон с размытием по протоколу"
@@ -1816,6 +1897,12 @@
   },
   "Critical Priority": {
     "Critical Priority": "Критический Приоритет"
+  },
+  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
+    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
+  },
+  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
+    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": ""
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
     "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: переключить вкладку • Ctrl+S: закрепить/открепить • Shift+Del: очистить всё • Esc: закрыть"
@@ -2012,6 +2099,15 @@
   "DankBar": {
     "DankBar": "DankBar"
   },
+  "DankCalendar": {
+    "DankCalendar": ""
+  },
+  "DankCalendar isn't installed": {
+    "DankCalendar isn't installed": ""
+  },
+  "DankCalendar isn't running": {
+    "DankCalendar isn't running": ""
+  },
   "DankMaterialShell is ready to use": {
     "DankMaterialShell is ready to use": "DankMaterialShell готов к использованию"
   },
@@ -2077,6 +2173,9 @@
   },
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": "Сочетание клавиш лаунчера по умолчанию"
+  },
+  "Default Mode": {
+    "Default Mode": ""
   },
   "Default Opens": {
     "Default Opens": "Открытие по умолчанию"
@@ -2194,6 +2293,9 @@
   },
   "Device connections": {
     "Device connections": "Подключения устройств"
+  },
+  "Device list scroll volume": {
+    "Device list scroll volume": ""
   },
   "Device names updated": {
     "Device names updated": "Имена устройств обновлены"
@@ -2369,11 +2471,17 @@
   "Dock & Launcher": {
     "Dock & Launcher": "Док & Лаунчер"
   },
+  "Dock Opacity": {
+    "Dock Opacity": ""
+  },
   "Dock Transparency": {
     "Dock Transparency": "Прозрачность Дока"
   },
   "Dock Visibility": {
     "Dock Visibility": "Видимость дока"
+  },
+  "Dock margin, opacity, and border": {
+    "Dock margin, opacity, and border": ""
   },
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": "Поля, прозрачность и рамка дока"
@@ -2465,6 +2573,9 @@
   "Edge the launcher slides from": {
     "Edge the launcher slides from": "Край, с которого выдвигается лаунчер"
   },
+  "Edit": {
+    "Edit": ""
+  },
   "Edit App": {
     "Edit App": "Изменить приложение"
   },
@@ -2479,6 +2590,9 @@
   },
   "Edit clipboard text": {
     "Edit clipboard text": "Редактировать текст буфера обмена"
+  },
+  "Edit event": {
+    "Edit event": ""
   },
   "Editing changes on %1": {
     "Editing changes on %1": ""
@@ -2597,6 +2711,9 @@
   "End": {
     "End": "Конец"
   },
+  "End must be after start": {
+    "End must be after start": ""
+  },
   "Enlarge on Hover": {
     "Enlarge on Hover": "Увеличивать при наведении"
   },
@@ -2680,6 +2797,9 @@
   },
   "Ethernet": {
     "Ethernet": "Ethernet"
+  },
+  "Event title": {
+    "Event title": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": "Каждые 15 минут"
@@ -3028,6 +3148,9 @@
   },
   "File Manager": {
     "File Manager": "Файловый менеджер"
+  },
+  "File changed on disk": {
+    "File changed on disk": ""
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "Файловый менеджер, используемый для открытия корзины. Выберите «custom», чтобы ввести собственную команду."
@@ -3839,6 +3962,9 @@
   "Insert your security key...": {
     "Insert your security key...": "Вставьте ключ безопасности..."
   },
+  "Inset the Notepad from screen edges using the compositor's configured gaps": {
+    "Inset the Notepad from screen edges using the compositor's configured gaps": ""
+  },
   "Install": {
     "Install": "Установить"
   },
@@ -3946,6 +4072,12 @@
   },
   "Keep Changes": {
     "Keep Changes": "Сохранить изменения"
+  },
+  "Keep My Edits": {
+    "Keep My Edits": ""
+  },
+  "Keep in Bar": {
+    "Keep in Bar": ""
   },
   "Keep typing": {
     "Keep typing": "Продолжайте ввод"
@@ -4274,6 +4406,9 @@
   "Manual Gap Size": {
     "Manual Gap Size": "Ручной размер отступа"
   },
+  "Manual Gaps": {
+    "Manual Gaps": ""
+  },
   "Manual Show/Hide": {
     "Manual Show/Hide": "Ручное Отображение/Скрытие"
   },
@@ -4357,6 +4492,9 @@
   },
   "Max Running Apps (0 = Unlimited)": {
     "Max Running Apps (0 = Unlimited)": "Макс запущенных приложений (0 = безлимитно)"
+  },
+  "Max Visible": {
+    "Max Visible": ""
   },
   "Max Volume": {
     "Max Volume": "Максимальная громкость"
@@ -4706,6 +4844,9 @@
   "New York, NY": {
     "New York, NY": "Нью-Йорк, NY"
   },
+  "New event": {
+    "New event": ""
+  },
   "New group name...": {
     "New group name...": "Новое название группы..."
   },
@@ -4841,6 +4982,9 @@
   "No brightness devices available": {
     "No brightness devices available": "Устройства яркости недоступны"
   },
+  "No calendar source available": {
+    "No calendar source available": ""
+  },
   "No changes": {
     "No changes": "Нет изменений"
   },
@@ -4967,6 +5111,9 @@
   "No recent clipboard entries found": {
     "No recent clipboard entries found": "Недавние записи буфера обмена не найдены"
   },
+  "No reminder": {
+    "No reminder": ""
+  },
   "No results": {
     "No results": "Нет результатов"
   },
@@ -5030,6 +5177,9 @@
   "No window rules configured": {
     "No window rules configured": "Правила окон не настроены"
   },
+  "No writable calendar available": {
+    "No writable calendar available": ""
+  },
   "Noise": {
     "Noise": ""
   },
@@ -5090,8 +5240,14 @@
   "Notepad Font Settings": {
     "Notepad Font Settings": "Настройки Шрифта Блокнота"
   },
+  "Notepad Settings": {
+    "Notepad Settings": ""
+  },
   "Notepad Slideout": {
     "Notepad Slideout": "Выезжающий блокнот"
+  },
+  "Notes": {
+    "Notes": ""
   },
   "Nothing": {
     "Nothing": "Ничего"
@@ -5215,6 +5371,9 @@
   },
   "Open Frame": {
     "Open Frame": "Разомкнутая рамка"
+  },
+  "Open From": {
+    "Open From": ""
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "Откройте KDE Connect на телефоне"
@@ -5459,6 +5618,9 @@
   "Paste": {
     "Paste": "Вставить"
   },
+  "Path copied to clipboard": {
+    "Path copied to clipboard": ""
+  },
   "Path to a video file or folder containing videos": {
     "Path to a video file or folder containing videos": "Путь к видеофайлу или папке с видео"
   },
@@ -5644,6 +5806,9 @@
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Интеграция с Polkit отключена. Управление пользователями требует Polkit для повышения привилегий."
+  },
+  "Popout": {
+    "Popout": ""
   },
   "Popout Shadows": {
     "Popout Shadows": "Тени всплывающих окон"
@@ -5966,6 +6131,9 @@
   "Release": {
     "Release": "Релиз"
   },
+  "Reload From Disk": {
+    "Reload From Disk": ""
+  },
   "Reload Plugin": {
     "Reload Plugin": "Перезагрузить плагин"
   },
@@ -5986,6 +6154,9 @@
   },
   "Remember last user": {
     "Remember last user": "Запомнить последнего пользователя"
+  },
+  "Reminder": {
+    "Reminder": ""
   },
   "Remove": {
     "Remove": "Удалить"
@@ -6287,6 +6458,9 @@
   "Saving...": {
     "Saving...": "Сохранение..."
   },
+  "Saving…": {
+    "Saving…": ""
+  },
   "Scale": {
     "Scale": "Масштаб"
   },
@@ -6575,6 +6749,12 @@
   "Set notification rules": {
     "Set notification rules": "Установить правила уведомлений"
   },
+  "Set the font size for notification body text (htmlBody)": {
+    "Set the font size for notification body text (htmlBody)": ""
+  },
+  "Set the font size for notification summary text": {
+    "Set the font size for notification summary text": ""
+  },
   "Setting": {
     "Setting": "Параметр"
   },
@@ -6833,6 +7013,9 @@
   "Show Workspace Apps": {
     "Show Workspace Apps": "Показать приложения рабочего пространства"
   },
+  "Show a bar that drains as the popup's auto-dismiss timer runs": {
+    "Show a bar that drains as the popup's auto-dismiss timer runs": ""
+  },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": ""
   },
@@ -6974,6 +7157,9 @@
   "Silence notifications": {
     "Silence notifications": "Приглушить уведомления"
   },
+  "Single-Line Popup": {
+    "Single-Line Popup": ""
+  },
   "Size": {
     "Size": "Размер"
   },
@@ -6997,6 +7183,9 @@
   },
   "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": {
     "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": ""
+  },
+  "Slideout": {
+    "Slideout": ""
   },
   "Small": {
     "Small": "Маленький"
@@ -7123,6 +7312,9 @@
   },
   "Summary": {
     "Summary": "Заголовок"
+  },
+  "Summary Font Size": {
+    "Summary Font Size": ""
   },
   "Sunrise": {
     "Sunrise": "Восход"
@@ -7472,6 +7664,9 @@
   "Timed Out": {
     "Timed Out": "Тайм-аут"
   },
+  "Timeout Progress Bar": {
+    "Timeout Progress Bar": ""
+  },
   "Timeout for critical priority notifications": {
     "Timeout for critical priority notifications": "Тайм-аут для уведомлений критического приоритета"
   },
@@ -7492,6 +7687,9 @@
   },
   "Title (optional)": {
     "Title (optional)": ""
+  },
+  "Title is required": {
+    "Title is required": ""
   },
   "Title regex (optional)": {
     "Title regex (optional)": "Regex заголовка (необязательно)"
@@ -7832,6 +8030,9 @@
   "Use Grid Layout": {
     "Use Grid Layout": "Использовать макет сетки"
   },
+  "Use HH:MM time format": {
+    "Use HH:MM time format": ""
+  },
   "Use IP Location": {
     "Use IP Location": "Используемый IP"
   },
@@ -7970,8 +8171,14 @@
   "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
     "Uses the spotlight-bar IPC action and always opens the minimal bar.": "Использует IPC-действие spotlight-bar и всегда открывает минималистичную панель."
   },
+  "Using DankCalendar%1": {
+    "Using DankCalendar%1": ""
+  },
   "Using global monospace font from Settings → Personalization": {
     "Using global monospace font from Settings → Personalization": "Используется глобальный моноширинный шрифт из Настройки → Персонализация"
+  },
+  "Using khal": {
+    "Using khal": ""
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": "Использование общих настроек из Gamma Control"
@@ -8059,6 +8266,9 @@
   },
   "Visibility": {
     "Visibility": "Видимость"
+  },
+  "Visible Entry Actions": {
+    "Visible Entry Actions": ""
   },
   "Visual Effects": {
     "Visual Effects": "Визуальные эффекты"
@@ -8182,6 +8392,9 @@
   },
   "Widget Management": {
     "Widget Management": "Управление виджетами"
+  },
+  "Widget Opacity": {
+    "Widget Opacity": ""
   },
   "Widget Outline": {
     "Widget Outline": "Контур виджета"
@@ -8425,6 +8638,9 @@
   },
   "featured": {
     "featured": "избранное"
+  },
+  "khal": {
+    "khal": ""
   },
   "last seen %1": {
     "last seen %1": "был в сети %1"
