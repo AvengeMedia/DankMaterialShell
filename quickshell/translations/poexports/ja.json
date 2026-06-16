@@ -134,6 +134,9 @@
   "1 day": {
     "1 day": "1日"
   },
+  "1 day before": {
+    "1 day before": ""
+  },
   "1 device connected": {
     "1 device connected": "1台接続済み"
   },
@@ -142,6 +145,9 @@
   },
   "1 hour 30 minutes": {
     "1 hour 30 minutes": "1時間30分"
+  },
+  "1 hour before": {
+    "1 hour before": ""
   },
   "1 minute": {
     "1 minute": "1分"
@@ -154,6 +160,9 @@
   },
   "1 task": {
     "1 task": ""
+  },
+  "10 min before": {
+    "10 min before": ""
   },
   "10 minutes": {
     "10 minutes": "10分"
@@ -172,6 +181,9 @@
   },
   "15 min": {
     "15 min": "15 分"
+  },
+  "15 min before": {
+    "15 min before": ""
   },
   "15 minutes": {
     "15 minutes": "15分"
@@ -230,6 +242,9 @@
   "30 min": {
     "30 min": "30 分"
   },
+  "30 min before": {
+    "30 min before": ""
+  },
   "30 minutes": {
     "30 minutes": "30分"
   },
@@ -253,6 +268,9 @@
   },
   "45 seconds": {
     "45 seconds": "45秒"
+  },
+  "5 min before": {
+    "5 min before": ""
   },
   "5 minutes": {
     "5 minutes": "5分"
@@ -449,8 +467,14 @@
   "Add by Address": {
     "Add by Address": "アドレスで追加"
   },
+  "Add location": {
+    "Add location": ""
+  },
   "Add match": {
     "Add match": ""
+  },
+  "Add notes": {
+    "Add notes": ""
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
@@ -499,6 +523,9 @@
   },
   "Allow": {
     "Allow": ""
+  },
+  "Allow adjusting device volume by scrolling on the right half of items in the device list": {
+    "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
   },
   "Allow clicks to pass through the widget": {
     "Allow clicks to pass through the widget": "クリックをウィジェットに透過させる"
@@ -686,6 +713,9 @@
   "At least one output must remain enabled": {
     "At least one output must remain enabled": "少なくとも1つの出力は有効のままにしておく必要がある"
   },
+  "At start": {
+    "At start": ""
+  },
   "Attach": {
     "Attach": "添付"
   },
@@ -776,14 +806,23 @@
   "Auto (Wide)": {
     "Auto (Wide)": "自動（ワイド）"
   },
+  "Auto Compositor Gaps": {
+    "Auto Compositor Gaps": ""
+  },
   "Auto Location": {
     "Auto Location": "自動位置検出"
+  },
+  "Auto Overflow": {
+    "Auto Overflow": ""
   },
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "自動ポップアップギャップ"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "自動モードがオンになっています。手動プロファイル選択は無効になっています。"
+  },
+  "Auto saved": {
+    "Auto saved": ""
   },
   "Auto-Clear After": {
     "Auto-Clear After": "自動消去まで"
@@ -814,6 +853,9 @@
   },
   "Auto-login on startup": {
     "Auto-login on startup": ""
+  },
+  "Auto-save to disk": {
+    "Auto-save to disk": ""
   },
   "Auto-saving...": {
     "Auto-saving...": "自動保存中..."
@@ -865,6 +907,9 @@
   },
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "システムが一時停止の準備中に自動的に画面をロック"
+  },
+  "Automatically save changes to opened files as you type": {
+    "Automatically save changes to opened files as you type": ""
   },
   "Automation": {
     "Automation": "自動化"
@@ -949,6 +994,9 @@
   },
   "Bar Configurations": {
     "Bar Configurations": "バーの設定"
+  },
+  "Bar Opacity": {
+    "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": "バーの影"
@@ -1052,11 +1100,17 @@
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "バー、ポップアウト、モーダル、通知の背後の背景をぼかす。コンポジターのサポートと設定が必要。"
   },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": ""
+  },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Niri 概要が開いているときに壁紙をぼかす"
   },
   "Body": {
     "Body": "本文"
+  },
+  "Body Font Size": {
+    "Body Font Size": ""
   },
   "Bold": {
     "Bold": "ボールド"
@@ -1177,6 +1231,9 @@
   },
   "Calendar": {
     "Calendar": "カレンダー"
+  },
+  "Calendar Backend": {
+    "Calendar Backend": ""
   },
   "Camera": {
     "Camera": "カメラ"
@@ -1342,6 +1399,9 @@
   },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": ""
+  },
+  "Choose which action buttons appear on clipboard entries": {
+    "Choose which action buttons appear on clipboard entries": ""
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "このウィジェットを表示するディスプレイを選ぶ"
@@ -1703,6 +1763,24 @@
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "すべてのポップアウト、モーダル、およびそのコンテンツレイヤーの透明度を制御"
   },
+  "Controls opacity of shell surfaces, popouts, and modals": {
+    "Controls opacity of shell surfaces, popouts, and modals": ""
+  },
+  "Controls opacity of the bar background": {
+    "Controls opacity of the bar background": ""
+  },
+  "Controls opacity of the border": {
+    "Controls opacity of the border": ""
+  },
+  "Controls opacity of the shadow layer": {
+    "Controls opacity of the shadow layer": ""
+  },
+  "Controls opacity of the widget outline": {
+    "Controls opacity of the widget outline": ""
+  },
+  "Controls opacity of widget backgrounds": {
+    "Controls opacity of widget backgrounds": ""
+  },
   "Controls outlines around blurred foreground cards, pills, and notification cards": {
     "Controls outlines around blurred foreground cards, pills, and notification cards": "ぼかした前景カード、ピル型要素、通知カードのアウトラインを調整"
   },
@@ -1711,6 +1789,9 @@
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": "影の基本ぼかし半径とオフセットを制御"
+  },
+  "Controls the opacity of the shadow": {
+    "Controls the opacity of the shadow": ""
   },
   "Controls the outer edge of protocol-blurred windows": {
     "Controls the outer edge of protocol-blurred windows": "プロトコルによるぼかしが適用されたウィンドウの外縁を調整"
@@ -1816,6 +1897,12 @@
   },
   "Critical Priority": {
     "Critical Priority": "最優先事項"
+  },
+  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
+    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
+  },
+  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
+    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": ""
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
     "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: タブ切替 • Ctrl+S: ピン留め/解除 • Shift+Del: すべてクリア • Esc: 閉じる"
@@ -2012,6 +2099,15 @@
   "DankBar": {
     "DankBar": "DankBar"
   },
+  "DankCalendar": {
+    "DankCalendar": ""
+  },
+  "DankCalendar isn't installed": {
+    "DankCalendar isn't installed": ""
+  },
+  "DankCalendar isn't running": {
+    "DankCalendar isn't running": ""
+  },
   "DankMaterialShell is ready to use": {
     "DankMaterialShell is ready to use": "DankMaterialShell は使用可能です"
   },
@@ -2077,6 +2173,9 @@
   },
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": ""
+  },
+  "Default Mode": {
+    "Default Mode": ""
   },
   "Default Opens": {
     "Default Opens": ""
@@ -2194,6 +2293,9 @@
   },
   "Device connections": {
     "Device connections": "デバイス接続"
+  },
+  "Device list scroll volume": {
+    "Device list scroll volume": ""
   },
   "Device names updated": {
     "Device names updated": "デバイス名を更新しました"
@@ -2369,11 +2471,17 @@
   "Dock & Launcher": {
     "Dock & Launcher": "ドックとランチャー"
   },
+  "Dock Opacity": {
+    "Dock Opacity": ""
+  },
   "Dock Transparency": {
     "Dock Transparency": "ドックの透明度"
   },
   "Dock Visibility": {
     "Dock Visibility": "ドックの表示"
+  },
+  "Dock margin, opacity, and border": {
+    "Dock margin, opacity, and border": ""
   },
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": "ドックの余白、透明度、境界線"
@@ -2465,6 +2573,9 @@
   "Edge the launcher slides from": {
     "Edge the launcher slides from": "ランチャーのスライドを端から"
   },
+  "Edit": {
+    "Edit": ""
+  },
   "Edit App": {
     "Edit App": "アプリを編集"
   },
@@ -2479,6 +2590,9 @@
   },
   "Edit clipboard text": {
     "Edit clipboard text": ""
+  },
+  "Edit event": {
+    "Edit event": ""
   },
   "Editing changes on %1": {
     "Editing changes on %1": ""
@@ -2597,6 +2711,9 @@
   "End": {
     "End": "終わり"
   },
+  "End must be after start": {
+    "End must be after start": ""
+  },
   "Enlarge on Hover": {
     "Enlarge on Hover": "ホバー時に拡大"
   },
@@ -2680,6 +2797,9 @@
   },
   "Ethernet": {
     "Ethernet": "Ethernet"
+  },
+  "Event title": {
+    "Event title": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": "15分ごと"
@@ -3028,6 +3148,9 @@
   },
   "File Manager": {
     "File Manager": "ファイルマネージャー"
+  },
+  "File changed on disk": {
+    "File changed on disk": ""
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "ゴミ箱を開くために使用するファイルマネージャーです。独自のコマンドを入力するには「カスタム」を選択してください。"
@@ -3839,6 +3962,9 @@
   "Insert your security key...": {
     "Insert your security key...": "セキュリティキーを挿入してください..."
   },
+  "Inset the Notepad from screen edges using the compositor's configured gaps": {
+    "Inset the Notepad from screen edges using the compositor's configured gaps": ""
+  },
   "Install": {
     "Install": "インストール"
   },
@@ -3946,6 +4072,12 @@
   },
   "Keep Changes": {
     "Keep Changes": "変更を保持"
+  },
+  "Keep My Edits": {
+    "Keep My Edits": ""
+  },
+  "Keep in Bar": {
+    "Keep in Bar": ""
   },
   "Keep typing": {
     "Keep typing": "入力し続けてください"
@@ -4274,6 +4406,9 @@
   "Manual Gap Size": {
     "Manual Gap Size": "手動ギャップサイズ"
   },
+  "Manual Gaps": {
+    "Manual Gaps": ""
+  },
   "Manual Show/Hide": {
     "Manual Show/Hide": "手動で表示/非表示"
   },
@@ -4357,6 +4492,9 @@
   },
   "Max Running Apps (0 = Unlimited)": {
     "Max Running Apps (0 = Unlimited)": "最大実行中アプリ数（0 = 無制限）"
+  },
+  "Max Visible": {
+    "Max Visible": ""
   },
   "Max Volume": {
     "Max Volume": "最大音量"
@@ -4706,6 +4844,9 @@
   "New York, NY": {
     "New York, NY": "New York, NY"
   },
+  "New event": {
+    "New event": ""
+  },
   "New group name...": {
     "New group name...": "新しいグループ名..."
   },
@@ -4841,6 +4982,9 @@
   "No brightness devices available": {
     "No brightness devices available": "利用可能な明るさデバイスがありません"
   },
+  "No calendar source available": {
+    "No calendar source available": ""
+  },
   "No changes": {
     "No changes": "変更なし"
   },
@@ -4967,6 +5111,9 @@
   "No recent clipboard entries found": {
     "No recent clipboard entries found": "最近のクリップボードエントリは見つかりませんでした"
   },
+  "No reminder": {
+    "No reminder": ""
+  },
   "No results": {
     "No results": "検索結果なし"
   },
@@ -5030,6 +5177,9 @@
   "No window rules configured": {
     "No window rules configured": "ウィンドウルールは設定されていません"
   },
+  "No writable calendar available": {
+    "No writable calendar available": ""
+  },
   "Noise": {
     "Noise": ""
   },
@@ -5090,8 +5240,14 @@
   "Notepad Font Settings": {
     "Notepad Font Settings": "メモ帳のフォント設定"
   },
+  "Notepad Settings": {
+    "Notepad Settings": ""
+  },
   "Notepad Slideout": {
     "Notepad Slideout": "メモ帳スライドアウト"
+  },
+  "Notes": {
+    "Notes": ""
   },
   "Nothing": {
     "Nothing": "なし"
@@ -5215,6 +5371,9 @@
   },
   "Open Frame": {
     "Open Frame": "オープンフレーム"
+  },
+  "Open From": {
+    "Open From": ""
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "スマートフォンで KDE Connect を開く"
@@ -5459,6 +5618,9 @@
   "Paste": {
     "Paste": "貼り付け"
   },
+  "Path copied to clipboard": {
+    "Path copied to clipboard": ""
+  },
   "Path to a video file or folder containing videos": {
     "Path to a video file or folder containing videos": "動画ファイル、または動画を含むフォルダーへのパス"
   },
@@ -5644,6 +5806,9 @@
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": ""
+  },
+  "Popout": {
+    "Popout": ""
   },
   "Popout Shadows": {
     "Popout Shadows": "ポップアウトの影"
@@ -5966,6 +6131,9 @@
   "Release": {
     "Release": "離す"
   },
+  "Reload From Disk": {
+    "Reload From Disk": ""
+  },
   "Reload Plugin": {
     "Reload Plugin": "プラグインをリロード"
   },
@@ -5986,6 +6154,9 @@
   },
   "Remember last user": {
     "Remember last user": "最後のユーザーを記憶"
+  },
+  "Reminder": {
+    "Reminder": ""
   },
   "Remove": {
     "Remove": "削除"
@@ -6287,6 +6458,9 @@
   "Saving...": {
     "Saving...": "保存しています..."
   },
+  "Saving…": {
+    "Saving…": ""
+  },
   "Scale": {
     "Scale": "スケール"
   },
@@ -6575,6 +6749,12 @@
   "Set notification rules": {
     "Set notification rules": "通知ルールを設定"
   },
+  "Set the font size for notification body text (htmlBody)": {
+    "Set the font size for notification body text (htmlBody)": ""
+  },
+  "Set the font size for notification summary text": {
+    "Set the font size for notification summary text": ""
+  },
   "Setting": {
     "Setting": "設定"
   },
@@ -6833,6 +7013,9 @@
   "Show Workspace Apps": {
     "Show Workspace Apps": "ワークスペースアプリを表示"
   },
+  "Show a bar that drains as the popup's auto-dismiss timer runs": {
+    "Show a bar that drains as the popup's auto-dismiss timer runs": ""
+  },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": ""
   },
@@ -6974,6 +7157,9 @@
   "Silence notifications": {
     "Silence notifications": "通知をミュート"
   },
+  "Single-Line Popup": {
+    "Single-Line Popup": ""
+  },
   "Size": {
     "Size": "サイズ"
   },
@@ -6997,6 +7183,9 @@
   },
   "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": {
     "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": ""
+  },
+  "Slideout": {
+    "Slideout": ""
   },
   "Small": {
     "Small": "小"
@@ -7123,6 +7312,9 @@
   },
   "Summary": {
     "Summary": "概要"
+  },
+  "Summary Font Size": {
+    "Summary Font Size": ""
   },
   "Sunrise": {
     "Sunrise": "日の出"
@@ -7472,6 +7664,9 @@
   "Timed Out": {
     "Timed Out": "タイムアウト"
   },
+  "Timeout Progress Bar": {
+    "Timeout Progress Bar": ""
+  },
   "Timeout for critical priority notifications": {
     "Timeout for critical priority notifications": "最優先通知のタイムアウト"
   },
@@ -7492,6 +7687,9 @@
   },
   "Title (optional)": {
     "Title (optional)": ""
+  },
+  "Title is required": {
+    "Title is required": ""
   },
   "Title regex (optional)": {
     "Title regex (optional)": "タイトルの正規表現（任意）"
@@ -7832,6 +8030,9 @@
   "Use Grid Layout": {
     "Use Grid Layout": "グリッドレイアウトを使用"
   },
+  "Use HH:MM time format": {
+    "Use HH:MM time format": ""
+  },
   "Use IP Location": {
     "Use IP Location": "IP ロケーションの使用"
   },
@@ -7970,8 +8171,14 @@
   "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
     "Uses the spotlight-bar IPC action and always opens the minimal bar.": ""
   },
+  "Using DankCalendar%1": {
+    "Using DankCalendar%1": ""
+  },
   "Using global monospace font from Settings → Personalization": {
     "Using global monospace font from Settings → Personalization": "設定 → パーソナライズからグローバル等幅フォントを使用する"
+  },
+  "Using khal": {
+    "Using khal": ""
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": "Gamma Control の共有設定を使用中"
@@ -8059,6 +8266,9 @@
   },
   "Visibility": {
     "Visibility": "視界"
+  },
+  "Visible Entry Actions": {
+    "Visible Entry Actions": ""
   },
   "Visual Effects": {
     "Visual Effects": "視覚効果"
@@ -8182,6 +8392,9 @@
   },
   "Widget Management": {
     "Widget Management": "ウィジェット管理"
+  },
+  "Widget Opacity": {
+    "Widget Opacity": ""
   },
   "Widget Outline": {
     "Widget Outline": "ウィジェットのアウトライン"
@@ -8425,6 +8638,9 @@
   },
   "featured": {
     "featured": "おすすめ"
+  },
+  "khal": {
+    "khal": ""
   },
   "last seen %1": {
     "last seen %1": "最後に確認されたのは 1%"

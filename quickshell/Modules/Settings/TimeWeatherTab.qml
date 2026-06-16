@@ -143,15 +143,6 @@ Item {
                     }
                 }
 
-                DankButton {
-                    text: I18n.tr("Launch DankCalendar")
-                    iconName: "calendar_month"
-                    backgroundColor: Theme.primary
-                    textColor: Theme.primaryText
-                    visible: CalendarService.dankNeedsLaunch && CalendarService.dankBinaryExists
-                    onClicked: CalendarService.launchDankCalendar()
-                }
-
                 Rectangle {
                     width: parent.width
                     height: 1

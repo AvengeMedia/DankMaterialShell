@@ -34,7 +34,7 @@ Singleton {
 
     readonly property bool dankConnected: dankBackend.connected
     readonly property bool dankBinaryExists: dankBackend.binaryExists
-    readonly property bool dankNeedsLaunch: backendPref === "dankcal" && !dankBackend.connected
+    readonly property bool dankNeedsLaunch: backendPref === "dankcal" && !dankBackend.connected && !dankBackend.socketFound
 
     property var calendars: dankBackend.calendars
     property var eventsByDate: ({})
