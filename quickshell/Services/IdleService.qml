@@ -53,6 +53,7 @@ Singleton {
     signal lockRequested
     signal fadeToLockRequested
     signal cancelFadeToLock
+    signal dismissFadeToLock
     signal fadeToDpmsRequested
     signal cancelFadeToDpms
     signal requestMonitorOff

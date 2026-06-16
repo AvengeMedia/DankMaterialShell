@@ -116,6 +116,12 @@ Item {
                         fadeWindowLoader.item.cancelFade();
                     }
                 }
+
+                function onDismissFadeToLock() {
+                    if (fadeWindowLoader.item) {
+                        fadeWindowLoader.item.dismiss();
+                    }
+                }
             }
         }
     }
