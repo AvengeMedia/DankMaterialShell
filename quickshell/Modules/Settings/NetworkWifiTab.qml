@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import qs.Common
+import qs.Modules.Network
 import qs.Modules.Settings.Widgets
 import qs.Modals.Common
 import qs.Services
@@ -673,15 +674,10 @@ Item {
                                                 hoverEnabled: true
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
-                                                    if (isConnected) {
-                                                        NetworkService.disconnectWifi();
-                                                        return;
-                                                    }
-                                                    if (modelData.secured && !modelData.saved && (DMSService.apiVersion < 7 || modelData.enterprise)) {
-                                                        PopoutService.showWifiPasswordModal(modelData.ssid);
-                                                        return;
-                                                    }
-                                                    NetworkService.connectToWifi(modelData.ssid);
+                                                    WifiConnectionActions.connectToNetwork(modelData, {
+                                                        connected: isConnected,
+                                                        disconnectWhenConnected: true
+                                                    });
                                                 }
                                             }
                                         }
@@ -1184,11 +1180,10 @@ Item {
                                     }
 
                                     onTriggered: {
-                                        if (isConnected) {
-                                            NetworkService.disconnectWifi();
-                                            return;
-                                        }
-                                        NetworkService.connectToWifi(modelData.ssid);
+                                        WifiConnectionActions.connectToNetwork(modelData, {
+                                            connected: isConnected,
+                                            disconnectWhenConnected: true
+                                        });
                                     }
                                 }
 

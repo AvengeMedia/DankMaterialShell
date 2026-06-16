@@ -653,7 +653,7 @@ Item {
             if (!wifiPasswordModalLoader.item)
                 return;
 
-            if (wifiPasswordModalLoader.item.visible && timeSinceLastPrompt < 1000) {
+            if (wifiPasswordModalLoader.item.shouldBeVisible && timeSinceLastPrompt < 1000) {
                 NetworkService.cancelCredentials(lastCredentialsToken);
                 lastCredentialsToken = token;
                 lastCredentialsTime = now;

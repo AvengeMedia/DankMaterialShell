@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import qs.Common
+import qs.Modules.Network
 import qs.Services
 import qs.Widgets
 import qs.Modals
@@ -749,11 +750,9 @@ Rectangle {
                         event.accepted = true;
                         return;
                     }
-                    if (modelData.secured && !modelData.saved && (DMSService.apiVersion < 7 || modelData.enterprise)) {
-                        PopoutService.showWifiPasswordModal(modelData.ssid);
-                    } else {
-                        NetworkService.connectToWifi(modelData.ssid);
-                    }
+                    WifiConnectionActions.connectToNetwork(modelData, {
+                        connected: wifiDelegate.isConnected
+                    });
                     event.accepted = true;
                 }
             }
@@ -804,15 +803,9 @@ Rectangle {
             }
 
             onTriggered: {
-                if (networkContextMenu.currentConnected) {
-                    NetworkService.disconnectWifi();
-                    return;
-                }
-                if (networkContextMenu.currentSecured && !networkContextMenu.currentSaved && (DMSService.apiVersion < 7 || networkContextMenu.currentEnterprise)) {
-                    PopoutService.showWifiPasswordModal(networkContextMenu.currentSSID);
-                    return;
-                }
-                NetworkService.connectToWifi(networkContextMenu.currentSSID);
+                WifiConnectionActions.connectToNetworkFromDetails(networkContextMenu.currentSSID, networkContextMenu.currentSecured, networkContextMenu.currentSaved, networkContextMenu.currentEnterprise, networkContextMenu.currentConnected, {
+                    disconnectWhenConnected: true
+                });
             }
         }
 
