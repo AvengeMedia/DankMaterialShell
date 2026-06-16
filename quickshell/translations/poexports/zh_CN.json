@@ -134,6 +134,9 @@
   "1 day": {
     "1 day": "1 天"
   },
+  "1 day before": {
+    "1 day before": ""
+  },
   "1 device connected": {
     "1 device connected": "已连接 1 个设备"
   },
@@ -142,6 +145,9 @@
   },
   "1 hour 30 minutes": {
     "1 hour 30 minutes": "1 小时 30 分钟"
+  },
+  "1 hour before": {
+    "1 hour before": ""
   },
   "1 minute": {
     "1 minute": "1 分钟"
@@ -154,6 +160,9 @@
   },
   "1 task": {
     "1 task": ""
+  },
+  "10 min before": {
+    "10 min before": ""
   },
   "10 minutes": {
     "10 minutes": "10 分钟"
@@ -172,6 +181,9 @@
   },
   "15 min": {
     "15 min": "15 分钟"
+  },
+  "15 min before": {
+    "15 min before": ""
   },
   "15 minutes": {
     "15 minutes": "15 分钟"
@@ -230,6 +242,9 @@
   "30 min": {
     "30 min": "30 分钟"
   },
+  "30 min before": {
+    "30 min before": ""
+  },
   "30 minutes": {
     "30 minutes": "30 分钟"
   },
@@ -253,6 +268,9 @@
   },
   "45 seconds": {
     "45 seconds": "45 秒钟"
+  },
+  "5 min before": {
+    "5 min before": ""
   },
   "5 minutes": {
     "5 minutes": "5 分钟"
@@ -449,8 +467,14 @@
   "Add by Address": {
     "Add by Address": "通过地址添加"
   },
+  "Add location": {
+    "Add location": ""
+  },
   "Add match": {
     "Add match": "添加匹配条件"
+  },
+  "Add notes": {
+    "Add notes": ""
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "将新用户添加到 %1 组，使其能够运行 dms greeter sync --profile。"
@@ -499,6 +523,9 @@
   },
   "Allow": {
     "Allow": "允许"
+  },
+  "Allow adjusting device volume by scrolling on the right half of items in the device list": {
+    "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
   },
   "Allow clicks to pass through the widget": {
     "Allow clicks to pass through the widget": "允许鼠标穿透部件"
@@ -686,6 +713,9 @@
   "At least one output must remain enabled": {
     "At least one output must remain enabled": "至少应有一个输出保持启用"
   },
+  "At start": {
+    "At start": ""
+  },
   "Attach": {
     "Attach": "附加"
   },
@@ -776,14 +806,23 @@
   "Auto (Wide)": {
     "Auto (Wide)": "自动（宽角）"
   },
+  "Auto Compositor Gaps": {
+    "Auto Compositor Gaps": ""
+  },
   "Auto Location": {
     "Auto Location": "自动定位"
+  },
+  "Auto Overflow": {
+    "Auto Overflow": ""
   },
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "自动弹窗间隙"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "自动模式已开启。手动选择配置已禁用。"
+  },
+  "Auto saved": {
+    "Auto saved": ""
   },
   "Auto-Clear After": {
     "Auto-Clear After": "自动清除"
@@ -814,6 +853,9 @@
   },
   "Auto-login on startup": {
     "Auto-login on startup": "启动时自动登录"
+  },
+  "Auto-save to disk": {
+    "Auto-save to disk": ""
   },
   "Auto-saving...": {
     "Auto-saving...": "正在自动保存..."
@@ -865,6 +907,9 @@
   },
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "当系统准备挂起时自动锁定屏幕"
+  },
+  "Automatically save changes to opened files as you type": {
+    "Automatically save changes to opened files as you type": ""
   },
   "Automation": {
     "Automation": "自动化"
@@ -949,6 +994,9 @@
   },
   "Bar Configurations": {
     "Bar Configurations": "状态栏设置"
+  },
+  "Bar Opacity": {
+    "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": "状态栏阴影"
@@ -1052,11 +1100,17 @@
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": "模糊状态栏、弹窗、模态框以及通知的背景。需要合成器支持与配置。"
   },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": ""
+  },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "打开 Niri 概览时模糊壁纸"
   },
   "Body": {
     "Body": "主体"
+  },
+  "Body Font Size": {
+    "Body Font Size": ""
   },
   "Bold": {
     "Bold": "粗体"
@@ -1177,6 +1231,9 @@
   },
   "Calendar": {
     "Calendar": "日历"
+  },
+  "Calendar Backend": {
+    "Calendar Backend": ""
   },
   "Camera": {
     "Camera": "摄像头"
@@ -1342,6 +1399,9 @@
   },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": "选择需要启动的桌面应用程序或命令"
+  },
+  "Choose which action buttons appear on clipboard entries": {
+    "Choose which action buttons appear on clipboard entries": ""
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "选择要在哪个显示器显示该小部件"
@@ -1703,6 +1763,24 @@
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "控制所有弹窗、模态框及其内容层的透明度"
   },
+  "Controls opacity of shell surfaces, popouts, and modals": {
+    "Controls opacity of shell surfaces, popouts, and modals": ""
+  },
+  "Controls opacity of the bar background": {
+    "Controls opacity of the bar background": ""
+  },
+  "Controls opacity of the border": {
+    "Controls opacity of the border": ""
+  },
+  "Controls opacity of the shadow layer": {
+    "Controls opacity of the shadow layer": ""
+  },
+  "Controls opacity of the widget outline": {
+    "Controls opacity of the widget outline": ""
+  },
+  "Controls opacity of widget backgrounds": {
+    "Controls opacity of widget backgrounds": ""
+  },
   "Controls outlines around blurred foreground cards, pills, and notification cards": {
     "Controls outlines around blurred foreground cards, pills, and notification cards": "控制已模糊处理的前景卡片、按钮和通知卡片的轮廓"
   },
@@ -1711,6 +1789,9 @@
   },
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": "控制阴影的基础模糊半径和偏移量"
+  },
+  "Controls the opacity of the shadow": {
+    "Controls the opacity of the shadow": ""
   },
   "Controls the outer edge of protocol-blurred windows": {
     "Controls the outer edge of protocol-blurred windows": "控制协议模糊窗口的边缘"
@@ -1816,6 +1897,12 @@
   },
   "Critical Priority": {
     "Critical Priority": "紧急优先级"
+  },
+  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
+    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
+  },
+  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
+    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": ""
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
     "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab：切换标签 • Ctrl+S：固定/取消固定 • Shift+Del：全部清除 • Esc：关闭"
@@ -2012,6 +2099,15 @@
   "DankBar": {
     "DankBar": "Dank 状态栏"
   },
+  "DankCalendar": {
+    "DankCalendar": ""
+  },
+  "DankCalendar isn't installed": {
+    "DankCalendar isn't installed": ""
+  },
+  "DankCalendar isn't running": {
+    "DankCalendar isn't running": ""
+  },
   "DankMaterialShell is ready to use": {
     "DankMaterialShell is ready to use": "DankMaterialShell 现已可用"
   },
@@ -2077,6 +2173,9 @@
   },
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": "默认启动器快捷键"
+  },
+  "Default Mode": {
+    "Default Mode": ""
   },
   "Default Opens": {
     "Default Opens": "默认打开"
@@ -2194,6 +2293,9 @@
   },
   "Device connections": {
     "Device connections": "设备连接"
+  },
+  "Device list scroll volume": {
+    "Device list scroll volume": ""
   },
   "Device names updated": {
     "Device names updated": "设备名已更新"
@@ -2369,11 +2471,17 @@
   "Dock & Launcher": {
     "Dock & Launcher": "程序坞和启动器"
   },
+  "Dock Opacity": {
+    "Dock Opacity": ""
+  },
   "Dock Transparency": {
     "Dock Transparency": "程序坞透明度"
   },
   "Dock Visibility": {
     "Dock Visibility": "程序坞可见性"
+  },
+  "Dock margin, opacity, and border": {
+    "Dock margin, opacity, and border": ""
   },
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": "程序坞边距、透明度和边框"
@@ -2465,6 +2573,9 @@
   "Edge the launcher slides from": {
     "Edge the launcher slides from": "启动器滑入侧"
   },
+  "Edit": {
+    "Edit": ""
+  },
   "Edit App": {
     "Edit App": "编辑应用"
   },
@@ -2479,6 +2590,9 @@
   },
   "Edit clipboard text": {
     "Edit clipboard text": "编辑剪贴板文本"
+  },
+  "Edit event": {
+    "Edit event": ""
   },
   "Editing changes on %1": {
     "Editing changes on %1": ""
@@ -2597,6 +2711,9 @@
   "End": {
     "End": "结束"
   },
+  "End must be after start": {
+    "End must be after start": ""
+  },
   "Enlarge on Hover": {
     "Enlarge on Hover": "悬停放大"
   },
@@ -2680,6 +2797,9 @@
   },
   "Ethernet": {
     "Ethernet": "以太网"
+  },
+  "Event title": {
+    "Event title": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": "每 15 分钟"
@@ -3028,6 +3148,9 @@
   },
   "File Manager": {
     "File Manager": "文件管理器"
+  },
+  "File changed on disk": {
+    "File changed on disk": ""
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "打开回收站的文件管理器。点击“自定义”以输入自定义命令。"
@@ -3839,6 +3962,9 @@
   "Insert your security key...": {
     "Insert your security key...": "请输入安全密钥..."
   },
+  "Inset the Notepad from screen edges using the compositor's configured gaps": {
+    "Inset the Notepad from screen edges using the compositor's configured gaps": ""
+  },
   "Install": {
     "Install": "安装"
   },
@@ -3946,6 +4072,12 @@
   },
   "Keep Changes": {
     "Keep Changes": "保持更改"
+  },
+  "Keep My Edits": {
+    "Keep My Edits": ""
+  },
+  "Keep in Bar": {
+    "Keep in Bar": ""
   },
   "Keep typing": {
     "Keep typing": "继续输入"
@@ -4274,6 +4406,9 @@
   "Manual Gap Size": {
     "Manual Gap Size": "手动设置间隙大小"
   },
+  "Manual Gaps": {
+    "Manual Gaps": ""
+  },
   "Manual Show/Hide": {
     "Manual Show/Hide": "手动显示/隐藏"
   },
@@ -4314,7 +4449,7 @@
     "Material Colors": "Material 配色"
   },
   "Material Design inspired color themes": {
-    "Material Design inspired color themes": "受 Material 设计启发的颜色主题"
+    "Material Design inspired color themes": "受 Material Design 启发的颜色主题"
   },
   "Material colors generated from wallpaper": {
     "Material colors generated from wallpaper": "从壁纸生成的 Material 色彩"
@@ -4357,6 +4492,9 @@
   },
   "Max Running Apps (0 = Unlimited)": {
     "Max Running Apps (0 = Unlimited)": "最大运行应用数 (0 = 无限制)"
+  },
+  "Max Visible": {
+    "Max Visible": ""
   },
   "Max Volume": {
     "Max Volume": "最大音量"
@@ -4706,6 +4844,9 @@
   "New York, NY": {
     "New York, NY": "纽约，美国纽约州"
   },
+  "New event": {
+    "New event": ""
+  },
   "New group name...": {
     "New group name...": "新分组名称..."
   },
@@ -4841,6 +4982,9 @@
   "No brightness devices available": {
     "No brightness devices available": "无可用亮度设备"
   },
+  "No calendar source available": {
+    "No calendar source available": ""
+  },
   "No changes": {
     "No changes": "无更改"
   },
@@ -4967,6 +5111,9 @@
   "No recent clipboard entries found": {
     "No recent clipboard entries found": "未找到近期剪切板项目"
   },
+  "No reminder": {
+    "No reminder": ""
+  },
   "No results": {
     "No results": "无结果"
   },
@@ -5030,6 +5177,9 @@
   "No window rules configured": {
     "No window rules configured": "未配置窗口规则"
   },
+  "No writable calendar available": {
+    "No writable calendar available": ""
+  },
   "Noise": {
     "Noise": "噪点"
   },
@@ -5090,8 +5240,14 @@
   "Notepad Font Settings": {
     "Notepad Font Settings": "便签字体设置"
   },
+  "Notepad Settings": {
+    "Notepad Settings": ""
+  },
   "Notepad Slideout": {
     "Notepad Slideout": "便签侧边栏"
+  },
+  "Notes": {
+    "Notes": ""
   },
   "Nothing": {
     "Nothing": "无"
@@ -5215,6 +5371,9 @@
   },
   "Open Frame": {
     "Open Frame": "打开框架"
+  },
+  "Open From": {
+    "Open From": ""
   },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "在你的手机上打开 KDE Connect"
@@ -5459,6 +5618,9 @@
   "Paste": {
     "Paste": "粘贴"
   },
+  "Path copied to clipboard": {
+    "Path copied to clipboard": ""
+  },
   "Path to a video file or folder containing videos": {
     "Path to a video file or folder containing videos": "视频文件路径或包含视频的文件夹"
   },
@@ -5644,6 +5806,9 @@
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit 集成已禁用。用户管理需要 Polkit 提升权限。"
+  },
+  "Popout": {
+    "Popout": ""
   },
   "Popout Shadows": {
     "Popout Shadows": "弹窗阴影"
@@ -5966,6 +6131,9 @@
   "Release": {
     "Release": "松开"
   },
+  "Reload From Disk": {
+    "Reload From Disk": ""
+  },
   "Reload Plugin": {
     "Reload Plugin": "重载插件"
   },
@@ -5986,6 +6154,9 @@
   },
   "Remember last user": {
     "Remember last user": "记住上次的用户"
+  },
+  "Reminder": {
+    "Reminder": ""
   },
   "Remove": {
     "Remove": "移除"
@@ -6287,6 +6458,9 @@
   "Saving...": {
     "Saving...": "正在保存..."
   },
+  "Saving…": {
+    "Saving…": ""
+  },
   "Scale": {
     "Scale": "缩放"
   },
@@ -6575,6 +6749,12 @@
   "Set notification rules": {
     "Set notification rules": "设置通知规则"
   },
+  "Set the font size for notification body text (htmlBody)": {
+    "Set the font size for notification body text (htmlBody)": ""
+  },
+  "Set the font size for notification summary text": {
+    "Set the font size for notification summary text": ""
+  },
   "Setting": {
     "Setting": "设置项"
   },
@@ -6732,7 +6912,7 @@
     "Show Log Out": "显示注销"
   },
   "Show Material Design ripple animations on interactive elements": {
-    "Show Material Design ripple animations on interactive elements": "在交互元素上显示 Material 设计的波纹动画"
+    "Show Material Design ripple animations on interactive elements": "在交互元素上显示 Material Design 的波纹动画"
   },
   "Show Media Player": {
     "Show Media Player": "显示媒体播放器"
@@ -6832,6 +7012,9 @@
   },
   "Show Workspace Apps": {
     "Show Workspace Apps": "显示工作区内应用"
+  },
+  "Show a bar that drains as the popup's auto-dismiss timer runs": {
+    "Show a bar that drains as the popup's auto-dismiss timer runs": ""
   },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": ""
@@ -6974,6 +7157,9 @@
   "Silence notifications": {
     "Silence notifications": "静默通知"
   },
+  "Single-Line Popup": {
+    "Single-Line Popup": ""
+  },
   "Size": {
     "Size": "尺寸"
   },
@@ -6997,6 +7183,9 @@
   },
   "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": {
     "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": "系统启动后直到你退出登录前，都会跳过登录界面的密码验证。锁屏解锁方式不变。同步后在下次重启时生效。"
+  },
+  "Slideout": {
+    "Slideout": ""
   },
   "Small": {
     "Small": "较小"
@@ -7123,6 +7312,9 @@
   },
   "Summary": {
     "Summary": "概要"
+  },
+  "Summary Font Size": {
+    "Summary Font Size": ""
   },
   "Sunrise": {
     "Sunrise": "日出"
@@ -7472,6 +7664,9 @@
   "Timed Out": {
     "Timed Out": "超时"
   },
+  "Timeout Progress Bar": {
+    "Timeout Progress Bar": ""
+  },
   "Timeout for critical priority notifications": {
     "Timeout for critical priority notifications": "关键优先级通知的超时时间"
   },
@@ -7492,6 +7687,9 @@
   },
   "Title (optional)": {
     "Title (optional)": ""
+  },
+  "Title is required": {
+    "Title is required": ""
   },
   "Title regex (optional)": {
     "Title regex (optional)": "标题正则（可选）"
@@ -7832,6 +8030,9 @@
   "Use Grid Layout": {
     "Use Grid Layout": "使用网格布局"
   },
+  "Use HH:MM time format": {
+    "Use HH:MM time format": ""
+  },
   "Use IP Location": {
     "Use IP Location": "使用 IP 定位"
   },
@@ -7970,8 +8171,14 @@
   "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
     "Uses the spotlight-bar IPC action and always opens the minimal bar.": "使用 spotlight-bar IPC 动作，并始终打开聚焦搜索栏。"
   },
+  "Using DankCalendar%1": {
+    "Using DankCalendar%1": ""
+  },
   "Using global monospace font from Settings → Personalization": {
     "Using global monospace font from Settings → Personalization": "正在使用“设置” → “个性化”中的全局等宽字体"
+  },
+  "Using khal": {
+    "Using khal": ""
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": "使用伽马控制的已共享设置"
@@ -8059,6 +8266,9 @@
   },
   "Visibility": {
     "Visibility": "可见性"
+  },
+  "Visible Entry Actions": {
+    "Visible Entry Actions": ""
   },
   "Visual Effects": {
     "Visual Effects": "视觉效果"
@@ -8182,6 +8392,9 @@
   },
   "Widget Management": {
     "Widget Management": "部件管理"
+  },
+  "Widget Opacity": {
+    "Widget Opacity": ""
   },
   "Widget Outline": {
     "Widget Outline": "部件轮廓"
@@ -8425,6 +8638,9 @@
   },
   "featured": {
     "featured": "精选"
+  },
+  "khal": {
+    "khal": ""
   },
   "last seen %1": {
     "last seen %1": "上次在线：%1"
