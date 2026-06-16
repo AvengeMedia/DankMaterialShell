@@ -17,6 +17,7 @@ Loader {
     property real barSpacing: 4
     property var barConfig: null
     property var blurBarWindow: null
+    property real sectionAvailablePrimarySize: 0
     property bool isFirst: false
     property bool isLast: false
     property real sectionSpacing: 0
@@ -138,6 +139,14 @@ Loader {
         when: root.item && "sectionSpacing" in root.item
         property: "sectionSpacing"
         value: root.sectionSpacing
+        restoreMode: Binding.RestoreNone
+    }
+
+    Binding {
+        target: root.item
+        when: root.item && "sectionAvailablePrimarySize" in root.item
+        property: "sectionAvailablePrimarySize"
+        value: root.sectionAvailablePrimarySize
         restoreMode: Binding.RestoreNone
     }
 

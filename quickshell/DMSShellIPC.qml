@@ -373,6 +373,10 @@ Item {
         }
 
         function open(): string {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                PopoutService.openNotepadPopout();
+                return "NOTEPAD_OPEN_SUCCESS";
+            }
             var instance = getActiveNotepadInstance();
             if (instance) {
                 instance.show();
@@ -382,6 +386,10 @@ Item {
         }
 
         function close(): string {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                PopoutService.notepadPopout?.hide();
+                return "NOTEPAD_CLOSE_SUCCESS";
+            }
             var instance = getActiveNotepadInstance();
             if (instance) {
                 instance.hide();
@@ -391,6 +399,10 @@ Item {
         }
 
         function toggle(): string {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                PopoutService.toggleNotepadPopout();
+                return "NOTEPAD_TOGGLE_SUCCESS";
+            }
             var instance = getActiveNotepadInstance();
             if (instance) {
                 instance.toggle();
@@ -944,7 +956,7 @@ Item {
 
         function tabs(): string {
             if (!PopoutService.settingsModal)
-                return "wallpaper\ntheme\ntypography\ntime_weather\nsounds\ndankbar\ndankbar_settings\ndankbar_appearance\ndankbar_widgets\nframe\nworkspaces\ncompositor\nmedia_player\nnotifications\nosd\nrunning_apps\nupdater\ndock\nlauncher\nkeybinds\ndisplays\nnetwork\nprinters\nlock_screen\npower_sleep\nplugins\nabout";
+                return "wallpaper\ntheme\ntypography\ntime_weather\nsounds\ndankbar\ndankbar_settings\ndankbar_appearance\ndankbar_widgets\nframe\nworkspaces\ncompositor\nmedia_player\nnotifications\nosd\nrunning_apps\nupdater\ndock\nlauncher\nkeybinds\ndisplays\nnetwork\nnetwork_status\nnetwork_ethernet\nnetwork_wifi\nnetwork_vpn\nprinters\nlock_screen\npower_sleep\nplugins\nabout";
             var modal = PopoutService.settingsModal;
             var ids = [];
             var structure = modal.sidebar?.categoryStructure ?? [];

@@ -151,7 +151,7 @@ Rectangle {
                 iconColor: Theme.surfaceVariantText
                 onClicked: {
                     PopoutService.closeControlCenter();
-                    PopoutService.openSettingsWithTab("network");
+                    PopoutService.openSettingsWithTab(currentPreferenceIndex === 0 ? "network_ethernet" : "network_wifi");
                 }
             }
         }

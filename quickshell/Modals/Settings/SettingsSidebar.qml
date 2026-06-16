@@ -238,8 +238,33 @@ Rectangle {
             "id": "network",
             "text": I18n.tr("Network"),
             "icon": "wifi",
-            "tabIndex": 7,
-            "dmsOnly": true
+            "dmsOnly": true,
+            "children": [
+                {
+                    "id": "network_status",
+                    "text": I18n.tr("Status"),
+                    "icon": "lan",
+                    "tabIndex": 7
+                },
+                {
+                    "id": "network_ethernet",
+                    "text": I18n.tr("Ethernet"),
+                    "icon": "settings_ethernet",
+                    "tabIndex": 39
+                },
+                {
+                    "id": "network_wifi",
+                    "text": I18n.tr("WiFi"),
+                    "icon": "wifi",
+                    "tabIndex": 40
+                },
+                {
+                    "id": "network_vpn",
+                    "text": I18n.tr("VPN"),
+                    "icon": "vpn_key",
+                    "tabIndex": 41
+                }
+            ]
         },
         {
             "id": "applications",

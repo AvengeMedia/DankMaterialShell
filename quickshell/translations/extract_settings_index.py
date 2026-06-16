@@ -102,7 +102,10 @@ TAB_INDEX_MAP = {
     "DockTab.qml": 5,
     "DankBarAppearanceTab.qml": 6,
     "WorkspaceAppearanceCard.qml": 6,
-    "NetworkTab.qml": 7,
+    "NetworkStatusTab.qml": 7,
+    "NetworkEthernetTab.qml": 39,
+    "NetworkWifiTab.qml": 40,
+    "NetworkVpnTab.qml": 41,
     "PrinterTab.qml": 8,
     "LauncherTab.qml": 9,
     "ThemeColorsTab.qml": 10,
@@ -172,6 +175,9 @@ TAB_CATEGORY_MAP = {
     36: "Autostart",
     37: "Personalization",
     38: "Applications",
+    39: "Network",
+    40: "Network",
+    41: "Network",
 }
 
 SEARCHABLE_COMPONENTS = [
@@ -446,8 +452,14 @@ def parse_tabs_from_sidebar(sidebar_file):
     return tabs
 
 
-def generate_tab_entries(sidebar_file):
+def generate_tab_entries(sidebar_file, settings_entries=None):
     tabs = parse_tabs_from_sidebar(sidebar_file)
+    settings_entries = settings_entries or []
+    highlightable_labels = {
+        (entry["tabIndex"], entry["label"])
+        for entry in settings_entries
+        if not str(entry["section"]).startswith("_tab_")
+    }
 
     label_counts = Counter([t["label"] for t in tabs])
 
@@ -459,6 +471,9 @@ def generate_tab_entries(sidebar_file):
             else tab["label"]
         )
         category = TAB_CATEGORY_MAP.get(tab["tabIndex"], "Settings")
+
+        if (tab["tabIndex"], label) in highlightable_labels:
+            continue
 
         keywords = enrich_keywords(tab["label"], None, category, [])
 
@@ -537,7 +552,7 @@ def main():
 
     print("Extracting settings search index...")
     settings_entries = extract_settings_index(root_dir)
-    tab_entries = generate_tab_entries(sidebar_file)
+    tab_entries = generate_tab_entries(sidebar_file, settings_entries)
 
     all_entries = tab_entries + settings_entries
 

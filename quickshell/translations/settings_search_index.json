@@ -429,6 +429,28 @@
     "description": "Automatically determine your location using your IP address"
   },
   {
+    "section": "calendarBackend",
+    "label": "Calendar Backend",
+    "tabIndex": 1,
+    "category": "Time & Weather",
+    "keywords": [
+      "backend",
+      "calendar",
+      "clock",
+      "daemon",
+      "dankcalendar",
+      "date",
+      "day",
+      "events",
+      "forecast",
+      "khal",
+      "month",
+      "time",
+      "weather",
+      "year"
+    ]
+  },
+  {
     "section": "dateFormat",
     "label": "Date Format",
     "tabIndex": 1,
@@ -1819,21 +1841,6 @@
     "description": "Remove corner rounding from the bar"
   },
   {
-    "section": "_tab_6",
-    "label": "Dank Bar",
-    "tabIndex": 6,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "dank",
-      "panel",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "icon": "toolbar"
-  },
-  {
     "section": "barAppearance",
     "label": "Dank Bar",
     "tabIndex": 6,
@@ -2117,6 +2124,25 @@
     ],
     "icon": "wifi",
     "conditionKey": "dmsConnected"
+  },
+  {
+    "section": "networkStatus",
+    "label": "Network Status",
+    "tabIndex": 7,
+    "category": "Network",
+    "keywords": [
+      "connection",
+      "connectivity",
+      "ethernet",
+      "internet",
+      "network",
+      "online",
+      "status",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "lan"
   },
   {
     "section": "_tab_8",
@@ -6351,25 +6377,6 @@
     "description": "Choose where on-screen displays appear on screen"
   },
   {
-    "section": "_tab_18",
-    "label": "On-screen Displays",
-    "tabIndex": 18,
-    "category": "On-screen Displays",
-    "keywords": [
-      "displays",
-      "indicator",
-      "monitor",
-      "monitors",
-      "osd",
-      "output",
-      "outputs",
-      "popup",
-      "screen",
-      "screens"
-    ],
-    "icon": "tune"
-  },
-  {
     "section": "osd",
     "label": "On-screen Displays",
     "tabIndex": 18,
@@ -6503,20 +6510,6 @@
     ],
     "icon": "tune",
     "description": "Open a terminal and run a custom command instead of the in-shell upgrade flow."
-  },
-  {
-    "section": "_tab_20",
-    "label": "System Updater",
-    "tabIndex": 20,
-    "category": "System Updater",
-    "keywords": [
-      "packages",
-      "system",
-      "updater",
-      "updates",
-      "upgrade"
-    ],
-    "icon": "refresh"
   },
   {
     "section": "systemUpdater",
@@ -7302,7 +7295,8 @@
       "screen",
       "widgets"
     ],
-    "icon": "widgets"
+    "icon": "widgets",
+    "conditionKey": "dmsConnected"
   },
   {
     "section": "_tab_27",
@@ -7970,19 +7964,6 @@
       "window"
     ],
     "description": "Reveal the arcs where surfaces meet the frame"
-  },
-  {
-    "section": "_tab_33",
-    "label": "Frame",
-    "tabIndex": 33,
-    "category": "Frame",
-    "keywords": [
-      "border",
-      "decoration",
-      "frame",
-      "window"
-    ],
-    "icon": "frame_source"
   },
   {
     "section": "frameEnabled",
@@ -8863,23 +8844,6 @@
     "description": "Space between windows"
   },
   {
-    "section": "_tab_38",
-    "label": "Window Rules",
-    "tabIndex": 38,
-    "category": "Applications",
-    "keywords": [
-      "applications",
-      "apps",
-      "floating",
-      "matching",
-      "programs",
-      "rules",
-      "window"
-    ],
-    "icon": "select_window",
-    "conditionKey": "windowRulesCapable"
-  },
-  {
     "section": "windowRules",
     "label": "Window Rules",
     "tabIndex": 38,
@@ -8901,5 +8865,56 @@
     "icon": "select_window",
     "description": "Define compositor rules for window behavior",
     "conditionKey": "windowRulesCapable"
+  },
+  {
+    "section": "networkEthernet",
+    "label": "Ethernet",
+    "tabIndex": 39,
+    "category": "Network",
+    "keywords": [
+      "adapters",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "network",
+      "online",
+      "wired"
+    ],
+    "icon": "settings_ethernet"
+  },
+  {
+    "section": "networkWifi",
+    "label": "WiFi",
+    "tabIndex": 40,
+    "category": "Network",
+    "keywords": [
+      "adapter",
+      "connectivity",
+      "network",
+      "online",
+      "radio",
+      "ssid",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "wifi"
+  },
+  {
+    "section": "networkVpn",
+    "label": "VPN",
+    "tabIndex": 41,
+    "category": "Network",
+    "keywords": [
+      "connectivity",
+      "import",
+      "network",
+      "online",
+      "openvpn",
+      "profiles",
+      "vpn",
+      "wireguard"
+    ],
+    "icon": "vpn_key"
   }
 ]

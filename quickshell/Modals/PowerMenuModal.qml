@@ -11,6 +11,7 @@ DankModal {
 
     layerNamespace: "dms:power-menu"
     keepPopoutsOpen: true
+    useOverlayLayer: true
 
     property int selectedIndex: 0
     property int selectedRow: 0

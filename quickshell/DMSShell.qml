@@ -1093,11 +1093,22 @@ Item {
             slideoutWidth: 480
             expandable: true
             expandedWidthValue: 960
+            edgeGap: SettingsData.notepadEffectiveEdgeGap
+            slideEdge: SettingsData.notepadSlideoutSide
+
+            onIsVisibleChanged: {
+                if (isVisible)
+                    PopoutService.notepadPopout?.hide();
+            }
 
             content: Component {
                 Notepad {
                     slideout: notepadSlideout
                     onHideRequested: notepadSlideout.hide()
+                    onPopoutRequested: {
+                        notepadSlideout.hide();
+                        PopoutService.openNotepadPopout();
+                    }
                 }
             }
 
@@ -1112,6 +1123,24 @@ Item {
 
         onInstancesChanged: PopoutService.notepadSlideouts = instances
         Component.onCompleted: PopoutService.notepadSlideouts = instances
+    }
+
+    LazyLoader {
+        id: notepadPopoutLoader
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.notepadPopoutLoader = notepadPopoutLoader;
+        }
+
+        onActiveChanged: {
+            if (active && item) {
+                PopoutService.notepadPopout = item;
+                PopoutService._onNotepadPopoutLoaded();
+            }
+        }
+
+        NotepadPopoutWindow {}
     }
 
     LazyLoader {

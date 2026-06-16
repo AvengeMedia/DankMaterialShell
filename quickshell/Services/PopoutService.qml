@@ -392,8 +392,7 @@ Singleton {
     function toggleSettingsWithTab(tabName: string) {
         if (settingsModal) {
             var idx = settingsModal.resolveTabIndex(tabName);
-            if (idx >= 0)
-                settingsModal.currentTabIndex = idx;
+            settingsModal.setTabIndex(idx);
             settingsModal.toggle();
             return;
         }
@@ -433,8 +432,7 @@ Singleton {
                     return;
                 }
                 var idx = settingsModal.resolveTabIndex(tabName);
-                if (idx >= 0)
-                    settingsModal.currentTabIndex = idx;
+                settingsModal.setTabIndex(idx);
                 toplevel.activate();
                 return;
             }
@@ -466,12 +464,11 @@ Singleton {
         if (_settingsWantsToggle) {
             _settingsWantsToggle = false;
             if (_settingsPendingTabIndex >= 0) {
-                settingsModal.currentTabIndex = _settingsPendingTabIndex;
+                settingsModal?.setTabIndex(_settingsPendingTabIndex);
                 _settingsPendingTabIndex = -1;
             } else if (_settingsPendingTab) {
                 var idx = settingsModal?.resolveTabIndex(_settingsPendingTab) ?? -1;
-                if (idx >= 0)
-                    settingsModal.currentTabIndex = idx;
+                settingsModal?.setTabIndex(idx);
                 _settingsPendingTab = "";
             }
             settingsModal?.toggle();
@@ -789,21 +786,97 @@ Singleton {
         networkInfoModal?.close();
     }
 
-    function openNotepad() {
+    function closeNotepadSlideouts() {
+        for (var i = 0; i < notepadSlideouts.length; i++) {
+            if (notepadSlideouts[i] && notepadSlideouts[i].isVisible)
+                notepadSlideouts[i].hide();
+        }
+    }
+
+    function openNotepadSlideout() {
+        notepadPopout?.hide();
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.show();
         }
     }
 
+    // Keep the notepad in a single presentation for default modes
+    Connections {
+        target: SettingsData
+        function onNotepadDefaultModeChanged() {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                var hadSlideout = false;
+                for (var i = 0; i < root.notepadSlideouts.length; i++) {
+                    if (root.notepadSlideouts[i] && root.notepadSlideouts[i].isVisible) {
+                        hadSlideout = true;
+                        root.notepadSlideouts[i].hide();
+                    }
+                }
+                if (hadSlideout)
+                    root.openNotepadPopout();
+            } else if (root.notepadPopout && root.notepadPopout.visible) {
+                root.notepadPopout.hide();
+                root.openNotepadSlideout();
+            }
+        }
+    }
+
+    function openNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            openNotepadPopout();
+            return;
+        }
+        openNotepadSlideout();
+    }
+
     function closeNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            notepadPopout?.hide();
+            return;
+        }
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.hide();
         }
     }
 
     function toggleNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            toggleNotepadPopout();
+            return;
+        }
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.toggle();
+        }
+    }
+
+    property var notepadPopout: null
+    property var notepadPopoutLoader: null
+    property bool _notepadPopoutWantsOpen: false
+
+    function openNotepadPopout() {
+        closeNotepadSlideouts();
+        if (notepadPopout) {
+            notepadPopout.show();
+        } else if (notepadPopoutLoader) {
+            _notepadPopoutWantsOpen = true;
+            notepadPopoutLoader.active = true;
+        }
+    }
+
+    function _onNotepadPopoutLoaded() {
+        if (_notepadPopoutWantsOpen && notepadPopout) {
+            _notepadPopoutWantsOpen = false;
+            notepadPopout.show();
+        }
+    }
+
+    function toggleNotepadPopout() {
+        if (notepadPopout) {
+            if (!notepadPopout.visible)
+                closeNotepadSlideouts();
+            notepadPopout.toggle();
+        } else {
+            openNotepadPopout();
         }
     }
 }

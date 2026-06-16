@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.Settings
+import qs.Services
 import qs.Widgets
 
 FocusScope {
@@ -232,7 +233,52 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: NetworkTab {}
+            sourceComponent: NetworkStatusTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: networkEthernetLoader
+            anchors.fill: parent
+            active: root.currentIndex === 39
+            visible: active
+            focus: active
+
+            sourceComponent: NetworkEthernetTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: networkWifiLoader
+            anchors.fill: parent
+            active: root.currentIndex === 40
+            visible: active
+            focus: active
+
+            sourceComponent: NetworkWifiTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: networkVpnLoader
+            anchors.fill: parent
+            active: root.currentIndex === 41
+            visible: active
+            focus: active
+
+            sourceComponent: NetworkVpnTab {}
 
             onActiveChanged: {
                 if (active && item)
