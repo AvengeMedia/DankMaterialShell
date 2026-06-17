@@ -87,9 +87,81 @@ func (_c *MockBackend_ActivateWiredConnection_Call) RunAndReturn(run func(uuid s
 	return _c
 }
 
-// CancelCredentials provides a mock function for the type MockBackend
-func (_mock *MockBackend) CancelCredentials(token string) error {
-	ret := _mock.Called(token)
+// ActivateCellularConnection provides a mock function with given fields: uuid
+func (_m *MockBackend) ActivateCellularConnection(uuid string) error {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ActivateCellularConnection")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ConnectCellular provides a mock function with no fields
+func (_m *MockBackend) ConnectCellular() error {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ConnectCellular")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DisconnectCellular provides a mock function with no fields
+func (_m *MockBackend) DisconnectCellular() error {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectCellular")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DisconnectCellularDevice provides a mock function with given fields: device
+func (_m *MockBackend) DisconnectCellularDevice(device string) error {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectCellularDevice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CancelCredentials provides a mock function with given fields: token
+func (_m *MockBackend) CancelCredentials(token string) error {
+	ret := _m.Called(token)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CancelCredentials")
@@ -816,9 +888,83 @@ func (_c *MockBackend_GetCurrentState_Call) RunAndReturn(run func() (*network.Ba
 	return _c
 }
 
-// GetEthernetDevices provides a mock function for the type MockBackend
-func (_mock *MockBackend) GetEthernetDevices() []network.EthernetDevice {
-	ret := _mock.Called()
+// GetCellularConnections provides a mock function with no fields
+func (_m *MockBackend) GetCellularConnections() ([]network.WiredConnection, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularConnections")
+	}
+
+	var r0 []network.WiredConnection
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]network.WiredConnection, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []network.WiredConnection); ok {
+		r0 = rf()
+	} else if ret.Get(0) != nil {
+		r0 = ret.Get(0).([]network.WiredConnection)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetCellularDevices provides a mock function with no fields
+func (_m *MockBackend) GetCellularDevices() []network.CellularDevice {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularDevices")
+	}
+
+	var r0 []network.CellularDevice
+	if rf, ok := ret.Get(0).(func() []network.CellularDevice); ok {
+		r0 = rf()
+	} else if ret.Get(0) != nil {
+		r0 = ret.Get(0).([]network.CellularDevice)
+	}
+
+	return r0
+}
+
+// GetCellularEnabled provides a mock function with no fields
+func (_m *MockBackend) GetCellularEnabled() (bool, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularEnabled")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (bool, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetEthernetDevices provides a mock function with no fields
+func (_m *MockBackend) GetEthernetDevices() []network.EthernetDevice {
+	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetEthernetDevices")
@@ -1857,9 +2003,27 @@ func (_c *MockBackend_SetWiFiAutoconnect_Call) RunAndReturn(run func(ssid string
 	return _c
 }
 
-// SetWiFiEnabled provides a mock function for the type MockBackend
-func (_mock *MockBackend) SetWiFiEnabled(enabled bool) error {
-	ret := _mock.Called(enabled)
+// SetCellularEnabled provides a mock function with given fields: enabled
+func (_m *MockBackend) SetCellularEnabled(enabled bool) error {
+	ret := _m.Called(enabled)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetCellularEnabled")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(bool) error); ok {
+		r0 = rf(enabled)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SetWiFiEnabled provides a mock function with given fields: enabled
+func (_m *MockBackend) SetWiFiEnabled(enabled bool) error {
+	ret := _m.Called(enabled)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SetWiFiEnabled")

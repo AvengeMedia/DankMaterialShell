@@ -123,8 +123,10 @@ BasePill {
         switch (NetworkService.networkStatus) {
         case "ethernet":
             return "lan";
+        case "cellular":
+            return "network_cell";
         case "vpn":
-            return NetworkService.ethernetConnected ? "lan" : NetworkService.wifiSignalIcon;
+            return NetworkService.ethernetConnected ? "lan" : (NetworkService.cellularConnected ? "network_cell" : NetworkService.wifiSignalIcon);
         default:
             return NetworkService.wifiSignalIcon;
         }
