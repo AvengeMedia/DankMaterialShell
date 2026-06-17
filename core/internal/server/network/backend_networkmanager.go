@@ -49,10 +49,20 @@ type ethernetDeviceInfo struct {
 	hwAddress string
 }
 
+type cellularDeviceInfo struct {
+	device      gonetworkmanager.Device
+	generic     gonetworkmanager.DeviceGeneric
+	name        string
+	hwAddress   string
+	description string
+}
+
 type NetworkManagerBackend struct {
 	nmConn          any
 	ethernetDevice  any
 	ethernetDevices map[string]*ethernetDeviceInfo
+	cellularDevice  any
+	cellularDevices map[string]*cellularDeviceInfo
 	wifiDevice      any
 	settings        any
 	wifiDev         any
@@ -152,6 +162,7 @@ func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*Netwo
 		nmConn:          nm,
 		stopChan:        make(chan struct{}),
 		ethernetDevices: make(map[string]*ethernetDeviceInfo),
+		cellularDevices: make(map[string]*cellularDeviceInfo),
 		wifiDevices:     make(map[string]*wifiDeviceInfo),
 		state: &BackendState{
 			Backend: "networkmanager",
@@ -212,6 +223,36 @@ func (b *NetworkManagerBackend) Initialize() error {
 				return fmt.Errorf("failed to get wired configurations: %w", err)
 			}
 
+		case gonetworkmanager.NmDeviceTypeModem:
+			if managed, _ := dev.GetPropertyManaged(); !managed {
+				continue
+			}
+			iface, err := dev.GetPropertyInterface()
+			if err != nil {
+				continue
+			}
+			g, _ := gonetworkmanager.NewDeviceGeneric(dev.GetPath())
+			hwAddr := ""
+			description := "Mobile broadband"
+			if g != nil {
+				hwAddr, _ = g.GetPropertyHwAddress()
+				if desc, err := g.GetPropertyTypeDescription(); err == nil && desc != "" {
+					description = desc
+				}
+			}
+
+			b.cellularDevices[iface] = &cellularDeviceInfo{
+				device:      dev,
+				generic:     g,
+				name:        iface,
+				hwAddress:   hwAddr,
+				description: description,
+			}
+
+			if b.cellularDevice == nil {
+				b.cellularDevice = dev
+			}
+
 		case gonetworkmanager.NmDeviceTypeWifi:
 			iface, err := dev.GetPropertyInterface()
 			if err != nil {
@@ -243,6 +284,7 @@ func (b *NetworkManagerBackend) Initialize() error {
 		b.state.WiFiEnabled = wifiEnabled
 		b.stateMutex.Unlock()
 	}
+	b.updateCellularRadioState()
 
 	if err := b.updateWiFiState(); err != nil {
 		log.Warnf("Failed to update WiFi state: %v", err)
@@ -266,6 +308,10 @@ func (b *NetworkManagerBackend) Initialize() error {
 	b.updateAllWiFiDevices()
 
 	b.updateAllEthernetDevices()
+	b.updateAllCellularDevices()
+	if _, err := b.listCellularConnections(); err != nil {
+		log.Warnf("Failed to get initial cellular configurations: %v", err)
+	}
 
 	if err := b.updatePrimaryConnection(); err != nil {
 		return err
@@ -375,6 +421,8 @@ func (b *NetworkManagerBackend) GetCurrentState() (*BackendState, error) {
 	state.WiFiDevices = append([]WiFiDevice(nil), b.state.WiFiDevices...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
 	state.EthernetDevices = append([]EthernetDevice(nil), b.state.EthernetDevices...)
+	state.CellularConnections = append([]WiredConnection(nil), b.state.CellularConnections...)
+	state.CellularDevices = append([]CellularDevice(nil), b.state.CellularDevices...)
 	state.VPNProfiles = append([]VPNProfile(nil), b.state.VPNProfiles...)
 	state.VPNActive = append([]VPNActive(nil), b.state.VPNActive...)
 
@@ -592,7 +640,7 @@ func (b *NetworkManagerBackend) getActiveConnections() (map[string]bool, error) 
 			continue
 		}
 
-		if connType != "802-3-ethernet" {
+		if connType != "802-3-ethernet" && !isCellularConnectionType(connType) {
 			continue
 		}
 

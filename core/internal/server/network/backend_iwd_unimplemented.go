@@ -33,6 +33,38 @@ func (b *IWDBackend) ActivateWiredConnection(uuid string) error {
 	return fmt.Errorf("wired connections not supported by iwd")
 }
 
+func (b *IWDBackend) GetCellularDevices() []CellularDevice {
+	return []CellularDevice{}
+}
+
+func (b *IWDBackend) GetCellularEnabled() (bool, error) {
+	return false, fmt.Errorf("cellular radio control not supported by iwd")
+}
+
+func (b *IWDBackend) SetCellularEnabled(enabled bool) error {
+	return fmt.Errorf("cellular radio control not supported by iwd")
+}
+
+func (b *IWDBackend) GetCellularConnections() ([]WiredConnection, error) {
+	return nil, fmt.Errorf("cellular connections not supported by iwd")
+}
+
+func (b *IWDBackend) ConnectCellular() error {
+	return fmt.Errorf("cellular connections not supported by iwd")
+}
+
+func (b *IWDBackend) DisconnectCellular() error {
+	return fmt.Errorf("cellular connections not supported by iwd")
+}
+
+func (b *IWDBackend) DisconnectCellularDevice(device string) error {
+	return fmt.Errorf("cellular connections not supported by iwd")
+}
+
+func (b *IWDBackend) ActivateCellularConnection(uuid string) error {
+	return fmt.Errorf("cellular connections not supported by iwd")
+}
+
 func (b *IWDBackend) ListVPNProfiles() ([]VPNProfile, error) {
 	return nil, fmt.Errorf("VPN not supported by iwd backend")
 }
