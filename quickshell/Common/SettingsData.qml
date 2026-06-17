@@ -164,6 +164,8 @@ Singleton {
     property real popupTransparency: 1.0
     property real dockTransparency: 1
     property string widgetBackgroundColor: "sch"
+    property string widgetBackgroundCustomColor: "#6750A4"
+    property real widgetBackgroundCustomStrength: 0.50
     property string widgetColorMode: "default"
     property string controlCenterTileColorMode: "primary"
     property string buttonColorMode: "primary"
@@ -385,11 +387,16 @@ Singleton {
     property bool dwlShowAllTags: false
     property bool workspaceActiveAppHighlightEnabled: false
     property string workspaceColorMode: "default"
+    property string workspaceFocusedCustomColor: "#6750A4"
     property string workspaceOccupiedColorMode: "none"
+    property string workspaceOccupiedCustomColor: "#625B71"
     property string workspaceUnfocusedColorMode: "default"
+    property string workspaceUnfocusedCustomColor: "#49454E"
     property string workspaceUrgentColorMode: "default"
+    property string workspaceUrgentCustomColor: "#B3261E"
     property bool workspaceFocusedBorderEnabled: false
     property string workspaceFocusedBorderColor: "primary"
+    property string workspaceFocusedBorderCustomColor: "#6750A4"
     property int workspaceFocusedBorderThickness: 2
     property var workspaceNameIcons: ({})
     property bool waveProgressEnabled: true

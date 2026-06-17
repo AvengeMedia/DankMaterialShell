@@ -28,6 +28,7 @@ Item {
     property var optionIcons: []
     property bool enableFuzzySearch: false
     property var optionIconMap: ({})
+    property var optionColorMap: ({})
 
     function rebuildIconMap() {
         const map = {};
@@ -160,7 +161,24 @@ Item {
             anchors.rightMargin: Theme.spacingS
             spacing: Theme.spacingS
 
+            Rectangle {
+                id: triggerSwatch
+
+                property var swatchColor: root.optionColorMap[root.currentValue]
+
+                width: 16
+                height: 16
+                radius: 8
+                color: swatchColor !== undefined ? swatchColor : "transparent"
+                border.color: Theme.outline
+                border.width: 1
+                anchors.verticalCenter: parent.verticalCenter
+                visible: swatchColor !== undefined
+            }
+
             DankIcon {
+                id: triggerIcon
+
                 name: root.optionIconMap[root.currentValue] ?? ""
                 size: 18
                 color: Theme.surfaceText
@@ -173,7 +191,7 @@ Item {
                 text: root.currentValue !== "" ? root.currentValue : root.emptyText
                 font.pixelSize: Theme.fontSizeMedium
                 color: root.currentValue !== "" ? Theme.surfaceText : Theme.outline
-                width: contentRow.width - (contentRow.children[0].visible ? contentRow.children[0].width + contentRow.spacing : 0)
+                width: contentRow.width - (triggerSwatch.visible ? triggerSwatch.width + contentRow.spacing : 0) - (triggerIcon.visible ? triggerIcon.width + contentRow.spacing : 0)
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
                 horizontalAlignment: Text.AlignLeft
@@ -406,6 +424,7 @@ Item {
                         property bool isSelected: dropdownMenu.selectedIndex === index
                         property bool isCurrentValue: root.currentValue === modelData
                         property string iconName: root.optionIconMap[modelData] ?? ""
+                        property var swatchColor: root.optionColorMap[modelData]
 
                         width: ListView.view.width
                         height: 32
@@ -420,6 +439,19 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingS
 
+                            Rectangle {
+                                id: optionSwatch
+
+                                width: 16
+                                height: 16
+                                radius: 8
+                                color: delegateRoot.swatchColor !== undefined ? delegateRoot.swatchColor : "transparent"
+                                border.color: delegateRoot.isCurrentValue ? Theme.primary : Theme.outline
+                                border.width: 1
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: delegateRoot.swatchColor !== undefined
+                            }
+
                             DankIcon {
                                 name: delegateRoot.iconName
                                 size: 18
@@ -433,7 +465,7 @@ Item {
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: delegateRoot.isCurrentValue ? Theme.primary : Theme.surfaceText
                                 font.weight: delegateRoot.isCurrentValue ? Font.Medium : Font.Normal
-                                width: root.popupWidth > 0 ? undefined : (delegateRoot.width - parent.x - Theme.spacingS * 2)
+                                width: root.popupWidth > 0 ? undefined : (delegateRoot.width - parent.x - Theme.spacingS * 2 - (optionSwatch.visible ? optionSwatch.width + parent.spacing : 0))
                                 elide: root.popupWidth > 0 ? Text.ElideNone : Text.ElideRight
                                 wrapMode: Text.NoWrap
                                 horizontalAlignment: Text.AlignLeft

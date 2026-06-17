@@ -20,6 +20,31 @@ Item {
     property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
     property var installedRegistryThemes: []
     property var templateDetection: []
+    readonly property var widgetBackgroundOptions: [({
+                "value": "sth",
+                "label": I18n.tr("Subtle Overlay", "widget background color option")
+            }), ({
+                "value": "s",
+                "label": I18n.tr("Surface", "widget background color option")
+            }), ({
+                "value": "sc",
+                "label": I18n.tr("Surface Container", "widget background color option")
+            }), ({
+                "value": "sch",
+                "label": I18n.tr("Surface High", "widget background color option")
+            }), ({
+                "value": "primaryContainer",
+                "label": I18n.tr("Primary Container", "widget background color option")
+            }), ({
+                "value": "secondaryContainer",
+                "label": I18n.tr("Secondary Container", "widget background color option")
+            }), ({
+                "value": "tertiaryContainer",
+                "label": I18n.tr("Tertiary Container", "widget background color option")
+            }), ({
+                "value": "custom",
+                "label": I18n.tr("Custom", "widget background color option")
+            })]
 
     property var cursorIncludeStatus: ({
             "exists": false,
@@ -1524,10 +1549,10 @@ Item {
 
                 SettingsButtonGroupRow {
                     tab: "theme"
-                    tags: ["widget", "style", "colorful", "default"]
+                    tags: ["widget", "text", "style", "colorful", "default"]
                     settingKey: "widgetColorMode"
-                    text: I18n.tr("Widget Style")
-                    description: I18n.tr("Change bar appearance")
+                    text: I18n.tr("Widget Text Style")
+                    description: I18n.tr("Choose neutral or accent-colored widget text")
                     model: [I18n.tr("Default", "widget style option"), I18n.tr("Colorful", "widget style option")]
                     currentIndex: SettingsData.widgetColorMode === "colorful" ? 1 : 0
                     onSelectionChanged: (index, selected) => {
@@ -1537,38 +1562,41 @@ Item {
                     }
                 }
 
-                SettingsButtonGroupRow {
+                WorkspaceColorRow {
                     tab: "theme"
-                    tags: ["widget", "background", "color"]
+                    tags: ["widget", "background", "color", "surface", "material"]
                     settingKey: "widgetBackgroundColor"
                     text: I18n.tr("Widget Background Color")
                     description: I18n.tr("Choose the background color for widgets")
-                    model: ["sth", "s", "sc", "sch"]
-                    buttonHeight: 20
-                    minButtonWidth: 32
-                    buttonPadding: Theme.spacingS
-                    checkIconSize: Theme.iconSizeSmall - 2
-                    textSize: Theme.fontSizeSmall - 2
-                    spacing: 1
-                    currentIndex: {
-                        switch (SettingsData.widgetBackgroundColor) {
-                        case "sth":
-                            return 0;
-                        case "s":
-                            return 1;
-                        case "sc":
-                            return 2;
-                        case "sch":
-                            return 3;
-                        default:
-                            return 0;
-                        }
-                    }
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        const colorOptions = ["sth", "s", "sc", "sch"];
-                        SettingsData.set("widgetBackgroundColor", colorOptions[index]);
+                    dropdownWidth: 220
+                    options: themeColorsTab.widgetBackgroundOptions
+                    currentMode: SettingsData.widgetBackgroundColor
+                    customColor: SettingsData.widgetBackgroundCustomColor || "#6750A4"
+                    pickerTitle: I18n.tr("Widget Background Color")
+                    onModeSelected: mode => SettingsData.set("widgetBackgroundColor", mode)
+                    onCustomColorSelected: selectedColor => SettingsData.set("widgetBackgroundCustomColor", selectedColor.toString())
+                }
+
+                SettingsSliderRow {
+                    id: widgetBackgroundCustomStrengthSlider
+                    visible: SettingsData.widgetBackgroundColor === "custom"
+                    tab: "theme"
+                    tags: ["widget", "background", "color", "custom", "blend"]
+                    settingKey: "widgetBackgroundCustomStrength"
+                    text: I18n.tr("Custom Blend")
+                    description: I18n.tr("Blend between Surface High and the selected custom color")
+                    value: Math.round(SettingsData.widgetBackgroundCustomStrength * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 40
+                    onSliderValueChanged: newValue => SettingsData.set("widgetBackgroundCustomStrength", newValue / 100)
+
+                    Binding {
+                        target: widgetBackgroundCustomStrengthSlider
+                        property: "value"
+                        value: Math.round(SettingsData.widgetBackgroundCustomStrength * 100)
+                        restoreMode: Binding.RestoreBinding
                     }
                 }
 
