@@ -38,27 +38,74 @@ Item {
             onCloseClicked: modal.hide()
         }
 
-        DankTextField {
-            id: searchField
+         Row {
             width: parent.width
-            placeholderText: ""
-            leftIconName: "search"
-            showClearButton: true
-            focus: true
-            ignoreTabKeys: true
-            keyForwardTargets: [modal.modalFocusScope]
-            onTextChanged: {
-                modal.searchText = text;
-                modal.updateFilteredModel();
+            spacing: Theme.spacingS
+
+            DankDropdown {
+                id: filterDropdown
+                width: 120
+
+                text: ""
+                currentValue: {
+                    switch (modal.activeFilter) {
+                        case "text":
+                            return I18n.tr("Text");
+                        case "long_text":
+                            return I18n.tr("Long Text");
+                        case "image":
+                            return I18n.tr("Image");
+                        default:
+                            return I18n.tr("All");
+                    }
+                }
+
+                options: [I18n.tr("All"), I18n.tr("Text"), I18n.tr("Long Text"), I18n.tr("Image")]
+
+                onValueChanged: value => {
+                    switch (value) {
+                        case I18n.tr("Text"):
+                            modal.activeFilter = "text";
+                            break;
+                        case I18n.tr("Long Text"):
+                            modal.activeFilter = "long_text";
+                            break;
+                        case I18n.tr("Image"):
+                            modal.activeFilter = "image";
+                            break;
+                        default:
+                            modal.activeFilter = "all";
+                    }
+                }
             }
-            Keys.onEscapePressed: function (event) {
-                modal.hide();
-                event.accepted = true;
-            }
-            Component.onCompleted: {
-                Qt.callLater(function () {
-                    forceActiveFocus();
-                });
+
+            DankTextField {
+                id: searchField
+
+                width: parent.width - 120 - parent.spacing
+
+                placeholderText: ""
+                leftIconName: "search"
+                showClearButton: true
+                focus: true
+                ignoreTabKeys: true
+                keyForwardTargets: [modal.modalFocusScope]
+
+                onTextChanged: {
+                    modal.searchText = text;
+                    modal.updateFilteredModel();
+                }
+
+                Keys.onEscapePressed: function (event) {
+                    modal.hide();
+                    event.accepted = true;
+                }
+
+                Component.onCompleted: {
+                    Qt.callLater(function () {
+                        forceActiveFocus();
+                    });
+                }
             }
         }
     }

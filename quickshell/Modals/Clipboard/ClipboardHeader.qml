@@ -41,41 +41,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-        DankDropdown {
-            width: 140
-
-            text: ""
-            currentValue: {
-                switch (header.activeFilter) {
-                    case "text":
-                        return I18n.tr("Text");
-                    case "long_text":
-                        return I18n.tr("Long Text");
-                    case "image":
-                        return I18n.tr("Image");
-                    default:
-                        return I18n.tr("All");
-                }
-            }
-
-            options: [I18n.tr("All"), I18n.tr("Text"), I18n.tr("Long Text"), I18n.tr("Image")]
-
-            onValueChanged: value => {
-                switch (value) {
-                    case I18n.tr("Text"):
-                        filterChanged("text");
-                        break;
-                    case I18n.tr("Long Text"):
-                        filterChanged("long_text");
-                        break;
-                    case I18n.tr("Image"):
-                        filterChanged("image");
-                        break;
-                    default:
-                        filterChanged("all");
-                }
-            }
-        }
     }
 
     Row {
