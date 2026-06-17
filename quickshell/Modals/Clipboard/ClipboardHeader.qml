@@ -38,6 +38,7 @@ Item {
             font.weight: Font.Medium
             anchors.verticalCenter: parent.verticalCenter
         }
+
     }
 
     Row {
