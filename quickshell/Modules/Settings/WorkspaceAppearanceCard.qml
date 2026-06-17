@@ -184,7 +184,7 @@ SettingsCard {
     readonly property bool workspaceStateColorsVisible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
     readonly property bool urgentWorkspaceColorsVisible: workspaceStateColorsVisible || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
 
-    WorkspaceColorRow {
+    ColorDropdownRow {
         text: I18n.tr("Focused Color")
         settingKey: "workspaceColorMode"
         tags: ["workspace", "focused", "color", "custom"]
@@ -202,7 +202,7 @@ SettingsCard {
         opacity: 0.15
     }
 
-    WorkspaceColorRow {
+    ColorDropdownRow {
         text: I18n.tr("Occupied Color")
         settingKey: "workspaceOccupiedColorMode"
         tags: ["workspace", "occupied", "color", "custom"]
@@ -222,7 +222,7 @@ SettingsCard {
         visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
     }
 
-    WorkspaceColorRow {
+    ColorDropdownRow {
         text: I18n.tr("Unfocused Color")
         settingKey: "workspaceUnfocusedColorMode"
         tags: ["workspace", "unfocused", "color", "custom"]
@@ -242,7 +242,7 @@ SettingsCard {
         visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     }
 
-    WorkspaceColorRow {
+    ColorDropdownRow {
         text: I18n.tr("Urgent Color")
         settingKey: "workspaceUrgentColorMode"
         tags: ["workspace", "urgent", "color", "custom"]
@@ -277,7 +277,7 @@ SettingsCard {
         visible: SettingsData.workspaceFocusedBorderEnabled
         leftPadding: Theme.spacingM
 
-        WorkspaceColorRow {
+        ColorDropdownRow {
             width: parent.width - parent.leftPadding
             text: I18n.tr("Border Color")
             settingKey: "workspaceFocusedBorderColor"

@@ -30,42 +30,14 @@ Column {
 
     function colorForValue(value) {
         switch (value) {
-        case "primary":
-        case "pri":
-            return Theme.primary;
-        case "primaryContainer":
-            return Theme.primaryContainer;
-        case "secondary":
-        case "sec":
-            return Theme.secondary;
-        case "secondaryContainer":
-            return Theme.secondaryContainer;
-        case "tertiary":
-        case "ter":
-            return Theme.tertiary;
-        case "tertiaryContainer":
-            return Theme.tertiaryContainer;
-        case "surfaceText":
-            return Theme.surfaceText;
-        case "s":
-            return Theme.surface;
-        case "sc":
-            return Theme.surfaceContainer;
-        case "sch":
-            return Theme.surfaceContainerHigh;
-        case "schh":
-            return Theme.surfaceContainerHighest;
-        case "sth":
-            return Theme.surfaceTextHover;
-        case "error":
-        case "err":
-            return Theme.error;
         case "custom":
             return root.customColor;
         case "none":
             return "transparent";
-        default:
+        case "default":
             return root.defaultColor;
+        default:
+            return Theme.roleColor(value);
         }
     }
 

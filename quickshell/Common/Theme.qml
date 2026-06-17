@@ -581,6 +581,45 @@ Singleton {
     readonly property int layerOutlineWidth: BlurService.enabled && layerOutlineOpacity > 0 ? 1 : 0
     property color surfaceTextHover: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.08)
     property color surfaceTextAlpha: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.3)
+
+    function roleColor(mode) {
+        switch (mode) {
+        case "primary":
+        case "pri":
+            return primary;
+        case "primaryContainer":
+            return primaryContainer;
+        case "secondary":
+        case "sec":
+            return secondary;
+        case "secondaryContainer":
+            return secondaryContainer;
+        case "tertiary":
+        case "ter":
+            return tertiary;
+        case "tertiaryContainer":
+            return tertiaryContainer;
+        case "surfaceText":
+            return surfaceText;
+        case "surfaceVariant":
+            return surfaceVariant;
+        case "s":
+            return surface;
+        case "sc":
+            return surfaceContainer;
+        case "sch":
+            return surfaceContainerHigh;
+        case "schh":
+            return surfaceContainerHighest;
+        case "sth":
+            return surfaceTextHover;
+        case "error":
+        case "err":
+            return error;
+        default:
+            return "transparent";
+        }
+    }
     property color surfaceTextLight: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.06)
     property color surfaceTextMedium: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.7)
 

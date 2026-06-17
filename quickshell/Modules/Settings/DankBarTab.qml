@@ -858,13 +858,6 @@ Item {
                 }
             }
 
-            SettingsControlledByFrame {
-                visible: dankBarTab.appearanceOnly && SettingsData.frameEnabled
-                parentModal: dankBarTab.parentModal
-                settingLabel: I18n.tr("Bar spacing and size")
-                reason: I18n.tr("Managed by Frame")
-            }
-
             SettingsCard {
                 tab: "appearance"
                 iconName: "space_bar"

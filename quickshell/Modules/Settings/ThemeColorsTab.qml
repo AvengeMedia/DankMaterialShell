@@ -1562,7 +1562,7 @@ Item {
                     }
                 }
 
-                WorkspaceColorRow {
+                ColorDropdownRow {
                     tab: "theme"
                     tags: ["widget", "background", "color", "surface", "material"]
                     settingKey: "widgetBackgroundColor"
@@ -1607,6 +1607,12 @@ Item {
                     text: I18n.tr("Control Center Tile Color")
                     description: I18n.tr("Active tile background and icon color", "control center tile color setting description")
                     options: [I18n.tr("Primary", "tile color option"), I18n.tr("Primary Container", "tile color option"), I18n.tr("Secondary", "tile color option"), I18n.tr("Surface Variant", "tile color option")]
+                    optionColorMap: ({
+                            [I18n.tr("Primary", "tile color option")]: Theme.roleColor("primary"),
+                            [I18n.tr("Primary Container", "tile color option")]: Theme.roleColor("primaryContainer"),
+                            [I18n.tr("Secondary", "tile color option")]: Theme.roleColor("secondary"),
+                            [I18n.tr("Surface Variant", "tile color option")]: Theme.roleColor("surfaceVariant")
+                        })
                     currentValue: {
                         switch (SettingsData.controlCenterTileColorMode) {
                         case "primaryContainer":
@@ -1639,6 +1645,12 @@ Item {
                     text: I18n.tr("Button Color")
                     description: I18n.tr("Color for primary action buttons")
                     options: [I18n.tr("Primary", "button color option"), I18n.tr("Primary Container", "button color option"), I18n.tr("Secondary", "button color option"), I18n.tr("Surface Variant", "button color option")]
+                    optionColorMap: ({
+                            [I18n.tr("Primary", "button color option")]: Theme.roleColor("primary"),
+                            [I18n.tr("Primary Container", "button color option")]: Theme.roleColor("primaryContainer"),
+                            [I18n.tr("Secondary", "button color option")]: Theme.roleColor("secondary"),
+                            [I18n.tr("Surface Variant", "button color option")]: Theme.roleColor("surfaceVariant")
+                        })
                     currentValue: {
                         switch (SettingsData.buttonColorMode) {
                         case "primaryContainer":
