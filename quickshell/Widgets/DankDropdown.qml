@@ -289,6 +289,40 @@ Item {
         dim: false
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
+        enter: Transition {
+            NumberAnimation {
+                property: "scale"
+                from: 0.9
+                to: 1
+                duration: Theme.shortDuration
+                easing.type: Theme.emphasizedEasing
+            }
+            NumberAnimation {
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        exit: Transition {
+            NumberAnimation {
+                property: "scale"
+                from: 1
+                to: 0.9
+                duration: Theme.shortDuration
+                easing.type: Theme.emphasizedEasing
+            }
+            NumberAnimation {
+                property: "opacity"
+                from: 1
+                to: 0
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
         background: Rectangle {
             color: "transparent"
         }
