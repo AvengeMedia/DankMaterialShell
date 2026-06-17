@@ -304,13 +304,9 @@ BasePill {
             if (root.isVerticalOrientation && activeWindow && activeWindow.appId && root.parentScreen) {
                 tooltipLoader.active = true;
                 if (tooltipLoader.item) {
-                    const globalPos = mapToGlobal(width / 2, height / 2);
+                    const localPos = mapToItem(null, width / 2, height / 2);
                     const currentScreen = root.parentScreen;
-                    const screenX = currentScreen ? currentScreen.x : 0;
-                    const screenY = currentScreen ? currentScreen.y : 0;
-                    const relativeY = globalPos.y - screenY;
-                    // Add minTooltipY offset to account for top bar
-                    const adjustedY = relativeY + root.minTooltipY;
+                    const adjustedY = localPos.y + root.minTooltipY;
                     const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + (barConfig?.spacing ?? 4) + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - (barConfig?.spacing ?? 4) - Theme.spacingXS);
 
                     const appName = Paths.getAppName(activeWindow.appId, activeDesktopEntry);
@@ -318,7 +314,7 @@ BasePill {
                     const tooltipText = appName + (title ? " • " + title : "");
 
                     const isLeft = root.axis?.edge === "left";
-                    tooltipLoader.item.show(tooltipText, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
+                    tooltipLoader.item.show(tooltipText, tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
                 }
             }
         }

@@ -19,14 +19,8 @@ PanelWindow {
 
     function show(text, x, y, screen, leftAlign, rightAlign) {
         root.text = text;
-        if (screen) {
-            targetScreen = screen;
-            const screenX = screen.x || 0;
-            targetX = x - screenX;
-        } else {
-            targetScreen = null;
-            targetX = x;
-        }
+        targetScreen = screen ?? null;
+        targetX = x;
         targetY = y;
         alignLeft = leftAlign ?? false;
         alignRight = rightAlign ?? false;

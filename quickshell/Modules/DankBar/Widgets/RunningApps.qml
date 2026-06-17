@@ -424,22 +424,16 @@ BasePill {
                                     windowContextMenuLoader.item.triggerBarThickness = root.barThickness;
                                     windowContextMenuLoader.item.triggerBarSpacing = root.barSpacing;
                                     if (root.isVerticalOrientation) {
-                                        const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
-                                        const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                        const screenY = root.parentScreen ? root.parentScreen.y : 0;
-                                        const relativeY = globalPos.y - screenY;
-                                        // Add minTooltipY offset to account for top bar
-                                        const adjustedY = relativeY + root.minTooltipY;
+                                        const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height / 2);
+                                        const adjustedY = localPos.y + root.minTooltipY;
                                         const xPos = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
                                         windowContextMenuLoader.item.showAt(xPos, adjustedY, true, root.axis?.edge);
                                     } else {
-                                        const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, 0);
-                                        const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                        const relativeX = globalPos.x - screenX;
+                                        const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, 0);
                                         const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height;
                                         const isBottom = root.axis?.edge === "bottom";
                                         const yPos = isBottom ? (screenHeight - root.barThickness - root.barSpacing - 32 - Theme.spacingXS) : (root.barThickness + root.barSpacing + Theme.spacingXS);
-                                        windowContextMenuLoader.item.showAt(relativeX, yPos, false, root.axis?.edge);
+                                        windowContextMenuLoader.item.showAt(localPos.x, yPos, false, root.axis?.edge);
                                     }
                                 }
                             } else if (mouse.button === Qt.MiddleButton) {
@@ -455,21 +449,17 @@ BasePill {
                             tooltipLoader.active = true;
                             if (tooltipLoader.item) {
                                 if (root.isVerticalOrientation) {
-                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
-                                    const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                    const screenY = root.parentScreen ? root.parentScreen.y : 0;
-                                    const relativeY = globalPos.y - screenY;
+                                    const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height / 2);
                                     const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
                                     const isLeft = root.axis?.edge === "left";
-                                    const adjustedY = relativeY + root.minTooltipY;
-                                    const finalX = screenX + tooltipX;
-                                    tooltipLoader.item.show(delegateItem.tooltipText, finalX, adjustedY, root.parentScreen, isLeft, !isLeft);
+                                    const adjustedY = localPos.y + root.minTooltipY;
+                                    tooltipLoader.item.show(delegateItem.tooltipText, tooltipX, adjustedY, root.parentScreen, isLeft, !isLeft);
                                 } else {
-                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height);
+                                    const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height);
                                     const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height;
                                     const isBottom = root.axis?.edge === "bottom";
                                     const tooltipY = isBottom ? (screenHeight - root.barThickness - root.barSpacing - Theme.spacingXS - 35) : (root.barThickness + root.barSpacing + Theme.spacingXS);
-                                    tooltipLoader.item.show(delegateItem.tooltipText, globalPos.x, tooltipY, root.parentScreen, false, false);
+                                    tooltipLoader.item.show(delegateItem.tooltipText, localPos.x, tooltipY, root.parentScreen, false, false);
                                 }
                             }
                         }
@@ -677,22 +667,16 @@ BasePill {
                                     windowContextMenuLoader.item.triggerBarThickness = root.barThickness;
                                     windowContextMenuLoader.item.triggerBarSpacing = root.barSpacing;
                                     if (root.isVerticalOrientation) {
-                                        const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
-                                        const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                        const screenY = root.parentScreen ? root.parentScreen.y : 0;
-                                        const relativeY = globalPos.y - screenY;
-                                        // Add minTooltipY offset to account for top bar
-                                        const adjustedY = relativeY + root.minTooltipY;
+                                        const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height / 2);
+                                        const adjustedY = localPos.y + root.minTooltipY;
                                         const xPos = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
                                         windowContextMenuLoader.item.showAt(xPos, adjustedY, true, root.axis?.edge);
                                     } else {
-                                        const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, 0);
-                                        const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                        const relativeX = globalPos.x - screenX;
+                                        const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, 0);
                                         const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height;
                                         const isBottom = root.axis?.edge === "bottom";
                                         const yPos = isBottom ? (screenHeight - root.barThickness - root.barSpacing - 32 - Theme.spacingXS) : (root.barThickness + root.barSpacing + Theme.spacingXS);
-                                        windowContextMenuLoader.item.showAt(relativeX, yPos, false, root.axis?.edge);
+                                        windowContextMenuLoader.item.showAt(localPos.x, yPos, false, root.axis?.edge);
                                     }
                                 }
                             } else if (mouse.button === Qt.MiddleButton) {
@@ -708,21 +692,17 @@ BasePill {
                             tooltipLoader.active = true;
                             if (tooltipLoader.item) {
                                 if (root.isVerticalOrientation) {
-                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
-                                    const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                    const screenY = root.parentScreen ? root.parentScreen.y : 0;
-                                    const relativeY = globalPos.y - screenY;
+                                    const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height / 2);
                                     const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
                                     const isLeft = root.axis?.edge === "left";
-                                    const adjustedY = relativeY + root.minTooltipY;
-                                    const finalX = screenX + tooltipX;
-                                    tooltipLoader.item.show(delegateItem.tooltipText, finalX, adjustedY, root.parentScreen, isLeft, !isLeft);
+                                    const adjustedY = localPos.y + root.minTooltipY;
+                                    tooltipLoader.item.show(delegateItem.tooltipText, tooltipX, adjustedY, root.parentScreen, isLeft, !isLeft);
                                 } else {
-                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height);
+                                    const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height);
                                     const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height;
                                     const isBottom = root.axis?.edge === "bottom";
                                     const tooltipY = isBottom ? (screenHeight - root.barThickness - root.barSpacing - Theme.spacingXS - 35) : (root.barThickness + root.barSpacing + Theme.spacingXS);
-                                    tooltipLoader.item.show(delegateItem.tooltipText, globalPos.x, tooltipY, root.parentScreen, false, false);
+                                    tooltipLoader.item.show(delegateItem.tooltipText, localPos.x, tooltipY, root.parentScreen, false, false);
                                 }
                             }
                         }
