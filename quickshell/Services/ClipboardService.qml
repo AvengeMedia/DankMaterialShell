@@ -39,6 +39,9 @@ Singleton {
 
     Process {
         id: wtypeProcess
+        // TODO: This is only a paste shortcut fallback. It assumes the target
+        // application accepts Ctrl+V, which is false for many terminals.
+        // Replace with a more reliable target-aware paste strategy.
         command: ["wtype", "-M", "ctrl", "-P", "v", "-p", "v", "-m", "ctrl"]
         running: false
     }

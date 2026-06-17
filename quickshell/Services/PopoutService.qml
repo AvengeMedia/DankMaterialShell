@@ -480,7 +480,7 @@ Singleton {
     }
 
     function closeClipboardHistory() {
-        clipboardHistoryModal?.close();
+        clipboardHistoryModal?.hide();
     }
 
     function unloadClipboardHistoryPopout() {
