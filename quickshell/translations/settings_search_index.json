@@ -11433,6 +11433,17 @@
   },
   {
     "section": "_tab_42",
+    "label": "Cellular",
+    "tabIndex": 42,
+    "category": "Settings",
+    "keywords": [
+      "cellular",
+      "settings"
+    ],
+    "icon": "network_cell"
+  },
+  {
+    "section": "_tab_42",
     "label": "Power & Security",
     "tabIndex": 42,
     "category": "Power & Security",

@@ -118,8 +118,10 @@ Column {
                 const status = NetworkService.networkStatus;
                 if (status === "ethernet")
                     return "settings_ethernet";
+                if (status === "cellular")
+                    return "network_cell";
                 if (status === "vpn")
-                    return NetworkService.ethernetConnected ? "settings_ethernet" : NetworkService.wifiSignalIcon;
+                    return NetworkService.ethernetConnected ? "settings_ethernet" : (NetworkService.cellularConnected ? "network_cell" : NetworkService.wifiSignalIcon);
                 if (status === "wifi")
                     return NetworkService.wifiSignalIcon;
                 return "wifi";
@@ -150,8 +152,10 @@ Column {
                 const status = NetworkService.networkStatus;
                 if (status === "ethernet")
                     return true;
+                if (status === "cellular")
+                    return true;
                 if (status === "vpn")
-                    return NetworkService.ethernetConnected || NetworkService.wifiConnected;
+                    return NetworkService.ethernetConnected || NetworkService.wifiConnected || NetworkService.cellularConnected;
                 if (status === "wifi")
                     return true;
                 return NetworkService.wifiEnabled;
@@ -473,9 +477,13 @@ Column {
                         const status = NetworkService.networkStatus;
                         if (status === "ethernet")
                             return I18n.tr("Ethernet", "network status");
+                        if (status === "cellular")
+                            return I18n.tr("Cellular", "network status");
                         if (status === "vpn") {
                             if (NetworkService.ethernetConnected)
                                 return I18n.tr("Ethernet", "network status");
+                            if (NetworkService.cellularConnected)
+                                return I18n.tr("Cellular", "network status");
                             if (NetworkService.wifiConnected && NetworkService.currentWifiSSID)
                                 return NetworkService.currentWifiSSID;
                         }
@@ -515,9 +523,13 @@ Column {
                         const status = NetworkService.networkStatus;
                         if (status === "ethernet")
                             return I18n.tr("Connected", "network status");
+                        if (status === "cellular")
+                            return NetworkService.cellularIP || I18n.tr("Connected", "network status");
                         if (status === "vpn") {
                             if (NetworkService.ethernetConnected)
                                 return I18n.tr("Connected", "network status");
+                            if (NetworkService.cellularConnected)
+                                return NetworkService.cellularIP || I18n.tr("Connected", "network status");
                             if (NetworkService.wifiConnected)
                                 return NetworkService.wifiSignalStrength > 0 ? NetworkService.wifiSignalStrength + "%" : I18n.tr("Connected", "network status");
                         }
