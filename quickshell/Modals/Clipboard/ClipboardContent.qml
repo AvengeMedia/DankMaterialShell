@@ -11,6 +11,14 @@ Item {
     property alias searchField: searchField
     property alias clipboardListView: clipboardListView
 
+    readonly property var filterOptions: [I18n.tr("All"), I18n.tr("Text"), I18n.tr("Long Text"), I18n.tr("Image")]
+    readonly property var filterValues: ["all", "text", "long_text", "image"]
+
+    function closeFilterMenu() {
+        filterMenuLoader.active = false;
+        filterMenuLoader.active = true;
+    }
+
     anchors.fill: parent
 
     Column {
@@ -30,60 +38,22 @@ Item {
             showKeyboardHints: modal.showKeyboardHints
             activeTab: modal.activeTab
             pinnedCount: modal.pinnedCount
-            activeFilter: modal.activeFilter
-            onFilterChanged: filter => modal.activeFilter = filter
             onKeyboardHintsToggled: modal.showKeyboardHints = !modal.showKeyboardHints
             onTabChanged: tabName => modal.activeTab = tabName
             onClearAllClicked: modal.confirmClearAll()
             onCloseClicked: modal.hide()
         }
 
-         Row {
+        Item {
+            id: searchRow
             width: parent.width
-            spacing: Theme.spacingS
-
-            DankDropdown {
-                id: filterDropdown
-                width: 120
-
-                text: ""
-                currentValue: {
-                    switch (modal.activeFilter) {
-                        case "text":
-                            return I18n.tr("Text");
-                        case "long_text":
-                            return I18n.tr("Long Text");
-                        case "image":
-                            return I18n.tr("Image");
-                        default:
-                            return I18n.tr("All");
-                    }
-                }
-
-                options: [I18n.tr("All"), I18n.tr("Text"), I18n.tr("Long Text"), I18n.tr("Image")]
-
-                onValueChanged: value => {
-                    switch (value) {
-                        case I18n.tr("Text"):
-                            modal.activeFilter = "text";
-                            break;
-                        case I18n.tr("Long Text"):
-                            modal.activeFilter = "long_text";
-                            break;
-                        case I18n.tr("Image"):
-                            modal.activeFilter = "image";
-                            break;
-                        default:
-                            modal.activeFilter = "all";
-                    }
-                }
-            }
+            implicitHeight: searchField.height
 
             DankTextField {
                 id: searchField
 
-                width: parent.width - 120 - parent.spacing
-
+                width: parent.width
+                rightAccessoryWidth: filterButton.width + Theme.spacingS
                 placeholderText: ""
                 leftIconName: "search"
                 showClearButton: true
@@ -105,6 +75,49 @@ Item {
                     Qt.callLater(function () {
                         forceActiveFocus();
                     });
+                }
+            }
+
+            DankActionButton {
+                id: filterButton
+
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                iconName: "filter_list"
+                iconColor: modal.activeFilter !== "all" ? Theme.primary : Theme.surfaceText
+                backgroundColor: modal.activeFilter !== "all" ? Theme.primarySelected : "transparent"
+                tooltipText: I18n.tr("Filter by type", "Clipboard history type filter button tooltip")
+                onClicked: filterMenuLoader.item?.openDropdownMenu()
+            }
+
+            Loader {
+                id: filterMenuLoader
+
+                active: true
+                sourceComponent: filterMenuComponent
+            }
+
+            Component {
+                id: filterMenuComponent
+
+                DankDropdown {
+                    showTrigger: false
+                    popupAnchorItem: filterButton
+                    popupWidth: 180
+                    alignPopupRight: true
+                    options: clipboardContent.filterOptions
+                    currentValue: {
+                        const idx = clipboardContent.filterValues.indexOf(clipboardContent.modal.activeFilter);
+                        return idx >= 0 ? clipboardContent.filterOptions[idx] : clipboardContent.filterOptions[0];
+                    }
+
+                    onValueChanged: value => {
+                        const idx = clipboardContent.filterOptions.indexOf(value);
+                        if (idx >= 0) {
+                            clipboardContent.modal.activeFilter = clipboardContent.filterValues[idx];
+                        }
+                    }
                 }
             }
         }

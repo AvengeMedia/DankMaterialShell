@@ -108,6 +108,8 @@ Singleton {
     }
 
     property bool clipboardEnterToPaste: false
+    property bool clipboardRememberTypeFilter: false
+    property string clipboardTypeFilter: "all"
     property var clipboardVisibleEntryActions: ["pin", "edit", "delete"]
 
     property var launcherPluginVisibility: ({})

@@ -11,13 +11,11 @@ Item {
     property bool showKeyboardHints: false
     property string activeTab: "recents"
     property int pinnedCount: 0
-    property string activeFilter: "all"
 
     signal keyboardHintsToggled
     signal clearAllClicked
     signal closeClicked
     signal tabChanged(string tabName)
-    signal filterChanged(string filter)
 
     height: ClipboardConstants.headerHeight
 

@@ -16,7 +16,7 @@ FocusScope {
 
     property string mode: "history"
     property string searchText: ClipboardService.searchText
-    property string activeFilter: ClipboardService.activeFilter
+    property string activeFilter: SettingsData.clipboardRememberTypeFilter ? SettingsData.clipboardTypeFilter : "all"
 
     readonly property bool clipboardAvailable: ClipboardService.clipboardAvailable
     readonly property bool wtypeAvailable: ClipboardService.wtypeAvailable
@@ -53,7 +53,12 @@ FocusScope {
 
     onActiveFilterChanged: {
         ClipboardService.activeFilter = activeFilter;
+        ClipboardService.selectedIndex = 0;
+        ClipboardService.keyboardNavigationActive = false;
         ClipboardService.updateFilteredModel();
+        if (SettingsData.clipboardRememberTypeFilter) {
+            SettingsData.set("clipboardTypeFilter", activeFilter);
+        }
     }
 
     function hide() {
@@ -124,6 +129,8 @@ FocusScope {
     function resetState() {
         activeImageLoads = 0;
         mode = "history";
+        historyContent.closeFilterMenu();
+        activeFilter = SettingsData.clipboardRememberTypeFilter ? SettingsData.clipboardTypeFilter : "all";
         ClipboardService.reset();
         keyboardController.reset();
     }
