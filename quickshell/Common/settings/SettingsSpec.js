@@ -230,6 +230,7 @@ var SPEC = {
     launcherUseOverlayLayer: { def: false },
     launcherStyle: { def: "full" },
     spotlightBarShowModeChips: { def: false },
+    keybindsFloatingWindow: { def: false },
 
     useAutoLocation: { def: false },
     weatherEnabled: { def: true },

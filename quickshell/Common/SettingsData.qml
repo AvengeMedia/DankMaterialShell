@@ -465,6 +465,8 @@ Singleton {
     property bool launcherUseOverlayLayer: false
     property string launcherStyle: "full"
     property bool spotlightBarShowModeChips: false
+    property bool keybindsFloatingWindow: false
+    onKeybindsFloatingWindowChanged: saveSettings()
 
     property string _legacyWeatherLocation: "New York, NY"
     property string _legacyWeatherCoordinates: "40.7128,-74.0060"
