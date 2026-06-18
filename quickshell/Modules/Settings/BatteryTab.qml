@@ -244,7 +244,7 @@ done
                     settingKey: "batteryNotificationType"
                     text: I18n.tr("Notification Type")
                     description: I18n.tr("Choose how to be notified about battery alerts.")
-                    model: [I18n.tr("Toast Overlay"), I18n.tr("System Notification")]
+                    model: [I18n.tr("Toast"), I18n.tr("Notification")]
                     currentIndex: SettingsData.batteryNotificationType
                     onSelectionChanged: (index, selected) => {
                         if (selected) {
@@ -259,6 +259,40 @@ done
                     description: I18n.tr("Automatically turn on Power Saver profile when battery is low.")
                     checked: SettingsData.batteryAutoPowerSaver
                     onToggled: checked => SettingsData.set("batteryAutoPowerSaver", checked)
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                }
+
+                StyledText {
+                    text: I18n.tr("Critical Battery Alert")
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.DemiBold
+                    color: Theme.surfaceText
+                    topPadding: Theme.spacingM
+                }
+
+                SettingsSliderRow {
+                    settingKey: "batteryCriticalThreshold"
+                    text: I18n.tr("Critical Threshold")
+                    description: I18n.tr("Battery percentage to trigger a critical alert.")
+                    value: SettingsData.batteryCriticalThreshold
+                    minimum: 1
+                    maximum: 30
+                    defaultValue: 10
+                    onSliderValueChanged: newValue => SettingsData.set("batteryCriticalThreshold", newValue)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "batteryNotifyCritical"
+                    text: I18n.tr("Critical Battery Notifications")
+                    description: I18n.tr("Show an urgent alert when battery reaches critical level.")
+                    checked: SettingsData.batteryNotifyCritical
+                    onToggled: checked => SettingsData.set("batteryNotifyCritical", checked)
                 }
             }
 

@@ -103,8 +103,10 @@ Singleton {
     // Is the system plugged in (Is not running on battery)
     readonly property bool isPluggedIn: !UPower.onBattery
     readonly property bool isLowBattery: batteryAvailable && batteryLevel <= SettingsData.batteryLowThreshold
+    readonly property bool isCriticalBattery: batteryAvailable && batteryLevel <= SettingsData.batteryCriticalThreshold
 
     property bool _hasNotifiedLowBattery: false
+    property bool _hasNotifiedCriticalBattery: false
     property bool _hasNotifiedChargeLimit: false
 
     function sendAlert(title, message, isWarning, category) {
@@ -129,15 +131,30 @@ Singleton {
             _hasNotifiedChargeLimit = false;
         }
 
-        if (isCharging || !isLowBattery) {
+        if (isCharging) {
             _hasNotifiedLowBattery = false;
+            _hasNotifiedCriticalBattery = false;
             return;
         }
 
-        if (!isCharging && isLowBattery) {
+        // Critical battery check (higher priority)
+        if (isCriticalBattery) {
+            if (!_hasNotifiedCriticalBattery && SettingsData.batteryNotifyCritical) {
+                _hasNotifiedCriticalBattery = true;
+                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), true, "battery-critical");
+            }
+            return;
+        }
+
+        if (batteryLevel > SettingsData.batteryCriticalThreshold) {
+            _hasNotifiedCriticalBattery = false;
+        }
+
+        // Low battery check
+        if (isLowBattery) {
             if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
                 _hasNotifiedLowBattery = true;
-                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1%").arg(batteryLevel), true, "battery-low");
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), true, "battery-low");
             }
 
             if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
@@ -146,11 +163,16 @@ Singleton {
                 }
             }
         }
+
+        if (batteryLevel > SettingsData.batteryLowThreshold) {
+            _hasNotifiedLowBattery = false;
+        }
     }
 
     onIsChargingChanged: {
         if (isCharging) {
             _hasNotifiedLowBattery = false;
+            _hasNotifiedCriticalBattery = false;
         } else {
             _hasNotifiedChargeLimit = false;
         }
