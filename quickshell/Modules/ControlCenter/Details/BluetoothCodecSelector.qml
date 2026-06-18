@@ -153,9 +153,9 @@ Item {
         width: 320
         height: contentColumn.implicitHeight + Theme.spacingL * 2
         radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-        border.width: 0
+        color: Theme.floatingSurface
+        border.color: Theme.outlineMedium
+        border.width: Theme.layerOutlineWidth
         opacity: modalVisible ? 1 : 0
         scale: modalVisible ? 1 : 0.9
 

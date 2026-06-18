@@ -9,6 +9,7 @@ import qs.Widgets
 
 FloatingWindow {
     id: processListModal
+    readonly property var log: Log.scoped("ProcessListModal")
 
     property bool disablePopupTransparency: true
     property int currentTab: 0
@@ -22,7 +23,7 @@ FloatingWindow {
 
     function show() {
         if (!DgopService.dgopAvailable) {
-            console.warn("ProcessListModal: dgop is not available");
+            log.warn("dgop is not available");
             return;
         }
         visible = true;
@@ -36,7 +37,7 @@ FloatingWindow {
 
     function toggle() {
         if (!DgopService.dgopAvailable) {
-            console.warn("ProcessListModal: dgop is not available");
+            log.warn("dgop is not available");
             return;
         }
         visible = !visible;
@@ -44,7 +45,7 @@ FloatingWindow {
 
     function focusOrToggle() {
         if (!DgopService.dgopAvailable) {
-            console.warn("ProcessListModal: dgop is not available");
+            log.warn("dgop is not available");
             return;
         }
         if (visible) {
@@ -273,7 +274,7 @@ FloatingWindow {
                     spacing: Theme.spacingXS
 
                     DankActionButton {
-                        visible: windowControls.supported
+                        visible: windowControls.canMaximize
                         circular: false
                         iconName: processListModal.maximized ? "fullscreen_exit" : "fullscreen"
                         iconSize: Theme.iconSize - 4

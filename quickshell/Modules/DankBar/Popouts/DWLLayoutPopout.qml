@@ -10,6 +10,8 @@ DankPopout {
 
     property var triggerScreen: null
 
+    readonly property bool isMango: CompositorService.isMango
+
     function setTriggerPosition(x, y, width, section, screen, barPosition, barThickness, barSpacing, barConfig) {
         triggerX = x;
         triggerY = y;
@@ -33,8 +35,8 @@ DankPopout {
     onScreenChanged: updateOutputState()
 
     function updateOutputState() {
-        if (screen && DwlService.dwlAvailable) {
-            outputState = DwlService.getOutputState(screen.name);
+        if (screen && MangoService.available) {
+            outputState = MangoService.getOutputState(screen.name);
         } else {
             outputState = null;
         }
@@ -80,7 +82,7 @@ DankPopout {
     }
 
     Connections {
-        target: DwlService
+        target: MangoService
         function onStateChanged() {
             updateOutputState();
         }
@@ -215,7 +217,7 @@ DankPopout {
                     spacing: Theme.spacingS
 
                     Repeater {
-                        model: DwlService.layouts
+                        model: MangoService.layouts
 
                         delegate: Rectangle {
                             required property string modelData
@@ -269,11 +271,11 @@ DankPopout {
                                     if (!root.triggerScreen) {
                                         return;
                                     }
-                                    if (!DwlService.dwlAvailable) {
+                                    if (!MangoService.available) {
                                         return;
                                     }
 
-                                    DwlService.setLayout(root.triggerScreen.name, index);
+                                    MangoService.setLayout(root.triggerScreen.name, index);
                                     root.close();
                                 }
                             }

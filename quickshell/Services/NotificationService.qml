@@ -6,10 +6,12 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import qs.Common
+import qs.Services
 import "../Common/markdown2html.js" as Markdown2Html
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("NotificationService")
 
     readonly property list<NotifWrapper> notifications: []
     readonly property list<NotifWrapper> allWrappers: []
@@ -33,6 +35,8 @@ Singleton {
     property int maxIngressPerSecond: 20
     property double _lastIngressSec: 0
     property int _ingressCountThisSec: 0
+    readonly property int notificationDedupBurstMs: 5000
+    property var _recentDedupKeys: []
 
     property var _dismissQueue: []
     property int _dismissBatchSize: 8
@@ -153,7 +157,7 @@ Singleton {
             historyAdapter.notifications = historyList;
             historyFileView.writeAdapter();
         } catch (e) {
-            console.warn("NotificationService: save history failed:", e);
+            log.warn("save history failed:", e);
         }
     }
 
@@ -203,7 +207,7 @@ Singleton {
             if ((maxAgeMs > 0 && loaded.length !== (historyAdapter.notifications || []).length) || needsRewrite)
                 saveHistory();
         } catch (e) {
-            console.warn("NotificationService: load history failed:", e);
+            log.warn("load history failed:", e);
             historyLoaded = true;
         }
     }
@@ -287,6 +291,79 @@ Singleton {
 
     function _nowSec() {
         return Date.now() / 1000.0;
+    }
+
+    function _normalizeDedupText(text) {
+        if (!text)
+            return "";
+        let normalized = text.toString();
+        normalized = normalized.replace(/<img\b[^>]*>/gi, "");
+        normalized = normalized.replace(/<[^>]+>/g, "");
+        normalized = normalized.replace(/\s+/g, " ").trim();
+        return normalized.toLowerCase();
+    }
+
+    function _dedupAppId(source) {
+        if (!source)
+            return "";
+        const desktopEntry = (source.desktopEntry || "").toString().trim().toLowerCase();
+        if (desktopEntry)
+            return desktopEntry;
+        return (source.appName || "").toString().trim().toLowerCase();
+    }
+
+    function _notificationDedupKey(source) {
+        if (!source)
+            return "";
+        const app = _dedupAppId(source);
+        const summary = _normalizeDedupText(source.summary);
+        const body = _normalizeDedupText(source.body);
+        const urgency = typeof source.urgency === "number" ? source.urgency : NotificationUrgency.Normal;
+        if (!app && !summary && !body)
+            return "";
+        const sep = "";
+        return app + sep + summary + sep + body + sep + urgency;
+    }
+
+    function _pruneRecentDedupKeys() {
+        const cutoff = Date.now() - notificationDedupBurstMs;
+        _recentDedupKeys = _recentDedupKeys.filter(entry => entry && entry.atMs >= cutoff);
+    }
+
+    function _hasRecentDuplicate(key) {
+        if (!key)
+            return false;
+        _pruneRecentDedupKeys();
+        return _recentDedupKeys.some(entry => entry && entry.key === key);
+    }
+
+    function _recordDedupKey(key) {
+        if (!key)
+            return;
+        _pruneRecentDedupKeys();
+        _recentDedupKeys.push({
+            "key": key,
+            "atMs": Date.now()
+        });
+    }
+
+    function _findActiveDuplicate(notif) {
+        const key = _notificationDedupKey(notif);
+        if (!key)
+            return null;
+
+        for (const w of allWrappers) {
+            if (!w || !w.notification || !w.popup)
+                continue;
+            if (_notificationDedupKey(w.notification) !== key)
+                continue;
+            if (visibleNotifications.indexOf(w) !== -1 || notificationQueue.indexOf(w) !== -1)
+                return w;
+            if (w.timer && w.timer.running)
+                return w;
+        }
+
+        return null;
     }
 
     function _ingressAllowed(urgency) {
@@ -403,7 +480,7 @@ Singleton {
             try {
                 return new RegExp(pattern, "i").test(value);
             } catch (e) {
-                console.warn("NotificationService: invalid notification rule regex:", pattern);
+                log.warn("invalid notification rule regex:", pattern);
                 return false;
             }
         }
@@ -599,6 +676,19 @@ Singleton {
                 return;
             }
 
+            if (SettingsData.notificationDedupeEnabled) {
+                const dedupKey = _notificationDedupKey(notif);
+                const duplicate = _findActiveDuplicate(notif);
+                if (duplicate || _hasRecentDuplicate(dedupKey)) {
+                    if (duplicate && duplicate.timer && duplicate.timer.running)
+                        duplicate.timer.restart();
+                    try {
+                        notif.dismiss();
+                    } catch (e) {}
+                    return;
+                }
+            }
+
             if (!_ingressAllowed(policy.urgency)) {
                 if (policy.urgency !== NotificationUrgency.Critical) {
                     try {
@@ -608,7 +698,11 @@ Singleton {
                 }
             }
 
-            if (SettingsData.soundsEnabled && SettingsData.soundNewNotification) {
+            // Honor the freedesktop "suppress-sound" hint: the sender
+            // plays its own audio for this notification and asks the
+            // server not to double up.
+            const suppressSound = !!(notif.hints && notif.hints["suppress-sound"]);
+            if (SettingsData.soundsEnabled && SettingsData.soundNewNotification && !suppressSound) {
                 if (policy.urgency === NotificationUrgency.Critical) {
                     AudioService.playCriticalNotificationSound();
                 } else {
@@ -634,6 +728,9 @@ Singleton {
             });
 
             if (wrapper) {
+                if (SettingsData.notificationDedupeEnabled)
+                    _recordDedupKey(_notificationDedupKey(notif));
+
                 root.allWrappers.push(wrapper);
                 if (shouldKeepInCenter) {
                     root.notifications.push(wrapper);

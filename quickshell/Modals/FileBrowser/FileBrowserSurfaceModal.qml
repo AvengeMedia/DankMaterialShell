@@ -25,6 +25,7 @@ DankModal {
     closeOnEscapeKey: true
     closeOnBackgroundClick: true
     allowStacking: true
+    useOverlayLayer: true
     keepPopoutsOpen: true
 
     onBackgroundClicked: close()

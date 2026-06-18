@@ -3,6 +3,7 @@ package clipboard
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -33,6 +34,8 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
+
+var errEntryNotFound = errors.New("entry not found")
 
 // These mime types won't be stored in history
 var sensitiveMimeTypes = []string{
@@ -212,9 +215,10 @@ func (m *Manager) setupDataDeviceSync() {
 		}
 
 		var offer any
-		if e.Id != nil {
+		switch {
+		case e.Id != nil:
 			offer = e.Id
-		} else if e.OfferId != 0 {
+		case e.OfferId != 0:
 			m.offerMutex.RLock()
 			offer = m.offerRegistry[e.OfferId]
 			m.offerMutex.RUnlock()
@@ -224,10 +228,6 @@ func (m *Manager) setupDataDeviceSync() {
 		wasOwner := m.isOwner
 		m.ownerLock.Unlock()
 
-		if offer == nil {
-			return
-		}
-
 		if wasOwner {
 			return
 		}
@@ -236,9 +236,11 @@ func (m *Manager) setupDataDeviceSync() {
 		m.currentOffer = offer
 
 		if prevOffer != nil && prevOffer != offer {
-			m.offerMutex.Lock()
-			delete(m.offerMimeTypes, prevOffer)
-			m.offerMutex.Unlock()
+			m.releaseOffer(prevOffer)
+		}
+
+		if offer == nil {
+			return
 		}
 
 		m.offerMutex.RLock()
@@ -290,6 +292,33 @@ func (m *Manager) setupDataDeviceSync() {
 	}
 
 	log.Info("Data device setup complete")
+}
+
+func (m *Manager) releaseOffer(offer any) {
+	if offer == nil {
+		return
+	}
+	typedOffer, ok := offer.(*ext_data_control.ExtDataControlOfferV1)
+	if !ok {
+		return
+	}
+	m.offerMutex.Lock()
+	delete(m.offerMimeTypes, offer)
+	delete(m.offerRegistry, typedOffer.ID())
+	m.offerMutex.Unlock()
+	typedOffer.Destroy()
+}
+
+func (m *Manager) releaseCurrentSource() {
+	if m.currentSource == nil {
+		return
+	}
+	source, ok := m.currentSource.(*ext_data_control.ExtDataControlSourceV1)
+	m.currentSource = nil
+	if !ok {
+		return
+	}
+	source.Destroy()
 }
 
 func (m *Manager) readAndStore(r *os.File, mimeType string) {
@@ -395,7 +424,7 @@ func (m *Manager) deduplicateInTx(b *bolt.Bucket, hash uint64) error {
 		if extractHash(v) != hash {
 			continue
 		}
-		entry, err := decodeEntry(v)
+		entry, err := decodeEntryMeta(v)
 		if err == nil && entry.Pinned {
 			continue
 		}
@@ -413,7 +442,7 @@ func (m *Manager) trimLengthInTx(b *bolt.Bucket) error {
 	c := b.Cursor()
 	var count int
 	for k, v := c.Last(); k != nil; k, v = c.Prev() {
-		entry, err := decodeEntry(v)
+		entry, err := decodeEntryMeta(v)
 		if err == nil && entry.Pinned {
 			continue
 		}
@@ -456,6 +485,14 @@ func encodeEntry(e Entry) ([]byte, error) {
 }
 
 func decodeEntry(data []byte) (Entry, error) {
+	return decodeEntryFields(data, true)
+}
+
+func decodeEntryMeta(data []byte) (Entry, error) {
+	return decodeEntryFields(data, false)
+}
+
+func decodeEntryFields(data []byte, withData bool) (Entry, error) {
 	buf := bytes.NewReader(data)
 	var e Entry
 
@@ -463,8 +500,15 @@ func decodeEntry(data []byte) (Entry, error) {
 
 	var dataLen uint32
 	binary.Read(buf, binary.BigEndian, &dataLen)
-	e.Data = make([]byte, dataLen)
-	buf.Read(e.Data)
+	switch {
+	case withData:
+		e.Data = make([]byte, dataLen)
+		buf.Read(e.Data)
+	default:
+		if _, err := buf.Seek(int64(dataLen), io.SeekCurrent); err != nil {
+			return e, err
+		}
+	}
 
 	var mimeLen uint32
 	binary.Read(buf, binary.BigEndian, &mimeLen)
@@ -531,16 +575,16 @@ func (m *Manager) hasSensitiveMimeType(mimes []string) bool {
 func (m *Manager) selectMimeType(mimes []string) string {
 	preferredTypes := []string{
 		"text/uri-list",
-		"text/plain;charset=utf-8",
-		"text/plain",
-		"UTF8_STRING",
-		"STRING",
-		"TEXT",
 		"image/png",
 		"image/jpeg",
 		"image/gif",
 		"image/bmp",
 		"image/tiff",
+		"text/plain;charset=utf-8",
+		"text/plain",
+		"UTF8_STRING",
+		"STRING",
+		"TEXT",
 	}
 
 	for _, pref := range preferredTypes {
@@ -668,14 +712,9 @@ func sizeStr(size int) string {
 func (m *Manager) updateState() {
 	history := m.GetHistory()
 
-	for i := range history {
-		history[i].Data = nil
-	}
-
 	var current *Entry
 	if len(history) > 0 {
 		c := history[0]
-		c.Data = nil
 		current = &c
 	}
 
@@ -728,7 +767,23 @@ func stateEqual(a, b *State) bool {
 	if len(a.History) != len(b.History) {
 		return false
 	}
+	for i := range a.History {
+		if !entryStateEqual(a.History[i], b.History[i]) {
+			return false
+		}
+	}
 	return true
+}
+
+func entryStateEqual(a, b Entry) bool {
+	return a.ID == b.ID &&
+		a.Hash == b.Hash &&
+		a.Pinned == b.Pinned &&
+		a.IsImage == b.IsImage &&
+		a.MimeType == b.MimeType &&
+		a.Preview == b.Preview &&
+		a.Size == b.Size &&
+		a.Timestamp.Equal(b.Timestamp)
 }
 
 func (m *Manager) GetHistory() []Entry {
@@ -750,7 +805,7 @@ func (m *Manager) GetHistory() []Entry {
 		c := b.Cursor()
 
 		for k, v := c.Last(); k != nil; k, v = c.Prev() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err != nil {
 				continue
 			}
@@ -818,7 +873,7 @@ func (m *Manager) GetEntry(id uint64) (*Entry, error) {
 		return nil, err
 	}
 	if !found {
-		return nil, fmt.Errorf("entry not found")
+		return nil, errEntryNotFound
 	}
 
 	return &entry, nil
@@ -880,7 +935,7 @@ func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
 		Pinned:    false,
 	}
 
-	if err := m.storeEntryWithoutDedup(newEntry); err != nil {
+	if err := m.storeEntry(newEntry); err != nil {
 		return err
 	}
 
@@ -888,36 +943,6 @@ func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
 	m.notifySubscribers()
 
 	return nil
-}
-
-func (m *Manager) storeEntryWithoutDedup(entry Entry) error {
-	if m.db == nil {
-		return fmt.Errorf("database not available")
-	}
-
-	entry.Hash = computeHash(entry.Data)
-
-	return m.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("clipboard"))
-
-		id, err := b.NextSequence()
-		if err != nil {
-			return err
-		}
-
-		entry.ID = id
-
-		encoded, err := encodeEntry(entry)
-		if err != nil {
-			return err
-		}
-
-		if err := b.Put(itob(id), encoded); err != nil {
-			return err
-		}
-
-		return m.trimLengthInTx(b)
-	})
 }
 
 func (m *Manager) ClearHistory() {
@@ -935,7 +960,7 @@ func (m *Manager) ClearHistory() {
 		var toDelete [][]byte
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err != nil || !entry.Pinned {
 				toDelete = append(toDelete, k)
 			}
@@ -958,7 +983,7 @@ func (m *Manager) ClearHistory() {
 		if b != nil {
 			c := b.Cursor()
 			for k, v := c.First(); k != nil; k, v = c.Next() {
-				entry, _ := decodeEntry(v)
+				entry, _ := decodeEntryMeta(v)
 				if entry.Pinned {
 					pinnedCount++
 				}
@@ -1066,6 +1091,7 @@ func (m *Manager) SetClipboard(data []byte, mimeType string) error {
 			m.ownerLock.Unlock()
 		})
 
+		m.releaseCurrentSource()
 		m.currentSource = source
 		m.sourceMutex.Lock()
 		m.sourceMimeTypes = []string{mimeType}
@@ -1145,9 +1171,11 @@ func (m *Manager) Close() {
 	m.subscribers = make(map[string]chan State)
 	m.subMutex.Unlock()
 
-	if m.currentSource != nil {
-		source := m.currentSource.(*ext_data_control.ExtDataControlSourceV1)
-		source.Destroy()
+	m.releaseCurrentSource()
+
+	if m.currentOffer != nil {
+		m.releaseOffer(m.currentOffer)
+		m.currentOffer = nil
 	}
 
 	if m.dataDevice != nil {
@@ -1191,11 +1219,10 @@ func (m *Manager) clearOldEntries(days int) error {
 		var toDelete [][]byte
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err != nil {
 				continue
 			}
-			// Skip pinned entries
 			if entry.Pinned {
 				continue
 			}
@@ -1310,7 +1337,7 @@ func (m *Manager) Search(params SearchParams) SearchResult {
 
 		c := b.Cursor()
 		for k, v := c.Last(); k != nil; k, v = c.Prev() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err != nil {
 				continue
 			}
@@ -1335,7 +1362,6 @@ func (m *Manager) Search(params SearchParams) SearchResult {
 				continue
 			}
 
-			entry.Data = nil
 			all = append(all, entry)
 		}
 		return nil
@@ -1510,7 +1536,7 @@ func (m *Manager) PinEntry(id uint64) error {
 		}
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err != nil || !entry.Pinned {
 				continue
 			}
@@ -1528,7 +1554,6 @@ func (m *Manager) PinEntry(id uint64) error {
 		return nil
 	}
 
-	// Check pinned count
 	cfg := m.getConfig()
 	pinnedCount := 0
 	if err := m.db.View(func(tx *bolt.Tx) error {
@@ -1538,7 +1563,7 @@ func (m *Manager) PinEntry(id uint64) error {
 		}
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err == nil && entry.Pinned {
 				pinnedCount++
 			}
@@ -1598,6 +1623,37 @@ func (m *Manager) UnpinEntry(id uint64) error {
 			return err
 		}
 
+		if entry.Pinned {
+			currentKey := itob(id)
+			var keepKey []byte
+			var deleteKeys [][]byte
+
+			c := b.Cursor()
+			for k, v := c.Last(); k != nil; k, v = c.Prev() {
+				if bytes.Equal(k, currentKey) || extractHash(v) != entry.Hash {
+					continue
+				}
+				duplicate, err := decodeEntryMeta(v)
+				if err == nil && !duplicate.Pinned {
+					key := append([]byte(nil), k...)
+					if keepKey == nil {
+						keepKey = key
+					} else {
+						deleteKeys = append(deleteKeys, key)
+					}
+				}
+			}
+
+			if keepKey != nil {
+				for _, key := range deleteKeys {
+					if err := b.Delete(key); err != nil {
+						return err
+					}
+				}
+				return b.Delete(currentKey)
+			}
+		}
+
 		entry.Pinned = false
 		encoded, err := encodeEntry(entry)
 		if err != nil {
@@ -1629,12 +1685,11 @@ func (m *Manager) GetPinnedEntries() []Entry {
 
 		c := b.Cursor()
 		for k, v := c.Last(); k != nil; k, v = c.Prev() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err != nil {
 				continue
 			}
 			if entry.Pinned {
-				entry.Data = nil
 				pinned = append(pinned, entry)
 			}
 		}
@@ -1660,7 +1715,7 @@ func (m *Manager) GetPinnedCount() int {
 
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			entry, err := decodeEntry(v)
+			entry, err := decodeEntryMeta(v)
 			if err == nil && entry.Pinned {
 				count++
 			}
@@ -1779,6 +1834,7 @@ func (m *Manager) CopyFile(filePath string) error {
 			m.ownerLock.Unlock()
 		})
 
+		m.releaseCurrentSource()
 		m.currentSource = source
 
 		m.ownerLock.Lock()

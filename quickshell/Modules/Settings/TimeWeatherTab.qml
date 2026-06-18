@@ -115,6 +115,34 @@ Item {
                     }
                 }
 
+                SettingsDropdownRow {
+                    tab: "time"
+                    tags: ["calendar", "backend", "daemon", "khal", "dankcalendar", "events"]
+                    settingKey: "calendarBackend"
+                    text: I18n.tr("Calendar Backend")
+                    description: {
+                        const resolved = CalendarService.activeBackend;
+                        switch (resolved) {
+                        case "dankcal":
+                            return I18n.tr("Using DankCalendar%1", "calendar backend status").arg(CalendarService.isDankActive && CalendarService.calendars.length > 0 ? "" : " (connecting…)");
+                        case "khal":
+                            return I18n.tr("Using khal", "calendar backend status");
+                        default:
+                            return I18n.tr("No calendar source available", "calendar backend status");
+                        }
+                    }
+                    readonly property var _backendValues: ["auto", "khal", "dankcal"]
+                    readonly property var _backendLabels: [I18n.tr("Auto", "calendar backend option"), I18n.tr("khal", "calendar backend option"), I18n.tr("DankCalendar", "calendar backend option")]
+                    options: _backendLabels
+                    currentValue: _backendLabels[Math.max(0, _backendValues.indexOf(SettingsData.calendarBackend))]
+                    onValueChanged: value => {
+                        const idx = _backendLabels.indexOf(value);
+                        if (idx < 0)
+                            return;
+                        SettingsData.set("calendarBackend", _backendValues[idx]);
+                    }
+                }
+
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -671,6 +699,7 @@ Item {
                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
                             anchors.right: parent.right
                             anchors.top: parent.top
+                            smoothTransform: isRefreshing
 
                             property bool isRefreshing: false
                             enabled: !isRefreshing
@@ -693,7 +722,7 @@ Item {
                                 onTriggered: refreshButton.isRefreshing = false
                             }
 
-                            NumberAnimation on rotation {
+                            RotationAnimator on rotation {
                                 running: refreshButton.isRefreshing
                                 from: 0
                                 to: 360

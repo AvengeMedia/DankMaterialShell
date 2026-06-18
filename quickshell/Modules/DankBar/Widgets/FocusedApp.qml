@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -14,9 +15,20 @@ BasePill {
 
     property var widgetData: null
     property bool compactMode: widgetData?.focusedWindowCompactMode !== undefined ? widgetData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode
-    property int availableWidth: 400
-    readonly property int maxNormalWidth: 456
-    readonly property int maxCompactWidth: 288
+    readonly property int maxWidth: {
+        const size = widgetData?.focusedWindowSize !== undefined ? widgetData.focusedWindowSize : SettingsData.focusedWindowSize;
+        switch (size) {
+        case 0:
+            return 288;
+        case 2:
+            return 656;
+        case 3:
+            return 856;
+        default:
+            return 456;
+        }
+    }
+    property int availableWidth: maxWidth
     property Toplevel activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
@@ -42,19 +54,26 @@ BasePill {
         const active = ToplevelManager.activeToplevel;
 
         if (!active) {
-            // Only clear if our tracked window is no longer alive
             if (activeWindow) {
-                const alive = ToplevelManager.toplevels?.values;
-                if (alive && !Array.from(alive).some(t => t === activeWindow))
-                    activeWindow = null;
+                if (CompositorService.isNiri) {
+                    if (NiriService.currentOutput === (parentScreen?.name ?? ""))
+                        activeWindow = null;
+                } else {
+                    const alive = ToplevelManager.toplevels?.values;
+                    if (alive && !Array.from(alive).some(t => t === activeWindow))
+                        activeWindow = null;
+                }
             }
             return;
         }
 
         if (!parentScreen || CompositorService.filterCurrentDisplay([active], parentScreen?.name)?.length > 0) {
             activeWindow = active;
+        } else if (activeWindow) {
+            const alive = ToplevelManager.toplevels?.values;
+            if (alive && !Array.from(alive).some(t => t === activeWindow))
+                activeWindow = null;
         }
-        // else: active window is on a different screen so keep the previous value
     }
 
     Component.onCompleted: {
@@ -65,13 +84,24 @@ BasePill {
     Connections {
         target: ToplevelManager
         function onActiveToplevelChanged() {
-            root.updateActiveWindow();
+            if (!CompositorService.isNiri)
+                root.updateActiveWindow();
         }
     }
 
     Connections {
         target: CompositorService
         function onToplevelsChanged() {
+            root.updateActiveWindow();
+        }
+    }
+
+    Connections {
+        target: CompositorService.isNiri ? NiriService : null
+        function onWindowsChanged() {
+            root.updateActiveWindow();
+        }
+        function onCurrentOutputChanged() {
             root.updateActiveWindow();
         }
     }
@@ -107,21 +137,15 @@ BasePill {
     }
     readonly property bool hasWindowsOnCurrentWorkspace: {
         if (CompositorService.isNiri) {
-            let currentWorkspaceId = null;
-            for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-                const ws = NiriService.allWorkspaces[i];
-                if (ws.is_focused) {
-                    currentWorkspaceId = ws.id;
-                    break;
-                }
-            }
-
-            if (!currentWorkspaceId) {
+            if (!activeWindow || !(activeWindow.title || activeWindow.appId))
                 return false;
-            }
-
-            const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId);
-            return workspaceWindows.length > 0 && activeWindow && (activeWindow.title || activeWindow.appId);
+            if (NiriService.currentOutput !== (parentScreen?.name ?? ""))
+                return true;
+            const focusedWin = NiriService.windows.find(w => w.is_focused);
+            if (!focusedWin)
+                return false;
+            const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id));
+            return screenWsIds.has(focusedWin.workspace_id);
         }
 
         if (CompositorService.isHyprland) {
@@ -159,8 +183,7 @@ BasePill {
                     return 0;
                 if (root.isVerticalOrientation)
                     return root.widgetThickness - root.horizontalPadding * 2;
-                const baseWidth = contentRow.implicitWidth;
-                return compactMode ? Math.min(baseWidth, maxCompactWidth - root.horizontalPadding * 2) : Math.min(baseWidth, maxNormalWidth - root.horizontalPadding * 2);
+                return contentRow.implicitWidth;
             }
             implicitHeight: root.widgetThickness - root.horizontalPadding * 2
             clip: false
@@ -197,7 +220,7 @@ BasePill {
                 visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
             }
 
-            Text {
+            StyledText {
                 anchors.centerIn: parent
                 visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && !Paths.isSteamApp(activeWindow.appId)
                 text: {
@@ -210,7 +233,7 @@ BasePill {
                 color: Theme.widgetTextColor
             }
 
-            Row {
+            RowLayout {
                 id: contentRow
                 anchors.centerIn: parent
                 spacing: Theme.spacingS
@@ -219,24 +242,23 @@ BasePill {
                 StyledText {
                     id: appText
                     text: {
-                        if (!activeWindow || !activeWindow.appId)
+                        if (compactMode || !activeWindow || !activeWindow.appId)
                             return "";
                         return Paths.getAppName(activeWindow.appId, activeDesktopEntry);
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
-                    width: Math.min(implicitWidth, compactMode ? 80 : 180)
-                    visible: !compactMode && text.length > 0
+                    Layout.maximumWidth: compactMode ? 80 : 180
+                    visible: text.length > 0
                 }
 
                 StyledText {
-                    text: "•"
+                    id: appSeparator
+                    text: compactMode ? "" : "•"
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.outlineButton
-                    anchors.verticalCenter: parent.verticalCenter
                     visible: !compactMode && appText.text && titleText.text
                 }
 
@@ -264,10 +286,9 @@ BasePill {
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
-                    width: Math.min(implicitWidth, compactMode ? 280 : 250)
+                    Layout.maximumWidth: maxWidth - appText.implicitWidth - appSeparator.implicitWidth
                     visible: text.length > 0
                 }
             }
@@ -283,13 +304,9 @@ BasePill {
             if (root.isVerticalOrientation && activeWindow && activeWindow.appId && root.parentScreen) {
                 tooltipLoader.active = true;
                 if (tooltipLoader.item) {
-                    const globalPos = mapToGlobal(width / 2, height / 2);
+                    const localPos = mapToItem(null, width / 2, height / 2);
                     const currentScreen = root.parentScreen;
-                    const screenX = currentScreen ? currentScreen.x : 0;
-                    const screenY = currentScreen ? currentScreen.y : 0;
-                    const relativeY = globalPos.y - screenY;
-                    // Add minTooltipY offset to account for top bar
-                    const adjustedY = relativeY + root.minTooltipY;
+                    const adjustedY = localPos.y + root.minTooltipY;
                     const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + (barConfig?.spacing ?? 4) + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - (barConfig?.spacing ?? 4) - Theme.spacingXS);
 
                     const appName = Paths.getAppName(activeWindow.appId, activeDesktopEntry);
@@ -297,7 +314,7 @@ BasePill {
                     const tooltipText = appName + (title ? " • " + title : "");
 
                     const isLeft = root.axis?.edge === "left";
-                    tooltipLoader.item.show(tooltipText, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
+                    tooltipLoader.item.show(tooltipText, tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
                 }
             }
         }

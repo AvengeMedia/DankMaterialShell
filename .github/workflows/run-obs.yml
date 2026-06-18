@@ -367,6 +367,16 @@ jobs:
           EOF
           chmod 600 ~/.config/osc/oscrc
 
+      # Cache OBS bundled Go toolchains
+      - name: Cache OBS bundled Go toolchains (dms-git)
+        if: contains(steps.packages.outputs.packages, 'dms-git')
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.cache/dms-obs-go-toolchain
+          key: dms-obs-go-toolchain-${{ runner.os }}-${{ hashFiles('core/go.mod') }}
+          restore-keys: |
+            dms-obs-go-toolchain-${{ runner.os }}-
+
       - name: Upload to OBS
         id: upload
         env:

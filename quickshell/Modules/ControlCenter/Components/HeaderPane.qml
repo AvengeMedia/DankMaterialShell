@@ -21,9 +21,9 @@ Rectangle {
 
     implicitHeight: 70
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-    border.width: 0
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Row {
         anchors.left: parent.left
@@ -60,7 +60,7 @@ Rectangle {
             }
 
             Typography {
-                text: DgopService.uptime || I18n.tr("Unknown")
+                text: DgopService.uptime ? I18n.tr("up", "uptime prefix, e.g. 'up 4h 2m'") + " " + DgopService.uptime.slice(3) : I18n.tr("Unknown")
                 style: Typography.Style.Caption
                 color: Theme.surfaceVariantText
             }

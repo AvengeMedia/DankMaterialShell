@@ -12,6 +12,7 @@ import "settings/SessionStore.js" as Store
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("SessionData")
 
     readonly property int sessionConfigVersion: 3
 
@@ -30,8 +31,35 @@ Singleton {
     property bool isLightMode: false
     property bool doNotDisturb: false
     property real doNotDisturbUntil: 0
+    property string terminalOverride: ""
     property bool isSwitchingMode: false
     property bool suppressOSD: true
+
+    readonly property var terminalOptions: ["ghostty", "kitty", "foot", "alacritty", "wezterm", "konsole", "gnome-terminal", "xterm"]
+    property var installedTerminals: []
+
+    function resolveTerminal() {
+        if (terminalOverride && terminalOverride.length > 0) {
+            return terminalOverride;
+        }
+        const env = Quickshell.env("TERMINAL");
+        if (env && env.length > 0) {
+            return env;
+        }
+        return "";
+    }
+
+    Process {
+        id: terminalProbe
+        running: true
+        command: ["sh", "-c", "for t in ghostty kitty foot alacritty wezterm konsole gnome-terminal xterm; do command -v \"$t\" >/dev/null 2>&1 && echo \"$t\"; done"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const found = text.trim().split("\n").filter(line => line.length > 0);
+                root.installedTerminals = found;
+            }
+        }
+    }
 
     Timer {
         id: dndExpireTimer
@@ -126,6 +154,8 @@ Singleton {
     property var trayItemOrder: []
     property var recentColors: []
     property bool showThirdPartyPlugins: false
+    property bool pluginBrowserInstalledFirst: false
+    property string pluginBrowserSortMode: "default"
     property string launchPrefix: ""
     property string lastBrightnessDevice: ""
     property var brightnessExponentialDevices: ({})
@@ -159,6 +189,7 @@ Singleton {
     property string timeLocale: ""
 
     property string launcherLastMode: "all"
+    property string launcherLastFileSearchType: "all"
     property string launcherLastQuery: ""
     property var launcherQueryHistory: []
     property string appDrawerLastMode: "apps"
@@ -230,7 +261,7 @@ Singleton {
         } catch (e) {
             _parseError = true;
             const msg = e.message;
-            console.error("SessionData: Failed to parse session.json - file will not be overwritten.");
+            log.error("Failed to parse session.json - file will not be overwritten.");
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse session.json"), msg));
         }
     }
@@ -310,7 +341,7 @@ Singleton {
         } catch (e) {
             _parseError = true;
             const msg = e.message;
-            console.error("SessionData: Failed to parse session.json - file will not be overwritten.");
+            log.error("Failed to parse session.json - file will not be overwritten.");
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse session.json"), msg));
         }
     }
@@ -525,7 +556,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -622,7 +653,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -653,7 +684,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -684,7 +715,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -715,7 +746,7 @@ Singleton {
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found");
+            log.warn("Screen not found");
             return;
         }
 
@@ -935,6 +966,20 @@ Singleton {
         saveSettings();
     }
 
+    function setPluginBrowserInstalledFirst(enabled) {
+        pluginBrowserInstalledFirst = enabled;
+        saveSettings();
+    }
+
+    function setPluginBrowserSortMode(mode) {
+        if (mode === "type" || mode === "contributor")
+            mode = "author";
+        if (mode !== "default" && mode !== "name" && mode !== "author" && mode !== "category")
+            mode = "default";
+        pluginBrowserSortMode = mode;
+        saveSettings();
+    }
+
     function setLaunchPrefix(prefix) {
         launchPrefix = prefix;
         saveSettings();
@@ -1150,6 +1195,17 @@ Singleton {
         saveSettings();
     }
 
+    function getLauncherRestoreMode() {
+        if (!SettingsData.rememberLastMode)
+            return "all";
+        return launcherLastMode || "all";
+    }
+
+    function setLauncherLastFileSearchType(type) {
+        launcherLastFileSearchType = type;
+        saveSettings();
+    }
+
     function setLauncherLastQuery(query) {
         launcherLastQuery = query;
         saveSettings();
@@ -1313,13 +1369,27 @@ Singleton {
         }
     }
 
+    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
+
+    property string greeterSessionBaseDir: root._greeterCacheDir
+
+    function setGreeterSessionBaseDir(dir) {
+        const next = dir || root._greeterCacheDir;
+        if (greeterSessionBaseDir === next)
+            return;
+        greeterSessionBaseDir = next;
+        if (isGreeterMode)
+            greeterSessionFile.reload();
+    }
+
+    function resetGreeterSessionBaseDir() {
+        setGreeterSessionBaseDir(root._greeterCacheDir);
+    }
+
     FileView {
         id: greeterSessionFile
 
-        path: {
-            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
-            return greetCfgDir + "/session.json";
-        }
+        path: root.greeterSessionBaseDir ? (root.greeterSessionBaseDir + "/session.json") : ""
         preload: isGreeterMode
         blockLoading: false
         blockWrites: true

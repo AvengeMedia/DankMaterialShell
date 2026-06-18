@@ -3,7 +3,10 @@ package providers
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 )
 
 func TestMangoWCProviderName(t *testing.T) {
@@ -316,5 +319,140 @@ bind=Ctrl,1,view,1,0
 
 	if !foundTerminal {
 		t.Error("Did not find terminal keybind with correct key and description")
+	}
+}
+
+func TestMangoWCSetBindPreservesStockCommentsAndGestures(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatalf("failed to create dms dir: %v", err)
+	}
+	bindsPath := filepath.Join(dmsDir, "binds.conf")
+	stock := strings.ReplaceAll(config.MangoBindsConfig, "{{TERMINAL_COMMAND}}", "ghostty")
+	if err := os.WriteFile(bindsPath, []byte(stock), 0o644); err != nil {
+		t.Fatalf("failed to write stock binds: %v", err)
+	}
+
+	provider := NewMangoWCProvider(tmpDir)
+	if err := provider.SetBind("SUPER+SHIFT+S", "spawn dms screenshot", "Screenshot: Interactive", nil); err != nil {
+		t.Fatalf("SetBind failed: %v", err)
+	}
+
+	contentBytes, err := os.ReadFile(bindsPath)
+	if err != nil {
+		t.Fatalf("failed to read binds: %v", err)
+	}
+	content := string(contentBytes)
+
+	for _, want := range []string{
+		"# === Application Launchers ===",
+		"# === Touchpad Gestures ===",
+		"gesturebind=none,right,3,viewtoleft_have_client",
+		"gesturebind=none,left,3,viewtoright_have_client",
+		"# Screenshot: Interactive\nbind=SUPER+SHIFT,S,spawn,dms screenshot",
+	} {
+		if !strings.Contains(content, want) {
+			t.Fatalf("expected saved binds to contain %q\ncontent:\n%s", want, content)
+		}
+	}
+	if strings.Contains(content, "# === Audio Controls ===\n# === Audio Controls ===") {
+		t.Fatalf("section header should not be duplicated as a bind description\ncontent:\n%s", content)
+	}
+}
+
+func TestMangoWCSetBindRestoresScaffoldForStrippedFile(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatalf("failed to create dms dir: %v", err)
+	}
+	bindsPath := filepath.Join(dmsDir, "binds.conf")
+	stripped := `bind=SUPER,t,spawn,ghostty
+bind=SUPER,Return,spawn,ghostty
+bind=SUPER,space,spawn,dms ipc call spotlight toggle
+bind=SUPER,v,spawn,dms ipc call clipboard toggle
+bind=SUPER,q,killclient
+bind=SUPER,Left,focusdir,left
+bind=SUPER,Right,focusdir,right
+bind=SUPER,Up,focusdir,up
+bind=SUPER,Down,focusdir,down
+bind=SUPER,1,view,1
+bind=SUPER,2,view,2
+bind=SUPER,3,view,3
+`
+	if err := os.WriteFile(bindsPath, []byte(stripped), 0o644); err != nil {
+		t.Fatalf("failed to write stripped binds: %v", err)
+	}
+
+	provider := NewMangoWCProvider(tmpDir)
+	if err := provider.SetBind("SUPER+SHIFT+S", "spawn dms screenshot", "Screenshot: Interactive", nil); err != nil {
+		t.Fatalf("SetBind failed: %v", err)
+	}
+
+	contentBytes, err := os.ReadFile(bindsPath)
+	if err != nil {
+		t.Fatalf("failed to read binds: %v", err)
+	}
+	content := string(contentBytes)
+
+	for _, want := range []string{
+		"# DMS default keybinds (MangoWM)",
+		"# === Touchpad Gestures ===",
+		"gesturebind=none,right,3,viewtoleft_have_client",
+		"bind=SUPER,H,focusdir,left",
+		"bind=SUPER,J,focusdir,down",
+		"bind=SUPER,K,focusdir,up",
+		"bind=SUPER,L,focusdir,right",
+		"# === Custom Keybinds ===",
+		"# Screenshot: Interactive\nbind=SUPER+SHIFT,S,spawn,dms screenshot",
+		"bind=SUPER,t,spawn,ghostty",
+	} {
+		if !strings.Contains(content, want) {
+			t.Fatalf("expected restored binds to contain %q\ncontent:\n%s", want, content)
+		}
+	}
+	if strings.Contains(content, "{{TERMINAL_COMMAND}}") {
+		t.Fatalf("terminal placeholder should have been resolved\ncontent:\n%s", content)
+	}
+}
+
+func TestMangoWCRemoveBindPreservesNonBindLines(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatalf("failed to create dms dir: %v", err)
+	}
+	bindsPath := filepath.Join(dmsDir, "binds.conf")
+	stock := strings.ReplaceAll(config.MangoBindsConfig, "{{TERMINAL_COMMAND}}", "ghostty")
+	if err := os.WriteFile(bindsPath, []byte(stock), 0o644); err != nil {
+		t.Fatalf("failed to write stock binds: %v", err)
+	}
+
+	provider := NewMangoWCProvider(tmpDir)
+	if err := provider.RemoveBind("SUPER+Tab"); err != nil {
+		t.Fatalf("RemoveBind failed: %v", err)
+	}
+
+	contentBytes, err := os.ReadFile(bindsPath)
+	if err != nil {
+		t.Fatalf("failed to read binds: %v", err)
+	}
+	content := string(contentBytes)
+
+	if strings.Contains(content, "bind=SUPER,Tab,focusstack,next") {
+		t.Fatalf("removed bind should be absent\ncontent:\n%s", content)
+	}
+	if strings.Contains(content, "# Focus Next Window") {
+		t.Fatalf("removed bind description should be absent\ncontent:\n%s", content)
+	}
+	for _, want := range []string{
+		"# === Focus Navigation ===",
+		"# === Touchpad Gestures ===",
+		"gesturebind=none,down,4,toggleoverview",
+	} {
+		if !strings.Contains(content, want) {
+			t.Fatalf("expected non-bind line %q to be preserved\ncontent:\n%s", want, content)
+		}
 	}
 }

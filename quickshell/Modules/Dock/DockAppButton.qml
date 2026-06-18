@@ -164,7 +164,7 @@ Item {
         if (!specialName)
             return false;
 
-        Hyprland.dispatch("togglespecialworkspace " + specialName);
+        HyprlandService.toggleSpecial(specialName);
         Qt.callLater(() => waylandToplevel.activate());
         return true;
     }
@@ -505,7 +505,7 @@ Item {
             border.width: 1
             border.color: Theme.primarySelected
 
-            Text {
+            StyledText {
                 anchors.centerIn: parent
                 text: {
                     if (!appData || !appData.appId) {

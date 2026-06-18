@@ -8,9 +8,21 @@ const ACTION_TYPES = [
 ];
 
 const DMS_ACTIONS = [
-    { id: "spawn dms ipc call spotlight toggle", label: "App Launcher: Toggle" },
-    { id: "spawn dms ipc call spotlight open", label: "App Launcher: Open" },
-    { id: "spawn dms ipc call spotlight close", label: "App Launcher: Close" },
+    { id: "spawn dms ipc call spotlight toggle", label: "Default Launcher: Toggle" },
+    { id: "spawn dms ipc call spotlight open", label: "Default Launcher: Open" },
+    { id: "spawn dms ipc call spotlight close", label: "Default Launcher: Close" },
+    { id: "spawn dms ipc call defaultApp browser", label: "Default Web Browser: Open" },
+    { id: "spawn dms ipc call defaultApp fileManager", label: "Default File Manager: Open" },
+    { id: "spawn dms ipc call defaultApp mail", label: "Default Mail: Open" },
+    { id: "spawn dms ipc call defaultApp calendar", label: "Default Calendar: Open" },
+    { id: "spawn dms ipc call defaultApp textEditor", label: "Default Text Editor: Open" },
+    { id: "spawn dms ipc call defaultApp pdfReader", label: "Default PDF Reader: Open" },
+    { id: "spawn dms ipc call defaultApp imageViewer", label: "Default Image Viewer: Open" },
+    { id: "spawn dms ipc call defaultApp videoPlayer", label: "Default Video Player: Open" },
+    { id: "spawn dms ipc call defaultApp musicPlayer", label: "Default Music Player: Open" },
+    { id: "spawn dms ipc call spotlight-bar toggle", label: "Spotlight Bar: Toggle" },
+    { id: "spawn dms ipc call spotlight-bar open", label: "Spotlight Bar: Open" },
+    { id: "spawn dms ipc call spotlight-bar close", label: "Spotlight Bar: Close" },
     { id: "spawn dms ipc call clipboard toggle", label: "Clipboard: Toggle" },
     { id: "spawn dms ipc call clipboard open", label: "Clipboard: Open" },
     { id: "spawn dms ipc call clipboard close", label: "Clipboard: Close" },
@@ -44,6 +56,9 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call dankdash wallpaper", label: "Wallpaper Browser" },
     { id: "spawn dms ipc call file browse wallpaper", label: "File: Browse Wallpaper" },
     { id: "spawn dms ipc call file browse profile", label: "File: Browse Profile" },
+    { id: "spawn dms ipc call color-picker toggle", label: "Color Picker: Toggle" },
+    { id: "spawn dms ipc call color-picker open", label: "Color Picker: Open" },
+    { id: "spawn dms ipc call color-picker close", label: "Color Picker: Close" },
     { id: "spawn dms ipc call keybinds toggle niri", label: "Keybinds Cheatsheet: Toggle", compositor: "niri" },
     { id: "spawn dms ipc call keybinds open niri", label: "Keybinds Cheatsheet: Open", compositor: "niri" },
     { id: "spawn dms ipc call keybinds close", label: "Keybinds Cheatsheet: Close" },
@@ -63,7 +78,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call mpris increment 5", label: "Player Volume Up (5%)" },
     { id: "spawn dms ipc call mpris decrement 5", label: "Player Volume Down (5%)" },
     { id: "spawn dms ipc call audio mute", label: "Volume Mute Toggle" },
-    { id: "spawn dms ipc call audio micmute", label: "Microphone Mute Toggle" },
+    { id: "spawn dms ipc call mic mute", label: "Microphone Mute Toggle" },
     { id: "spawn dms ipc call audio cycleoutput", label: "Audio Output: Cycle" },
     { id: "spawn dms ipc call brightness increment 5 \"\"", label: "Brightness Up" },
     { id: "spawn dms ipc call brightness increment 1 \"\"", label: "Brightness Up (1%)" },
@@ -83,6 +98,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call bar toggle index 0", label: "Bar: Toggle (Primary)" },
     { id: "spawn dms ipc call bar reveal index 0", label: "Bar: Reveal (Primary)" },
     { id: "spawn dms ipc call bar hide index 0", label: "Bar: Hide (Primary)" },
+    { id: "spawn dms ipc call bar toggleReveal index 0", label: "Bar: Toggle Autohide Reveal (Primary)" },
     { id: "spawn dms ipc call bar toggleAutoHide index 0", label: "Bar: Toggle Auto-Hide (Primary)" },
     { id: "spawn dms ipc call bar autoHide index 0", label: "Bar: Enable Auto-Hide (Primary)" },
     { id: "spawn dms ipc call bar manualHide index 0", label: "Bar: Disable Auto-Hide (Primary)" },
@@ -161,10 +177,16 @@ const NIRI_ACTIONS = {
         { id: "focus-monitor-right", label: "Focus Monitor Right" },
         { id: "focus-monitor-down", label: "Focus Monitor Down" },
         { id: "focus-monitor-up", label: "Focus Monitor Up" },
-        { id: "move-column-to-monitor-left", label: "Move to Monitor Left" },
-        { id: "move-column-to-monitor-right", label: "Move to Monitor Right" },
-        { id: "move-column-to-monitor-down", label: "Move to Monitor Down" },
-        { id: "move-column-to-monitor-up", label: "Move to Monitor Up" }
+        { id: "move-column-to-monitor-left", label: "Move Column to Monitor Left" },
+        { id: "move-column-to-monitor-right", label: "Move Column to Monitor Right" },
+        { id: "move-column-to-monitor-down", label: "Move Column to Monitor Down" },
+        { id: "move-column-to-monitor-up", label: "Move Column to Monitor Up" },
+        { id: "move-workspace-to-monitor-left", label: "Move Workspace to Monitor Left" },
+        { id: "move-workspace-to-monitor-right", label: "Move Workspace to Monitor Right" },
+        { id: "move-workspace-to-monitor-down", label: "Move Workspace to Monitor Down" },
+        { id: "move-workspace-to-monitor-up", label: "Move Workspace to Monitor Up" },
+        { id: "move-workspace-to-monitor-next", label: "Move Workspace to Next Monitor" },
+        { id: "move-workspace-to-monitor-previous", label: "Move Workspace to Previous Monitor" }
     ],
     "Screenshot": [
         { id: "screenshot", label: "Screenshot (Interactive)" },
@@ -760,6 +782,26 @@ const DMS_ACTION_ARGS = {
     }
 };
 
+const DMS_AMOUNT_LABELS = {
+    "audio increment": "Volume Up",
+    "audio decrement": "Volume Down",
+    "mpris increment": "Player Volume Up",
+    "mpris decrement": "Player Volume Down",
+    "brightness increment": "Brightness Up",
+    "brightness decrement": "Brightness Down"
+};
+
+function getDmsAmountLabel(action) {
+    var parsed = parseDmsActionArgs(action);
+    var label = DMS_AMOUNT_LABELS[parsed.base];
+    if (!label)
+        return null;
+    var amount = parsed.args?.amount;
+    if (amount === undefined || amount === null || amount === "")
+        return label;
+    return label + " (" + amount + "%)";
+}
+
 function getActionTypes() {
     return ACTION_TYPES;
 }
@@ -833,6 +875,10 @@ function findCompositorAction(compositor, actionId) {
 function getActionLabel(action, compositor) {
     if (!action)
         return "";
+
+    var amountLabel = getDmsAmountLabel(action);
+    if (amountLabel)
+        return amountLabel;
 
     var dmsAct = findDmsAction(action);
     if (dmsAct)

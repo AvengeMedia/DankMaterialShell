@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/blur"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
@@ -90,6 +91,7 @@ var (
 	wayfireVersionRegex    = regexp.MustCompile(`wayfire (\d+\.\d+)`)
 	labwcVersionRegex      = regexp.MustCompile(`labwc (\d+\.\d+\.\d+)`)
 	mangowcVersionRegex    = regexp.MustCompile(`mango (\d+\.\d+\.\d+)`)
+	miracleVersionRegex    = regexp.MustCompile(`miracle-wm v?(\d+\.\d+\.\d+)`)
 )
 
 var doctorCmd = &cobra.Command{
@@ -123,6 +125,7 @@ const (
 	catConfigFiles
 	catServices
 	catEnvironment
+	catFonts
 )
 
 func (c category) String() string {
@@ -145,6 +148,8 @@ func (c category) String() string {
 		return "Services"
 	case catEnvironment:
 		return "Environment"
+	case catFonts:
+		return "Fonts"
 	default:
 		return "Unknown"
 	}
@@ -211,6 +216,7 @@ func runDoctor(cmd *cobra.Command, args []string) {
 		checkConfigurationFiles(),
 		checkSystemdServices(),
 		checkEnvironmentVars(),
+		checkFonts(),
 	)
 
 	switch {
@@ -468,6 +474,7 @@ func checkWindowManagers() []checkResult {
 		{"Wayfire", "wayfire", "--version", wayfireVersionRegex, []string{"wayfire"}},
 		{"labwc", "labwc", "--version", labwcVersionRegex, []string{"labwc"}},
 		{"mangowc", "mango", "-v", mangowcVersionRegex, []string{"mango"}},
+		{"Miracle WM", "miracle-wm", "--version", miracleVersionRegex, []string{"miracle-wm"}},
 	}
 
 	var results []checkResult
@@ -500,7 +507,7 @@ func checkWindowManagers() []checkResult {
 		results = append(results, checkResult{
 			catCompositor, "Compositor", statusError,
 			"No supported Wayland compositor found",
-			"Install Hyprland, niri, Sway, River, or Wayfire",
+			"Install Hyprland, niri, Sway, River, Wayfire, or miracle-wm",
 			doctorDocsURL + "#compositor-checks",
 		})
 	}
@@ -509,7 +516,22 @@ func checkWindowManagers() []checkResult {
 		results = append(results, checkResult{catCompositor, "Active", statusInfo, wm, "", doctorDocsURL + "#compositor"})
 	}
 
+	results = append(results, checkCompositorBlurSupport())
+
 	return results
+}
+
+func checkCompositorBlurSupport() checkResult {
+	supported, err := blur.ProbeSupport()
+	if err != nil {
+		return checkResult{catCompositor, "Background Blur", statusInfo, "Unable to verify", err.Error(), doctorDocsURL + "#compositor-checks"}
+	}
+
+	if supported {
+		return checkResult{catCompositor, "Background Blur", statusOK, "Supported", "Compositor supports ext-background-effect-v1", doctorDocsURL + "#compositor-checks"}
+	}
+
+	return checkResult{catCompositor, "Background Blur", statusWarn, "Unsupported", "Compositor does not support ext-background-effect-v1", doctorDocsURL + "#compositor-checks"}
 }
 
 func getVersionFromCommand(cmd, arg string, regex *regexp.Regexp) string {
@@ -535,6 +557,8 @@ func detectRunningWM() string {
 		return "Hyprland"
 	case os.Getenv("NIRI_SOCKET") != "":
 		return "niri"
+	case os.Getenv("MIRACLESOCK") != "":
+		return "Miracle WM"
 	case os.Getenv("XDG_CURRENT_DESKTOP") != "":
 		return os.Getenv("XDG_CURRENT_DESKTOP")
 	}
@@ -553,6 +577,7 @@ func checkQuickshellFeatures() ([]checkResult, bool) {
 	qmlContent := `
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 
 ShellRoot {
 	id: root
@@ -561,6 +586,7 @@ ShellRoot {
 	property bool idleMonitorAvailable: false
 	property bool idleInhibitorAvailable: false
 	property bool shortcutInhibitorAvailable: false
+	property bool backgroundBlurAvailable: false
 
 	Timer {
 		interval: 50
@@ -578,16 +604,18 @@ ShellRoot {
 
 			try {
 				var testItem = Qt.createQmlObject(
-					'import Quickshell.Wayland; import QtQuick; QtObject { ' +
+					'import Quickshell; import Quickshell.Wayland; import QtQuick; QtObject { ' +
 					'readonly property bool hasIdleMonitor: typeof IdleMonitor !== "undefined"; ' +
 					'readonly property bool hasIdleInhibitor: typeof IdleInhibitor !== "undefined"; ' +
-					'readonly property bool hasShortcutInhibitor: typeof ShortcutInhibitor !== "undefined" ' +
+					'readonly property bool hasShortcutInhibitor: typeof ShortcutInhibitor !== "undefined"; ' +
+					'readonly property bool hasBackgroundBlur: typeof BackgroundEffect !== "undefined" ' +
 					'}',
 					root
 				)
 				root.idleMonitorAvailable = testItem.hasIdleMonitor
 				root.idleInhibitorAvailable = testItem.hasIdleInhibitor
 				root.shortcutInhibitorAvailable = testItem.hasShortcutInhibitor
+				root.backgroundBlurAvailable = testItem.hasBackgroundBlur
 				testItem.destroy()
 			} catch (e) {}
 
@@ -595,6 +623,8 @@ ShellRoot {
 			console.warn(root.idleMonitorAvailable ? "FEATURE:IdleMonitor:OK" : "FEATURE:IdleMonitor:UNAVAILABLE")
 			console.warn(root.idleInhibitorAvailable ? "FEATURE:IdleInhibitor:OK" : "FEATURE:IdleInhibitor:UNAVAILABLE")
 			console.warn(root.shortcutInhibitorAvailable ? "FEATURE:ShortcutInhibitor:OK" : "FEATURE:ShortcutInhibitor:UNAVAILABLE")
+
+			console.warn(root.backgroundBlurAvailable ? "FEATURE:BackgroundBlur:OK" : "FEATURE:BackgroundBlur:UNAVAILABLE")
 
 			Quickshell.execDetached(["kill", "-TERM", String(Quickshell.processId)])
 		}
@@ -616,6 +646,7 @@ ShellRoot {
 		{"IdleMonitor", "Idle detection"},
 		{"IdleInhibitor", "Prevent idle/sleep"},
 		{"ShortcutInhibitor", "Allow shortcut management (niri)"},
+		{"BackgroundBlur", "Background blur API support in Quickshell"},
 	}
 
 	var results []checkResult
@@ -920,9 +951,12 @@ func checkSystemdServices() []checkResult {
 			message = fmt.Sprintf("%s, %s", dmsState.enabled, dmsState.active)
 		}
 		switch {
+		case dmsState.active == "failed":
+			status = statusError
+		case dmsState.active == "active":
 		case dmsState.enabled == "disabled":
 			status, message = statusWarn, "Disabled"
-		case dmsState.active == "failed" || dmsState.active == "inactive":
+		case dmsState.active == "inactive":
 			status = statusError
 		}
 		results = append(results, checkResult{catServices, "dms.service", status, message, "", doctorDocsURL + "#services"})
@@ -1104,4 +1138,101 @@ func formatResultsPlain(results []checkResult) string {
 		ds.ErrorCount(), ds.WarningCount(), ds.OKCount())
 
 	return sb.String()
+}
+
+func checkFonts() []checkResult {
+	var results []checkResult
+	url := doctorDocsURL + "#fonts"
+
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return nil
+	}
+	settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
+
+	fontFamily := "Inter Variable"
+	monoFontFamily := "Fira Code"
+
+	if data, err := os.ReadFile(settingsPath); err == nil {
+		var settings struct {
+			FontFamily     string `json:"fontFamily"`
+			MonoFontFamily string `json:"monoFontFamily"`
+		}
+		if err := json.Unmarshal(data, &settings); err == nil {
+			if settings.FontFamily != "" {
+				fontFamily = settings.FontFamily
+			}
+			if settings.MonoFontFamily != "" {
+				monoFontFamily = settings.MonoFontFamily
+			}
+		}
+	}
+
+	if !utils.CommandExists("fc-list") {
+		results = append(results, checkResult{catFonts, "Fontconfig Tools", statusWarn, "fc-list not installed", "Cannot verify if fonts are cached.", url})
+		return results
+	}
+
+	// Retrieve font list
+	output, err := exec.Command("fc-list", ":", "family").Output()
+	if err != nil {
+		results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Failed to query font list", "Fontconfig cache query failed. Try running 'fc-cache -fv'.", url})
+		return results
+	}
+
+	outStr := string(output)
+	if len(strings.TrimSpace(outStr)) == 0 {
+		results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Cache is empty", "No fonts found in fontconfig cache. Try running 'fc-cache -fv'.", url})
+		return results
+	}
+
+	lowerFonts := strings.ToLower(outStr)
+
+	// Helper to check if a font exists
+	hasFont := func(name string) bool {
+		target := strings.ToLower(strings.TrimSpace(name))
+		if target == "" {
+			return false
+		}
+		for _, line := range strings.Split(lowerFonts, "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			// Each line can have comma-separated families
+			families := strings.Split(line, ",")
+			for _, fam := range families {
+				if strings.TrimSpace(fam) == target {
+					return true
+				}
+			}
+		}
+		return false
+	}
+
+	// Normal Font Check
+	if hasFont(fontFamily) {
+		results = append(results, checkResult{catFonts, "Normal Font", statusOK, fontFamily, "Available", url})
+	} else {
+		results = append(results, checkResult{
+			catFonts, "Normal Font", statusWarn,
+			fmt.Sprintf("'%s' not found", fontFamily),
+			"Font is not registered. Try running 'fc-cache -fv' or install the font.",
+			url,
+		})
+	}
+
+	// Monospace Font Check
+	if hasFont(monoFontFamily) {
+		results = append(results, checkResult{catFonts, "Monospace Font", statusOK, monoFontFamily, "Available", url})
+	} else {
+		results = append(results, checkResult{
+			catFonts, "Monospace Font", statusWarn,
+			fmt.Sprintf("'%s' not found", monoFontFamily),
+			"Font is not registered. Try running 'fc-cache -fv' or install the font.",
+			url,
+		})
+	}
+
+	return results
 }

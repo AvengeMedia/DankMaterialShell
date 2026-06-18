@@ -6,30 +6,17 @@ import Quickshell
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("MultimediaService")
 
-    property bool available: false
+    readonly property bool available: probeLoader.status === Loader.Ready
 
-    function detectAvailability() {
-        try {
-            const testObj = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                Item {}
-            `, root, "MultimediaService.TestComponent");
-            if (testObj) {
-                testObj.destroy();
-            }
-            available = true;
-            return true;
-        } catch (e) {
-            available = false;
-            return false;
-        }
-    }
-
-    Component.onCompleted: {
-        if (!detectAvailability()) {
-            console.warn("MultimediaService: QtMultimedia not available");
+    Loader {
+        id: probeLoader
+        source: "MultimediaProbe.qml"
+        active: true
+        onStatusChanged: {
+            if (status === Loader.Error)
+                log.warn("QtMultimedia not available");
         }
     }
 }

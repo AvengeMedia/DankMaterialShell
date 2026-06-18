@@ -15,6 +15,10 @@ const (
 
 var MangoWCModSeparators = []rune{'+', ' '}
 
+func isMangoWCSectionComment(comment string) bool {
+	return strings.HasPrefix(strings.TrimSpace(comment), "===")
+}
+
 type MangoWCKeyBinding struct {
 	Mods    []string `json:"mods"`
 	Key     string   `json:"key"`
@@ -216,101 +220,40 @@ func mangowcAutogenerateComment(command, params string) string {
 	}
 }
 
-func (p *MangoWCParser) getKeybindAtLine(lineNumber int) *MangoWCKeyBinding {
+func (p *MangoWCParser) getKeybindAtLine(lineNumber int, precedingComment string) *MangoWCKeyBinding {
 	if lineNumber >= len(p.contentLines) {
 		return nil
 	}
-
-	line := p.contentLines[lineNumber]
-
-	bindMatch := regexp.MustCompile(`^(bind[lsr]*)\s*=\s*(.+)$`)
-	matches := bindMatch.FindStringSubmatch(line)
-	if len(matches) < 3 {
-		return nil
-	}
-
-	bindType := matches[1]
-	content := matches[2]
-
-	parts := strings.SplitN(content, "#", 2)
-	keys := parts[0]
-
-	var comment string
-	if len(parts) > 1 {
-		comment = strings.TrimSpace(parts[1])
-	}
-
-	if strings.HasPrefix(comment, MangoWCHideComment) {
-		return nil
-	}
-
-	keyFields := strings.SplitN(keys, ",", 4)
-	if len(keyFields) < 3 {
-		return nil
-	}
-
-	mods := strings.TrimSpace(keyFields[0])
-	key := strings.TrimSpace(keyFields[1])
-	command := strings.TrimSpace(keyFields[2])
-
-	var params string
-	if len(keyFields) > 3 {
-		params = strings.TrimSpace(keyFields[3])
-	}
-
-	if comment == "" {
-		comment = mangowcAutogenerateComment(command, params)
-	}
-
-	var modList []string
-	if mods != "" && !strings.EqualFold(mods, "none") {
-		modstring := mods + string(MangoWCModSeparators[0])
-		p := 0
-		for index, char := range modstring {
-			isModSep := false
-			for _, sep := range MangoWCModSeparators {
-				if char == sep {
-					isModSep = true
-					break
-				}
-			}
-			if isModSep {
-				if index-p > 1 {
-					modList = append(modList, modstring[p:index])
-				}
-				p = index + 1
-			}
-		}
-	}
-
-	_ = bindType
-
-	return &MangoWCKeyBinding{
-		Mods:    modList,
-		Key:     key,
-		Command: command,
-		Params:  params,
-		Comment: comment,
-	}
+	return p.getKeybindAtLineContent(p.contentLines[lineNumber], precedingComment)
 }
 
 func (p *MangoWCParser) ParseKeys() []MangoWCKeyBinding {
 	var keybinds []MangoWCKeyBinding
+	var pendingComment string
 
 	for lineNumber := 0; lineNumber < len(p.contentLines); lineNumber++ {
-		line := p.contentLines[lineNumber]
-		if line == "" || strings.HasPrefix(strings.TrimSpace(line), "#") {
+		trimmed := strings.TrimSpace(p.contentLines[lineNumber])
+		if trimmed == "" {
+			pendingComment = ""
+			continue
+		}
+		if strings.HasPrefix(trimmed, "#") {
+			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+			if isMangoWCSectionComment(pendingComment) {
+				pendingComment = ""
+			}
+			continue
+		}
+		if !strings.HasPrefix(trimmed, "bind") {
+			pendingComment = ""
 			continue
 		}
 
-		if !strings.HasPrefix(strings.TrimSpace(line), "bind") {
-			continue
-		}
-
-		keybind := p.getKeybindAtLine(lineNumber)
+		keybind := p.getKeybindAtLine(lineNumber, pendingComment)
 		if keybind != nil {
 			keybinds = append(keybinds, *keybind)
 		}
+		pendingComment = ""
 	}
 
 	return keybinds
@@ -459,21 +402,38 @@ func (p *MangoWCParser) parseFileWithSource(filePath string) ([]MangoWCKeyBindin
 	p.currentSource = absPath
 
 	var keybinds []MangoWCKeyBinding
+	var pendingComment string
 	lines := strings.Split(string(data), "\n")
 
-	for lineNum, line := range lines {
+	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
+
+		if trimmed == "" {
+			pendingComment = ""
+			continue
+		}
 
 		if strings.HasPrefix(trimmed, "source") {
 			p.handleSource(trimmed, filepath.Dir(absPath), &keybinds)
+			pendingComment = ""
+			continue
+		}
+
+		if strings.HasPrefix(trimmed, "#") {
+			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+			if isMangoWCSectionComment(pendingComment) {
+				pendingComment = ""
+			}
 			continue
 		}
 
 		if !strings.HasPrefix(trimmed, "bind") {
+			pendingComment = ""
 			continue
 		}
 
-		kb := p.getKeybindAtLineContent(line, lineNum)
+		kb := p.getKeybindAtLineContent(line, pendingComment)
+		pendingComment = ""
 		if kb == nil {
 			continue
 		}
@@ -529,8 +489,11 @@ func (p *MangoWCParser) parseDMSBindsDirectly(dmsBindsPath string) []MangoWCKeyB
 	return keybinds
 }
 
-func (p *MangoWCParser) getKeybindAtLineContent(line string, _ int) *MangoWCKeyBinding {
-	bindMatch := regexp.MustCompile(`^(bind[lsr]*)\s*=\s*(.+)$`)
+// getKeybindAtLineContent parses one `bind=` line. precedingComment (a `# ...`
+// line directly above) is the description: mango feeds inline comments to spawn
+// as argv, so DMS keeps descriptions on the line above; inline `#` is a fallback.
+func (p *MangoWCParser) getKeybindAtLineContent(line string, precedingComment string) *MangoWCKeyBinding {
+	bindMatch := regexp.MustCompile(`^(bind[lsrp]*)\s*=\s*(.+)$`)
 	matches := bindMatch.FindStringSubmatch(line)
 	if len(matches) < 3 {
 		return nil
@@ -543,6 +506,12 @@ func (p *MangoWCParser) getKeybindAtLineContent(line string, _ int) *MangoWCKeyB
 	var comment string
 	if len(parts) > 1 {
 		comment = strings.TrimSpace(parts[1])
+	}
+	if comment == "" {
+		comment = strings.TrimSpace(precedingComment)
+		if isMangoWCSectionComment(comment) {
+			comment = ""
+		}
 	}
 
 	if strings.HasPrefix(comment, MangoWCHideComment) {

@@ -26,4 +26,4 @@ jobs:
           go-version-file: core/go.mod
 
       - name: run pre-commit hooks
-        uses: j178/prek-action@v1
+        uses: j178/prek-action@v2

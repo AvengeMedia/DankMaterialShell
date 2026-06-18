@@ -17,10 +17,22 @@ FocusScope {
     property alias controller: controller
     property alias resultsList: resultsList
     property alias actionPanel: actionPanel
+    readonly property alias activeContextMenu: contextMenu
 
     property bool editMode: false
     property var editingApp: null
     property string editAppId: ""
+    readonly property bool _blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
+    readonly property real _launcherFieldAlpha: {
+        if (Theme.transparentBlurLayers)
+            return 0.28;
+        if (Theme.blurForegroundLayers)
+            return Math.max(Theme.popupTransparency, 0.62);
+        return Theme.popupTransparency;
+    }
+    readonly property color _launcherSearchFieldColor: Theme.withAlpha(Theme.surfaceContainerHigh, _launcherFieldAlpha)
+    readonly property color _launcherSearchBorderColor: Theme.withAlpha(Theme.outline, _blurActive ? 0.16 : Theme.layerOutlineOpacity)
+    readonly property color _launcherSearchFocusedBorderColor: Theme.withAlpha(Theme.primary, _blurActive ? 0.72 : 1.0)
 
     function resetScroll() {
         resultsList.resetScroll();
@@ -28,6 +40,12 @@ FocusScope {
 
     function focusSearchField() {
         searchField.forceActiveFocus();
+    }
+
+    function closeTransientUi() {
+        contextMenu.hide();
+        actionPanel.hide();
+        root.enabled = true;
     }
 
     function openEditMode(app) {
@@ -41,7 +59,6 @@ FocusScope {
         editCommentField.text = existing?.comment || "";
         editEnvVarsField.text = existing?.envVars || "";
         editExtraFlagsField.text = existing?.extraFlags || "";
-        editDgpuToggle.checked = existing?.launchOnDgpu || false;
         editMode = true;
         Qt.callLater(() => editNameField.forceActiveFocus());
     }
@@ -65,8 +82,6 @@ FocusScope {
             override.envVars = editEnvVarsField.text.trim();
         if (editExtraFlagsField.text.trim())
             override.extraFlags = editExtraFlagsField.text.trim();
-        if (editDgpuToggle.checked)
-            override.launchOnDgpu = true;
         SessionData.setAppOverride(editAppId, override);
         closeEditMode();
     }
@@ -89,7 +104,7 @@ FocusScope {
 
     Controller {
         id: controller
-        active: root.parentModal?.spotlightOpen ?? true
+        active: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
         viewModeContext: root.viewModeContext
 
         onItemExecuted: {
@@ -114,6 +129,21 @@ FocusScope {
         }
     }
 
+    Connections {
+        target: root.parentModal
+        ignoreUnknownSignals: true
+
+        function onSpotlightOpenChanged() {
+            if (!root.parentModal?.spotlightOpen)
+                root.closeTransientUi();
+        }
+
+        function onContentVisibleChanged() {
+            if (!root.parentModal?.contentVisible)
+                root.closeTransientUi();
+        }
+    }
+
     Keys.onPressed: event => {
         if (editMode) {
             if (event.key === Qt.Key_Escape) {
@@ -124,6 +154,7 @@ FocusScope {
         }
 
         var hasCtrl = event.modifiers & Qt.ControlModifier;
+        var hasAlt = event.modifiers & Qt.AltModifier;
         event.accepted = true;
 
         switch (event.key) {
@@ -149,18 +180,10 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Down:
-            if (hasCtrl) {
-                controller.navigateHistory("down");
-            } else {
-                controller.selectNext();
-            }
+            controller.selectNext();
             return;
         case Qt.Key_Up:
-            if (hasCtrl) {
-                controller.navigateHistory("up");
-            } else {
-                controller.selectPrevious();
-            }
+            controller.selectPrevious();
             return;
         case Qt.Key_PageDown:
             controller.selectPageDown(8);
@@ -169,10 +192,6 @@ FocusScope {
             controller.selectPageUp(8);
             return;
         case Qt.Key_Right:
-            if (hasCtrl) {
-                controller.cycleMode();
-                return;
-            }
             if (controller.getCurrentSectionViewMode() !== "list") {
                 controller.selectRight();
                 return;
@@ -180,21 +199,8 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Left:
-            if (hasCtrl) {
-                const reverse = true;
-                controller.cycleMode(reverse);
-                return;
-            }
             if (controller.getCurrentSectionViewMode() !== "list") {
                 controller.selectLeft();
-                return;
-            }
-            event.accepted = false;
-            return;
-        case Qt.Key_H:
-            if (hasCtrl) {
-                const reverse = true;
-                controller.cycleMode(reverse);
                 return;
             }
             event.accepted = false;
@@ -209,13 +215,6 @@ FocusScope {
         case Qt.Key_K:
             if (hasCtrl) {
                 controller.selectPrevious();
-                return;
-            }
-            event.accepted = false;
-            return;
-        case Qt.Key_L:
-            if (hasCtrl) {
-                controller.cycleMode();
                 return;
             }
             event.accepted = false;
@@ -235,19 +234,13 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Tab:
-            if (hasCtrl && actionPanel.hasActions) {
+            if (actionPanel.hasActions) {
                 actionPanel.expanded ? actionPanel.cycleAction() : actionPanel.show();
-                return;
             }
-            controller.selectNext();
             return;
         case Qt.Key_Backtab:
-            if (hasCtrl && actionPanel.expanded) {
-                const reverse = true;
-                actionPanel.expanded ? actionPanel.cycleAction(reverse) : actionPanel.show();
-                return;
-            }
-            controller.selectPrevious();
+            if (actionPanel.expanded)
+                actionPanel.hide();
             return;
         case Qt.Key_Return:
         case Qt.Key_Enter:
@@ -270,36 +263,29 @@ FocusScope {
             }
             return;
         case Qt.Key_1:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("all");
                 return;
             }
             event.accepted = false;
             return;
         case Qt.Key_2:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("apps");
                 return;
             }
             event.accepted = false;
             return;
         case Qt.Key_3:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("files");
                 return;
             }
             event.accepted = false;
             return;
         case Qt.Key_4:
-            if (hasCtrl) {
+            if (hasCtrl || hasAlt) {
                 controller.setMode("plugins");
-                return;
-            }
-            event.accepted = false;
-            return;
-        case Qt.Key_Slash:
-            if (event.modifiers === Qt.NoModifier && searchField.text.length === 0) {
-                controller.setMode("files", true);
                 return;
             }
             event.accepted = false;
@@ -311,24 +297,29 @@ FocusScope {
 
     Item {
         anchors.fill: parent
-        visible: !editMode && !(root.parentModal?.isClosing ?? false)
+        visible: !editMode
 
         Item {
             id: footerBar
+            readonly property bool _connectedBottomEmerge: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom")
+            readonly property bool _connectedArcAtFooter: _connectedBottomEmerge && !(root.parentModal?.launcherArcExtenderActive ?? false)
+            readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
+
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.leftMargin: root.parentModal?.borderWidth ?? 1
             anchors.rightMargin: root.parentModal?.borderWidth ?? 1
-            anchors.bottomMargin: root.parentModal?.borderWidth ?? 1
-            readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
-            height: showFooter ? 36 : 0
+            anchors.bottomMargin: _connectedBottomEmerge ? 0 : (root.parentModal?.borderWidth ?? 1)
+            height: showFooter ? (_connectedArcAtFooter ? 76 : 36) : 0
             visible: showFooter
             clip: true
 
             Rectangle {
                 anchors.fill: parent
                 anchors.topMargin: -Theme.cornerRadius
+                // In connected mode the launcher provides the surface so update the toolbar for arcs
+                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !root._blurActive
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 radius: Theme.cornerRadius
             }
@@ -336,7 +327,7 @@ FocusScope {
             Row {
                 id: modeButtonsRow
                 anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingXS
+                anchors.leftMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 layoutDirection: I18n.isRtl ? Qt.RightToLeft : Qt.LeftToRight
                 spacing: 2
@@ -372,7 +363,7 @@ FocusScope {
                         width: buttonContent.width + Theme.spacingM * 2
                         height: 28
                         radius: Theme.cornerRadius
-                        color: controller.searchMode === modelData.id || modeArea.containsMouse ? Theme.primaryContainer : "transparent"
+                        color: controller.searchMode === modelData.id ? Theme.buttonBg : modeArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                         Row {
                             id: buttonContent
@@ -383,14 +374,14 @@ FocusScope {
                                 anchors.verticalCenter: parent.verticalCenter
                                 name: modelData.icon
                                 size: 14
-                                color: controller.searchMode === modelData.id ? Theme.primary : Theme.surfaceVariantText
+                                color: controller.searchMode === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
                             }
 
                             StyledText {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: modelData.label
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: controller.searchMode === modelData.id ? Theme.primary : Theme.surfaceText
+                                color: controller.searchMode === modelData.id ? Theme.buttonText : Theme.surfaceText
                             }
                         }
 
@@ -408,7 +399,7 @@ FocusScope {
             Row {
                 id: hintsRow
                 anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 layoutDirection: I18n.isRtl ? Qt.RightToLeft : Qt.LeftToRight
                 spacing: Theme.spacingM
@@ -429,7 +420,7 @@ FocusScope {
 
                 StyledText {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Ctrl-Tab " + I18n.tr("actions")
+                    text: "Tab " + I18n.tr("actions")
                     font.pixelSize: Theme.fontSizeSmall - 1
                     color: Theme.surfaceVariantText
                     visible: actionPanel.hasActions
@@ -493,9 +484,11 @@ FocusScope {
                     id: searchField
                     width: parent.width - (pluginBadge.visible ? pluginBadge.width + Theme.spacingS : 0)
                     cornerRadius: Theme.cornerRadius
-                    backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                    normalBorderColor: Theme.outlineMedium
-                    focusedBorderColor: Theme.primary
+                    backgroundColor: root._launcherSearchFieldColor
+                    normalBorderColor: root._launcherSearchBorderColor
+                    focusedBorderColor: root._launcherSearchFocusedBorderColor
+                    borderWidth: 1
+                    focusedBorderWidth: 2
                     leftIconName: controller.activePluginId ? "extension" : controller.searchQuery.startsWith("/") ? "folder" : "search"
                     leftIconSize: Theme.iconSize
                     leftIconColor: Theme.surfaceVariantText
@@ -503,7 +496,7 @@ FocusScope {
                     showClearButton: true
                     textColor: Theme.surfaceText
                     font.pixelSize: Theme.fontSizeLarge
-                    enabled: root.parentModal ? root.parentModal.spotlightOpen : true
+                    enabled: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
                     placeholderText: ""
                     ignoreUpDownKeys: true
                     ignoreTabKeys: true
@@ -643,7 +636,7 @@ FocusScope {
                                 width: chipContent.width + Theme.spacingM * 2
                                 height: sortDropdown.height
                                 radius: Theme.cornerRadius
-                                color: controller.fileSearchType === modelData.id || chipArea.containsMouse ? Theme.primaryContainer : "transparent"
+                                color: controller.fileSearchType === modelData.id ? Theme.buttonBg : chipArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                                 Row {
                                     id: chipContent
@@ -654,14 +647,14 @@ FocusScope {
                                         anchors.verticalCenter: parent.verticalCenter
                                         name: modelData.icon
                                         size: 14
-                                        color: controller.fileSearchType === modelData.id ? Theme.primary : Theme.surfaceVariantText
+                                        color: controller.fileSearchType === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
                                     }
 
                                     StyledText {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: modelData.label
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: controller.fileSearchType === modelData.id ? Theme.primary : Theme.surfaceText
+                                        color: controller.fileSearchType === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
                                     }
                                 }
 
@@ -737,6 +730,14 @@ FocusScope {
             Item {
                 width: parent.width
                 height: parent.height - searchField.height - categoryRow.height - fileFilterRow.height - actionPanel.height - Theme.spacingXS * ((categoryRow.visible ? 1 : 0) + (fileFilterRow.visible ? 1 : 0) + 2)
+                opacity: {
+                    if (!root.parentModal)
+                        return 1;
+                    if (Theme.isDirectionalEffect && root.parentModal.isClosing)
+                        return 1;
+                    return root.parentModal.isClosing ? 0 : 1;
+                }
+
                 ResultsList {
                     id: resultsList
                     anchors.fill: parent
@@ -769,7 +770,6 @@ FocusScope {
         }
         function onSearchQueryRequested(query) {
             searchField.text = query;
-            searchField.cursorPosition = query.length;
         }
         function onModeChanged() {
             extFilterField.text = "";
@@ -979,15 +979,6 @@ FocusScope {
                             keyNavigationTab: editNameField
                             keyNavigationBacktab: editEnvVarsField
                         }
-                    }
-
-                    DankToggle {
-                        id: editDgpuToggle
-                        width: parent.width
-                        text: I18n.tr("Launch on dGPU by default")
-                        visible: SessionService.nvidiaCommand.length > 0
-                        checked: false
-                        onToggled: checked => editDgpuToggle.checked = checked
                     }
                 }
             }

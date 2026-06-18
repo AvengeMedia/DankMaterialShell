@@ -1,6 +1,6 @@
 binds {
     // === System & Overview ===
-    Mod+D repeat=false { toggle-overview; }
+    Mod+O repeat=false { toggle-overview; }
     Mod+Tab repeat=false { toggle-overview; }
     Mod+Shift+Slash { show-hotkey-overlay; }
 
@@ -8,6 +8,9 @@ binds {
     Mod+T hotkey-overlay-title="Open Terminal" { spawn "{{TERMINAL_COMMAND}}"; }
     Mod+Space hotkey-overlay-title="Application Launcher" {
         spawn "dms" "ipc" "call" "spotlight" "toggle";
+    }
+    Alt+Space hotkey-overlay-title="Spotlight Bar" {
+        spawn "dms" "ipc" "call" "spotlight-bar" "toggle";
     }
     Mod+V hotkey-overlay-title="Clipboard Manager" {
         spawn "dms" "ipc" "call" "clipboard" "toggle";
@@ -215,6 +218,11 @@ binds {
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
+    // === Display Profiles ===
+    Mod+P hotkey-overlay-title="Cycle Display Profile" {
+        spawn "dms" "ipc" "outputs" "cycleProfile";
+    }
+
     // === System Controls ===
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
     Mod+Shift+P { power-off-monitors; }

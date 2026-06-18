@@ -33,9 +33,14 @@ Item {
     Component.onCompleted: {
         if (!settingKey)
             return;
-        let flickable = findParentFlickable();
-        if (flickable)
-            SettingsSearchService.registerCard(settingKey, root, flickable);
+        var key = settingKey;
+        Qt.callLater(() => {
+            if (!root.parent)
+                return;
+            var flickable = findParentFlickable();
+            if (flickable)
+                SettingsSearchService.registerCard(key, root, flickable);
+        });
     }
 
     Component.onDestruction: {

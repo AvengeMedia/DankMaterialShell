@@ -15,6 +15,7 @@ Item {
     property var allPlayers: []
     property point anchorPos: Qt.point(0, 0)
     property bool isRightEdge: false
+    property var targetWindow: null
 
     property bool __isChromeBrowser: {
         if (!activePlayer?.identity)
@@ -41,19 +42,47 @@ Item {
     signal panelEntered
     signal panelExited
 
-    property int __volumeHoverCount: 0
+    property int __panelHoverCount: 0
 
-    function volumeAreaEntered() {
-        __volumeHoverCount++;
+    onDropdownTypeChanged: {
+        if (dropdownType === 0) {
+            __panelHoverCount = 0;
+        }
+    }
+
+    function panelAreaEntered() {
+        __panelHoverCount++;
         panelEntered();
     }
 
-    function volumeAreaExited() {
-        __volumeHoverCount--;
-        Qt.callLater(() => {
-            if (__volumeHoverCount <= 0)
-                panelExited();
-        });
+    function panelAreaExited() {
+        __panelHoverCount = Math.max(0, __panelHoverCount - 1);
+        if (__panelHoverCount === 0)
+            panelExited();
+    }
+
+    readonly property Item __activePanel: {
+        switch (dropdownType) {
+        case 1:
+            return volumePanel;
+        case 2:
+            return audioDevicesPanel;
+        case 3:
+            return playersPanel;
+        default:
+            return null;
+        }
+    }
+
+    WindowBlur {
+        targetWindow: root.targetWindow
+        readonly property bool active: root.__activePanel !== null && root.__activePanel.visible && root.__activePanel.opacity > 0
+        readonly property real s: root.__activePanel ? Math.min(1, root.__activePanel.scale) : 1
+        blurX: root.__activePanel ? root.__activePanel.x + root.__activePanel.width * (1 - s) * 0.5 : 0
+        blurY: root.__activePanel ? root.__activePanel.y + root.__activePanel.height * (1 - s) * 0.5 : 0
+        blurWidth: active ? root.__activePanel.width * s : 0
+        blurHeight: active ? root.__activePanel.height * s : 0
+        blurRadius: Theme.cornerRadius * 2
     }
 
     Rectangle {
@@ -64,27 +93,29 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 1
 
-        opacity: dropdownType === 1 ? 1 : 0
-        scale: dropdownType === 1 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 1 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 1 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 1)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 1 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
@@ -106,8 +137,8 @@ Item {
             anchors.fill: parent
             anchors.margins: -12
             hoverEnabled: true
-            onEntered: volumeAreaEntered()
-            onExited: volumeAreaExited()
+            onEntered: panelAreaEntered()
+            onExited: panelAreaExited()
         }
 
         Item {
@@ -126,23 +157,26 @@ Item {
                     width: parent.width
                     height: parent.height
                     anchors.centerIn: parent
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                    color: Theme.withAlpha(Theme.outline, Theme.popupTransparency)
                     radius: Theme.cornerRadius
                 }
 
                 Rectangle {
+                    readonly property real ratio: volumeAvailable ? Math.min(1.0, currentVolume) : 0
+                    readonly property real thumbHeight: 4
                     width: parent.width
-                    height: volumeAvailable ? (Math.min(1.0, currentVolume) * parent.height) : 0
+                    height: Math.max(0, ratio * (parent.height - thumbHeight) - 3)
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: Theme.primary
-                    bottomLeftRadius: Theme.cornerRadius
-                    bottomRightRadius: Theme.cornerRadius
+                    radius: Theme.cornerRadius
+                    topLeftRadius: 0
+                    topRightRadius: 0
                 }
 
                 Rectangle {
                     width: parent.width + 8
-                    height: 8
+                    height: 4
                     radius: Theme.cornerRadius
                     y: {
                         const ratio = volumeAvailable ? Math.min(1.0, currentVolume) : 0;
@@ -151,8 +185,7 @@ Item {
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: Theme.primary
-                    border.width: 3
-                    border.color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1.0)
+                    border.width: 0
                 }
 
                 MouseArea {
@@ -163,8 +196,8 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     preventStealing: true
 
-                    onEntered: volumeAreaEntered()
-                    onExited: volumeAreaExited()
+                    onEntered: panelAreaEntered()
+                    onExited: panelAreaExited()
                     onPressed: mouse => updateVolume(mouse)
                     onPositionChanged: mouse => {
                         if (pressed)
@@ -202,27 +235,29 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 2
 
-        opacity: dropdownType === 2 ? 1 : 0
-        scale: dropdownType === 2 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 2 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 2 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 2)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 2 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
@@ -238,6 +273,14 @@ Item {
             borderWidth: audioDevicesPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
             shadowEnabled: Theme.elevationEnabled
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            anchors.margins: -12
+            hoverEnabled: true
+            onEntered: panelAreaEntered()
+            onExited: panelAreaExited()
         }
 
         Column {
@@ -274,7 +317,7 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                            color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
                             border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                             border.width: modelData === AudioService.sink ? 2 : 1
 
@@ -320,7 +363,13 @@ Item {
                                     }
 
                                     StyledText {
-                                        text: modelData === AudioService.sink ? "Active" : "Available"
+                                        text: {
+                                            if (!modelData?.audio)
+                                                return modelData === AudioService.sink ? I18n.tr("Active") : I18n.tr("Available");
+                                            if (modelData.audio.muted)
+                                                return I18n.tr("Muted", "audio status");
+                                            return Math.round(modelData.audio.volume * 100) + "%";
+                                        }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                         elide: Text.ElideRight
@@ -334,12 +383,34 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: {
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onPressed: mouse => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        mouse.accepted = true;
+                                    }
+                                }
+                                onWheel: wheelEvent => {
+                                    if (SettingsData.audioDeviceScrollVolumeEnabled && wheelEvent.x >= deviceMouseArea.width / 2) {
+                                        AudioService.handleNodeVolumeWheel(modelData, wheelEvent);
+                                    } else {
+                                        wheelEvent.accepted = false;
+                                    }
+                                }
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        if (modelData && modelData.audio) {
+                                            SessionData.suppressOSDTemporarily();
+                                            modelData.audio.muted = !modelData.audio.muted;
+                                        }
+                                        return;
+                                    }
                                     if (modelData && modelData.name) {
                                         AudioService.setDefaultSinkByName(modelData.name);
                                         root.deviceSelected(modelData);
                                     }
                                 }
+                                onEntered: panelAreaEntered()
+                                onExited: panelAreaExited()
                             }
                         }
                     }
@@ -356,27 +427,29 @@ Item {
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+        color: Theme.floatingSurface
+        border.color: Theme.outlineStrong
         border.width: 2
 
-        opacity: dropdownType === 3 ? 1 : 0
-        scale: dropdownType === 3 ? 1 : 0.96
+        opacity: Theme.isDirectionalEffect ? 1 : (dropdownType === 3 ? 1 : 0)
+        scale: Theme.isDirectionalEffect ? 1 : (dropdownType === 3 ? 1 : Theme.effectScaleCollapsed)
         transformOrigin: isRightEdge ? Item.Left : Item.Right
 
         Behavior on opacity {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                duration: Math.round(Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3) * Theme.variantOpacityDurationScale)
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
         Behavior on scale {
+            enabled: !Theme.isDirectionalEffect
             NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, dropdownType === 3)
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                easing.bezierCurve: dropdownType === 3 ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
             }
         }
 
@@ -392,6 +465,14 @@ Item {
             borderWidth: playersPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
             shadowEnabled: Theme.elevationEnabled
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            anchors.margins: -12
+            hoverEnabled: true
+            onEntered: panelAreaEntered()
+            onExited: panelAreaExited()
         }
 
         Column {
@@ -428,7 +509,7 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                            color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
                             border.color: modelData === activePlayer ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                             border.width: modelData === activePlayer ? 2 : 1
 
@@ -467,15 +548,7 @@ Item {
                                     }
 
                                     StyledText {
-                                        text: {
-                                            if (!modelData)
-                                                return "";
-                                            const artist = modelData.trackArtist || "";
-                                            const isActive = modelData === activePlayer;
-                                            if (artist.length > 0)
-                                                return artist + (isActive ? " (Active)" : "");
-                                            return isActive ? "Active" : "Available";
-                                        }
+                                        text: modelData?.trackArtist || I18n.tr("Unknown Artist")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                         elide: Text.ElideRight
@@ -495,6 +568,8 @@ Item {
                                         root.playerSelected(modelData);
                                     }
                                 }
+                                onEntered: panelAreaEntered()
+                                onExited: panelAreaExited()
                             }
                         }
                     }

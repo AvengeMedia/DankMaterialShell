@@ -370,14 +370,6 @@ Item {
                         }
                     }
                 }
-
-                StyledText {
-                    text: I18n.tr("Idle monitoring not supported - requires newer Quickshell version")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.error
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: !IdleService.idleMonitorAvailable
-                }
             }
 
             SettingsCard {
@@ -462,6 +454,11 @@ Item {
                                 key: "restart",
                                 label: I18n.tr("Show Restart DMS"),
                                 desc: I18n.tr("Restart the DankMaterialShell")
+                            },
+                            {
+                                key: "switchuser",
+                                label: I18n.tr("Show Switch User"),
+                                desc: I18n.tr("Opens a picker of other active sessions on this seat")
                             },
                             {
                                 key: "hibernate",
@@ -606,26 +603,6 @@ Item {
                 }
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "tune"
-                title: I18n.tr("Advanced")
-                settingKey: "powerAdvanced"
-                collapsible: true
-                expanded: false
-
-                SettingsSliderRow {
-                    settingKey: "batteryChargeLimit"
-                    tags: ["battery", "charge", "limit", "percentage", "power"]
-                    text: I18n.tr("Battery Charge Limit")
-                    description: I18n.tr("Note: this only changes the percentage, it does not actually limit charging.")
-                    value: SettingsData.batteryChargeLimit
-                    minimum: 50
-                    maximum: 100
-                    defaultValue: 100
-                    onSliderValueChanged: newValue => SettingsData.set("batteryChargeLimit", newValue)
-                }
-            }
         }
     }
 }

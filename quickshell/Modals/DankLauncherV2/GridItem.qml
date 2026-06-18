@@ -44,6 +44,15 @@ Rectangle {
         cornerRadius: root.radius
     }
 
+    SourceBadge {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: Theme.spacingXS
+        source: root.item?.type === "app" ? (root.item.source || "") : ""
+        glyphSize: 14
+        z: 1
+    }
+
     Column {
         anchors.centerIn: parent
         anchors.margins: Theme.spacingS
@@ -61,7 +70,7 @@ Rectangle {
             materialIconSizeAdjustment: root.computedIconSize * 0.3
         }
 
-        Text {
+        StyledText {
             width: parent.width
             text: root.item?._hName ?? root.item?.name ?? ""
             textFormat: root.item?._hRich ? Text.RichText : Text.PlainText

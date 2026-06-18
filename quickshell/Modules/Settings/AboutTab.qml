@@ -15,7 +15,7 @@ Item {
     property bool isSway: CompositorService.isSway
     property bool isScroll: CompositorService.isScroll
     property bool isMiracle: CompositorService.isMiracle
-    property bool isDwl: CompositorService.isDwl
+    property bool isMango: CompositorService.isMango
     property bool isLabwc: CompositorService.isLabwc
 
     property string compositorName: {
@@ -27,7 +27,7 @@ Item {
             return "scroll";
         if (isMiracle)
             return "miracle";
-        if (isDwl)
+        if (isMango)
             return "mangowc";
         if (isLabwc)
             return "labwc";
@@ -43,7 +43,7 @@ Item {
             return "/assets/sway.svg";
         if (isMiracle)
             return "/assets/miraclewm.svg";
-        if (isDwl)
+        if (isMango)
             return "/assets/mango.png";
         if (isLabwc)
             return "/assets/labwc.png";
@@ -59,7 +59,7 @@ Item {
             return "https://github.com/dawsers/scroll";
         if (isMiracle)
             return "https://github.com/miracle-wm-org/miracle-wm";
-        if (isDwl)
+        if (isMango)
             return "https://github.com/DreamMaoMao/mangowc";
         if (isLabwc)
             return "https://labwc.github.io/";
@@ -75,7 +75,7 @@ Item {
             return I18n.tr("Scroll GitHub");
         if (isMiracle)
             return I18n.tr("Scroll GitHub");
-        if (isDwl)
+        if (isMango)
             return I18n.tr("mangowc GitHub");
         if (isLabwc)
             return I18n.tr("LabWC Website");
@@ -88,7 +88,7 @@ Item {
     property string compositorDiscordUrl: {
         if (isHyprland)
             return "https://discord.com/invite/hQ9XvMUjjr";
-        if (isDwl)
+        if (isMango)
             return "https://discord.gg/CPjbDxesh5";
         return "";
     }
@@ -96,7 +96,7 @@ Item {
     property string compositorDiscordTooltip: {
         if (isHyprland)
             return I18n.tr("Hyprland Discord Server");
-        if (isDwl)
+        if (isMango)
             return I18n.tr("mangowc Discord Server");
         return "";
     }
@@ -107,9 +107,9 @@ Item {
     property string ircUrl: "https://web.libera.chat/gamja/?channels=#labwc"
     property string ircTooltip: I18n.tr("LabWC IRC Channel")
 
-    property bool showMatrix: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isDwl && !isLabwc
-    property bool showCompositorDiscord: isHyprland || isDwl
-    property bool showReddit: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isDwl && !isLabwc
+    property bool showMatrix: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isMango && !isLabwc
+    property bool showCompositorDiscord: isHyprland || isMango
+    property bool showReddit: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isMango && !isLabwc
     property bool showIrc: isLabwc
 
     DankFlickable {
@@ -171,7 +171,7 @@ Item {
                             }
                         }
 
-                        Text {
+                        StyledText {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "DANK LINUX"
                             font.pixelSize: parent.compactLogo ? 32 : 48
@@ -189,10 +189,10 @@ Item {
 
                     StyledText {
                         text: {
-                            if (!SystemUpdateService.shellVersion && !DMSService.cliVersion)
+                            if (!ShellVersionService.shellVersion && !DMSService.cliVersion)
                                 return "dms";
 
-                            let version = SystemUpdateService.shellVersion || "";
+                            let version = ShellVersionService.shellVersion || "";
                             let cliVersion = DMSService.cliVersion || "";
 
                             // Debian/Ubuntu/OpenSUSE git format: 1.0.3+git2264.c5c5ce84
@@ -218,7 +218,7 @@ Item {
 
                                 let baseVersion = extractBaseVersion(cliVersion);
                                 if (!baseVersion)
-                                    baseVersion = extractBaseVersion(SystemUpdateService.semverVersion);
+                                    baseVersion = extractBaseVersion(ShellVersionService.semverVersion);
                                 if (baseVersion) {
                                     return `dms (git) v${baseVersion}-${match[1]}`;
                                 }
@@ -253,8 +253,8 @@ Item {
                     }
 
                     StyledText {
-                        visible: SystemUpdateService.shellCodename.length > 0
-                        text: `"${SystemUpdateService.shellCodename}"`
+                        visible: ShellVersionService.shellCodename.length > 0
+                        text: `"${ShellVersionService.shellCodename}"`
                         font.pixelSize: Theme.fontSizeMedium
                         font.italic: true
                         color: Theme.surfaceVariantText

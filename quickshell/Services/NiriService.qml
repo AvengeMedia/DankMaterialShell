@@ -6,9 +6,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("NiriService")
 
     readonly property string socketPath: Quickshell.env("NIRI_SOCKET")
 
@@ -106,7 +108,7 @@ Singleton {
             if (exitCode === 0) {
                 configValidationOutput = "";
             } else if (hasInitialConnection && configValidationOutput.length > 0) {
-                ToastService.showError("niri: failed to load config", configValidationOutput, "", "niri-config");
+                ToastService.showError(I18n.tr("niri: failed to load config"), configValidationOutput, "", "niri-config");
             }
         }
     }
@@ -118,10 +120,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated layout config at", configPath);
+                log.info("Generated layout config at", configPath);
                 return;
             }
-            console.warn("NiriService: Failed to write layout config, exit code:", exitCode);
+            log.warn("Failed to write layout config, exit code:", exitCode);
         }
     }
 
@@ -132,10 +134,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated alttab config at", alttabPath);
+                log.info("Generated alttab config at", alttabPath);
                 return;
             }
-            console.warn("NiriService: Failed to write alttab config, exit code:", exitCode);
+            log.warn("Failed to write alttab config, exit code:", exitCode);
         }
     }
 
@@ -145,10 +147,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated wpblur config at", blurrulePath);
+                log.info("Generated wpblur config at", blurrulePath);
                 return;
             }
-            console.warn("NiriService: Failed to write wpblur config, exit code:", exitCode);
+            log.warn("Failed to write wpblur config, exit code:", exitCode);
         }
     }
 
@@ -159,10 +161,10 @@ Singleton {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("NiriService: Generated cursor config at", cursorPath);
+                log.info("Generated cursor config at", cursorPath);
                 return;
             }
-            console.warn("NiriService: Failed to write cursor config, exit code:", exitCode);
+            log.warn("Failed to write cursor config, exit code:", exitCode);
         }
     }
 
@@ -184,7 +186,7 @@ Singleton {
                     const event = JSON.parse(line);
                     handleNiriEvent(event);
                 } catch (e) {
-                    console.warn("NiriService: Failed to parse event:", line, e);
+                    log.warn("Failed to parse event:", line, e);
                 }
             }
         }
@@ -201,19 +203,19 @@ Singleton {
             return;
         Proc.runCommand("niri-fetch-outputs", ["niri", "msg", "-j", "outputs"], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("NiriService: Failed to fetch outputs, exit code:", exitCode);
+                log.warn("Failed to fetch outputs, exit code:", exitCode);
                 return;
             }
             try {
                 const outputsData = JSON.parse(output);
                 outputs = outputsData;
-                console.info("NiriService: Loaded", Object.keys(outputsData).length, "outputs");
+                log.info("Loaded", Object.keys(outputsData).length, "outputs");
                 updateDisplayScales();
                 if (windows.length > 0) {
                     windows = sortWindowsByLayout(windows);
                 }
             } catch (e) {
-                console.warn("NiriService: Failed to parse outputs:", e);
+                log.warn("Failed to parse outputs:", e);
             }
         });
     }
@@ -566,7 +568,7 @@ Singleton {
         configReloaded();
 
         if (hasInitialConnection && !suppressConfigToast && !suppressNextConfigToast && !matugenSuppression) {
-            ToastService.showInfo("niri: config reloaded", "", "", "niri-config");
+            ToastService.showInfo(I18n.tr("niri: config reloaded"), "", "", "niri-config");
         } else if (suppressNextConfigToast) {
             suppressNextConfigToast = false;
             suppressResetTimer.stop();
@@ -732,12 +734,12 @@ Singleton {
         });
     }
 
-    function switchToWorkspace(workspaceIndex) {
+    function switchToWorkspace(workspaceId) {
         return send({
             "Action": {
                 "FocusWorkspace": {
                     "reference": {
-                        "Index": workspaceIndex
+                        "Id": workspaceId
                     }
                 }
             }
@@ -1076,7 +1078,7 @@ Singleton {
     }
 
     function doGenerateNiriLayoutConfig() {
-        console.log("NiriService: Generating layout config...");
+        log.debug("Generating layout config...");
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
         const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4;
@@ -1136,7 +1138,7 @@ Singleton {
             const path = niriDmsDir + "/" + name + ".kdl";
             Proc.runCommand("niri-ensure-" + name, ["sh", "-c", `mkdir -p "${niriDmsDir}" && [ ! -f "${path}" ] && touch "${path}" || true`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("NiriService: Failed to ensure " + name + ".kdl, exit code:", exitCode);
+                    log.warn("Failed to ensure " + name + ".kdl, exit code:", exitCode);
             });
         }
 
@@ -1144,7 +1146,7 @@ Singleton {
     }
 
     function generateNiriBlurrule() {
-        console.log("NiriService: Generating wpblur config...");
+        log.debug("Generating wpblur config...");
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const niriDmsDir = configDir + "/niri/dms";
@@ -1160,7 +1162,7 @@ Singleton {
         if (!CompositorService.isNiri)
             return;
 
-        console.log("NiriService: Generating cursor config...");
+        log.debug("Generating cursor config...");
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const niriDmsDir = configDir + "/niri/dms";
@@ -1246,15 +1248,36 @@ Singleton {
 
         const commands = [];
 
+        if (config.disabled !== undefined) {
+            commands.push(`niri msg output "${outputName}" ${config.disabled ? "off" : "on"}`);
+            if (config.disabled) {
+                const fullDisableCommand = "{ " + commands.join(" && ") + "; } 2>&1";
+                Proc.runCommand("niri-output-config", ["sh", "-c", fullDisableCommand], (output, exitCode) => {
+                    if (exitCode !== 0) {
+                        log.warn("Failed to apply output config:", outputName, "exit:", exitCode, output);
+                        if (callback)
+                            callback(false, output);
+                        return;
+                    }
+                    fetchOutputs();
+                    if (callback)
+                        callback(true, "Success");
+                });
+                return;
+            }
+        }
+
         if (config.position !== undefined) {
-            commands.push(`niri msg output "${outputName}" position ${config.position.x} ${config.position.y}`);
+            commands.push(`niri msg output "${outputName}" position set ${config.position.x} ${config.position.y}`);
         }
 
         if (config.mode !== undefined) {
             commands.push(`niri msg output "${outputName}" mode ${config.mode}`);
         }
 
-        if (config.vrr !== undefined) {
+        if (config.vrrOnDemand !== undefined) {
+            commands.push(`niri msg output "${outputName}" vrr --on-demand ${config.vrrOnDemand ? "on" : "off"}`);
+        } else if (config.vrr !== undefined) {
             commands.push(`niri msg output "${outputName}" vrr ${config.vrr ? "on" : "off"}`);
         }
 
@@ -1272,15 +1295,15 @@ Singleton {
             return;
         }
 
-        const fullCommand = commands.join(" && ");
+        const fullCommand = "{ " + commands.join(" && ") + "; } 2>&1";
         Proc.runCommand("niri-output-config", ["sh", "-c", fullCommand], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("NiriService: Failed to apply output config:", output);
+                log.warn("Failed to apply output config:", outputName, "exit:", exitCode, output);
                 if (callback)
                     callback(false, output);
                 return;
             }
-            console.info("NiriService: Applied output config for", outputName);
+            log.info("Applied output config for", outputName);
             fetchOutputs();
             if (callback)
                 callback(true, "Success");
@@ -1295,10 +1318,32 @@ Singleton {
         return outputName;
     }
 
-    function generateOutputsConfig(outputsData) {
+    function outputSettingsFor(output, outputName, niriSettings) {
+        const identifier = getOutputIdentifier(output, outputName);
+        if (niriSettings)
+            return niriSettings[identifier] || niriSettings[outputName] || {};
+        return SettingsData.getNiriOutputSettings(identifier);
+    }
+
+    function transformToNiri(transform) {
+        const transformMap = {
+            "Normal": "normal",
+            "90": "90",
+            "180": "180",
+            "270": "270",
+            "Flipped": "flipped",
+            "Flipped90": "flipped-90",
+            "Flipped180": "flipped-180",
+            "Flipped270": "flipped-270"
+        };
+        return transformMap[transform] || "normal";
+    }
+
+    function buildOutputsConfig(outputsData, niriSettings) {
         const data = outputsData || outputs;
         if (!data || Object.keys(data).length === 0)
-            return;
+            return "";
+
         let kdlContent = `// Auto-generated by DMS - do not edit manually\n\n`;
 
         const sortedNames = Object.keys(data).sort((a, b) => {
@@ -1309,12 +1354,14 @@ Singleton {
         for (const outputName of sortedNames) {
             const output = data[outputName];
             const identifier = getOutputIdentifier(output, outputName);
-            const niriSettings = SettingsData.getNiriOutputSettings(identifier);
+            const outputSettings = outputSettingsFor(output, outputName, niriSettings);
 
             kdlContent += `output "${identifier}" {\n`;
 
-            if (niriSettings.disabled) {
+            if (outputSettings.disabled) {
                 kdlContent += `    off\n`;
+                kdlContent += `}\n\n`;
+                continue;
             }
 
             if (output.current_mode !== undefined && output.modes && output.modes[output.current_mode]) {
@@ -1326,17 +1373,7 @@ Singleton {
                 kdlContent += `    scale ${output.logical.scale || 1.0}\n`;
 
                 if (output.logical.transform && output.logical.transform !== "Normal") {
-                    const transformMap = {
-                        "Normal": "normal",
-                        "90": "90",
-                        "180": "180",
-                        "270": "270",
-                        "Flipped": "flipped",
-                        "Flipped90": "flipped-90",
-                        "Flipped180": "flipped-180",
-                        "Flipped270": "flipped-270"
-                    };
-                    kdlContent += `    transform "${transformMap[output.logical.transform] || "normal"}"\n`;
+                    kdlContent += `    transform "${transformToNiri(output.logical.transform)}"\n`;
                 }
 
                 if (output.logical.x !== undefined && output.logical.y !== undefined) {
@@ -1344,23 +1381,36 @@ Singleton {
                 }
             }
 
-            if (output.vrr_enabled || niriSettings.vrrOnDemand) {
-                const vrrOnDemand = niriSettings.vrrOnDemand ?? false;
+            if (output.vrr_enabled || outputSettings.vrrOnDemand) {
+                const vrrOnDemand = outputSettings.vrrOnDemand ?? false;
                 kdlContent += vrrOnDemand ? `    variable-refresh-rate on-demand=true\n` : `    variable-refresh-rate\n`;
             }
 
-            if (niriSettings.focusAtStartup) {
+            if (outputSettings.focusAtStartup) {
                 kdlContent += `    focus-at-startup\n`;
             }
 
-            if (niriSettings.backdropColor) {
-                kdlContent += `    backdrop-color "${niriSettings.backdropColor}"\n`;
+            if (outputSettings.backdropColor) {
+                kdlContent += `    backdrop-color "${outputSettings.backdropColor}"\n`;
             }
 
-            kdlContent += generateHotCornersBlock(niriSettings);
-            kdlContent += generateLayoutBlock(niriSettings);
+            kdlContent += generateHotCornersBlock(outputSettings);
+            kdlContent += generateLayoutBlock(outputSettings);
 
             kdlContent += `}\n\n`;
+        }
+
+        return kdlContent;
+    }
+
+    function generateOutputsConfig(outputsData, settingsOrCallback, maybeCallback) {
+        const niriSettings = typeof settingsOrCallback === "function" ? null : settingsOrCallback;
+        const callback = typeof settingsOrCallback === "function" ? settingsOrCallback : maybeCallback;
+        const kdlContent = buildOutputsConfig(outputsData, niriSettings);
+        if (!kdlContent) {
+            if (callback)
+                callback(false);
+            return;
         }
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
@@ -1369,10 +1419,14 @@ Singleton {
 
         Proc.runCommand("niri-write-outputs", ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${outputsPath}" << 'EOF'\n${kdlContent}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("NiriService: Failed to write outputs config:", output);
+                log.warn("Failed to write outputs config:", output);
+                if (callback)
+                    callback(false, output);
                 return;
             }
-            console.info("NiriService: Generated outputs config at", outputsPath);
+            log.info("Generated outputs config at", outputsPath);
+            if (callback)
+                callback(true, "");
         });
     }
 
@@ -1445,13 +1499,13 @@ Singleton {
         });
     }
 
-    function moveWorkspaceToIndex(workspaceIdx, targetIndex) {
+    function moveWorkspaceToIndex(workspaceId, targetIndex) {
         return send({
             "Action": {
                 "MoveWorkspaceToIndex": {
                     "index": targetIndex,
                     "reference": {
-                        "Index": workspaceIdx
+                        "Id": workspaceId
                     }
                 }
             }

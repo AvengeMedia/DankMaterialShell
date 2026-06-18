@@ -1,0 +1,253 @@
+import QtQuick
+import qs.Common
+import qs.Services
+import qs.Widgets
+
+DankOSD {
+    id: root
+
+    readonly property bool useVertical: isVerticalLayout
+    property int _displayVolume: 0
+
+    function _syncVolume() {
+        if (!AudioService.source?.audio)
+            return;
+        _displayVolume = Math.round(AudioService.source.audio.volume * 100);
+    }
+
+    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(260, screenWidth - Theme.spacingM * 2)
+    osdHeight: useVertical ? Math.min(260, screenHeight - Theme.spacingM * 2) : (40 + Theme.spacingS * 2)
+    autoHideInterval: 3000
+    enableMouseInteraction: true
+
+    Connections {
+        target: AudioService.source?.audio ?? null
+
+        function onVolumeChanged() {
+            root._syncVolume();
+            if (SettingsData.osdMicVolumeEnabled)
+                root.show();
+        }
+
+        function onMutedChanged() {
+            if (SettingsData.osdMicMuteEnabled)
+                root.show();
+        }
+    }
+
+    Connections {
+        target: AudioService
+
+        function onSourceChanged() {
+            root._syncVolume();
+            if (root.shouldBeVisible && SettingsData.osdMicVolumeEnabled)
+                root.show();
+        }
+    }
+
+    content: Loader {
+        anchors.fill: parent
+        sourceComponent: useVertical ? verticalContent : horizontalContent
+    }
+
+    Component {
+        id: horizontalContent
+
+        Item {
+            property int gap: Theme.spacingS
+
+            anchors.centerIn: parent
+            width: parent.width - Theme.spacingS * 2
+            height: 40
+
+            Rectangle {
+                width: Theme.iconSize
+                height: Theme.iconSize
+                radius: Theme.iconSize / 2
+                color: "transparent"
+                x: parent.gap
+                anchors.verticalCenter: parent.verticalCenter
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: AudioService.source?.audio?.muted ? "mic_off" : "mic"
+                    size: Theme.iconSize
+                    color: muteButton.containsMouse ? Theme.primary : (AudioService.source?.audio?.muted ? Theme.error : Theme.surfaceText)
+                }
+
+                MouseArea {
+                    id: muteButton
+
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: AudioService.toggleMicMute()
+                    onContainsMouseChanged: setChildHovered(containsMouse || volumeSlider.containsMouse)
+                }
+            }
+
+            DankSlider {
+                id: volumeSlider
+
+                width: parent.width - Theme.iconSize - parent.gap * 3
+                height: 40
+                x: parent.gap * 2 + Theme.iconSize
+                anchors.verticalCenter: parent.verticalCenter
+                minimum: 0
+                maximum: 100
+                enabled: AudioService.source?.audio ?? false
+                showValue: true
+                unit: "%"
+                thumbOutlineColor: Theme.surfaceContainer
+                valueOverride: root._displayVolume
+                alwaysShowValue: SettingsData.osdAlwaysShowValue
+
+                Component.onCompleted: {
+                    root._syncVolume();
+                    value = root._displayVolume;
+                }
+
+                onSliderValueChanged: newValue => {
+                    if (!AudioService.source?.audio)
+                        return;
+                    SessionData.suppressOSDTemporarily();
+                    AudioService.source.audio.volume = newValue / 100;
+                    resetHideTimer();
+                }
+
+                onContainsMouseChanged: setChildHovered(containsMouse || muteButton.containsMouse)
+
+                Binding on value {
+                    value: root._displayVolume
+                    when: !volumeSlider.pressed
+                }
+            }
+        }
+    }
+
+    Component {
+        id: verticalContent
+
+        Item {
+            anchors.fill: parent
+            property int gap: Theme.spacingS
+
+            Rectangle {
+                width: Theme.iconSize
+                height: Theme.iconSize
+                radius: Theme.iconSize / 2
+                color: "transparent"
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: gap
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: AudioService.source?.audio?.muted ? "mic_off" : "mic"
+                    size: Theme.iconSize
+                    color: muteButtonVert.containsMouse ? Theme.primary : (AudioService.source?.audio?.muted ? Theme.error : Theme.surfaceText)
+                }
+
+                MouseArea {
+                    id: muteButtonVert
+
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: AudioService.toggleMicMute()
+                    onContainsMouseChanged: setChildHovered(containsMouse || vertSliderArea.containsMouse)
+                }
+            }
+
+            Item {
+                id: vertSlider
+                width: 12
+                height: parent.height - Theme.iconSize - gap * 3 - 24
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: gap * 2 + Theme.iconSize
+
+                property bool dragging: false
+                property int value: root._displayVolume
+
+                Rectangle {
+                    id: vertTrack
+                    width: parent.width
+                    height: parent.height
+                    anchors.centerIn: parent
+                    color: Theme.outline
+                    radius: Theme.cornerRadius
+                }
+
+                Rectangle {
+                    id: vertFill
+                    width: parent.width
+                    height: (vertSlider.value / 100) * parent.height
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: AudioService.source?.audio?.muted ? Theme.error : Theme.primary
+                    radius: Theme.cornerRadius
+                }
+
+                Rectangle {
+                    id: vertHandle
+                    width: 24
+                    height: 8
+                    radius: Theme.cornerRadius
+                    y: {
+                        const ratio = vertSlider.value / 100;
+                        const travel = parent.height - height;
+                        return Math.max(0, Math.min(travel, travel * (1 - ratio)));
+                    }
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: AudioService.source?.audio?.muted ? Theme.error : Theme.primary
+                    border.width: 3
+                    border.color: Theme.surfaceContainer
+                }
+
+                MouseArea {
+                    id: vertSliderArea
+                    anchors.fill: parent
+                    anchors.margins: -12
+                    enabled: AudioService.source?.audio ?? false
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+
+                    onContainsMouseChanged: setChildHovered(containsMouse || muteButtonVert.containsMouse)
+
+                    onPressed: mouse => {
+                        vertSlider.dragging = true;
+                        updateVolume(mouse);
+                    }
+
+                    onReleased: vertSlider.dragging = false
+
+                    onPositionChanged: mouse => {
+                        if (pressed)
+                            updateVolume(mouse);
+                    }
+
+                    onClicked: mouse => updateVolume(mouse)
+
+                    function updateVolume(mouse) {
+                        if (!AudioService.source?.audio)
+                            return;
+                        const ratio = 1.0 - (mouse.y / height);
+                        const volume = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+                        SessionData.suppressOSDTemporarily();
+                        AudioService.source.audio.volume = volume / 100;
+                        resetHideTimer();
+                    }
+                }
+            }
+
+            StyledText {
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: gap
+                text: vertSlider.value + "%"
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                visible: SettingsData.osdAlwaysShowValue
+            }
+        }
+    }
+}

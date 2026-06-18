@@ -22,14 +22,14 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/trayrecovery"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
@@ -38,7 +38,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 24
+const APIVersion = 26
 
 var CLIVersion = "dev"
 
@@ -64,8 +64,7 @@ var waylandManager *wayland.Manager
 var bluezManager *bluez.Manager
 var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
-var dwlManager *dwl.Manager
-var extWorkspaceManager *extworkspace.Manager
+var tailscaleManager *tailscale.Manager
 var brightnessManager *brightness.Manager
 var wlrOutputManager *wlroutput.Manager
 var evdevManager *evdev.Manager
@@ -75,6 +74,7 @@ var wlContext *wlcontext.SharedContext
 var themeModeManager *thememode.Manager
 var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
+var sysUpdateManager *sysupdate.Manager
 var geoClientInstance geolocation.Client
 
 const dbusClientID = "dms-dbus-client"
@@ -82,8 +82,6 @@ const dbusClientID = "dms-dbus-client"
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsSubscribers syncmap.Map[string, bool]
 var cupsSubscriberCount atomic.Int32
-var extWorkspaceAvailable atomic.Bool
-var extWorkspaceInitMutex sync.Mutex
 
 func getSocketDir() string {
 	if runtime := os.Getenv("XDG_RUNTIME_DIR"); runtime != "" {
@@ -252,30 +250,6 @@ func InitializeCupsManager() error {
 	return nil
 }
 
-func InitializeDwlManager() error {
-	log.Info("Attempting to initialize DWL IPC...")
-
-	if wlContext == nil {
-		ctx, err := wlcontext.New()
-		if err != nil {
-			log.Errorf("Failed to create shared Wayland context: %v", err)
-			return err
-		}
-		wlContext = ctx
-	}
-
-	manager, err := dwl.NewManager(wlContext.Display())
-	if err != nil {
-		log.Debug("Failed to initialize dwl manager: %v", err)
-		return err
-	}
-
-	dwlManager = manager
-
-	log.Info("DWL IPC initialized successfully")
-	return nil
-}
-
 func InitializeBrightnessManager() error {
 	manager, err := brightness.NewManager()
 	if err != nil {
@@ -286,30 +260,6 @@ func InitializeBrightnessManager() error {
 	brightnessManager = manager
 
 	log.Info("Brightness manager initialized")
-	return nil
-}
-
-func InitializeExtWorkspaceManager() error {
-	log.Info("Attempting to initialize ExtWorkspace...")
-
-	if wlContext == nil {
-		ctx, err := wlcontext.New()
-		if err != nil {
-			log.Errorf("Failed to create shared Wayland context: %v", err)
-			return err
-		}
-		wlContext = ctx
-	}
-
-	manager, err := extworkspace.NewManager(wlContext.Display())
-	if err != nil {
-		log.Debug("Failed to initialize extworkspace manager: %v", err)
-		return err
-	}
-
-	extWorkspaceManager = manager
-
-	log.Info("ExtWorkspace initialized successfully")
 	return nil
 }
 
@@ -421,6 +371,19 @@ func InitializeLocationManager(geoClient geolocation.Client) error {
 	return nil
 }
 
+func InitializeSysUpdateManager() error {
+	manager, err := sysupdate.NewManager()
+	if err != nil {
+		log.Warnf("Failed to initialize sysupdate manager: %v", err)
+		return err
+	}
+
+	sysUpdateManager = manager
+
+	log.Info("Sysupdate manager initialized")
+	return nil
+}
+
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
@@ -429,6 +392,7 @@ func handleConnection(conn net.Conn) {
 	conn.Write(capsData)
 	conn.Write([]byte("\n"))
 	scanner := bufio.NewScanner(conn)
+	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), 64*1024*1024) // grow up to 64 MB for large clipboard payloads
 	for scanner.Scan() {
 		line := scanner.Bytes()
 
@@ -474,12 +438,8 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "cups")
 	}
 
-	if dwlManager != nil {
-		caps = append(caps, "dwl")
-	}
-
-	if extWorkspaceAvailable.Load() {
-		caps = append(caps, "extworkspace")
+	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
+		caps = append(caps, "tailscale")
 	}
 
 	if brightnessManager != nil {
@@ -504,6 +464,10 @@ func getCapabilities() Capabilities {
 
 	if dbusManager != nil {
 		caps = append(caps, "dbus")
+	}
+
+	if sysUpdateManager != nil {
+		caps = append(caps, "sysupdate")
 	}
 
 	return Capabilities{Capabilities: caps}
@@ -540,12 +504,8 @@ func getServerInfo() ServerInfo {
 		caps = append(caps, "cups")
 	}
 
-	if dwlManager != nil {
-		caps = append(caps, "dwl")
-	}
-
-	if extWorkspaceAvailable.Load() {
-		caps = append(caps, "extworkspace")
+	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
+		caps = append(caps, "tailscale")
 	}
 
 	if brightnessManager != nil {
@@ -574,6 +534,10 @@ func getServerInfo() ServerInfo {
 
 	if dbusManager != nil {
 		caps = append(caps, "dbus")
+	}
+
+	if sysUpdateManager != nil {
+		caps = append(caps, "sysupdate")
 	}
 
 	return ServerInfo{
@@ -1016,28 +980,28 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}
 	}
 
-	if shouldSubscribe("dwl") && dwlManager != nil {
+	if shouldSubscribe("tailscale") && tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		wg.Add(1)
-		dwlChan := dwlManager.Subscribe(clientID + "-dwl")
+		tailscaleChan := tailscaleManager.Subscribe(clientID + "-tailscale")
 		go func() {
 			defer wg.Done()
-			defer dwlManager.Unsubscribe(clientID + "-dwl")
+			defer tailscaleManager.Unsubscribe(clientID + "-tailscale")
 
-			initialState := dwlManager.GetState()
+			initialState := tailscaleManager.GetState()
 			select {
-			case eventChan <- ServiceEvent{Service: "dwl", Data: initialState}:
+			case eventChan <- ServiceEvent{Service: "tailscale", Data: initialState}:
 			case <-stopChan:
 				return
 			}
 
 			for {
 				select {
-				case state, ok := <-dwlChan:
+				case state, ok := <-tailscaleChan:
 					if !ok {
 						return
 					}
 					select {
-					case eventChan <- ServiceEvent{Service: "dwl", Data: state}:
+					case eventChan <- ServiceEvent{Service: "tailscale", Data: state}:
 					case <-stopChan:
 						return
 					}
@@ -1046,50 +1010,6 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 				}
 			}
 		}()
-	}
-
-	if shouldSubscribe("extworkspace") {
-		if extWorkspaceManager == nil && extWorkspaceAvailable.Load() {
-			extWorkspaceInitMutex.Lock()
-			if extWorkspaceManager == nil {
-				if err := InitializeExtWorkspaceManager(); err != nil {
-					log.Warnf("Failed to initialize ExtWorkspace manager for subscription: %v", err)
-				}
-			}
-			extWorkspaceInitMutex.Unlock()
-		}
-
-		if extWorkspaceManager != nil {
-			wg.Add(1)
-			extWorkspaceChan := extWorkspaceManager.Subscribe(clientID + "-extworkspace")
-			go func() {
-				defer wg.Done()
-				defer extWorkspaceManager.Unsubscribe(clientID + "-extworkspace")
-
-				initialState := extWorkspaceManager.GetState()
-				select {
-				case eventChan <- ServiceEvent{Service: "extworkspace", Data: initialState}:
-				case <-stopChan:
-					return
-				}
-
-				for {
-					select {
-					case state, ok := <-extWorkspaceChan:
-						if !ok {
-							return
-						}
-						select {
-						case eventChan <- ServiceEvent{Service: "extworkspace", Data: state}:
-						case <-stopChan:
-							return
-						}
-					case <-stopChan:
-						return
-					}
-				}
-			}()
-		}
 	}
 
 	if shouldSubscribe("brightness") && brightnessManager != nil {
@@ -1243,6 +1163,38 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}()
 	}
 
+	if shouldSubscribe("sysupdate") && sysUpdateManager != nil {
+		wg.Add(1)
+		sysupdateChan := sysUpdateManager.Subscribe(clientID + "-sysupdate")
+		go func() {
+			defer wg.Done()
+			defer sysUpdateManager.Unsubscribe(clientID + "-sysupdate")
+
+			initialState := sysUpdateManager.GetState()
+			select {
+			case eventChan <- ServiceEvent{Service: "sysupdate", Data: initialState}:
+			case <-stopChan:
+				return
+			}
+
+			for {
+				select {
+				case state, ok := <-sysupdateChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "sysupdate", Data: state}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
 	if shouldSubscribe("dbus") && dbusManager != nil {
 		wg.Add(1)
 		dbusChan := dbusManager.SubscribeSignals(dbusClientID)
@@ -1315,12 +1267,6 @@ func cleanupManagers() {
 	if cupsManager != nil {
 		cupsManager.Close()
 	}
-	if dwlManager != nil {
-		dwlManager.Close()
-	}
-	if extWorkspaceManager != nil {
-		extWorkspaceManager.Close()
-	}
 	if brightnessManager != nil {
 		brightnessManager.Close()
 	}
@@ -1348,13 +1294,27 @@ func cleanupManagers() {
 	if locationManager != nil {
 		locationManager.Close()
 	}
+	if sysUpdateManager != nil {
+		sysUpdateManager.Close()
+	}
 	if geoClientInstance != nil {
 		geoClientInstance.Close()
+	}
+	if tailscaleManager != nil {
+		tailscaleManager.Close()
 	}
 }
 
 func Start(printDocs bool) error {
 	cleanupStaleSockets()
+
+	// Tailscale manager always starts — reconnects internally via WatchIPNBus.
+	// The capability is only advertised once tailscaled is reachable; the
+	// callback wakes capability subscribers so QML clients see it transition.
+	tailscaleManager = tailscale.NewManager("")
+	tailscaleManager.SetAvailabilityCallback(func(bool) {
+		notifyCapabilityChange()
+	})
 
 	socketPath := GetSocketPath()
 	os.Remove(socketPath)
@@ -1473,26 +1433,6 @@ func Start(printDocs bool) error {
 		log.Info(" cups.resumePrinter                    - Resume printer (params: printerName)")
 		log.Info(" cups.cancelJob                        - Cancel job (params: printerName, jobID)")
 		log.Info(" cups.purgeJobs                        - Cancel all jobs (params: printerName)")
-		log.Info("DWL:")
-		log.Info(" dwl.getState                          - Get current dwl state (tags, windows, layouts, keyboard)")
-		log.Info(" dwl.setTags                           - Set active tags (params: output, tagmask, toggleTagset)")
-		log.Info(" dwl.setClientTags                     - Set focused client tags (params: output, andTags, xorTags)")
-		log.Info(" dwl.setLayout                         - Set layout (params: output, index)")
-		log.Info(" dwl.subscribe                         - Subscribe to dwl state changes (streaming)")
-		log.Info("   Output state includes:")
-		log.Info("     - tags         : Tag states (active, clients, focused)")
-		log.Info("     - layoutSymbol : Current layout name")
-		log.Info("     - title        : Focused window title")
-		log.Info("     - appId        : Focused window app ID")
-		log.Info("     - kbLayout     : Current keyboard layout")
-		log.Info("     - keymode      : Current keybind mode")
-		log.Info("ExtWorkspace:")
-		log.Info(" extworkspace.getState                 - Get current workspace state (groups, workspaces)")
-		log.Info(" extworkspace.activateWorkspace        - Activate workspace (params: groupID, workspaceID)")
-		log.Info(" extworkspace.deactivateWorkspace      - Deactivate workspace (params: groupID, workspaceID)")
-		log.Info(" extworkspace.removeWorkspace          - Remove workspace (params: groupID, workspaceID)")
-		log.Info(" extworkspace.createWorkspace          - Create workspace (params: groupID, name)")
-		log.Info(" extworkspace.subscribe                - Subscribe to workspace state changes (streaming)")
 		log.Info("Brightness:")
 		log.Info(" brightness.getState                   - Get current brightness state for all devices")
 		log.Info(" brightness.setBrightness              - Set device brightness (params: device, percent)")
@@ -1669,18 +1609,6 @@ func Start(printDocs bool) error {
 		log.Debugf("AppPicker manager unavailable: %v", err)
 	}
 
-	if err := InitializeDwlManager(); err != nil {
-		log.Debugf("DWL manager unavailable: %v", err)
-	}
-
-	if extworkspace.CheckCapability() {
-		extWorkspaceAvailable.Store(true)
-		log.Info("ExtWorkspace capability detected and will be available on subscription")
-	} else {
-		log.Debug("ExtWorkspace capability not available")
-		extWorkspaceAvailable.Store(false)
-	}
-
 	if err := InitializeWlrOutputManager(); err != nil {
 		log.Debugf("WlrOutput manager unavailable: %v", err)
 	}
@@ -1732,6 +1660,10 @@ func Start(printDocs bool) error {
 			notifyCapabilityChange()
 		}
 	}()
+
+	if err := InitializeSysUpdateManager(); err != nil {
+		log.Warnf("Sysupdate manager unavailable: %v", err)
+	}
 
 	log.Info("")
 	log.Infof("Ready! Capabilities: %v", getCapabilities().Capabilities)

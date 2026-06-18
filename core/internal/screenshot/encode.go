@@ -9,10 +9,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
@@ -105,7 +103,7 @@ func GetOutputDir() string {
 		return dir
 	}
 
-	if xdgPics := getXDGPicturesDir(); xdgPics != "" {
+	if xdgPics := utils.XDGPicturesDir(); xdgPics != "" {
 		screenshotDir := filepath.Join(xdgPics, "Screenshots")
 		if err := os.MkdirAll(screenshotDir, 0o755); err == nil {
 			return screenshotDir
@@ -113,40 +111,10 @@ func GetOutputDir() string {
 		return xdgPics
 	}
 
-	if home := os.Getenv("HOME"); home != "" {
+	if home, err := os.UserHomeDir(); err == nil {
 		return home
 	}
 	return "."
-}
-
-func getXDGPicturesDir() string {
-	userConfigDir, err := os.UserConfigDir()
-	if err != nil {
-		log.Error("failed to get user config dir", "err", err)
-		return ""
-	}
-	userDirsFile := filepath.Join(userConfigDir, "user-dirs.dirs")
-	data, err := os.ReadFile(userDirsFile)
-	if err != nil {
-		return ""
-	}
-
-	for _, line := range strings.Split(string(data), "\n") {
-		if len(line) == 0 || line[0] == '#' {
-			continue
-		}
-		const prefix = "XDG_PICTURES_DIR="
-		if !strings.HasPrefix(line, prefix) {
-			continue
-		}
-		path := strings.Trim(line[len(prefix):], "\"")
-		expanded, err := utils.ExpandPath(path)
-		if err != nil {
-			return ""
-		}
-		return expanded
-	}
-	return ""
 }
 
 func WriteToFile(buf *ShmBuffer, path string, format Format, quality int) error {

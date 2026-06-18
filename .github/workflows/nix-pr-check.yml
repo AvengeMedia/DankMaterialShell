@@ -1,4 +1,4 @@
-name: Check nix flake
+name: Nix flake and NixOS tests
 
 on:
   pull_request:
@@ -9,6 +9,7 @@ on:
 jobs:
   check-flake:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
 
       - name: Checkout
@@ -18,6 +19,25 @@ jobs:
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
+        with:
+          enable_kvm: true
+          extra_nix_config: |
+            system-features = nixos-test benchmark big-parallel kvm
 
       - name: Check the flake
-        run: nix flake check
+        run: nix flake check -L
+
+      - name: Run NixOS module test
+        run: nix build .#nixosTests.x86_64-linux.nixos-module -L
+
+      - name: Run NixOS service start test
+        run: nix build .#nixosTests.x86_64-linux.nixos-service-start-module -L
+
+      - name: Run greeter niri test
+        run: nix build .#nixosTests.x86_64-linux.greeter-niri-module -L
+
+      - name: Run home-manager module test
+        run: nix build .#nixosTests.x86_64-linux.home-manager-module -L
+
+      - name: Run niri home-manager module test
+        run: nix build .#nixosTests.x86_64-linux.niri-home-module -L

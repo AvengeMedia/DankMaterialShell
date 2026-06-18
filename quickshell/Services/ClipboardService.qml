@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("ClipboardService")
 
     readonly property int longTextThreshold: 200
 
@@ -21,15 +23,25 @@ Singleton {
     property int pinnedCount: 0
     property int totalCount: 0
     property string searchText: ""
+    property string activeFilter: "all"
     property int selectedIndex: 0
     property bool keyboardNavigationActive: false
     property int refCount: 0
+    property real _launcherLastRefresh: 0
+    property bool _launcherCacheValid: false
+    property string _launcherCachedQuery: ""
+    property var _launcherCachedEntries: []
+    property int _launcherSearchSeq: 0
 
     signal historyCopied
     signal historyCleared
+    signal launcherSearchReady(string query)
 
     Process {
         id: wtypeProcess
+        // TODO: This is only a paste shortcut fallback. It assumes the target
+        // application accepts Ctrl+V, which is false for many terminals.
+        // Replace with a more reliable target-aware paste strategy.
         command: ["wtype", "-M", "ctrl", "-P", "v", "-p", "v", "-m", "ctrl"]
         running: false
     }
@@ -42,14 +54,21 @@ Singleton {
     }
 
     function updateFilteredModel() {
-        const query = searchText.trim();
-        let filtered = [];
+        let filtered = internalEntries;
 
-        if (query.length === 0) {
-            filtered = internalEntries;
-        } else {
+        if (activeFilter !== "all") {
+            filtered = filtered.filter(entry =>
+                getEntryType(entry) === activeFilter
+            );
+        }
+
+        const query = searchText.trim();
+
+        if (query.length > 0) {
             const lowerQuery = query.toLowerCase();
-            filtered = internalEntries.filter(entry => entry.preview.toLowerCase().includes(lowerQuery));
+            filtered = filtered.filter(entry =>
+                entry.preview.toLowerCase().includes(lowerQuery)
+            );
         }
 
         filtered.sort((a, b) => {
@@ -60,15 +79,19 @@ Singleton {
 
         clipboardEntries = filtered;
         unpinnedEntries = filtered.filter(e => !e.pinned);
+        pinnedEntries = filtered.filter(e => e.pinned);
         totalCount = clipboardEntries.length;
 
-        if (unpinnedEntries.length === 0) {
+        const activeCount = Math.max(unpinnedEntries.length, pinnedEntries.length);
+
+        if (activeCount === 0) {
             keyboardNavigationActive = false;
             selectedIndex = 0;
             return;
         }
-        if (selectedIndex >= unpinnedEntries.length) {
-            selectedIndex = unpinnedEntries.length - 1;
+
+        if (selectedIndex >= activeCount) {
+            selectedIndex = activeCount - 1;
         }
     }
 
@@ -78,7 +101,7 @@ Singleton {
         }
         DMSService.sendRequest("clipboard.getHistory", null, function (response) {
             if (response.error) {
-                console.warn("ClipboardService: Failed to get history:", response.error);
+                log.warn("Failed to get history:", response.error);
                 return;
             }
             internalEntries = response.result || [];
@@ -86,6 +109,125 @@ Singleton {
             pinnedCount = pinnedEntries.length;
             updateFilteredModel();
         });
+    }
+
+    function ensureLauncherHistory() {
+        if (!clipboardAvailable) {
+            return;
+        }
+
+        const now = Date.now();
+        if (internalEntries.length === 0 || now - _launcherLastRefresh > 5000) {
+            _launcherLastRefresh = now;
+            refresh();
+        }
+    }
+
+    function requestLauncherSearch(query, limit) {
+        if (!clipboardAvailable) {
+            return;
+        }
+
+        const trimmed = (query || "").toString().trim();
+        const maxItems = limit > 0 ? limit : 20;
+        if (_launcherCacheValid && _launcherCachedQuery === trimmed) {
+            return;
+        }
+
+        _launcherSearchSeq++;
+        const seq = _launcherSearchSeq;
+        DMSService.sendRequest("clipboard.search", {
+            "query": trimmed,
+            "limit": maxItems
+        }, function (response) {
+            if (seq !== _launcherSearchSeq) {
+                return;
+            }
+            if (response.error) {
+                log.warn("Launcher clipboard search failed:", response.error);
+                _launcherCacheValid = true;
+                _launcherCachedQuery = trimmed;
+                _launcherCachedEntries = [];
+                launcherSearchReady(trimmed);
+                return;
+            }
+            const result = response.result || {};
+            _launcherCacheValid = true;
+            _launcherCachedQuery = trimmed;
+            _launcherCachedEntries = result.entries || [];
+            launcherSearchReady(trimmed);
+        });
+    }
+
+    function getCachedLauncherSearchEntries(query, limit) {
+        if (!clipboardAvailable) {
+            return [];
+        }
+
+        const trimmed = (query || "").toString().trim();
+        const maxItems = limit > 0 ? limit : 20;
+        if (!_launcherCacheValid || _launcherCachedQuery !== trimmed) {
+            requestLauncherSearch(trimmed, maxItems);
+            return [];
+        }
+        return _launcherCachedEntries.slice(0, maxItems);
+    }
+
+    function invalidateLauncherSearchCache() {
+        _launcherCacheValid = false;
+        _launcherCachedQuery = "";
+        _launcherCachedEntries = [];
+        _launcherSearchSeq++;
+    }
+
+    function getLauncherEntries(query, limit, minLength) {
+        if (!clipboardAvailable) {
+            return [];
+        }
+
+        const trimmed = (query || "").toString().trim();
+        const requiredLength = minLength !== undefined ? minLength : 2;
+        if (trimmed.length < requiredLength) {
+            return [];
+        }
+
+        const lowerQuery = trimmed.toLowerCase();
+        const maxItems = limit > 0 ? limit : 8;
+        const matches = [];
+
+        for (var i = 0; i < internalEntries.length; i++) {
+            const entry = internalEntries[i];
+            const preview = getEntryPreview(entry).toString();
+            const typeText = entry.isImage ? "image picture screenshot clipboard" : "text clipboard";
+            const haystack = (preview + " " + typeText).toLowerCase();
+            if (haystack.indexOf(lowerQuery) === -1) {
+                continue;
+            }
+            matches.push(entry);
+        }
+
+        matches.sort((a, b) => {
+            if (a.pinned !== b.pinned)
+                return b.pinned ? 1 : -1;
+            return (b.id || 0) - (a.id || 0);
+        });
+
+        return matches.slice(0, maxItems);
+    }
+
+    function getRecentLauncherEntries(limit) {
+        if (!clipboardAvailable) {
+            return [];
+        }
+
+        const maxItems = limit > 0 ? limit : 20;
+        const entries = internalEntries.slice();
+        entries.sort((a, b) => {
+            if (a.pinned !== b.pinned)
+                return b.pinned ? 1 : -1;
+            return (b.id || 0) - (a.id || 0);
+        });
+        return entries.slice(0, maxItems);
     }
 
     function reset() {
@@ -111,6 +253,17 @@ Singleton {
                 closeCallback();
             }
         });
+    }
+
+    function pasteClipboard(closeCallback) {
+        if (!wtypeAvailable) {
+            ToastService.showError(I18n.tr("wtype not available - install wtype for paste support"));
+            return;
+        }
+        if (closeCallback) {
+            closeCallback();
+        }
+        pasteTimer.start();
     }
 
     function pasteEntry(entry, closeCallback) {
@@ -144,7 +297,7 @@ Singleton {
             "id": entry.id
         }, function (response) {
             if (response.error) {
-                console.warn("ClipboardService: Failed to delete entry:", response.error);
+                log.warn("Failed to delete entry:", response.error);
                 return;
             }
             internalEntries = internalEntries.filter(e => e.id !== entry.id);
@@ -169,7 +322,7 @@ Singleton {
                 "id": entry.id
             }, function (response) {
                 if (response.error) {
-                    console.warn("ClipboardService: Failed to delete entry:", response.error);
+                    log.warn("Failed to delete entry:", response.error);
                     return;
                 }
                 internalEntries = internalEntries.filter(e => e.id !== entry.id);
@@ -223,7 +376,7 @@ Singleton {
         const savedCount = pinnedCount;
         DMSService.sendRequest("clipboard.clearHistory", null, function (response) {
             if (response.error) {
-                console.warn("ClipboardService: Failed to clear history:", response.error);
+                log.warn("Failed to clear history:", response.error);
                 return;
             }
             refresh();
@@ -248,11 +401,15 @@ Singleton {
         return "text";
     }
 
-    function hashedPinnedEntry(entryHash) {
+    function getPinnedEntryByHash(entryHash) {
         if (!entryHash) {
-            return false;
+            return null;
         }
-        return pinnedEntries.some(pinnedEntry => pinnedEntry.hash === entryHash);
+        return internalEntries.find(entry => entry.pinned && entry.hash === entryHash) || null;
+    }
+
+    function hashedPinnedEntry(entryHash) {
+        return getPinnedEntryByHash(entryHash) !== null;
     }
 
     onClipboardAvailableChanged: {

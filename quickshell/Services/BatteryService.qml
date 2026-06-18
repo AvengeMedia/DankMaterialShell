@@ -27,15 +27,32 @@ Singleton {
     // List of laptop batteries
     readonly property var batteries: UPower.devices.values.filter(dev => dev.isLaptopBattery)
 
+    readonly property var readyBatteries: batteries.filter(b => b.ready)
+    readonly property var stateKnownBatteries: batteries.filter(b => b.ready && b.state !== UPowerDeviceState.Unknown)
+
+    property real _lastBatteryLevel: 0
+    property bool _lastIsCharging: false
+    property real _lastChangeRate: 0
+    property real _lastBatteryEnergy: 0
+    property real _lastBatteryCapacity: 0
+
     readonly property bool usePreferred: preferredBatteryOverride && preferredBatteryOverride.length > 0
+    readonly property UPowerDevice preferredDevice: {
+        if (!usePreferred)
+            return null;
+        const override = preferredBatteryOverride.toLowerCase();
+        return batteries.find(dev => dev.nativePath.toLowerCase().includes(override)) || null;
+    }
+    readonly property bool preferredDeviceKnown: preferredDevice && preferredDevice.ready && preferredDevice.state !== UPowerDeviceState.Unknown
 
     // Main battery (for backward compatibility)
     readonly property UPowerDevice device: {
-        var preferredDev;
         if (usePreferred) {
-            preferredDev = batteries.find(dev => dev.nativePath.toLowerCase().includes(preferredBatteryOverride.toLowerCase()));
+            if (preferredDeviceKnown)
+                return preferredDevice;
+            return stateKnownBatteries[0] || null;
         }
-        return preferredDev || batteries[0] || null;
+        return stateKnownBatteries[0] || readyBatteries[0] || batteries[0] || null;
     }
     // Whether at least one battery is available
     readonly property bool batteryAvailable: batteries.length > 0
@@ -44,21 +61,122 @@ Singleton {
         if (!batteryAvailable)
             return 0;
         if (batteryCapacity === 0) {
-            if (usePreferred && device && device.ready)
-                return Math.round(device.percentage * 100 * scale);
-            const validBatteries = batteries.filter(b => b.ready && b.percentage >= 0);
+            if (usePreferred && preferredDeviceKnown) {
+                const val = Math.round(preferredDevice.percentage * 100 * scale);
+                _lastBatteryLevel = val;
+                return val;
+            }
+            if (usePreferred && preferredDevice)
+                return _lastBatteryLevel;
+            const validBatteries = stateKnownBatteries.filter(b => b.ready && b.percentage >= 0);
             if (validBatteries.length === 0)
-                return 0;
+                return _lastBatteryLevel;
             const avgPercentage = validBatteries.reduce((sum, b) => sum + b.percentage, 0) / validBatteries.length;
-            return Math.round(avgPercentage * 100 * scale);
+            const val = Math.round(avgPercentage * 100 * scale);
+            _lastBatteryLevel = val;
+            return val;
         }
-        return Math.round((batteryEnergy * 100) / batteryCapacity * scale);
+        const energy = batteryEnergy;
+        const cap = batteryCapacity;
+        if (cap === 0)
+            return _lastBatteryLevel;
+        const val = Math.round((energy * 100) / cap * scale);
+        _lastBatteryLevel = val;
+        return val;
     }
-    readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging)
+    readonly property bool isCharging: {
+        if (!batteryAvailable)
+            return false;
+        if (usePreferred && preferredDeviceKnown) {
+            const preferredCharging = preferredDevice.state === UPowerDeviceState.Charging;
+            _lastIsCharging = preferredCharging;
+            return preferredCharging;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastIsCharging;
+        const val = stateKnownBatteries.some(b => b.state === UPowerDeviceState.Charging);
+        if (stateKnownBatteries.length > 0)
+            _lastIsCharging = val;
+        return stateKnownBatteries.length > 0 ? val : _lastIsCharging;
+    }
 
     // Is the system plugged in (Is not running on battery)
     readonly property bool isPluggedIn: !UPower.onBattery
-    readonly property bool isLowBattery: batteryAvailable && batteryLevel <= 20
+    readonly property bool isLowBattery: batteryAvailable && batteryLevel <= SettingsData.batteryLowThreshold
+    readonly property bool isCriticalBattery: batteryAvailable && batteryLevel <= SettingsData.batteryCriticalThreshold
+
+    property bool _hasNotifiedLowBattery: false
+    property bool _hasNotifiedCriticalBattery: false
+    property bool _hasNotifiedChargeLimit: false
+
+    function sendAlert(title, message, isWarning, category) {
+        if (SettingsData.batteryNotificationType === 1) {
+            Quickshell.execDetached(["notify-send", "-u", isWarning ? "critical" : "normal", "-a", "DMS", "-i", isWarning ? "battery-caution" : "battery-charging", title, message]);
+        } else {
+            if (isWarning) {
+                ToastService.showWarning(title, message, "", category);
+            } else {
+                ToastService.showInfo(title, message, "", category);
+            }
+        }
+    }
+
+    onBatteryLevelChanged: {
+        if (isCharging && batteryLevel >= SettingsData.batteryChargeLimit) {
+            if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
+                _hasNotifiedChargeLimit = true;
+                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), false, "battery-charge-limit");
+            }
+        } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
+            _hasNotifiedChargeLimit = false;
+        }
+
+        if (isCharging) {
+            _hasNotifiedLowBattery = false;
+            _hasNotifiedCriticalBattery = false;
+            return;
+        }
+
+        // Critical battery check (higher priority)
+        if (isCriticalBattery) {
+            if (!_hasNotifiedCriticalBattery && SettingsData.batteryNotifyCritical) {
+                _hasNotifiedCriticalBattery = true;
+                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), true, "battery-critical");
+            }
+            return;
+        }
+
+        if (batteryLevel > SettingsData.batteryCriticalThreshold) {
+            _hasNotifiedCriticalBattery = false;
+        }
+
+        // Low battery check
+        if (isLowBattery) {
+            if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
+                _hasNotifiedLowBattery = true;
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), true, "battery-low");
+            }
+
+            if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
+                if (PowerProfileWatcher.currentProfile !== PowerProfile.PowerSaver) {
+                    PowerProfileWatcher.applyProfile(PowerProfile.PowerSaver);
+                }
+            }
+        }
+
+        if (batteryLevel > SettingsData.batteryLowThreshold) {
+            _hasNotifiedLowBattery = false;
+        }
+    }
+
+    onIsChargingChanged: {
+        if (isCharging) {
+            _hasNotifiedLowBattery = false;
+            _hasNotifiedCriticalBattery = false;
+        } else {
+            _hasNotifiedChargeLimit = false;
+        }
+    }
 
     onIsPluggedInChanged: {
         if (suppressSound || !batteryAvailable) {
@@ -90,9 +208,17 @@ Singleton {
     readonly property real changeRate: {
         if (!batteryAvailable)
             return 0;
-        if (usePreferred && device && device.ready)
-            return device.changeRate;
-        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.changeRate, 0) : 0;
+        if (usePreferred && preferredDeviceKnown) {
+            _lastChangeRate = preferredDevice.changeRate;
+            return _lastChangeRate;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastChangeRate;
+        if (stateKnownBatteries.length === 0)
+            return _lastChangeRate;
+        const val = stateKnownBatteries.reduce((sum, b) => sum + b.changeRate, 0);
+        _lastChangeRate = val;
+        return val;
     }
 
     // Aggregated battery health
@@ -100,12 +226,10 @@ Singleton {
         if (!batteryAvailable)
             return "N/A";
 
-        // If a preferred battery is selected and ready
-        if (usePreferred && device && device.ready && device.healthSupported)
-            return `${Math.round(device.healthPercentage)}%`;
+        if (usePreferred && preferredDeviceKnown && preferredDevice.healthSupported)
+            return `${Math.round(preferredDevice.healthPercentage)}%`;
 
-        // Otherwise, calculate the average health of all laptop batteries
-        const validBatteries = batteries.filter(b => b.healthSupported && b.healthPercentage > 0);
+        const validBatteries = stateKnownBatteries.filter(b => b.ready && b.healthSupported && b.healthPercentage > 0);
         if (validBatteries.length === 0)
             return "N/A";
 
@@ -116,18 +240,34 @@ Singleton {
     readonly property real batteryEnergy: {
         if (!batteryAvailable)
             return 0;
-        if (usePreferred && device && device.ready)
-            return device.energy;
-        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energy, 0) : 0;
+        if (usePreferred && preferredDeviceKnown) {
+            _lastBatteryEnergy = preferredDevice.energy;
+            return _lastBatteryEnergy;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastBatteryEnergy;
+        if (stateKnownBatteries.length === 0)
+            return _lastBatteryEnergy;
+        const val = stateKnownBatteries.reduce((sum, b) => sum + b.energy, 0);
+        _lastBatteryEnergy = val;
+        return val;
     }
 
     // Total battery capacity (Wh)
     readonly property real batteryCapacity: {
         if (!batteryAvailable)
             return 0;
-        if (usePreferred && device && device.ready)
-            return device.energyCapacity;
-        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energyCapacity, 0) : 0;
+        if (usePreferred && preferredDeviceKnown) {
+            _lastBatteryCapacity = preferredDevice.energyCapacity;
+            return _lastBatteryCapacity;
+        }
+        if (usePreferred && preferredDevice)
+            return _lastBatteryCapacity;
+        if (stateKnownBatteries.length === 0)
+            return _lastBatteryCapacity;
+        const val = stateKnownBatteries.reduce((sum, b) => sum + b.energyCapacity, 0);
+        _lastBatteryCapacity = val;
+        return val;
     }
 
     function translateBatteryState(state) {
@@ -152,13 +292,15 @@ Singleton {
     // Aggregated battery status
     readonly property string batteryStatus: {
         if (!batteryAvailable) {
-            return I18n.tr("No Battery", "battery status");
+            return I18n.tr("No battery", "battery status");
         }
 
-        if (isCharging && !batteries.some(b => b.changeRate > 0))
+        const targetBatteries = stateKnownBatteries.length > 0 ? stateKnownBatteries : batteries;
+
+        if (isCharging && !targetBatteries.some(b => b.changeRate > 0))
             return I18n.tr("Plugged In", "battery status");
 
-        const states = batteries.map(b => b.state);
+        const states = targetBatteries.map(b => b.state);
         if (states.every(s => s === states[0]))
             return translateBatteryState(states[0]);
 
@@ -168,19 +310,16 @@ Singleton {
     readonly property bool suggestPowerSaver: false
 
     readonly property var bluetoothDevices: {
-        const btDevices = [];
         const bluetoothTypes = [UPowerDeviceType.BluetoothGeneric, UPowerDeviceType.Headphones, UPowerDeviceType.Headset, UPowerDeviceType.Keyboard, UPowerDeviceType.Mouse, UPowerDeviceType.Speakers];
 
-        for (var i = 0; i < UPower.devices.count; i++) {
-            const dev = UPower.devices.get(i);
-            if (dev && dev.ready && bluetoothTypes.includes(dev.type)) {
-                btDevices.push({
-                    "name": dev.model || UPowerDeviceType.toString(dev.type),
-                    "percentage": Math.round(dev.percentage * 100),
-                    "type": dev.type
-                });
-            }
-        }
+        const btDevices = UPower.devices.values.filter(dev => dev && dev.ready && bluetoothTypes.includes(dev.type)).map(dev => {
+            return {
+                "name": dev.model || UPowerDeviceType.toString(dev.type),
+                "percentage": Math.round(dev.percentage * 100),
+                "type": dev.type
+            };
+        });
+
         return btDevices;
     }
 

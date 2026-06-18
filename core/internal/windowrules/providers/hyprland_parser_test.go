@@ -3,7 +3,10 @@ package providers
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
 )
 
 func TestParseWindowRuleV1(t *testing.T) {
@@ -151,7 +154,7 @@ func TestHyprlandWritableProvider(t *testing.T) {
 		t.Errorf("Name() = %q, want hyprland", provider.Name())
 	}
 
-	expectedPath := filepath.Join(tmpDir, "dms", "windowrules.conf")
+	expectedPath := filepath.Join(tmpDir, "dms", "windowrules.lua")
 	if provider.GetOverridePath() != expectedPath {
 		t.Errorf("GetOverridePath() = %q, want %q", provider.GetOverridePath(), expectedPath)
 	}
@@ -182,6 +185,27 @@ func TestHyprlandSetAndLoadDMSRules(t *testing.T) {
 	}
 	if rules[0].MatchCriteria.AppID != "^(firefox)$" {
 		t.Errorf("AppID = %q, want ^(firefox)$", rules[0].MatchCriteria.AppID)
+	}
+}
+
+func TestHyprlandSetRuleLeavesConfOnlyInstallReadOnly(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.conf"), []byte("windowrulev2 = float, class:^(kitty)$\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	provider := NewHyprlandWritableProvider(tmpDir)
+	rule := newTestWindowRule("test_id", "Test Rule", "^(firefox)$")
+	rule.Actions.OpenFloating = boolPtr(true)
+
+	err := provider.SetRule(rule)
+	if err == nil {
+		t.Fatal("expected SetRule to reject conf-only Hyprland config")
+	}
+	if !strings.Contains(err.Error(), "read-only") {
+		t.Fatalf("expected read-only error, got %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(tmpDir, "dms", "windowrules.lua")); !os.IsNotExist(err) {
+		t.Fatalf("expected no Lua windowrules file to be created for conf-only config, stat err=%v", err)
 	}
 }
 
@@ -267,6 +291,104 @@ windowrulev2 = tile, class:^(extraapp)$
 
 	if len(rules) != 2 {
 		t.Errorf("expected 2 rules, got %d", len(rules))
+	}
+}
+
+func TestParseHyprlandLuaRequiresFragment(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	mainLua := filepath.Join(tmpDir, "hyprland.lua")
+	fragLua := filepath.Join(dmsDir, "windowrules.lua")
+
+	if err := os.WriteFile(fragLua, []byte(`
+hl.window_rule({ match = { class = "^test$" }, float = true })
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.WriteFile(mainLua, []byte(`
+require("dms.windowrules")
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := ParseHyprlandWindowRules(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseHyprlandWindowRules: %v", err)
+	}
+	if len(res.Rules) != 1 {
+		t.Fatalf("expected 1 rule, got %d", len(res.Rules))
+	}
+	if !res.DMSRulesIncluded {
+		t.Fatal("expected dms.windowrules fragment to be marked included")
+	}
+	wr := ConvertHyprlandRulesToWindowRules(res.Rules)[0]
+	if wr.MatchCriteria.AppID != "^test$" || wr.Actions.OpenFloating == nil || !*wr.Actions.OpenFloating {
+		t.Fatalf("unexpected merged rule: %#v", wr)
+	}
+}
+
+func TestParseHyprlandLuaNoInitialFocusAlias(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(`
+hl.window_rule({
+	match = { class = "^steam$" },
+	no_initial_focus = true,
+})
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := ParseHyprlandWindowRules(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseHyprlandWindowRules: %v", err)
+	}
+	if len(res.Rules) != 1 {
+		t.Fatalf("expected 1 rule, got %d", len(res.Rules))
+	}
+	wr := ConvertHyprlandRulesToWindowRules(res.Rules)[0]
+	if wr.Actions.NoFocus == nil || !*wr.Actions.NoFocus {
+		t.Fatalf("expected no_initial_focus to populate NoFocus action: %#v", wr.Actions)
+	}
+}
+
+func TestFormatLuaManagedHyprRuleUsesLuaFieldNames(t *testing.T) {
+	enabled := true
+	rule := windowrules.WindowRule{
+		ID:      "test-rule",
+		Enabled: true,
+		MatchCriteria: windowrules.MatchCriteria{
+			AppID: "^app$",
+		},
+		Actions: windowrules.Actions{
+			NoFocus:     &enabled,
+			NoShadow:    &enabled,
+			NoDim:       &enabled,
+			NoBlur:      &enabled,
+			NoAnim:      &enabled,
+			ForcergbX:   &enabled,
+			Idleinhibit: "focus",
+		},
+	}
+
+	lines := formatLuaManagedHyprRule(rule)
+	joined := strings.Join(lines, "\n")
+	for _, want := range []string{
+		"no_focus = true",
+		"no_shadow = true",
+		"no_dim = true",
+		"no_blur = true",
+		"no_anim = true",
+		"force_rgbx = true",
+		`idle_inhibit = "focus"`,
+	} {
+		if !strings.Contains(joined, want) {
+			t.Fatalf("formatted rule missing %q: %s", want, joined)
+		}
 	}
 }
 

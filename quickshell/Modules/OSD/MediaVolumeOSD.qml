@@ -30,8 +30,8 @@ DankOSD {
         onTriggered: _suppressNewPlayer = false
     }
 
-    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(260, Screen.width - Theme.spacingM * 2)
-    osdHeight: useVertical ? Math.min(260, Screen.height - Theme.spacingM * 2) : (40 + Theme.spacingS * 2)
+    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(260, screenWidth - Theme.spacingM * 2)
+    osdHeight: useVertical ? Math.min(260, screenHeight - Theme.spacingM * 2) : (40 + Theme.spacingS * 2)
     autoHideInterval: 3000
     enableMouseInteraction: true
 

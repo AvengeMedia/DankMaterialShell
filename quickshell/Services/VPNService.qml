@@ -4,9 +4,11 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("VPNService")
 
     readonly property bool available: DMSNetworkService.vpnAvailable
 
@@ -48,7 +50,7 @@ Singleton {
         DMSService.sendRequest("network.vpn.plugins", null, response => {
             pluginsLoading = false;
             if (response.error) {
-                console.warn("VPNService: Failed to fetch plugins:", response.error);
+                log.warn("Failed to fetch plugins:", response.error);
                 return;
             }
             if (!response.result)
@@ -214,6 +216,8 @@ Singleton {
     function getVpnTypeFromProfile(profile) {
         if (!profile)
             return "VPN";
+        if (profile.typeLabel)
+            return profile.typeLabel;
         if (profile.type === "wireguard")
             return "WireGuard";
         return getPluginName(profile.serviceType);

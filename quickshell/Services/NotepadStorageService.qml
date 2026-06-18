@@ -6,9 +6,11 @@ import QtCore
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("NotepadStorageService")
 
     property int refCount: 0
 
@@ -20,6 +22,49 @@ Singleton {
     property int currentTabIndex: 0
     property var tabsBeingCreated: ({})
     property bool metadataLoaded: false
+
+    // Shared live edit state across slideout and popout surfaces.
+    property var sessionBuffers: ({})
+    property int sessionBufferRevision: 0
+
+    function setSessionBuffer(tabId, content, baseline) {
+        if (tabId === undefined || tabId === null || tabId < 0)
+            return
+        var next = Object.assign({}, sessionBuffers)
+        if (content !== baseline) {
+            next[tabId] = { content: content, baseline: baseline }
+        } else {
+            delete next[tabId]
+        }
+        sessionBuffers = next
+        sessionBufferRevision++
+    }
+
+    function getSessionBuffer(tabId) {
+        return sessionBuffers[tabId]
+    }
+
+    function clearSessionBuffer(tabId) {
+        if (sessionBuffers[tabId] === undefined)
+            return
+        var next = Object.assign({}, sessionBuffers)
+        delete next[tabId]
+        sessionBuffers = next
+        sessionBufferRevision++
+    }
+
+    property var conflictTabId: -1
+    property string conflictDiskContent: ""
+
+    function flagConflict(tabId, diskContent) {
+        conflictDiskContent = diskContent
+        conflictTabId = tabId
+    }
+
+    function clearConflict() {
+        conflictTabId = -1
+        conflictDiskContent = ""
+    }
 
     Component.onCompleted: {
         ensureDirectories()
@@ -39,7 +84,7 @@ Singleton {
                 root.metadataLoaded = true
                 root.validateTabs()
             } catch(e) {
-                console.warn("Failed to parse notepad metadata:", e)
+                log.warn("Failed to parse notepad metadata:", e)
                 root.createDefaultTab()
             }
         }
@@ -148,7 +193,7 @@ Singleton {
                         callback: callback
                     })
                 } else {
-                    console.warn("Tab file does not exist:", fullPath)
+                    log.warn("Tab file does not exist:", fullPath)
                     callback("")
                 }
             }
@@ -207,6 +252,10 @@ Singleton {
         if (tabIndex < 0 || tabIndex >= tabs.length) return
 
         var newTabs = tabs.slice()
+        var closedTabId = newTabs[tabIndex] ? newTabs[tabIndex].id : -1
+        clearSessionBuffer(closedTabId)
+        if (conflictTabId === closedTabId)
+            clearConflict()
 
         if (newTabs.length <= 1) {
             var id = Date.now()
@@ -389,7 +438,7 @@ Singleton {
             }
 
             onSaveFailed: {
-                console.error("Failed to save tab content")
+                log.error("Failed to save tab content")
                 if (creationCallback) {
                     creationCallback()
                 }

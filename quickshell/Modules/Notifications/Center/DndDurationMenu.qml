@@ -107,7 +107,7 @@ Rectangle {
 
     implicitWidth: Math.max(220, menuColumn.implicitWidth + Theme.spacingM * 2)
     implicitHeight: menuColumn.implicitHeight + Theme.spacingM * 2
-    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    color: Theme.floatingSurface
     radius: Theme.cornerRadius
     border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
     border.width: BlurService.enabled ? BlurService.borderWidth : 1

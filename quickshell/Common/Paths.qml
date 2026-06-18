@@ -24,7 +24,9 @@ Singleton {
     }
 
     function expandTilde(path: string): string {
-        return strip(path.replace("~", stringify(root.home)));
+        if (!path.startsWith("~"))
+            return path;
+        return strip(root.home) + path.substring(1);
     }
 
     function shortenHome(path: string): string {

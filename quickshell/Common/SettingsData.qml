@@ -13,8 +13,9 @@ import "settings/SettingsStore.js" as Store
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 5
+    readonly property int settingsConfigVersion: 11
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -37,6 +38,18 @@ Singleton {
         Custom
     }
 
+    enum AnimationVariant {
+        Material,
+        Fluent,
+        Dynamic
+    }
+
+    enum AnimationEffect {
+        Standard,     // 0 — M3: scale-in, rises from below
+        Directional,  // 1 — pure large slide, no scale
+        Depth         // 2 — medium slide with deep depth scale pop
+    }
+
     enum SuspendBehavior {
         Suspend,
         Hibernate,
@@ -46,6 +59,20 @@ Singleton {
     enum WidgetColorMode {
         Default,
         Colorful
+    }
+
+    enum TextRenderType {
+        Qt,
+        Native,
+        Curve
+    }
+
+    enum TextRenderQuality {
+        Default,
+        Low,
+        Normal,
+        High,
+        VeryHigh
     }
 
     readonly property string _homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
@@ -81,6 +108,9 @@ Singleton {
     }
 
     property bool clipboardEnterToPaste: false
+    property bool clipboardRememberTypeFilter: false
+    property string clipboardTypeFilter: "all"
+    property var clipboardVisibleEntryActions: ["pin", "edit", "delete"]
 
     property var launcherPluginVisibility: ({})
 
@@ -136,6 +166,8 @@ Singleton {
     property real popupTransparency: 1.0
     property real dockTransparency: 1
     property string widgetBackgroundColor: "sch"
+    property string widgetBackgroundCustomColor: "#6750A4"
+    property real widgetBackgroundCustomStrength: 0.50
     property string widgetColorMode: "default"
     property string controlCenterTileColorMode: "primary"
     property string buttonColorMode: "primary"
@@ -146,12 +178,15 @@ Singleton {
     property int hyprlandLayoutGapsOverride: -1
     property int hyprlandLayoutRadiusOverride: -1
     property int hyprlandLayoutBorderSize: -1
+    property bool hyprlandResizeOnBorder: false
     property int mangoLayoutGapsOverride: -1
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
+    property bool mangoTrackpadNaturalScrolling: true
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
+    property string calendarBackend: "auto"
     property bool use24HourClock: true
     property bool showSeconds: false
     property bool padHours12Hour: false
@@ -168,6 +203,10 @@ Singleton {
     property int modalCustomAnimationDuration: 150
     property bool enableRippleEffects: true
     onEnableRippleEffectsChanged: saveSettings()
+    property int animationVariant: SettingsData.AnimationVariant.Material
+    onAnimationVariantChanged: saveSettings()
+    property int motionEffect: SettingsData.AnimationEffect.Standard
+    onMotionEffectChanged: saveSettings()
     property bool m3ElevationEnabled: true
     onM3ElevationEnabledChanged: saveSettings()
     property int m3ElevationIntensity: 12
@@ -186,17 +225,69 @@ Singleton {
     onPopoutElevationEnabledChanged: saveSettings()
     property bool barElevationEnabled: true
     onBarElevationEnabledChanged: saveSettings()
+
     property bool blurEnabled: false
     onBlurEnabledChanged: saveSettings()
+    property bool blurForegroundLayers: true
+    onBlurForegroundLayersChanged: saveSettings()
+    property real blurLayerOutlineOpacity: 0.12
+    onBlurLayerOutlineOpacityChanged: saveSettings()
     property string blurBorderColor: "outline"
     onBlurBorderColorChanged: saveSettings()
     property string blurBorderCustomColor: "#ffffff"
     onBlurBorderCustomColorChanged: saveSettings()
-    property real blurBorderOpacity: 1.0
+    property real blurBorderOpacity: 0.35
     onBlurBorderOpacityChanged: saveSettings()
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false
+
+    property bool frameEnabled: false
+    onFrameEnabledChanged: saveSettings()
+    property real frameThickness: 16
+    onFrameThicknessChanged: saveSettings()
+    property real frameRounding: 23
+    onFrameRoundingChanged: saveSettings()
+    property string frameColor: ""
+    onFrameColorChanged: saveSettings()
+    property real frameOpacity: 1.0
+    onFrameOpacityChanged: saveSettings()
+    property var frameScreenPreferences: ["all"]
+    onFrameScreenPreferencesChanged: saveSettings()
+    property real frameBarSize: 40
+    onFrameBarSizeChanged: saveSettings()
+    property bool frameShowOnOverview: false
+    onFrameShowOnOverviewChanged: saveSettings()
+    property bool frameBlurEnabled: true
+    onFrameBlurEnabledChanged: saveSettings()
+    property bool frameCloseGaps: true
+    onFrameCloseGapsChanged: saveSettings()
+    property string frameLauncherEmergeSide: "bottom"
+    onFrameLauncherEmergeSideChanged: saveSettings()
+    property bool frameLauncherArcExtender: false
+    onFrameLauncherArcExtenderChanged: saveSettings()
+    readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
+    property string frameMode: "connected"
+    onFrameModeChanged: saveSettings()
+    property var connectedFrameBarStyleBackups: ({})
+    onConnectedFrameBarStyleBackupsChanged: saveSettings()
+    readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
+    onConnectedFrameModeActiveChanged: {
+        if (_loading)
+            return;
+        _reconcileConnectedFrameBarStyles();
+    }
+
+    readonly property color effectiveFrameColor: {
+        const fc = frameColor;
+        if (!fc || fc === "default")
+            return Theme.surfaceContainer;
+        if (fc === "primary")
+            return Theme.primary;
+        if (fc === "surface")
+            return Theme.surface;
+        return fc;
+    }
 
     property bool showLauncherButton: true
     property bool showWorkspaceSwitcher: true
@@ -211,6 +302,9 @@ Singleton {
     property int selectedGpuIndex: 0
     property var enabledGpuPciIds: []
     property bool showSystemTray: true
+    property string systemTrayIconTintMode: "none"
+    property int systemTrayIconTintSaturation: 50
+    property int systemTrayIconTintStrength: 135
     property bool showClock: true
     property bool showNotificationButton: true
     property bool showBattery: true
@@ -229,6 +323,8 @@ Singleton {
     property bool controlCenterShowBatteryIcon: false
     property bool controlCenterShowPrinterIcon: false
     property bool controlCenterShowScreenSharingIcon: true
+    property bool controlCenterShowIdleInhibitorIcon: false
+    property bool controlCenterShowDoNotDisturbIcon: false
     property bool showPrivacyButton: true
     property bool privacyShowMicIcon: false
     property bool privacyShowCameraIcon: false
@@ -284,6 +380,7 @@ Singleton {
     property bool showWorkspaceApps: false
     property bool workspaceDragReorder: true
     property bool groupWorkspaceApps: true
+    property bool groupActiveWorkspaceApps: false
     property int maxWorkspaceIcons: 3
     property int workspaceAppIconSizeOffset: 0
     property bool workspaceFollowFocus: false
@@ -292,11 +389,16 @@ Singleton {
     property bool dwlShowAllTags: false
     property bool workspaceActiveAppHighlightEnabled: false
     property string workspaceColorMode: "default"
+    property string workspaceFocusedCustomColor: "#6750A4"
     property string workspaceOccupiedColorMode: "none"
+    property string workspaceOccupiedCustomColor: "#625B71"
     property string workspaceUnfocusedColorMode: "default"
+    property string workspaceUnfocusedCustomColor: "#49454E"
     property string workspaceUrgentColorMode: "default"
+    property string workspaceUrgentCustomColor: "#B3261E"
     property bool workspaceFocusedBorderEnabled: false
     property string workspaceFocusedBorderColor: "primary"
+    property string workspaceFocusedBorderCustomColor: "#6750A4"
     property int workspaceFocusedBorderThickness: 2
     property var workspaceNameIcons: ({})
     property bool waveProgressEnabled: true
@@ -305,12 +407,17 @@ Singleton {
     property bool audioVisualizerEnabled: true
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5
+    property bool audioDeviceScrollVolumeEnabled: false
     property bool clockCompactMode: false
+    property int focusedWindowSize: 1
     property bool focusedWindowCompactMode: false
     property bool runningAppsCompactMode: true
     property int barMaxVisibleApps: 0
     property int barMaxVisibleRunningApps: 0
     property bool barShowOverflowBadge: true
+    property bool trayAutoOverflow: true
+    property bool trayPopupSingleLine: true
+    property int trayMaxVisibleItems: 0
     property bool appsDockHideIndicators: false
     property bool appsDockColorizeActive: false
     property string appsDockActiveColorMode: "primary"
@@ -318,6 +425,7 @@ Singleton {
     property int appsDockEnlargePercentage: 125
     property int appsDockIconSizePercentage: 100
     property bool keyboardLayoutNameCompactMode: false
+    property bool keyboardLayoutNameShowIcon: false
     property bool runningAppsCurrentWorkspace: true
     property bool runningAppsGroupByApp: false
     property bool runningAppsCurrentMonitor: false
@@ -327,6 +435,7 @@ Singleton {
     property string lockDateFormat: ""
     property bool greeterRememberLastSession: true
     property bool greeterRememberLastUser: true
+    property bool greeterAutoLogin: false
     property bool greeterEnableFprint: false
     property bool greeterEnableU2f: false
     property string greeterWallpaperPath: ""
@@ -348,6 +457,7 @@ Singleton {
     property int appLauncherGridColumns: 4
     property bool spotlightCloseNiriOverview: true
     property bool rememberLastQuery: false
+    property bool rememberLastMode: true
     property var spotlightSectionViewModes: ({})
     onSpotlightSectionViewModesChanged: saveSettings()
     property var appDrawerSectionViewModes: ({})
@@ -361,6 +471,11 @@ Singleton {
     property bool dankLauncherV2UnloadOnClose: false
     property bool dankLauncherV2IncludeFilesInAll: false
     property bool dankLauncherV2IncludeFoldersInAll: false
+    property bool launcherUseOverlayLayer: false
+    property string launcherStyle: "full"
+    property bool spotlightBarShowModeChips: false
+    property bool keybindsFloatingWindow: false
+    onKeybindsFloatingWindowChanged: saveSettings()
 
     property string _legacyWeatherLocation: "New York, NY"
     property string _legacyWeatherCoordinates: "40.7128,-74.0060"
@@ -391,7 +506,7 @@ Singleton {
                 "hideOnTouch": false,
                 "inactiveTimeout": 0
             },
-            "dwl": {
+            "mango": {
                 "cursorHideTimeout": 0
             }
         })
@@ -411,18 +526,48 @@ Singleton {
     property int fontWeight: Font.Normal
     property real fontScale: 1.0
     property real dankBarFontScale: 1.0
+    property int textRenderType: SettingsData.TextRenderType.Qt
+    property int textRenderQuality: SettingsData.TextRenderQuality.Default
 
     property bool notepadUseMonospace: true
     property string notepadFontFamily: ""
     property real notepadFontSize: 14
+    property real notificationSummaryFontSize: Spec.SPEC.notificationSummaryFontSize.def
+    property real notificationBodyFontSize: Spec.SPEC.notificationBodyFontSize.def
     property bool notepadShowLineNumbers: false
+    property bool notepadAutoSave: false
+    property string notepadSlideoutSide: "right"
+    property string notepadDefaultMode: "slideout"
     property real notepadTransparencyOverride: -1
     property real notepadLastCustomTransparency: 0.7
+    property bool notepadUseCompositorGap: false
+    property int notepadEdgeGap: 0
+
+    // Compositor layout gap when enabled and available, else the manual value.
+    readonly property int notepadEffectiveEdgeGap: {
+        if (notepadUseCompositorGap) {
+            var g = -1;
+            if (CompositorService.isNiri)
+                g = niriLayoutGapsOverride;
+            else if (CompositorService.isHyprland)
+                g = hyprlandLayoutGapsOverride;
+            else if (CompositorService.isMango)
+                g = mangoLayoutGapsOverride;
+            if (g >= 0)
+                return g;
+        }
+        return Math.max(0, notepadEdgeGap);
+    }
 
     onNotepadUseMonospaceChanged: saveSettings()
     onNotepadFontFamilyChanged: saveSettings()
     onNotepadFontSizeChanged: saveSettings()
     onNotepadShowLineNumbersChanged: saveSettings()
+    onNotepadAutoSaveChanged: saveSettings()
+    onNotepadSlideoutSideChanged: saveSettings()
+    onNotepadDefaultModeChanged: saveSettings()
+    onNotepadUseCompositorGapChanged: saveSettings()
+    onNotepadEdgeGapChanged: saveSettings()
     // onCenteringModeChanged: saveSettings()
     onNotepadTransparencyOverrideChanged: {
         if (notepadTransparencyOverride > 0) {
@@ -438,6 +583,7 @@ Singleton {
     property bool soundVolumeChanged: true
     property bool soundPluggedIn: true
     property bool soundLogin: false
+    property bool muteSoundsWhenMediaPlaying: true
 
     property int acMonitorTimeout: 0
     property int acLockTimeout: 0
@@ -452,6 +598,13 @@ Singleton {
     property string batteryProfileName: ""
     property int batteryPostLockMonitorTimeout: 0
     property int batteryChargeLimit: 100
+    property bool batteryNotifyChargeLimit: false
+    property int batteryCriticalThreshold: 10
+    property bool batteryNotifyCritical: true
+    property int batteryLowThreshold: 20
+    property bool batteryNotifyLow: false
+    property int batteryNotificationType: 0
+    property bool batteryAutoPowerSaver: false
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
     property bool fadeToLockEnabled: true
@@ -486,6 +639,7 @@ Singleton {
     property bool matugenTemplatePywalfox: true
     property bool matugenTemplateZenBrowser: true
     property bool matugenTemplateVesktop: true
+    property bool matugenTemplateVencord: true
     property bool matugenTemplateEquibop: true
     property bool matugenTemplateGhostty: true
     property bool matugenTemplateKitty: true
@@ -514,6 +668,7 @@ Singleton {
     property bool showDock: false
     property bool dockAutoHide: false
     property bool dockSmartAutoHide: false
+    property bool dockUseOverlayLayer: false
     property bool dockGroupByApp: false
     property bool dockRestoreSpecialWorkspaceOnClick: false
     property bool dockOpenOnOverview: false
@@ -538,6 +693,9 @@ Singleton {
     property int dockMaxVisibleApps: 0
     property int dockMaxVisibleRunningApps: 0
     property bool dockShowOverflowBadge: true
+    property bool dockShowTrash: false
+    property string dockTrashFileManager: "default"
+    property string dockTrashCustomCommand: ""
 
     property bool notificationOverlayEnabled: false
     property bool notificationPopupShadowEnabled: true
@@ -590,6 +748,8 @@ Singleton {
     property int notificationTimeoutNormal: 5000
     property int notificationTimeoutCritical: 0
     property bool notificationCompactMode: false
+    property bool notificationShowTimeoutBar: false
+    property bool notificationDedupeEnabled: true
     property int notificationPopupPosition: SettingsData.Position.Top
     property int notificationAnimationSpeed: SettingsData.AnimationSpeed.Short
     property int notificationCustomAnimationDuration: 400
@@ -610,6 +770,7 @@ Singleton {
     property bool osdBrightnessEnabled: true
     property bool osdIdleInhibitorEnabled: true
     property bool osdMicMuteEnabled: true
+    property bool osdMicVolumeEnabled: true
     property bool osdCapsLockEnabled: true
     property bool osdPowerProfileEnabled: true
     property bool osdAudioOutputEnabled: true
@@ -627,9 +788,13 @@ Singleton {
     property string customPowerActionPowerOff: ""
 
     property bool updaterHideWidget: false
+    property bool updaterCheckOnStart: false
     property bool updaterUseCustomCommand: false
     property string updaterCustomCommand: ""
     property string updaterTerminalAdditionalParams: ""
+    property int updaterIntervalSeconds: 1800
+    property bool updaterIncludeFlatpak: true
+    property bool updaterAllowAUR: true
 
     property string displayNameMode: "system"
     property var screenPreferences: ({})
@@ -641,6 +806,7 @@ Singleton {
     property bool displayProfileAutoSelect: false
     property bool displayShowDisconnected: false
     property bool displaySnapToEdge: true
+    property var barIpcRevealStates: ({})
 
     property var barConfigs: [
         {
@@ -678,6 +844,7 @@ Singleton {
             "fontScale": 1.0,
             "iconScale": 1.0,
             "autoHide": false,
+            "autoHideStrict": false,
             "autoHideDelay": 250,
             "showOnWindowsOpen": false,
             "openOnOverview": false,
@@ -685,6 +852,7 @@ Singleton {
             "popupGapsAuto": true,
             "popupGapsManual": 4,
             "maximizeDetection": true,
+            "useOverlayLayer": false,
             "scrollEnabled": true,
             "scrollXBehavior": "column",
             "scrollYBehavior": "workspace",
@@ -1107,8 +1275,8 @@ Singleton {
             NiriService.generateNiriLayoutConfig();
         if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
             HyprlandService.generateLayoutConfig();
-        if (CompositorService.isDwl && typeof DwlService !== "undefined")
-            DwlService.generateLayoutConfig();
+        if (CompositorService.isMango && typeof MangoService !== "undefined")
+            MangoService.generateLayoutConfig();
     }
 
     function applyStoredIconTheme() {
@@ -1226,6 +1394,15 @@ Singleton {
         });
     }
 
+    function scheduleGreeterAutoLoginSync() {
+        if (isGreeterMode)
+            return;
+        Qt.callLater(() => {
+            Processes.settingsRoot = root;
+            Processes.scheduleGreeterAutoLoginSync();
+        });
+    }
+
     readonly property var _hooks: ({
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
@@ -1233,7 +1410,8 @@ Singleton {
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
-            "scheduleAuthApply": scheduleAuthApply
+            "scheduleAuthApply": scheduleAuthApply,
+            "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync
         })
 
     function set(key, value) {
@@ -1261,6 +1439,9 @@ Singleton {
 
             Store.parse(root, obj);
 
+            if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
+                frameMode = "connected";
+
             if (obj?.weatherLocation !== undefined)
                 _legacyWeatherLocation = obj.weatherLocation;
             if (obj?.weatherCoordinates !== undefined)
@@ -1281,13 +1462,14 @@ Singleton {
         } catch (e) {
             _parseError = true;
             const msg = e.message;
-            console.error("SettingsData: Failed to parse settings.json - file will not be overwritten. Error:", msg);
+            log.error("Failed to parse settings.json - file will not be overwritten. Error:", msg);
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse settings.json"), msg));
             applyStoredTheme();
         } finally {
             _loading = false;
         }
         loadPluginSettings();
+        Qt.callLater(() => _reconcileConnectedFrameBarStyles());
     }
 
     property var _pendingMigration: null
@@ -1302,12 +1484,12 @@ Singleton {
         if (_isReadOnly) {
             _hasUnsavedChanges = _checkForUnsavedChanges();
             if (!wasReadOnly)
-                console.info("SettingsData: settings.json is now read-only");
+                log.info("settings.json is now read-only");
         } else {
             _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
             _hasUnsavedChanges = false;
             if (wasReadOnly)
-                console.info("SettingsData: settings.json is now writable");
+                log.info("settings.json is now writable");
             if (_pendingMigration)
                 settingsFile.setText(JSON.stringify(_pendingMigration, null, 2));
         }
@@ -1361,7 +1543,7 @@ Singleton {
         } catch (e) {
             const msg = e.message || String(e);
             if (!_isMissingPluginSettingsError(e))
-                console.warn("SettingsData: Failed to load plugin_settings.json. Error:", msg);
+                log.warn("Failed to load plugin_settings.json. Error:", msg);
             _resetPluginSettings();
         }
     }
@@ -1378,7 +1560,7 @@ Singleton {
         } catch (e) {
             _pluginParseError = true;
             const msg = e.message;
-            console.error("SettingsData: Failed to parse plugin_settings.json - file will not be overwritten. Error:", msg);
+            log.error("Failed to parse plugin_settings.json - file will not be overwritten. Error:", msg);
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse plugin_settings.json"), msg));
             pluginSettings = {};
         } finally {
@@ -1399,6 +1581,149 @@ Singleton {
         if (_pluginSettingsLoading || _pluginParseError)
             return;
         pluginSettingsFile.setText(JSON.stringify(pluginSettings, null, 2));
+    }
+
+    function _connectedFrameBarStyleSnapshot(config) {
+        return {
+            "shadowIntensity": config?.shadowIntensity ?? 0,
+            "squareCorners": config?.squareCorners ?? false,
+            "gothCornersEnabled": config?.gothCornersEnabled ?? false,
+            "borderEnabled": config?.borderEnabled ?? false
+        };
+    }
+
+    function _hasConnectedFrameBarStyleBackups() {
+        return connectedFrameBarStyleBackups && Object.keys(connectedFrameBarStyleBackups).length > 0;
+    }
+
+    function _captureConnectedFrameBarStyleBackups(configs, overwriteExisting) {
+        if (!Array.isArray(configs))
+            return;
+
+        const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
+        const validIds = {};
+        let changed = false;
+
+        for (let i = 0; i < configs.length; i++) {
+            const config = configs[i];
+            if (!config?.id)
+                continue;
+            validIds[config.id] = true;
+
+            if (!overwriteExisting && nextBackups[config.id] !== undefined)
+                continue;
+
+            const snapshot = _connectedFrameBarStyleSnapshot(config);
+            if (JSON.stringify(nextBackups[config.id]) !== JSON.stringify(snapshot)) {
+                nextBackups[config.id] = snapshot;
+                changed = true;
+            }
+        }
+
+        if (overwriteExisting) {
+            for (const barId in nextBackups) {
+                if (validIds[barId])
+                    continue;
+                delete nextBackups[barId];
+                changed = true;
+            }
+        }
+
+        if (changed)
+            connectedFrameBarStyleBackups = nextBackups;
+    }
+
+    function _restoreConnectedFrameBarStyleBackups() {
+        if (!_hasConnectedFrameBarStyleBackups())
+            return;
+
+        const backups = connectedFrameBarStyleBackups || {};
+        const configs = JSON.parse(JSON.stringify(barConfigs));
+        let changed = false;
+
+        for (let i = 0; i < configs.length; i++) {
+            const backup = backups[configs[i].id];
+            if (!backup)
+                continue;
+            for (const key in backup) {
+                if (configs[i][key] === backup[key])
+                    continue;
+                configs[i][key] = backup[key];
+                changed = true;
+            }
+        }
+
+        if (changed)
+            barConfigs = configs;
+        connectedFrameBarStyleBackups = ({});
+        if (changed)
+            updateBarConfigs();
+    }
+
+    // Zeroes out connected-mode-hostile fields (shadow, square/goth corners, border).
+    // Returns { configs, changed } — `configs` is the same ref when no change.
+    function _sanitizeBarConfigsForConnectedFrame(configs) {
+        if (!connectedFrameModeActive || !Array.isArray(configs))
+            return {
+                "configs": configs,
+                "changed": false
+            };
+
+        let anyChanged = false;
+        const out = configs.map(cfg => {
+            if (!cfg)
+                return cfg;
+            let dirty = false;
+            const s = Object.assign({}, cfg);
+            if ((s.shadowIntensity ?? 0) !== 0) {
+                s.shadowIntensity = 0;
+                dirty = true;
+            }
+            if (s.squareCorners ?? false) {
+                s.squareCorners = false;
+                dirty = true;
+            }
+            if (s.gothCornersEnabled ?? false) {
+                s.gothCornersEnabled = false;
+                dirty = true;
+            }
+            if (s.borderEnabled ?? false) {
+                s.borderEnabled = false;
+                dirty = true;
+            }
+            if (dirty)
+                anyChanged = true;
+            return dirty ? s : cfg;
+        });
+        return {
+            "configs": anyChanged ? out : configs,
+            "changed": anyChanged
+        };
+    }
+
+    function effectiveBarConfigForRender(config, usesFrameBarChrome) {
+        if (!config || !connectedFrameModeActive || usesFrameBarChrome)
+            return config;
+        const backup = connectedFrameBarStyleBackups[config.id];
+        if (!backup)
+            return config;
+        return Object.assign({}, config, backup);
+    }
+
+    // Single entry point for connected-mode settings state.
+    //   !active → restore backups
+    function _reconcileConnectedFrameBarStyles() {
+        if (!connectedFrameModeActive) {
+            _restoreConnectedFrameBarStyleBackups();
+            return;
+        }
+        if (!_hasConnectedFrameBarStyleBackups())
+            _captureConnectedFrameBarStyleBackups(barConfigs, true);
+        const result = _sanitizeBarConfigsForConnectedFrame(barConfigs);
+        if (result.changed) {
+            barConfigs = result.configs;
+            updateBarConfigs();
+        }
     }
 
     function detectAvailableIconThemes() {
@@ -1548,35 +1873,37 @@ Singleton {
         const spacing = barSpacing !== undefined ? barSpacing : (defaultBar?.spacing ?? 4);
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
         const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
-        const bottomGap = Math.max(0, rawBottomGap);
+        const isConnected = connectedFrameModeActive;
+        const bottomGap = isConnected ? 0 : Math.max(0, rawBottomGap);
 
         const useAutoGaps = (barConfig && barConfig.popupGapsAuto !== undefined) ? barConfig.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
         const manualGapValue = (barConfig && barConfig.popupGapsManual !== undefined) ? barConfig.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
-        const popupGap = useAutoGaps ? Math.max(4, spacing) : manualGapValue;
+        const popupGap = isConnected ? 0 : (useAutoGaps ? Math.max(4, spacing) : manualGapValue);
+        const edgeSpacing = isConnected ? 0 : spacing;
 
         switch (position) {
         case SettingsData.Position.Left:
             return {
-                "x": barThickness + spacing + popupGap,
+                "x": barThickness + edgeSpacing + popupGap,
                 "y": relativeY,
                 "width": widgetWidth
             };
         case SettingsData.Position.Right:
             return {
-                "x": (screen?.width || 0) - (barThickness + spacing + popupGap),
+                "x": (screen?.width || 0) - (barThickness + edgeSpacing + popupGap),
                 "y": relativeY,
                 "width": widgetWidth
             };
         case SettingsData.Position.Bottom:
             return {
                 "x": relativeX,
-                "y": (screen?.height || 0) - (barThickness + spacing + bottomGap + popupGap),
+                "y": (screen?.height || 0) - (barThickness + edgeSpacing + bottomGap + popupGap),
                 "width": widgetWidth
             };
         default:
             return {
                 "x": relativeX,
-                "y": barThickness + spacing + bottomGap + popupGap,
+                "y": barThickness + edgeSpacing + bottomGap + popupGap,
                 "width": widgetWidth
             };
         }
@@ -1670,7 +1997,9 @@ Singleton {
         const screenWidth = screen.width;
         const screenHeight = screen.height;
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
-        const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
+        const isConnected = connectedFrameModeActive;
+        const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
+        const bottomGap = isConnected ? 0 : rawBottomGap;
 
         let topOffset = 0;
         let bottomOffset = 0;
@@ -1692,7 +2021,7 @@ Singleton {
                 const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
                 const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
                 const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing + wingSize;
-                const otherBottomGap = other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0);
+                const otherBottomGap = isConnected ? 0 : (other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0));
 
                 switch (other.position) {
                 case SettingsData.Position.Top:
@@ -1780,10 +2109,39 @@ Singleton {
         return barConfigs.find(cfg => cfg.id === barId) || null;
     }
 
+    function isBarIpcRevealed(barId) {
+        if (!barId)
+            return false;
+        return !!barIpcRevealStates[barId];
+    }
+
+    function setBarIpcReveal(barId, revealed) {
+        if (!barId)
+            return;
+        const nextRevealed = !!revealed;
+        if (!!barIpcRevealStates[barId] === nextRevealed)
+            return;
+        const states = Object.assign({}, barIpcRevealStates);
+        if (nextRevealed) {
+            states[barId] = true;
+        } else {
+            delete states[barId];
+        }
+        barIpcRevealStates = states;
+    }
+
+    function toggleBarIpcReveal(barId) {
+        const revealed = !isBarIpcRevealed(barId);
+        setBarIpcReveal(barId, revealed);
+        return revealed;
+    }
+
     function addBarConfig(config) {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         configs.push(config);
-        barConfigs = configs;
+        if (connectedFrameModeActive)
+            _captureConnectedFrameBarStyleBackups(configs, false);
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
         updateBarConfigs();
     }
 
@@ -1793,9 +2151,11 @@ Singleton {
         if (index === -1)
             return;
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
+        if (updates.autoHide === false || updates.visible === false)
+            setBarIpcReveal(barId, false);
 
         Object.assign(configs[index], updates);
-        barConfigs = configs;
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
         updateBarConfigs();
 
         if (positionChanged) {
@@ -1849,6 +2209,12 @@ Singleton {
             return;
         const configs = barConfigs.filter(cfg => cfg.id !== barId);
         barConfigs = configs;
+        if (connectedFrameBarStyleBackups?.[barId] !== undefined) {
+            const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
+            delete nextBackups[barId];
+            connectedFrameBarStyleBackups = nextBackups;
+        }
+        setBarIpcReveal(barId, false);
         updateBarConfigs();
     }
 
@@ -1933,7 +2299,10 @@ Singleton {
 
     function getFilteredScreens(componentId) {
         var prefs = screenPreferences && screenPreferences[componentId] || ["all"];
-        if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
+        if (componentId === "wallpaper" && Array.isArray(prefs) && prefs.length === 0) {
+            return [];
+        }
+        if (!prefs || prefs.length === 0 || prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
             return Quickshell.screens;
         }
         var filtered = Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
@@ -1941,6 +2310,95 @@ Singleton {
             return Quickshell.screens;
         }
         return filtered;
+    }
+
+    function getFrameFilteredScreens() {
+        var prefs = frameScreenPreferences || ["all"];
+        if (!prefs || prefs.length === 0 || prefs.includes("all")) {
+            return Quickshell.screens;
+        }
+        return Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
+    }
+
+    function getActiveBarEdgeForScreen(screen) {
+        if (!screen)
+            return "";
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled)
+                continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
+            switch (bc.position ?? 0) {
+            case SettingsData.Position.Top:
+                return "top";
+            case SettingsData.Position.Bottom:
+                return "bottom";
+            case SettingsData.Position.Left:
+                return "left";
+            case SettingsData.Position.Right:
+                return "right";
+            }
+        }
+        return "";
+    }
+
+    function getActiveBarEdgesForScreen(screen) {
+        if (!screen)
+            return [];
+        var edges = [];
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled)
+                continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
+            switch (bc.position ?? 0) {
+            case SettingsData.Position.Top:
+                edges.push("top");
+                break;
+            case SettingsData.Position.Bottom:
+                edges.push("bottom");
+                break;
+            case SettingsData.Position.Left:
+                edges.push("left");
+                break;
+            case SettingsData.Position.Right:
+                edges.push("right");
+                break;
+            }
+        }
+        return edges;
+    }
+
+    function frameEdgeInsetForSide(screen, side) {
+        if (!frameEnabled || !screen)
+            return 0;
+        const edges = getActiveBarEdgesForScreen(screen);
+        return edges.includes(side) ? frameBarSize : frameThickness;
+    }
+
+    function getActiveBarThicknessForScreen(screen) {
+        if (frameEnabled)
+            return frameBarSize;
+        if (!screen)
+            return frameThickness;
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled)
+                continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
+            const innerPadding = bc.innerPadding ?? 4;
+            const barT = Math.max(26 + innerPadding * 0.6, Theme.barHeight - 4 - (8 - innerPadding));
+            const spacing = bc.spacing ?? 4;
+            const bottomGap = bc.bottomGap ?? 0;
+            return barT + spacing + bottomGap;
+        }
+        return frameThickness;
     }
 
     function sendTestNotifications() {
@@ -2051,8 +2509,8 @@ Singleton {
             HyprlandService.generateCursorConfig();
             return;
         }
-        if (CompositorService.isDwl && typeof DwlService !== "undefined") {
-            DwlService.generateCursorConfig();
+        if (CompositorService.isMango && typeof MangoService !== "undefined") {
+            MangoService.generateCursorConfig();
             return;
         }
     }
@@ -2781,7 +3239,7 @@ Singleton {
             } catch (e) {
                 _parseError = true;
                 const msg = e.message;
-                console.error("SettingsData: Failed to reload settings.json - file will not be overwritten. Error:", msg);
+                log.error("Failed to reload settings.json - file will not be overwritten. Error:", msg);
                 Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse settings.json"), msg));
             } finally {
                 _loading = false;
@@ -2816,7 +3274,7 @@ Singleton {
             if (!isGreeterMode) {
                 const msg = String(error || "");
                 if (!_isMissingPluginSettingsError(error))
-                    console.warn("SettingsData: Failed to load plugin_settings.json. Error:", msg);
+                    log.warn("Failed to load plugin_settings.json. Error:", msg);
                 _resetPluginSettings();
             }
         }

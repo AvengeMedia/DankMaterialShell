@@ -10,11 +10,15 @@ Item {
     required property var axis
     required property var barConfig
 
+    readonly property bool frameShapesBar: SettingsData.frameEnabled && barWindow.usesFrameBarChrome
+
+    visible: !frameShapesBar
+
     anchors.fill: parent
 
     anchors.left: parent.left
     anchors.top: parent.top
-    readonly property bool gothEnabled: (barConfig?.gothCornersEnabled ?? false) && !barWindow.hasMaximizedToplevel
+    readonly property bool gothEnabled: (barConfig?.gothCornersEnabled ?? false) && !(barWindow.flattenForMaximizedWindow && barWindow.hasMaximizedToplevel)
     anchors.leftMargin: -(gothEnabled && axis.isVertical && axis.edge === "right" ? barWindow._wingR : 0)
     anchors.rightMargin: -(gothEnabled && axis.isVertical && axis.edge === "left" ? barWindow._wingR : 0)
     anchors.topMargin: -(gothEnabled && !axis.isVertical && axis.edge === "bottom" ? barWindow._wingR : 0)
@@ -37,9 +41,11 @@ Item {
     }
 
     property real rt: {
+        if (frameShapesBar)
+            return SettingsData.frameRounding;
         if (barConfig?.squareCorners ?? false)
             return 0;
-        if (barWindow.hasMaximizedToplevel)
+        if (barWindow.flattenForMaximizedWindow && barWindow.hasMaximizedToplevel)
             return 0;
         return Theme.cornerRadius;
     }
@@ -109,9 +115,32 @@ Item {
     readonly property real shadowOffsetX: Theme.elevationOffsetXFor(hasPerBarOverride ? null : elevLevel, effectiveShadowDirection, shadowOffsetMagnitude)
     readonly property real shadowOffsetY: Theme.elevationOffsetYFor(hasPerBarOverride ? null : elevLevel, effectiveShadowDirection, shadowOffsetMagnitude)
 
-    readonly property string mainPath: generatePathForPosition(width, height)
-    readonly property string borderFullPath: generateBorderFullPath(width, height)
-    readonly property string borderEdgePath: generateBorderEdgePath(width, height)
+    readonly property string mainPath: {
+        frameShapesBar;
+        rt;
+        wing;
+        barWindow.flattenForMaximizedWindow;
+        barWindow.hasMaximizedToplevel;
+        width;
+        height;
+        return generatePathForPosition(width, height);
+    }
+    readonly property string borderFullPath: {
+        frameShapesBar;
+        rt;
+        wing;
+        width;
+        height;
+        return generateBorderFullPath(width, height);
+    }
+    readonly property string borderEdgePath: {
+        frameShapesBar;
+        rt;
+        wing;
+        width;
+        height;
+        return generateBorderEdgePath(width, height);
+    }
     property bool mainPathCorrectShape: false
     property bool borderFullPathCorrectShape: false
     property bool borderEdgePathCorrectShape: false
@@ -130,6 +159,12 @@ Item {
         if (width > 0 && height > 0) {
             root: borderEdgePathCorrectShape = true;
         }
+    }
+
+    onFrameShapesBarChanged: {
+        mainPathCorrectShape = false;
+        borderFullPathCorrectShape = false;
+        borderEdgePathCorrectShape = false;
     }
 
     MouseArea {
@@ -172,7 +207,6 @@ Item {
         shadowOffsetX: root.shadowOffsetX
         shadowOffsetY: root.shadowOffsetY
         shadowColor: root.shadowColor
-        blurMax: Theme.elevationBlurMax
     }
 
     Loader {
@@ -255,11 +289,12 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
+        const crE = frameShapesBar ? 0 : cr;
 
-        let d = `M ${cr} 0`;
-        d += ` L ${w - cr} 0`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${w} ${cr}`;
+        let d = `M ${crE} 0`;
+        d += ` L ${w - crE} 0`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${w} ${crE}`;
         if (r > 0) {
             d += ` L ${w} ${h + r}`;
             d += ` A ${r} ${r} 0 0 0 ${w - r} ${h}`;
@@ -273,9 +308,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 1 0 ${h - cr}`;
         }
-        d += ` L 0 ${cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${cr} 0`;
+        d += ` L 0 ${crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${crE} 0`;
         d += " Z";
         return d;
     }
@@ -285,11 +320,12 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
+        const crE = frameShapesBar ? 0 : cr;
 
-        let d = `M ${cr} ${fullH}`;
-        d += ` L ${w - cr} ${fullH}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 ${w} ${fullH - cr}`;
+        let d = `M ${crE} ${fullH}`;
+        d += ` L ${w - crE} ${fullH}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 ${w} ${fullH - crE}`;
         if (r > 0) {
             d += ` L ${w} 0`;
             d += ` A ${r} ${r} 0 0 1 ${w - r} ${r}`;
@@ -303,9 +339,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 0 0 ${cr}`;
         }
-        d += ` L 0 ${fullH - cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 ${cr} ${fullH}`;
+        d += ` L 0 ${fullH - crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 ${crE} ${fullH}`;
         d += " Z";
         return d;
     }
@@ -314,11 +350,12 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
+        const crE = frameShapesBar ? 0 : cr;
 
-        let d = `M 0 ${cr}`;
-        d += ` L 0 ${h - cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 ${cr} ${h}`;
+        let d = `M 0 ${crE}`;
+        d += ` L 0 ${h - crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 ${crE} ${h}`;
         if (r > 0) {
             d += ` L ${w + r} ${h}`;
             d += ` A ${r} ${r} 0 0 1 ${w} ${h - r}`;
@@ -332,9 +369,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 0 ${w - cr} 0`;
         }
-        d += ` L ${cr} 0`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 0 0 ${cr}`;
+        d += ` L ${crE} 0`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 0 0 ${crE}`;
         d += " Z";
         return d;
     }
@@ -344,11 +381,12 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
+        const crE = frameShapesBar ? 0 : cr;
 
-        let d = `M ${fullW} ${cr}`;
-        d += ` L ${fullW} ${h - cr}`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${fullW - cr} ${h}`;
+        let d = `M ${fullW} ${crE}`;
+        d += ` L ${fullW} ${h - crE}`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${fullW - crE} ${h}`;
         if (r > 0) {
             d += ` L 0 ${h}`;
             d += ` A ${r} ${r} 0 0 0 ${r} ${h - r}`;
@@ -362,9 +400,9 @@ Item {
             if (cr > 0)
                 d += ` A ${cr} ${cr} 0 0 1 ${cr} 0`;
         }
-        d += ` L ${fullW - cr} 0`;
-        if (cr > 0)
-            d += ` A ${cr} ${cr} 0 0 1 ${fullW} ${cr}`;
+        d += ` L ${fullW - crE} 0`;
+        if (crE > 0)
+            d += ` A ${crE} ${crE} 0 0 1 ${fullW} ${crE}`;
         d += " Z";
         return d;
     }

@@ -148,7 +148,7 @@ Item {
             if (wasDragging || mouse.button !== Qt.LeftButton)
                 return;
 
-            PopoutService.toggleDankLauncherV2();
+            PopoutService.toggleDankLauncherV2(dockApps?.usesOverlayLayer ?? false);
         }
         onPositionChanged: mouse => {
             if (longPressing && !dragging) {
@@ -236,7 +236,7 @@ Item {
             }
 
             IconImage {
-                visible: SettingsData.dockLauncherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
+                visible: SettingsData.dockLauncherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
                 anchors.centerIn: parent
                 width: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
                 height: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
@@ -247,7 +247,7 @@ Item {
                         return "file://" + Theme.shellDir + "/assets/niri.svg";
                     } else if (CompositorService.isHyprland) {
                         return "file://" + Theme.shellDir + "/assets/hyprland.svg";
-                    } else if (CompositorService.isDwl) {
+                    } else if (CompositorService.isMango) {
                         return "file://" + Theme.shellDir + "/assets/mango.png";
                     } else if (CompositorService.isSway) {
                         return "file://" + Theme.shellDir + "/assets/sway.svg";

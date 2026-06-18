@@ -163,7 +163,7 @@ Item {
         property color extraInfoColor: Theme.surfaceVariantText
 
         radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+        color: Theme.nestedSurface
         border.color: Theme.outlineLight
         border.width: 1
 

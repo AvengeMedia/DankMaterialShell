@@ -3,13 +3,13 @@
 # Usage: ./ppa-upload.sh [package-name] [ppa-name] [ubuntu-series] [rebuild-number] [--keep-builds] [--rebuild=N]
 #
 # Examples:
-#   ./ppa-upload.sh dms                    # Upload to questing + resolute (default)
-#   ./ppa-upload.sh dms 2                 # Native: questing ppa2, resolute ppa3 (auto +1 on second series)
+#   ./ppa-upload.sh dms                    # Upload to resolute + stonking (default)
+#   ./ppa-upload.sh dms 2                 # Native: resolute ppa2, stonking ppa3 (auto +1 on second series)
 #   ./ppa-upload.sh dms --rebuild=2       # Rebuild with ppa2 (flag syntax)
 #   ./ppa-upload.sh dms-git               # Single package (both series)
 #   ./ppa-upload.sh all                   # All packages (each to both series)
 #   ./ppa-upload.sh dms resolute          # 26.04 LTS only (same as "dms dms resolute")
-#   ./ppa-upload.sh dms questing          # 25.10 only
+#   ./ppa-upload.sh dms stonking          # 26.10 only
 #   ./ppa-upload.sh dms dms resolute      # Explicit PPA name + one series (optional form)
 #   ./ppa-upload.sh dms dms resolute 2    # One series + rebuild number
 #   ./ppa-upload.sh distro/ubuntu/dms dms # Path-style (backward compatible)
@@ -70,8 +70,8 @@ if [[ ${#POSITIONAL_ARGS[@]} -gt 0 ]]; then
     fi
 fi
 
-# Shorthand: "dms resolute" / "dms questing" (package + series; PPA inferred — no need for "dms dms resolute")
-if [[ ${#POSITIONAL_ARGS[@]} -eq 2 ]] && [[ "${POSITIONAL_ARGS[1]}" == "questing" || "${POSITIONAL_ARGS[1]}" == "resolute" ]]; then
+# Shorthand: "dms resolute" / "dms stonking" (package + series; PPA inferred — no need for "dms dms resolute")
+if [[ ${#POSITIONAL_ARGS[@]} -eq 2 ]] && [[ "${POSITIONAL_ARGS[1]}" == "resolute" || "${POSITIONAL_ARGS[1]}" == "stonking" ]]; then
     PACKAGE_INPUT="${POSITIONAL_ARGS[0]}"
     PPA_NAME_INPUT=""
     UBUNTU_SERIES_RAW="${POSITIONAL_ARGS[1]}"
@@ -79,11 +79,11 @@ fi
 
 SERIES_LIST=()
 if [[ -z "$UBUNTU_SERIES_RAW" ]]; then
-    SERIES_LIST=(questing resolute)
-elif [[ "$UBUNTU_SERIES_RAW" == "questing" || "$UBUNTU_SERIES_RAW" == "resolute" ]]; then
+    SERIES_LIST=(resolute stonking)
+elif [[ "$UBUNTU_SERIES_RAW" == "resolute" || "$UBUNTU_SERIES_RAW" == "stonking" ]]; then
     SERIES_LIST=("$UBUNTU_SERIES_RAW")
 else
-    error "Invalid Ubuntu series: $UBUNTU_SERIES_RAW (use questing, resolute, or omit for both)"
+    error "Invalid Ubuntu series: $UBUNTU_SERIES_RAW (use resolute, stonking, or omit for both)"
     exit 1
 fi
 
@@ -217,6 +217,42 @@ fi
 PACKAGE_DIR=$(cd "$PACKAGE_DIR" && pwd)
 PARENT_DIR=$(dirname "$PACKAGE_DIR")
 
+setup_launchpad_sftp() {
+    if [[ -z "${LAUNCHPAD_SSH_PRIVATE_KEY:-}" ]]; then
+        error "LAUNCHPAD_SSH_PRIVATE_KEY is required for CI SFTP uploads."
+        error "Add a GitHub Actions secret containing a private SSH key whose public key is registered in Launchpad."
+        error "Optional: set LAUNCHPAD_SSH_LOGIN if the Launchpad login is not 'avengemedia'."
+        exit 1
+    fi
+
+    local ssh_dir="$HOME/.ssh"
+    local key_file="$ssh_dir/launchpad_ppa"
+    local login="${LAUNCHPAD_SSH_LOGIN:-avengemedia}"
+    local strict_host_key_checking="yes"
+
+    mkdir -p "$ssh_dir"
+    chmod 700 "$ssh_dir"
+    printf '%s\n' "$LAUNCHPAD_SSH_PRIVATE_KEY" > "$key_file"
+    chmod 600 "$key_file"
+
+    if ssh-keyscan -H ppa.launchpad.net >> "$ssh_dir/known_hosts" 2>/dev/null; then
+        chmod 600 "$ssh_dir/known_hosts"
+    else
+        warn "Could not prefetch ppa.launchpad.net SSH host key; allowing OpenSSH to trust it on first SFTP connection"
+        strict_host_key_checking="accept-new"
+    fi
+
+    cat > "$ssh_dir/config" <<EOF
+Host ppa.launchpad.net
+    HostName ppa.launchpad.net
+    User ${login}
+    IdentityFile ${key_file}
+    IdentitiesOnly yes
+    StrictHostKeyChecking ${strict_host_key_checking}
+EOF
+    chmod 600 "$ssh_dir/config"
+}
+
 if [[ ${#SERIES_LIST[@]} -gt 1 ]]; then
     SOURCE_FORMAT_LINE=$(head -1 "$PACKAGE_DIR/debian/source/format" 2>/dev/null || echo "")
     IS_NATIVE_DUAL=false
@@ -330,8 +366,30 @@ if [ "$PPA_NAME" = "danklinux" ] || [ "$PPA_NAME" = "dms" ] || [ "$PPA_NAME" = "
     info "  - $BUILDINFO"
     echo
 
-    LFTP_SCRIPT=$(mktemp)
-    cat >"$LFTP_SCRIPT" <<EOF
+    if [[ -n "${GITHUB_ACTIONS:-}" || -n "${CI:-}" ]] && command -v dput >/dev/null 2>&1; then
+        setup_launchpad_sftp
+        DPUT_CONFIG=$(mktemp)
+        cat >"$DPUT_CONFIG" <<EOF
+[avengemedia-${PPA_NAME}]
+fqdn = ppa.launchpad.net
+method = sftp
+incoming = ~avengemedia/ubuntu/${PPA_NAME}/
+login = ${LAUNCHPAD_SSH_LOGIN:-avengemedia}
+allow_unsigned_uploads = 0
+EOF
+
+        info "Using dput for CI upload (SFTP)"
+        if dput -c "$DPUT_CONFIG" "avengemedia-${PPA_NAME}" "$CHANGES_FILE"; then
+            success "Upload successful!"
+            rm -f "$DPUT_CONFIG"
+        else
+            rm -f "$DPUT_CONFIG"
+            error "dput upload failed!"
+            exit 1
+        fi
+    else
+        LFTP_SCRIPT=$(mktemp)
+        cat >"$LFTP_SCRIPT" <<EOF
 cd ~avengemedia/ubuntu/$PPA_NAME/
 lcd $BUILD_DIR
 mput $CHANGES_BASENAME
@@ -341,13 +399,14 @@ mput $BUILDINFO
 bye
 EOF
 
-    if lftp -d ftp://anonymous:@ppa.launchpad.net <"$LFTP_SCRIPT"; then
-        success "Upload successful!"
-        rm -f "$LFTP_SCRIPT"
-    else
-        error "Upload failed!"
-        rm -f "$LFTP_SCRIPT"
-        exit 1
+        if lftp -d ftp://anonymous:@ppa.launchpad.net <"$LFTP_SCRIPT"; then
+            success "Upload successful!"
+            rm -f "$LFTP_SCRIPT"
+        else
+            error "Upload failed!"
+            rm -f "$LFTP_SCRIPT"
+            exit 1
+        fi
     fi
 else
     # This branch should not be reached for DMS packages

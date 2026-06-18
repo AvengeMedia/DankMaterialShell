@@ -6,30 +6,50 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("HyprlandService")
 
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation))
     readonly property string hyprDmsDir: configDir + "/hypr/dms"
-    readonly property string outputsPath: hyprDmsDir + "/outputs.conf"
-    readonly property string layoutPath: hyprDmsDir + "/layout.conf"
-    readonly property string cursorPath: hyprDmsDir + "/cursor.conf"
-    readonly property string windowrulesPath: hyprDmsDir + "/windowrules.conf"
+    readonly property string outputsPath: hyprDmsDir + "/outputs.lua"
+    readonly property string layoutPath: hyprDmsDir + "/layout.lua"
+    readonly property string cursorPath: hyprDmsDir + "/cursor.lua"
+    readonly property string windowrulesPath: hyprDmsDir + "/windowrules.lua"
+    readonly property bool luaConfigActive: CompositorService.isHyprland && (Hyprland.usingLua === true || luaConfigDetected)
 
     property int _lastGapValue: -1
+    property bool luaConfigDetected: false
+    property bool luaConfigStatusReady: false
+    property bool luaConfigStatusLoading: false
+    property string luaConfigFormat: ""
+
+    onLuaConfigActiveChanged: {
+        if (luaConfigActive)
+            ensureDmsLuaConfigs();
+    }
 
     Component.onCompleted: {
         if (CompositorService.isHyprland) {
-            Qt.callLater(generateLayoutConfig);
-            ensureWindowrulesConfig();
+            refreshLuaConfigStatus();
+            if (luaConfigActive)
+                ensureDmsLuaConfigs();
         }
     }
 
+    function ensureDmsLuaConfigs() {
+        Qt.callLater(generateLayoutConfig);
+        Qt.callLater(ensureWindowrulesConfig);
+    }
+
     function ensureWindowrulesConfig() {
+        if (!canWriteLuaConfig("windowrules"))
+            return;
         Proc.runCommand("hypr-ensure-windowrules", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && [ ! -f "${windowrulesPath}" ] && touch "${windowrulesPath}" || true`], (output, exitCode) => {
             if (exitCode !== 0)
-                console.warn("HyprlandService: Failed to ensure windowrules.conf:", output);
+                log.warn("Failed to ensure windowrules.lua:", output);
         });
     }
 
@@ -49,24 +69,95 @@ Singleton {
     Connections {
         target: CompositorService
         function onIsHyprlandChanged() {
-            if (CompositorService.isHyprland)
-                generateLayoutConfig();
+            if (CompositorService.isHyprland) {
+                refreshLuaConfigStatus();
+                if (luaConfigActive)
+                    ensureDmsLuaConfigs();
+                return;
+            }
+            luaConfigDetected = false;
+            luaConfigStatusReady = false;
+            luaConfigStatusLoading = false;
+            luaConfigFormat = "";
         }
     }
 
     function getOutputIdentifier(output, outputName) {
         if (SettingsData.displayNameMode === "model" && output.make && output.model)
-            return "desc:" + output.make + " " + output.model + " " + (output.serial || "Unknown");
+            return ("desc:" + output.make + " " + output.model + " " + (output.serial || "Unknown")).replace(/,/g, "");
         return outputName;
     }
 
-    function generateOutputsConfig(outputsData, hyprlandSettings) {
-        if (!outputsData || Object.keys(outputsData).length === 0)
+    function luaQuoted(str) {
+        return JSON.stringify(String(str ?? ""));
+    }
+
+    function refreshLuaConfigStatus() {
+        if (!CompositorService.isHyprland) {
+            luaConfigDetected = false;
+            luaConfigStatusReady = false;
+            luaConfigStatusLoading = false;
+            luaConfigFormat = "";
+            return;
+        }
+        if (luaConfigStatusLoading)
             return;
 
+        luaConfigStatusLoading = true;
+        Proc.runCommand("hypr-lua-config-status", ["dms", "config", "resolve-include", "hyprland", "outputs.lua"], (output, exitCode) => {
+            luaConfigStatusLoading = false;
+            luaConfigStatusReady = true;
+            if (exitCode !== 0) {
+                luaConfigDetected = false;
+                luaConfigFormat = "";
+                return;
+            }
+            try {
+                const status = JSON.parse(output.trim());
+                luaConfigFormat = status.configFormat ?? "";
+                luaConfigDetected = luaConfigFormat === "lua" && status.readOnly !== true;
+            } catch (e) {
+                luaConfigDetected = false;
+                luaConfigFormat = "";
+            }
+        });
+    }
+
+    function canWriteLuaConfig(name) {
+        if (luaConfigActive)
+            return true;
+        if (CompositorService.isHyprland && !luaConfigStatusReady && !luaConfigStatusLoading)
+            refreshLuaConfigStatus();
+        if (CompositorService.isHyprland && (luaConfigStatusLoading || !luaConfigStatusReady)) {
+            log.debug("Deferring Hyprland", name || "config", "Lua write until config format is known");
+            return false;
+        }
+        log.info("Skipping Hyprland", name || "config", "Lua write because the active Hyprland config is not Lua");
+        return false;
+    }
+
+    function forceFlagValue(value) {
+        if (value === true)
+            return 1;
+        if (value === false)
+            return -1;
+        return Number(value);
+    }
+
+    function generateOutputsConfig(outputsData, hyprlandSettings, callback) {
+        if (!canWriteLuaConfig("outputs")) {
+            if (callback)
+                callback(false);
+            return;
+        }
+        if (!outputsData || Object.keys(outputsData).length === 0) {
+            if (callback)
+                callback(false);
+            return;
+        }
+
         const settings = hyprlandSettings || SettingsData.hyprlandOutputSettings;
-        let lines = ["# Auto-generated by DMS - do not edit manually", ""];
-        let monitorv2Blocks = [];
+        let lines = ["-- Auto-generated by DMS — do not edit manually", ""];
 
         for (const outputName in outputsData) {
             const output = outputsData[outputName];
@@ -77,7 +168,7 @@ Singleton {
             const outputSettings = settings[identifier] || {};
 
             if (outputSettings.disabled) {
-                lines.push("monitor = " + identifier + ", disable");
+                lines.push(`hl.monitor({ output = ${luaQuoted(identifier)}, disabled = true })`);
                 continue;
             }
 
@@ -93,90 +184,70 @@ Singleton {
             const position = x + "x" + y;
             const scale = output.logical?.scale ?? 1.0;
 
-            let monitorLine = "monitor = " + identifier + ", " + resolution + ", " + position + ", " + scale;
+            const parts = [`output = ${luaQuoted(identifier)}`, `mode = ${luaQuoted(resolution)}`, `position = ${luaQuoted(position)}`, `scale = ${Number(scale)}`];
 
             const transform = transformToHyprland(output.logical?.transform ?? "Normal");
             if (transform !== 0)
-                monitorLine += ", transform, " + transform;
+                parts.push(`transform = ${transform}`);
 
             if (output.vrr_supported) {
                 const vrrMode = outputSettings.vrrFullscreenOnly ? 2 : (output.vrr_enabled ? 1 : 0);
-                monitorLine += ", vrr, " + vrrMode;
+                parts.push(`vrr = ${vrrMode}`);
             }
 
             if (output.mirror && output.mirror.length > 0)
-                monitorLine += ", mirror, " + output.mirror;
+                parts.push(`mirror = ${luaQuoted(output.mirror)}`);
 
             if (outputSettings.bitdepth && outputSettings.bitdepth !== 8)
-                monitorLine += ", bitdepth, " + outputSettings.bitdepth;
+                parts.push(`bitdepth = ${Number(outputSettings.bitdepth)}`);
 
             if (outputSettings.colorManagement && outputSettings.colorManagement !== "auto")
-                monitorLine += ", cm, " + outputSettings.colorManagement;
+                parts.push(`cm = ${luaQuoted(outputSettings.colorManagement)}`);
 
             if (outputSettings.sdrBrightness !== undefined && outputSettings.sdrBrightness !== 1.0)
-                monitorLine += ", sdrbrightness, " + outputSettings.sdrBrightness;
+                parts.push(`sdrbrightness = ${Number(outputSettings.sdrBrightness)}`);
 
             if (outputSettings.sdrSaturation !== undefined && outputSettings.sdrSaturation !== 1.0)
-                monitorLine += ", sdrsaturation, " + outputSettings.sdrSaturation;
+                parts.push(`sdrsaturation = ${Number(outputSettings.sdrSaturation)}`);
 
-            lines.push(monitorLine);
+            if (outputSettings.supportsWideColor !== undefined)
+                parts.push(`supports_wide_color = ${forceFlagValue(outputSettings.supportsWideColor)}`);
 
-            const needsMonitorv2 = outputSettings.supportsHdr || outputSettings.supportsWideColor || outputSettings.sdrMinLuminance !== undefined || outputSettings.sdrMaxLuminance !== undefined || outputSettings.minLuminance !== undefined || outputSettings.maxLuminance !== undefined || outputSettings.maxAvgLuminance !== undefined;
+            if (outputSettings.supportsHdr !== undefined)
+                parts.push(`supports_hdr = ${forceFlagValue(outputSettings.supportsHdr)}`);
 
-            if (needsMonitorv2) {
-                let block = "monitorv2 {\n";
-                block += "    output = " + identifier + "\n";
-
-                if (outputSettings.supportsWideColor)
-                    block += "    supports_wide_color = true\n";
-                if (outputSettings.supportsHdr)
-                    block += "    supports_hdr = true\n";
-                if (outputSettings.sdrMinLuminance !== undefined)
-                    block += "    sdr_min_luminance = " + outputSettings.sdrMinLuminance + "\n";
-                if (outputSettings.sdrMaxLuminance !== undefined)
-                    block += "    sdr_max_luminance = " + outputSettings.sdrMaxLuminance + "\n";
-                if (outputSettings.minLuminance !== undefined)
-                    block += "    min_luminance = " + outputSettings.minLuminance + "\n";
-                if (outputSettings.maxLuminance !== undefined)
-                    block += "    max_luminance = " + outputSettings.maxLuminance + "\n";
-                if (outputSettings.maxAvgLuminance !== undefined)
-                    block += "    max_avg_luminance = " + outputSettings.maxAvgLuminance + "\n";
-
-                block += "}";
-                monitorv2Blocks.push(block);
-            }
-        }
-
-        if (monitorv2Blocks.length > 0) {
-            lines.push("");
-            for (const block of monitorv2Blocks)
-                lines.push(block);
+            lines.push("hl.monitor({ " + parts.join(", ") + " })");
         }
 
         lines.push("");
-
         const content = lines.join("\n");
 
         Proc.runCommand("hypr-write-outputs", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && cat > "${outputsPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to write outputs config:", output);
+                log.warn("Failed to write outputs config:", output);
+                if (callback)
+                    callback(false);
                 return;
             }
-            console.info("HyprlandService: Generated outputs config at", outputsPath);
+            log.info("Generated outputs config at", outputsPath);
             if (CompositorService.isHyprland)
                 reloadConfig();
+            if (callback)
+                callback(true);
         });
     }
 
     function reloadConfig() {
         Proc.runCommand("hyprctl-reload", ["hyprctl", "reload"], (output, exitCode) => {
             if (exitCode !== 0)
-                console.warn("HyprlandService: hyprctl reload failed:", output);
+                log.warn("hyprctl reload failed:", output);
         });
     }
 
     function generateLayoutConfig() {
         if (!CompositorService.isHyprland)
+            return;
+        if (!canWriteLuaConfig("layout"))
             return;
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
@@ -186,26 +257,29 @@ Singleton {
         const cornerRadius = (typeof SettingsData !== "undefined" && SettingsData.hyprlandLayoutRadiusOverride >= 0) ? SettingsData.hyprlandLayoutRadiusOverride : defaultRadius;
         const gaps = (typeof SettingsData !== "undefined" && SettingsData.hyprlandLayoutGapsOverride >= 0) ? SettingsData.hyprlandLayoutGapsOverride : defaultGaps;
         const borderSize = (typeof SettingsData !== "undefined" && SettingsData.hyprlandLayoutBorderSize >= 0) ? SettingsData.hyprlandLayoutBorderSize : defaultBorderSize;
+        const resizeOnBorder = (typeof SettingsData !== "undefined" && SettingsData.hyprlandResizeOnBorder) ? true : false;
 
-        let content = `# Auto-generated by DMS - do not edit manually
+        let content = `-- Auto-generated by DMS — do not edit manually
 
-general {
-    gaps_in = ${gaps}
-    gaps_out = ${gaps}
-    border_size = ${borderSize}
-}
-
-decoration {
-    rounding = ${cornerRadius}
-}
+hl.config({
+	general = {
+		gaps_in = ${gaps},
+		gaps_out = ${gaps},
+		border_size = ${borderSize},
+		resize_on_border = ${resizeOnBorder},
+	},
+	decoration = {
+		rounding = ${cornerRadius},
+	},
+})
 `;
 
         Proc.runCommand("hypr-write-layout", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && cat > "${layoutPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to write layout config:", output);
+                log.warn("Failed to write layout config:", output);
                 return;
             }
-            console.info("HyprlandService: Generated layout config at", layoutPath);
+            log.info("Generated layout config at", layoutPath);
             reloadConfig();
         });
     }
@@ -259,12 +333,14 @@ decoration {
     function generateCursorConfig() {
         if (!CompositorService.isHyprland)
             return;
+        if (!canWriteLuaConfig("cursor"))
+            return;
 
         const settings = typeof SettingsData !== "undefined" ? SettingsData.cursorSettings : null;
         if (!settings) {
-            Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
+            Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && printf '%s\\n' "-- Auto-generated by DMS — do not edit manually" "" > "${cursorPath}"`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("HyprlandService: Failed to write cursor config:", output);
+                    log.warn("Failed to write cursor config:", output);
             });
             return;
         }
@@ -280,32 +356,34 @@ decoration {
         const hasCursorSettings = hideOnKeyPress || hideOnTouch || inactiveTimeout > 0;
 
         if (!hasTheme && !hasNonDefaultSize && !hasCursorSettings) {
-            Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
+            Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && printf '%s\\n' "-- Auto-generated by DMS — do not edit manually" "" > "${cursorPath}"`], (output, exitCode) => {
                 if (exitCode !== 0)
-                    console.warn("HyprlandService: Failed to write cursor config:", output);
+                    log.warn("Failed to write cursor config:", output);
             });
             return;
         }
 
-        let lines = ["# Auto-generated by DMS - do not edit manually", ""];
+        let lines = ["-- Auto-generated by DMS — do not edit manually", ""];
 
         if (hasTheme) {
-            lines.push(`env = HYPRCURSOR_THEME,${themeName}`);
-            lines.push(`env = XCURSOR_THEME,${themeName}`);
+            lines.push(`hl.env("HYPRCURSOR_THEME", ${luaQuoted(themeName)})`);
+            lines.push(`hl.env("XCURSOR_THEME", ${luaQuoted(themeName)})`);
         }
-        lines.push(`env = HYPRCURSOR_SIZE,${size}`);
-        lines.push(`env = XCURSOR_SIZE,${size}`);
+        lines.push(`hl.env("HYPRCURSOR_SIZE", ${luaQuoted(String(size))})`);
+        lines.push(`hl.env("XCURSOR_SIZE", ${luaQuoted(String(size))})`);
 
         if (hasCursorSettings) {
             lines.push("");
-            lines.push("cursor {");
+            lines.push("hl.config({");
+            lines.push("\tcursor = {");
             if (hideOnKeyPress)
-                lines.push("    hide_on_key_press = true");
+                lines.push("\t\thide_on_key_press = true,");
             if (hideOnTouch)
-                lines.push("    hide_on_touch = true");
+                lines.push("\t\thide_on_touch = true,");
             if (inactiveTimeout > 0)
-                lines.push(`    inactive_timeout = ${inactiveTimeout}`);
-            lines.push("}");
+                lines.push(`\t\tinactive_timeout = ${inactiveTimeout},`);
+            lines.push("\t},");
+            lines.push("})");
         }
 
         lines.push("");
@@ -313,7 +391,7 @@ decoration {
 
         Proc.runCommand("hypr-write-cursor", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && cat > "${cursorPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to write cursor config:", output);
+                log.warn("Failed to write cursor config:", output);
                 return;
             }
             if (hasTheme)
@@ -329,10 +407,107 @@ decoration {
         if (!wsId)
             return;
         const fullName = wsId + " " + newName;
-        Proc.runCommand("hyprland-rename-ws", ["hyprctl", "dispatch", "renameworkspace", String(wsId), fullName], (output, exitCode) => {
-            if (exitCode !== 0) {
-                console.warn("HyprlandService: Failed to rename workspace:", output);
-            }
-        });
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.workspace.rename({ workspace = ${luaValue(wsId)}, name = ${luaString(fullName)} })`);
+        } else {
+            Hyprland.dispatch(`renameworkspace ${wsId} ${fullName}`);
+        }
+    }
+
+    function focusWorkspace(workspace) {
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.focus({ workspace = ${luaValue(workspace)} })`);
+        } else {
+            Hyprland.dispatch(`workspace ${workspace}`);
+        }
+    }
+
+    function luaString(value) {
+        return `"${String(value ?? "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"")}"`;
+    }
+
+    function luaValue(value) {
+        const text = String(value ?? "");
+        return /^[-+]?\d+$/.test(text) ? text : luaString(text);
+    }
+
+    function windowSelector(windowAddress) {
+        if (!windowAddress)
+            return "";
+
+        const text = String(windowAddress);
+        if (text.startsWith("address:"))
+            return text;
+
+        return `address:${text.startsWith("0x") ? text : "0x" + text}`;
+    }
+
+    function focusWindow(windowAddress) {
+        const selector = windowSelector(windowAddress);
+        if (!selector)
+            return;
+
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.focus({ window = ${luaString(selector)} })`);
+        } else {
+            Hyprland.dispatch(`focuswindow ${selector}`);
+        }
+    }
+
+    function closeWindow(windowAddress) {
+        const selector = windowSelector(windowAddress);
+        if (!selector)
+            return;
+
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.window.close(${luaString(selector)})`);
+        } else {
+            Hyprland.dispatch(`closewindow ${selector}`);
+        }
+    }
+
+    function moveToWorkspace(workspace, windowAddress, follow = true) {
+        const selector = windowSelector(windowAddress);
+        if (!selector)
+            return;
+
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.window.move({ workspace = ${luaValue(workspace)}, window = ${luaString(selector)}, follow = ${follow ? "true" : "false"} })`);
+        } else {
+            const dispatcher = follow ? "movetoworkspace" : "movetoworkspacesilent";
+            Hyprland.dispatch(`${dispatcher} ${workspace},${selector}`);
+        }
+    }
+
+    function toggleSpecial(specialName) {
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${luaString(specialName)})`);
+        } else {
+            Hyprland.dispatch("togglespecialworkspace " + specialName);
+        }
+    }
+
+    function exit() {
+        if (luaConfigActive) {
+            Hyprland.dispatch("hl.dsp.exit()");
+        } else {
+            Hyprland.dispatch("exit");
+        }
+    }
+
+    function dpmsOff() {
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.dpms({ action = "disable" })`);
+        } else {
+            Hyprland.dispatch("dpms off");
+        }
+    }
+
+    function dpmsOn() {
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.dpms({ action = "enable" })`);
+        } else {
+            Hyprland.dispatch("dpms on");
+        }
     }
 }

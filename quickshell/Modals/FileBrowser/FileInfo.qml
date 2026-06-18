@@ -1,5 +1,4 @@
 import QtQuick
-import QtCore
 import Quickshell.Io
 import qs.Common
 import qs.Widgets
@@ -22,9 +21,9 @@ Rectangle {
 
     onShowFileInfoChanged: {
         if (showFileInfo && currentFileName && currentPath) {
-            const fullPath = currentPath + "/" + currentFileName
-            fileStatProcess.selectedFilePath = fullPath
-            fileStatProcess.running = true
+            const fullPath = currentPath + "/" + currentFileName;
+            fileStatProcess.selectedFilePath = fullPath;
+            fileStatProcess.running = true;
         }
     }
 
@@ -38,14 +37,14 @@ Rectangle {
         stdout: StdioCollector {
             onStreamFinished: {
                 if (text && text.trim()) {
-                    const parts = text.trim().split('|')
+                    const parts = text.trim().split('|');
                     if (parts.length >= 4) {
                         fileStatProcess.fileStats = {
                             "modifiedTime": parts[0],
                             "permissions": parts[1],
                             "size": parseInt(parts[2]) || 0,
                             "fullPath": parts[3]
-                        }
+                        };
                     }
                 }
             }
@@ -60,31 +59,31 @@ Rectangle {
 
     onCurrentFileNameChanged: {
         if (showFileInfo && currentFileName && currentPath) {
-            const fullPath = currentPath + "/" + currentFileName
+            const fullPath = currentPath + "/" + currentFileName;
             if (fullPath !== fileStatProcess.selectedFilePath) {
-                fileStatProcess.selectedFilePath = fullPath
-                fileStatProcess.running = true
+                fileStatProcess.selectedFilePath = fullPath;
+                fileStatProcess.running = true;
             }
         }
     }
 
     function updateFileInfo(filePath, fileName, isDirectory) {
         if (filePath && filePath !== fileStatProcess.selectedFilePath) {
-            fileStatProcess.selectedFilePath = filePath
-            currentFileName = fileName || ""
-            currentFileIsDir = isDirectory || false
+            fileStatProcess.selectedFilePath = filePath;
+            currentFileName = fileName || "";
+            currentFileIsDir = isDirectory || false;
 
-            let ext = ""
+            let ext = "";
             if (!isDirectory && fileName) {
-                const lastDot = fileName.lastIndexOf('.')
+                const lastDot = fileName.lastIndexOf('.');
                 if (lastDot > 0) {
-                    ext = fileName.substring(lastDot + 1).toLowerCase()
+                    ext = fileName.substring(lastDot + 1).toLowerCase();
                 }
             }
-            currentFileExtension = ext
+            currentFileExtension = ext;
 
             if (showFileInfo) {
-                fileStatProcess.running = true
+                fileStatProcess.running = true;
             }
         }
     }
@@ -100,10 +99,10 @@ Rectangle {
                 "permissions": "",
                 "extension": "",
                 "position": "N/A"
-            }
+            };
         }
 
-        const hasValidFile = currentFileName !== ""
+        const hasValidFile = currentFileName !== "";
         return {
             "exists": hasValidFile,
             "name": hasValidFile ? currentFileName : "Loading...",
@@ -113,7 +112,7 @@ Rectangle {
             "permissions": fileStatProcess.fileStats ? fileStatProcess.fileStats.permissions : "Loading...",
             "extension": currentFileExtension,
             "position": sourceFolderModel ? ((selectedIndex + 1) + " of " + sourceFolderModel.count) : "N/A"
-        }
+        };
     }
 
     Column {
@@ -209,23 +208,23 @@ Rectangle {
 
     function formatFileSize(bytes) {
         if (bytes === 0 || !bytes) {
-            return "0 B"
+            return "0 B";
         }
-        const k = 1024
-        const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-        const i = Math.floor(Math.log(bytes) / Math.log(k))
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     }
 
     function formatDateTime(dateTimeString) {
         if (!dateTimeString) {
-            return "Unknown"
+            return "Unknown";
         }
-        const parts = dateTimeString.split(' ')
+        const parts = dateTimeString.split(' ');
         if (parts.length >= 2) {
-            return parts[0] + " " + parts[1].split('.')[0]
+            return parts[0] + " " + parts[1].split('.')[0];
         }
-        return dateTimeString
+        return dateTimeString;
     }
 
     Behavior on opacity {

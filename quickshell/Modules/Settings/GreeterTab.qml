@@ -2,12 +2,10 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
-import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -153,7 +151,7 @@ Item {
 
     function runGreeterInstallAction() {
         root.greeterPendingAction = !root.greeterInstalled ? "install" : !root.greeterEnabled ? "activate" : "uninstall";
-        greeterStatusText = I18n.tr("Opening terminal: ") + root.greeterActionLabel + "…";
+        greeterStatusText = I18n.tr("Opening terminal: ") + root.greeterActionLabel + "...";
         greeterInstallActionRunning = true;
         greeterInstallActionProcess.running = true;
     }
@@ -190,7 +188,7 @@ Item {
         greeterSudoProbeStderr = "";
         greeterTerminalFallbackStderr = "";
         greeterTerminalFallbackFromPrecheck = false;
-        greeterStatusText = I18n.tr("Checking whether sudo authentication is needed…");
+        greeterStatusText = I18n.tr("Checking whether sudo authentication is needed...");
         greeterSyncRunning = true;
         greeterSudoProbeProcess.running = true;
     }
@@ -329,7 +327,7 @@ Item {
         onExited: exitCode => {
             const err = (root.greeterSudoProbeStderr || "").trim();
             if (exitCode === 0) {
-                root.greeterStatusText = I18n.tr("Running greeter sync…");
+                root.greeterStatusText = I18n.tr("Running greeter sync...");
                 greeterSyncProcess.running = true;
                 return;
             }
@@ -448,7 +446,7 @@ Item {
                 settingKey: "greeterStatus"
 
                 StyledText {
-                    text: I18n.tr("Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.")
+                    text: I18n.tr("Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -470,7 +468,7 @@ Item {
                         id: statusTextArea
                         anchors.fill: parent
                         anchors.margins: Theme.spacingM
-                        text: root.greeterStatusRunning ? I18n.tr("Checking…", "greeter status loading") : (root.greeterStatusText || I18n.tr("Click Refresh to check status.", "greeter status placeholder"))
+                        text: root.greeterStatusRunning ? I18n.tr("Checking...", "greeter status loading") : (root.greeterStatusText || I18n.tr("Click Refresh to check status.", "greeter status placeholder"))
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: "monospace"
                         color: root.greeterStatusRunning ? Theme.surfaceVariantText : Theme.surfaceText
@@ -588,7 +586,7 @@ Item {
                 }
 
                 StyledText {
-                    text: I18n.tr("Time format")
+                    text: I18n.tr("Time Format")
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -607,7 +605,7 @@ Item {
                 SettingsToggleRow {
                     settingKey: "greeterShowSeconds"
                     tags: ["greeter", "time", "seconds"]
-                    text: I18n.tr("Show seconds")
+                    text: I18n.tr("Show Seconds")
                     checked: SettingsData.greeterShowSeconds
                     onToggled: checked => SettingsData.set("greeterShowSeconds", checked)
                 }
@@ -632,7 +630,7 @@ Item {
                 SettingsDropdownRow {
                     settingKey: "greeterLockDateFormat"
                     tags: ["greeter", "date", "format"]
-                    text: I18n.tr("Date format")
+                    text: I18n.tr("Date Format")
                     description: I18n.tr("Greeter only — format for the date on the login screen")
                     options: root._lockDateFormatPresets.map(p => p.label)
                     currentValue: {
@@ -744,6 +742,16 @@ Item {
                     description: I18n.tr("Pre-fill the last successful username on the greeter")
                     checked: SettingsData.greeterRememberLastUser
                     onToggled: checked => SettingsData.set("greeterRememberLastUser", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "greeterAutoLogin"
+                    tags: ["greeter", "autologin", "login", "startup", "password"]
+                    text: I18n.tr("Auto-login on startup")
+                    description: SettingsData.greeterRememberLastUser && SettingsData.greeterRememberLastSession ? I18n.tr("Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.") : I18n.tr("Requires remembering the last user and session. Enable those options first.")
+                    checked: SettingsData.greeterAutoLogin
+                    enabled: SettingsData.greeterRememberLastUser && SettingsData.greeterRememberLastSession
+                    onToggled: checked => SettingsData.set("greeterAutoLogin", checked)
                 }
             }
 

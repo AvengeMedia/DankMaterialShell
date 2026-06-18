@@ -33,9 +33,14 @@ Item {
     Component.onCompleted: {
         if (!settingKey)
             return;
-        let flickable = findParentFlickable();
-        if (flickable)
-            SettingsSearchService.registerCard(settingKey, root, flickable);
+        var key = settingKey;
+        Qt.callLater(() => {
+            if (!root.parent)
+                return;
+            var flickable = findParentFlickable();
+            if (flickable)
+                SettingsSearchService.registerCard(key, root, flickable);
+        });
     }
 
     Component.onDestruction: {
@@ -59,6 +64,8 @@ Item {
 
     property alias model: buttonGroup.model
     property alias currentIndex: buttonGroup.currentIndex
+    property alias initialSelection: buttonGroup.initialSelection
+    property alias currentSelection: buttonGroup.currentSelection
     property alias selectionMode: buttonGroup.selectionMode
     property alias buttonHeight: buttonGroup.buttonHeight
     property alias minButtonWidth: buttonGroup.minButtonWidth

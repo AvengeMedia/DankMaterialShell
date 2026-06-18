@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "GreetdEnv.js" as GreetdEnv
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("GreetdMemory")
 
     readonly property string greetCfgDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
     readonly property string sessionConfigPath: greetCfgDir + "/session.json"
@@ -16,6 +18,7 @@ Singleton {
     readonly property bool rememberLastUser: GreetdEnv.readBoolOverride(Quickshell.env, ["DMS_GREET_REMEMBER_LAST_USER", "DMS_SAVE_USERNAME"], true)
 
     property string lastSessionId: ""
+    property string lastSessionExec: ""
     property string lastSuccessfulUser: ""
     property bool memoryReady: false
     property bool isLightMode: false
@@ -42,7 +45,7 @@ Singleton {
                 nightModeEnabled = config.nightModeEnabled !== undefined ? config.nightModeEnabled : false;
             }
         } catch (e) {
-            console.warn("Failed to parse greeter session config:", e);
+            log.warn("Failed to parse greeter session config:", e);
         }
     }
 
@@ -52,11 +55,12 @@ Singleton {
                 return;
             const memory = JSON.parse(content);
             lastSessionId = rememberLastSession ? (memory.lastSessionId || "") : "";
+            lastSessionExec = rememberLastSession ? (memory.lastSessionExec || "") : "";
             lastSuccessfulUser = rememberLastUser ? (memory.lastSuccessfulUser || "") : "";
             if (!rememberLastSession || !rememberLastUser)
                 saveMemory();
         } catch (e) {
-            console.warn("Failed to parse greetd memory:", e);
+            log.warn("Failed to parse greetd memory:", e);
         }
     }
 
@@ -64,6 +68,8 @@ Singleton {
         let memory = {};
         if (rememberLastSession && lastSessionId)
             memory.lastSessionId = lastSessionId;
+        if (rememberLastSession && lastSessionExec)
+            memory.lastSessionExec = lastSessionExec;
         if (rememberLastUser && lastSuccessfulUser)
             memory.lastSuccessfulUser = lastSuccessfulUser;
         memoryFileView.setText(JSON.stringify(memory, null, 2));
@@ -71,13 +77,28 @@ Singleton {
 
     function setLastSessionId(id) {
         if (!rememberLastSession) {
-            if (lastSessionId !== "") {
+            if (lastSessionId !== "" || lastSessionExec !== "") {
                 lastSessionId = "";
+                lastSessionExec = "";
                 saveMemory();
             }
             return;
         }
         lastSessionId = id || "";
+        if (!lastSessionId)
+            lastSessionExec = "";
+        saveMemory();
+    }
+
+    function setLastSessionExec(exec) {
+        if (!rememberLastSession) {
+            if (lastSessionExec !== "") {
+                lastSessionExec = "";
+                saveMemory();
+            }
+            return;
+        }
+        lastSessionExec = exec || "";
         saveMemory();
     }
 
@@ -122,7 +143,7 @@ Singleton {
             parseSessionConfig(sessionConfigFileView.text());
         }
         onLoadFailed: error => {
-            console.warn("Could not load greeter session config from", root.sessionConfigPath, "error:", error);
+            log.warn("Could not load greeter session config from", root.sessionConfigPath, "error:", error);
         }
     }
 }

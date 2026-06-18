@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -98,56 +100,72 @@ var setupWindowrulesCmd = &cobra.Command{
 }
 
 type dmsConfigSpec struct {
-	niriFile    string
-	hyprFile    string
-	niriContent func(terminal string) string
-	hyprContent func(terminal string) string
+	niriFile     string
+	hyprFile     string
+	mangoFile    string
+	niriContent  func(terminal string) string
+	hyprContent  func(terminal string) string
+	mangoContent func(terminal string) string
 }
 
 var dmsConfigSpecs = map[string]dmsConfigSpec{
 	"binds": {
-		niriFile: "binds.kdl",
-		hyprFile: "binds.conf",
+		niriFile:  "binds.kdl",
+		hyprFile:  "binds.lua",
+		mangoFile: "binds.conf",
 		niriContent: func(t string) string {
 			return strings.ReplaceAll(config.NiriBindsConfig, "{{TERMINAL_COMMAND}}", t)
 		},
 		hyprContent: func(t string) string {
-			return strings.ReplaceAll(config.HyprBindsConfig, "{{TERMINAL_COMMAND}}", t)
+			return strings.ReplaceAll(config.DMSBindsLuaConfig, "{{TERMINAL_COMMAND}}", t)
+		},
+		mangoContent: func(t string) string {
+			return strings.ReplaceAll(config.MangoBindsConfig, "{{TERMINAL_COMMAND}}", t)
 		},
 	},
 	"layout": {
-		niriFile:    "layout.kdl",
-		hyprFile:    "layout.conf",
-		niriContent: func(_ string) string { return config.NiriLayoutConfig },
-		hyprContent: func(_ string) string { return config.HyprLayoutConfig },
+		niriFile:     "layout.kdl",
+		hyprFile:     "layout.lua",
+		mangoFile:    "layout.conf",
+		niriContent:  func(_ string) string { return config.NiriLayoutConfig },
+		hyprContent:  func(_ string) string { return config.DMSLayoutLuaConfig },
+		mangoContent: func(_ string) string { return config.MangoLayoutConfig },
 	},
 	"colors": {
-		niriFile:    "colors.kdl",
-		hyprFile:    "colors.conf",
-		niriContent: func(_ string) string { return config.NiriColorsConfig },
-		hyprContent: func(_ string) string { return config.HyprColorsConfig },
+		niriFile:     "colors.kdl",
+		hyprFile:     "colors.lua",
+		mangoFile:    "colors.conf",
+		niriContent:  func(_ string) string { return config.NiriColorsConfig },
+		hyprContent:  func(_ string) string { return config.DMSColorsLuaConfig },
+		mangoContent: func(_ string) string { return config.MangoColorsConfig },
 	},
 	"alttab": {
 		niriFile:    "alttab.kdl",
 		niriContent: func(_ string) string { return config.NiriAlttabConfig },
 	},
 	"outputs": {
-		niriFile:    "outputs.kdl",
-		hyprFile:    "outputs.conf",
-		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return "" },
+		niriFile:     "outputs.kdl",
+		hyprFile:     "outputs.lua",
+		mangoFile:    "outputs.conf",
+		niriContent:  func(_ string) string { return "" },
+		hyprContent:  func(_ string) string { return config.DMSOutputsLuaConfig },
+		mangoContent: func(_ string) string { return "" },
 	},
 	"cursor": {
-		niriFile:    "cursor.kdl",
-		hyprFile:    "cursor.conf",
-		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return "" },
+		niriFile:     "cursor.kdl",
+		hyprFile:     "cursor.lua",
+		mangoFile:    "cursor.conf",
+		niriContent:  func(_ string) string { return "" },
+		hyprContent:  func(_ string) string { return config.DMSCursorLuaConfig },
+		mangoContent: func(_ string) string { return "" },
 	},
 	"windowrules": {
-		niriFile:    "windowrules.kdl",
-		hyprFile:    "windowrules.conf",
-		niriContent: func(_ string) string { return "" },
-		hyprContent: func(_ string) string { return "" },
+		niriFile:     "windowrules.kdl",
+		hyprFile:     "windowrules.lua",
+		mangoFile:    "windowrules.conf",
+		niriContent:  func(_ string) string { return "" },
+		hyprContent:  func(_ string) string { return config.DMSWindowRulesLuaConfig },
+		mangoContent: func(_ string) string { return "" },
 	},
 }
 
@@ -190,7 +208,7 @@ func detectCompositorForSetup() (string, error) {
 
 	switch len(compositors) {
 	case 0:
-		return "", fmt.Errorf("no supported compositors found (niri or Hyprland required)")
+		return "", fmt.Errorf("no supported compositors found (niri, Hyprland, or mango required)")
 	case 1:
 		return strings.ToLower(compositors[0]), nil
 	}
@@ -222,6 +240,9 @@ func runSetupDmsConfig(name string) error {
 	case "hyprland":
 		filename = spec.hyprFile
 		contentFn = spec.hyprContent
+	case "mango", "mangowc":
+		filename = spec.mangoFile
+		contentFn = spec.mangoContent
 	default:
 		return fmt.Errorf("unsupported compositor: %s", compositor)
 	}
@@ -233,9 +254,11 @@ func runSetupDmsConfig(name string) error {
 	var dmsDir string
 	switch compositor {
 	case "niri":
-		dmsDir = filepath.Join(os.Getenv("HOME"), ".config", "niri", "dms")
+		dmsDir = filepath.Join(utils.XDGConfigHome(), "niri", "dms")
 	case "hyprland":
-		dmsDir = filepath.Join(os.Getenv("HOME"), ".config", "hypr", "dms")
+		dmsDir = filepath.Join(utils.XDGConfigHome(), "hypr", "dms")
+	case "mango", "mangowc":
+		dmsDir = filepath.Join(utils.XDGConfigHome(), "mango", "dms")
 	}
 
 	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
@@ -267,9 +290,18 @@ func runSetupDmsConfig(name string) error {
 func runSetup() error {
 	fmt.Println("=== DMS Configuration Setup ===")
 
+	ensureInputGroup()
+
 	wm, wmSelected := promptCompositor()
 	terminal, terminalSelected := promptTerminal()
-	useSystemd := promptSystemd()
+	useSystemd := true
+	if wmSelected {
+		if wm == deps.WindowManagerMango {
+			useSystemd = false
+		} else {
+			useSystemd = promptSystemd()
+		}
+	}
 
 	if !wmSelected && !terminalSelected {
 		fmt.Println("No configurations selected. Exiting.")
@@ -340,14 +372,46 @@ func runSetup() error {
 	return nil
 }
 
+// Add user to the input group for the evdev manager for inut state tracking.
+// Caps Lock OSD and the Caps Lock bar indicator.
+func ensureInputGroup() {
+	if !utils.HasGroup("input") {
+		return
+	}
+	currentUser := os.Getenv("USER")
+	if currentUser == "" {
+		currentUser = os.Getenv("LOGNAME")
+	}
+	if currentUser == "" {
+		return
+	}
+	out, err := execGroups(currentUser)
+	if err == nil && strings.Contains(out, "input") {
+		fmt.Printf("✓ %s is already in the input group (Caps Lock OSD enabled)\n", currentUser)
+		return
+	}
+	fmt.Println("Adding user to input group for Caps Lock OSD support...")
+	if err := privesc.Run(context.Background(), "", "usermod", "-aG", "input", currentUser); err != nil {
+		fmt.Printf("⚠ Could not add %s to input group (Caps Lock OSD will be unavailable): %v\n", currentUser, err)
+	} else {
+		fmt.Printf("✓ Added %s to input group (logout/login required to take effect)\n", currentUser)
+	}
+}
+
+func execGroups(user string) (string, error) {
+	out, err := exec.Command("groups", user).Output()
+	return string(out), err
+}
+
 func promptCompositor() (deps.WindowManager, bool) {
 	fmt.Println("Select compositor:")
 	fmt.Println("1) Niri")
 	fmt.Println("2) Hyprland")
-	fmt.Println("3) None")
+	fmt.Println("3) Mango")
+	fmt.Println("4) None")
 
 	var response string
-	fmt.Print("\nChoice (1-3): ")
+	fmt.Print("\nChoice (1-4): ")
 	fmt.Scanln(&response)
 	response = strings.TrimSpace(response)
 
@@ -356,6 +420,8 @@ func promptCompositor() (deps.WindowManager, bool) {
 		return deps.WindowManagerNiri, true
 	case "2":
 		return deps.WindowManagerHyprland, true
+	case "3":
+		return deps.WindowManagerMango, true
 	default:
 		return deps.WindowManagerNiri, false
 	}
@@ -403,16 +469,27 @@ func checkExistingConfigs(wm deps.WindowManager, wmSelected bool, terminal deps.
 	willBackup := false
 
 	if wmSelected {
-		var configPath string
+		var configPaths []string
 		switch wm {
 		case deps.WindowManagerNiri:
-			configPath = filepath.Join(homeDir, ".config", "niri", "config.kdl")
+			configPaths = []string{filepath.Join(homeDir, ".config", "niri", "config.kdl")}
 		case deps.WindowManagerHyprland:
-			configPath = filepath.Join(homeDir, ".config", "hypr", "hyprland.conf")
+			configPaths = []string{
+				filepath.Join(homeDir, ".config", "hypr", "hyprland.lua"),
+				filepath.Join(homeDir, ".config", "hypr", "hyprland.conf"),
+			}
+		case deps.WindowManagerMango:
+			configPaths = []string{
+				filepath.Join(homeDir, ".config", "mango", "config.conf"),
+				filepath.Join(homeDir, ".config", "mango", "mango.conf"),
+			}
 		}
 
-		if _, err := os.Stat(configPath); err == nil {
-			willBackup = true
+		for _, configPath := range configPaths {
+			if _, err := os.Stat(configPath); err == nil {
+				willBackup = true
+				break
+			}
 		}
 	}
 

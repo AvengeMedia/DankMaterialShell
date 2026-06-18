@@ -33,7 +33,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 80
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            color: Theme.nestedSurface
 
             RowLayout {
                 anchors.fill: parent
@@ -110,7 +110,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            color: Theme.nestedSurface
 
             ColumnLayout {
                 anchors.fill: parent

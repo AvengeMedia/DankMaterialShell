@@ -3,9 +3,12 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("Proc")
 
     readonly property int noTimeout: -1
     property int defaultDebounceMs: 50
@@ -19,7 +22,7 @@ Singleton {
         const isRandomId = !id;
 
         if (!_procDebouncers[procId]) {
-            const t = Qt.createQmlObject('import QtQuick; Timer { repeat: false }', root);
+            const t = debounceTimerComp.createObject(root);
             t.triggered.connect(function () {
                 _launchProc(procId, isRandomId);
             });
@@ -47,14 +50,10 @@ Singleton {
         const entry = _procDebouncers[id];
         if (!entry)
             return;
-        const proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false }', root);
-        const out = Qt.createQmlObject('import Quickshell.Io; StdioCollector {}', proc);
-        const err = Qt.createQmlObject('import Quickshell.Io; StdioCollector {}', proc);
-        const timeoutTimer = Qt.createQmlObject('import QtQuick; Timer { repeat: false }', root);
-
-        proc.stdout = out;
-        proc.stderr = err;
-        proc.command = entry.command;
+        const proc = procComp.createObject(root, {
+            command: entry.command
+        });
+        const timeoutTimer = debounceTimerComp.createObject(root);
 
         let capturedOut = "";
         let capturedErr = "";
@@ -75,9 +74,9 @@ Singleton {
             }
         });
 
-        out.streamFinished.connect(function () {
+        proc.stdout.streamFinished.connect(function () {
             try {
-                capturedOut = out.text || "";
+                capturedOut = proc.stdout.text || "";
             } catch (e) {
                 capturedOut = "";
             }
@@ -85,9 +84,9 @@ Singleton {
             maybeComplete();
         });
 
-        err.streamFinished.connect(function () {
+        proc.stderr.streamFinished.connect(function () {
             try {
-                capturedErr = err.text || "";
+                capturedErr = proc.stderr.text || "";
             } catch (e) {
                 capturedErr = "";
             }
@@ -112,7 +111,7 @@ Singleton {
                     const safeExitCode = exitCodeValue !== null && exitCodeValue !== undefined ? exitCodeValue : -1;
                     entry.callback(safeOutput, safeExitCode);
                 } catch (e) {
-                    console.warn("runCommand callback error for command:", entry.command, "Error:", e);
+                    log.warn("runCommand callback error for command:", entry.command, "Error:", e);
                 }
             }
             try {
@@ -137,5 +136,21 @@ Singleton {
         proc.running = true;
         if (entry.timeoutMs !== noTimeout)
             timeoutTimer.start();
+    }
+
+    Component {
+        id: debounceTimerComp
+        Timer {
+            repeat: false
+        }
+    }
+
+    Component {
+        id: procComp
+        Process {
+            running: false
+            stdout: StdioCollector {}
+            stderr: StdioCollector {}
+        }
     }
 }

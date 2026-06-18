@@ -3,10 +3,12 @@ import qs.Common
 import qs.Services
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.ControlCenter.Components
+import "../utils/detailHeight.js" as DetailHeightUtils
 import "../utils/layout.js" as LayoutUtils
 
 Column {
     id: root
+    readonly property var log: Log.scoped("DragDropGrid")
 
     property bool editMode: false
     property string expandedSection: ""
@@ -24,6 +26,7 @@ Column {
     signal moveWidget(int fromIndex, int toIndex)
     signal toggleWidgetSize(int index)
     signal collapseRequested
+    signal configRequested(int index, var widgetData, var anchor)
 
     function requestCollapse() {
         collapseRequested();
@@ -36,6 +39,7 @@ Column {
     property real currentRowWidth: 0
     property int expandedRowIndex: -1
     property var colorPickerModal: null
+    property var activePluginDetailInstance: null
 
     readonly property real _maxDetailHeight: {
         const rows = layoutResult.rows;
@@ -49,6 +53,29 @@ Column {
         }
         const rowSpacing = Math.max(0, rows.length - 1) * spacing;
         return Math.max(100, maxPopoutHeight - totalRowHeight - rowSpacing);
+    }
+
+    readonly property real targetImplicitHeight: {
+        if (editMode)
+            return editModeGrid.implicitHeight;
+        const rows = layoutResult.rows;
+        let totalHeight = 0;
+        for (let i = 0; i < rows.length; i++) {
+            const widgets = rows[i] || [];
+            const sliderOnly = widgets.length > 0 && widgets.every(w => {
+                const id = w.id || "";
+                return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
+            });
+            totalHeight += sliderOnly ? (editMode ? 56 : 36) : 60;
+            if (expandedSection !== "" && i === expandedRowIndex)
+                totalHeight += detailHeightForSection(expandedSection) + Theme.spacingS;
+        }
+        totalHeight += Math.max(0, rows.length - 1) * spacing;
+        return totalHeight;
+    }
+
+    function detailHeightForSection(section) {
+        return DetailHeightUtils.detailHeightForSection(section, _maxDetailHeight, activePluginDetailInstance);
     }
 
     function calculateRowsAndWidgets() {
@@ -75,8 +102,154 @@ Column {
         item.z = 1000;
     }
 
+    function getCompoundPillIconBlinking(id) {
+        if (id === "wifi") return NetworkService.isWifiConnecting;
+        if (id === "bluetooth") return BluetoothService.connecting;
+        return false;
+    }
+
+    function getCompoundPillIconName(id, widgetDef) {
+        switch (id) {
+        case "wifi": {
+            if (NetworkService.wifiToggling) return "sync";
+            if (NetworkService.isConnecting && !NetworkService.ethernetConnected) return NetworkService.wifiSignalIcon;
+            const status = NetworkService.networkStatus;
+            if (status === "ethernet") return "settings_ethernet";
+            if (status === "vpn") return NetworkService.ethernetConnected ? "settings_ethernet" : NetworkService.wifiSignalIcon;
+            if (status === "wifi") return NetworkService.wifiSignalIcon;
+            return "wifi";
+        }
+        case "bluetooth": {
+            return "bluetooth";
+        }
+        case "audioOutput": {
+            if (!AudioService.sink?.audio) return "volume_off";
+            let volume = AudioService.sink.audio.volume;
+            let muted = AudioService.sink.audio.muted;
+            if (muted) return "volume_off";
+            if (volume === 0.0) return "volume_mute";
+            if (volume <= 0.33) return "volume_down";
+            if (volume <= 0.66) return "volume_up";
+            return "volume_up";
+        }
+        case "audioInput": {
+            if (!AudioService.source?.audio) return "mic_off";
+            return AudioService.source.audio.muted ? "mic_off" : "mic";
+        }
+        default:
+            return widgetDef?.icon || "help";
+        }
+    }
+
+    function getCompoundPillIsActive(id) {
+        switch (id) {
+        case "wifi": {
+            if (NetworkService.wifiToggling) return false;
+            const status = NetworkService.networkStatus;
+            if (status === "ethernet") return true;
+            if (status === "vpn") return NetworkService.ethernetConnected || NetworkService.wifiConnected;
+            if (status === "wifi") return true;
+            return NetworkService.wifiEnabled;
+        }
+        case "bluetooth":
+            return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled);
+        case "audioOutput":
+            return !!(AudioService.sink?.audio && !AudioService.sink.audio.muted);
+        case "audioInput":
+            return !!(AudioService.source?.audio && !AudioService.source.audio.muted);
+        default:
+            return false;
+        }
+    }
+
+    function handleCompoundPillToggled(id) {
+        switch (id) {
+        case "wifi": {
+            if (NetworkService.networkStatus !== "ethernet" && !NetworkService.wifiToggling) {
+                NetworkService.toggleWifiRadio();
+            }
+            break;
+        }
+        case "bluetooth": {
+            if (BluetoothService.available && BluetoothService.adapter) {
+                BluetoothService.adapter.enabled = !BluetoothService.adapter.enabled;
+            }
+            break;
+        }
+        case "audioOutput": {
+            if (AudioService.sink && AudioService.sink.audio) {
+                AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
+            }
+            break;
+        }
+        case "audioInput": {
+            if (AudioService.source && AudioService.source.audio) {
+                AudioService.source.audio.muted = !AudioService.source.audio.muted;
+            }
+            break;
+        }
+        }
+    }
+
+    function handleCompoundPillWheelEvent(id, wheelEvent) {
+        if (id === "audioOutput") {
+            if (!AudioService.sink || !AudioService.sink.audio) return;
+            let delta = wheelEvent.angleDelta.y;
+            let maxVol = AudioService.sinkMaxVolume;
+            let currentVolume = AudioService.sink.audio.volume * 100;
+            let newVolume;
+            if (delta > 0) newVolume = Math.min(maxVol, currentVolume + 5);
+            else newVolume = Math.max(0, currentVolume - 5);
+            AudioService.sink.audio.muted = false;
+            AudioService.sink.audio.volume = newVolume / 100;
+            wheelEvent.accepted = true;
+        } else if (id === "audioInput") {
+            if (!AudioService.source || !AudioService.source.audio) return;
+            let delta = wheelEvent.angleDelta.y;
+            let currentVolume = AudioService.source.audio.volume * 100;
+            let newVolume;
+            if (delta > 0) newVolume = Math.min(100, currentVolume + 5);
+            else newVolume = Math.max(0, currentVolume - 5);
+            AudioService.source.audio.muted = false;
+            AudioService.source.audio.volume = newVolume / 100;
+            wheelEvent.accepted = true;
+        }
+    }
+
+    function componentForWidget(widgetData) {
+        const id = widgetData.id || "";
+        const widgetWidth = widgetData.width || 50;
+        if (id.startsWith("builtin_"))
+            return builtinPluginWidgetComponent;
+        if (id.startsWith("plugin_"))
+            return pluginWidgetComponent;
+        switch (id) {
+        case "wifi":
+        case "bluetooth":
+        case "audioOutput":
+        case "audioInput":
+            return widgetWidth <= 25 ? smallCompoundComponent : compoundPillComponent;
+        case "volumeSlider":
+            return audioSliderComponent;
+        case "brightnessSlider":
+            return brightnessSliderComponent;
+        case "inputVolumeSlider":
+            return inputAudioSliderComponent;
+        case "battery":
+            return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent;
+        case "diskUsage":
+            return widgetWidth <= 25 ? smallDiskUsageComponent : diskUsagePillComponent;
+        case "colorPicker":
+            return widgetWidth <= 25 ? smallColorPickerComponent : colorPickerPillComponent;
+        case "doNotDisturb":
+            return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
+        default:
+            return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
+        }
+    }
+
     Repeater {
-        model: root.layoutResult.rows
+        model: root.editMode ? [] : root.layoutResult.rows
 
         Column {
             width: root.width
@@ -143,36 +316,12 @@ Column {
                             return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
                         }
 
-                        widgetComponent: {
-                            const id = modelData.id || "";
-                            if (id.startsWith("builtin_")) {
-                                return builtinPluginWidgetComponent;
-                            } else if (id.startsWith("plugin_")) {
-                                return pluginWidgetComponent;
-                            } else if (id === "wifi" || id === "bluetooth" || id === "audioOutput" || id === "audioInput") {
-                                return compoundPillComponent;
-                            } else if (id === "volumeSlider") {
-                                return audioSliderComponent;
-                            } else if (id === "brightnessSlider") {
-                                return brightnessSliderComponent;
-                            } else if (id === "inputVolumeSlider") {
-                                return inputAudioSliderComponent;
-                            } else if (id === "battery") {
-                                return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent;
-                            } else if (id === "diskUsage") {
-                                return widgetWidth <= 25 ? smallDiskUsageComponent : diskUsagePillComponent;
-                            } else if (id === "colorPicker") {
-                                return colorPickerPillComponent;
-                            } else if (id === "doNotDisturb") {
-                                return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
-                            } else {
-                                return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
-                            }
-                        }
+                        widgetComponent: root.componentForWidget(modelData)
 
                         onWidgetMoved: (fromIndex, toIndex) => root.moveWidget(fromIndex, toIndex)
                         onRemoveWidget: index => root.removeWidget(index)
                         onToggleWidgetSize: index => root.toggleWidgetSize(index)
+                        onConfigRequested: (idx, data, anchor) => root.configRequested(idx, data, anchor)
                     }
                 }
             }
@@ -180,8 +329,10 @@ Column {
             DetailHost {
                 id: detailHost
                 width: parent.width
-                maxAvailableHeight: root._maxDetailHeight
-                height: active ? (getDetailHeight(root.expandedSection) + Theme.spacingS) : 0
+                height: active ? (root.detailHeightForSection(root.expandedSection) + Theme.spacingS) : 0
+                clip: true
+                property string retainedSection: ""
+                property var retainedWidgetData: null
                 property bool active: {
                     if (root.expandedSection === "")
                         return false;
@@ -198,16 +349,74 @@ Column {
 
                     return rowIndex === root.expandedRowIndex;
                 }
-                visible: active
-                expandedSection: root.expandedSection
-                expandedWidgetData: root.expandedWidgetData
+                visible: active || height > 0.5
+                expandedSection: active ? root.expandedSection : retainedSection
+                expandedWidgetData: active ? root.expandedWidgetData : retainedWidgetData
                 bluetoothCodecSelector: root.bluetoothCodecSelector
                 widgetModel: root.model
                 collapseCallback: root.requestCollapse
                 screenName: root.screenName
                 screenModel: root.screenModel
+
+                function retainActiveDetail() {
+                    if (!active || !root.expandedSection)
+                        return;
+                    retainedSection = root.expandedSection;
+                    retainedWidgetData = root.expandedWidgetData;
+                }
+
+                function syncActivePluginDetail() {
+                    if (active) {
+                        root.activePluginDetailInstance = pluginDetailInstance;
+                    } else if (root.activePluginDetailInstance === pluginDetailInstance) {
+                        root.activePluginDetailInstance = null;
+                    }
+                }
+
+                onActiveChanged: {
+                    retainActiveDetail();
+                    syncActivePluginDetail();
+                }
+                onPluginDetailInstanceChanged: syncActivePluginDetail()
+                onHeightChanged: {
+                    if (!active && height <= 0.5) {
+                        retainedSection = "";
+                        retainedWidgetData = null;
+                    }
+                }
+
+                Connections {
+                    target: root
+                    function onExpandedSectionChanged() {
+                        detailHost.retainActiveDetail();
+                    }
+                    function onExpandedWidgetDataChanged() {
+                        detailHost.retainActiveDetail();
+                    }
+                }
+
+                Behavior on height {
+                    enabled: true
+                    NumberAnimation {
+                        duration: Theme.variantDuration(Theme.popoutAnimationDuration, detailHost.active)
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: detailHost.active ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+                    }
+                }
             }
         }
+    }
+
+    EditModeGrid {
+        id: editModeGrid
+        width: root.width
+        visible: root.editMode
+        active: root.editMode
+        model: root.model
+        componentProvider: root
+        onRemoveWidget: index => root.removeWidget(index)
+        onToggleWidgetSize: index => root.toggleWidgetSize(index)
+        onConfigRequested: (idx, data, anchor) => root.configRequested(idx, data, anchor)
     }
 
     Component {
@@ -234,65 +443,16 @@ Column {
             property var widgetDef: root.model?.getWidgetForId(widgetData.id || "")
             width: parent.width
             height: 60
-            iconName: {
-                switch (widgetData.id || "") {
-                case "wifi":
-                    {
-                        if (NetworkService.wifiToggling)
-                            return "sync";
-
-                        const status = NetworkService.networkStatus;
-                        if (status === "ethernet")
-                            return "settings_ethernet";
-                        if (status === "vpn")
-                            return NetworkService.ethernetConnected ? "settings_ethernet" : NetworkService.wifiSignalIcon;
-                        if (status === "wifi")
-                            return NetworkService.wifiSignalIcon;
-                        if (NetworkService.wifiEnabled)
-                            return "wifi_off";
-                        return "wifi_off";
-                    }
-                case "bluetooth":
-                    {
-                        if (!BluetoothService.available)
-                            return "bluetooth_disabled";
-                        if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
-                            return "bluetooth_disabled";
-                        return "bluetooth";
-                    }
-                case "audioOutput":
-                    {
-                        if (!AudioService.sink?.audio)
-                            return "volume_off";
-                        let volume = AudioService.sink.audio.volume;
-                        let muted = AudioService.sink.audio.muted;
-                        if (muted)
-                            return "volume_off";
-                        if (volume === 0.0)
-                            return "volume_mute";
-                        if (volume <= 0.33)
-                            return "volume_down";
-                        if (volume <= 0.66)
-                            return "volume_up";
-                        return "volume_up";
-                    }
-                case "audioInput":
-                    {
-                        if (!AudioService.source?.audio)
-                            return "mic_off";
-                        let muted = AudioService.source.audio.muted;
-                        return muted ? "mic_off" : "mic";
-                    }
-                default:
-                    return widgetDef?.icon || "help";
-                }
-            }
+            iconBlinking: root.getCompoundPillIconBlinking(widgetData.id || "")
+            iconName: root.getCompoundPillIconName(widgetData.id || "", widgetDef)
             primaryText: {
                 switch (widgetData.id || "") {
                 case "wifi":
                     {
                         if (NetworkService.wifiToggling)
                             return NetworkService.wifiEnabled ? I18n.tr("Disabling WiFi...", "network status") : I18n.tr("Enabling WiFi...", "network status");
+                        if (NetworkService.isConnecting && !NetworkService.ethernetConnected)
+                            return NetworkService.connectingSSID || I18n.tr("Connecting...", "network status");
 
                         const status = NetworkService.networkStatus;
                         if (status === "ethernet")
@@ -333,6 +493,8 @@ Column {
                     {
                         if (NetworkService.wifiToggling)
                             return I18n.tr("Please wait...", "network status");
+                        if (NetworkService.isConnecting && !NetworkService.ethernetConnected)
+                            return I18n.tr("Connecting...", "network status");
 
                         const status = NetworkService.networkStatus;
                         if (status === "ethernet")
@@ -355,6 +517,8 @@ Column {
                             return I18n.tr("No adapters", "bluetooth status");
                         if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
                             return I18n.tr("Off", "bluetooth status");
+                        if (BluetoothService.connecting)
+                            return I18n.tr("Connecting...", "bluetooth status");
                         const primaryDevice = (() => {
                                 if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
                                     return null;
@@ -395,66 +559,12 @@ Column {
                     return widgetDef?.description || "";
                 }
             }
-            isActive: {
-                switch (widgetData.id || "") {
-                case "wifi":
-                    {
-                        if (NetworkService.wifiToggling)
-                            return false;
-
-                        const status = NetworkService.networkStatus;
-                        if (status === "ethernet")
-                            return true;
-                        if (status === "vpn")
-                            return NetworkService.ethernetConnected || NetworkService.wifiConnected;
-                        if (status === "wifi")
-                            return true;
-                        return NetworkService.wifiEnabled;
-                    }
-                case "bluetooth":
-                    return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled);
-                case "audioOutput":
-                    return !!(AudioService.sink?.audio && !AudioService.sink.audio.muted);
-                case "audioInput":
-                    return !!(AudioService.source?.audio && !AudioService.source.audio.muted);
-                default:
-                    return false;
-                }
-            }
+            isActive: root.getCompoundPillIsActive(widgetData.id || "")
             enabled: widgetDef?.enabled ?? true
             onToggled: {
                 if (root.editMode)
                     return;
-                switch (widgetData.id || "") {
-                case "wifi":
-                    {
-                        if (NetworkService.networkStatus !== "ethernet" && !NetworkService.wifiToggling) {
-                            NetworkService.toggleWifiRadio();
-                        }
-                        break;
-                    }
-                case "bluetooth":
-                    {
-                        if (BluetoothService.available && BluetoothService.adapter) {
-                            BluetoothService.adapter.enabled = !BluetoothService.adapter.enabled;
-                        }
-                        break;
-                    }
-                case "audioOutput":
-                    {
-                        if (AudioService.sink && AudioService.sink.audio) {
-                            AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
-                        }
-                        break;
-                    }
-                case "audioInput":
-                    {
-                        if (AudioService.source && AudioService.source.audio) {
-                            AudioService.source.audio.muted = !AudioService.source.audio.muted;
-                        }
-                        break;
-                    }
-                }
+                root.handleCompoundPillToggled(widgetData.id || "");
             }
             onExpandClicked: {
                 if (root.editMode)
@@ -464,35 +574,7 @@ Column {
             onWheelEvent: function (wheelEvent) {
                 if (root.editMode)
                     return;
-                const id = widgetData.id || "";
-                if (id === "audioOutput") {
-                    if (!AudioService.sink || !AudioService.sink.audio)
-                        return;
-                    let delta = wheelEvent.angleDelta.y;
-                    let maxVol = AudioService.sinkMaxVolume;
-                    let currentVolume = AudioService.sink.audio.volume * 100;
-                    let newVolume;
-                    if (delta > 0)
-                        newVolume = Math.min(maxVol, currentVolume + 5);
-                    else
-                        newVolume = Math.max(0, currentVolume - 5);
-                    AudioService.sink.audio.muted = false;
-                    AudioService.sink.audio.volume = newVolume / 100;
-                    wheelEvent.accepted = true;
-                } else if (id === "audioInput") {
-                    if (!AudioService.source || !AudioService.source.audio)
-                        return;
-                    let delta = wheelEvent.angleDelta.y;
-                    let currentVolume = AudioService.source.audio.volume * 100;
-                    let newVolume;
-                    if (delta > 0)
-                        newVolume = Math.min(100, currentVolume + 5);
-                    else
-                        newVolume = Math.max(0, currentVolume - 5);
-                    AudioService.source.audio.muted = false;
-                    AudioService.source.audio.volume = newVolume / 100;
-                    wheelEvent.accepted = true;
-                }
+                root.handleCompoundPillWheelEvent(widgetData.id || "", wheelEvent);
             }
         }
     }
@@ -509,7 +591,8 @@ Column {
                 anchors.centerIn: parent
                 width: parent.width
                 height: 14
-                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                sliderTrackColor: Theme.ccSliderTrackColor
+                sliderTrackOpacity: Theme.ccSliderTrackOpacity
             }
         }
     }
@@ -531,7 +614,8 @@ Column {
                 instanceId: widgetData.instanceId || ""
                 screenName: root.screenName
                 parentScreen: root.parentScreen
-                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                sliderTrackColor: Theme.ccSliderTrackColor
+                sliderTrackOpacity: Theme.ccSliderTrackOpacity
 
                 onIconClicked: {
                     if (!root.editMode && DisplayService.devices && DisplayService.devices.length > 1) {
@@ -554,7 +638,8 @@ Column {
                 anchors.centerIn: parent
                 width: parent.width
                 height: 14
-                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                sliderTrackColor: Theme.ccSliderTrackColor
+                sliderTrackOpacity: Theme.ccSliderTrackOpacity
             }
         }
     }
@@ -622,7 +707,7 @@ Column {
                 case "darkMode":
                     return "contrast";
                 case "idleInhibitor":
-                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
+                    return "motion_sensor_active";
                 default:
                     return "help";
                 }
@@ -707,9 +792,9 @@ Column {
                 case "darkMode":
                     return "contrast";
                 case "doNotDisturb":
-                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off";
+                    return "do_not_disturb_on";
                 case "idleInhibitor":
-                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
+                    return "motion_sensor_active";
                 default:
                     return "help";
                 }
@@ -783,6 +868,7 @@ Column {
 
             mountPath: widgetData.mountPath || "/"
             instanceId: widgetData.instanceId || ""
+            showMountPath: widgetData.showMountPath !== undefined ? widgetData.showMountPath : true
 
             onExpandClicked: {
                 if (!root.editMode) {
@@ -802,6 +888,7 @@ Column {
 
             mountPath: widgetData.mountPath || "/"
             instanceId: widgetData.instanceId || ""
+            showMountPath: widgetData.showMountPath !== undefined ? widgetData.showMountPath : true
 
             onClicked: {
                 if (!root.editMode) {
@@ -847,6 +934,18 @@ Column {
                         root.model.cupsLoader.active = true;
                     }
                     builtinInstance = Qt.binding(() => root.model?.cupsBuiltinInstance);
+                }
+                if (id === "builtin_tailscale") {
+                    if (root.model?.tailscaleLoader) {
+                        root.model.tailscaleLoader.active = true;
+                    }
+                    builtinInstance = Qt.binding(() => root.model?.tailscaleBuiltinInstance);
+                }
+                if (id === "builtin_display_profiles") {
+                    if (root.model?.displayProfilesLoader) {
+                        root.model.displayProfilesLoader.active = true;
+                    }
+                    builtinInstance = Qt.binding(() => root.model?.displayProfilesBuiltinInstance);
                 }
             }
 
@@ -985,7 +1084,7 @@ Column {
                         return true;
                     }
                 } catch (e) {
-                    console.warn("DragDropGrid: stale plugin component for", pluginId, "- reloading");
+                    log.warn("stale plugin component for", pluginId, "- reloading");
                     PluginService.reloadPlugin(pluginId);
                 }
                 return false;
@@ -1092,6 +1191,49 @@ Column {
                 } else if (pluginInstance) {
                     pluginInstance.ccWidgetToggled();
                 }
+            }
+        }
+    }
+
+    Component {
+        id: smallCompoundComponent
+        SmallCompoundButton {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            property var widgetDef: root.model?.getWidgetForId(widgetData.id || "")
+            width: parent.width
+            height: 48
+            iconBlinking: root.getCompoundPillIconBlinking(widgetData.id || "")
+            iconName: root.getCompoundPillIconName(widgetData.id || "", widgetDef)
+            isActive: root.getCompoundPillIsActive(widgetData.id || "")
+            enabled: (widgetDef?.enabled ?? true) && !root.editMode
+            onToggled: {
+                if (root.editMode) return;
+                root.handleCompoundPillToggled(widgetData.id || "");
+            }
+            onExpandClicked: {
+                if (root.editMode) return;
+                root.expandClicked(widgetData, widgetIndex);
+            }
+            onWheelEvent: function(wheelEvent) {
+                if (root.editMode) return;
+                root.handleCompoundPillWheelEvent(widgetData.id || "", wheelEvent);
+            }
+        }
+    }
+
+    Component {
+        id: smallColorPickerComponent
+        SmallColorPickerButton {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            width: parent.width
+            height: 48
+            colorPickerModal: root.colorPickerModal
+            onClicked: {
+                if (root.editMode) return;
+                if (root.colorPickerModal)
+                    root.colorPickerModal.show();
             }
         }
     }

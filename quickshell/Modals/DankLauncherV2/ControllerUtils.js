@@ -101,6 +101,39 @@ function detectIconType(iconName) {
     return "material";
 }
 
+function classifyAppSource(app) {
+    if (!app)
+        return "";
+
+    var execRaw = app.execString || app.exec || "";
+    if (!execRaw && !app.id)
+        return "";
+
+    var exec = execRaw.toLowerCase();
+    var cmd0 = (app.command && app.command.length > 0) ? String(app.command[0]).toLowerCase() : "";
+    var id = (app.id || "").toLowerCase();
+
+    if (cmd0 === "flatpak" || exec.indexOf("flatpak run ") !== -1)
+        return "flatpak";
+
+    if (cmd0 === "snap"
+        || exec.indexOf("bamf_desktop_file_hint=") !== -1
+        || exec.indexOf("/snap/bin/") !== -1
+        || exec.indexOf("/snap/core") !== -1
+        || exec.indexOf("snap run ") === 0)
+        return "snap";
+
+    if (/\.appimage(\s|$|")/i.test(execRaw) || id.indexOf("appimagekit_") === 0)
+        return "appimage";
+
+    if (exec.indexOf("/nix/store/") !== -1
+        || exec.indexOf("/run/current-system/sw/") !== -1
+        || exec.indexOf("/etc/profiles/per-user/") !== -1)
+        return "nix";
+
+    return "system";
+}
+
 function sortPluginIdsByOrder(pluginIds, order) {
     if (!order || order.length === 0)
         return pluginIds;
@@ -125,4 +158,15 @@ function sortPluginsOrdered(plugins, order) {
         var bOrder = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
         return aOrder - bOrder;
     });
+}
+
+function parseFileSearchPrefix(query) {
+    if (!query || !query.startsWith("/"))
+        return null;
+    var rest = query.substring(1);
+    if (rest === "d" || rest.startsWith("d ") || rest.startsWith("d\t"))
+        return { type: "dir", query: rest.substring(1).trim() };
+    if (rest === "f" || rest.startsWith("f ") || rest.startsWith("f\t"))
+        return { type: "file", query: rest.substring(1).trim() };
+    return { type: null, query: rest.trim() };
 }

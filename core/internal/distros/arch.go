@@ -112,6 +112,11 @@ func (a *ArchDistribution) DetectDependenciesWithTerminal(ctx context.Context, w
 		dependencies = append(dependencies, a.detectXwaylandSatellite())
 	}
 
+	// Mango-specific tools (dwl-based, uses xwayland-satellite like niri)
+	if wm == deps.WindowManagerMango {
+		dependencies = append(dependencies, a.detectXwaylandSatellite())
+	}
+
 	dependencies = append(dependencies, a.detectMatugen())
 	dependencies = append(dependencies, a.detectDgop())
 
@@ -172,6 +177,11 @@ func (a *ArchDistribution) isInSystemRepo(pkg string) bool {
 	return exec.Command("pacman", "-Si", pkg).Run() == nil
 }
 
+// isSonameProvides reports whether dep is a shared-library soname
+func isSonameProvides(dep string) bool {
+	return strings.HasSuffix(dep, ".so") || strings.Contains(dep, ".so.")
+}
+
 func (a *ArchDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
 	return a.GetPackageMappingWithVariants(wm, make(map[string]deps.PackageVariant))
 }
@@ -199,6 +209,9 @@ func (a *ArchDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 	case deps.WindowManagerNiri:
 		packages["niri"] = a.getNiriMapping(variants["niri"])
 		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
+	case deps.WindowManagerMango:
+		packages["mango"] = a.getMangoMapping(variants["mango"])
+		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
 	}
 
 	return packages
@@ -208,8 +221,7 @@ func (a *ArchDistribution) getQuickshellMapping(variant deps.PackageVariant) Pac
 	if forceQuickshellGit || variant == deps.VariantGit {
 		return PackageMapping{Name: "quickshell-git", Repository: RepoTypeAUR}
 	}
-	// ! TODO - for now we're only forcing quickshell-git on ARCH, as other distros use DL repos which pin a newer quickshell
-	return PackageMapping{Name: "quickshell-git", Repository: RepoTypeAUR}
+	return PackageMapping{Name: "quickshell", Repository: RepoTypeSystem}
 }
 
 func (a *ArchDistribution) getHyprlandMapping(_ deps.PackageVariant) PackageMapping {
@@ -221,6 +233,13 @@ func (a *ArchDistribution) getNiriMapping(variant deps.PackageVariant) PackageMa
 		return PackageMapping{Name: "niri-git", Repository: RepoTypeAUR}
 	}
 	return PackageMapping{Name: "niri", Repository: RepoTypeSystem}
+}
+
+func (a *ArchDistribution) getMangoMapping(variant deps.PackageVariant) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "mangowm-git", Repository: RepoTypeAUR}
+	}
+	return PackageMapping{Name: "mangowm", Repository: RepoTypeAUR}
 }
 
 func (a *ArchDistribution) getMatugenMapping(variant deps.PackageVariant) PackageMapping {
@@ -330,6 +349,12 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 			return fmt.Errorf("failed to preinstall quickshell-git: %w", err)
 		}
 		aurPkgs = slices.DeleteFunc(aurPkgs, func(p string) bool { return p == "quickshell-git" })
+	}
+
+	if slices.Contains(systemPkgs, "quickshell") && a.packageInstalled("quickshell-git") {
+		if err := a.removeQuickshellGit(ctx, sudoPassword, progressChan); err != nil {
+			return fmt.Errorf("failed to remove quickshell-git: %w", err)
+		}
 	}
 
 	// Phase 3: System Packages
@@ -447,6 +472,20 @@ func (a *ArchDistribution) categorizePackages(dependencies []deps.Dependency, wm
 	}
 
 	return systemPkgs, aurPkgs, manualPkgs, variantMap
+}
+
+func (a *ArchDistribution) removeQuickshellGit(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseSystemPackages,
+		Progress:    0.33,
+		Step:        "Removing quickshell-git...",
+		IsComplete:  false,
+		NeedsSudo:   true,
+		CommandInfo: "sudo pacman -Rdd --noconfirm quickshell-git",
+		LogOutput:   "Removing quickshell-git so stable quickshell can be installed",
+	}
+	cmd := privesc.ExecCommand(ctx, sudoPassword, "pacman -Rdd --noconfirm quickshell-git")
+	return a.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.33, 0.35)
 }
 
 func (a *ArchDistribution) preinstallQuickshellGit(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
@@ -705,7 +744,7 @@ func (a *ArchDistribution) installSingleAURPackageInternal(ctx context.Context, 
 				continue
 			}
 			seen[dep] = true
-			if a.isInSystemRepo(dep) {
+			if isSonameProvides(dep) || a.isInSystemRepo(dep) {
 				systemPkgs = append(systemPkgs, dep)
 			} else {
 				aurPkgs = append(aurPkgs, dep)

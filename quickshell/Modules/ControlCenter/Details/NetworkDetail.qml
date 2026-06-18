@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import qs.Common
+import qs.Modules.Network
 import qs.Services
 import qs.Widgets
 import qs.Modals
@@ -22,9 +23,9 @@ Rectangle {
         return headerRow.height + wifiOffContent.height + Theme.spacingM;
     }
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-    border.width: 0
+    color: Theme.nestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Component.onCompleted: {
         NetworkService.addRef();
@@ -151,7 +152,7 @@ Rectangle {
                 iconColor: Theme.surfaceVariantText
                 onClicked: {
                     PopoutService.closeControlCenter();
-                    PopoutService.openSettingsWithTab("network");
+                    PopoutService.openSettingsWithTab(currentPreferenceIndex === 0 ? "network_ethernet" : "network_wifi");
                 }
             }
         }
@@ -177,8 +178,9 @@ Rectangle {
                 name: "sync"
                 size: 32
                 color: Theme.primary
+                smoothTransform: NetworkService.wifiToggling
 
-                RotationAnimation on rotation {
+                RotationAnimator on rotation {
                     running: NetworkService.wifiToggling
                     loops: Animation.Infinite
                     from: 0
@@ -493,8 +495,9 @@ Rectangle {
             name: "refresh"
             size: 48
             color: Qt.rgba(Theme.surfaceText.r || 0.8, Theme.surfaceText.g || 0.8, Theme.surfaceText.b || 0.8, 0.3)
+            smoothTransform: wifiScanningOverlay.visible
 
-            RotationAnimation on rotation {
+            RotationAnimator on rotation {
                 running: wifiScanningOverlay.visible
                 loops: Animation.Infinite
                 from: 0
@@ -539,7 +542,11 @@ Rectangle {
                     return -1;
                 if (b.ssid === ssid)
                     return 1;
-                return b.signal - a.signal;
+                const aBucket = Math.floor((a.signal || 0) / 25);
+                const bBucket = Math.floor((b.signal || 0) / 25);
+                if (aBucket !== bBucket)
+                    return bBucket - aBucket;
+                return (a.ssid || "").localeCompare(b.ssid || "");
             });
             return sorted;
         }
@@ -642,6 +649,7 @@ Rectangle {
                     wifiContent.menuOpen = true;
                     networkContextMenu.currentSSID = modelData.ssid;
                     networkContextMenu.currentSecured = modelData.secured;
+                    networkContextMenu.currentEnterprise = modelData.enterprise;
                     networkContextMenu.currentConnected = wifiDelegate.isConnected;
                     networkContextMenu.currentSaved = modelData.saved;
                     networkContextMenu.currentSignal = modelData.signal;
@@ -714,7 +722,7 @@ Rectangle {
 
             DankActionButton {
                 id: qrCodeButton
-                visible: modelData.secured && modelData.saved
+                visible: modelData.secured && modelData.saved && !(modelData.enterprise || false)
                 anchors.right: parent.right
                 anchors.rightMargin: optionsButton.width + pinWifiRow.width + 3 * Theme.spacingM + Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
@@ -742,11 +750,9 @@ Rectangle {
                         event.accepted = true;
                         return;
                     }
-                    if (modelData.secured && !modelData.saved && DMSService.apiVersion < 7) {
-                        PopoutService.showWifiPasswordModal(modelData.ssid);
-                    } else {
-                        NetworkService.connectToWifi(modelData.ssid);
-                    }
+                    WifiConnectionActions.connectToNetwork(modelData, {
+                        connected: wifiDelegate.isConnected
+                    });
                     event.accepted = true;
                 }
             }
@@ -760,6 +766,7 @@ Rectangle {
 
         property string currentSSID: ""
         property bool currentSecured: false
+        property bool currentEnterprise: false
         property bool currentConnected: false
         property bool currentSaved: false
         property int currentSignal: 0
@@ -796,15 +803,9 @@ Rectangle {
             }
 
             onTriggered: {
-                if (networkContextMenu.currentConnected) {
-                    NetworkService.disconnectWifi();
-                    return;
-                }
-                if (networkContextMenu.currentSecured && !networkContextMenu.currentSaved && DMSService.apiVersion < 7) {
-                    PopoutService.showWifiPasswordModal(networkContextMenu.currentSSID);
-                    return;
-                }
-                NetworkService.connectToWifi(networkContextMenu.currentSSID);
+                WifiConnectionActions.connectToNetworkFromDetails(networkContextMenu.currentSSID, networkContextMenu.currentSecured, networkContextMenu.currentSaved, networkContextMenu.currentEnterprise, networkContextMenu.currentConnected, {
+                    disconnectWhenConnected: true
+                });
             }
         }
 

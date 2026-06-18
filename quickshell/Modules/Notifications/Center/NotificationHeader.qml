@@ -128,7 +128,9 @@ Item {
                     height: Theme.iconSize + Theme.spacingS
                     radius: Theme.cornerRadius
                     visible: root.currentTab === 0 ? NotificationService.notifications.length > 0 : NotificationService.historyList.length > 0
-                    color: clearArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                    color: clearArea.containsMouse ? Theme.primaryHoverLight : Theme.nestedSurface
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
                     Row {
                         id: clearButtonContent

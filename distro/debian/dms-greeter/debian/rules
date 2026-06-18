@@ -29,7 +29,9 @@ override_dh_auto_install:
 		install -Dm644 $$SOURCE_DIR/LICENSE \
 			debian/dms-greeter/usr/share/doc/dms-greeter/LICENSE && \
 		install -Dpm0644 $$SOURCE_DIR/systemd/tmpfiles-dms-greeter.conf \
-			debian/dms-greeter/usr/lib/tmpfiles.d/dms-greeter.conf; \
+			debian/dms-greeter/usr/lib/tmpfiles.d/dms-greeter.conf && \
+		install -Dm644 $$SOURCE_DIR/systemd/sysusers-dms-greeter.conf \
+			debian/dms-greeter/usr/lib/sysusers.d/dms-greeter.conf; \
 	else \
 		echo "ERROR: No upstream source (dms-qml or Modules/Greetd/assets/dms-greeter)!" && \
 		echo "Contents of current directory:" && ls -la && exit 1; \

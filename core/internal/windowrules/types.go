@@ -43,31 +43,40 @@ type Actions struct {
 	FocusRingOff         *bool    `json:"focusRingOff,omitempty"`
 	BorderOff            *bool    `json:"borderOff,omitempty"`
 	DrawBorderWithBg     *bool    `json:"drawBorderWithBackground,omitempty"`
-	Size                 string   `json:"size,omitempty"`
-	Move                 string   `json:"move,omitempty"`
-	Monitor              string   `json:"monitor,omitempty"`
-	Workspace            string   `json:"workspace,omitempty"`
-	Tile                 *bool    `json:"tile,omitempty"`
-	NoFocus              *bool    `json:"nofocus,omitempty"`
-	NoBorder             *bool    `json:"noborder,omitempty"`
-	NoShadow             *bool    `json:"noshadow,omitempty"`
-	NoDim                *bool    `json:"nodim,omitempty"`
-	NoBlur               *bool    `json:"noblur,omitempty"`
-	NoAnim               *bool    `json:"noanim,omitempty"`
-	NoRounding           *bool    `json:"norounding,omitempty"`
-	Pin                  *bool    `json:"pin,omitempty"`
-	Opaque               *bool    `json:"opaque,omitempty"`
-	ForcergbX            *bool    `json:"forcergbx,omitempty"`
-	Idleinhibit          string   `json:"idleinhibit,omitempty"`
+	BackgroundBlur       *bool    `json:"backgroundBlur,omitempty"`
+	BackgroundXray       *bool    `json:"backgroundXray,omitempty"`
+	BackgroundNoise      *float64 `json:"backgroundNoise,omitempty"`
+	BackgroundSaturation *float64 `json:"backgroundSaturation,omitempty"`
+
+	DefaultFloatingX          *int   `json:"defaultFloatingX,omitempty"`
+	DefaultFloatingY          *int   `json:"defaultFloatingY,omitempty"`
+	DefaultFloatingRelativeTo string `json:"defaultFloatingRelativeTo,omitempty"`
+	Size                      string `json:"size,omitempty"`
+	Move                      string `json:"move,omitempty"`
+	Monitor                   string `json:"monitor,omitempty"`
+	Workspace                 string `json:"workspace,omitempty"`
+	Tile                      *bool  `json:"tile,omitempty"`
+	NoFocus                   *bool  `json:"nofocus,omitempty"`
+	NoBorder                  *bool  `json:"noborder,omitempty"`
+	NoShadow                  *bool  `json:"noshadow,omitempty"`
+	NoDim                     *bool  `json:"nodim,omitempty"`
+	NoBlur                    *bool  `json:"noblur,omitempty"`
+	NoAnim                    *bool  `json:"noanim,omitempty"`
+	NoRounding                *bool  `json:"norounding,omitempty"`
+	Pin                       *bool  `json:"pin,omitempty"`
+	Opaque                    *bool  `json:"opaque,omitempty"`
+	ForcergbX                 *bool  `json:"forcergbx,omitempty"`
+	Idleinhibit               string `json:"idleinhibit,omitempty"`
 }
 
 type WindowRule struct {
-	ID            string        `json:"id"`
-	Name          string        `json:"name,omitempty"`
-	Enabled       bool          `json:"enabled"`
-	MatchCriteria MatchCriteria `json:"matchCriteria"`
-	Actions       Actions       `json:"actions"`
-	Source        string        `json:"source,omitempty"`
+	ID            string          `json:"id"`
+	Name          string          `json:"name,omitempty"`
+	Enabled       bool            `json:"enabled"`
+	MatchCriteria MatchCriteria   `json:"matchCriteria"`
+	Matches       []MatchCriteria `json:"matches,omitempty"`
+	Actions       Actions         `json:"actions"`
+	Source        string          `json:"source,omitempty"`
 }
 
 type DMSRulesStatus struct {
@@ -79,6 +88,8 @@ type DMSRulesStatus struct {
 	Effective       bool   `json:"effective"`
 	OverriddenBy    int    `json:"overriddenBy"`
 	StatusMessage   string `json:"statusMessage"`
+	ConfigFormat    string `json:"configFormat,omitempty"`
+	ReadOnly        bool   `json:"readOnly,omitempty"`
 }
 
 type RuleSet struct {

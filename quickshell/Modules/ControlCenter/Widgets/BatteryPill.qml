@@ -25,7 +25,7 @@ CompoundPill {
             return `${BatteryService.batteryLevel}% • ` + I18n.tr("Charging");
         }
         if (BatteryService.isPluggedIn) {
-            return `${BatteryService.batteryLevel}% • ` + I18n.tr("Plugged in");
+            return `${BatteryService.batteryLevel}% • ` + I18n.tr("Plugged In");
         }
         return `${BatteryService.batteryLevel}%`;
     }

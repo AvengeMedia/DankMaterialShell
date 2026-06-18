@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 PanelWindow {
     id: root
@@ -18,14 +19,8 @@ PanelWindow {
 
     function show(text, x, y, screen, leftAlign, rightAlign) {
         root.text = text;
-        if (screen) {
-            targetScreen = screen;
-            const screenX = screen.x || 0;
-            targetX = x - screenX;
-        } else {
-            targetScreen = null;
-            targetX = x;
-        }
+        targetScreen = screen ?? null;
+        targetX = x;
         targetY = y;
         alignLeft = leftAlign ?? false;
         alignRight = rightAlign ?? false;
@@ -51,33 +46,42 @@ PanelWindow {
 
     margins {
         left: {
-            const screenWidth = targetScreen?.width ?? Screen.width
+            const screenWidth = targetScreen?.width ?? Screen.width;
             if (alignLeft) {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX)));
             } else if (alignRight) {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth)));
             } else {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth / 2)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth / 2)));
             }
         }
         top: {
-            const screenHeight = targetScreen?.height ?? Screen.height
+            const screenHeight = targetScreen?.height ?? Screen.height;
             if (alignLeft || alignRight) {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY - implicitHeight / 2)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY - implicitHeight / 2)));
             } else {
-                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY)))
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY)));
             }
         }
     }
 
+    WindowBlur {
+        targetWindow: root
+        blurX: 0
+        blurY: 0
+        blurWidth: root.visible ? root.width : 0
+        blurHeight: root.visible ? root.height : 0
+        blurRadius: Theme.cornerRadius
+    }
+
     Rectangle {
         anchors.fill: parent
-        color: BlurService.enabled ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         radius: Theme.cornerRadius
         border.width: BlurService.enabled ? BlurService.borderWidth : 1
-        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
+        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
 
-        Text {
+        StyledText {
             id: textContent
 
             anchors.centerIn: parent

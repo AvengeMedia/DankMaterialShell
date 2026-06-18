@@ -29,7 +29,7 @@ DankModal {
         confirmButtonText = "Confirm";
         cancelButtonText = "Cancel";
         confirmButtonColor = Theme.primary;
-        onConfirm = onConfirmCallback || ((text) => {});
+        onConfirm = onConfirmCallback || (text => {});
         onCancel = onCancelCallback || (() => {});
         selectedButton = -1;
         keyboardNavigation = false;
@@ -44,7 +44,7 @@ DankModal {
         confirmButtonText = options.confirmText || "Confirm";
         cancelButtonText = options.cancelText || "Cancel";
         confirmButtonColor = options.confirmColor || Theme.primary;
-        onConfirm = options.onConfirm || ((text) => {});
+        onConfirm = options.onConfirm || (text => {});
         onCancel = options.onCancel || (() => {});
         selectedButton = -1;
         keyboardNavigation = false;

@@ -53,7 +53,42 @@ QtObject {
         }
     }
 
+    function togglePinSelected() {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0 || ClipboardService.selectedIndex < 0 || ClipboardService.selectedIndex >= entries.length) {
+            return;
+        }
+        const selectedEntry = entries[ClipboardService.selectedIndex];
+        if (selectedEntry.pinned) {
+            modal.unpinEntry(selectedEntry);
+            return;
+        }
+        const pinnedDuplicate = ClipboardService.getPinnedEntryByHash(selectedEntry.hash);
+        if (pinnedDuplicate) {
+            modal.unpinEntry(pinnedDuplicate);
+        } else {
+            modal.pinEntry(selectedEntry);
+        }
+    }
+
+    function editSelected() {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0) {
+            return;
+        }
+        const index = ClipboardService.selectedIndex >= 0 && ClipboardService.selectedIndex < entries.length ? ClipboardService.selectedIndex : 0;
+        modal.editEntry(entries[index]);
+    }
+
     function handleKey(event) {
+        if (modal.mode === "editor") {
+            if (event.key === Qt.Key_Escape) {
+                modal.mode = "history";
+                event.accepted = true;
+            }
+            return;
+        }
+
         switch (event.key) {
         case Qt.Key_Escape:
             if (ClipboardService.keyboardNavigationActive) {
@@ -65,6 +100,12 @@ QtObject {
             return;
         case Qt.Key_Down:
         case Qt.Key_Tab:
+            if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ControlModifier)) {
+                modal.activeTab = modal.activeTab === "saved" ? "recents" : "saved";
+                ClipboardService.selectedIndex = 0;
+                event.accepted = true;
+                return;
+            }
             if (!ClipboardService.keyboardNavigationActive) {
                 ClipboardService.keyboardNavigationActive = true;
                 ClipboardService.selectedIndex = 0;
@@ -75,11 +116,15 @@ QtObject {
             return;
         case Qt.Key_Up:
         case Qt.Key_Backtab:
+            if (event.key === Qt.Key_Backtab && (event.modifiers & Qt.ControlModifier)) {
+                modal.activeTab = modal.activeTab === "saved" ? "recents" : "saved";
+                ClipboardService.selectedIndex = 0;
+                event.accepted = true;
+                return;
+            }
             if (!ClipboardService.keyboardNavigationActive) {
                 ClipboardService.keyboardNavigationActive = true;
                 ClipboardService.selectedIndex = 0;
-            } else if (ClipboardService.selectedIndex === 0) {
-                ClipboardService.keyboardNavigationActive = false;
             } else {
                 selectPrevious();
             }
@@ -108,8 +153,6 @@ QtObject {
                 if (!ClipboardService.keyboardNavigationActive) {
                     ClipboardService.keyboardNavigationActive = true;
                     ClipboardService.selectedIndex = 0;
-                } else if (ClipboardService.selectedIndex === 0) {
-                    ClipboardService.keyboardNavigationActive = false;
                 } else {
                     selectPrevious();
                 }
@@ -121,14 +164,23 @@ QtObject {
                     event.accepted = true;
                 }
                 return;
+            case Qt.Key_S:
+                if (ClipboardService.keyboardNavigationActive) {
+                    togglePinSelected();
+                    event.accepted = true;
+                }
+                return;
+            case Qt.Key_E:
+                editSelected();
+                event.accepted = true;
+                return;
             }
         }
 
         if (event.modifiers & Qt.ShiftModifier) {
             switch (event.key) {
             case Qt.Key_Delete:
-                modal.clearAll();
-                modal.hide();
+                modal.confirmClearAll();
                 event.accepted = true;
                 return;
             case Qt.Key_Return:

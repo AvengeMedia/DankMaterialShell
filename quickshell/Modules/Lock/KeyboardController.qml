@@ -1,9 +1,11 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import qs.Services
 
 Item {
     id: keyboard_controller
+    readonly property var log: Log.scoped("KeyboardController")
 
     // reference on the TextInput
     property Item target
@@ -14,21 +16,20 @@ Item {
 
     function show() {
         if (!isKeyboardActive && keyboard === null) {
-            keyboard = keyboardComponent.createObject(
-                        keyboard_controller.rootObject)
-            keyboard.target = keyboard_controller.target
-            keyboard.dismissed.connect(hide)
-            isKeyboardActive = true
+            keyboard = keyboardComponent.createObject(keyboard_controller.rootObject);
+            keyboard.target = keyboard_controller.target;
+            keyboard.dismissed.connect(hide);
+            isKeyboardActive = true;
         } else
-            console.log("The keyboard is already shown")
+            log.debug("The keyboard is already shown");
     }
 
     function hide() {
         if (isKeyboardActive && keyboard !== null) {
-            keyboard.destroy()
-            isKeyboardActive = false
+            keyboard.destroy();
+            isKeyboardActive = false;
         } else
-            console.log("The keyboard is already hidden")
+            log.debug("The keyboard is already hidden");
     }
 
     // private

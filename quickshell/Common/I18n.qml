@@ -5,9 +5,11 @@ import QtQuick
 import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("I18n")
 
     property string _resolvedLocale: "en"
 
@@ -54,15 +56,15 @@ Singleton {
             try {
                 root.translations = JSON.parse(text());
                 root.translationsLoaded = true;
-                console.info(`I18n: Loaded translations for '${root._resolvedLocale}' (${Object.keys(root.translations).length} contexts)`);
+                log.info(`I18n: Loaded translations for '${root._resolvedLocale}' (${Object.keys(root.translations).length} contexts)`);
             } catch (e) {
-                console.warn(`I18n: Error parsing '${root._resolvedLocale}':`, e, "- falling back to English");
+                log.warn(`I18n: Error parsing '${root._resolvedLocale}':`, e, "- falling back to English");
                 root._fallbackToEnglish();
             }
         }
 
         onLoadFailed: error => {
-            console.warn(`I18n: Failed to load '${root._resolvedLocale}' (${error}), ` + "falling back to English");
+            log.warn(`I18n: Failed to load '${root._resolvedLocale}' (${error}), ` + "falling back to English");
             root._fallbackToEnglish();
         }
     }
@@ -105,14 +107,14 @@ Singleton {
         _selectedPath = fileUrl;
         translationsLoaded = false;
         translations = ({});
-        console.info(`I18n: Using locale '${localeTag}' from ${fileUrl}`);
+        log.info(`I18n: Using locale '${localeTag}' from ${fileUrl}`);
     }
 
     function _fallbackToEnglish() {
         _selectedPath = "";
         translationsLoaded = false;
         translations = ({});
-        console.warn("I18n: Falling back to built-in English strings");
+        log.warn("Falling back to built-in English strings");
     }
 
     function tr(term, context) {

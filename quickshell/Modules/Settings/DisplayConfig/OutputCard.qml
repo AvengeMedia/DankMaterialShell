@@ -12,6 +12,17 @@ StyledRect {
     required property string outputName
     required property var outputData
     property bool isConnected: outputData?.connected ?? false
+    property bool isDisabled: {
+        void (DisplayConfigState.pendingHyprlandChanges);
+        void (DisplayConfigState.pendingNiriChanges);
+        if (!root.isConnected)
+            return false;
+        if (CompositorService.isHyprland)
+            return DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "disabled", false);
+        if (CompositorService.isNiri)
+            return DisplayConfigState.getNiriSetting(root.outputData, root.outputName, "disabled", false);
+        return false;
+    }
 
     width: parent.width
     height: settingsColumn.implicitHeight + Theme.spacingM * 2
@@ -19,7 +30,7 @@ StyledRect {
     color: Theme.withAlpha(Theme.surfaceContainerHigh, isConnected ? 0.5 : 0.3)
     border.color: Theme.withAlpha(Theme.outline, 0.3)
     border.width: 1
-    opacity: isConnected ? 1.0 : 0.7
+    opacity: isConnected ? (isDisabled ? 0.5 : 1.0) : 0.7
 
     Column {
         id: settingsColumn
@@ -32,14 +43,14 @@ StyledRect {
             spacing: Theme.spacingM
 
             DankIcon {
-                name: root.isConnected ? "desktop_windows" : "desktop_access_disabled"
+                name: root.isConnected && !root.isDisabled ? "desktop_windows" : "desktop_access_disabled"
                 size: Theme.iconSize - 4
-                color: root.isConnected ? Theme.primary : Theme.surfaceVariantText
+                color: root.isConnected && !root.isDisabled ? Theme.primary : Theme.surfaceVariantText
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Column {
-                width: parent.width - Theme.iconSize - Theme.spacingM - (disconnectedBadge.visible ? disconnectedBadge.width + deleteButton.width + Theme.spacingS * 2 : 0)
+                width: parent.width - Theme.iconSize - Theme.spacingM - (disconnectedBadge.visible ? disconnectedBadge.width + deleteButton.width + Theme.spacingS * 2 : disabledBadge.visible ? disabledBadge.width + Theme.spacingS : 0)
                 spacing: 2
 
                 StyledText {
@@ -102,12 +113,30 @@ StyledRect {
                     onClicked: DisplayConfigState.deleteDisconnectedOutput(root.outputName)
                 }
             }
+
+            Rectangle {
+                id: disabledBadge
+                visible: root.isDisabled
+                width: disabledText.implicitWidth + Theme.spacingM
+                height: disabledText.implicitHeight + Theme.spacingXS
+                radius: height / 2
+                color: Theme.withAlpha(Theme.outline, 0.3)
+                anchors.verticalCenter: parent.verticalCenter
+
+                StyledText {
+                    id: disabledText
+                    text: I18n.tr("Disabled")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    anchors.centerIn: parent
+                }
+            }
         }
 
         DankDropdown {
             width: parent.width
             text: I18n.tr("Resolution & Refresh")
-            visible: root.isConnected
+            visible: root.isConnected && !root.isDisabled
             currentValue: {
                 const pendingMode = DisplayConfigState.getPendingValue(root.outputName, "mode");
                 if (pendingMode)
@@ -141,10 +170,20 @@ StyledRect {
             horizontalAlignment: Text.AlignLeft
         }
 
+        StyledText {
+            visible: root.isDisabled
+            text: I18n.tr("This output is disabled in the current profile")
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceVariantText
+            wrapMode: Text.WordWrap
+            width: parent.width
+            horizontalAlignment: Text.AlignLeft
+        }
+
         Row {
             width: parent.width
             spacing: Theme.spacingM
-            visible: root.isConnected
+            visible: root.isConnected && !root.isDisabled
 
             Column {
                 width: (parent.width - Theme.spacingM) / 2
@@ -164,12 +203,40 @@ StyledRect {
                     height: scaleDropdown.visible ? scaleDropdown.height : scaleInput.height
 
                     property bool customMode: false
-                    property string currentScale: {
+                    property real currentScaleValue: {
                         const pendingScale = DisplayConfigState.getPendingValue(root.outputName, "scale");
                         if (pendingScale !== undefined)
-                            return parseFloat(pendingScale.toFixed(2)).toString();
-                        const scale = DisplayConfigState.outputs[root.outputName]?.logical?.scale ?? 1.0;
-                        return parseFloat(scale.toFixed(2)).toString();
+                            return pendingScale;
+                        return root.outputData?.logical?.scale || 1.0;
+                    }
+                    property string currentScale: DisplayConfigState.formatScaleLabel(currentScaleValue)
+                    property var scaleOptionsData: {
+                        void (DisplayConfigState.pendingChanges);
+                        const customLabel = I18n.tr("Custom...");
+                        const values = DisplayConfigState.getScalePresetValues(root.outputName, root.outputData);
+                        const labels = [];
+                        const valueByLabel = {};
+
+                        function addValue(value) {
+                            if (!isFinite(value) || value <= 0)
+                                return;
+                            const label = DisplayConfigState.formatScaleLabel(value);
+                            if (valueByLabel[label] !== undefined)
+                                return;
+                            valueByLabel[label] = value;
+                            labels.push(label);
+                        }
+
+                        for (const value of values)
+                            addValue(value);
+                        addValue(scaleContainer.currentScaleValue);
+
+                        labels.sort((a, b) => parseFloat(a) - parseFloat(b));
+                        labels.push(customLabel);
+                        return {
+                            "labels": labels,
+                            "valueByLabel": valueByLabel
+                        };
                     }
 
                     DankDropdown {
@@ -178,20 +245,7 @@ StyledRect {
                         dropdownWidth: parent.width
                         visible: !scaleContainer.customMode
                         currentValue: scaleContainer.currentScale
-                        options: {
-                            const standard = ["0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "2.5", "3", I18n.tr("Custom...")];
-                            const current = scaleContainer.currentScale;
-                            if (standard.slice(0, -1).includes(current))
-                                return standard;
-                            const opts = [...standard.slice(0, -1), current, standard[standard.length - 1]];
-                            return opts.sort((a, b) => {
-                                if (a === I18n.tr("Custom..."))
-                                    return 1;
-                                if (b === I18n.tr("Custom..."))
-                                    return -1;
-                                return parseFloat(a) - parseFloat(b);
-                            });
-                        }
+                        options: scaleContainer.scaleOptionsData.labels
                         onValueChanged: value => {
                             if (value === I18n.tr("Custom...")) {
                                 scaleContainer.customMode = true;
@@ -200,7 +254,8 @@ StyledRect {
                                 scaleInput.selectAll();
                                 return;
                             }
-                            DisplayConfigState.setPendingChange(root.outputName, "scale", parseFloat(value));
+                            const mapped = scaleContainer.scaleOptionsData.valueByLabel[value];
+                            DisplayConfigState.setPendingChange(root.outputName, "scale", mapped !== undefined ? mapped : parseFloat(value));
                         }
                     }
 
@@ -209,7 +264,7 @@ StyledRect {
                         width: parent.width
                         height: 40
                         visible: scaleContainer.customMode
-                        placeholderText: "0.5 - 4.0"
+                        placeholderText: "0.25 - 4.0"
 
                         function applyValue() {
                             const val = parseFloat(text);
@@ -218,7 +273,7 @@ StyledRect {
                                 scaleContainer.customMode = false;
                                 return;
                             }
-                            DisplayConfigState.setPendingChange(root.outputName, "scale", parseFloat(val.toFixed(2)));
+                            DisplayConfigState.setPendingChange(root.outputName, "scale", parseFloat(val.toFixed(6)));
                             scaleContainer.customMode = false;
                         }
 
@@ -251,8 +306,7 @@ StyledRect {
                         const pendingTransform = DisplayConfigState.getPendingValue(root.outputName, "transform");
                         if (pendingTransform)
                             return DisplayConfigState.getTransformLabel(pendingTransform);
-                        const data = DisplayConfigState.outputs[root.outputName];
-                        return DisplayConfigState.getTransformLabel(data?.logical?.transform ?? "Normal");
+                        return DisplayConfigState.getTransformLabel(root.outputData?.logical?.transform ?? "Normal");
                     }
                     options: [I18n.tr("Normal"), I18n.tr("90°"), I18n.tr("180°"), I18n.tr("270°"), I18n.tr("Flipped"), I18n.tr("Flipped 90°"), I18n.tr("Flipped 180°"), I18n.tr("Flipped 270°")]
                     onValueChanged: value => DisplayConfigState.setPendingChange(root.outputName, "transform", DisplayConfigState.getTransformValue(value))
@@ -263,7 +317,7 @@ StyledRect {
         DankToggle {
             width: parent.width
             text: I18n.tr("Variable Refresh Rate")
-            visible: root.isConnected && !CompositorService.isDwl && !CompositorService.isHyprland && !CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
+            visible: root.isConnected && !root.isDisabled && !CompositorService.isMango && !CompositorService.isHyprland && !CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
             checked: {
                 const pendingVrr = DisplayConfigState.getPendingValue(root.outputName, "vrr");
                 if (pendingVrr !== undefined)
@@ -276,7 +330,7 @@ StyledRect {
         DankDropdown {
             width: parent.width
             text: I18n.tr("Variable Refresh Rate")
-            visible: root.isConnected && CompositorService.isHyprland && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
+            visible: root.isConnected && !root.isDisabled && CompositorService.isHyprland && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
             options: [I18n.tr("Off"), I18n.tr("On"), I18n.tr("Fullscreen Only")]
             currentValue: {
                 DisplayConfigState.pendingHyprlandChanges;
@@ -299,7 +353,7 @@ StyledRect {
         DankDropdown {
             width: parent.width
             text: I18n.tr("Variable Refresh Rate")
-            visible: root.isConnected && CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
+            visible: root.isConnected && !root.isDisabled && CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
             options: [I18n.tr("Off"), I18n.tr("On"), I18n.tr("On-Demand")]
             currentValue: {
                 DisplayConfigState.pendingNiriChanges;

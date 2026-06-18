@@ -8,6 +8,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("OverviewWidget")
     required property var panelWindow
     required property bool overviewOpen
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(panelWindow.screen)
@@ -104,6 +105,24 @@ Item {
         } catch (e) {
             return false;
         }
+    }
+
+    function getWorkspaceViewportBounds(workspaceId) {
+        const workspace = allWorkspaces?.find(ws => ws?.id === workspaceId);
+        const mon = workspace?.monitor?.lastIpcObject || monitor?.lastIpcObject || {};
+        const reserved = mon.reserved || [0, 0, 0, 0];
+
+        const x = (mon.x ?? 0) + (reserved[0] ?? 0);
+        const y = (mon.y ?? 0) + (reserved[1] ?? 0);
+        const width = Math.max((mon.width ?? monitorPhysicalWidth) - (reserved[0] ?? 0) - (reserved[2] ?? 0), 1);
+        const height = Math.max((mon.height ?? monitorPhysicalHeight) - (reserved[1] ?? 0) - (reserved[3] ?? 0), 1);
+        const scale = Math.min(root.workspaceImplicitWidth / width, root.workspaceImplicitHeight / height);
+
+        return {
+            "x": x,
+            "y": y,
+            "scale": scale
+        };
     }
 
     property bool monitorIsFocused: monitor?.focused ?? false
@@ -222,7 +241,7 @@ Item {
                                 onClicked: {
                                     if (root.draggingTargetWorkspace === -1) {
                                         root.overviewOpen = false;
-                                        Hyprland.dispatch(`workspace ${workspaceValue}`);
+                                        HyprlandService.focusWorkspace(workspaceValue);
                                     }
                                 }
                             }
@@ -276,7 +295,7 @@ Item {
                             }
                             return result;
                         } catch (e) {
-                            console.error("OverviewWidget filter error:", e);
+                            log.error("OverviewWidget filter error:", e);
                             return [];
                         }
                     }
@@ -308,12 +327,16 @@ Item {
                     readonly property int workspaceIndex: getWorkspaceIndex()
                     readonly property int workspaceColIndex: workspaceIndex % root.effectiveColumns
                     readonly property int workspaceRowIndex: Math.floor(workspaceIndex / root.effectiveColumns)
+                    readonly property var workspaceBounds: root.getWorkspaceViewportBounds(windowWorkspaceId)
 
                     toplevel: modelData
                     scale: root.scale
                     monitorDpr: root.dpr
                     availableWorkspaceWidth: root.workspaceImplicitWidth
                     availableWorkspaceHeight: root.workspaceImplicitHeight
+                    contentOriginX: workspaceBounds.x
+                    contentOriginY: workspaceBounds.y
+                    contentScale: workspaceBounds.scale
                     widgetMonitorId: root.monitor.id
 
                     xOffset: (root.workspaceImplicitWidth + workspaceSpacing) * workspaceColIndex
@@ -351,7 +374,7 @@ Item {
                             root.draggingTargetWorkspace = -1;
 
                             if (targetWorkspace !== -1 && targetWorkspace !== windowData?.workspace.id) {
-                                Hyprland.dispatch(`movetoworkspacesilent ${targetWorkspace},address:${windowData?.address}`);
+                                HyprlandService.moveToWorkspace(targetWorkspace, windowData?.address, false);
                                 Qt.callLater(() => {
                                     Hyprland.refreshToplevels();
                                     Hyprland.refreshWorkspaces();
@@ -371,10 +394,10 @@ Item {
                                 return;
                             if (event.button === Qt.LeftButton) {
                                 root.overviewOpen = false;
-                                Hyprland.dispatch(`focuswindow address:${windowData.address}`);
+                                HyprlandService.focusWindow(windowData.address);
                                 event.accepted = true;
                             } else if (event.button === Qt.MiddleButton) {
-                                Hyprland.dispatch(`closewindow address:${windowData.address}`);
+                                HyprlandService.closeWindow(windowData.address);
                                 event.accepted = true;
                             }
                         }

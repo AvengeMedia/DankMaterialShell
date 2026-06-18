@@ -4,6 +4,7 @@ import qs.Common
 import qs.Modals
 import qs.Modals.Changelog
 import qs.Modals.Clipboard
+import qs.Modals.Common
 import qs.Modals.Greeter
 import qs.Modals.Settings
 import qs.Modals.DankLauncherV2
@@ -21,11 +22,24 @@ import qs.Modules.OSD
 import qs.Modules.ProcessList
 import qs.Modules.DankBar
 import qs.Modules.DankBar.Popouts
+import qs.Modules.Frame
 import qs.Modules.WorkspaceOverlays
+import qs.Modules.Settings.DisplayConfig
 import qs.Services
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DMSShell")
+    readonly property var _sessionsServiceRef: SessionsService
+
+    property bool osdSurfacesLoaded: true
+    property int pendingOsdResumeReloads: 0
+
+    function recreateOsdSurfaces() {
+        OSDManager.currentOSDsByScreen = ({});
+        osdSurfacesLoaded = false;
+        osdSurfaceReloadTimer.restart();
+    }
 
     Instantiator {
         id: daemonPluginInstantiator
@@ -44,7 +58,7 @@ Item {
                         item.popoutService = PopoutService;
                     }
                     item.pluginId = pluginId;
-                    console.info("Daemon plugin loaded:", pluginId);
+                    log.info("Daemon plugin loaded:", pluginId);
                 }
             }
         }
@@ -83,7 +97,7 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    console.log("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
+                    log.debug("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
                 }
             }
 
@@ -100,6 +114,12 @@ Item {
                 function onCancelFadeToLock() {
                     if (fadeWindowLoader.item) {
                         fadeWindowLoader.item.cancelFade();
+                    }
+                }
+
+                function onDismissFadeToLock() {
+                    if (fadeWindowLoader.item) {
+                        fadeWindowLoader.item.dismiss();
                     }
                 }
             }
@@ -123,7 +143,7 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    console.log("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
+                    log.debug("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
                 }
             }
 
@@ -152,7 +172,24 @@ Item {
         }
     }
 
+    property bool barSurfacesLoaded: true
+
+    function recreateBarSurfaces() {
+        log.info("Recreating bar surfaces, screens:", Quickshell.screens.length,
+                 Quickshell.screens.map(s => s.name).join(","));
+        if (barSurfacesLoaded)
+            barSurfacesLoaded = false;
+        barSurfaceReloadAction.schedule();
+    }
+
+    DeferredAction {
+        id: barSurfaceReloadAction
+        onTriggered: root.barSurfacesLoaded = true
+    }
+
     property string _barLayoutStateJson: {
+        if (!barSurfacesLoaded)
+            return "[]";
         const configs = SettingsData.barConfigs;
         const mapped = configs.map(c => ({
                     id: c.id,
@@ -176,6 +213,32 @@ Item {
         }
     }
 
+    Connections {
+        target: SettingsData
+        function onFrameEnabledChanged() {
+            root.recreateBarSurfaces();
+        }
+        function onConnectedFrameModeActiveChanged() {
+            root.recreateBarSurfaces();
+        }
+        function onForceDankBarLayoutRefresh() {
+            root.recreateBarSurfaces();
+        }
+    }
+
+    property bool frameSurfacesLoaded: true
+
+    Loader {
+        active: root.frameSurfacesLoaded
+        asynchronous: false
+        sourceComponent: Frame {}
+    }
+
+    DeferredAction {
+        id: frameSurfaceReloadAction
+        onTriggered: root.frameSurfacesLoaded = true
+    }
+
     Repeater {
         id: dankBarRepeater
         model: ScriptModel {
@@ -189,7 +252,7 @@ Item {
             id: barLoader
             required property var modelData
             property var barConfig: SettingsData.barConfigs.find(cfg => cfg.id === modelData.id) || null
-            active: barConfig?.enabled ?? false
+            active: root.barSurfacesLoaded && (barConfig?.enabled ?? false)
             asynchronous: false
 
             sourceComponent: DankBar {
@@ -232,10 +295,172 @@ Item {
         }
     }
 
+    Timer {
+        id: osdResumeRecreateTimer
+        interval: 400
+        repeat: false
+        onTriggered: {
+            root.recreateOsdSurfaces();
+            root.pendingOsdResumeReloads--;
+
+            if (root.pendingOsdResumeReloads <= 0) {
+                root.pendingOsdResumeReloads = 0;
+                interval = 400;
+                return;
+            }
+
+            interval = 1400;
+            restart();
+        }
+    }
+
+    Timer {
+        id: osdSurfaceReloadTimer
+        interval: 120
+        repeat: false
+        onTriggered: root.osdSurfacesLoaded = true
+    }
+
+    property bool hadRealScreen: true
+    property var previousRealScreenNames: []
+    // Guards for the screen-reconnect recovery path (see scheduleScreenReconnectRecovery).
+    property bool _screenRecoveryCooldown: false
+    property bool _screenRecoveryPending: false
+
+    function _getRealScreenNames() {
+        const names = [];
+        for (let i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name.length > 0)
+                names.push(Quickshell.screens[i].name);
+        }
+        return names;
+    }
+
+    function _hasRealScreen() {
+        for (let i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name.length > 0)
+                return true;
+        }
+        return false;
+    }
+
+    function triggerSurfaceRecovery(source) {
+        log.info("Surface recovery triggered by:", source,
+                 "screens:", Quickshell.screens.length,
+                 Quickshell.screens.map(s => s.name).join(","),
+                 "barLoaded:", root.barSurfacesLoaded,
+                 "frameLoaded:", root.frameSurfacesLoaded,
+                 "dockEnabled:", root.dockEnabled);
+        surfaceResumeRecoveryTimer.pass = 0;
+        surfaceResumeRecoveryTimer.interval = 800;
+        surfaceResumeRecoveryTimer.restart();
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            const hasReal = root._hasRealScreen();
+            const currentNames = root._getRealScreenNames();
+            log.info("Screens changed:", Quickshell.screens.length,
+                     Quickshell.screens.map(s => "'" + s.name + "'").join(","),
+                     "hasReal:", hasReal, "hadReal:", root.hadRealScreen);
+            const fullReconnect = !root.hadRealScreen && hasReal;
+            const partialReconnect = root.previousRealScreenNames.length > 0
+                && currentNames.some(name => !root.previousRealScreenNames.includes(name));
+            if (fullReconnect || partialReconnect) {
+                log.info("Screen reconnect detected, scheduling surface recovery",
+                         "full:", fullReconnect, "partial:", partialReconnect);
+                root.scheduleScreenReconnectRecovery();
+            }
+            root.hadRealScreen = hasReal;
+            root.previousRealScreenNames = currentNames;
+        }
+    }
+
+    // A DPMS off/on cycle removes an output from the screen list and re-adds it,
+    // which is indistinguishable here from a hotplug. Recovering immediately on
+    // every such event lets a flapping monitor (or a recovery that itself perturbs
+    // the output) drive an endless recovery storm that power-cycles the display
+    // (#2642). Debounce a burst of changes into a single pass, then hold a cooldown
+    // so repeated flaps trigger at most one recovery per window. Recovery still runs
+    // once per resume, so a partial DPMS resume keeps redrawing its surfaces (#2579).
+    function scheduleScreenReconnectRecovery() {
+        if (root._screenRecoveryCooldown) {
+            root._screenRecoveryPending = true;
+            return;
+        }
+        screenReconnectDebounce.restart();
+    }
+
+    Timer {
+        id: screenReconnectDebounce
+        // Wide enough to collapse the output-remove + output-re-add pair that one
+        // DPMS off/on cycle emits as two near-simultaneous events into one recovery.
+        interval: 450
+        repeat: false
+        onTriggered: {
+            root._screenRecoveryCooldown = true;
+            root._screenRecoveryPending = false;
+            screenReconnectCooldown.restart();
+            root.triggerSurfaceRecovery("screen-reconnect");
+        }
+    }
+
+    Timer {
+        id: screenReconnectCooldown
+        // Must exceed the full two-pass surfaceResumeRecoveryTimer sequence
+        // (800 + 2000 ms) so the cooldown still covers an in-flight recovery;
+        // raise this if those passes are lengthened.
+        interval: 4000
+        repeat: false
+        onTriggered: {
+            root._screenRecoveryCooldown = false;
+            if (root._screenRecoveryPending) {
+                root._screenRecoveryPending = false;
+                screenReconnectDebounce.restart();
+            }
+        }
+    }
+
+    Timer {
+        id: surfaceResumeRecoveryTimer
+        interval: 800
+        repeat: false
+        property int pass: 0
+        onTriggered: {
+            pass++;
+            log.info("Surface recovery pass", pass,
+                     "screens:", Quickshell.screens.length,
+                     Quickshell.screens.map(s => s.name).join(","));
+
+            root.recreateBarSurfaces();
+
+            if (root.frameSurfacesLoaded) {
+                root.frameSurfacesLoaded = false;
+                frameSurfaceReloadAction.schedule();
+            }
+
+            root.dockEnabled = false;
+            Qt.callLater(() => {
+                root.dockEnabled = true;
+            });
+
+            if (pass < 2) {
+                interval = 2000;
+                restart();
+            } else {
+                pass = 0;
+                interval = 800;
+            }
+        }
+    }
+
     Component.onCompleted: {
         dockRecreateDebounce.start();
         // Force PolkitService singleton to initialize
         PolkitService.polkitAvailable;
+        // Force DisplayConfigState singleton to initialize so auto-config runs at startup
+        DisplayConfigState.hasOutputBackend;
         loginSoundTimer.start();
     }
 
@@ -249,11 +474,15 @@ Item {
 
         sourceComponent: Dock {
             contextMenu: dockContextMenuLoader.item ? dockContextMenuLoader.item : null
+            trashContextMenu: dockTrashContextMenuLoader.item ? dockTrashContextMenuLoader.item : null
         }
 
         onLoaded: {
             if (item) {
                 dockContextMenuLoader.active = true;
+                if (SettingsData.dockShowTrash) {
+                    dockTrashContextMenuLoader.active = true;
+                }
             }
         }
 
@@ -290,7 +519,6 @@ Item {
         sourceComponent: Component {
             DankDashPopout {
                 id: dankDashPopout
-                onPopoutClosed: PopoutService.unloadDankDash()
             }
         }
     }
@@ -302,6 +530,43 @@ Item {
 
         DockContextMenu {
             id: dockContextMenu
+        }
+    }
+
+    LazyLoader {
+        id: dockTrashContextMenuLoader
+
+        active: false
+
+        DockTrashContextMenu {
+            id: dockTrashContextMenu
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onDockShowTrashChanged() {
+            if (SettingsData.dockShowTrash) {
+                dockTrashContextMenuLoader.active = true;
+            }
+        }
+    }
+
+    ConfirmModal {
+        id: emptyTrashConfirm
+    }
+
+    Connections {
+        target: TrashService
+        function onEmptyTrashConfirmRequested(itemCount) {
+            emptyTrashConfirm.showWithOptions({
+                title: I18n.tr("Empty Trash?"),
+                message: I18n.tr("Permanently delete %1 item(s)? This cannot be undone.").arg(itemCount),
+                confirmText: I18n.tr("Empty"),
+                cancelText: I18n.tr("Cancel"),
+                confirmColor: Theme.error,
+                onConfirm: () => TrashService.emptyTrash()
+            });
         }
     }
 
@@ -412,6 +677,8 @@ Item {
         enabled: PolkitService.polkitAvailable
 
         function onAuthenticationRequestStarted() {
+            if (PopoutService.systemUpdatePopout?.shouldBeVisible)
+                return;
             polkitAuthModalLoader.active = true;
             if (polkitAuthModalLoader.item)
                 polkitAuthModalLoader.item.show();
@@ -440,7 +707,7 @@ Item {
             if (!wifiPasswordModalLoader.item)
                 return;
 
-            if (wifiPasswordModalLoader.item.visible && timeSinceLastPrompt < 1000) {
+            if (wifiPasswordModalLoader.item.shouldBeVisible && timeSinceLastPrompt < 1000) {
                 NetworkService.cancelCredentials(lastCredentialsToken);
                 lastCredentialsToken = token;
                 lastCredentialsTime = now;
@@ -613,6 +880,25 @@ Item {
     }
 
     LazyLoader {
+        id: spotlightBarModalLoader
+
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.spotlightBarModalLoader = spotlightBarModalLoader;
+        }
+
+        DankLauncherV2ModalSpotlight {
+            id: spotlightBarModal
+
+            Component.onCompleted: {
+                PopoutService.spotlightBarModal = spotlightBarModal;
+                PopoutService._onSpotlightBarModalLoaded();
+            }
+        }
+    }
+
+    LazyLoader {
         id: clipboardHistoryPopoutLoader
 
         active: false
@@ -696,7 +982,7 @@ Item {
                 cmd += " " + escapedPath;
             }
 
-            console.log("FilePicker: Launching", cmd);
+            log.debug("FilePicker: Launching", cmd);
 
             Quickshell.execDetached({
                 command: ["sh", "-c", cmd]
@@ -728,15 +1014,17 @@ Item {
         }
 
         function onAppPickerRequested(data) {
-            console.log("DMSShell: App picker requested with data:", JSON.stringify(data));
+            log.debug("App picker requested with data:", JSON.stringify(data));
 
             if (!data || !data.target) {
-                console.warn("DMSShell: Invalid app picker request data");
+                log.warn("Invalid app picker request data");
                 return;
             }
 
             filePickerModal.targetData = data.target;
             filePickerModal.targetDataLabel = data.requestType || "file";
+            filePickerModal.mimeType = data.mimeType || "";
+            filePickerModal.rememberMimeTypes = [];
 
             if (data.categories && data.categories.length > 0) {
                 filePickerModal.categoryFilter = data.categories;
@@ -746,6 +1034,32 @@ Item {
 
             filePickerModal.usageHistoryKey = "filePickerUsageHistory";
             filePickerModal.open();
+        }
+    }
+
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            log.info("Session resumed: screens:", Quickshell.screens.length,
+                     Quickshell.screens.map(s => s.name).join(","),
+                     "barLoaded:", root.barSurfacesLoaded,
+                     "frameLoaded:", root.frameSurfacesLoaded,
+                     "dockEnabled:", root.dockEnabled);
+
+            root.pendingOsdResumeReloads = 2;
+            osdResumeRecreateTimer.interval = 400;
+            osdResumeRecreateTimer.restart();
+
+            // This path runs its own recovery directly, so drop any queued or
+            // in-flight screen-reconnect recovery to avoid a redundant pass once
+            // its cooldown expires.
+            screenReconnectDebounce.stop();
+            screenReconnectCooldown.stop();
+            root._screenRecoveryCooldown = false;
+            root._screenRecoveryPending = false;
+
+            root.triggerSurfaceRecovery("sessionResumed");
         }
     }
 
@@ -790,9 +1104,18 @@ Item {
 
         ProcessListModal {
             id: processListModal
+            property bool wasShown: false
 
             Component.onCompleted: {
                 PopoutService.processListModal = processListModal;
+            }
+
+            onVisibleChanged: {
+                if (visible) {
+                    wasShown = true;
+                } else if (wasShown) {
+                    PopoutService.unloadProcessListModal();
+                }
             }
         }
     }
@@ -808,7 +1131,12 @@ Item {
 
         SystemUpdatePopout {
             id: systemUpdatePopout
-            onPopoutClosed: PopoutService.unloadSystemUpdate()
+            onPopoutClosed: {
+                if (systemUpdatePopout._reopenAfterUpgrade) {
+                    return;
+                }
+                PopoutService.unloadSystemUpdate();
+            }
 
             Component.onCompleted: {
                 PopoutService.systemUpdatePopout = systemUpdatePopout;
@@ -827,12 +1155,22 @@ Item {
             slideoutWidth: 480
             expandable: true
             expandedWidthValue: 960
-            customTransparency: SettingsData.notepadTransparencyOverride
+            edgeGap: SettingsData.notepadEffectiveEdgeGap
+            slideEdge: SettingsData.notepadSlideoutSide
+
+            onIsVisibleChanged: {
+                if (isVisible)
+                    PopoutService.notepadPopout?.hide();
+            }
 
             content: Component {
                 Notepad {
                     slideout: notepadSlideout
                     onHideRequested: notepadSlideout.hide()
+                    onPopoutRequested: {
+                        notepadSlideout.hide();
+                        PopoutService.openNotepadPopout();
+                    }
                 }
             }
 
@@ -850,6 +1188,24 @@ Item {
     }
 
     LazyLoader {
+        id: notepadPopoutLoader
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.notepadPopoutLoader = notepadPopoutLoader;
+        }
+
+        onActiveChanged: {
+            if (active && item) {
+                PopoutService.notepadPopout = item;
+                PopoutService._onNotepadPopoutLoaded();
+            }
+        }
+
+        NotepadPopoutWindow {}
+    }
+
+    LazyLoader {
         id: powerMenuModalLoader
 
         active: false
@@ -858,6 +1214,7 @@ Item {
             id: powerMenuModal
 
             onPowerActionRequested: (action, title, message) => {
+                PopoutService.closeControlCenter();
                 switch (action) {
                 case "logout":
                     SessionService.logout();
@@ -878,12 +1235,31 @@ Item {
             }
 
             onLockRequested: {
+                PopoutService.closeControlCenter();
                 lock.activate();
+            }
+
+            onSwitchUserRequested: {
+                switchUserModalLoader.active = true;
+                Qt.callLater(() => {
+                    if (switchUserModalLoader.item)
+                        switchUserModalLoader.item.showFromPowerMenu();
+                });
             }
 
             Component.onCompleted: {
                 PopoutService.powerMenuModal = powerMenuModal;
             }
+        }
+    }
+
+    LazyLoader {
+        id: switchUserModalLoader
+
+        active: false
+
+        SwitchUserModal {
+            id: switchUserModal
         }
     }
 
@@ -898,6 +1274,24 @@ Item {
             Component.onCompleted: {
                 PopoutService.hyprKeybindsModal = keybindsModal;
             }
+        }
+    }
+
+    LazyLoader {
+        id: powerProfileModalLoader
+
+        active: false
+
+        PowerProfileModal {
+            id: powerProfileModal
+
+            Component.onCompleted: {
+                PopoutService.powerProfileModal = powerProfileModal;
+            }
+        }
+
+        Component.onCompleted: {
+            PopoutService.powerProfileModalLoader = powerProfileModalLoader;
         }
     }
 
@@ -923,81 +1317,85 @@ Item {
         }
     }
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: VolumeOSD {
-            modelData: item
-        }
-    }
-
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: MediaVolumeOSD {
-            modelData: item
-        }
-    }
-
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: MediaPlaybackOSD {
-            modelData: item
-        }
-    }
-
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: MicMuteOSD {
-            modelData: item
-        }
-    }
-
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: BrightnessOSD {
-            modelData: item
-        }
-    }
-
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
-
-        delegate: IdleInhibitorOSD {
-            modelData: item
-        }
-    }
-
     Loader {
-        id: powerProfileWatcherLoader
-        active: SettingsData.osdPowerProfileEnabled
-        source: "Services/PowerProfileWatcher.qml"
-    }
+        id: osdSurfacesLoader
+        active: root.osdSurfacesLoaded
+        asynchronous: false
 
-    Variants {
-        model: SettingsData.osdPowerProfileEnabled ? SettingsData.getFilteredScreens("osd") : []
+        sourceComponent: Component {
+            Item {
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-        delegate: PowerProfileOSD {
-            modelData: item
-        }
-    }
+                    delegate: VolumeOSD {
+                        modelData: item
+                    }
+                }
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-        delegate: CapsLockOSD {
-            modelData: item
-        }
-    }
+                    delegate: MediaVolumeOSD {
+                        modelData: item
+                    }
+                }
 
-    Variants {
-        model: SettingsData.getFilteredScreens("osd")
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
 
-        delegate: AudioOutputOSD {
-            modelData: item
+                    delegate: MediaPlaybackOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: MicVolumeOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: BrightnessOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: IdleInhibitorOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.osdPowerProfileEnabled ? SettingsData.getFilteredScreens("osd") : []
+
+                    delegate: PowerProfileOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: CapsLockOSD {
+                        modelData: item
+                    }
+                }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: AudioOutputOSD {
+                        modelData: item
+                    }
+                }
+            }
         }
     }
 

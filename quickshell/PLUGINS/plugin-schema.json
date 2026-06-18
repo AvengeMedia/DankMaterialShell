@@ -11,8 +11,7 @@
     "version",
     "author",
     "type",
-    "capabilities",
-    "component"
+    "capabilities"
   ],
   "properties": {
     "id": {
@@ -42,8 +41,8 @@
     },
     "type": {
       "type": "string",
-      "description": "Plugin type",
-      "enum": ["widget", "daemon", "launcher", "desktop"]
+      "description": "Plugin type. Use 'composite' (or any value) together with 'components' to provide multiple surfaces from one plugin.",
+      "enum": ["widget", "daemon", "launcher", "desktop", "composite"]
     },
     "capabilities": {
       "type": "array",
@@ -55,8 +54,36 @@
     },
     "component": {
       "type": "string",
-      "description": "Relative path to main QML component file",
+      "description": "Relative path to main QML component file. Required unless 'components' is provided.",
       "pattern": "^\\./.*\\.qml$"
+    },
+    "components": {
+      "type": "object",
+      "description": "Map of surface name to relative QML component path, for multi-surface (composite) plugins. Provide any subset of surfaces; each is loaded independently.",
+      "properties": {
+        "widget": {
+          "type": "string",
+          "description": "Bar/Control Center widget component (PluginComponent)",
+          "pattern": "^\\./.*\\.qml$"
+        },
+        "desktop": {
+          "type": "string",
+          "description": "Desktop widget component",
+          "pattern": "^\\./.*\\.qml$"
+        },
+        "daemon": {
+          "type": "string",
+          "description": "Background daemon component (instantiated once)",
+          "pattern": "^\\./.*\\.qml$"
+        },
+        "launcher": {
+          "type": "string",
+          "description": "Launcher provider component (requires 'trigger')",
+          "pattern": "^\\./.*\\.qml$"
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
     },
     "trigger": {
       "type": "string",
@@ -109,6 +136,29 @@
       "then": {
         "required": ["trigger"]
       }
+    },
+    {
+      "if": {
+        "required": ["components"],
+        "properties": {
+          "components": {
+            "required": ["launcher"]
+          }
+        }
+      },
+      "then": {
+        "required": ["trigger"]
+      }
+    },
+    {
+      "anyOf": [
+        {
+          "required": ["component"]
+        },
+        {
+          "required": ["components"]
+        }
+      ]
     }
   ],
   "additionalProperties": true

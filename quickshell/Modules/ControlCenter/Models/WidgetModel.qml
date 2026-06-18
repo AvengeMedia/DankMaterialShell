@@ -6,9 +6,12 @@ import "../utils/widgets.js" as WidgetUtils
 
 QtObject {
     id: root
+    readonly property var log: Log.scoped("WidgetModel")
 
     property var vpnBuiltinInstance: null
     property var cupsBuiltinInstance: null
+    property var tailscaleBuiltinInstance: null
+    property var displayProfilesBuiltinInstance: null
 
     property var vpnLoader: Loader {
         active: false
@@ -26,7 +29,7 @@ QtObject {
                 const widgets = SettingsData.controlCenterWidgets || [];
                 const hasVpnWidget = widgets.some(w => w.id === "builtin_vpn");
                 if (!hasVpnWidget && vpnLoader.active) {
-                    console.log("VpnWidget: No VPN widget in control center, deactivating loader");
+                    log.debug("VpnWidget: No VPN widget in control center, deactivating loader");
                     vpnLoader.active = false;
                 }
             }
@@ -55,8 +58,65 @@ QtObject {
                 const widgets = SettingsData.controlCenterWidgets || [];
                 const hasCupsWidget = widgets.some(w => w.id === "builtin_cups");
                 if (!hasCupsWidget && cupsLoader.active) {
-                    console.log("CupsWidget: No CUPS widget in control center, deactivating loader");
+                    log.debug("CupsWidget: No CUPS widget in control center, deactivating loader");
                     cupsLoader.active = false;
+                }
+            }
+        }
+    }
+
+    property var tailscaleLoader: Loader {
+        active: false
+        sourceComponent: Component {
+            TailscaleWidget {}
+        }
+
+        onItemChanged: {
+            root.tailscaleBuiltinInstance = item;
+        }
+
+        onActiveChanged: {
+            if (!active) {
+                root.tailscaleBuiltinInstance = null;
+            }
+        }
+
+        Connections {
+            target: SettingsData
+            function onControlCenterWidgetsChanged() {
+                const widgets = SettingsData.controlCenterWidgets || [];
+                const hasTailscaleWidget = widgets.some(w => w.id === "builtin_tailscale");
+                if (!hasTailscaleWidget && tailscaleLoader.active) {
+                    root.log.debug("No Tailscale widget in control center, deactivating loader");
+                    tailscaleLoader.active = false;
+                }
+            }
+        }
+    }
+
+    property var displayProfilesLoader: Loader {
+        active: false
+        sourceComponent: Component {
+            DisplayProfilesWidget {}
+        }
+
+        onItemChanged: {
+            root.displayProfilesBuiltinInstance = item;
+        }
+
+        onActiveChanged: {
+            if (!active)
+                root.displayProfilesBuiltinInstance = null;
+        }
+
+        Connections {
+            target: SettingsData
+            function onControlCenterWidgetsChanged() {
+                const widgets = SettingsData.controlCenterWidgets || [];
+                const hasWidget = widgets.some(w => w.id === "builtin_display_profiles");
+                if (!hasWidget && displayProfilesLoader.active) {
+                    root.log.debug("No Display Profiles widget in control center, deactivating loader");
+                    displayProfilesLoader.active = false;
                 }
             }
         }
@@ -185,7 +245,7 @@ QtObject {
         {
             "id": "builtin_vpn",
             "text": I18n.tr("VPN"),
-            "description": I18n.tr("VPN connections"),
+            "description": I18n.tr("VPN Connections"),
             "icon": "vpn_key",
             "type": "builtin_plugin",
             "enabled": DMSNetworkService.available,
@@ -200,6 +260,25 @@ QtObject {
             "type": "builtin_plugin",
             "enabled": CupsService.available,
             "warning": !CupsService.available ? I18n.tr("CUPS not available") : undefined,
+            "isBuiltinPlugin": true
+        },
+        {
+            "id": "builtin_tailscale",
+            "text": I18n.tr("Tailscale", "Tailscale mesh VPN widget title"),
+            "description": I18n.tr("Tailscale Network", "Tailscale control center widget description"),
+            "icon": "device_hub",
+            "type": "builtin_plugin",
+            "enabled": TailscaleService.available,
+            "warning": !TailscaleService.available ? I18n.tr("Tailscale not available", "Warning when Tailscale service is not running") : undefined,
+            "isBuiltinPlugin": true
+        },
+        {
+            "id": "builtin_display_profiles",
+            "text": I18n.tr("Display Profiles"),
+            "description": I18n.tr("Switch between display configurations"),
+            "icon": "monitor",
+            "type": "builtin_plugin",
+            "enabled": true,
             "isBuiltinPlugin": true
         }
     ]
@@ -271,6 +350,10 @@ QtObject {
 
     function moveWidget(fromIndex, toIndex) {
         WidgetUtils.moveWidget(fromIndex, toIndex);
+    }
+
+    function reorderWidgets(newOrder) {
+        WidgetUtils.reorderWidgets(newOrder);
     }
 
     function resetToDefault() {

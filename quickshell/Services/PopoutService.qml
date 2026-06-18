@@ -34,6 +34,8 @@ Singleton {
     property var clipboardHistoryModal: null
     property var dankLauncherV2Modal: null
     property var dankLauncherV2ModalLoader: null
+    property var spotlightBarModal: null
+    property var spotlightBarModalLoader: null
     property var powerMenuModal: null
     property var processListModal: null
     property var processListModalLoader: null
@@ -48,6 +50,8 @@ Singleton {
     property var bluetoothPairingModal: null
     property var networkInfoModal: null
     property var windowRuleModalLoader: null
+    property var powerProfileModal: null
+    property var powerProfileModalLoader: null
 
     property var notepadSlideouts: []
 
@@ -202,10 +206,9 @@ Singleton {
     }
 
     function unloadDankDash() {
-        if (!dankDashPopoutLoader)
-            return;
-        dankDashPopout = null;
-        dankDashPopoutLoader.active = false;
+        // DankDash is intentionally kept alive after first use. Destroying this
+        // lazy popout during its close signal can invalidate connected overlay
+        // bindings while Qt is still unwinding the signal stack.
     }
 
     function toggleDankDash(tabIndex, x, y, width, section, screen) {
@@ -305,7 +308,8 @@ Singleton {
 
     function openSystemUpdate(x, y, width, section, screen) {
         if (systemUpdatePopout) {
-            setPosition(systemUpdatePopout, x, y, width, section, screen);
+            if (arguments.length >= 5)
+                setPosition(systemUpdatePopout, x, y, width, section, screen);
             systemUpdatePopout.open();
         }
     }
@@ -323,7 +327,8 @@ Singleton {
 
     function toggleSystemUpdate(x, y, width, section, screen) {
         if (systemUpdatePopout) {
-            setPosition(systemUpdatePopout, x, y, width, section, screen);
+            if (arguments.length >= 5)
+                setPosition(systemUpdatePopout, x, y, width, section, screen);
             systemUpdatePopout.toggle();
         }
     }
@@ -387,8 +392,7 @@ Singleton {
     function toggleSettingsWithTab(tabName: string) {
         if (settingsModal) {
             var idx = settingsModal.resolveTabIndex(tabName);
-            if (idx >= 0)
-                settingsModal.currentTabIndex = idx;
+            settingsModal.setTabIndex(idx);
             settingsModal.toggle();
             return;
         }
@@ -428,8 +432,7 @@ Singleton {
                     return;
                 }
                 var idx = settingsModal.resolveTabIndex(tabName);
-                if (idx >= 0)
-                    settingsModal.currentTabIndex = idx;
+                settingsModal.setTabIndex(idx);
                 toplevel.activate();
                 return;
             }
@@ -461,12 +464,11 @@ Singleton {
         if (_settingsWantsToggle) {
             _settingsWantsToggle = false;
             if (_settingsPendingTabIndex >= 0) {
-                settingsModal.currentTabIndex = _settingsPendingTabIndex;
+                settingsModal?.setTabIndex(_settingsPendingTabIndex);
                 _settingsPendingTabIndex = -1;
             } else if (_settingsPendingTab) {
                 var idx = settingsModal?.resolveTabIndex(_settingsPendingTab) ?? -1;
-                if (idx >= 0)
-                    settingsModal.currentTabIndex = idx;
+                settingsModal?.setTabIndex(idx);
                 _settingsPendingTab = "";
             }
             settingsModal?.toggle();
@@ -478,7 +480,7 @@ Singleton {
     }
 
     function closeClipboardHistory() {
-        clipboardHistoryModal?.close();
+        clipboardHistoryModal?.hide();
     }
 
     function unloadClipboardHistoryPopout() {
@@ -499,8 +501,16 @@ Singleton {
     property bool _dankLauncherV2WantsToggle: false
     property string _dankLauncherV2PendingQuery: ""
     property string _dankLauncherV2PendingMode: ""
+    property bool _dankLauncherV2TriggerUsesOverlayLayer: false
 
-    function openDankLauncherV2() {
+    function _setDankLauncherV2TriggerUsesOverlayLayer(value) {
+        _dankLauncherV2TriggerUsesOverlayLayer = value === true;
+        if (dankLauncherV2Modal)
+            dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
+    }
+
+    function openDankLauncherV2(triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.show();
         } else if (dankLauncherV2ModalLoader) {
@@ -510,7 +520,8 @@ Singleton {
         }
     }
 
-    function openDankLauncherV2WithQuery(query: string) {
+    function openDankLauncherV2WithQuery(query: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.showWithQuery(query);
         } else if (dankLauncherV2ModalLoader) {
@@ -521,7 +532,8 @@ Singleton {
         }
     }
 
-    function openDankLauncherV2WithMode(mode: string) {
+    function openDankLauncherV2WithMode(mode: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.showWithMode(mode);
         } else if (dankLauncherV2ModalLoader) {
@@ -543,7 +555,8 @@ Singleton {
         }
     }
 
-    function toggleDankLauncherV2() {
+    function toggleDankLauncherV2(triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggle();
         } else if (dankLauncherV2ModalLoader) {
@@ -553,7 +566,8 @@ Singleton {
         }
     }
 
-    function toggleDankLauncherV2WithMode(mode: string) {
+    function toggleDankLauncherV2WithMode(mode: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggleWithMode(mode);
         } else if (dankLauncherV2ModalLoader) {
@@ -564,7 +578,8 @@ Singleton {
         }
     }
 
-    function toggleDankLauncherV2WithQuery(query: string) {
+    function toggleDankLauncherV2WithQuery(query: string, triggerUsesOverlayLayer) {
+        _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggleWithQuery(query);
         } else if (dankLauncherV2ModalLoader) {
@@ -576,6 +591,8 @@ Singleton {
     }
 
     function _onDankLauncherV2ModalLoaded() {
+        if (dankLauncherV2Modal)
+            dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
         if (_dankLauncherV2WantsOpen) {
             _dankLauncherV2WantsOpen = false;
             if (_dankLauncherV2PendingQuery) {
@@ -600,6 +617,45 @@ Singleton {
         }
     }
 
+    property bool _spotlightBarWantsOpen: false
+    property bool _spotlightBarWantsToggle: false
+
+    function openSpotlightBar() {
+        if (spotlightBarModal) {
+            spotlightBarModal.show();
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarWantsOpen = true;
+            _spotlightBarWantsToggle = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
+    function closeSpotlightBar() {
+        spotlightBarModal?.hide();
+    }
+
+    function toggleSpotlightBar() {
+        if (spotlightBarModal) {
+            spotlightBarModal.toggle();
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarWantsToggle = true;
+            _spotlightBarWantsOpen = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
+    function _onSpotlightBarModalLoaded() {
+        if (_spotlightBarWantsOpen) {
+            _spotlightBarWantsOpen = false;
+            spotlightBarModal?.show();
+            return;
+        }
+        if (_spotlightBarWantsToggle) {
+            _spotlightBarWantsToggle = false;
+            spotlightBarModal?.toggle();
+        }
+    }
+
     function openPowerMenu() {
         powerMenuModal?.openCentered();
     }
@@ -618,6 +674,40 @@ Singleton {
         }
     }
 
+    function openPowerProfileModal() {
+        if (powerProfileModal) {
+            powerProfileModal.openCentered();
+        } else if (powerProfileModalLoader) {
+            powerProfileModalLoader.active = true;
+            Qt.callLater(() => powerProfileModal?.openCentered());
+        }
+    }
+
+    function closePowerProfileModal() {
+        powerProfileModal?.close();
+    }
+
+    function togglePowerProfileModal() {
+        if (powerProfileModal) {
+            if (powerProfileModal.shouldBeVisible) {
+                powerProfileModal.close();
+            } else {
+                powerProfileModal.openCentered();
+            }
+        } else if (powerProfileModalLoader) {
+            powerProfileModalLoader.active = true;
+            Qt.callLater(() => {
+                if (powerProfileModal) {
+                    if (powerProfileModal.shouldBeVisible) {
+                        powerProfileModal.close();
+                    } else {
+                        powerProfileModal.openCentered();
+                    }
+                }
+            });
+        }
+    }
+
     function showProcessListModal() {
         if (processListModal) {
             processListModal.show();
@@ -629,6 +719,13 @@ Singleton {
 
     function hideProcessListModal() {
         processListModal?.hide();
+    }
+
+    function unloadProcessListModal() {
+        if (processListModalLoader) {
+            processListModal = null;
+            processListModalLoader.active = false;
+        }
     }
 
     function toggleProcessListModal() {
@@ -659,8 +756,11 @@ Singleton {
     function showWifiPasswordModal(ssid) {
         if (wifiPasswordModalLoader)
             wifiPasswordModalLoader.active = true;
-        if (wifiPasswordModal)
+        if (wifiPasswordModal) {
             wifiPasswordModal.show(ssid);
+        } else {
+            Qt.callLater(() => wifiPasswordModal?.show(ssid));
+        }
     }
 
     function showWifiQRCodeModal(ssid) {
@@ -673,8 +773,11 @@ Singleton {
     function showHiddenNetworkModal() {
         if (wifiPasswordModalLoader)
             wifiPasswordModalLoader.active = true;
-        if (wifiPasswordModal)
+        if (wifiPasswordModal) {
             wifiPasswordModal.showHidden();
+        } else {
+            Qt.callLater(() => wifiPasswordModal?.showHidden());
+        }
     }
 
     function hideWifiPasswordModal() {
@@ -689,21 +792,97 @@ Singleton {
         networkInfoModal?.close();
     }
 
-    function openNotepad() {
+    function closeNotepadSlideouts() {
+        for (var i = 0; i < notepadSlideouts.length; i++) {
+            if (notepadSlideouts[i] && notepadSlideouts[i].isVisible)
+                notepadSlideouts[i].hide();
+        }
+    }
+
+    function openNotepadSlideout() {
+        notepadPopout?.hide();
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.show();
         }
     }
 
+    // Keep the notepad in a single presentation for default modes
+    Connections {
+        target: SettingsData
+        function onNotepadDefaultModeChanged() {
+            if (SettingsData.notepadDefaultMode === "popout") {
+                var hadSlideout = false;
+                for (var i = 0; i < root.notepadSlideouts.length; i++) {
+                    if (root.notepadSlideouts[i] && root.notepadSlideouts[i].isVisible) {
+                        hadSlideout = true;
+                        root.notepadSlideouts[i].hide();
+                    }
+                }
+                if (hadSlideout)
+                    root.openNotepadPopout();
+            } else if (root.notepadPopout && root.notepadPopout.visible) {
+                root.notepadPopout.hide();
+                root.openNotepadSlideout();
+            }
+        }
+    }
+
+    function openNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            openNotepadPopout();
+            return;
+        }
+        openNotepadSlideout();
+    }
+
     function closeNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            notepadPopout?.hide();
+            return;
+        }
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.hide();
         }
     }
 
     function toggleNotepad() {
+        if (SettingsData.notepadDefaultMode === "popout") {
+            toggleNotepadPopout();
+            return;
+        }
         if (notepadSlideouts.length > 0) {
             notepadSlideouts[0]?.toggle();
+        }
+    }
+
+    property var notepadPopout: null
+    property var notepadPopoutLoader: null
+    property bool _notepadPopoutWantsOpen: false
+
+    function openNotepadPopout() {
+        closeNotepadSlideouts();
+        if (notepadPopout) {
+            notepadPopout.show();
+        } else if (notepadPopoutLoader) {
+            _notepadPopoutWantsOpen = true;
+            notepadPopoutLoader.active = true;
+        }
+    }
+
+    function _onNotepadPopoutLoaded() {
+        if (_notepadPopoutWantsOpen && notepadPopout) {
+            _notepadPopoutWantsOpen = false;
+            notepadPopout.show();
+        }
+    }
+
+    function toggleNotepadPopout() {
+        if (notepadPopout) {
+            if (!notepadPopout.visible)
+                closeNotepadSlideouts();
+            notepadPopout.toggle();
+        } else {
+            openNotepadPopout();
         }
     }
 }

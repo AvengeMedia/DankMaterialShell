@@ -11,15 +11,16 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/mime"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	serverPlugins "github.com/AvengeMedia/DankMaterialShell/core/internal/server/plugins"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
 	serverThemes "github.com/AvengeMedia/DankMaterialShell/core/internal/server/themes"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
@@ -91,6 +92,11 @@ func RouteRequest(conn net.Conn, req models.Request) {
 		return
 	}
 
+	if strings.HasPrefix(req.Method, "mime.") {
+		mime.HandleRequest(conn, req)
+		return
+	}
+
 	if strings.HasPrefix(req.Method, "browser.") || strings.HasPrefix(req.Method, "apppicker.") {
 		if appPickerManager == nil {
 			models.RespondError(conn, req.ID, "apppicker manager not initialized")
@@ -109,12 +115,12 @@ func RouteRequest(conn net.Conn, req models.Request) {
 		return
 	}
 
-	if strings.HasPrefix(req.Method, "dwl.") {
-		if dwlManager == nil {
-			models.RespondError(conn, req.ID, "dwl manager not initialized")
+	if strings.HasPrefix(req.Method, "tailscale.") {
+		if tailscaleManager == nil {
+			models.RespondError(conn, req.ID, "Tailscale not available")
 			return
 		}
-		dwl.HandleRequest(conn, req, dwlManager)
+		tailscale.HandleRequest(conn, req, tailscaleManager)
 		return
 	}
 
@@ -124,27 +130,6 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		brightness.HandleRequest(conn, req, brightnessManager)
-		return
-	}
-
-	if strings.HasPrefix(req.Method, "extworkspace.") {
-		if extWorkspaceManager == nil {
-			if extWorkspaceAvailable.Load() {
-				extWorkspaceInitMutex.Lock()
-				if extWorkspaceManager == nil {
-					if err := InitializeExtWorkspaceManager(); err != nil {
-						extWorkspaceInitMutex.Unlock()
-						models.RespondError(conn, req.ID, "extworkspace manager not available")
-						return
-					}
-				}
-				extWorkspaceInitMutex.Unlock()
-			} else {
-				models.RespondError(conn, req.ID, "extworkspace manager not initialized")
-				return
-			}
-		}
-		extworkspace.HandleRequest(conn, req, extWorkspaceManager)
 		return
 	}
 
@@ -199,6 +184,15 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		location.HandleRequest(conn, req, locationManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "sysupdate.") {
+		if sysUpdateManager == nil {
+			models.RespondError(conn, req.ID, "sysupdate manager not initialized")
+			return
+		}
+		sysupdate.HandleRequest(conn, req, sysUpdateManager)
 		return
 	}
 

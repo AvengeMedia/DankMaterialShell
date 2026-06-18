@@ -5,21 +5,31 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 import "GreetdEnv.js" as GreetdEnv
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("GreetdSettings")
 
-    readonly property string configPath: {
-        const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
-        return greetCfgDir + "/settings.json";
+    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
+
+    property string configBaseDir: root._greeterCacheDir
+    readonly property string configPath: root.configBaseDir ? (root.configBaseDir + "/settings.json") : ""
+    readonly property string greeterWallpaperOverridePath: root.configBaseDir ? (root.configBaseDir + "/greeter_wallpaper_override.jpg") : ""
+
+    function setConfigBaseDir(dir) {
+        const next = dir || root._greeterCacheDir;
+        if (configBaseDir === next)
+            return;
+        configBaseDir = next;
+        settingsLoaded = false;
+        settingsFile.reload();
     }
 
-    readonly property string _greeterCacheDir: {
-        const i = root.configPath.lastIndexOf("/");
-        return i >= 0 ? root.configPath.substring(0, i) : "";
+    function resetConfigBaseDir() {
+        setConfigBaseDir(root._greeterCacheDir);
     }
-    readonly property string greeterWallpaperOverridePath: root._greeterCacheDir ? (root._greeterCacheDir + "/greeter_wallpaper_override.jpg") : ""
 
     property string currentThemeName: "purple"
     property bool settingsLoaded: false
@@ -57,6 +67,7 @@ Singleton {
     property bool lockScreenShowProfileImage: true
     property bool rememberLastSession: true
     property bool rememberLastUser: true
+    property bool greeterAutoLogin: false
     property bool greeterEnableFprint: false
     property bool greeterEnableU2f: false
     property string greeterWallpaperPath: ""
@@ -81,8 +92,7 @@ Singleton {
 
             currentThemeName = settings.currentThemeName !== undefined ? settings.currentThemeName : "purple";
             customThemeFile = settings.customThemeFile !== undefined ? settings.customThemeFile : "";
-	    registryThemeVariants = settings.registryThemeVariants !== undefined ?
-		settings.registryThemeVariants : ({});
+            registryThemeVariants = settings.registryThemeVariants !== undefined ? settings.registryThemeVariants : ({});
             matugenScheme = settings.matugenScheme !== undefined ? settings.matugenScheme : "scheme-tonal-spot";
             use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true;
             showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : false;
@@ -123,6 +133,9 @@ Singleton {
             } else {
                 rememberLastUser = settings.greeterRememberLastUser !== undefined ? settings.greeterRememberLastUser : settings.rememberLastUser !== undefined ? settings.rememberLastUser : true;
             }
+            if (configBaseDir === root._greeterCacheDir) {
+                greeterAutoLogin = settings.greeterAutoLogin !== undefined ? settings.greeterAutoLogin : false;
+            }
             greeterEnableFprint = settings.greeterEnableFprint !== undefined ? settings.greeterEnableFprint : false;
             greeterEnableU2f = settings.greeterEnableU2f !== undefined ? settings.greeterEnableU2f : false;
             greeterWallpaperPath = settings.greeterWallpaperPath !== undefined ? settings.greeterWallpaperPath : "";
@@ -142,7 +155,7 @@ Singleton {
                 Theme.applyGreeterTheme(currentThemeName);
             }
         } catch (e) {
-            console.warn("Failed to parse greetd settings:", e);
+            log.warn("Failed to parse greetd settings:", e);
         } finally {
             settingsLoaded = true;
         }
@@ -192,7 +205,7 @@ Singleton {
             parseSettings(settingsFile.text());
         }
         onLoadFailed: error => {
-            console.warn("Failed to load greetd settings:", error);
+            log.warn("Failed to load greetd settings:", error);
             root.parseSettings("");
         }
     }

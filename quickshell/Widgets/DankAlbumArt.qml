@@ -8,15 +8,19 @@ Item {
     id: root
 
     property MprisPlayer activePlayer
-    property string artUrl: (activePlayer?.trackArtUrl) || ""
+    property string artUrl: TrackArtService.resolvedArtUrl
     property string lastValidArtUrl: ""
     property alias albumArtStatus: albumArt.imageStatus
     property real albumSize: Math.min(width, height) * 0.88
     property bool showAnimation: true
     property real animationScale: 1.0
 
+    onActivePlayerChanged: {
+        lastValidArtUrl = "";
+    }
+
     onArtUrlChanged: {
-        if (artUrl && albumArt.status !== Image.Error) {
+        if (artUrl && albumArtStatus !== Image.Error) {
             lastValidArtUrl = artUrl;
         }
     }
@@ -71,8 +75,13 @@ Item {
             PathCubic {}
         }
 
+        Component {
+            id: pathMoveComp
+            PathMove {}
+        }
+
         Component.onCompleted: {
-            shapePath.pathElements.push(Qt.createQmlObject('import QtQuick; import QtQuick.Shapes; PathMove {}', shapePath));
+            shapePath.pathElements.push(pathMoveComp.createObject(shapePath));
 
             for (let i = 0; i < segments; i++) {
                 const seg = cubicSegment.createObject(shapePath);

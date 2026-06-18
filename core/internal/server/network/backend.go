@@ -67,6 +67,7 @@ type BackendState struct {
 	WiFiBSSID              string
 	WiFiSignal             uint8
 	WiFiNetworks           []WiFiNetwork
+	SavedWiFiNetworks      []WiFiNetwork
 	WiFiDevices            []WiFiDevice
 	WiredConnections       []WiredConnection
 	VPNProfiles            []VPNProfile
@@ -74,6 +75,7 @@ type BackendState struct {
 	IsConnecting           bool
 	ConnectingSSID         string
 	ConnectingDevice       string
+	ConnectingPreExisting  bool
 	IsConnectingVPN        bool
 	ConnectingVPNUUID      string
 	LastError              string

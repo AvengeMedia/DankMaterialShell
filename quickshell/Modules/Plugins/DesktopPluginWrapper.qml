@@ -211,6 +211,7 @@ Item {
     property real minWidth: contentLoader.item?.minWidth ?? 100
     property real minHeight: contentLoader.item?.minHeight ?? 100
     property bool forceSquare: contentLoader.item?.forceSquare ?? false
+    property bool acceptsKeyboardFocus: contentLoader.item?.acceptsKeyboardFocus ?? false
     property bool isInteracting: dragArea.pressed || resizeArea.pressed
 
     property var _gridSettingsTrigger: SettingsData.desktopWidgetGridSettings
@@ -299,11 +300,16 @@ Item {
         }
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
         WlrLayershell.keyboardFocus: {
-            if (!root.isInteracting)
+            if (PopoutManager.screenshotActive)
                 return WlrKeyboardFocus.None;
-            if (CompositorService.useHyprlandFocusGrab)
+            if (root.isInteracting) {
+                if (CompositorService.useHyprlandFocusGrab)
+                    return WlrKeyboardFocus.OnDemand;
+                return WlrKeyboardFocus.Exclusive;
+            }
+            if (root.acceptsKeyboardFocus)
                 return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
+            return WlrKeyboardFocus.None;
         }
 
         HyprlandFocusGrab {
@@ -403,6 +409,8 @@ Item {
                     item.widgetWidth = Qt.binding(() => contentLoader.width);
                 if (item.widgetHeight !== undefined)
                     item.widgetHeight = Qt.binding(() => contentLoader.height);
+                if (item.screen !== undefined)
+                    item.screen = Qt.binding(() => root.screen);
             }
         }
 
@@ -712,7 +720,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    Text {
+                    StyledText {
                         text: root.gridEnabled ? I18n.tr("Grid: ON", "Widget grid snap status") : I18n.tr("Grid: OFF", "Widget grid snap status")
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: Theme.fontFamily
@@ -727,7 +735,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    Text {
+                    StyledText {
                         text: root.gridSize + "px"
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: Theme.fontFamily
@@ -742,7 +750,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    Text {
+                    StyledText {
                         text: I18n.tr("G: grid • Z/X: size", "Widget grid keyboard hints")
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: Theme.fontFamily

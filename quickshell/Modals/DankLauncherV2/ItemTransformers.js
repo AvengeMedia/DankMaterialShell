@@ -27,6 +27,7 @@ function transformApp(app, override, defaultActions, primaryActionLabel) {
         data: app,
         keywords: app.keywords || [],
         actions: actions,
+        source: Utils.classifyAppSource(app),
         primaryAction: {
             name: primaryActionLabel,
             icon: "open_in_new",
@@ -93,17 +94,19 @@ function transformBuiltInLauncherItem(item, pluginId, openLabel) {
 
     return {
         id: item.action || "",
-        type: "plugin",
+        type: item.type || "plugin",
         name: item.name || "",
         subtitle: item.comment || "",
         icon: icon,
         iconType: iconType,
-        section: "plugin_" + pluginId,
-        data: item,
+        section: item.section || ("plugin_" + pluginId),
+        data: item.data || item,
         pluginId: pluginId,
         isBuiltInLauncher: true,
         keywords: item.keywords || [],
         actions: [],
+        source: item.source || "",
+        badgeLabel: item.badgeLabel || "",
         primaryAction: {
             name: openLabel,
             icon: "open_in_new",
@@ -113,6 +116,58 @@ function transformBuiltInLauncherItem(item, pluginId, openLabel) {
         _hSub: "",
         _hRich: false,
         _preScored: item._preScored
+    };
+}
+
+function transformClipboardItem(entry, copyLabel, pasteLabel, primaryLabel, imageLabel, textLabel, pinnedLabel, pasteHintLabel, copyHintLabel, clipboardLabel) {
+    var preview = (entry.preview || "").toString().replace(/\s+/g, " ").trim();
+    var isImage = entry.isImage || false;
+    var title = preview.length > 0 ? preview : imageLabel;
+    if (title.length > 140)
+        title = title.substring(0, 137) + "...";
+
+    var typeLabel = isImage ? imageLabel : textLabel;
+    var subtitle = typeLabel;
+    if (entry.pinned)
+        subtitle = pinnedLabel + " - " + subtitle;
+    if (pasteHintLabel)
+        subtitle += " - " + pasteHintLabel;
+    if (copyHintLabel)
+        subtitle += " - " + copyHintLabel;
+
+    return {
+        id: "clipboard_" + (entry.id || entry.hash || title),
+        type: "clipboard",
+        name: title,
+        subtitle: subtitle,
+        icon: isImage ? "image" : "content_paste",
+        iconType: "material",
+        section: "clipboard",
+        data: entry,
+        keywords: [preview, isImage ? "image" : "text", "clipboard"],
+        actions: [
+            {
+                name: copyLabel,
+                icon: "content_copy",
+                action: "clipboard_copy"
+            },
+            {
+                name: pasteLabel,
+                icon: "content_paste",
+                action: "clipboard_paste"
+            }
+        ],
+        source: clipboardLabel,
+        badgeLabel: clipboardLabel,
+        primaryAction: {
+            name: primaryLabel,
+            icon: primaryLabel === pasteLabel ? "content_paste" : "content_copy",
+            action: primaryLabel === pasteLabel ? "clipboard_paste" : "clipboard_copy"
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: entry._preScored
     };
 }
 

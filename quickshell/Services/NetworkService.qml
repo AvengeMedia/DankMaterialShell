@@ -3,9 +3,11 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("NetworkService")
 
     property bool networkAvailable: activeService !== null
     property string backend: activeService?.backend ?? ""
@@ -40,6 +42,7 @@ Singleton {
 
     property string userPreference: activeService?.userPreference ?? "auto"
     property bool isConnecting: activeService?.isConnecting ?? false
+    readonly property bool isWifiConnecting: isConnecting && !ethernetConnected && !wifiToggling
     property string connectingSSID: activeService?.connectingSSID ?? ""
     property string connectionError: activeService?.connectionError ?? ""
 
@@ -51,6 +54,7 @@ Singleton {
     property bool changingPreference: activeService?.changingPreference ?? false
     property string targetPreference: activeService?.targetPreference ?? ""
     property var savedWifiNetworks: activeService?.savedWifiNetworks ?? []
+    readonly property int savedWifiStateApiVersion: activeService?.savedWifiStateApiVersion ?? 26
     property string connectionStatus: activeService?.connectionStatus ?? ""
     property string lastConnectionError: activeService?.lastConnectionError ?? ""
     property bool passwordDialogShouldReopen: activeService?.passwordDialogShouldReopen ?? false
@@ -97,12 +101,12 @@ Singleton {
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
     Component.onCompleted: {
-        console.info("NetworkService: Initializing...");
+        log.info("Initializing...");
         if (!socketPath || socketPath.length === 0) {
-            console.info("NetworkService: DMS_SOCKET not set, using LegacyNetworkService");
+            log.info("DMS_SOCKET not set, using LegacyNetworkService");
             useLegacyService();
         } else {
-            console.log("NetworkService: DMS_SOCKET found, waiting for capabilities...");
+            log.debug("DMS_SOCKET found, waiting for capabilities...");
         }
     }
 
@@ -111,13 +115,13 @@ Singleton {
 
         function onNetworkAvailableChanged() {
             if (!activeService && DMSNetworkService.networkAvailable) {
-                console.info("NetworkService: Network capability detected, using DMSNetworkService");
+                log.info("Network capability detected, using DMSNetworkService");
                 activeService = DMSNetworkService;
                 usingLegacy = false;
-                console.info("NetworkService: Switched to DMSNetworkService, networkAvailable:", networkAvailable);
+                log.info("Switched to DMSNetworkService, networkAvailable:", networkAvailable);
                 connectSignals();
             } else if (!activeService && !DMSNetworkService.networkAvailable && socketPath && socketPath.length > 0) {
-                console.info("NetworkService: Network capability not available in DMS, using LegacyNetworkService");
+                log.info("Network capability not available in DMS, using LegacyNetworkService");
                 useLegacyService();
             }
         }
@@ -126,7 +130,7 @@ Singleton {
     function useLegacyService() {
         activeService = LegacyNetworkService;
         usingLegacy = true;
-        console.info("NetworkService: Switched to LegacyNetworkService, networkAvailable:", networkAvailable);
+        log.info("Switched to LegacyNetworkService, networkAvailable:", networkAvailable);
         if (LegacyNetworkService.activate) {
             LegacyNetworkService.activate();
         }
@@ -174,6 +178,12 @@ Singleton {
     function scanWifiNetworks() {
         if (activeService && activeService.scanWifiNetworks) {
             activeService.scanWifiNetworks();
+        }
+    }
+
+    function refreshSavedWifiNetworks() {
+        if (activeService && activeService.refreshSavedWifiNetworks) {
+            activeService.refreshSavedWifiNetworks();
         }
     }
 

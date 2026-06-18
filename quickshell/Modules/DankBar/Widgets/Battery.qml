@@ -7,6 +7,7 @@ import qs.Widgets
 
 BasePill {
     id: battery
+    readonly property var log: Log.scoped("Battery")
 
     property bool batteryPopupVisible: false
     property var popoutTarget: null
@@ -117,10 +118,18 @@ BasePill {
         width: battery.width + battery.leftMargin + battery.rightMargin
         height: battery.height + battery.topMargin + battery.bottomMargin
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: mouse => {
             battery.triggerRipple(this, mouse.x, mouse.y);
-            toggleBatteryPopup();
+            if (mouse.button === Qt.LeftButton) {
+                toggleBatteryPopup();
+            } else if (mouse.button === Qt.RightButton) {
+                if (PowerProfileWatcher.available) {
+                    PowerProfileWatcher.cycleProfile();
+                } else {
+                    ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+                }
+            }
         }
         onWheel: wheel => {
             var delta = wheel.angleDelta.y;
@@ -130,36 +139,20 @@ BasePill {
             // Check if this is a touchpad
             if (delta !== 120 && delta !== -120) {
                 touchpadAccumulator += delta;
-                console.info("Acc: "+touchpadAccumulator);
                 if (Math.abs(touchpadAccumulator) < 500)
                     return;
                 delta = touchpadAccumulator;
                 touchpadAccumulator = 0;
             }
-            console.info("Trigger! Delta: "+delta)
 
-            // This is after the other delta checks so it only shows on valid Y scroll
-            if (typeof PowerProfiles === "undefined") {
-                ToastService.showError("power-profiles-daemon not available");
+            if (!DisplayService.brightnessAvailable) {
                 return;
             }
 
-            // Get list of profiles, and current index
-            const profiles = [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []);
-            var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
-
-            // Step once based on mouse wheel direction
-            if (delta > 0) index += 1;
-            else index -= 1;
-
-            // Already at end of list, can't go further
-            if (index < 0 || index >= profiles.length) return;
-
-            // Set new profile
-            PowerProfiles.profile = profiles[index];
-            if (PowerProfiles.profile !== profiles[index]) {
-                ToastService.showError("Failed to set power profile");
-            }
+            const step = 5;
+            const change = delta > 0 ? step : -step;
+            const newBrightness = Math.max(0, Math.min(100, DisplayService.brightnessLevel + change));
+            DisplayService.setBrightness(newBrightness, "", false);
         }
     }
 }

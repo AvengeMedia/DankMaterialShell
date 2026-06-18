@@ -69,6 +69,20 @@ Rectangle {
                 }
             }
             break;
+        case "file":
+            if (selectedItem?.actions) {
+                for (var i = 0; i < selectedItem.actions.length; i++) {
+                    result.push(selectedItem.actions[i]);
+                }
+            }
+            break;
+        case "clipboard":
+            if (selectedItem?.actions) {
+                for (var i = 0; i < selectedItem.actions.length; i++) {
+                    result.push(selectedItem.actions[i]);
+                }
+            }
+            break;
         }
         return result;
     }
@@ -81,6 +95,8 @@ Rectangle {
             return getPluginContextMenuActions().length > 0;
         case "plugin_browse":
             return selectedItem?.actions?.length > 0;
+        case "file":
+            return selectedItem?.actions?.length > 0;
         default:
             return actions.length > 1;
         }
@@ -88,7 +104,7 @@ Rectangle {
 
     width: parent?.width ?? 200
     height: expanded && hasActions ? 52 : 0
-    color: Theme.surfaceContainerHigh
+    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     radius: Theme.cornerRadius
 
     clip: true
@@ -209,7 +225,7 @@ Rectangle {
 
     function cycleAction(reverse = false) {
         if (actions.length > 0) {
-            if (! reverse)
+            if (!reverse)
                 selectedActionIndex = (selectedActionIndex + 1) % actions.length;
             else
                 selectedActionIndex = (selectedActionIndex - 1) % actions.length;

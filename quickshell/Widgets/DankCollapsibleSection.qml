@@ -45,7 +45,8 @@ ColumnLayout {
 
                 Behavior on rotation {
                     enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-                    DankAnim {
+                    NumberAnimation {
+                        easing.type: Easing.BezierSpline
                         duration: Theme.shortDuration
                         easing.bezierCurve: Theme.expressiveCurves.standard
                     }
@@ -88,7 +89,8 @@ ColumnLayout {
 
             Behavior on opacity {
                 enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-                DankAnim {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
                     duration: Theme.shortDuration
                     easing.bezierCurve: Theme.expressiveCurves.standard
                 }
@@ -108,7 +110,8 @@ ColumnLayout {
 
             Behavior on opacity {
                 enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-                DankAnim {
+                NumberAnimation {
+                    easing.type: Easing.BezierSpline
                     duration: Theme.shortDuration
                     easing.bezierCurve: Theme.expressiveCurves.standard
                 }

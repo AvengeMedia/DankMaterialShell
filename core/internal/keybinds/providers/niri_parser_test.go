@@ -71,6 +71,101 @@ func TestNormalizeKDLBraces(t *testing.T) {
 	}
 }
 
+func TestQuoteLeadingUnderscoreIdents(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		out  string
+	}{
+		{"leading underscore node", `_JAVA_AWT_WM_NONREPARENTING "1"`, `"_JAVA_AWT_WM_NONREPARENTING" "1"`},
+		{"mid underscore untouched", `XDG_CURRENT_DESKTOP "niri"`, `XDG_CURRENT_DESKTOP "niri"`},
+		{"indented node", "environment {\n  _FOO \"1\"\n}", "environment {\n  \"_FOO\" \"1\"\n}"},
+		{"underscore in string", `spawn "_not_a_node"`, `spawn "_not_a_node"`},
+		{"underscore in line comment", "// _comment\n_FOO \"1\"", "// _comment\n\"_FOO\" \"1\""},
+		{"underscore in block comment", "/* _x */ _FOO \"1\"", "/* _x */ \"_FOO\" \"1\""},
+		{"block comment abuts node", `/* x */_FOO "1"`, `/* x */"_FOO" "1"`},
+		{"slashdash before node", `/-_FOO "1"`, `/-"_FOO" "1"`},
+		{"node after closing paren", "node (u8)_v", `node (u8)"_v"`},
+		{"node before brace without space", "_FOO{ }", `"_FOO"{ }`},
+		{"lone underscore", `_ "x"`, `"_" "x"`},
+		{"property value", "node key=_val", `node key="_val"`},
+		{"no underscores", "node child", "node child"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := quoteLeadingUnderscoreIdents(tc.in)
+			if got != tc.out {
+				t.Errorf("quoteLeadingUnderscoreIdents(%q) = %q, want %q", tc.in, got, tc.out)
+			}
+		})
+	}
+}
+
+func TestNiriParseLeadingUnderscoreEnvironment(t *testing.T) {
+	tmpDir := t.TempDir()
+	configFile := filepath.Join(tmpDir, "config.kdl")
+
+	// A leading-underscore environment node (a common Java/tiling-WM fix) must
+	// not abort parsing of the rest of the config — keybinds still have to load.
+	content := `environment {
+    XDG_CURRENT_DESKTOP "niri"
+    _JAVA_AWT_WM_NONREPARENTING "1"
+}
+binds {
+    Mod+Q { close-window; }
+    Mod+KP_Home { focus-workspace 1; }
+}
+`
+	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed on config with leading-underscore env node: %v", err)
+	}
+
+	if len(result.Section.Keybinds) != 2 {
+		t.Errorf("Expected 2 keybinds, got %d", len(result.Section.Keybinds))
+	}
+
+	foundClose := false
+	for _, kb := range result.Section.Keybinds {
+		if kb.Action == "close-window" {
+			foundClose = true
+		}
+	}
+	if !foundClose {
+		t.Error("close-window keybind not found — leading-underscore env node broke parsing")
+	}
+}
+
+func TestNiriParseSlashdashLeadingUnderscore(t *testing.T) {
+	tmpDir := t.TempDir()
+	configFile := filepath.Join(tmpDir, "config.kdl")
+
+	// A slashdashed leading-underscore node must not abort parsing either.
+	content := `environment {
+    /-_JAVA_AWT_WM_NONREPARENTING "1"
+}
+binds {
+    Mod+Q { close-window; }
+}
+`
+	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed on config with slashdashed leading-underscore node: %v", err)
+	}
+
+	if len(result.Section.Keybinds) != 1 {
+		t.Errorf("Expected 1 keybind, got %d", len(result.Section.Keybinds))
+	}
+}
+
 func TestNiriParseKeyCombo(t *testing.T) {
 	tests := []struct {
 		combo        string
@@ -523,6 +618,50 @@ binds {
 
 	if _, ok := bindMap["Mod+3"]; !ok {
 		t.Error("Mod+3 should exist (added after include)")
+	}
+}
+
+func TestNiriKeyIdentityIsCaseInsensitive(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatalf("Failed to create dms dir: %v", err)
+	}
+
+	config := `binds {
+    Alt+Space hotkey-overlay-title="Spotlight Bar" { spawn "dms" "ipc" "call" "spotlight-bar" "toggle"; }
+}
+include "dms/binds.kdl"
+`
+	if err := os.WriteFile(filepath.Join(tmpDir, "config.kdl"), []byte(config), 0o644); err != nil {
+		t.Fatalf("Failed to write config: %v", err)
+	}
+	include := `binds {
+    Alt+space hotkey-overlay-title="Default Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+}
+`
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds.kdl"), []byte(include), 0o644); err != nil {
+		t.Fatalf("Failed to write binds include: %v", err)
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed: %v", err)
+	}
+
+	var altSpaceBinds []NiriKeyBinding
+	parser := NewNiriParser("")
+	for _, kb := range result.Section.Keybinds {
+		if normalizeNiriBindKey(parser.formatBindKey(&kb)) == "alt+space" {
+			altSpaceBinds = append(altSpaceBinds, kb)
+		}
+	}
+
+	if len(altSpaceBinds) != 1 {
+		t.Fatalf("Expected one Alt+Space identity, got %d", len(altSpaceBinds))
+	}
+	if got := altSpaceBinds[0].Args; len(got) < 5 || got[3] != "spotlight" || got[4] != "toggle" {
+		t.Fatalf("Expected later DMS include to win with spotlight toggle, got action=%s args=%v", altSpaceBinds[0].Action, got)
 	}
 }
 

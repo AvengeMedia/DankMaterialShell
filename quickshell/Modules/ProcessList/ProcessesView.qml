@@ -301,10 +301,19 @@ Item {
             clip: true
             spacing: 2
 
-            add: root.searchText.length > 0 ? ListViewTransitions.add : null
-            remove: root.searchText.length > 0 ? ListViewTransitions.remove : null
-            displaced: root.searchText.length > 0 ? ListViewTransitions.displaced : null
-            move: root.searchText.length > 0 ? ListViewTransitions.move : null
+            states: [
+                State {
+                    name: "snap"
+                    when: Theme.snapListModelChanges
+                    PropertyChanges {
+                        target: processListView
+                        add: null
+                        remove: null
+                        displaced: null
+                        move: null
+                    }
+                }
+            ]
 
             model: ScriptModel {
                 values: root.cachedProcesses

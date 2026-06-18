@@ -37,6 +37,7 @@ FloatingWindow {
     property bool isCompactMode: width < 700
     property bool menuVisible: !isCompactMode
     property bool enableAnimations: true
+    property string keybindSearchQuery: ""
 
     signal closingModal
 
@@ -52,25 +53,31 @@ FloatingWindow {
         visible = !visible;
     }
 
+    function setTabIndex(tabIndex: int) {
+        if (tabIndex < 0)
+            return;
+        currentTabIndex = tabIndex;
+        sidebar.autoExpandForTab(tabIndex);
+    }
+
     function showWithTab(tabIndex: int) {
-        if (tabIndex >= 0) {
-            currentTabIndex = tabIndex;
-            sidebar.autoExpandForTab(tabIndex);
-        }
+        setTabIndex(tabIndex);
         visible = true;
     }
 
     function showWithTabName(tabName: string) {
         var idx = sidebar.resolveTabIndex(tabName);
-        if (idx >= 0) {
-            currentTabIndex = idx;
-            sidebar.autoExpandForTab(idx);
-        }
+        setTabIndex(idx);
         visible = true;
     }
 
     function resolveTabIndex(tabName: string): int {
         return sidebar.resolveTabIndex(tabName);
+    }
+
+    function showKeybindsSearch(query: string) {
+        keybindSearchQuery = query || "";
+        showWithTabName("keybinds");
     }
 
     function toggleMenu() {
@@ -235,7 +242,7 @@ FloatingWindow {
                     spacing: Theme.spacingXS
 
                     DankActionButton {
-                        visible: windowControls.supported
+                        visible: windowControls.canMaximize
                         circular: false
                         iconName: settingsModal.maximized ? "fullscreen_exit" : "fullscreen"
                         iconSize: Theme.iconSize - 4

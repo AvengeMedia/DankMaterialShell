@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -12,11 +11,7 @@ DankModal {
 
     layerNamespace: "dms:power-menu"
     keepPopoutsOpen: true
-
-    HyprlandFocusGrab {
-        windows: [root.contentWindow]
-        active: root.useHyprlandFocusGrab && root.shouldHaveFocus
-    }
+    useOverlayLayer: true
 
     property int selectedIndex: 0
     property int selectedRow: 0
@@ -81,6 +76,8 @@ DankModal {
         executeAction(action);
     }
 
+    signal switchUserRequested
+
     function executeAction(action) {
         if (action === "lock") {
             close();
@@ -90,6 +87,11 @@ DankModal {
         if (action === "restart") {
             close();
             Quickshell.execDetached(["dms", "restart"]);
+            return;
+        }
+        if (action === "switchuser") {
+            close();
+            switchUserRequested();
             return;
         }
         close();
@@ -216,6 +218,12 @@ DankModal {
                 "label": I18n.tr("Restart DMS"),
                 "key": "D"
             };
+        case "switchuser":
+            return {
+                "icon": "switch_account",
+                "label": I18n.tr("Switch User"),
+                "key": "U"
+            };
         default:
             return {
                 "icon": "help",
@@ -259,20 +267,24 @@ DankModal {
         cancelHold();
         close();
     }
-    onOpened: () => {
+    onShouldBeVisibleChanged: {
+        if (!shouldBeVisible)
+            return;
         holdAction = "";
         holdActionIndex = -1;
         holdProgress = 0;
         showHoldHint = false;
         updateVisibleActions();
         const defaultIndex = getDefaultActionIndex();
+        selectedIndex = defaultIndex;
         if (SettingsData.powerMenuGridLayout) {
             selectedRow = Math.floor(defaultIndex / gridColumns);
             selectedCol = defaultIndex % gridColumns;
-            selectedIndex = defaultIndex;
-        } else {
-            selectedIndex = defaultIndex;
         }
+    }
+    onShouldHaveFocusChanged: {
+        if (!shouldHaveFocus)
+            return;
         Qt.callLater(() => modalFocusScope.forceActiveFocus());
     }
     onDialogClosed: () => {
@@ -335,9 +347,11 @@ DankModal {
             break;
         case Qt.Key_P:
             if (!(event.modifiers & Qt.ControlModifier)) {
-                const idx = visibleActions.indexOf("poweroff");
-                startHold("poweroff", idx);
-                event.accepted = true;
+                if (visibleActions.includes("poweroff")) {
+                    const idx = visibleActions.indexOf("poweroff");
+                    startHold("poweroff", idx);
+                    event.accepted = true;
+                }
             } else {
                 selectedIndex = (selectedIndex - 1 + visibleActions.length) % visibleActions.length;
                 event.accepted = true;
@@ -356,28 +370,40 @@ DankModal {
             }
             break;
         case Qt.Key_R:
-            startHold("reboot", visibleActions.indexOf("reboot"));
-            event.accepted = true;
+            if (visibleActions.includes("reboot")) {
+                startHold("reboot", visibleActions.indexOf("reboot"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_X:
-            startHold("logout", visibleActions.indexOf("logout"));
-            event.accepted = true;
+            if (visibleActions.includes("logout")) {
+                startHold("logout", visibleActions.indexOf("logout"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_L:
-            startHold("lock", visibleActions.indexOf("lock"));
-            event.accepted = true;
+            if (visibleActions.includes("lock")) {
+                startHold("lock", visibleActions.indexOf("lock"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_S:
-            startHold("suspend", visibleActions.indexOf("suspend"));
-            event.accepted = true;
+            if (visibleActions.includes("suspend")) {
+                startHold("suspend", visibleActions.indexOf("suspend"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_H:
-            startHold("hibernate", visibleActions.indexOf("hibernate"));
-            event.accepted = true;
+            if (visibleActions.includes("hibernate")) {
+                startHold("hibernate", visibleActions.indexOf("hibernate"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_D:
-            startHold("restart", visibleActions.indexOf("restart"));
-            event.accepted = true;
+            if (visibleActions.includes("restart")) {
+                startHold("restart", visibleActions.indexOf("restart"));
+                event.accepted = true;
+            }
             break;
         }
     }
@@ -428,9 +454,11 @@ DankModal {
             break;
         case Qt.Key_P:
             if (!(event.modifiers & Qt.ControlModifier)) {
-                const idx = visibleActions.indexOf("poweroff");
-                startHold("poweroff", idx);
-                event.accepted = true;
+                if (visibleActions.includes("poweroff")) {
+                    const idx = visibleActions.indexOf("poweroff");
+                    startHold("poweroff", idx);
+                    event.accepted = true;
+                }
             } else {
                 selectedCol = (selectedCol - 1 + gridColumns) % gridColumns;
                 selectedIndex = selectedRow * gridColumns + selectedCol;
@@ -452,28 +480,40 @@ DankModal {
             }
             break;
         case Qt.Key_R:
-            startHold("reboot", visibleActions.indexOf("reboot"));
-            event.accepted = true;
+            if (visibleActions.includes("reboot")) {
+                startHold("reboot", visibleActions.indexOf("reboot"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_X:
-            startHold("logout", visibleActions.indexOf("logout"));
-            event.accepted = true;
+            if (visibleActions.includes("logout")) {
+                startHold("logout", visibleActions.indexOf("logout"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_L:
-            startHold("lock", visibleActions.indexOf("lock"));
-            event.accepted = true;
+            if (visibleActions.includes("lock")) {
+                startHold("lock", visibleActions.indexOf("lock"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_S:
-            startHold("suspend", visibleActions.indexOf("suspend"));
-            event.accepted = true;
+            if (visibleActions.includes("suspend")) {
+                startHold("suspend", visibleActions.indexOf("suspend"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_H:
-            startHold("hibernate", visibleActions.indexOf("hibernate"));
-            event.accepted = true;
+            if (visibleActions.includes("hibernate")) {
+                startHold("hibernate", visibleActions.indexOf("hibernate"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_D:
-            startHold("restart", visibleActions.indexOf("restart"));
-            event.accepted = true;
+            if (visibleActions.includes("restart")) {
+                startHold("restart", visibleActions.indexOf("restart"));
+                event.accepted = true;
+            }
             break;
         }
     }

@@ -60,6 +60,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "pywalfox", Commands: []string{"pywalfox"}, ConfigFile: "pywalfox.toml"},
 	{ID: "zenbrowser", Commands: []string{"zen", "zen-browser", "zen-beta", "zen-twilight"}, Flatpaks: []string{"app.zen_browser.zen"}, ConfigFile: "zenbrowser.toml"},
 	{ID: "vesktop", Commands: []string{"vesktop"}, Flatpaks: []string{"dev.vencord.Vesktop"}, ConfigFile: "vesktop.toml"},
+	{ID: "vencord", Commands: []string{"discord", "Discord", "discord-canary", "DiscordCanary"}, Flatpaks: []string{"com.discordapp.Discord", "com.discordapp.DiscordCanary"}, ConfigFile: "vencord.toml"},
 	{ID: "equibop", Commands: []string{"equibop"}, ConfigFile: "equibop.toml"},
 	{ID: "ghostty", Commands: []string{"ghostty"}, ConfigFile: "ghostty.toml", Kind: TemplateKindTerminal},
 	{ID: "kitty", Commands: []string{"kitty"}, ConfigFile: "kitty.toml", Kind: TemplateKindTerminal},

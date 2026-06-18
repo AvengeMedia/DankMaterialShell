@@ -16,6 +16,7 @@ FloatingWindow {
     property bool saveMode: false
     property string defaultFileName: ""
     property var parentModal: null
+    parentWindow: parentModal
     property bool shouldHaveFocus: visible
     property bool allowFocusOverride: false
     property bool shouldBeVisible: visible

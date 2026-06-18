@@ -1,4 +1,7 @@
 {
+  "%1 (+%2 more)": {
+    "%1 (+%2 more)": ""
+  },
   "%1 Animation Speed": {
     "%1 Animation Speed": "%1 Velocidade de Animação"
   },
@@ -26,6 +29,9 @@
   "%1 connected": {
     "%1 connected": "%1 conectado(s)"
   },
+  "%1 copied": {
+    "%1 copied": ""
+  },
   "%1 custom animation duration": {
     "%1 custom animation duration": "%1 duração de animação personalizada"
   },
@@ -50,6 +56,12 @@
   "%1 filtered": {
     "%1 filtered": ""
   },
+  "%1 h %2 m left": {
+    "%1 h %2 m left": ""
+  },
+  "%1 h left": {
+    "%1 h left": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 agora está incluído na configuração"
   },
@@ -59,8 +71,17 @@
   "%1 issues found": {
     "%1 issues found": "%1 problemas encontrados"
   },
+  "%1 min left": {
+    "%1 min left": ""
+  },
   "%1 notifications": {
     "%1 notifications": "%1 notificações"
+  },
+  "%1 online": {
+    "%1 online": ""
+  },
+  "%1 tasks": {
+    "%1 tasks": ""
   },
   "%1 update": {
     "%1 update": ""
@@ -89,6 +110,9 @@
   "%1m ago": {
     "%1m ago": "%1m atrás"
   },
+  "%command%": {
+    "%command%": ""
+  },
   "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": {
     "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": ""
   },
@@ -110,17 +134,20 @@
   "1 day": {
     "1 day": "1 dia"
   },
+  "1 day before": {
+    "1 day before": ""
+  },
   "1 device connected": {
     "1 device connected": "1 dispositivo conectado"
-  },
-  "1 event": {
-    "1 event": "1 evento"
   },
   "1 hour": {
     "1 hour": "1 hora"
   },
   "1 hour 30 minutes": {
     "1 hour 30 minutes": "1 hora e 30 minutos"
+  },
+  "1 hour before": {
+    "1 hour before": ""
   },
   "1 minute": {
     "1 minute": "1 minuto"
@@ -130,6 +157,12 @@
   },
   "1 second": {
     "1 second": "1 segundo"
+  },
+  "1 task": {
+    "1 task": ""
+  },
+  "10 min before": {
+    "10 min before": ""
   },
   "10 minutes": {
     "10 minutes": "10 minutos"
@@ -145,6 +178,12 @@
   },
   "14 days": {
     "14 days": "14 dias"
+  },
+  "15 min": {
+    "15 min": ""
+  },
+  "15 min before": {
+    "15 min before": ""
   },
   "15 minutes": {
     "15 minutes": "15 minutos"
@@ -176,9 +215,6 @@
   "24-hour clock": {
     "24-hour clock": ""
   },
-  "24-hour format": {
-    "24-hour format": "formato de 24 horas"
-  },
   "25 seconds": {
     "25 seconds": "25 segundos"
   },
@@ -203,6 +239,12 @@
   "30 days": {
     "30 days": "30 dias"
   },
+  "30 min": {
+    "30 min": ""
+  },
+  "30 min before": {
+    "30 min before": ""
+  },
   "30 minutes": {
     "30 minutes": "30 minutos"
   },
@@ -226,6 +268,9 @@
   },
   "45 seconds": {
     "45 seconds": "45 segundos"
+  },
+  "5 min before": {
+    "5 min before": ""
   },
   "5 minutes": {
     "5 minutes": "5 minutos"
@@ -272,11 +317,20 @@
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Um shell de desktop moderno para compositores Wayland"
   },
+  "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": {
+    "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": ""
+  },
+  "A user with that name already exists.": {
+    "A user with that name already exists.": ""
+  },
   "AC Power": {
     "AC Power": "Energia AC"
   },
   "API": {
     "API": "API"
+  },
+  "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": ""
   },
   "Aborted": {
     "Aborted": "Abortado"
@@ -311,6 +365,12 @@
   "Action failed or terminal was closed.": {
     "Action failed or terminal was closed.": "A ação falhou ou o termianl foi fechado."
   },
+  "Action performed when scrolling horizontally on the bar": {
+    "Action performed when scrolling horizontally on the bar": ""
+  },
+  "Action performed when scrolling vertically on the bar": {
+    "Action performed when scrolling vertically on the bar": ""
+  },
   "Actions": {
     "Actions": "Ações"
   },
@@ -335,6 +395,12 @@
   "Active Lock Screen Monitor": {
     "Active Lock Screen Monitor": "Monitor de Tela de Bloqueio Atual"
   },
+  "Active VPN": {
+    "Active VPN": ""
+  },
+  "Active in Column": {
+    "Active in Column": ""
+  },
   "Active tile background and icon color": {
     "Active tile background and icon color": "Cor de fundo e ícone do bloco ativo"
   },
@@ -356,11 +422,20 @@
   "Add": {
     "Add": "Adicionar"
   },
+  "Add \"%1\" to the %2 group?": {
+    "Add \"%1\" to the %2 group?": ""
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": ""
+  },
   "Add Bar": {
     "Add Bar": "Adicionar Barra"
   },
   "Add Desktop Widget": {
     "Add Desktop Widget": "Adicionar Widget de Área de Trabalho"
+  },
+  "Add Entry": {
+    "Add Entry": ""
   },
   "Add Printer": {
     "Add Printer": "Adicionar Impressora"
@@ -371,8 +446,11 @@
   "Add Widget": {
     "Add Widget": "Adicionar Widget"
   },
-  "Add Widget to %1 Section": {
-    "Add Widget to %1 Section": "Adicionar Widget para a Seção %1"
+  "Add Widget to %1": {
+    "Add Widget to %1": ""
+  },
+  "Add Window Rule": {
+    "Add Window Rule": ""
   },
   "Add a border around the dock": {
     "Add a border around the dock": "Adicionar uma borda ao redor da dock"
@@ -380,11 +458,35 @@
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
     "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Adicionar um prefixo personalizado para todos os inicializações de aplicativos. Isso pode ser usado para coisas como 'uwsm-app', 'systemd-run' ou outros invólucros de comandos."
   },
+  "Add a task...": {
+    "Add a task...": ""
+  },
   "Add and configure widgets that appear on your desktop": {
     "Add and configure widgets that appear on your desktop": "Adicionar e configurar widgets que aparecem na sua área de trabalho"
   },
   "Add by Address": {
     "Add by Address": "Adicionar por Endereço"
+  },
+  "Add location": {
+    "Add location": ""
+  },
+  "Add match": {
+    "Add match": ""
+  },
+  "Add notes": {
+    "Add notes": ""
+  },
+  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
+  },
+  "Add the new user to the %1 group so they can use sudo.": {
+    "Add the new user to the %1 group so they can use sudo.": ""
+  },
+  "Add to Autostart": {
+    "Add to Autostart": ""
+  },
+  "Adjust the bar height via inner padding": {
+    "Adjust the bar height via inner padding": ""
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Ajusta o número de colunas no modo de visualização em grade"
@@ -394,6 +496,9 @@
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
     "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": ""
+  },
+  "Administrator group:": {
+    "Administrator group:": ""
   },
   "Advanced": {
     "Advanced": "Avançado"
@@ -416,8 +521,26 @@
   "All displays": {
     "All displays": "Todos as Telas"
   },
+  "Allow": {
+    "Allow": ""
+  },
+  "Allow adjusting device volume by scrolling on the right half of items in the device list": {
+    "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
+  },
   "Allow clicks to pass through the widget": {
     "Allow clicks to pass through the widget": "Permitir cliques passarem pelo widget"
+  },
+  "Allow greeter access?": {
+    "Allow greeter access?": ""
+  },
+  "Allow greeter login access": {
+    "Allow greeter login access": ""
+  },
+  "Already on that session": {
+    "Already on that session": ""
+  },
+  "Also group repeated application icons on the active workspace": {
+    "Also group repeated application icons on the active workspace": ""
   },
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Voltar • F1/I: Informações de Arquivo • F10: Ajuda • Esc: Fechar"
@@ -446,6 +569,9 @@
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Sempre mostrar quando houver apenas um monitor conectado"
   },
+  "Always use this app for %1": {
+    "Always use this app for %1": ""
+  },
   "Amount": {
     "Amount": "Quantidade"
   },
@@ -458,11 +584,17 @@
   "Analyzing configuration...": {
     "Analyzing configuration...": "Analisando configuração..."
   },
+  "Anchor": {
+    "Anchor": ""
+  },
   "Animation Duration": {
     "Animation Duration": "Duração da Animação"
   },
   "Animation Speed": {
     "Animation Speed": "Velocidade de Animação"
+  },
+  "Animation Style": {
+    "Animation Style": ""
   },
   "Anonymous Identity": {
     "Anonymous Identity": "Identidade Anônima"
@@ -470,11 +602,23 @@
   "Anonymous Identity (optional)": {
     "Anonymous Identity (optional)": "Identidade Anônima (opcional)"
   },
+  "Any window": {
+    "Any window": ""
+  },
   "App Customizations": {
     "App Customizations": "Personalizações do Aplicativo"
   },
+  "App ID": {
+    "App ID": ""
+  },
+  "App ID (e.g. firefox)": {
+    "App ID (e.g. firefox)": ""
+  },
   "App ID Substitutions": {
     "App ID Substitutions": "Substituições de ID de Aplicativo"
+  },
+  "App ID regex": {
+    "App ID regex": ""
   },
   "App ID regex (e.g. ^firefox$)": {
     "App ID regex (e.g. ^firefox$)": "Regex de ID de Aplicativo (ex: ^firefox$)"
@@ -491,14 +635,23 @@
   "Appearance": {
     "Appearance": "Aparência"
   },
+  "Application": {
+    "Application": ""
+  },
   "Application Dock": {
     "Application Dock": "Dock de Aplicativos"
   },
   "Applications": {
     "Applications": "Aplicativos"
   },
+  "Applications and commands to start automatically when you log in": {
+    "Applications and commands to start automatically when you log in": ""
+  },
   "Apply Changes": {
     "Apply Changes": "Aplicar Alterações"
+  },
+  "Apply Flatpak updates alongside system updates when running 'Update All'.": {
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": ""
   },
   "Apply GTK Colors": {
     "Apply GTK Colors": "Aplicar cores no GTK"
@@ -506,11 +659,20 @@
   "Apply Qt Colors": {
     "Apply Qt Colors": "Aplicar cores no QT"
   },
+  "Apply compositor blur behind the frame border": {
+    "Apply compositor blur behind the frame border": ""
+  },
+  "Apply inverse concave corner cutouts to the bar": {
+    "Apply inverse concave corner cutouts to the bar": ""
+  },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Aplicar temperatura de cor quente para reduzir a fadiga ocular. Use as configurações de automação abaixo para controlar quando ela será ativada."
   },
-  "Applying authentication changes…": {
-    "Applying authentication changes…": ""
+  "Applying authentication changes...": {
+    "Applying authentication changes...": ""
+  },
+  "Applying auto-login on startup...": {
+    "Applying auto-login on startup...": ""
   },
   "Apps": {
     "Apps": "Aplicativos"
@@ -533,6 +695,9 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Aplicativos com popups de notificação silenciados. Dessilenciar ou excluir para remover."
   },
+  "Arc Extender": {
+    "Arc Extender": ""
+  },
   "Architecture": {
     "Architecture": "Arquitetura"
   },
@@ -541,6 +706,15 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Organizar monitores e configurar resolução, taxa de atualização e VRR"
+  },
+  "At Startup": {
+    "At Startup": ""
+  },
+  "At least one output must remain enabled": {
+    "At least one output must remain enabled": ""
+  },
+  "At start": {
+    "At start": ""
   },
   "Attach": {
     "Attach": ""
@@ -632,11 +806,23 @@
   "Auto (Wide)": {
     "Auto (Wide)": "Automático (Largo)"
   },
+  "Auto Compositor Gaps": {
+    "Auto Compositor Gaps": ""
+  },
   "Auto Location": {
     "Auto Location": "Localização Automática"
   },
+  "Auto Overflow": {
+    "Auto Overflow": ""
+  },
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "Espaçamento Automático de Popup"
+  },
+  "Auto mode is on. Manual profile selection is disabled.": {
+    "Auto mode is on. Manual profile selection is disabled.": ""
+  },
+  "Auto saved": {
+    "Auto saved": ""
   },
   "Auto-Clear After": {
     "Auto-Clear After": "Auto-Limpeza Depois"
@@ -655,6 +841,21 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "Esconder Automaticamente o Dock"
+  },
+  "Auto-login": {
+    "Auto-login": ""
+  },
+  "Auto-login disabled": {
+    "Auto-login disabled": ""
+  },
+  "Auto-login enabled": {
+    "Auto-login enabled": ""
+  },
+  "Auto-login on startup": {
+    "Auto-login on startup": ""
+  },
+  "Auto-save to disk": {
+    "Auto-save to disk": ""
   },
   "Auto-saving...": {
     "Auto-saving...": "Salvando automáticamente..."
@@ -680,6 +881,9 @@
   "Automatic Cycling": {
     "Automatic Cycling": "Rotação Automática"
   },
+  "Automatically calculate popup gap based on bar spacing": {
+    "Automatically calculate popup gap based on bar spacing": ""
+  },
   "Automatically cycle through wallpapers in the same folder": {
     "Automatically cycle through wallpapers in the same folder": "Circular automaticamente dentre os papéis de parede na mesma pasta"
   },
@@ -692,6 +896,9 @@
   "Automatically determine your location using your IP address": {
     "Automatically determine your location using your IP address": "Detectar automaticamente a sua localização usando o seu endereço de IP"
   },
+  "Automatically hide the bar when the pointer moves away": {
+    "Automatically hide the bar when the pointer moves away": ""
+  },
   "Automatically lock after": {
     "Automatically lock after": "Bloquear automaticamente após"
   },
@@ -701,8 +908,17 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "Bloquear tela automaticamente quando o sistema é preparado para suspensão"
   },
+  "Automatically save changes to opened files as you type": {
+    "Automatically save changes to opened files as you type": ""
+  },
   "Automation": {
     "Automation": "Automação"
+  },
+  "Autostart Apps": {
+    "Autostart Apps": ""
+  },
+  "Autostart Entries": {
+    "Autostart Entries": ""
   },
   "Available": {
     "Available": "Disponível"
@@ -731,14 +947,23 @@
   "Back": {
     "Back": "Voltar"
   },
+  "Back to user list": {
+    "Back to user list": ""
+  },
   "Backend": {
     "Backend": "Backend"
+  },
+  "Backends: %1": {
+    "Backends: %1": ""
   },
   "Background": {
     "Background": ""
   },
   "Background Blur": {
     "Background Blur": ""
+  },
+  "Background Effect": {
+    "Background Effect": ""
   },
   "Background Opacity": {
     "Background Opacity": "Opacidade do Fundo"
@@ -761,14 +986,32 @@
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Paleta equilibrada com destaques de cor focados (padrão)."
   },
+  "Bar": {
+    "Bar": ""
+  },
+  "Bar %1": {
+    "Bar %1": ""
+  },
   "Bar Configurations": {
     "Bar Configurations": "Configurações da Barra"
+  },
+  "Bar Opacity": {
+    "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": "Sombras da Barra"
   },
   "Bar Transparency": {
     "Bar Transparency": "Trasparência da Barra"
+  },
+  "Bar corners and background": {
+    "Bar corners and background": ""
+  },
+  "Bar shadow, border, and corners": {
+    "Bar shadow, border, and corners": ""
+  },
+  "Bar spacing and size": {
+    "Bar spacing and size": ""
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Cor base para sombras (a opacidade é aplicada automaticamente)"
@@ -797,6 +1040,12 @@
   "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": {
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "Vincular o bloqueio de tela aos sinais do DBus do loginctl. Desative se estiver usando um bloqueio de tela externo"
   },
+  "Bind the spotlight IPC action in your compositor config.": {
+    "Bind the spotlight IPC action in your compositor config.": ""
+  },
+  "Bind the spotlight-bar IPC action in your compositor config.": {
+    "Bind the spotlight-bar IPC action in your compositor config.": ""
+  },
   "Binds Include Missing": {
     "Binds Include Missing": "Atalhos Incluem Definições Ausentes"
   },
@@ -805,6 +1054,9 @@
   },
   "Bit Depth": {
     "Bit Depth": "Profundidade de Bits"
+  },
+  "Black": {
+    "Black": ""
   },
   "Block Out": {
     "Block Out": "Bloquear"
@@ -830,6 +1082,9 @@
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth indisponível"
   },
+  "Blur": {
+    "Blur": ""
+  },
   "Blur Border Color": {
     "Blur Border Color": ""
   },
@@ -845,11 +1100,20 @@
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.": ""
   },
+  "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": ""
+  },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Desfoque de papel de parede quando a visão geral do niri estiver aberta"
   },
   "Body": {
     "Body": "Corpo"
+  },
+  "Body Font Size": {
+    "Body Font Size": ""
+  },
+  "Bold": {
+    "Bold": ""
   },
   "Border": {
     "Border": "Borda"
@@ -857,8 +1121,14 @@
   "Border Color": {
     "Border Color": "Cor da Borda"
   },
+  "Border Off": {
+    "Border Off": ""
+  },
   "Border Opacity": {
     "Border Opacity": "Opacidade da Borda"
+  },
+  "Border Radius": {
+    "Border Radius": ""
   },
   "Border Size": {
     "Border Size": "Tamanho da Borda"
@@ -866,11 +1136,17 @@
   "Border Thickness": {
     "Border Thickness": "Espessura da Borda"
   },
+  "Border Width": {
+    "Border Width": ""
+  },
   "Border color around blurred surfaces": {
     "Border color around blurred surfaces": ""
   },
-  "Border with BG": {
-    "Border with BG": "Borda com Fundo"
+  "Border w/ Bg": {
+    "Border w/ Bg": ""
+  },
+  "Border with Background": {
+    "Border with Background": ""
   },
   "Bottom": {
     "Bottom": "Inferior"
@@ -953,6 +1229,12 @@
   "CUPS not available": {
     "CUPS not available": "CUPS indisponível"
   },
+  "Calendar": {
+    "Calendar": ""
+  },
+  "Calendar Backend": {
+    "Calendar Backend": ""
+  },
   "Camera": {
     "Camera": "Câmera"
   },
@@ -965,8 +1247,23 @@
   "Canceled": {
     "Canceled": "Cancelado"
   },
+  "Cannot delete the only administrator": {
+    "Cannot delete the only administrator": ""
+  },
+  "Cannot disable the only output": {
+    "Cannot disable the only output": ""
+  },
+  "Cannot open trash: '%1' is not installed": {
+    "Cannot open trash: '%1' is not installed": ""
+  },
+  "Cannot open trash: no custom command set": {
+    "Cannot open trash: no custom command set": ""
+  },
   "Cannot pair": {
     "Cannot pair": "Não foi possível parear"
+  },
+  "Cannot remove the only administrator": {
+    "Cannot remove the only administrator": ""
   },
   "Capabilities": {
     "Capabilities": "Capacidades"
@@ -982,6 +1279,12 @@
   },
   "Caps Lock is on": {
     "Caps Lock is on": "Caps Lock está ligado"
+  },
+  "Cast Target": {
+    "Cast Target": ""
+  },
+  "Category": {
+    "Category": ""
   },
   "Center Section": {
     "Center Section": "Seção Central"
@@ -1019,20 +1322,26 @@
   "Check for system updates": {
     "Check for system updates": "Verificar por atualizações de sistema"
   },
-  "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": {
-    "Check sync status on demand. Sync copies your theme, settings, and wallpaper configuration to the login screen. Authentication changes apply automatically.": ""
+  "Check interval": {
+    "Check interval": ""
+  },
+  "Check on startup": {
+    "Check on startup": ""
+  },
+  "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": {
+    "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": ""
+  },
+  "Check your custom command in Settings → Dock → Trash.": {
+    "Check your custom command in Settings → Dock → Trash.": ""
   },
   "Checking for updates...": {
     "Checking for updates...": ""
   },
-  "Checking whether sudo authentication is needed…": {
-    "Checking whether sudo authentication is needed…": ""
+  "Checking whether sudo authentication is needed...": {
+    "Checking whether sudo authentication is needed...": ""
   },
   "Checking...": {
     "Checking...": ""
-  },
-  "Checking…": {
-    "Checking…": ""
   },
   "Choose Color": {
     "Choose Color": "Escolha a Cor"
@@ -1055,6 +1364,9 @@
   "Choose a color": {
     "Choose a color": "Escolha uma cor"
   },
+  "Choose a power profile": {
+    "Choose a power profile": ""
+  },
   "Choose colors from palette": {
     "Choose colors from palette": "Escolha cores da paleta"
   },
@@ -1066,6 +1378,9 @@
   },
   "Choose icon": {
     "Choose icon": "Escolher Ícone"
+  },
+  "Choose monochrome or a theme color tint for system tray icons": {
+    "Choose monochrome or a theme color tint for system tray icons": ""
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "Escolha a cor de fundo para os widgets"
@@ -1082,6 +1397,12 @@
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "Escolher onde OSDs aparecerão na tela"
   },
+  "Choose whether to launch a desktop app or a command": {
+    "Choose whether to launch a desktop app or a command": ""
+  },
+  "Choose which action buttons appear on clipboard entries": {
+    "Choose which action buttons appear on clipboard entries": ""
+  },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Escolha quais monitores mostrarão este widget"
   },
@@ -1096,6 +1417,9 @@
   },
   "Circle": {
     "Circle": "Círculo"
+  },
+  "Class regex": {
+    "Class regex": ""
   },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "Regex de Classe (ex: ^firefox$)"
@@ -1166,11 +1490,11 @@
   "Clipboard Manager": {
     "Clipboard Manager": "Gerenciador da Área de Transferência"
   },
+  "Clipboard Saved": {
+    "Clipboard Saved": ""
+  },
   "Clipboard sent": {
     "Clipboard sent": "Área de transferência enviada"
-  },
-  "Clipboard service not available": {
-    "Clipboard service not available": "Serviço de área de transferência não disponível"
   },
   "Clipboard works but nothing saved to disk": {
     "Clipboard works but nothing saved to disk": "A área de transferência funciona mas nada é salvo no disco"
@@ -1195,6 +1519,9 @@
   },
   "Color": {
     "Color": "Cor"
+  },
+  "Color %1 copied": {
+    "Color %1 copied": ""
   },
   "Color Gamut": {
     "Color Gamut": "Gamut de Cor"
@@ -1262,6 +1589,9 @@
   "Command": {
     "Command": "Comando"
   },
+  "Command Line": {
+    "Command Line": ""
+  },
   "Commands": {
     "Commands": "Comandos"
   },
@@ -1285,9 +1615,6 @@
   },
   "Compositor Settings": {
     "Compositor Settings": "Configurações do Compositor"
-  },
-  "Compositor not supported": {
-    "Compositor not supported": "Compositor não suportado"
   },
   "Config Format": {
     "Config Format": "Formato de Configuração"
@@ -1322,6 +1649,9 @@
   "Configure match criteria and actions": {
     "Configure match criteria and actions": "Configurar critérios de correspondência e ações"
   },
+  "Configure one in Settings → Dock → Trash.": {
+    "Configure one in Settings → Dock → Trash.": ""
+  },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "Configurar quais telas mostram \"%1\""
   },
@@ -1339,6 +1669,9 @@
   },
   "Confirm passkey for ": {
     "Confirm passkey for ": "Confirmar chave de acesso para "
+  },
+  "Confirm password": {
+    "Confirm password": ""
   },
   "Conflicts with: %1": {
     "Conflicts with: %1": "Conflita com: %1"
@@ -1364,11 +1697,20 @@
   "Connected Displays": {
     "Connected Displays": "Telas Conectadas"
   },
+  "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": {
+    "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": ""
+  },
+  "Connected Options": {
+    "Connected Options": ""
+  },
+  "Connected to %1": {
+    "Connected to %1": ""
+  },
   "Connecting to Device": {
     "Connecting to Device": "Conectando ao Dispositivo"
   },
-  "Connecting to clipboard service…": {
-    "Connecting to clipboard service…": ""
+  "Connecting to clipboard service...": {
+    "Connecting to clipboard service...": ""
   },
   "Connecting...": {
     "Connecting...": "Conectando..."
@@ -1387,6 +1729,9 @@
   },
   "Contrast": {
     "Contrast": "Contraste"
+  },
+  "Contributor": {
+    "Contributor": ""
   },
   "Control Center": {
     "Control Center": "Painel de Controle"
@@ -1409,8 +1754,35 @@
   "Control workspaces and columns by scrolling on the bar": {
     "Control workspaces and columns by scrolling on the bar": "Controle espaços de trabalho e colunas rolando na barra"
   },
+  "Controls how much original icon color is removed before applying tint": {
+    "Controls how much original icon color is removed before applying tint": ""
+  },
+  "Controls how strongly the selected tint color is applied": {
+    "Controls how strongly the selected tint color is applied": ""
+  },
   "Controls opacity of all popouts, modals, and their content layers": {
     "Controls opacity of all popouts, modals, and their content layers": "Controla a opacidade de todos os popouts, modais e suas camadas de conteúdo"
+  },
+  "Controls opacity of shell surfaces, popouts, and modals": {
+    "Controls opacity of shell surfaces, popouts, and modals": ""
+  },
+  "Controls opacity of the bar background": {
+    "Controls opacity of the bar background": ""
+  },
+  "Controls opacity of the border": {
+    "Controls opacity of the border": ""
+  },
+  "Controls opacity of the shadow layer": {
+    "Controls opacity of the shadow layer": ""
+  },
+  "Controls opacity of the widget outline": {
+    "Controls opacity of the widget outline": ""
+  },
+  "Controls opacity of widget backgrounds": {
+    "Controls opacity of widget backgrounds": ""
+  },
+  "Controls outlines around blurred foreground cards, pills, and notification cards": {
+    "Controls outlines around blurred foreground cards, pills, and notification cards": ""
   },
   "Controls shadow cast direction for elevation layers": {
     "Controls shadow cast direction for elevation layers": ""
@@ -1418,11 +1790,20 @@
   "Controls the base blur radius and offset of shadows": {
     "Controls the base blur radius and offset of shadows": ""
   },
+  "Controls the opacity of the shadow": {
+    "Controls the opacity of the shadow": ""
+  },
+  "Controls the outer edge of protocol-blurred windows": {
+    "Controls the outer edge of protocol-blurred windows": ""
+  },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "Controla a transparência da sombra"
   },
   "Convenience options for the login screen. Sync to apply.": {
     "Convenience options for the login screen. Sync to apply.": "Opções de conveniência para a tela de login. Sincronize para aplicar."
+  },
+  "Convert to DMS": {
+    "Convert to DMS": ""
   },
   "Cooldown": {
     "Cooldown": "Tempo de espera"
@@ -1475,6 +1856,9 @@
   "Corners & Background": {
     "Corners & Background": "Cantos e Fundo"
   },
+  "Couldn't open a terminal for the auto-login update.": {
+    "Couldn't open a terminal for the auto-login update.": ""
+  },
   "Count Only": {
     "Count Only": "Apenas Contagem"
   },
@@ -1490,6 +1874,9 @@
   "Create Printer": {
     "Create Printer": "Criar Impressora"
   },
+  "Create User": {
+    "Create User": ""
+  },
   "Create Window Rule": {
     "Create Window Rule": "Criar Regra de Janela"
   },
@@ -1502,11 +1889,29 @@
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
     "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Criar regras para silenciar, ignorar, ocultar do histórico ou substituir a prioridade de notificação. O padrão apenas substitui a prioridade; as notificações ainda aparecem normalmente."
   },
+  "Created plugin directory: %1": {
+    "Created plugin directory: %1": ""
+  },
   "Creating...": {
     "Creating...": "Criando..."
   },
   "Critical Priority": {
     "Critical Priority": "Prioridade Crítica"
+  },
+  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
+    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
+  },
+  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
+    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": ""
+  },
+  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": {
+    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": ""
+  },
+  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": {
+    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": ""
   },
   "Current": {
     "Current": "Atual"
@@ -1559,6 +1964,12 @@
   "Cursor Theme": {
     "Cursor Theme": "Tema do Cursor"
   },
+  "Curve": {
+    "Curve": ""
+  },
+  "Curve: curve rasterizer.": {
+    "Curve: curve rasterizer.": ""
+  },
   "Custom": {
     "Custom": "Customizado"
   },
@@ -1604,11 +2015,20 @@
   "Custom Transparency": {
     "Custom Transparency": "Transparência Customizada"
   },
+  "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
+  },
+  "Custom open-trash command": {
+    "Custom open-trash command": ""
+  },
   "Custom power profile": {
     "Custom power profile": "Perfil de energia personalizado"
   },
   "Custom theme loaded from JSON file": {
     "Custom theme loaded from JSON file": "Tema personalizado carregado do arquivo JSON"
+  },
+  "Custom update command": {
+    "Custom update command": ""
   },
   "Custom...": {
     "Custom...": "Customizado..."
@@ -1628,8 +2048,17 @@
   "DEMO MODE - Click anywhere to exit": {
     "DEMO MODE - Click anywhere to exit": "MODO DEMONSTRAÇÃO - Clique em qualquer lugar para sair"
   },
+  "DMS Chooser": {
+    "DMS Chooser": ""
+  },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "Gerenciador de Plugins DMS indispónivel"
+  },
+  "DMS Settings": {
+    "DMS Settings": ""
+  },
+  "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": {
+    "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": ""
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Atalhos DMS"
@@ -1637,8 +2066,14 @@
   "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": {
     "DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.": ""
   },
+  "DMS needs administrator access. The terminal closes automatically when done.": {
+    "DMS needs administrator access. The terminal closes automatically when done.": ""
+  },
   "DMS out of date": {
     "DMS out of date": "DMS desatualizado"
+  },
+  "DMS server is outdated (API v%1, expected v%2)": {
+    "DMS server is outdated (API v%1, expected v%2)": ""
   },
   "DMS service is not connected. Clipboard settings are unavailable.": {
     "DMS service is not connected. Clipboard settings are unavailable.": "Serviço do DMS não está conectado. Configurações de área de transferência não estão disponíveis."
@@ -1648,9 +2083,6 @@
   },
   "DMS_SOCKET not available": {
     "DMS_SOCKET not available": "DMS_SOCKET não está disponível"
-  },
-  "DWL service not available": {
-    "DWL service not available": "Serviço do DWL não disponível"
   },
   "Daily": {
     "Daily": "Diário"
@@ -1666,6 +2098,15 @@
   },
   "DankBar": {
     "DankBar": "DankBar"
+  },
+  "DankCalendar": {
+    "DankCalendar": ""
+  },
+  "DankCalendar isn't installed": {
+    "DankCalendar isn't installed": ""
+  },
+  "DankCalendar isn't running": {
+    "DankCalendar isn't running": ""
   },
   "DankMaterialShell is ready to use": {
     "DankMaterialShell is ready to use": "DankMaterialShell está pronto para uso"
@@ -1687,9 +2128,6 @@
   },
   "Date Format": {
     "Date Format": "Formatação de Data"
-  },
-  "Date format": {
-    "Date format": ""
   },
   "Date format on greeter": {
     "Date format on greeter": ""
@@ -1724,8 +2162,32 @@
   "Default (Black)": {
     "Default (Black)": ""
   },
+  "Default (Global)": {
+    "Default (Global)": ""
+  },
+  "Default Apps": {
+    "Default Apps": ""
+  },
+  "Default Launcher": {
+    "Default Launcher": ""
+  },
+  "Default Launcher Shortcut": {
+    "Default Launcher Shortcut": ""
+  },
+  "Default Mode": {
+    "Default Mode": ""
+  },
+  "Default Opens": {
+    "Default Opens": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Largura Padrão (%)"
+  },
+  "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
+    "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": ""
+  },
+  "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": {
+    "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": ""
   },
   "Default selected action": {
     "Default selected action": "Ação selecionada por padrão"
@@ -1742,6 +2204,9 @@
   "Delete": {
     "Delete": "Excluir"
   },
+  "Delete \"%1\" and remove the home directory? This cannot be undone.": {
+    "Delete \"%1\" and remove the home directory? This cannot be undone.": ""
+  },
   "Delete \"%1\"?": {
     "Delete \"%1\"?": "Excluir \"%1\"?"
   },
@@ -1750,6 +2215,9 @@
   },
   "Delete Printer": {
     "Delete Printer": "Excluir Impressora"
+  },
+  "Delete Rule": {
+    "Delete Rule": ""
   },
   "Delete Saved Item?": {
     "Delete Saved Item?": "Excluir Item Salvo?"
@@ -1763,8 +2231,23 @@
   "Delete profile \"%1\"?": {
     "Delete profile \"%1\"?": "Excluir perfil \"%1\"?"
   },
+  "Delete user": {
+    "Delete user": ""
+  },
+  "Delete user?": {
+    "Delete user?": ""
+  },
+  "Demi Bold": {
+    "Demi Bold": ""
+  },
   "Dependencies & documentation": {
     "Dependencies & documentation": ""
+  },
+  "Depth": {
+    "Depth": ""
+  },
+  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Deriva cores que combinam de perto com a imagem de fundo."
@@ -1774,6 +2257,9 @@
   },
   "Desktop": {
     "Desktop": "Área de Trabalho"
+  },
+  "Desktop Application": {
+    "Desktop Application": ""
   },
   "Desktop Clock": {
     "Desktop Clock": "Relógio da Área de Trabalho"
@@ -1796,6 +2282,9 @@
   "Details for \"%1": {
     "Details for \"%1\"": ""
   },
+  "Detected backends: %1": {
+    "Detected backends: %1": ""
+  },
   "Development": {
     "Development": "Desenvolvimento"
   },
@@ -1804,6 +2293,9 @@
   },
   "Device connections": {
     "Device connections": "Conexões de dispositivo"
+  },
+  "Device list scroll volume": {
+    "Device list scroll volume": ""
   },
   "Device names updated": {
     "Device names updated": "Nomes de dispositivos atualizados"
@@ -1820,6 +2312,12 @@
   "Direction Source": {
     "Direction Source": ""
   },
+  "Directional": {
+    "Directional": ""
+  },
+  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": ""
+  },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Desativar conexão automática"
   },
@@ -1835,8 +2333,14 @@
   "Disabled": {
     "Disabled": "Desativado"
   },
+  "Disabled by Frame Mode": {
+    "Disabled by Frame Mode": ""
+  },
   "Disabling WiFi...": {
     "Disabling WiFi...": "Desativando WiFi..."
+  },
+  "Disabling auto-login on startup...": {
+    "Disabling auto-login on startup...": ""
   },
   "Disc": {
     "Disc": "Disco"
@@ -1901,8 +2405,8 @@
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "Exibir todas as prioridades em aplicativos de tela cheia"
   },
-  "Display and switch DWL layouts": {
-    "Display and switch DWL layouts": "Mostra e altera layouts do DWL"
+  "Display and switch MangoWC layouts": {
+    "Display and switch MangoWC layouts": ""
   },
   "Display application icons in workspace indicators": {
     "Display application icons in workspace indicators": "Mostrar ícones de aplicativos em indicadores de espaço de trabalho"
@@ -1919,6 +2423,12 @@
   "Display hourly weather predictions": {
     "Display hourly weather predictions": "Exibir previsões meteorológicas por hora"
   },
+  "Display line numbers in editor": {
+    "Display line numbers in editor": ""
+  },
+  "Display name for this entry": {
+    "Display name for this entry": ""
+  },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "Mostrar apenas áreas de trabalho que possuem janelas"
   },
@@ -1927,6 +2437,9 @@
   },
   "Display seconds in the clock": {
     "Display seconds in the clock": "Exibir segundos no relógio"
+  },
+  "Display setup failed": {
+    "Display setup failed": ""
   },
   "Display the power system menu": {
     "Display the power system menu": "Mostra o menu de energia do sistema"
@@ -1958,11 +2471,20 @@
   "Dock & Launcher": {
     "Dock & Launcher": "Dock & Lançador"
   },
+  "Dock Opacity": {
+    "Dock Opacity": ""
+  },
   "Dock Transparency": {
     "Dock Transparency": "Transparência da Dock"
   },
   "Dock Visibility": {
     "Dock Visibility": "Visibilidade do Dock"
+  },
+  "Dock margin, opacity, and border": {
+    "Dock margin, opacity, and border": ""
+  },
+  "Dock margin, transparency, and border": {
+    "Dock margin, transparency, and border": ""
   },
   "Docs": {
     "Docs": "Documentos"
@@ -1994,11 +2516,17 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Arraste os indicadores de área de trabalho para reordená-los"
   },
+  "Draw a connected picture-frame border around the entire display": {
+    "Draw a connected picture-frame border around the entire display": ""
+  },
   "Driver": {
     "Driver": "Driver"
   },
   "Drizzle": {
     "Drizzle": "Garoa"
+  },
+  "Drop your override for %1 so the DMS default action re-applies?": {
+    "Drop your override for %1 so the DMS default action re-applies?": ""
   },
   "Duplicate": {
     "Duplicate": "Duplicar"
@@ -2030,23 +2558,59 @@
   "Dynamic colors from wallpaper": {
     "Dynamic colors from wallpaper": "Cores dinâmicas do papel de parede"
   },
+  "Dynamic colors parse error: %1": {
+    "Dynamic colors parse error: %1": ""
+  },
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Cores dinâmicas, predefinições"
+  },
+  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
   },
   "Edge Spacing": {
     "Edge Spacing": "Espaçamento de Bordas"
   },
+  "Edge the launcher slides from": {
+    "Edge the launcher slides from": ""
+  },
+  "Edit": {
+    "Edit": ""
+  },
   "Edit App": {
     "Edit App": "Editar Aplicativo"
   },
+  "Edit Clipboard": {
+    "Edit Clipboard": ""
+  },
+  "Edit Rule": {
+    "Edit Rule": ""
+  },
   "Edit Window Rule": {
     "Edit Window Rule": "Editar Regra de Janela"
+  },
+  "Edit clipboard text": {
+    "Edit clipboard text": ""
+  },
+  "Edit event": {
+    "Edit event": ""
+  },
+  "Editing changes on %1": {
+    "Editing changes on %1": ""
   },
   "Education": {
     "Education": "Educação"
   },
   "Empty": {
     "Empty": "Vázio"
+  },
+  "Empty Trash": {
+    "Empty Trash": ""
+  },
+  "Empty Trash (%1)": {
+    "Empty Trash (%1)": ""
+  },
+  "Empty Trash?": {
+    "Empty Trash?": ""
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Ativar a profundidade de cores de 10 bits para uma gama de cores mais ampla e suporte HDR"
@@ -2059,6 +2623,9 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Habilitar Não Perturbe"
+  },
+  "Enable Frame": {
+    "Enable Frame": ""
   },
   "Enable History": {
     "Enable History": "Ativar Histórico"
@@ -2144,6 +2711,9 @@
   "End": {
     "End": "Fim"
   },
+  "End must be after start": {
+    "End must be after start": ""
+  },
   "Enlarge on Hover": {
     "Enlarge on Hover": "Aumentar ao Passar o Mouse"
   },
@@ -2207,6 +2777,9 @@
   "Enterprise": {
     "Enterprise": "Enterprise"
   },
+  "Entry Type": {
+    "Entry Type": ""
+  },
   "Entry pinned": {
     "Entry pinned": "Entrada fixada"
   },
@@ -2225,11 +2798,29 @@
   "Ethernet": {
     "Ethernet": "Ethernet"
   },
+  "Event title": {
+    "Event title": ""
+  },
+  "Every 15 minutes": {
+    "Every 15 minutes": ""
+  },
+  "Every 30 minutes": {
+    "Every 30 minutes": ""
+  },
+  "Every 4 hours": {
+    "Every 4 hours": ""
+  },
+  "Every hour": {
+    "Every hour": ""
+  },
   "Exact": {
     "Exact": "Exato"
   },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "Ajuste da Zona Exclusiva"
+  },
+  "Existing Users": {
+    "Existing Users": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "Recurso Experimental"
@@ -2239,6 +2830,9 @@
   },
   "Exponential": {
     "Exponential": "Exponencial"
+  },
+  "Expose the Arcs": {
+    "Expose the Arcs": ""
   },
   "Expressive": {
     "Expressive": "Expressivo"
@@ -2254,6 +2848,12 @@
   },
   "Extra Arguments": {
     "Extra Arguments": "Argumentos Extras"
+  },
+  "Extra Bold": {
+    "Extra Bold": ""
+  },
+  "Extra Light": {
+    "Extra Light": ""
   },
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: Ativar • F10: Ajuda"
@@ -2273,14 +2873,20 @@
   "Failed to activate configuration": {
     "Failed to activate configuration": "Erro ao ativar configuração"
   },
-  "Failed to activate profile - file not found": {
-    "Failed to activate profile - file not found": "Falha ao ativar perfil - arquivo não encontrado"
-  },
   "Failed to add binds include": {
     "Failed to add binds include": "Falha ao adicionar \"include\" dos atalhos"
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "Falha ao adicionar impressora para a classe"
+  },
+  "Failed to apply GTK colors": {
+    "Failed to apply GTK colors": ""
+  },
+  "Failed to apply Qt colors": {
+    "Failed to apply Qt colors": ""
+  },
+  "Failed to apply profile": {
+    "Failed to apply profile": ""
   },
   "Failed to browse device": {
     "Failed to browse device": "Falha ao navegar no dispositivo"
@@ -2290,9 +2896,6 @@
   },
   "Failed to cancel selected job": {
     "Failed to cancel selected job": "Falha ao cancelar o trabalho selecionado"
-  },
-  "Failed to check for updates:\n%1": {
-    "Failed to check for updates:\n%1": ""
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "Falha ao verificar limite de pin"
@@ -2309,9 +2912,6 @@
   "Failed to create printer": {
     "Failed to create printer": "Falha ao criar impressora"
   },
-  "Failed to create profiles directory": {
-    "Failed to create profiles directory": "Falha ao criar diretório de perfis"
-  },
   "Failed to delete VPN": {
     "Failed to delete VPN": "Falha ao excluir VPN"
   },
@@ -2327,6 +2927,9 @@
   "Failed to disable night mode": {
     "Failed to disable night mode": "Falha ao desativar o modo noturno"
   },
+  "Failed to disable plugin: %1": {
+    "Failed to disable plugin: %1": ""
+  },
   "Failed to disconnect VPN": {
     "Failed to disconnect VPN": "Erro ao desconectar VPN"
   },
@@ -2335,6 +2938,9 @@
   },
   "Failed to disconnect WiFi": {
     "Failed to disconnect WiFi": "Erro ao disconectar WiFi"
+  },
+  "Failed to empty trash": {
+    "Failed to empty trash": ""
   },
   "Failed to enable IP location": {
     "Failed to enable IP location": "Falha ao ativar a localização IP"
@@ -2347,6 +2953,15 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Falha ao ativar o modo noturno"
+  },
+  "Failed to enable plugin: %1": {
+    "Failed to enable plugin: %1": ""
+  },
+  "Failed to fetch network QR code: %1": {
+    "Failed to fetch network QR code: %1": ""
+  },
+  "Failed to generate systemd override": {
+    "Failed to generate systemd override": ""
   },
   "Failed to hold job": {
     "Failed to hold job": "Falha ao segurar trabalho"
@@ -2366,6 +2981,9 @@
   "Failed to move job": {
     "Failed to move job": "Falha ao mover trabalho"
   },
+  "Failed to move to trash": {
+    "Failed to move to trash": ""
+  },
   "Failed to parse plugin_settings.json": {
     "Failed to parse plugin_settings.json": "Falha ao analisar plugin_settings.json"
   },
@@ -2384,8 +3002,17 @@
   "Failed to print test page": {
     "Failed to print test page": "Falha ao imprimir página de testes"
   },
+  "Failed to read theme file: %1": {
+    "Failed to read theme file: %1": ""
+  },
   "Failed to reject pairing": {
     "Failed to reject pairing": "Falha ao rejeitar pareamento"
+  },
+  "Failed to reload plugin: %1": {
+    "Failed to reload plugin: %1": ""
+  },
+  "Failed to remove QR code at %1: %2": {
+    "Failed to remove QR code at %1: %2": ""
   },
   "Failed to remove device": {
     "Failed to remove device": "Erro ao remover dispositivo"
@@ -2420,8 +3047,8 @@
   "Failed to save keybind": {
     "Failed to save keybind": "Falha ao salvar atalho"
   },
-  "Failed to save profile file": {
-    "Failed to save profile file": "Falha ao salvar arquivo de perfil"
+  "Failed to save profile": {
+    "Failed to save profile": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Falha ao enviar área de transferência"
@@ -2468,6 +3095,9 @@
   "Failed to update autoconnect": {
     "Failed to update autoconnect": "Erro ao atualizar conexão automática"
   },
+  "Failed to update clipboard": {
+    "Failed to update clipboard": ""
+  },
   "Failed to update description": {
     "Failed to update description": "Falha ao atualizar descrição"
   },
@@ -2477,8 +3107,17 @@
   "Failed to update sharing": {
     "Failed to update sharing": "Falha ao atualizar compartilhamento"
   },
+  "Failed to write autostart entry": {
+    "Failed to write autostart entry": ""
+  },
+  "Failed to write outputs config.": {
+    "Failed to write outputs config.": ""
+  },
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "Falha ao salvar arquivo temporário para validação"
+  },
+  "Failed: %1": {
+    "Failed: %1": ""
   },
   "Features": {
     "Features": "Recursos"
@@ -2507,11 +3146,23 @@
   "File Information": {
     "File Information": "Informação do Arquivo"
   },
+  "File Manager": {
+    "File Manager": ""
+  },
+  "File changed on disk": {
+    "File changed on disk": ""
+  },
+  "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
+    "File manager used to open the trash. Pick \"custom\" to enter your own command.": ""
+  },
   "File received from": {
     "File received from": "Arquivo recebido de"
   },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "Pesquisa de arquivo requer dsearch\nInstalar de github.com/morelazers/dsearch"
+  },
+  "File search unavailable": {
+    "File search unavailable": ""
   },
   "Files": {
     "Files": "Arquivos"
@@ -2522,20 +3173,23 @@
   "Fill": {
     "Fill": "Preenchimento"
   },
+  "Filter": {
+    "Filter": ""
+  },
   "Find in Text": {
     "Find in Text": "Procurar no Texto"
   },
   "Find in note...": {
     "Find in note...": "Procurar na nota..."
   },
+  "Fine-tune the space reserved for the bar from the screen edge": {
+    "Fine-tune the space reserved for the bar from the screen edge": ""
+  },
   "Fingerprint availability could not be confirmed.": {
     "Fingerprint availability could not be confirmed.": ""
   },
   "Fingerprint error": {
     "Fingerprint error": ""
-  },
-  "Fingerprint error: %1": {
-    "Fingerprint error: %1": ""
   },
   "Fingerprint not recognized (%1/%2). Please try again or use password.": {
     "Fingerprint not recognized (%1/%2). Please try again or use password.": ""
@@ -2582,11 +3236,41 @@
   "Float": {
     "Float": "Flutuante"
   },
+  "Float Anchor": {
+    "Float Anchor": ""
+  },
+  "Float X": {
+    "Float X": ""
+  },
+  "Float Y": {
+    "Float Y": ""
+  },
+  "Floating": {
+    "Floating": ""
+  },
+  "Floating Position": {
+    "Floating Position": ""
+  },
+  "Fluent": {
+    "Fluent": ""
+  },
+  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
+  },
   "Focus": {
     "Focus": "Foco"
   },
+  "Focus Ring Color": {
+    "Focus Ring Color": ""
+  },
+  "Focus Ring Off": {
+    "Focus Ring Off": ""
+  },
   "Focus at Startup": {
     "Focus at Startup": "Foco no Iniciar"
+  },
+  "Focused": {
+    "Focused": ""
   },
   "Focused Border": {
     "Focused Border": "Borda em Foco"
@@ -2599,9 +3283,6 @@
   },
   "Focused Window": {
     "Focused Window": "Janela Focada"
-  },
-  "Focused monitor only": {
-    "Focused monitor only": ""
   },
   "Fog": {
     "Fog": "Neblina"
@@ -2621,6 +3302,9 @@
   "Follow focus": {
     "Follow focus": "Seguir foco"
   },
+  "Follows the default launcher choice selected above.": {
+    "Follows the default launcher choice selected above.": ""
+  },
   "Font": {
     "Font": "Fonte"
   },
@@ -2639,11 +3323,35 @@
   "Font used on the login screen": {
     "Font used on the login screen": "Fonte usada na tela de login"
   },
+  "For 1 hour": {
+    "For 1 hour": ""
+  },
+  "For 15 minutes": {
+    "For 15 minutes": ""
+  },
+  "For 3 hours": {
+    "For 3 hours": ""
+  },
+  "For 30 minutes": {
+    "For 30 minutes": ""
+  },
+  "For 8 hours": {
+    "For 8 hours": ""
+  },
+  "For editing plain text files": {
+    "For editing plain text files": ""
+  },
+  "For reading PDF files": {
+    "For reading PDF files": ""
+  },
   "Force HDR": {
     "Force HDR": "Forçar HDR"
   },
   "Force Kill (SIGKILL)": {
     "Force Kill (SIGKILL)": "Forçar Encerramento (SIGKILL)"
+  },
+  "Force RGBX": {
+    "Force RGBX": ""
   },
   "Force Wide Color": {
     "Force Wide Color": "Forçar Cor Ampla"
@@ -2659,6 +3367,9 @@
   },
   "Forecast Not Available": {
     "Forecast Not Available": "Previsão do Tempo não Disponível"
+  },
+  "Foreground Layers": {
+    "Foreground Layers": ""
   },
   "Forever": {
     "Forever": "Para sempre"
@@ -2681,11 +3392,17 @@
   "Format Legend": {
     "Format Legend": "Formatar Legenda"
   },
-  "Found %1 package to update:": {
-    "Found %1 package to update:": ""
+  "Frame": {
+    "Frame": ""
   },
-  "Found %1 packages to update:": {
-    "Found %1 packages to update:": ""
+  "Frame Blur": {
+    "Frame Blur": ""
+  },
+  "Frame Blur follows Background Blur in Theme & Colors": {
+    "Frame Blur follows Background Blur in Theme & Colors": ""
+  },
+  "Frame Border Color": {
+    "Frame Border Color": ""
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Liberar VRAM/memória quando o lançador estiver fechado. Pode causar um pequeno atraso ao reabrir."
@@ -2699,6 +3416,9 @@
   "Fruit Salad": {
     "Fruit Salad": "Salada de Frutas"
   },
+  "Full": {
+    "Full": ""
+  },
   "Full Command:": {
     "Full Command:": "Comando Completo:"
   },
@@ -2707,6 +3427,9 @@
   },
   "Full Day & Month": {
     "Full Day & Month": "Dia e Mês Completo"
+  },
+  "Full command to execute": {
+    "Full command to execute": ""
   },
   "Full with Year": {
     "Full with Year": "Completo com Ano"
@@ -2738,6 +3461,9 @@
   "GPU temperature display": {
     "GPU temperature display": ""
   },
+  "GTK colors applied successfully": {
+    "GTK colors applied successfully": ""
+  },
   "GTK, Qt, IDEs, more": {
     "GTK, Qt, IDEs, more": "GTK, Qt, IDEs, mais"
   },
@@ -2750,6 +3476,9 @@
   "Gamma control not available. Requires DMS API v6+.": {
     "Gamma control not available. Requires DMS API v6+.": "Controle de gama não disponível. Necessário DMS API v6+."
   },
+  "Generate Override": {
+    "Generate Override": ""
+  },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": ""
   },
@@ -2761,6 +3490,9 @@
   },
   "GitHub": {
     "GitHub": "GitHub"
+  },
+  "Global fonts can be configured in Settings → Personalization": {
+    "Global fonts can be configured in Settings → Personalization": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Dimensionar globalmente todas as durações de animação"
@@ -2782,6 +3514,21 @@
   },
   "Gradually fade the screen before turning off monitors with a configurable grace period": {
     "Gradually fade the screen before turning off monitors with a configurable grace period": "Desaparecer gradualmente a tela antes de desligar monitores com um período de carência configurável"
+  },
+  "Grant": {
+    "Grant": ""
+  },
+  "Grant admin?": {
+    "Grant admin?": ""
+  },
+  "Grant administrator privileges": {
+    "Grant administrator privileges": ""
+  },
+  "Granted administrator privileges": {
+    "Granted administrator privileges": ""
+  },
+  "Granted greeter login access": {
+    "Granted greeter login access": ""
   },
   "Graph Time Range": {
     "Graph Time Range": "Intervalo de Tempo do Gráfico"
@@ -2807,6 +3554,12 @@
   "Greeter font": {
     "Greeter font": ""
   },
+  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": ""
+  },
+  "Greeter group:": {
+    "Greeter group:": ""
+  },
   "Greeter only — does not affect main clock": {
     "Greeter only — does not affect main clock": ""
   },
@@ -2827,6 +3580,9 @@
   },
   "Group": {
     "Group": "Grupo"
+  },
+  "Group Active Workspace": {
+    "Group Active Workspace": ""
   },
   "Group Workspace Apps": {
     "Group Workspace Apps": "Agrupar Aplicativos da Área de Trabalho"
@@ -2858,8 +3614,17 @@
   "HSV": {
     "HSV": "HSV"
   },
+  "HSV %1 copied": {
+    "HSV %1 copied": ""
+  },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML copiado para a área de transferência"
+  },
+  "Handles links and opens HTML files": {
+    "Handles links and opens HTML files": ""
+  },
+  "Handles mailto links": {
+    "Handles mailto links": ""
   },
   "Health": {
     "Health": "Saúde"
@@ -2887,6 +3652,9 @@
   },
   "Hibernate": {
     "Hibernate": "Hibernar"
+  },
+  "Hibernate failed": {
+    "Hibernate failed": ""
   },
   "Hidden": {
     "Hidden": "Oculto"
@@ -2918,9 +3686,6 @@
   "Hide Indicators": {
     "Hide Indicators": "Ocultar Indicadores"
   },
-  "Hide Updater Widget": {
-    "Hide Updater Widget": "Ocultar Widget de Atualização"
-  },
   "Hide When Typing": {
     "Hide When Typing": "Ocultar ao Digitar"
   },
@@ -2947,6 +3712,12 @@
   },
   "Hide on Touch": {
     "Hide on Touch": "Ocultar no Toque"
+  },
+  "Hide the bar when the pointer leaves even if a popout is still open": {
+    "Hide the bar when the pointer leaves even if a popout is still open": ""
+  },
+  "High": {
+    "High": ""
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Paleta de alta fidelidade que preserva tons da fonte."
@@ -2987,6 +3758,9 @@
   "Home": {
     "Home": "Casa"
   },
+  "Horizontal and vertical bar thickness": {
+    "Horizontal and vertical bar thickness": ""
+  },
   "Host": {
     "Host": ""
   },
@@ -3008,6 +3782,9 @@
   "Hourly Forecast Count": {
     "Hourly Forecast Count": "Contagem de Previsão por Hora"
   },
+  "How often the server polls for new updates.": {
+    "How often the server polls for new updates.": ""
+  },
   "How often to change wallpaper": {
     "How often to change wallpaper": "Tempo entre papéis de parede"
   },
@@ -3028,6 +3805,15 @@
   },
   "Hyprland Website": {
     "Hyprland Website": ""
+  },
+  "Hyprland conf mode": {
+    "Hyprland conf mode": ""
+  },
+  "Hyprland conf mode is read-only in Settings": {
+    "Hyprland conf mode is read-only in Settings": ""
+  },
+  "Hyprland config include missing": {
+    "Hyprland config include missing": ""
   },
   "I Understand": {
     "I Understand": "Entendi"
@@ -3059,8 +3845,17 @@
   "Icon Theme": {
     "Icon Theme": "Tema de Ícones"
   },
+  "Identical alerts show as one popup instead of stacking": {
+    "Identical alerts show as one popup instead of stacking": ""
+  },
+  "Identical alerts stack as separate notification cards": {
+    "Identical alerts stack as separate notification cards": ""
+  },
   "Idle": {
     "Idle": "Em espera"
+  },
+  "Idle Inhibit": {
+    "Idle Inhibit": ""
   },
   "Idle Inhibitor": {
     "Idle Inhibitor": "Inibitor de inatividade"
@@ -3068,8 +3863,8 @@
   "Idle Settings": {
     "Idle Settings": "Configurações de inatividade"
   },
-  "Idle monitoring not supported - requires newer Quickshell version": {
-    "Idle monitoring not supported - requires newer Quickshell version": "Monitoramento de inatividade não disponível – requer versão mais recente do Quickshell"
+  "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps": {
+    "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps": ""
   },
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "Se o campo está escondido, ele aparecerá no momento que uma tecla e pressionada."
@@ -3079,6 +3874,9 @@
   },
   "Image": {
     "Image": "Imagem"
+  },
+  "Image Viewer": {
+    "Image Viewer": ""
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "Imagem copiada para a área de trabalho"
@@ -3092,8 +3890,14 @@
   "Inactive Monitor Color": {
     "Inactive Monitor Color": "Cor do Monitor Inativo"
   },
+  "Include AUR updates": {
+    "Include AUR updates": ""
+  },
   "Include Files in All Tab": {
     "Include Files in All Tab": ""
+  },
+  "Include Flatpak updates": {
+    "Include Flatpak updates": ""
   },
   "Include Folders in All Tab": {
     "Include Folders in All Tab": ""
@@ -3140,6 +3944,15 @@
   "Inhibitable": {
     "Inhibitable": "Inibível"
   },
+  "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
+    "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": ""
+  },
+  "Initialised": {
+    "Initialised": ""
+  },
+  "Inner padding applied to each widget": {
+    "Inner padding applied to each widget": ""
+  },
   "Input Devices": {
     "Input Devices": "Dispositivos de Entrada"
   },
@@ -3148,6 +3961,9 @@
   },
   "Insert your security key...": {
     "Insert your security key...": ""
+  },
+  "Inset the Notepad from screen edges using the compositor's configured gaps": {
+    "Inset the Notepad from screen edges using the compositor's configured gaps": ""
   },
   "Install": {
     "Install": "Instalar"
@@ -3166,6 +3982,9 @@
   },
   "Install complete. Greeter has been installed.": {
     "Install complete. Greeter has been installed.": ""
+  },
+  "Install dsearch to search files.": {
+    "Install dsearch to search files.": ""
   },
   "Install failed: %1": {
     "Install failed: %1": "Instalação falhou: %1"
@@ -3197,6 +4016,9 @@
   "Installing: %1": {
     "Installing: %1": "Instalando: %1"
   },
+  "Integrations": {
+    "Integrations": ""
+  },
   "Intelligent Auto-hide": {
     "Intelligent Auto-hide": "Ocultação Automática Inteligente"
   },
@@ -3215,11 +4037,23 @@
   "Interval": {
     "Interval": "Intervalo"
   },
+  "Invalid JSON format: %1": {
+    "Invalid JSON format: %1": ""
+  },
   "Invalid configuration": {
     "Invalid configuration": "Configuração inválida"
   },
+  "Invalid password for %1": {
+    "Invalid password for %1": ""
+  },
+  "Invalid username": {
+    "Invalid username": ""
+  },
   "Invert on mode change": {
     "Invert on mode change": "Inverter na mudança de modo"
+  },
+  "Invert touchpad scroll direction": {
+    "Invert touchpad scroll direction": ""
   },
   "Iris Bloom": {
     "Iris Bloom": "Íris em Flor"
@@ -3238,6 +4072,15 @@
   },
   "Keep Changes": {
     "Keep Changes": "Manter Alterações"
+  },
+  "Keep My Edits": {
+    "Keep My Edits": ""
+  },
+  "Keep in Bar": {
+    "Keep in Bar": ""
+  },
+  "Keep typing": {
+    "Keep typing": ""
   },
   "Keeping Awake": {
     "Keeping Awake": "Mantendo Ligado"
@@ -3335,9 +4178,6 @@
   "Launch on dGPU": {
     "Launch on dGPU": "Inicializar na dGPU"
   },
-  "Launch on dGPU by default": {
-    "Launch on dGPU by default": ""
-  },
   "Launcher": {
     "Launcher": "Lançador"
   },
@@ -3346,6 +4186,12 @@
   },
   "Launcher Button Logo": {
     "Launcher Button Logo": "Logo do botão do Lançador"
+  },
+  "Launcher Emerge Side": {
+    "Launcher Emerge Side": ""
+  },
+  "Layer Outline Opacity": {
+    "Layer Outline Opacity": ""
   },
   "Layout": {
     "Layout": "Layout"
@@ -3364,6 +4210,9 @@
   },
   "Left Section": {
     "Left Section": "Seção da Esquerda"
+  },
+  "Light": {
+    "Light": ""
   },
   "Light Direction": {
     "Light Direction": "Direção da Luz"
@@ -3491,6 +4340,9 @@
   "Longitude": {
     "Longitude": "Longitude"
   },
+  "Low": {
+    "Low": ""
+  },
   "Low Priority": {
     "Low Priority": "Baixa Prioridade"
   },
@@ -3500,8 +4352,17 @@
   "MTU": {
     "MTU": "MTU"
   },
+  "Mail": {
+    "Mail": ""
+  },
+  "Make admin": {
+    "Make admin": ""
+  },
   "Make sure KDE Connect or Valent is running on your other devices": {
     "Make sure KDE Connect or Valent is running on your other devices": "Certifique-se de que o KDE Connect ou Valent esteja em execução em seus outros dispositivos"
+  },
+  "Make the bar background fully transparent": {
+    "Make the bar background fully transparent": ""
   },
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "Gerencia e configure plugins para extender funcionalidades do DMS"
@@ -3509,8 +4370,26 @@
   "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
     "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Gerencie até 4 configurações de barras independentes. Cada barra possui sua própria posição, widgets, estilo e atribuição de telas."
   },
+  "Managed by Frame": {
+    "Managed by Frame": ""
+  },
+  "Managed by Frame in Connected Mode": {
+    "Managed by Frame in Connected Mode": ""
+  },
   "Management": {
     "Management": "Gerenciamento"
+  },
+  "Manages calendar events": {
+    "Manages calendar events": ""
+  },
+  "Manages files and directories": {
+    "Manages files and directories": ""
+  },
+  "Mango Options": {
+    "Mango Options": ""
+  },
+  "Mango service not available": {
+    "Mango service not available": ""
   },
   "MangoWC Layout Overrides": {
     "MangoWC Layout Overrides": "Substituições de Layout MangoWC"
@@ -3527,8 +4406,14 @@
   "Manual Gap Size": {
     "Manual Gap Size": "Espaçamento Manual"
   },
+  "Manual Gaps": {
+    "Manual Gaps": ""
+  },
   "Manual Show/Hide": {
     "Manual Show/Hide": "Mostrar/Esconder Manualmente"
+  },
+  "Manual config": {
+    "Manual config": ""
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "Mapear nomes de classe de janela para nomes de ícones para exibição adequada do ícone"
@@ -3548,11 +4433,17 @@
   "Marker Waste Full": {
     "Marker Waste Full": "Coletor de Resíduos Cheio"
   },
+  "Match (%1)": {
+    "Match (%1)": ""
+  },
+  "Match Conditions": {
+    "Match Conditions": ""
+  },
   "Match Criteria": {
     "Match Criteria": "Critérios de Correspondência"
   },
-  "Matches profile: %1": {
-    "Matches profile: %1": "Perfil correspondente: %1"
+  "Material": {
+    "Material": ""
   },
   "Material Colors": {
     "Material Colors": "Cores Material"
@@ -3565,6 +4456,9 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": ""
+  },
+  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": ""
   },
   "Matugen Contrast": {
     "Matugen Contrast": ""
@@ -3598,6 +4492,9 @@
   },
   "Max Running Apps (0 = Unlimited)": {
     "Max Running Apps (0 = Unlimited)": "Máximo de Aplicativos em Execução (0 = Ilimitado)"
+  },
+  "Max Visible": {
+    "Max Visible": ""
   },
   "Max Volume": {
     "Max Volume": "Volume Máximo"
@@ -3676,9 +4573,6 @@
   },
   "Media Player Settings": {
     "Media Player Settings": "Configurações do Reprodutor de Mídia"
-  },
-  "Media Players": {
-    "Media Players": ""
   },
   "Media Players (": {
     "Media Players (": "Reprodutores de Mídia("
@@ -3785,6 +4679,9 @@
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "Monitor o qual papel de parede controla cores de tema dinâmicas"
   },
+  "Monitors in \"%1\":": {
+    "Monitors in \"%1\":": ""
+  },
   "Monochrome": {
     "Monochrome": "Monocromático"
   },
@@ -3800,8 +4697,14 @@
   "Morning": {
     "Morning": "Manhã"
   },
+  "Motion Effects": {
+    "Motion Effects": ""
+  },
   "Mount Points": {
     "Mount Points": "Pontos de Montagem"
+  },
+  "Mouse clicks pass through the bar to windows behind it": {
+    "Mouse clicks pass through the bar to windows behind it": ""
   },
   "Mouse pointer appearance": {
     "Mouse pointer appearance": "Aparência do ponteiro do mouse"
@@ -3815,11 +4718,17 @@
   "Move Widget": {
     "Move Widget": "Mover Widget"
   },
+  "Move to Trash": {
+    "Move to Trash": ""
+  },
   "Moving to Paused": {
     "Moving to Paused": "Movendo para Pausado"
   },
   "Multi-Monitor": {
     "Multi-Monitor": "Multi-Monitor"
+  },
+  "Multimedia": {
+    "Multimedia": ""
   },
   "Multiplexer": {
     "Multiplexer": ""
@@ -3832,6 +4741,9 @@
   },
   "Music": {
     "Music": "Música"
+  },
+  "Music Player": {
+    "Music Player": ""
   },
   "Mute Popups": {
     "Mute Popups": "Silenciar Popups"
@@ -3848,6 +4760,9 @@
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Paleta suave com tons sutis e calmantes."
   },
+  "My Online": {
+    "My Online": ""
+  },
   "NM not supported": {
     "NM not supported": "NM não suportado"
   },
@@ -3856,6 +4771,15 @@
   },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Ícones de Áreas de Trabalho Nomeadas"
+  },
+  "Native": {
+    "Native": ""
+  },
+  "Native: platform renderer (FreeType).": {
+    "Native: platform renderer (FreeType).": ""
+  },
+  "Natural Touchpad Scrolling": {
+    "Natural Touchpad Scrolling": ""
   },
   "Navigate": {
     "Navigate": ""
@@ -3887,6 +4811,9 @@
   "Network download and upload speed display": {
     "Network download and upload speed display": "Monitor de velocidades de download e upload da rede"
   },
+  "Network not found": {
+    "Network not found": ""
+  },
   "Neutral": {
     "Neutral": "Neutro"
   },
@@ -3917,6 +4844,9 @@
   "New York, NY": {
     "New York, NY": "Nova York, NY"
   },
+  "New event": {
+    "New event": ""
+  },
   "New group name...": {
     "New group name...": "Novo nome de grupo..."
   },
@@ -3938,6 +4868,9 @@
   "Night mode & gamma": {
     "Night mode & gamma": "Modo noturno e gama"
   },
+  "Night mode failed: DMS gamma control not available": {
+    "Night mode failed: DMS gamma control not available": ""
+  },
   "Niri Integration": {
     "Niri Integration": "Integração com niri"
   },
@@ -3958,9 +4891,6 @@
   },
   "No Background": {
     "No Background": "Sem fundo"
-  },
-  "No Battery": {
-    "No Battery": "Sem Bateria"
   },
   "No Bluetooth adapter found": {
     "No Bluetooth adapter found": "Adaptador Bluetooth não encontrado"
@@ -4019,6 +4949,9 @@
   "No active %1 sessions": {
     "No active %1 sessions": ""
   },
+  "No active session found for %1": {
+    "No active session found for %1": ""
+  },
   "No adapter": {
     "No adapter": "Sem adaptador"
   },
@@ -4027,6 +4960,9 @@
   },
   "No app customizations.": {
     "No app customizations.": "Sem personalizações de aplicativo."
+  },
+  "No application selected": {
+    "No application selected": ""
   },
   "No apps found": {
     "No apps found": "Nenhum aplicativo encontrado"
@@ -4037,11 +4973,17 @@
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
     "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Nenhum aplicativo silenciado. Clique com o botão direito em uma notificação e escolha \"Silenciar popups\" para adicionar um aqui."
   },
+  "No autostart entries": {
+    "No autostart entries": ""
+  },
   "No battery": {
     "No battery": "Sem bateria"
   },
   "No brightness devices available": {
     "No brightness devices available": "Nenhum dispositivo de brilho disponível"
+  },
+  "No calendar source available": {
+    "No calendar source available": ""
   },
   "No changes": {
     "No changes": "Nenhuma alteração"
@@ -4067,6 +5009,9 @@
   "No disk data available": {
     "No disk data available": "Nenhum dado de disco disponível"
   },
+  "No display profiles found. Create them in Settings > Displays.": {
+    "No display profiles found. Create them in Settings > Displays.": ""
+  },
   "No drivers found": {
     "No drivers found": "Nenhum driver encontrado"
   },
@@ -4087,6 +5032,9 @@
   },
   "No hidden apps.": {
     "No hidden apps.": "Sem aplicativos ocultos."
+  },
+  "No human user accounts found.": {
+    "No human user accounts found.": ""
   },
   "No info items": {
     "No info items": "Nenhum item de informação"
@@ -4115,6 +5063,9 @@
   "No matches": {
     "No matches": "Nenhuma correspondência"
   },
+  "No matching devices": {
+    "No matching devices": ""
+  },
   "No matching processes": {
     "No matching processes": "Nenhum processo correspondente"
   },
@@ -4124,14 +5075,17 @@
   "No mount points found": {
     "No mount points found": "Nenhum ponto de montagem encontrado"
   },
+  "No other active sessions on this seat": {
+    "No other active sessions on this seat": ""
+  },
   "No output device": {
     "No output device": "Sem dispositivo de saída"
   },
   "No output devices found": {
     "No output devices found": "Nenhum dispositivo de saída encontrado"
   },
-  "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": {
-    "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.": ""
+  "No peers found": {
+    "No peers found": ""
   },
   "No plugin results": {
     "No plugin results": "Sem resultados de plugin"
@@ -4157,17 +5111,32 @@
   "No recent clipboard entries found": {
     "No recent clipboard entries found": "Nenhuma entrada recente de área de transferência encontrada"
   },
+  "No reminder": {
+    "No reminder": ""
+  },
+  "No results": {
+    "No results": ""
+  },
   "No results found": {
     "No results found": "Nenhum resultado encontrado"
   },
   "No saved clipboard entries": {
     "No saved clipboard entries": "Nenhuma entrada de área de transferência salva"
   },
+  "No session selected": {
+    "No session selected": ""
+  },
   "No sessions found": {
     "No sessions found": ""
   },
   "No status output.": {
     "No status output.": ""
+  },
+  "No supported package manager found.": {
+    "No supported package manager found.": ""
+  },
+  "No terminal configured": {
+    "No terminal configured": ""
   },
   "No themes found": {
     "No themes found": "Nenhum tema encontrado"
@@ -4177,6 +5146,9 @@
   },
   "No trigger": {
     "No trigger": "Sem gatilho"
+  },
+  "No user specified": {
+    "No user specified": ""
   },
   "No video found in folder": {
     "No video found in folder": "Nenhum vídeo encontrado na pasta"
@@ -4205,8 +5177,17 @@
   "No window rules configured": {
     "No window rules configured": "Nenhuma regra de janela configurada"
   },
+  "No writable calendar available": {
+    "No writable calendar available": ""
+  },
+  "Noise": {
+    "Noise": ""
+  },
   "None": {
     "None": "Nenhum"
+  },
+  "None active": {
+    "None active": ""
   },
   "Normal": {
     "Normal": "Normal"
@@ -4232,11 +5213,17 @@
   "Not available — install or configure pam_u2f.": {
     "Not available — install or configure pam_u2f.": ""
   },
+  "Not bound": {
+    "Not bound": ""
+  },
   "Not connected": {
     "Not connected": "Não conectado"
   },
   "Not detected": {
     "Not detected": "Não detectado"
+  },
+  "Not listed?": {
+    "Not listed?": ""
   },
   "Not paired": {
     "Not paired": "Não pareado"
@@ -4253,8 +5240,14 @@
   "Notepad Font Settings": {
     "Notepad Font Settings": "Configurações da Fonte do Bloco de Notas"
   },
+  "Notepad Settings": {
+    "Notepad Settings": ""
+  },
   "Notepad Slideout": {
     "Notepad Slideout": "Blocos de Notas Deslizante"
+  },
+  "Notes": {
+    "Notes": ""
   },
   "Nothing": {
     "Nothing": "Nada"
@@ -4328,14 +5321,20 @@
   "On": {
     "On": "Ligado"
   },
+  "On indefinitely": {
+    "On indefinitely": ""
+  },
   "On-Demand": {
     "On-Demand": "Por Demanda"
   },
-  "On-Screen Displays": {
-    "On-Screen Displays": "Displays na Tela (OSDs)"
-  },
   "On-screen Displays": {
     "On-screen Displays": "Exibições OSD"
+  },
+  "Once a day": {
+    "Once a day": ""
+  },
+  "Online": {
+    "Online": ""
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Apenas ajustar gama baseada em regras de tempo ou localização."
@@ -4352,6 +5351,12 @@
   "Opacity": {
     "Opacity": "Opacidade"
   },
+  "Opacity of the bar background": {
+    "Opacity of the bar background": ""
+  },
+  "Opacity of widget backgrounds": {
+    "Opacity of widget backgrounds": ""
+  },
   "Opaque": {
     "Opaque": "Opaco"
   },
@@ -4361,14 +5366,32 @@
   "Open App": {
     "Open App": "Abrir Aplicativo"
   },
+  "Open Dir": {
+    "Open Dir": ""
+  },
+  "Open Frame": {
+    "Open Frame": ""
+  },
+  "Open From": {
+    "Open From": ""
+  },
   "Open KDE Connect on your phone": {
     "Open KDE Connect on your phone": "Abra o KDE Connect em seu telefone"
   },
   "Open Notepad File": {
     "Open Notepad File": "Abrir Arquivo do Bloco de Notas"
   },
+  "Open Trash": {
+    "Open Trash": ""
+  },
+  "Open Trash With": {
+    "Open Trash With": ""
+  },
   "Open a new note": {
     "Open a new note": "Abrir uma nova nota"
+  },
+  "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
   },
   "Open folder": {
     "Open folder": "Abrir pasta"
@@ -4397,14 +5420,29 @@
   "Opening files": {
     "Opening files": "Abrindo arquivos"
   },
+  "Opening terminal to update greetd": {
+    "Opening terminal to update greetd": ""
+  },
   "Opening terminal: ": {
     "Opening terminal: ": ""
+  },
+  "Opens a picker of other active sessions on this seat": {
+    "Opens a picker of other active sessions on this seat": ""
+  },
+  "Opens image files": {
+    "Opens image files": ""
+  },
+  "Opens the connected launcher in Connected Frame Mode.": {
+    "Opens the connected launcher in Connected Frame Mode.": ""
   },
   "Optional description": {
     "Optional description": "Descrição opcional"
   },
   "Optional location": {
     "Optional location": "Localização opcional"
+  },
+  "Optional state-based conditions applied to the first match.": {
+    "Optional state-based conditions applied to the first match.": ""
   },
   "Options": {
     "Options": "Opções"
@@ -4429,9 +5467,6 @@
   },
   "Output Area Full": {
     "Output Area Full": "Área de Saída Cheia"
-  },
-  "Output Device": {
-    "Output Device": ""
   },
   "Output Devices": {
     "Output Devices": "Dispositivos de Saída"
@@ -4466,11 +5501,17 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Substituir configurações de layout global para esta saída"
   },
+  "Override global transparency for Notepad": {
+    "Override global transparency for Notepad": ""
+  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": ""
   },
   "Override the global shadow with per-bar settings": {
     "Override the global shadow with per-bar settings": ""
+  },
+  "Override the popup gap size when auto is disabled": {
+    "Override the popup gap size when auto is disabled": ""
   },
   "Overrides": {
     "Overrides": "Sobrescritas"
@@ -4483,6 +5524,9 @@
   },
   "Overwrite": {
     "Overwrite": "Sobrescrever"
+  },
+  "Owner: %1": {
+    "Owner: %1": ""
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
     "PAM already provides fingerprint auth. Enable this to show it at login.": ""
@@ -4498,6 +5542,9 @@
   },
   "PAM provides fingerprint auth, but no reader was detected.": {
     "PAM provides fingerprint auth, but no reader was detected.": ""
+  },
+  "PDF Reader": {
+    "PDF Reader": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -4550,11 +5597,29 @@
   "Password": {
     "Password": "Senha"
   },
+  "Password cannot be empty": {
+    "Password cannot be empty": ""
+  },
+  "Password change failed (exit %1)": {
+    "Password change failed (exit %1)": ""
+  },
+  "Password set": {
+    "Password set": ""
+  },
+  "Password updated": {
+    "Password updated": ""
+  },
   "Password...": {
     "Password...": ""
   },
+  "Passwords do not match.": {
+    "Passwords do not match.": ""
+  },
   "Paste": {
     "Paste": "Colar"
+  },
+  "Path copied to clipboard": {
+    "Path copied to clipboard": ""
   },
   "Path to a video file or folder containing videos": {
     "Path to a video file or folder containing videos": "Caminho para um arquivo de vídeo ou pasta de vídeos"
@@ -4592,6 +5657,9 @@
   "Performance": {
     "Performance": "Desempenho"
   },
+  "Permanently delete %1 item(s)? This cannot be undone.": {
+    "Permanently delete %1 item(s)? This cannot be undone.": ""
+  },
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "Permissão negada ao definir imagem de perfil."
   },
@@ -4607,8 +5675,17 @@
   "Phone number": {
     "Phone number": "Número de telefone"
   },
+  "Pick a different file manager in Settings → Dock → Trash.": {
+    "Pick a different file manager in Settings → Dock → Trash.": ""
+  },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": ""
+  },
+  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
+    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": ""
+  },
+  "Pick how long to pause notifications": {
+    "Pick how long to pause notifications": ""
   },
   "Pictures": {
     "Pictures": "Imagens"
@@ -4637,11 +5714,20 @@
   "Pixelate": {
     "Pixelate": "Pixelizar"
   },
+  "Place a trash bin at the end of the dock": {
+    "Place a trash bin at the end of the dock": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Use este local para os diretórios de plugin. Cada plugin deve ter um arquivo de manifesto plugin.json."
   },
   "Place plugins in %1": {
     "Place plugins in %1": "Coloque plugins em %1"
+  },
+  "Place the bar on the Wayland overlay layer": {
+    "Place the bar on the Wayland overlay layer": ""
+  },
+  "Place the dock on the Wayland overlay layer": {
+    "Place the dock on the Wayland overlay layer": ""
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
@@ -4667,6 +5753,12 @@
   "Playback error: ": {
     "Playback error: ": ""
   },
+  "Plays audio files": {
+    "Plays audio files": ""
+  },
+  "Plays video files": {
+    "Plays video files": ""
+  },
   "Please wait...": {
     "Please wait...": "Aguarde..."
   },
@@ -4675,9 +5767,6 @@
   },
   "Plugged In": {
     "Plugged In": "Conectado"
-  },
-  "Plugged in": {
-    "Plugged in": "Conectado"
   },
   "Plugin": {
     "Plugin": "Plugin"
@@ -4691,14 +5780,35 @@
   "Plugin Visibility": {
     "Plugin Visibility": "Visibilidade do Plugin"
   },
+  "Plugin disabled: %1": {
+    "Plugin disabled: %1": ""
+  },
+  "Plugin enabled: %1": {
+    "Plugin enabled: %1": ""
+  },
   "Plugin is disabled - enable in Plugins settings to use": {
     "Plugin is disabled - enable in Plugins settings to use": "Plugin está desativado - ative em configurações de Plugins para usar"
+  },
+  "Plugin reloaded: %1": {
+    "Plugin reloaded: %1": ""
+  },
+  "Plugin uninstalled: %1": {
+    "Plugin uninstalled: %1": ""
+  },
+  "Plugin updated: %1": {
+    "Plugin updated: %1": ""
   },
   "Plugins": {
     "Plugins": "Plugins"
   },
   "Pointer": {
     "Pointer": "Ponteiro"
+  },
+  "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
+    "Polkit integration is disabled. User management requires Polkit to elevate privileges.": ""
+  },
+  "Popout": {
+    "Popout": ""
   },
   "Popout Shadows": {
     "Popout Shadows": ""
@@ -4717,9 +5827,6 @@
   },
   "Popup Shadow": {
     "Popup Shadow": "Sombra do Popup"
-  },
-  "Popup Transparency": {
-    "Popup Transparency": "Transparência do Popup"
   },
   "Popup behavior, position": {
     "Popup behavior, position": "Comportamento de pop-up, posição"
@@ -4753,6 +5860,9 @@
   },
   "Power Menu Customization": {
     "Power Menu Customization": "Customização do Menu de Energia"
+  },
+  "Power Mode": {
+    "Power Mode": ""
   },
   "Power Off": {
     "Power Off": "Desligar"
@@ -4904,17 +6014,32 @@
   "Profile not found": {
     "Profile not found": "Perfil não encontrado"
   },
+  "Profile not found in monitors.json": {
+    "Profile not found in monitors.json": ""
+  },
   "Profile saved: %1": {
     "Profile saved: %1": "Perfil salvo: %1"
   },
   "Protocol": {
     "Protocol": "Protocolo"
   },
+  "Qt": {
+    "Qt": ""
+  },
+  "Qt colors applied successfully": {
+    "Qt colors applied successfully": ""
+  },
+  "Qt: distance-field renderer.": {
+    "Qt: distance-field renderer.": ""
+  },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia não está disponível"
   },
   "QtMultimedia is not available - video screensaver requires qt multimedia services": {
     "QtMultimedia is not available - video screensaver requires qt multimedia services": ""
+  },
+  "Quality": {
+    "Quality": ""
   },
   "Quick Access": {
     "Quick Access": "Acesso Rápido"
@@ -4955,6 +6080,12 @@
   "Rate": {
     "Rate": "Taxa"
   },
+  "Re-enter password": {
+    "Re-enter password": ""
+  },
+  "Read-only legacy config": {
+    "Read-only legacy config": ""
+  },
   "Read:": {
     "Read:": "Leitura:"
   },
@@ -4963,6 +6094,9 @@
   },
   "Reboot": {
     "Reboot": "Reiniciar"
+  },
+  "Recent": {
+    "Recent": ""
   },
   "Recent Colors": {
     "Recent Colors": "Cores Recentes"
@@ -4979,8 +6113,14 @@
   "Refresh Weather": {
     "Refresh Weather": "Atualizar Clima"
   },
+  "Refreshing...": {
+    "Refreshing...": ""
+  },
   "Regex": {
     "Regex": "Regex"
+  },
+  "Regular": {
+    "Regular": ""
   },
   "Reject": {
     "Reject": "Rejeitar"
@@ -4991,6 +6131,9 @@
   "Release": {
     "Release": "Soltar"
   },
+  "Reload From Disk": {
+    "Reload From Disk": ""
+  },
   "Reload Plugin": {
     "Reload Plugin": "Reiniciar Plugin"
   },
@@ -4999,6 +6142,9 @@
   },
   "Remaining / Total": {
     "Remaining / Total": "Restante / Total"
+  },
+  "Remember Last Mode": {
+    "Remember Last Mode": ""
   },
   "Remember Last Query": {
     "Remember Last Query": ""
@@ -5009,14 +6155,56 @@
   "Remember last user": {
     "Remember last user": "Lembrar último usuário"
   },
+  "Reminder": {
+    "Reminder": ""
+  },
   "Remove": {
     "Remove": "Remover"
+  },
+  "Remove \"%1\" from the %2 group?": {
+    "Remove \"%1\" from the %2 group?": ""
+  },
+  "Remove Shortcut?": {
+    "Remove Shortcut?": ""
   },
   "Remove Widget Padding": {
     "Remove Widget Padding": "Remover Preenchimento de Widgets"
   },
+  "Remove admin": {
+    "Remove admin": ""
+  },
+  "Remove admin?": {
+    "Remove admin?": ""
+  },
+  "Remove corner rounding from the bar": {
+    "Remove corner rounding from the bar": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Remover espaçámentos e borda quando janelas estão maximizadas"
+  },
+  "Remove greeter access?": {
+    "Remove greeter access?": ""
+  },
+  "Remove greeter login access": {
+    "Remove greeter login access": ""
+  },
+  "Remove inner padding from all widgets": {
+    "Remove inner padding from all widgets": ""
+  },
+  "Remove match": {
+    "Remove match": ""
+  },
+  "Remove the shortcut %1?": {
+    "Remove the shortcut %1?": ""
+  },
+  "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
+    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": ""
+  },
+  "Removed administrator privileges": {
+    "Removed administrator privileges": ""
+  },
+  "Removed greeter login access": {
+    "Removed greeter login access": ""
   },
   "Rename": {
     "Rename": "Renomear"
@@ -5054,14 +6242,20 @@
   "Requires DMS %1": {
     "Requires DMS %1": "Requer DMS %1"
   },
-  "Requires DWL compositor": {
-    "Requires DWL compositor": "Requer o compositor DWL"
+  "Requires DMS server with sysupdate capability": {
+    "Requires DMS server with sysupdate capability": ""
+  },
+  "Requires MangoWC compositor": {
+    "Requires MangoWC compositor": ""
   },
   "Requires a newer version of Quickshell": {
     "Requires a newer version of Quickshell": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Requer suporte a modo noturno"
+  },
+  "Requires remembering the last user and session. Enable those options first.": {
+    "Requires remembering the last user and session. Enable those options first.": ""
   },
   "Reset": {
     "Reset": "Resetar"
@@ -5072,11 +6266,23 @@
   "Reset Size": {
     "Reset Size": "Restaurar Tamanho"
   },
+  "Reset to Default?": {
+    "Reset to Default?": ""
+  },
+  "Reset to default": {
+    "Reset to default": ""
+  },
   "Reset to default name": {
     "Reset to default name": "Redefinir para o nome padrão"
   },
   "Resize Widget": {
     "Resize Widget": "Redimensionar Widget"
+  },
+  "Resize on Border": {
+    "Resize on Border": ""
+  },
+  "Resize windows by dragging their edges with the mouse": {
+    "Resize windows by dragging their edges with the mouse": ""
   },
   "Resolution & Refresh": {
     "Resolution & Refresh": "Resolução & Taxa de Atualização"
@@ -5096,8 +6302,14 @@
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": ""
   },
+  "Restore the last selected mode (tab) when the launcher is opened": {
+    "Restore the last selected mode (tab) when the launcher is opened": ""
+  },
   "Resume": {
     "Resume": "Resumir"
+  },
+  "Reveal the arcs where surfaces meet the frame": {
+    "Reveal the arcs where surfaces meet the frame": ""
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Inverter Direção do Scroll"
@@ -5144,12 +6356,6 @@
   "Rounded corners for windows": {
     "Rounded corners for windows": "Cantos arredondados para janelas"
   },
-  "Rounded corners for windows (border_radius)": {
-    "Rounded corners for windows (border_radius)": "Cantos arredondados para janelas (border_radius)"
-  },
-  "Rounded corners for windows (decoration.rounding)": {
-    "Rounded corners for windows (decoration.rounding)": "Cantos arredondados para janelas (decoration.rounding)"
-  },
   "Rule": {
     "Rule": "Regra"
   },
@@ -5158,6 +6364,9 @@
   },
   "Rules (%1)": {
     "Rules (%1)": "Regras (%1)"
+  },
+  "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.": {
+    "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.": ""
   },
   "Run Again": {
     "Run Again": "Executar Novamente"
@@ -5174,14 +6383,20 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "Rodar um comando do shell (ex. notify-send)"
   },
+  "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
+    "Run paru/yay with AUR enabled when 'Update All' is clicked.": ""
+  },
   "Running Apps": {
     "Running Apps": "Apps Em Execução"
   },
   "Running Apps Settings": {
     "Running Apps Settings": "Configurações de Apps em Execução"
   },
-  "Running greeter sync…": {
-    "Running greeter sync…": ""
+  "Running greeter sync...": {
+    "Running greeter sync...": ""
+  },
+  "Running in terminal": {
+    "Running in terminal": ""
   },
   "SDR Brightness": {
     "SDR Brightness": "Brilho SDR"
@@ -5192,6 +6407,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "Saturation": {
+    "Saturation": ""
+  },
   "Save": {
     "Save": "Salvar"
   },
@@ -5200,6 +6418,12 @@
   },
   "Save QR Code": {
     "Save QR Code": "Salvar Código QR"
+  },
+  "Save and close": {
+    "Save and close": ""
+  },
+  "Save and paste": {
+    "Save and paste": ""
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Salvar e alternar entre configurações de exibição"
@@ -5234,6 +6458,9 @@
   "Saving...": {
     "Saving...": "Salvando..."
   },
+  "Saving…": {
+    "Saving…": ""
+  },
   "Scale": {
     "Scale": "Escala"
   },
@@ -5260,9 +6487,6 @@
   },
   "Score": {
     "Score": "Pontuação"
-  },
-  "Screen Sharing": {
-    "Screen Sharing": "Compartilhamento de Tela"
   },
   "Screen sharing": {
     "Screen sharing": "Compartilhamento de tela"
@@ -5297,11 +6521,20 @@
   "Search Options": {
     "Search Options": "Opções de Pesquisa"
   },
+  "Search applications...": {
+    "Search applications...": ""
+  },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
     "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Buscar por combinação de teclas, descrição ou nome de ação.\n\nA ação padrão copia o atalho para a área de transferência.\nClique com o botão direito ou pressione Seta para a Direita para fixar atalhos usados com frequência - eles aparecerão no topo quando não estiver pesquisando."
   },
+  "Search devices...": {
+    "Search devices...": ""
+  },
   "Search for a location...": {
     "Search for a location...": "Procurar um local..."
+  },
+  "Search installed plugins...": {
+    "Search installed plugins...": ""
   },
   "Search keybinds...": {
     "Search keybinds...": "Pesquisar atalhos..."
@@ -5326,6 +6559,9 @@
   },
   "Search...": {
     "Search...": "Buscar..."
+  },
+  "Searching": {
+    "Searching": ""
   },
   "Searching...": {
     "Searching...": "Pesquisando..."
@@ -5390,6 +6626,9 @@
   "Select a color from the palette or use custom sliders": {
     "Select a color from the palette or use custom sliders": "Escolha uma cor na paleta ou use controles deslizantes"
   },
+  "Select a desktop application": {
+    "Select a desktop application": ""
+  },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Selecione um widget para adicionar à sua área de trabalho. Cada widget é uma instância separada com suas próprias configurações."
   },
@@ -5398,6 +6637,9 @@
   },
   "Select a window...": {
     "Select a window...": "Selecionar uma janela..."
+  },
+  "Select an active session to switch to. The current session stays running in the background.": {
+    "Select an active session to switch to. The current session stays running in the background.": ""
   },
   "Select an image file...": {
     "Select an image file...": "Selecione um arquivo de imagem..."
@@ -5438,6 +6680,9 @@
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Selecione o algoritmo usado para cores baseadas no papel de parede"
   },
+  "Select user...": {
+    "Select user...": ""
+  },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Selecionar quais provedores de combinações de teclas incluir"
   },
@@ -5464,6 +6709,9 @@
   },
   "Sending": {
     "Sending": "Enviando"
+  },
+  "Separate": {
+    "Separate": ""
   },
   "Separator": {
     "Separator": "Separador"
@@ -5492,14 +6740,29 @@
   "Set different wallpapers for light and dark mode": {
     "Set different wallpapers for light and dark mode": "Use papéis de parede diferentes para modos claro e escuro"
   },
+  "Set initial password": {
+    "Set initial password": ""
+  },
   "Set key and action to save": {
     "Set key and action to save": "Definir chave e ação para salvar"
   },
   "Set notification rules": {
     "Set notification rules": "Definir regras de notificação"
   },
+  "Set the font size for notification body text (htmlBody)": {
+    "Set the font size for notification body text (htmlBody)": ""
+  },
+  "Set the font size for notification summary text": {
+    "Set the font size for notification summary text": ""
+  },
+  "Setting": {
+    "Setting": ""
+  },
   "Settings": {
     "Settings": "Configurações"
+  },
+  "Settings Search": {
+    "Settings Search": ""
   },
   "Settings are read-only. Changes will not persist.": {
     "Settings are read-only. Changes will not persist.": "Configurações são somente leitura. Mudanças não serão mantidas."
@@ -5518,6 +6781,9 @@
   },
   "Shadow Override": {
     "Shadow Override": ""
+  },
+  "Shadow blur radius in pixels": {
+    "Shadow blur radius in pixels": ""
   },
   "Shadow elevation on bars and panels": {
     "Shadow elevation on bars and panels": ""
@@ -5549,17 +6815,11 @@
   "Shell": {
     "Shell": "Shell"
   },
-  "Shift+Del: Clear All • Esc: Close": {
-    "Shift+Del: Clear All • Esc: Close": "Shift+Del: Apagar tudo • Esc: Fechar"
+  "Shift+Enter to copy": {
+    "Shift+Enter to copy": ""
   },
   "Shift+Enter to paste": {
     "Shift+Enter to paste": "Shift+Enter para colar"
-  },
-  "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": {
-    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Shift+Enter: Copiar • Shift+Del: Limpar Tudo • Esc: Fechar"
-  },
-  "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
-    "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": "Shift+Enter: Colar • Shift+Del: Limpar Tudo • Esc: Fechar"
   },
   "Short": {
     "Short": "Curto"
@@ -5581,6 +6841,9 @@
   },
   "Show All Tags": {
     "Show All Tags": "Mostrar Todas as Tags"
+  },
+  "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": {
+    "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": ""
   },
   "Show Badge": {
     "Show Badge": "Mostrar Distintivo"
@@ -5630,6 +6893,9 @@
   "Show Humidity": {
     "Show Humidity": "Mostrar Umidade"
   },
+  "Show Icon": {
+    "Show Icon": ""
+  },
   "Show Launcher Button": {
     "Show Launcher Button": "Mostrar Botão do Launcher"
   },
@@ -5659,6 +6925,9 @@
   },
   "Show Memory in GB": {
     "Show Memory in GB": ""
+  },
+  "Show Mode Chips": {
+    "Show Mode Chips": ""
   },
   "Show Network": {
     "Show Network": "Mostrar Rede"
@@ -5711,6 +6980,9 @@
   "Show Swap": {
     "Show Swap": ""
   },
+  "Show Switch User": {
+    "Show Switch User": ""
+  },
   "Show System Date": {
     "Show System Date": "Mostrar Data do Sistema"
   },
@@ -5722,6 +6994,9 @@
   },
   "Show Top Processes": {
     "Show Top Processes": "Mostrar Processos Principais"
+  },
+  "Show Trash in Dock": {
+    "Show Trash in Dock": ""
   },
   "Show Weather Condition": {
     "Show Weather Condition": "Mostrar Condição do Tempo"
@@ -5738,8 +7013,11 @@
   "Show Workspace Apps": {
     "Show Workspace Apps": "Mostrar Aplicativos da Área de Trabalho Virtual"
   },
-  "Show all 9 tags instead of only occupied tags (DWL only)": {
-    "Show all 9 tags instead of only occupied tags (DWL only)": "Mostrar todas as 9 tags ao invés de apenas tags ocupadas (apenas DWL)"
+  "Show a bar that drains as the popup's auto-dismiss timer runs": {
+    "Show a bar that drains as the popup's auto-dismiss timer runs": ""
+  },
+  "Show all 9 tags instead of only occupied tags": {
+    "Show all 9 tags instead of only occupied tags": ""
   },
   "Show an outline ring around the focused workspace indicator": {
     "Show an outline ring around the focused workspace indicator": "Mostrar um anel de contorno ao redor do indicador de espaço de trabalho em foco"
@@ -5759,6 +7037,12 @@
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": ""
   },
+  "Show during Niri overview": {
+    "Show during Niri overview": ""
+  },
+  "Show foreground surfaces on blurred panels for stronger contrast": {
+    "Show foreground surfaces on blurred panels for stronger contrast": ""
+  },
   "Show in GB": {
     "Show in GB": ""
   },
@@ -5767,6 +7051,9 @@
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Mostrar guias de modo e dicas de teclado na parte inferior."
+  },
+  "Show mount path": {
+    "Show mount path": ""
   },
   "Show notification popups only on the currently focused monitor": {
     "Show notification popups only on the currently focused monitor": ""
@@ -5819,8 +7106,11 @@
   "Show on-screen display when volume changes": {
     "Show on-screen display when volume changes": "Mostrar aviso na tela quando o volume mudar"
   },
-  "Show seconds": {
-    "Show seconds": ""
+  "Show the bar only when no windows are open": {
+    "Show the bar only when no windows are open": ""
+  },
+  "Show the bar when niri overview is active": {
+    "Show the bar when niri overview is active": ""
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Mostrar informação de clima na barra superior e na central de controle"
@@ -5861,6 +7151,15 @@
   "Signal:": {
     "Signal:": "Sinal:"
   },
+  "Silence for a while": {
+    "Silence for a while": ""
+  },
+  "Silence notifications": {
+    "Silence notifications": ""
+  },
+  "Single-Line Popup": {
+    "Single-Line Popup": ""
+  },
   "Size": {
     "Size": "Tamanho"
   },
@@ -5881,6 +7180,12 @@
   },
   "Skip setup": {
     "Skip setup": "Pular configuração"
+  },
+  "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": {
+    "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": ""
+  },
+  "Slideout": {
+    "Slideout": ""
   },
   "Small": {
     "Small": "Pequeno"
@@ -5915,14 +7220,14 @@
   "Sounds": {
     "Sounds": "Sons"
   },
+  "Source: %1": {
+    "Source: %1": ""
+  },
+  "Space between the bar and screen edges": {
+    "Space between the bar and screen edges": ""
+  },
   "Space between windows": {
     "Space between windows": "Espaço entre janelas"
-  },
-  "Space between windows (gappih/gappiv/gappoh/gappov)": {
-    "Space between windows (gappih/gappiv/gappoh/gappov)": "Espaço entre janelas (gappih/gappiv/gappoh/gappov)"
-  },
-  "Space between windows (gaps_in and gaps_out)": {
-    "Space between windows (gaps_in and gaps_out)": "Espaço entre janelas (gaps_in e gaps_out)"
   },
   "Spacer": {
     "Spacer": "Espaçador"
@@ -5939,6 +7244,18 @@
   "Spool Area Full": {
     "Spool Area Full": "Área de Spool Cheia"
   },
+  "Spotlight": {
+    "Spotlight": ""
+  },
+  "Spotlight Bar": {
+    "Spotlight Bar": ""
+  },
+  "Spotlight Bar Shortcut": {
+    "Spotlight Bar Shortcut": ""
+  },
+  "Spotlight Search": {
+    "Spotlight Search": ""
+  },
   "Square Corners": {
     "Square Corners": "Cantos Retos"
   },
@@ -5947,6 +7264,9 @@
   },
   "Standard": {
     "Standard": "Padrão"
+  },
+  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": ""
   },
   "Start": {
     "Start": "Iniciar"
@@ -5978,11 +7298,23 @@
   "Stretch": {
     "Stretch": "Esticar"
   },
+  "Stretch widget icons to fill the available bar height": {
+    "Stretch widget icons to fill the available bar height": ""
+  },
+  "Stretch widget text to fill the available bar height": {
+    "Stretch widget text to fill the available bar height": ""
+  },
+  "Strict auto-hide": {
+    "Strict auto-hide": ""
+  },
   "Stripes": {
     "Stripes": "Listras"
   },
   "Summary": {
     "Summary": "Resumo"
+  },
+  "Summary Font Size": {
+    "Summary Font Size": ""
   },
   "Sunrise": {
     "Sunrise": "Nascer do Sol"
@@ -5990,14 +7322,29 @@
   "Sunset": {
     "Sunset": "Pôr do Sol"
   },
+  "Suppress Duplicate Notifications": {
+    "Suppress Duplicate Notifications": ""
+  },
   "Suppress notification popups while enabled": {
     "Suppress notification popups while enabled": "Suprimir pop-ups de notificação enquanto ativado"
   },
   "Surface": {
     "Surface": "Superfície"
   },
+  "Surface Behavior": {
+    "Surface Behavior": ""
+  },
+  "Surface Opacity": {
+    "Surface Opacity": ""
+  },
   "Surface Variant": {
     "Surface Variant": "Variante de Superfície"
+  },
+  "Surfaces emerge flush from the bar": {
+    "Surfaces emerge flush from the bar": ""
+  },
+  "Surfaces float independently of the frame": {
+    "Surfaces float independently of the frame": ""
   },
   "Suspend": {
     "Suspend": "Suspender"
@@ -6016,6 +7363,9 @@
   },
   "Switch User": {
     "Switch User": "Trocar Usuário"
+  },
+  "Switch between display configurations": {
+    "Switch between display configurations": ""
   },
   "Switch to power profile": {
     "Switch to power profile": "Trocar para perfil de energia"
@@ -6071,6 +7421,9 @@
   "System Tray": {
     "System Tray": "Bandeja do Sistema"
   },
+  "System Tray Icon Tint": {
+    "System Tray Icon Tint": ""
+  },
   "System Update": {
     "System Update": "Atualização do Sistema"
   },
@@ -6092,8 +7445,8 @@
   "System toast notifications": {
     "System toast notifications": "Notificações toast do sistema"
   },
-  "System update custom command": {
-    "System update custom command": "Comando personalizado para atualização do sistema"
+  "Systemd Override generated": {
+    "Systemd Override generated": ""
   },
   "Tab": {
     "Tab": "Aba"
@@ -6101,11 +7454,26 @@
   "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
     "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Navegação • ←→↑↓: Navegação em Grade • Enter/Espaço: Selecionar"
   },
+  "Tags": {
+    "Tags": ""
+  },
+  "Tags: %1": {
+    "Tags: %1": ""
+  },
+  "Tailscale": {
+    "Tailscale": ""
+  },
+  "Tailscale Network": {
+    "Tailscale Network": ""
+  },
+  "Tailscale not available": {
+    "Tailscale not available": ""
+  },
   "Terminal": {
     "Terminal": ""
   },
-  "Terminal custom additional parameters": {
-    "Terminal custom additional parameters": "Parâmetros adicionais para o terminal"
+  "Terminal additional parameters": {
+    "Terminal additional parameters": ""
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
@@ -6149,6 +7517,12 @@
   "Text Color": {
     "Text Color": ""
   },
+  "Text Editor": {
+    "Text Editor": ""
+  },
+  "Text Rendering": {
+    "Text Rendering": ""
+  },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "A ferramenta 'dgop' é necessária para monitoramento do sistema.\nPor favor, instale o dgop para usar este recurso."
   },
@@ -6164,6 +7538,9 @@
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "A fila de trabalhos dessa impressora está vazia"
   },
+  "The rule applies to any window matching one of these.": {
+    "The rule applies to any window matching one of these.": ""
+  },
   "Theme & Colors": {
     "Theme & Colors": "Tema & Cores"
   },
@@ -6173,11 +7550,26 @@
   "Theme Registry": {
     "Theme Registry": "Registro de Tema"
   },
+  "Theme color used for the border": {
+    "Theme color used for the border": ""
+  },
+  "Theme color used for the widget outline": {
+    "Theme color used for the widget outline": ""
+  },
+  "Theme worker failed (%1)": {
+    "Theme worker failed (%1)": ""
+  },
   "Themes": {
     "Themes": "Temas"
   },
+  "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
+    "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": ""
+  },
   "Thickness": {
     "Thickness": "Espessura"
+  },
+  "Thin": {
+    "Thin": ""
   },
   "Third-Party Plugin Warning": {
     "Third-Party Plugin Warning": "Aviso Sobre Plugins de Terceiros"
@@ -6188,8 +7580,26 @@
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "Esta vinculação é substituída pela configuração do config.kdl"
   },
+  "This device": {
+    "This device": ""
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.": ""
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": ""
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": ""
+  },
+  "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.": {
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.": ""
+  },
   "This may take a few seconds": {
     "This may take a few seconds": "Isso pode levar alguns segundos"
+  },
+  "This output is disabled in the current profile": {
+    "This output is disabled in the current profile": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Este plugin não possui permissão de 'settings_write'.\n\nAdicione \"permissions\": [\"settings_read\", \"settings_write\"] ao plugin.json"
@@ -6242,17 +7652,20 @@
   "Time Format": {
     "Time Format": "Formato de Tempo"
   },
-  "Time format": {
-    "Time format": ""
-  },
   "Time remaining: %1": {
     "Time remaining: %1": "Tempo restante: %1"
+  },
+  "Time to wait before hiding after the pointer leaves": {
+    "Time to wait before hiding after the pointer leaves": ""
   },
   "Time until full: %1": {
     "Time until full: %1": "Tempo até o carregamento completo: %1"
   },
   "Timed Out": {
     "Timed Out": "Tempo Limite Esgotado"
+  },
+  "Timeout Progress Bar": {
+    "Timeout Progress Bar": ""
   },
   "Timeout for critical priority notifications": {
     "Timeout for critical priority notifications": "Tempo limite para notificações de prioridade crítica"
@@ -6263,14 +7676,29 @@
   "Timeout for normal priority notifications": {
     "Timeout for normal priority notifications": "Tempo limite para notificações de prioridade normal"
   },
+  "Tint Saturation": {
+    "Tint Saturation": ""
+  },
+  "Tint Strength": {
+    "Tint Strength": ""
+  },
   "Title": {
     "Title": "Título"
+  },
+  "Title (optional)": {
+    "Title (optional)": ""
+  },
+  "Title is required": {
+    "Title is required": ""
   },
   "Title regex (optional)": {
     "Title regex (optional)": "Regex de Título (opcional)"
   },
   "To Full": {
     "To Full": "Para completar"
+  },
+  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
+    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": ""
   },
   "To update, run the following command:": {
     "To update, run the following command:": "Para atualizar, execute o seguinte comando:"
@@ -6283,6 +7711,12 @@
   },
   "Today": {
     "Today": "Hoje"
+  },
+  "Toggle bar visibility manually via IPC": {
+    "Toggle bar visibility manually via IPC": ""
+  },
+  "Toggle fonts": {
+    "Toggle fonts": ""
   },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Alternar visibilidade dessa configuração de barra"
@@ -6353,6 +7787,24 @@
   "Transparency": {
     "Transparency": "Transparência"
   },
+  "Transparency of the border": {
+    "Transparency of the border": ""
+  },
+  "Transparency of the shadow layer": {
+    "Transparency of the shadow layer": ""
+  },
+  "Transparency of the widget outline": {
+    "Transparency of the widget outline": ""
+  },
+  "Trash": {
+    "Trash": ""
+  },
+  "Trash command failed (exit %1)": {
+    "Trash command failed (exit %1)": ""
+  },
+  "Tray Icon Fix": {
+    "Tray Icon Fix": ""
+  },
   "Trending GIFs": {
     "Trending GIFs": "GIFs em alta"
   },
@@ -6374,17 +7826,35 @@
   "Try a different search": {
     "Try a different search": "Tente uma pesquisa diferente"
   },
+  "Try a different search or switch filters.": {
+    "Try a different search or switch filters.": ""
+  },
+  "Turn off": {
+    "Turn off": ""
+  },
+  "Turn off Do Not Disturb": {
+    "Turn off Do Not Disturb": ""
+  },
   "Turn off all displays immediately when the lock screen activates": {
     "Turn off all displays immediately when the lock screen activates": "Desligar todos os monitores imediatamente quando a tela de bloqueio for ativada"
   },
   "Turn off monitors after": {
     "Turn off monitors after": "Desligar monitores depois de"
   },
+  "Turn off monitors after lock": {
+    "Turn off monitors after lock": ""
+  },
+  "Turn off now": {
+    "Turn off now": ""
+  },
   "Type": {
     "Type": "Tipo"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Digite pelo menos 2 caracteres"
+  },
+  "Type at least 2 characters to search files.": {
+    "Type at least 2 characters to search files.": ""
   },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": "Digite este prefixo para pesquisar combinações de teclas"
@@ -6400,6 +7870,9 @@
   },
   "Unavailable": {
     "Unavailable": "Indisponível"
+  },
+  "Uncategorized": {
+    "Uncategorized": ""
   },
   "Unfocused Color": {
     "Unfocused Color": "Cor sem Foco"
@@ -6494,6 +7967,21 @@
   "Unsaved note...": {
     "Unsaved note...": "Nota não salva..."
   },
+  "Unset": {
+    "Unset": ""
+  },
+  "Until %1": {
+    "Until %1": ""
+  },
+  "Until 8 AM": {
+    "Until 8 AM": ""
+  },
+  "Until I turn it off": {
+    "Until I turn it off": ""
+  },
+  "Until tomorrow, 8:00 AM": {
+    "Until tomorrow, 8:00 AM": ""
+  },
   "Untitled": {
     "Untitled": "Sem título"
   },
@@ -6512,11 +8000,20 @@
   "Update Plugin": {
     "Update Plugin": "Atualizar Plugin"
   },
+  "Update failed: %1": {
+    "Update failed: %1": ""
+  },
+  "Upgrading...": {
+    "Upgrading...": ""
+  },
   "Uptime": {
     "Uptime": "Tempo de Atividade"
   },
   "Uptime:": {
     "Uptime:": "Tempo de Atividade:"
+  },
+  "Urgent": {
+    "Urgent": ""
   },
   "Urgent Color": {
     "Urgent Color": "Cor Urgente"
@@ -6533,6 +8030,9 @@
   "Use Grid Layout": {
     "Use Grid Layout": "Usar Layout em Grade"
   },
+  "Use HH:MM time format": {
+    "Use HH:MM time format": ""
+  },
   "Use IP Location": {
     "Use IP Location": "Usar Localização do Endereço IP"
   },
@@ -6548,11 +8048,17 @@
   "Use Monospace Font": {
     "Use Monospace Font": "Usar Fonte Monoespaçada"
   },
+  "Use Overlay Layer": {
+    "Use Overlay Layer": ""
+  },
   "Use System Theme": {
     "Use System Theme": "Usar Tema do Sistema"
   },
   "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
     "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": ""
+  },
+  "Use a custom radius for goth corner cutouts": {
+    "Use a custom radius for goth corner cutouts": ""
   },
   "Use a fixed shadow direction for this bar": {
     "Use a fixed shadow direction for this bar": ""
@@ -6572,23 +8078,20 @@
   "Use custom border/focus-ring width": {
     "Use custom border/focus-ring width": "Usar largura de borda/anel de foco personalizada"
   },
-  "Use custom command for update your system": {
-    "Use custom command for update your system": "Usar comando personalizado para atualizar seu sistema"
-  },
   "Use custom gaps instead of bar spacing": {
     "Use custom gaps instead of bar spacing": "Usar espaçamentos personalizados em vez de espaçamento da barra"
   },
   "Use custom window radius instead of theme radius": {
     "Use custom window radius instead of theme radius": "Usar raio de janela personalizado em vez do raio do tema"
   },
-  "Use custom window rounding instead of theme radius": {
-    "Use custom window rounding instead of theme radius": "Usar arredondamento de janela personalizado em vez do raio do tema"
-  },
   "Use desktop wallpaper": {
     "Use desktop wallpaper": ""
   },
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": ""
+  },
+  "Use keys 1-3 or arrows, Enter/Space to select": {
+    "Use keys 1-3 or arrows, Enter/Space to select": ""
   },
   "Use light theme instead of dark theme": {
     "Use light theme instead of dark theme": "Usar tema claro em vez de escuro"
@@ -6602,11 +8105,20 @@
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "Usar tema de som das configurações do sistema"
   },
+  "Use the extended surface for launcher content": {
+    "Use the extended surface for launcher content": ""
+  },
+  "Use the overlay layer when opening the launcher": {
+    "Use the overlay layer when opening the launcher": ""
+  },
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Usar a mesma posição e tamanho em todos os monitores"
   },
   "Use trigger prefix to activate": {
     "Use trigger prefix to activate": "Usar prefixo de gatilho para ativar"
+  },
+  "Used for xdg-terminal-exec": {
+    "Used for xdg-terminal-exec": ""
   },
   "Used when accent color is set to Custom": {
     "Used when accent color is set to Custom": "Usado quando a cor de destaque é definida como Personalizada"
@@ -6614,17 +8126,59 @@
   "User": {
     "User": "Usuário"
   },
+  "User Window Rules (%1)": {
+    "User Window Rules (%1)": ""
+  },
+  "User already exists": {
+    "User already exists": ""
+  },
+  "User created": {
+    "User created": ""
+  },
+  "User created with administrator and greeter login access": {
+    "User created with administrator and greeter login access": ""
+  },
+  "User created with administrator privileges": {
+    "User created with administrator privileges": ""
+  },
+  "User created with greeter login access": {
+    "User created with greeter login access": ""
+  },
+  "User deleted": {
+    "User deleted": ""
+  },
+  "User not found": {
+    "User not found": ""
+  },
   "Username": {
     "Username": "Nome de usuário"
   },
+  "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
+    "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": ""
+  },
   "Username...": {
     "Username...": ""
+  },
+  "Users": {
+    "Users": ""
   },
   "Uses sunrise/sunset times based on your location.": {
     "Uses sunrise/sunset times based on your location.": "Usa horários de nascer/pôr do sol com base na sua localização."
   },
   "Uses sunrise/sunset times to automatically adjust night mode based on your location.": {
     "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "Usa o tempo de nascer e pôr do sol para ajustar automaticamente o modo noturno baseado na sua localização."
+  },
+  "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
+    "Uses the spotlight-bar IPC action and always opens the minimal bar.": ""
+  },
+  "Using DankCalendar%1": {
+    "Using DankCalendar%1": ""
+  },
+  "Using global monospace font from Settings → Personalization": {
+    "Using global monospace font from Settings → Personalization": ""
+  },
+  "Using khal": {
+    "Using khal": ""
   },
   "Using shared settings from Gamma Control": {
     "Using shared settings from Gamma Control": "Usando configurações compartilhadas do Gamma Control"
@@ -6643,9 +8197,6 @@
   },
   "VPN configuration updated": {
     "VPN configuration updated": "Configuração da VPN atualizada"
-  },
-  "VPN connections": {
-    "VPN connections": "Conexões VPN"
   },
   "VPN deleted": {
     "VPN deleted": "VPN excluída"
@@ -6689,6 +8240,9 @@
   "Vertical Tiling": {
     "Vertical Tiling": "Tiling Vertical"
   },
+  "Very High": {
+    "Very High": ""
+  },
   "Vibrant": {
     "Vibrant": "Vibrante"
   },
@@ -6697,6 +8251,9 @@
   },
   "Video Path": {
     "Video Path": ""
+  },
+  "Video Player": {
+    "Video Player": ""
   },
   "Video Screensaver": {
     "Video Screensaver": ""
@@ -6709,6 +8266,9 @@
   },
   "Visibility": {
     "Visibility": "Visibilidade"
+  },
+  "Visible Entry Actions": {
+    "Visible Entry Actions": ""
   },
   "Visual Effects": {
     "Visual Effects": "Efeitos Visuais"
@@ -6773,6 +8333,9 @@
   "Weather Widget": {
     "Weather Widget": "Widget de Clima"
   },
+  "Web Browser": {
+    "Web Browser": ""
+  },
   "Welcome": {
     "Welcome": "Boas-vindas"
   },
@@ -6785,11 +8348,11 @@
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Quando ativado, apps são ordenados alfabeticamente. Quando desativado, apps são ordenados por frequência de uso."
   },
+  "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
+    "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": ""
+  },
   "When locked": {
     "When locked": "Quando bloqueado"
-  },
-  "When updater widget is used, then hide it if no update found": {
-    "When updater widget is used, then hide it if no update found": "Quando o widget de atualização for usado, ocultá-lo se nenhuma atualização for encontrada"
   },
   "Wi-Fi Password": {
     "Wi-Fi Password": "Senha do Wi-Fi"
@@ -6830,6 +8393,9 @@
   "Widget Management": {
     "Widget Management": "Gerenciamento de Widgets"
   },
+  "Widget Opacity": {
+    "Widget Opacity": ""
+  },
   "Widget Outline": {
     "Widget Outline": "Borda de Widgets"
   },
@@ -6851,17 +8417,23 @@
   "Widgets": {
     "Widgets": "Widgets"
   },
+  "Widgets & Notifications": {
+    "Widgets & Notifications": ""
+  },
   "Widgets, layout, style": {
     "Widgets, layout, style": "Widgets, layout, estilo"
   },
   "Width": {
     "Width": "Largura"
   },
-  "Width of window border (borderpx)": {
-    "Width of window border (borderpx)": "Largura da borda da janela (borderpx)"
+  "Width of the border in pixels": {
+    "Width of the border in pixels": ""
   },
-  "Width of window border (general.border_size)": {
-    "Width of window border (general.border_size)": "Largura da borda da janela (general.border_size)"
+  "Width of the widget outline in pixels": {
+    "Width of the widget outline in pixels": ""
+  },
+  "Width of window border": {
+    "Width of window border": ""
   },
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "Largura da borda da janela e anel de foco"
@@ -6890,9 +8462,6 @@
   "Window Opening": {
     "Window Opening": "Abertura de Janela"
   },
-  "Window Rounding": {
-    "Window Rounding": "Arredondamento da Janela"
-  },
   "Window Rules": {
     "Window Rules": "Regras de Janela"
   },
@@ -6904,6 +8473,9 @@
   },
   "Wipe": {
     "Wipe": "Limpar"
+  },
+  "Working...": {
+    "Working...": ""
   },
   "Workspace": {
     "Workspace": "Área de Trabalho"
@@ -6932,14 +8504,29 @@
   "Workspaces": {
     "Workspaces": "Áreas de Trabalho"
   },
-  "Workspaces & Widgets": {
-    "Workspaces & Widgets": "Áreas de Trabalho e Widgets"
+  "Wrap the app command. %command% is replaced with the actual executable": {
+    "Wrap the app command. %command% is replaced with the actual executable": ""
   },
   "Write:": {
     "Write:": "Escrita:"
   },
+  "X": {
+    "X": ""
+  },
   "X Axis": {
     "X Axis": "Eixo X"
+  },
+  "X-Ray": {
+    "X-Ray": ""
+  },
+  "XWayland": {
+    "XWayland": ""
+  },
+  "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
+    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": ""
+  },
+  "Y": {
+    "Y": ""
   },
   "Y Axis": {
     "Y Axis": "Eixo Y"
@@ -6965,14 +8552,26 @@
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Você precisa definir um dos seguintes:\nQT_QPA_PLATFORMTHEME=gtk3 OU\nQT_QPA_PLATFORMTHEME=qt6ct\ncomo variáveis de ambiente, e então reiniciar o shell.\n\nqt6ct requer qt6ct-kde para ser instalado."
   },
+  "You'll enter your password at the greeter after the next reboot.": {
+    "You'll enter your password at the greeter after the next reboot.": ""
+  },
+  "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": {
+    "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": ""
+  },
   "You're All Set!": {
     "You're All Set!": "Tudo Pronto!"
+  },
+  "Your compositor does not support background blur (ext-background-effect-v1)": {
+    "Your compositor does not support background blur (ext-background-effect-v1)": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": ""
   },
   "actions": {
     "actions": "ações"
+  },
+  "admin": {
+    "admin": ""
   },
   "attached": {
     "attached": ""
@@ -6998,6 +8597,9 @@
   "dgop not available": {
     "dgop not available": "dgop não disponível"
   },
+  "direct": {
+    "direct": ""
+  },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
   },
@@ -7007,11 +8609,23 @@
   "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": {
     "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": "A configuração dms/outputs existe, mas não está incluída no seu configurador de compositor. As alterações de exibição não serão persistentes."
   },
+  "e.g. /usr/bin/my-script --flag": {
+    "e.g. /usr/bin/my-script --flag": ""
+  },
+  "e.g. My Script": {
+    "e.g. My Script": ""
+  },
+  "e.g. alice": {
+    "e.g. alice": ""
+  },
   "e.g., firefox, kitty --title foo": {
     "e.g., firefox, kitty --title foo": "ex. firefox, kitty --title foo"
   },
   "e.g., focus-workspace 3, resize-column -10": {
     "e.g., focus-workspace 3, resize-column -10": "ex. focus-workspace 3, resize-column -10"
+  },
+  "e.g., hl.dsp.focus({ workspace = \"3\" })": {
+    "e.g., hl.dsp.focus({ workspace = \"3\" })": ""
   },
   "e.g., notify-send 'Hello' && sleep 1": {
     "e.g., notify-send 'Hello' && sleep 1": "por exemplo, notify-send 'Olá' && sleep 1"
@@ -7019,26 +8633,44 @@
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": ""
   },
-  "events": {
-    "events": "eventos"
-  },
   "ext": {
     "ext": "ext"
   },
   "featured": {
     "featured": "em destaque"
   },
+  "khal": {
+    "khal": ""
+  },
+  "last seen %1": {
+    "last seen %1": ""
+  },
   "leave empty for default": {
     "leave empty for default": "deixe vazio por padrão"
   },
+  "loginctl activate failed (exit %1)": {
+    "loginctl activate failed (exit %1)": ""
+  },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl não disponível - integração com bloqueio requer conexão de socket DMS"
+  },
+  "mango: config reloaded": {
+    "mango: config reloaded": ""
+  },
+  "mango: failed to reload config": {
+    "mango: failed to reload config": ""
   },
   "mangowc Discord Server": {
     "mangowc Discord Server": ""
   },
   "mangowc GitHub": {
     "mangowc GitHub": ""
+  },
+  "matugen not available or disabled - cannot apply GTK colors": {
+    "matugen not available or disabled - cannot apply GTK colors": ""
+  },
+  "matugen not available or disabled - cannot apply Qt colors": {
+    "matugen not available or disabled - cannot apply Qt colors": ""
   },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen não encontrado - instale o pacote matugen para tematização dinâmica"
@@ -7063,6 +8695,12 @@
   },
   "niri/dms Discord": {
     "niri/dms Discord": ""
+  },
+  "niri: config reloaded": {
+    "niri: config reloaded": ""
+  },
+  "niri: failed to load config": {
+    "niri: failed to load config": ""
   },
   "now": {
     "now": "agora"
@@ -7103,8 +8741,17 @@
   "r/niri Subreddit": {
     "r/niri Subreddit": ""
   },
+  "relay: %1": {
+    "relay: %1": ""
+  },
+  "remote": {
+    "remote": ""
+  },
   "seconds": {
     "seconds": "segundos"
+  },
+  "session %1": {
+    "session %1": ""
   },
   "source": {
     "source": "fonte"
@@ -7112,11 +8759,23 @@
   "this app": {
     "this app": "este aplicativo"
   },
+  "until %1": {
+    "until %1": ""
+  },
   "up": {
     "up": "cima"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "atualize dms para integração com o NM."
+  },
+  "useradd failed (exit %1)": {
+    "useradd failed (exit %1)": ""
+  },
+  "userdel failed (exit %1)": {
+    "userdel failed (exit %1)": ""
+  },
+  "usermod failed (exit %1)": {
+    "usermod failed (exit %1)": ""
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 por %2"
@@ -7166,10 +8825,10 @@
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
     "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Navegar • Espaço: Expandir • Enter: Ação/Expandir • E: Texto"
   },
-  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": {
-    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • F10: Help": ""
+  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
+    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": ""
   },
-  "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": {
-    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: Navegar • Enter: Colar • Del: Excluir • F10: Ajuda"
+  "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
+    "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": ""
   }
 }

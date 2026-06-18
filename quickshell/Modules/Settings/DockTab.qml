@@ -8,6 +8,10 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    property var parentModal: null
+    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
+    readonly property bool connectedPersistentDockActive: connectedFrameModeActive && SettingsData.showDock && !SettingsData.dockAutoHide && !SettingsData.dockSmartAutoHide
+
     FileBrowserModal {
         id: dockLogoFileBrowser
         browserTitle: I18n.tr("Select Dock Launcher Logo")
@@ -66,7 +70,7 @@ Item {
                     text: I18n.tr("Intelligent Auto-hide")
                     description: I18n.tr("Show dock when floating windows don't overlap its area")
                     checked: SettingsData.dockSmartAutoHide
-                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isHyprland)
+                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
                     onToggled: checked => {
                         if (checked && SettingsData.dockAutoHide) {
                             SettingsData.set("dockAutoHide", false);
@@ -83,6 +87,16 @@ Item {
                     checked: SettingsData.dockOpenOnOverview
                     visible: CompositorService.isNiri
                     onToggled: checked => SettingsData.set("dockOpenOnOverview", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "dockUseOverlayLayer"
+                    tags: ["dock", "fullscreen", "overlay", "layer"]
+                    text: I18n.tr("Use Overlay Layer", "dock layer toggle: use Wayland overlay layer")
+                    description: I18n.tr("Place the dock on the Wayland overlay layer")
+                    checked: SettingsData.dockUseOverlayLayer
+                    visible: SettingsData.showDock
+                    onToggled: checked => SettingsData.set("dockUseOverlayLayer", checked)
                 }
             }
 
@@ -268,7 +282,7 @@ Item {
                                         modes.push("niri");
                                     } else if (CompositorService.isHyprland) {
                                         modes.push("Hyprland");
-                                    } else if (CompositorService.isDwl) {
+                                    } else if (CompositorService.isMango) {
                                         modes.push("mango");
                                     } else if (CompositorService.isSway) {
                                         modes.push("Sway");
@@ -508,6 +522,66 @@ Item {
 
             SettingsCard {
                 width: parent.width
+                iconName: "delete"
+                title: I18n.tr("Trash")
+                settingKey: "dockTrash"
+
+                SettingsToggleRow {
+                    settingKey: "dockShowTrash"
+                    tags: ["dock", "trash", "bin", "recycle"]
+                    text: I18n.tr("Show Trash in Dock")
+                    description: I18n.tr("Place a trash bin at the end of the dock")
+                    checked: SettingsData.dockShowTrash
+                    onToggled: checked => SettingsData.set("dockShowTrash", checked)
+                }
+
+                SettingsDropdownRow {
+                    id: trashFmDropdown
+                    settingKey: "dockTrashFileManager"
+                    tags: ["dock", "trash", "file", "manager", "nautilus", "thunar", "dolphin", "custom"]
+                    text: I18n.tr("Open Trash With")
+                    description: I18n.tr("File manager used to open the trash. Pick \"custom\" to enter your own command.")
+                    visible: SettingsData.dockShowTrash
+                    currentValue: SettingsData.dockTrashFileManager
+                    options: TrashService.availableFileManagers || []
+                    onValueChanged: value => SettingsData.set("dockTrashFileManager", value)
+                }
+
+                FocusScope {
+                    width: parent.width - Theme.spacingM * 2
+                    height: visible ? trashCustomCommandColumn.implicitHeight : 0
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingM
+                    visible: SettingsData.dockShowTrash && SettingsData.dockTrashFileManager === "custom"
+
+                    Column {
+                        id: trashCustomCommandColumn
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Custom open-trash command")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: trashCustomCommandField
+                            width: parent.width
+                            placeholderText: "pcmanfm trash:///"
+                            backgroundColor: Theme.surfaceContainerHighest
+                            normalBorderColor: Theme.outlineMedium
+                            focusedBorderColor: Theme.primary
+                            text: SettingsData.dockTrashCustomCommand
+
+                            onTextEdited: SettingsData.set("dockTrashCustomCommand", text.trim())
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 iconName: "photo_size_select_large"
                 title: I18n.tr("Sizing")
                 settingKey: "dockSizing"
@@ -538,37 +612,50 @@ Item {
                     value: SettingsData.dockSpacing
                     minimum: 0
                     maximum: 32
+                    unit: "px"
                     defaultValue: 8
                     onSliderValueChanged: newValue => SettingsData.set("dockSpacing", newValue)
                 }
 
                 SettingsSliderRow {
                     text: I18n.tr("Exclusive Zone Offset")
+                    visible: !root.connectedFrameModeActive || root.connectedPersistentDockActive
                     value: SettingsData.dockBottomGap
                     minimum: -100
                     maximum: 100
+                    unit: "px"
                     defaultValue: 0
                     onSliderValueChanged: newValue => SettingsData.set("dockBottomGap", newValue)
                 }
 
                 SettingsSliderRow {
                     text: I18n.tr("Margin")
+                    visible: !root.connectedFrameModeActive
                     value: SettingsData.dockMargin
                     minimum: 0
                     maximum: 100
+                    unit: "px"
                     defaultValue: 0
                     onSliderValueChanged: newValue => SettingsData.set("dockMargin", newValue)
                 }
             }
 
+            SettingsControlledByFrame {
+                visible: root.connectedFrameModeActive
+                parentModal: root.parentModal
+                settingLabel: I18n.tr("Dock margin, opacity, and border")
+                reason: I18n.tr("Managed by Frame in Connected Mode")
+            }
+
             SettingsCard {
                 width: parent.width
                 iconName: "opacity"
-                title: I18n.tr("Transparency")
+                title: I18n.tr("Opacity")
                 settingKey: "dockTransparency"
+                visible: !root.connectedFrameModeActive
 
                 SettingsSliderRow {
-                    text: I18n.tr("Dock Transparency")
+                    text: I18n.tr("Dock Opacity")
                     value: Math.round(SettingsData.dockTransparency * 100)
                     minimum: 0
                     maximum: 100
@@ -585,6 +672,7 @@ Item {
                 settingKey: "dockBorder"
                 collapsible: true
                 expanded: false
+                visible: !root.connectedFrameModeActive
 
                 SettingsToggleRow {
                     text: I18n.tr("Border")

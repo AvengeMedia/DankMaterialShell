@@ -51,10 +51,18 @@ var keybindsSetCmd = &cobra.Command{
 
 var keybindsRemoveCmd = &cobra.Command{
 	Use:   "remove <provider> <key>",
-	Short: "Remove a keybind override",
-	Long:  "Remove a keybind override from the specified provider",
+	Short: "Remove a keybind",
+	Long:  "Remove a keybind. For Hyprland this writes a negative override to dms/binds-user.lua so the key stays unbound across DMS updates. For other providers it deletes the entry from the managed file.",
 	Args:  cobra.ExactArgs(2),
 	Run:   runKeybindsRemove,
+}
+
+var keybindsResetCmd = &cobra.Command{
+	Use:   "reset <provider> <key>",
+	Short: "Reset a keybind override to its DMS default",
+	Long:  "Drop the user override for the given key so the DMS default re-applies. For providers without a separate default file (Niri, MangoWC) this is equivalent to remove.",
+	Args:  cobra.ExactArgs(2),
+	Run:   runKeybindsReset,
 }
 
 func init() {
@@ -72,6 +80,7 @@ func init() {
 	keybindsCmd.AddCommand(keybindsShowCmd)
 	keybindsCmd.AddCommand(keybindsSetCmd)
 	keybindsCmd.AddCommand(keybindsRemoveCmd)
+	keybindsCmd.AddCommand(keybindsResetCmd)
 
 	keybinds.SetJSONProviderFactory(func(filePath string) (keybinds.Provider, error) {
 		return providers.NewJSONFileProvider(filePath)
@@ -260,6 +269,22 @@ func runKeybindsRemove(_ *cobra.Command, args []string) {
 		"success": true,
 		"key":     key,
 		"removed": true,
+	}, "", "  ")
+	fmt.Fprintln(os.Stdout, string(output))
+}
+
+func runKeybindsReset(_ *cobra.Command, args []string) {
+	providerName, key := args[0], args[1]
+	writable := getWritableProvider(providerName)
+
+	if err := writable.ResetBind(key); err != nil {
+		log.Fatalf("Error resetting keybind: %v", err)
+	}
+
+	output, _ := json.MarshalIndent(map[string]any{
+		"success": true,
+		"key":     key,
+		"reset":   true,
 	}, "", "  ")
 	fmt.Fprintln(os.Stdout, string(output))
 }

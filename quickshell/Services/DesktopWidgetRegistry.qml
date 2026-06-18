@@ -21,8 +21,7 @@ Singleton {
     Connections {
         target: PluginService
         function onPluginLoaded(pluginId) {
-            const plugin = PluginService.availablePlugins[pluginId];
-            if (plugin?.type === "desktop")
+            if (PluginService.pluginDesktopComponents[pluginId] !== undefined)
                 syncPluginWidgets();
         }
         function onPluginUnloaded(pluginId) {

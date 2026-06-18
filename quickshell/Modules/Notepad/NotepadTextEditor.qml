@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,14 +8,12 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-pragma ComponentBehavior: Bound
-
 Column {
     id: root
 
     Component.onCompleted: {
         if (PluginService.isPluginLoaded("dankNotepadModule")) {
-            pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "")
+            pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "");
         }
     }
 
@@ -32,66 +32,144 @@ Column {
     property string pluginHighlightedHtml: ""
     property string lastPluginContent: ""
     property int loadRequestId: 0
+    property bool ignoreNextExternalChange: false
+    property bool watcherReloadPending: false
+    property bool externalWatchPaused: false
+    property bool inPopout: false
+    property bool surfaceVisible: true
+    // Tab ids are Date.now() timestamps (~1.78e12) which overflow a 32-bit `int`,
+    // corrupting the value (e.g. -946062153) and breaking buffer keying. `var`
+    // holds the full JS-safe integer.
+    property var loadedTabId: -1
+    property bool applyingShared: false
+    property bool showPathInfo: false
 
-    signal saveRequested()
-    signal openRequested()
-    signal newRequested()
-    signal previewRequested()
-    signal escapePressed()
-    signal contentChanged()
-    signal settingsRequested()
+    function currentFilePath() {
+        if (!currentTab)
+            return "";
+        return currentTab.isTemporary ? (NotepadStorageService.baseDir + "/" + currentTab.filePath) : currentTab.filePath;
+    }
+
+    signal saveRequested
+    signal openRequested
+    signal newRequested
+    signal previewRequested
+    signal escapePressed
+    signal contentChanged
+    signal settingsRequested
+    signal popoutRequested
+    signal dockRequested
+    signal conflictDetected(string diskContent)
+    signal autoSaveRequested
 
     function hasUnsavedChanges() {
         if (!currentTab || !contentLoaded) {
-            return false
+            return false;
         }
 
         if (currentTab.isTemporary) {
-            return textArea.text.length > 0
+            return textArea.text.length > 0;
         }
-        return textArea.text !== lastSavedContent
+        return textArea.text !== lastSavedContent;
+    }
+
+    function commitLiveBuffer() {
+        if (loadedTabId < 0 || !contentLoaded)
+            return;
+        NotepadStorageService.setSessionBuffer(loadedTabId, textArea.text, lastSavedContent);
     }
 
     function loadCurrentTabContent() {
-        if (!currentTab) return
+        if (!currentTab)
+            return;
+        const requestedTabId = currentTab.id;
+        const requestId = ++loadRequestId;
+        contentLoaded = false;
+        NotepadStorageService.loadTabContent(NotepadStorageService.currentTabIndex, content => {
+            const activeTab = NotepadStorageService.tabs.length > NotepadStorageService.currentTabIndex ? NotepadStorageService.tabs[NotepadStorageService.currentTabIndex] : null;
+            if (requestId !== loadRequestId || !activeTab || activeTab.id !== requestedTabId)
+                return;
 
-        const requestedTabId = currentTab.id
-        const requestId = ++loadRequestId
-        contentLoaded = false
-        NotepadStorageService.loadTabContent(
-            NotepadStorageService.currentTabIndex,
-            (content) => {
-                const activeTab = NotepadStorageService.tabs.length > NotepadStorageService.currentTabIndex
-                    ? NotepadStorageService.tabs[NotepadStorageService.currentTabIndex]
-                    : null
-                if (requestId !== loadRequestId || !activeTab || activeTab.id !== requestedTabId)
-                    return
-
-                lastSavedContent = content
-                textArea.text = content
-                contentLoaded = true
-                syncContentToPlugin()
+            const buffer = NotepadStorageService.getSessionBuffer(requestedTabId);
+            if (buffer !== undefined) {
+                applyingShared = true;
+                lastSavedContent = buffer.baseline;
+                textArea.text = buffer.content;
+                applyingShared = false;
+                loadedTabId = requestedTabId;
+                contentLoaded = true;
+                syncContentToPlugin();
+                applyDiskContent(content);
+                return;
             }
-        )
+
+            applyingShared = true;
+            lastSavedContent = content;
+            textArea.text = content;
+            applyingShared = false;
+            loadedTabId = requestedTabId;
+            contentLoaded = true;
+            syncContentToPlugin();
+        });
     }
 
     function saveCurrentTabContent() {
-        if (!currentTab || !contentLoaded) return
-
-        NotepadStorageService.saveTabContent(
-            NotepadStorageService.currentTabIndex,
-            textArea.text
-        )
-        lastSavedContent = textArea.text
+        if (!currentTab || !contentLoaded)
+            return;
+        if (!currentTab.isTemporary)
+            return;
+        NotepadStorageService.saveTabContent(NotepadStorageService.currentTabIndex, textArea.text);
+        lastSavedContent = textArea.text;
+        NotepadStorageService.clearSessionBuffer(loadedTabId);
     }
 
     function autoSaveToSession() {
-        if (!currentTab || !contentLoaded) return
-        saveCurrentTabContent()
+        commitLiveBuffer();
+        if (!currentTab || !contentLoaded)
+            return;
+        if (currentTab.isTemporary) {
+            saveCurrentTabContent();
+        } else if (SettingsData.notepadAutoSave) {
+            root.autoSaveRequested();
+        }
+    }
+
+    function syncFromDisk() {
+        if (!currentTab)
+            return;
+        loadCurrentTabContent();
+    }
+
+    function applyDiskContent(diskContent) {
+        if (diskContent === undefined || diskContent === null)
+            return;
+        if (diskContent === textArea.text) {
+            lastSavedContent = diskContent;
+            return;
+        }
+        if (diskContent === lastSavedContent) {
+            return;
+        }
+        if (textArea.text === lastSavedContent) {
+            reloadFromDisk(diskContent);
+        } else if (surfaceVisible) {
+            conflictDetected(diskContent);
+        }
+    }
+
+    function reloadFromDisk(diskContent) {
+        applyingShared = true;
+        contentLoaded = false;
+        textArea.text = diskContent;
+        lastSavedContent = diskContent;
+        contentLoaded = true;
+        applyingShared = false;
+        NotepadStorageService.clearSessionBuffer(loadedTabId);
+        syncContentToPlugin();
     }
 
     function setTextDocumentLineHeight() {
-        return
+        return;
     }
 
     property string lastTextForLineModel: ""
@@ -99,191 +177,182 @@ Column {
 
     function updateLineModel() {
         if (!SettingsData.notepadShowLineNumbers) {
-            lineModel = []
-            lastTextForLineModel = ""
-            return
+            lineModel = [];
+            lastTextForLineModel = "";
+            return;
         }
 
         if (textArea.text !== lastTextForLineModel || lineModel.length === 0) {
-            lastTextForLineModel = textArea.text
-            lineModel = textArea.text.split('\n')
+            lastTextForLineModel = textArea.text;
+            lineModel = textArea.text.split('\n');
         }
     }
 
     function performSearch() {
-        let matches = []
-        currentMatchIndex = -1
+        let matches = [];
+        currentMatchIndex = -1;
 
         if (!searchQuery || searchQuery.length === 0) {
-            searchMatches = []
-            matchCount = 0
-            textArea.select(0, 0)
-            return
+            searchMatches = [];
+            matchCount = 0;
+            textArea.select(0, 0);
+            return;
         }
 
-        const text = textArea.text
-        const query = searchQuery.toLowerCase()
-        let index = 0
+        const text = textArea.text;
+        const query = searchQuery.toLowerCase();
+        let index = 0;
 
         while (index < text.length) {
-            const foundIndex = text.toLowerCase().indexOf(query, index)
-            if (foundIndex === -1) break
-
+            const foundIndex = text.toLowerCase().indexOf(query, index);
+            if (foundIndex === -1)
+                break;
             matches.push({
                 start: foundIndex,
                 end: foundIndex + searchQuery.length
-            })
-            index = foundIndex + 1
+            });
+            index = foundIndex + 1;
         }
 
-        searchMatches = matches
-        matchCount = matches.length
+        searchMatches = matches;
+        matchCount = matches.length;
 
         if (matchCount > 0) {
-            currentMatchIndex = 0
-            highlightCurrentMatch()
+            currentMatchIndex = 0;
+            highlightCurrentMatch();
         } else {
-            textArea.select(0, 0)
+            textArea.select(0, 0);
         }
     }
 
     function highlightCurrentMatch() {
         if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
-            const match = searchMatches[currentMatchIndex]
+            const match = searchMatches[currentMatchIndex];
 
-            textArea.cursorPosition = match.start
-            textArea.moveCursorSelection(match.end, TextEdit.SelectCharacters)
+            textArea.cursorPosition = match.start;
+            textArea.moveCursorSelection(match.end, TextEdit.SelectCharacters);
 
-            const flickable = textArea.parent
+            const flickable = textArea.parent;
             if (flickable && flickable.contentY !== undefined) {
-                const lineHeight = textArea.font.pixelSize * 1.5
-                const approxLine = textArea.text.substring(0, match.start).split('\n').length
-                const targetY = approxLine * lineHeight - flickable.height / 2
-                flickable.contentY = Math.max(0, Math.min(targetY, flickable.contentHeight - flickable.height))
+                const lineHeight = textArea.font.pixelSize * 1.5;
+                const approxLine = textArea.text.substring(0, match.start).split('\n').length;
+                const targetY = approxLine * lineHeight - flickable.height / 2;
+                flickable.contentY = Math.max(0, Math.min(targetY, flickable.contentHeight - flickable.height));
             }
         }
     }
 
     function findNext() {
-        if (matchCount === 0 || searchMatches.length === 0) return
-
-        currentMatchIndex = (currentMatchIndex + 1) % matchCount
-        highlightCurrentMatch()
+        if (matchCount === 0 || searchMatches.length === 0)
+            return;
+        currentMatchIndex = (currentMatchIndex + 1) % matchCount;
+        highlightCurrentMatch();
     }
 
     function findPrevious() {
-        if (matchCount === 0 || searchMatches.length === 0) return
-
-        currentMatchIndex = currentMatchIndex <= 0 ? matchCount - 1 : currentMatchIndex - 1
-        highlightCurrentMatch()
+        if (matchCount === 0 || searchMatches.length === 0)
+            return;
+        currentMatchIndex = currentMatchIndex <= 0 ? matchCount - 1 : currentMatchIndex - 1;
+        highlightCurrentMatch();
     }
 
     function showSearch() {
-        searchVisible = true
+        searchVisible = true;
         Qt.callLater(() => {
-            searchField.forceActiveFocus()
-        })
+            searchField.forceActiveFocus();
+        });
     }
 
     function togglePreview() {
         if (!inlinePreviewVisible) {
-            inlinePreviewVisible = true
-            previewMode = "split"
+            inlinePreviewVisible = true;
+            previewMode = "split";
         } else if (previewMode === "split") {
-            previewMode = "full"
+            previewMode = "full";
         } else {
-            inlinePreviewVisible = false
-            previewMode = "split"
+            inlinePreviewVisible = false;
+            previewMode = "split";
         }
-        syncContentToPlugin()
+        syncContentToPlugin();
     }
 
     function renderPreviewHtml() {
-        if (!inlinePreviewVisible) return ""
-        return pluginHighlightedHtml.length > 0 ? pluginHighlightedHtml : "<p><i>Rendering preview…</i></p>"
+        if (!inlinePreviewVisible)
+            return "";
+        return pluginHighlightedHtml.length > 0 ? pluginHighlightedHtml : "<p><i>Rendering preview…</i></p>";
     }
 
     function syncContentToPlugin() {
         if (!PluginService.isPluginLoaded("dankNotepadModule"))
-            return
-
+            return;
         if (!currentTab)
-            return
-
-        const filePath = currentTab?.filePath || ""
-        const ext = filePath.split('.').pop().toLowerCase()
-        const content = textArea.text
+            return;
+        const filePath = currentTab?.filePath || "";
+        const baseName = filePath.split('/').pop();
+        const ext = baseName.includes('.') ? baseName.split('.').pop().toLowerCase() : "";
+        const content = textArea.text;
 
         if (content === lastPluginContent && SettingsData.getBuiltInPluginSetting("dankNotepadModule", "previewActive", false) === inlinePreviewVisible) {
-            return
+            return;
         }
 
-        lastPluginContent = content
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "previewActive", inlinePreviewVisible)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFilePath", filePath)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFileExtension", ext)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "sourceContent", content)
-        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "updatedAt", Date.now())
+        lastPluginContent = content;
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "previewActive", inlinePreviewVisible);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFilePath", filePath);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "currentFileExtension", ext);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "sourceContent", content);
+        SettingsData.setBuiltInPluginSetting("dankNotepadModule", "updatedAt", Date.now());
     }
 
     function hideSearch() {
-        searchVisible = false
-        searchQuery = ""
-        searchMatches = []
-        matchCount = 0
-        currentMatchIndex = -1
-        textArea.select(0, 0)
-        textArea.forceActiveFocus()
+        searchVisible = false;
+        searchQuery = "";
+        searchMatches = [];
+        matchCount = 0;
+        currentMatchIndex = -1;
+        textArea.select(0, 0);
+        textArea.forceActiveFocus();
     }
 
     function copyPlainTextToClipboard() {
-        if (!inlinePreviewVisible || !textArea.text) return
-
-        const content = textArea.text
-        if (content.length > 0) {
-            const proc = Qt.createQmlObject(`
-                import QtQuick
-                import Quickshell.Io
-                Process {
-                    property string content: ""
-                    command: ["sh", "-c", "printf '%s' \\"$CONTENT\\" | dms clipboard copy"]
-                    environment: { "CONTENT": content }
-                    running: false
-                }`,
-                root,
-                "copyProc"
-            )
-            proc.content = content
-            proc.running = true
-            proc.exited.connect(() => {
-                ToastService.showInfo(I18n.tr("Copied to clipboard"))
-                proc.destroy()
-            })
-        }
+        if (!inlinePreviewVisible || !textArea.text)
+            return;
+        const content = textArea.text;
+        if (content.length === 0)
+            return;
+        const proc = clipboardCopyProcComp.createObject(root, {
+            content: content,
+            running: true
+        });
+        proc.exited.connect(() => {
+            ToastService.showInfo(I18n.tr("Copied to clipboard"));
+            proc.destroy();
+        });
     }
 
     function copyHtmlToClipboard() {
-        if (!inlinePreviewVisible || !pluginHighlightedHtml) return
+        if (!inlinePreviewVisible || !pluginHighlightedHtml)
+            return;
+        if (pluginHighlightedHtml.length === 0)
+            return;
+        const proc = clipboardCopyProcComp.createObject(root, {
+            content: pluginHighlightedHtml,
+            running: true
+        });
+        proc.exited.connect(() => {
+            ToastService.showInfo(I18n.tr("HTML copied to clipboard"));
+            proc.destroy();
+        });
+    }
 
-        if (pluginHighlightedHtml.length > 0) {
-            const proc = Qt.createQmlObject(`
-                import QtQuick
-                import Quickshell.Io
-                Process {
-                    property string content: ""
-                    command: ["sh", "-c", "printf '%s' \\"$CONTENT\\" | dms clipboard copy"]
-                    environment: { "CONTENT": content }
-                    running: false
-                }`,
-                root,
-                "copyProcHtml"
-            )
-            proc.content = pluginHighlightedHtml
-            proc.running = true
-            proc.exited.connect(() => {
-                ToastService.showInfo(I18n.tr("HTML copied to clipboard"))
-                proc.destroy()
-            })
+    Component {
+        id: clipboardCopyProcComp
+        Process {
+            property string content: ""
+            command: ["sh", "-c", "printf '%s' \"$CONTENT\" | dms clipboard copy"]
+            environment: ({
+                    "CONTENT": content
+                })
         }
     }
 
@@ -334,43 +403,43 @@ Column {
                 clip: true
 
                 Component.onCompleted: {
-                    text = root.searchQuery
+                    text = root.searchQuery;
                 }
 
                 Connections {
                     target: root
                     function onSearchQueryChanged() {
                         if (searchField.text !== root.searchQuery) {
-                            searchField.text = root.searchQuery
+                            searchField.text = root.searchQuery;
                         }
                     }
                 }
 
                 onTextChanged: {
                     if (root.searchQuery !== text) {
-                        root.searchQuery = text
-                        root.performSearch()
+                        root.searchQuery = text;
+                        root.performSearch();
                     }
                 }
                 Keys.onEscapePressed: event => {
-                    root.hideSearch()
-                    event.accepted = true
+                    root.hideSearch();
+                    event.accepted = true;
                 }
                 Keys.onReturnPressed: event => {
                     if (event.modifiers & Qt.ShiftModifier) {
-                        root.findPrevious()
+                        root.findPrevious();
                     } else {
-                        root.findNext()
+                        root.findNext();
                     }
-                    event.accepted = true
+                    event.accepted = true;
                 }
                 Keys.onEnterPressed: event => {
                     if (event.modifiers & Qt.ShiftModifier) {
-                        root.findPrevious()
+                        root.findPrevious();
                     } else {
-                        root.findNext()
+                        root.findNext();
                     }
-                    event.accepted = true
+                    event.accepted = true;
                 }
             }
 
@@ -483,7 +552,7 @@ Column {
                                 width: 32
                                 height: measuringText.contentHeight
 
-                                Text {
+                                StyledText {
                                     id: measuringText
                                     width: textArea.width - textArea.leftPadding - textArea.rightPadding
                                     text: modelData || " "
@@ -541,31 +610,42 @@ Column {
                             SequentialAnimation on opacity {
                                 running: textArea.activeFocus
                                 loops: Animation.Infinite
-                                PropertyAnimation { from: 1.0; to: 0.0; duration: 650; easing.type: Easing.InOutQuad }
-                                PropertyAnimation { from: 0.0; to: 1.0; duration: 650; easing.type: Easing.InOutQuad }
+                                OpacityAnimator {
+                                    from: 1.0
+                                    to: 0.0
+                                    duration: 650
+                                    easing.type: Easing.InOutQuad
+                                }
+                                OpacityAnimator {
+                                    from: 0.0
+                                    to: 1.0
+                                    duration: 650
+                                    easing.type: Easing.InOutQuad
+                                }
                             }
                         }
 
                         Component.onCompleted: {
-                            loadCurrentTabContent()
-                            setTextDocumentLineHeight()
-                            root.updateLineModel()
+                            loadCurrentTabContent();
+                            setTextDocumentLineHeight();
+                            root.updateLineModel();
                             Qt.callLater(() => {
-                                textArea.forceActiveFocus()
-                            })
+                                textArea.forceActiveFocus();
+                            });
                         }
 
                         Connections {
                             target: NotepadStorageService
                             function onCurrentTabIndexChanged() {
-                                loadCurrentTabContent()
+                                root.commitLiveBuffer();
+                                loadCurrentTabContent();
                                 Qt.callLater(() => {
-                                    textArea.forceActiveFocus()
-                                })
+                                    textArea.forceActiveFocus();
+                                });
                             }
                             function onTabsChanged() {
                                 if (NotepadStorageService.tabs.length > 0 && !contentLoaded) {
-                                    loadCurrentTabContent()
+                                    loadCurrentTabContent();
                                 }
                             }
                         }
@@ -573,53 +653,55 @@ Column {
                         Connections {
                             target: SettingsData
                             function onNotepadShowLineNumbersChanged() {
-                                root.updateLineModel()
+                                root.updateLineModel();
                             }
                         }
 
                         onTextChanged: {
-                            if (contentLoaded && text !== lastSavedContent) {
-                                autoSaveTimer.restart()
+                            // Debounced flush to the shared buffer (+ optional disk
+                            // autosave) for every loaded tab, not just scratch notes.
+                            if (contentLoaded && !applyingShared) {
+                                autoSaveTimer.restart();
                             }
-                            root.contentChanged()
-                            root.updateLineModel()
-                            pluginSyncTimer.restart()
+                            root.contentChanged();
+                            root.updateLineModel();
+                            pluginSyncTimer.restart();
                         }
 
-                        Keys.onEscapePressed: (event) => {
-                            root.escapePressed()
-                            event.accepted = true
+                        Keys.onEscapePressed: event => {
+                            root.escapePressed();
+                            event.accepted = true;
                         }
 
-                        Keys.onPressed: (event) => {
+                        Keys.onPressed: event => {
                             if (event.modifiers & Qt.ControlModifier) {
                                 switch (event.key) {
                                 case Qt.Key_S:
-                                    event.accepted = true
-                                    root.saveRequested()
-                                    break
+                                    event.accepted = true;
+                                    root.saveRequested();
+                                    break;
                                 case Qt.Key_O:
-                                    event.accepted = true
-                                    root.openRequested()
-                                    break
+                                    event.accepted = true;
+                                    root.openRequested();
+                                    break;
                                 case Qt.Key_N:
-                                    event.accepted = true
-                                    root.newRequested()
-                                    break
+                                    event.accepted = true;
+                                    root.newRequested();
+                                    break;
                                 case Qt.Key_A:
-                                    event.accepted = true
-                                    textArea.selectAll()
-                                    break
+                                    event.accepted = true;
+                                    textArea.selectAll();
+                                    break;
                                 case Qt.Key_F:
-                                    event.accepted = true
-                                    root.showSearch()
-                                    break
+                                    event.accepted = true;
+                                    root.showSearch();
+                                    break;
                                 case Qt.Key_P:
                                     if (PluginService.isPluginLoaded("dankNotepadModule")) {
-                                        event.accepted = true
-                                        root.previewRequested()
+                                        event.accepted = true;
+                                        root.previewRequested();
                                     }
-                                    break
+                                    break;
                                 }
                             }
                         }
@@ -727,7 +809,7 @@ Column {
                     contentWidth: width - 11
                     contentHeight: previewText.paintedHeight + Theme.spacingM * 2
 
-                    Text {
+                    StyledText {
                         id: previewText
                         width: parent.width - Theme.spacingM
                         padding: Theme.spacingM
@@ -752,6 +834,7 @@ Column {
         spacing: Theme.spacingS
 
         Item {
+            id: buttonBarItem
             width: parent.width
             height: 32
 
@@ -828,71 +911,160 @@ Column {
                 }
             }
 
-            DankActionButton {
+            Row {
+                id: rightButtonRow
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: "more_horiz"
-                iconSize: Theme.iconSize - 2
-                iconColor: Theme.surfaceText
-                onClicked: root.settingsRequested()
+                spacing: Theme.spacingS
+
+                DankActionButton {
+                    visible: !root.inPopout
+                    iconName: "open_in_new"
+                    iconSize: Theme.iconSize - 2
+                    iconColor: Theme.surfaceText
+                    onClicked: root.popoutRequested()
+                }
+
+                DankActionButton {
+                    visible: root.inPopout
+                    iconName: "dock_to_right"
+                    iconSize: Theme.iconSize - 2
+                    iconColor: Theme.surfaceText
+                    onClicked: root.dockRequested()
+                }
+
+                DankActionButton {
+                    iconName: "more_horiz"
+                    iconSize: Theme.iconSize - 2
+                    iconColor: Theme.surfaceText
+                    onClicked: root.settingsRequested()
+                }
+            }
+
+            StyledRect {
+                id: pathInfoPopup
+                visible: root.showPathInfo
+                anchors.right: parent.right
+                anchors.bottom: parent.top
+                anchors.bottomMargin: Theme.spacingS
+                width: Math.min(root.width, 360)
+                height: pathInfoRow.implicitHeight + Theme.spacingS * 2
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                border.color: Theme.outlineMedium
+                border.width: 1
+                z: 10
+
+                Row {
+                    id: pathInfoRow
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: Theme.spacingM
+                    anchors.rightMargin: Theme.spacingM
+                    spacing: Theme.spacingS
+
+                    DankIcon {
+                        name: currentTab && currentTab.isTemporary ? "draft" : "description"
+                        size: Theme.iconSize - 4
+                        color: Theme.surfaceVariantText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        width: pathInfoRow.width - (Theme.iconSize - 4) - copyPathButton.width - Theme.spacingS * 2
+                        text: root.currentFilePath()
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        elide: Text.ElideMiddle
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    DankActionButton {
+                        id: copyPathButton
+                        iconName: "content_copy"
+                        iconSize: Theme.iconSize - 6
+                        iconColor: Theme.surfaceTextMedium
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            const proc = clipboardCopyProcComp.createObject(root, {
+                                content: root.currentFilePath(),
+                                running: true
+                            });
+                            proc.exited.connect(() => {
+                                ToastService.showInfo(I18n.tr("Path copied to clipboard"));
+                                proc.destroy();
+                            });
+                        }
+                    }
+                }
             }
         }
 
         Row {
+            id: statusRow
             width: parent.width
             spacing: Theme.spacingL
 
             StyledText {
                 text: {
                     const len = textArea.text.length;
-                    if (len === 0) return I18n.tr("Empty");
-                    return len === 1
-                        ? I18n.tr("%1 character").arg(len)
-                        : I18n.tr("%1 characters").arg(len);
+                    if (len === 0)
+                        return I18n.tr("Empty");
+                    return len === 1 ? I18n.tr("%1 character").arg(len) : I18n.tr("%1 characters").arg(len);
                 }
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
             }
 
             StyledText {
-                text: textArea.lineCount === 1
-                    ? I18n.tr("Line: %1").arg(textArea.lineCount)
-                    : I18n.tr("Lines: %1").arg(textArea.lineCount)
+                text: textArea.lineCount === 1 ? I18n.tr("Line: %1").arg(textArea.lineCount) : I18n.tr("Lines: %1").arg(textArea.lineCount)
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 visible: textArea.text.length > 0
                 opacity: 1.0
             }
 
-            StyledText {
-                text: {
-                    if (autoSaveTimer.running) {
-                        return I18n.tr("Auto-saving...")
-                    }
+            Row {
+                visible: textArea.text.length > 0
+                spacing: Theme.spacingXS
 
-                    if (hasUnsavedChanges()) {
-                        if (currentTab && currentTab.isTemporary) {
-                            return I18n.tr("Unsaved note...")
-                        } else {
-                            return I18n.tr("Unsaved changes")
+                StyledText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    readonly property bool savingToDisk: autoSaveTimer.running && currentTab && (currentTab.isTemporary || SettingsData.notepadAutoSave)
+                    text: {
+                        if (savingToDisk) {
+                            return I18n.tr("Saving...");
                         }
-                    } else {
-                        return I18n.tr("Saved")
-                    }
-                }
-                font.pixelSize: Theme.fontSizeSmall
-                color: {
-                    if (autoSaveTimer.running) {
-                        return Theme.primary
-                    }
 
-                    if (hasUnsavedChanges()) {
-                        return Theme.warning
-                    } else {
-                        return Theme.success
+                        if (currentTab && currentTab.isTemporary) {
+                            return I18n.tr("Auto saved");
+                        }
+
+                        return hasUnsavedChanges() ? I18n.tr("Unsaved changes") : I18n.tr("Saved");
+                    }
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: {
+                        if (savingToDisk) {
+                            return Theme.primary;
+                        }
+
+                        if (currentTab && currentTab.isTemporary) {
+                            return Theme.success;
+                        }
+
+                        return hasUnsavedChanges() ? Theme.warning : Theme.success;
                     }
                 }
-                opacity: textArea.text.length > 0 ? 1.0 : 0.0
+
+                DankActionButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    iconName: "info"
+                    iconSize: Theme.iconSizeSmall
+                    iconColor: root.showPathInfo ? Theme.primary : Theme.surfaceTextMedium
+                    buttonSize: 20
+                    onClicked: root.showPathInfo = !root.showPathInfo
+                }
             }
         }
     }
@@ -902,7 +1074,7 @@ Column {
         interval: 2000
         repeat: false
         onTriggered: {
-            autoSaveToSession()
+            autoSaveToSession();
         }
     }
 
@@ -913,11 +1085,63 @@ Column {
         onTriggered: syncContentToPlugin()
     }
 
+    FileView {
+        id: externalWatch
+        path: (!root.externalWatchPaused && currentTab && !currentTab.isTemporary && currentTab.filePath) ? currentTab.filePath : ""
+        blockLoading: true
+        preload: true
+        watchChanges: true
+
+        onFileChanged: {
+            root.watcherReloadPending = true;
+            reload();
+        }
+
+        onLoaded: {
+            if (root.ignoreNextExternalChange) {
+                root.ignoreNextExternalChange = false;
+                root.lastSavedContent = externalWatch.text();
+                root.watcherReloadPending = false;
+                return;
+            }
+            if (!root.watcherReloadPending)
+                return;
+            root.watcherReloadPending = false;
+            if (!root.contentLoaded || !root.currentTab || root.currentTab.isTemporary)
+                return;
+            if (!root.surfaceVisible)
+                return;
+            root.applyDiskContent(externalWatch.text());
+        }
+
+        onLoadFailed: error => {}
+    }
+
     Connections {
         target: SettingsData
         function onBuiltInPluginSettingsChanged() {
             if (PluginService.isPluginLoaded("dankNotepadModule")) {
-                pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "")
+                pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "");
+            }
+        }
+    }
+
+    Connections {
+        target: NotepadStorageService
+        function onSessionBufferRevisionChanged() {
+            if (applyingShared || !contentLoaded || loadedTabId < 0)
+                return;
+            if (textArea.activeFocus)
+                return;
+            var buffer = NotepadStorageService.getSessionBuffer(loadedTabId);
+            if (buffer === undefined || buffer.content === textArea.text)
+                return;
+            if (textArea.text === lastSavedContent) {
+                applyingShared = true;
+                lastSavedContent = buffer.baseline;
+                textArea.text = buffer.content;
+                applyingShared = false;
+                syncContentToPlugin();
             }
         }
     }

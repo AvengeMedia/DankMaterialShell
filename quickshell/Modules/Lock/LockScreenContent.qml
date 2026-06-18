@@ -9,11 +9,13 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import qs.Common
+import qs.Modals
 import qs.Services
 import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("LockScreenContent")
 
     function encodeFileUrl(path) {
         if (!path)
@@ -72,6 +74,10 @@ Item {
         return pam && (pam.u2fState === "waiting" || pam.u2fState === "insert") && !pam.u2fPending;
     }
 
+    function canStartSecurityKeyUnlock() {
+        return !demoMode && pam && pam.u2f && pam.u2f.available && SettingsData.enableU2f && SettingsData.u2fMode === "or" && !pam.passwd.active && !pam.u2f.active && !pam.u2fPending && !root.unlocking;
+    }
+
     Component.onCompleted: {
         WeatherService.addRef();
         UserInfoService.getUserInfo();
@@ -95,9 +101,9 @@ Item {
         if (SessionService.loginctlAvailable && DMSService.apiVersion >= 2) {
             DMSService.sendRequest("loginctl.lockerReady", null, resp => {
                 if (resp?.error)
-                    console.warn("lockerReady failed:", resp.error);
+                    log.warn("lockerReady failed:", resp.error);
                 else
-                    console.log("lockerReady sent (afterAnimating/afterRendering)");
+                    log.debug("lockerReady sent (afterAnimating/afterRendering)");
             });
         }
     }
@@ -747,8 +753,45 @@ Item {
                         }
                     }
 
-                    TextInput {
+                    FocusScope {
                         id: passwordField
+
+                        property string text: root.passwordBuffer
+                        property int cursorPosition: text.length
+
+                        signal accepted()
+
+                        function clampCursorPosition() {
+                            cursorPosition = Math.max(0, Math.min(cursorPosition, text.length));
+                        }
+
+                        function clear() {
+                            text = "";
+                            cursorPosition = 0;
+                        }
+
+                        function insertText(value) {
+                            if (value.length === 0)
+                                return;
+                            clampCursorPosition();
+                            text = text.slice(0, cursorPosition) + value + text.slice(cursorPosition);
+                            cursorPosition += value.length;
+                        }
+
+                        function backspace() {
+                            clampCursorPosition();
+                            if (cursorPosition === 0)
+                                return;
+                            text = text.slice(0, cursorPosition - 1) + text.slice(cursorPosition);
+                            cursorPosition -= 1;
+                        }
+
+                        function isPrintableText(value) {
+                            if (value.length === 0)
+                                return false;
+                            const code = value.charCodeAt(0);
+                            return code >= 0x20 && code !== 0x7f;
+                        }
 
                         anchors.fill: parent
                         anchors.leftMargin: lockIconContainer.width + Theme.spacingM * 2
@@ -759,6 +802,9 @@ Item {
                             }
                             if (enterButton.visible) {
                                 margin += enterButton.width + 2;
+                            }
+                            if (securityKeyButton.visible) {
+                                margin += securityKeyButton.width;
                             }
                             if (virtualKeyboardButton.visible) {
                                 margin += virtualKeyboardButton.width;
@@ -772,7 +818,6 @@ Item {
                         focus: true
                         enabled: !demoMode
                         activeFocusOnTab: !demoMode
-                        echoMode: parent.showPassword ? TextInput.Normal : TextInput.Password
                         onTextChanged: {
                             if (!demoMode) {
                                 root.passwordBuffer = text;
@@ -800,12 +845,31 @@ Item {
                                     return;
                                 }
                                 clear();
+                                event.accepted = true;
+                                return;
                             }
 
                             if (pam.passwd.active) {
-                                console.log("PAM is active, ignoring input");
+                                log.debug("PAM is active, ignoring input");
                                 event.accepted = true;
                                 return;
+                            }
+
+                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                accepted();
+                                event.accepted = true;
+                                return;
+                            }
+
+                            if (event.key === Qt.Key_Backspace) {
+                                backspace();
+                                event.accepted = true;
+                                return;
+                            }
+
+                            if (isPrintableText(event.text)) {
+                                insertText(event.text);
+                                event.accepted = true;
                             }
                         }
 
@@ -840,6 +904,17 @@ Item {
                                 });
                             }
                         }
+
+                        Connections {
+                            target: root
+
+                            function onPasswordBufferChanged() {
+                                if (passwordField.text === root.passwordBuffer)
+                                    return;
+                                passwordField.text = root.passwordBuffer;
+                                passwordField.cursorPosition = passwordField.text.length;
+                            }
+                        }
                     }
 
                     KeyboardController {
@@ -853,7 +928,7 @@ Item {
 
                         anchors.left: lockIconContainer.right
                         anchors.leftMargin: Theme.spacingM
-                        anchors.right: (revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right))))
+                        anchors.right: (revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (securityKeyButton.visible ? securityKeyButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right)))))
                         anchors.rightMargin: 2
                         anchors.verticalCenter: parent.verticalCenter
                         text: {
@@ -895,7 +970,7 @@ Item {
                     StyledText {
                         anchors.left: lockIconContainer.right
                         anchors.leftMargin: Theme.spacingM
-                        anchors.right: (revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right))))
+                        anchors.right: (revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (securityKeyButton.visible ? securityKeyButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right)))))
                         anchors.rightMargin: 2
                         anchors.verticalCenter: parent.verticalCenter
                         text: {
@@ -925,7 +1000,7 @@ Item {
                     DankActionButton {
                         id: revealButton
 
-                        anchors.right: virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right))
+                        anchors.right: virtualKeyboardButton.visible ? virtualKeyboardButton.left : (securityKeyButton.visible ? securityKeyButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right)))
                         anchors.rightMargin: 0
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: parent.showPassword ? "visibility_off" : "visibility"
@@ -935,10 +1010,26 @@ Item {
                         onClicked: parent.showPassword = !parent.showPassword
                     }
                     DankActionButton {
-                        id: virtualKeyboardButton
+                        id: securityKeyButton
 
                         anchors.right: enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right)
-                        anchors.rightMargin: enterButton.visible ? 0 : Theme.spacingS
+                        anchors.rightMargin: 0
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "passkey"
+                        buttonSize: 32
+                        visible: root.canStartSecurityKeyUnlock()
+                        enabled: visible
+                        onClicked: {
+                            passwordField.text = "";
+                            root.passwordBuffer = "";
+                            pam.u2f.startForAlternativeAuth();
+                        }
+                    }
+                    DankActionButton {
+                        id: virtualKeyboardButton
+
+                        anchors.right: securityKeyButton.visible ? securityKeyButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right))
+                        anchors.rightMargin: securityKeyButton.visible || enterButton.visible ? 0 : Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "keyboard"
                         buttonSize: 32
@@ -1024,7 +1115,7 @@ Item {
                                     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
                                 }
 
-                                RotationAnimation on rotation {
+                                RotationAnimator on rotation {
                                     running: pam.passwd.active && !root.unlocking
                                     loops: Animation.Infinite
                                     duration: Anims.durLong
@@ -1437,6 +1528,7 @@ Item {
                 }
 
                 DankIcon {
+                    id: lockNetworkIcon
                     name: {
                         if (NetworkService.wifiToggling)
                             return "sync";
@@ -1450,9 +1542,14 @@ Item {
                         }
                     }
                     size: Theme.iconSize - 2
-                    color: NetworkService.networkStatus !== "disconnected" ? "white" : Qt.rgba(255, 255, 255, 0.5)
+                    color: (NetworkService.networkStatus !== "disconnected" || NetworkService.isConnecting) ? "white" : Qt.rgba(255, 255, 255, 0.5)
                     anchors.verticalCenter: parent.verticalCenter
                     visible: NetworkService.networkAvailable
+
+                    DankBlink {
+                        target: lockNetworkIcon
+                        running: NetworkService.isWifiConnecting
+                    }
                 }
 
                 DankIcon {
@@ -1464,11 +1561,17 @@ Item {
                 }
 
                 DankIcon {
+                    id: lockBluetoothIcon
                     name: "bluetooth"
                     size: Theme.iconSize - 2
                     color: "white"
                     anchors.verticalCenter: parent.verticalCenter
                     visible: BluetoothService.available && BluetoothService.enabled
+
+                    DankBlink {
+                        target: lockBluetoothIcon
+                        running: BluetoothService.connecting
+                    }
                 }
 
                 DankIcon {
@@ -1622,7 +1725,7 @@ Item {
             buttonSize: 40
             onClicked: {
                 if (demoMode) {
-                    console.log("Demo: Power Menu");
+                    log.debug("Demo: Power Menu");
                 } else {
                     powerMenu.show();
                 }
@@ -1692,5 +1795,12 @@ Item {
                 Qt.callLater(() => passwordField.forceActiveFocus());
             }
         }
+        onSwitchUserRequested: {
+            switchUserPicker.showFromLockScreen();
+        }
+    }
+
+    SwitchUserModal {
+        id: switchUserPicker
     }
 }

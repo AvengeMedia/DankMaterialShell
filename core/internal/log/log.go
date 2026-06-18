@@ -1,12 +1,16 @@
 package log
 
 import (
+	"io"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 
 	"github.com/charmbracelet/lipgloss"
 	cblog "github.com/charmbracelet/log"
+	"github.com/mattn/go-isatty"
+	"github.com/muesli/termenv"
 )
 
 // Logger embeds the Charm Logger and adds Printf/Fatalf
@@ -21,7 +25,25 @@ func (l *Logger) Fatalf(format string, v ...any) { l.Logger.Fatalf(format, v...)
 var (
 	logger     *Logger
 	initLogger sync.Once
+
+	logMu     sync.Mutex
+	logFile   *os.File
+	logStderr io.Writer = os.Stderr
+
+	ansiRe = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 )
+
+// ansiStripWriter strips ANSI escape sequences before forwarding to w. Used
+// for the file sink so colored stderr stays colored while the file stays plain.
+type ansiStripWriter struct{ w io.Writer }
+
+func (a *ansiStripWriter) Write(p []byte) (int, error) {
+	stripped := ansiRe.ReplaceAll(p, nil)
+	if _, err := a.w.Write(stripped); err != nil {
+		return 0, err
+	}
+	return len(p), nil
+}
 
 func parseLogLevel(level string) cblog.Level {
 	switch strings.ToLower(level) {
@@ -86,7 +108,7 @@ func GetLogger() *Logger {
 			SetString(" DEBUG").
 			Foreground(lipgloss.Color("4"))
 
-		base := cblog.New(os.Stderr)
+		base := cblog.New(logStderr)
 		base.SetStyles(styles)
 		base.SetReportTimestamp(false)
 
@@ -98,8 +120,83 @@ func GetLogger() *Logger {
 		base.SetPrefix(" go")
 
 		logger = &Logger{base}
+
+		if path := os.Getenv("DMS_LOG_FILE"); path != "" {
+			_ = SetLogFile(path)
+		}
 	})
 	return logger
+}
+
+// SetLevel updates the active log level. Accepts the same strings as
+// DMS_LOG_LEVEL. Unknown values default to info.
+func SetLevel(level string) {
+	GetLogger().SetLevel(parseLogLevel(level))
+}
+
+// SetLogFile makes the logger append to path in addition to stderr. Passing an
+// empty string detaches the file sink. Atomic per-line writes (≤PIPE_BUF) on
+// O_APPEND keep concurrent Go and QML writers from corrupting each other.
+//
+// Color handling: charmbracelet/log auto-detects color support from its
+// io.Writer, and io.MultiWriter doesn't pass that through, so we force the ANSI
+// profile when stderr is a TTY and route the file through ansiStripWriter so
+// the file stays plain while stderr keeps its colors.
+func SetLogFile(path string) error {
+	logMu.Lock()
+	defer logMu.Unlock()
+
+	if logFile != nil {
+		logFile.Close()
+		logFile = nil
+	}
+
+	l := GetLogger()
+	if path == "" {
+		l.SetOutput(logStderr)
+		applyColorProfile(l, logStderr)
+		return nil
+	}
+
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0o644)
+	if err != nil {
+		return err
+	}
+	logFile = f
+	out := io.MultiWriter(logStderr, &ansiStripWriter{w: f})
+	l.SetOutput(out)
+	applyColorProfile(l, logStderr)
+	return nil
+}
+
+// applyColorProfile forces the renderer's color profile to match what stderr
+// would produce on its own, undoing the auto-downgrade triggered by wrapping
+// stderr in a non-TTY writer (e.g. io.MultiWriter).
+func applyColorProfile(l *Logger, stderr io.Writer) {
+	f, ok := stderr.(*os.File)
+	if !ok {
+		l.SetColorProfile(termenv.Ascii)
+		return
+	}
+	if isatty.IsTerminal(f.Fd()) {
+		l.SetColorProfile(termenv.ANSI)
+		return
+	}
+	l.SetColorProfile(termenv.Ascii)
+}
+
+// ApplyEnvOverrides re-reads DMS_LOG_LEVEL and DMS_LOG_FILE and reconfigures
+// the singleton. Safe to call after CLI flags have rewritten the environment.
+func ApplyEnvOverrides() {
+	GetLogger()
+	if level := os.Getenv("DMS_LOG_LEVEL"); level != "" {
+		SetLevel(level)
+	}
+	if path := os.Getenv("DMS_LOG_FILE"); path != "" {
+		if err := SetLogFile(path); err != nil {
+			Warnf("Failed to open log file %q: %v", path, err)
+		}
+	}
 }
 
 // * Convenience wrappers

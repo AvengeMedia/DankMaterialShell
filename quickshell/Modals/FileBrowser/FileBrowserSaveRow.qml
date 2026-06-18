@@ -8,6 +8,7 @@ Row {
     property bool saveMode: false
     property string defaultFileName: ""
     property string currentPath: ""
+    property alias fileName: fileNameInput.text
 
     signal saveRequested(string filePath)
 
@@ -29,15 +30,15 @@ Row {
         Component.onCompleted: {
             if (saveMode)
                 Qt.callLater(() => {
-                                 forceActiveFocus()
-                             })
+                    forceActiveFocus();
+                });
         }
         onAccepted: {
             if (text.trim() !== "") {
-                var basePath = currentPath.replace(/^file:\/\//, '')
-                var fullPath = basePath + "/" + text.trim()
-                fullPath = fullPath.replace(/\/+/g, '/')
-                saveRequested(fullPath)
+                var basePath = currentPath.replace(/^file:\/\//, '');
+                var fullPath = basePath + "/" + text.trim();
+                fullPath = fullPath.replace(/\/+/g, '/');
+                saveRequested(fullPath);
             }
         }
     }
@@ -63,10 +64,10 @@ Row {
             enabled: fileNameInput.text.trim() !== ""
             onClicked: {
                 if (fileNameInput.text.trim() !== "") {
-                    var basePath = currentPath.replace(/^file:\/\//, '')
-                    var fullPath = basePath + "/" + fileNameInput.text.trim()
-                    fullPath = fullPath.replace(/\/+/g, '/')
-                    saveRequested(fullPath)
+                    var basePath = currentPath.replace(/^file:\/\//, '');
+                    var fullPath = basePath + "/" + fileNameInput.text.trim();
+                    fullPath = fullPath.replace(/\/+/g, '/');
+                    saveRequested(fullPath);
                 }
             }
         }

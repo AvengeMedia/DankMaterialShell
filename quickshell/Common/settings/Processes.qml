@@ -12,6 +12,35 @@ Singleton {
 
     property var settingsRoot: null
 
+    onSettingsRootChanged: {
+        if (settingsRoot && !settingsRoot.isGreeterMode)
+            consumeGreeterAutoLoginPendingSync();
+    }
+
+    readonly property string greeterAutoLoginPendingSyncPath: (Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter") + "/.local/state/auto-login-sync-pending"
+
+    function consumeGreeterAutoLoginPendingSync() {
+        if (!settingsRoot || settingsRoot.isGreeterMode)
+            return;
+        greeterAutoLoginPendingCheckProcess.running = true;
+    }
+
+    property var greeterAutoLoginPendingCheckProcess: Process {
+        command: ["sh", "-c", "if [ -f " + JSON.stringify(root.greeterAutoLoginPendingSyncPath) + " ]; then rm -f " + JSON.stringify(root.greeterAutoLoginPendingSyncPath) + "; echo pending; fi"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if ((text || "").trim() !== "pending" || !root.settingsRoot)
+                    return;
+                if (!root.settingsRoot.greeterAutoLogin)
+                    root.settingsRoot.set("greeterAutoLogin", true);
+                else
+                    root.scheduleGreeterAutoLoginSync();
+            }
+        }
+    }
+
     property string greetdPamText: ""
     property string systemAuthPamText: ""
     property string commonAuthPamText: ""
@@ -296,6 +325,66 @@ Singleton {
             authApplyDebounce.restart();
     }
 
+    // --- Greeter auto-login sync pipeline ---
+
+    property bool greeterAutoLoginSyncRunning: false
+    property bool greeterAutoLoginSyncQueued: false
+    property bool greeterAutoLoginSyncRerunRequested: false
+    property string greeterAutoLoginSyncStdout: ""
+    property string greeterAutoLoginSyncStderr: ""
+    property string greeterAutoLoginSyncTerminalFallbackStderr: ""
+
+    function scheduleGreeterAutoLoginSync() {
+        if (!settingsRoot || settingsRoot.isGreeterMode)
+            return;
+
+        greeterAutoLoginSyncQueued = true;
+        if (greeterAutoLoginSyncRunning) {
+            greeterAutoLoginSyncRerunRequested = true;
+            return;
+        }
+
+        greeterAutoLoginSyncDebounce.restart();
+    }
+
+    function beginGreeterAutoLoginSync() {
+        if (!greeterAutoLoginSyncQueued || greeterAutoLoginSyncRunning || !settingsRoot || settingsRoot.isGreeterMode)
+            return;
+
+        greeterAutoLoginSyncQueued = false;
+        greeterAutoLoginSyncRerunRequested = false;
+        greeterAutoLoginSyncStdout = "";
+        greeterAutoLoginSyncStderr = "";
+        greeterAutoLoginSyncTerminalFallbackStderr = "";
+        greeterAutoLoginSyncRunning = true;
+        greeterAutoLoginSyncSudoProbeProcess.running = true;
+    }
+
+    function launchGreeterAutoLoginSyncTerminalFallback(details) {
+        ToastService.showWarning(I18n.tr("Opening terminal to update greetd"), I18n.tr("DMS needs administrator access. The terminal closes automatically when done.") + (details ? "\n\n" + details : ""), "dms greeter sync --autologin", "greeter-autologin-sync");
+        greeterAutoLoginSyncTerminalFallbackStderr = "";
+        greeterAutoLoginSyncTerminalFallbackProcess.running = true;
+    }
+
+    function greeterAutoLoginSyncSuccessToast(details) {
+        const enabling = settingsRoot && settingsRoot.greeterAutoLogin;
+        // Clear the sticky in-progress toast, then confirm with an auto-dismissing toast.
+        ToastService.dismissCategory("greeter-autologin-sync");
+        if (enabling) {
+            ToastService.showWarning(I18n.tr("Auto-login enabled"), I18n.tr("You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.") + (details ? "\n\n" + details : ""));
+        } else {
+            ToastService.showInfo(I18n.tr("Auto-login disabled"), I18n.tr("You'll enter your password at the greeter after the next reboot.") + (details ? "\n\n" + details : ""));
+        }
+    }
+
+    function finishGreeterAutoLoginSync() {
+        const shouldRerun = greeterAutoLoginSyncQueued || greeterAutoLoginSyncRerunRequested;
+        greeterAutoLoginSyncRunning = false;
+        greeterAutoLoginSyncRerunRequested = false;
+        if (shouldRerun)
+            greeterAutoLoginSyncDebounce.restart();
+    }
+
     // --- PAM parsing helpers ---
 
     function stripPamComment(line) {
@@ -433,6 +522,82 @@ Singleton {
         onTriggered: root.beginAuthApply()
     }
 
+    Timer {
+        id: greeterAutoLoginSyncDebounce
+        interval: 300
+        repeat: false
+        onTriggered: root.beginGreeterAutoLoginSync()
+    }
+
+    property var greeterAutoLoginSyncProcess: Process {
+        command: ["dms", "greeter", "sync", "--yes", "--autologin"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: root.greeterAutoLoginSyncStdout = text || ""
+        }
+
+        stderr: StdioCollector {
+            onStreamFinished: root.greeterAutoLoginSyncStderr = text || ""
+        }
+
+        onExited: exitCode => {
+            const out = (root.greeterAutoLoginSyncStdout || "").trim();
+            const err = (root.greeterAutoLoginSyncStderr || "").trim();
+
+            if (exitCode === 0) {
+                let details = out;
+                if (err !== "")
+                    details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
+                root.greeterAutoLoginSyncSuccessToast(details);
+                root.finishGreeterAutoLoginSync();
+                return;
+            }
+
+            let details = "";
+            if (out !== "")
+                details = out;
+            if (err !== "")
+                details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
+            root.launchGreeterAutoLoginSyncTerminalFallback(details);
+        }
+    }
+
+    property var greeterAutoLoginSyncSudoProbeProcess: Process {
+        command: ["sudo", "-n", "true"]
+        running: false
+
+        onExited: exitCode => {
+            const enabling = root.settingsRoot && root.settingsRoot.greeterAutoLogin;
+            if (exitCode === 0) {
+                ToastService.showWarning(enabling ? I18n.tr("Applying auto-login on startup...") : I18n.tr("Disabling auto-login on startup..."), "", "dms greeter sync --autologin", "greeter-autologin-sync");
+                root.greeterAutoLoginSyncProcess.running = true;
+                return;
+            }
+
+            root.launchGreeterAutoLoginSyncTerminalFallback();
+        }
+    }
+
+    property var greeterAutoLoginSyncTerminalFallbackProcess: Process {
+        command: ["dms", "greeter", "sync", "--terminal", "--yes", "--autologin"]
+        running: false
+
+        stderr: StdioCollector {
+            onStreamFinished: root.greeterAutoLoginSyncTerminalFallbackStderr = text || ""
+        }
+
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.greeterAutoLoginSyncSuccessToast("");
+            } else {
+                let details = (root.greeterAutoLoginSyncTerminalFallbackStderr || "").trim();
+                ToastService.showError(I18n.tr("Couldn't open a terminal for the auto-login update.") + " (exit " + exitCode + ")", details, "dms greeter sync --autologin", "greeter-autologin-sync");
+            }
+            root.finishGreeterAutoLoginSync();
+        }
+    }
+
     property var authApplyProcess: Process {
         command: ["dms", "auth", "sync", "--yes"]
         running: false
@@ -480,7 +645,7 @@ Singleton {
         onExited: exitCode => {
             const err = (root.authApplySudoProbeStderr || "").trim();
             if (exitCode === 0) {
-                ToastService.showInfo(I18n.tr("Applying authentication changes…"), "", "", "auth-sync");
+                ToastService.showInfo(I18n.tr("Applying authentication changes..."), "", "", "auth-sync");
                 root.authApplyProcess.running = true;
                 return;
             }

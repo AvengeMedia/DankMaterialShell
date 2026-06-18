@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -13,6 +14,8 @@ Row {
     property string instanceId: ""
     property string screenName: ""
     property var parentScreen: null
+    property color sliderTrackColor: "transparent"
+    property real sliderTrackOpacity: Theme.ccSliderTrackOpacity
 
     signal iconClicked
 
@@ -29,8 +32,10 @@ Row {
         }
 
         if (screenName && screenName.length > 0) {
+            const screen = Quickshell.screens.find(s => s.name === screenName);
+            const pinKey = screen ? SettingsData.getScreenDisplayName(screen) : screenName;
             const pins = SettingsData.brightnessDevicePins || {};
-            const pinnedDevice = pins[screenName];
+            const pinnedDevice = pins[pinKey];
             if (pinnedDevice && pinnedDevice.length > 0) {
                 const found = DisplayService.devices.find(dev => dev.name === pinnedDevice);
                 if (found) {
@@ -184,7 +189,8 @@ Row {
             }
         }
         thumbOutlineColor: Theme.surfaceContainer
-        trackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+        trackColor: root.sliderTrackColor.a > 0 ? root.sliderTrackColor : Theme.ccSliderTrackColor
+        trackOpacity: root.sliderTrackOpacity
 
         Binding on value {
             value: root.targetBrightness

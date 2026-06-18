@@ -156,14 +156,14 @@ func (s *Screenshoter) captureWindow() (*CaptureResult, error) {
 	switch DetectCompositor() {
 	case CompositorHyprland:
 		return s.captureAndCrop(output, region)
-	case CompositorDWL:
-		return s.captureDWLWindow(output, region, geom)
+	case CompositorMango:
+		return s.captureMangoWindow(output, region, geom)
 	default:
 		return s.captureRegionOnOutput(output, region)
 	}
 }
 
-func (s *Screenshoter) captureDWLWindow(output *WaylandOutput, region Region, geom *WindowGeometry) (*CaptureResult, error) {
+func (s *Screenshoter) captureMangoWindow(output *WaylandOutput, region Region, geom *WindowGeometry) (*CaptureResult, error) {
 	result, err := s.captureWholeOutput(output)
 	if err != nil {
 		return nil, err
@@ -628,7 +628,7 @@ func (s *Screenshoter) captureRegionOnOutput(output *WaylandOutput, region Regio
 	w := int32(float64(region.Width) * scale)
 	h := int32(float64(region.Height) * scale)
 
-	if DetectCompositor() == CompositorDWL {
+	if DetectCompositor() == CompositorMango {
 		scaledOutW := int32(float64(output.width) * scale)
 		scaledOutH := int32(float64(output.height) * scale)
 		if localX >= scaledOutW {

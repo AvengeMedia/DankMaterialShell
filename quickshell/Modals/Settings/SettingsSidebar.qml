@@ -23,6 +23,7 @@ Rectangle {
     property bool searchActive: searchField.text.length > 0
     property int searchSelectedIndex: 0
     property int keyboardHighlightIndex: -1
+    readonly property int navigationStateDuration: Theme.currentAnimationSpeed === SettingsData.AnimationSpeed.None ? 0 : Anims.settingsNavigationStateDuration
 
     function focusSearch() {
         searchField.forceActiveFocus();
@@ -101,6 +102,13 @@ Rectangle {
                     "icon": "volume_up",
                     "tabIndex": 15,
                     "soundsOnly": true
+                },
+                {
+                    "id": "compositor_layout",
+                    "text": CompositorService.isNiri ? "Niri" : (CompositorService.isHyprland ? "Hyprland" : "MangoWC"),
+                    "icon": "layers",
+                    "tabIndex": 37,
+                    "layoutCapable": true
                 }
             ]
         },
@@ -109,6 +117,12 @@ Rectangle {
             "text": I18n.tr("Dank Bar"),
             "icon": "toolbar",
             "children": [
+                {
+                    "id": "dankbar_appearance",
+                    "text": I18n.tr("Appearance"),
+                    "icon": "palette",
+                    "tabIndex": 6
+                },
                 {
                     "id": "dankbar_settings",
                     "text": I18n.tr("Settings"),
@@ -120,21 +134,27 @@ Rectangle {
                     "text": I18n.tr("Widgets"),
                     "icon": "widgets",
                     "tabIndex": 22
-                }
-            ]
-        },
-        {
-            "id": "workspaces_widgets",
-            "text": I18n.tr("Workspaces & Widgets"),
-            "icon": "dashboard",
-            "collapsedByDefault": true,
-            "children": [
+                },
                 {
                     "id": "workspaces",
                     "text": I18n.tr("Workspaces"),
                     "icon": "view_module",
                     "tabIndex": 4
                 },
+                {
+                    "id": "frame",
+                    "text": I18n.tr("Frame"),
+                    "icon": "frame_source",
+                    "tabIndex": 33
+                }
+            ]
+        },
+        {
+            "id": "workspaces_widgets",
+            "text": I18n.tr("Widgets & Notifications"),
+            "icon": "dashboard",
+            "collapsedByDefault": true,
+            "children": [
                 {
                     "id": "media_player",
                     "text": I18n.tr("Media Player"),
@@ -154,19 +174,6 @@ Rectangle {
                     "tabIndex": 18
                 },
                 {
-                    "id": "running_apps",
-                    "text": I18n.tr("Running Apps"),
-                    "icon": "app_registration",
-                    "tabIndex": 19,
-                    "hyprlandNiriOnly": true
-                },
-                {
-                    "id": "updater",
-                    "text": I18n.tr("System Updater"),
-                    "icon": "refresh",
-                    "tabIndex": 20
-                },
-                {
                     "id": "desktop_widgets",
                     "text": I18n.tr("Desktop Widgets"),
                     "icon": "widgets",
@@ -177,7 +184,7 @@ Rectangle {
         {
             "id": "dock_launcher",
             "text": I18n.tr("Dock & Launcher"),
-            "icon": "apps",
+            "icon": "shelf_auto_hide",
             "collapsedByDefault": true,
             "children": [
                 {
@@ -231,8 +238,68 @@ Rectangle {
             "id": "network",
             "text": I18n.tr("Network"),
             "icon": "wifi",
-            "tabIndex": 7,
-            "dmsOnly": true
+            "dmsOnly": true,
+            "children": [
+                {
+                    "id": "network_status",
+                    "text": I18n.tr("Status"),
+                    "icon": "lan",
+                    "tabIndex": 7
+                },
+                {
+                    "id": "network_ethernet",
+                    "text": I18n.tr("Ethernet"),
+                    "icon": "settings_ethernet",
+                    "tabIndex": 39
+                },
+                {
+                    "id": "network_wifi",
+                    "text": I18n.tr("WiFi"),
+                    "icon": "wifi",
+                    "tabIndex": 40
+                },
+                {
+                    "id": "network_vpn",
+                    "text": I18n.tr("VPN"),
+                    "icon": "vpn_key",
+                    "tabIndex": 41
+                }
+            ]
+        },
+        {
+            "id": "applications",
+            "text": I18n.tr("Applications"),
+            "icon": "apps",
+            "collapsedByDefault": true,
+            "children": [
+                {
+                    "id": "default_apps",
+                    "text": I18n.tr("Default Apps"),
+                    "icon": "star",
+                    "tabIndex": 34
+                },
+                {
+                    "id": "running_apps",
+                    "text": I18n.tr("Running Apps"),
+                    "icon": "app_registration",
+                    "tabIndex": 19,
+                    "hyprlandNiriOnly": true
+                },
+                {
+                    "id": "autostart",
+                    "text": I18n.tr("Autostart Apps"),
+                    "icon": "line_start",
+                    "tabIndex": 36,
+                    "autostartOnly": true
+                },
+                {
+                    "id": "window_rules",
+                    "text": I18n.tr("Window Rules"),
+                    "icon": "select_window",
+                    "tabIndex": 38,
+                    "windowRulesCapable": true
+                }
+            ]
         },
         {
             "id": "system",
@@ -273,11 +340,17 @@ Rectangle {
                     "tabIndex": 32
                 },
                 {
-                    "id": "window_rules",
-                    "text": I18n.tr("Window Rules"),
-                    "icon": "select_window",
-                    "tabIndex": 28,
-                    "niriOnly": true
+                    "id": "updater",
+                    "text": I18n.tr("System Updater"),
+                    "icon": "refresh",
+                    "tabIndex": 20,
+                    "updaterOnly": true
+                },
+                {
+                    "id": "users",
+                    "text": I18n.tr("Users"),
+                    "icon": "manage_accounts",
+                    "tabIndex": 35
                 }
             ]
         },
@@ -304,6 +377,12 @@ Rectangle {
                     "text": I18n.tr("Power & Sleep"),
                     "icon": "power_settings_new",
                     "tabIndex": 21
+                },
+                {
+                    "id": "battery",
+                    "text": I18n.tr("Battery"),
+                    "icon": "battery_charging_full",
+                    "tabIndex": 42
                 }
             ]
         },
@@ -336,9 +415,17 @@ Rectangle {
             return false;
         if (item.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland)
             return false;
+        if (item.windowRulesCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
+            return false;
+        if (item.layoutCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
+            return false;
         if (item.niriOnly && !CompositorService.isNiri)
             return false;
         if (item.clipboardOnly && (!DMSService.isConnected || DMSService.apiVersion < 23))
+            return false;
+        if (item.updaterOnly && !SystemUpdateService.sysupdateAvailable)
+            return false;
+        if (item.autostartOnly && !DesktopService.autostartAvailable)
             return false;
         return true;
     }
@@ -504,6 +591,8 @@ Rectangle {
             return -1;
 
         var normalized = name.toLowerCase().replace(/[_\-\s]/g, "");
+        if (normalized === "compositor")
+            normalized = "workspaces";
 
         for (var i = 0; i < categoryStructure.length; i++) {
             var cat = categoryStructure[i];
@@ -548,7 +637,7 @@ Rectangle {
         id: __m1
         font.pixelSize: Theme.fontSizeMedium
         font.weight: Font.Medium
-        text: I18n.tr("Workspaces & Widgets")
+        text: I18n.tr("Widgets & Notifications")
     }
     StyledTextMetrics {
         id: __m2
@@ -742,6 +831,7 @@ Rectangle {
                             id: resultRipple
                             rippleColor: root.searchSelectedIndex === resultDelegate.index ? Theme.buttonText : Theme.surfaceText
                             cornerRadius: resultDelegate.radius
+                            animationDuration: Anims.settingsNavigationRippleDuration
                         }
 
                         Row {
@@ -797,8 +887,9 @@ Rectangle {
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
+                                duration: root.navigationStateDuration
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: Anims.expressiveEffects
                             }
                         }
                     }
@@ -872,6 +963,7 @@ Rectangle {
                             id: categoryRipple
                             rippleColor: categoryRow.isActive ? Theme.buttonText : Theme.surfaceText
                             cornerRadius: categoryRow.radius
+                            animationDuration: Anims.settingsNavigationRippleDuration
                         }
 
                         Row {
@@ -927,8 +1019,9 @@ Rectangle {
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
+                                duration: root.navigationStateDuration
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: Anims.expressiveEffects
                             }
                         }
                     }
@@ -969,6 +1062,7 @@ Rectangle {
                                     id: childRipple
                                     rippleColor: childDelegate.isActive ? Theme.buttonText : Theme.surfaceText
                                     cornerRadius: childDelegate.radius
+                                    animationDuration: Anims.settingsNavigationRippleDuration
                                 }
 
                                 Row {
@@ -1009,8 +1103,9 @@ Rectangle {
 
                                 Behavior on color {
                                     ColorAnimation {
-                                        duration: Theme.shortDuration
-                                        easing.type: Theme.standardEasing
+                                        duration: root.navigationStateDuration
+                                        easing.type: Easing.BezierSpline
+                                        easing.bezierCurve: Anims.expressiveEffects
                                     }
                                 }
                             }

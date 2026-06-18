@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Notifications
 import qs.Common
@@ -16,6 +15,13 @@ Rectangle {
     property bool userInitiatedExpansion: false
     property bool isAnimating: false
     property bool animateExpansion: true
+    property bool isDescriptionToggleAnimation: false
+    property bool _retainedExpandedContent: false
+    property bool _clipAnimatedContent: false
+    property real expandedContentOpacity: expanded ? 1 : 0
+    property real collapsedContentOpacity: expanded ? 0 : 1
+    readonly property bool renderExpandedContent: expanded || _retainedExpandedContent
+    readonly property bool renderCollapsedContent: !expanded
 
     property bool isGroupSelected: false
     property int selectedNotificationIndex: -1
@@ -34,11 +40,12 @@ Rectangle {
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real collapsedContentHeight: Math.max(iconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
     readonly property real baseCardHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing
+    readonly property bool connectedFrameMode: SettingsData.connectedFrameModeActive
 
     width: parent ? parent.width : 400
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
-    radius: Theme.cornerRadius
+    radius: connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     scale: (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
     readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
     readonly property var shadowElevation: Theme.elevationLevel1
@@ -56,6 +63,16 @@ Rectangle {
         });
     }
 
+    function expansionMotionDuration() {
+        if (isDescriptionToggleAnimation)
+            return descriptionExpanded ? Theme.notificationInlineExpandDuration : Theme.notificationInlineCollapseDuration;
+        return Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded);
+    }
+
+    function expansionMotionCurve() {
+        return root.expanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve;
+    }
+
     Behavior on scale {
         enabled: listLevelScaleAnimationsEnabled
         NumberAnimation {
@@ -65,6 +82,7 @@ Rectangle {
     }
 
     Behavior on shadowBlurPx {
+        enabled: !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -72,6 +90,7 @@ Rectangle {
     }
 
     Behavior on shadowOffsetXPx {
+        enabled: !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -79,6 +98,7 @@ Rectangle {
     }
 
     Behavior on shadowOffsetYPx {
+        enabled: !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -93,6 +113,24 @@ Rectangle {
         }
     }
 
+    Behavior on expandedContentOpacity {
+        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        NumberAnimation {
+            duration: root.expansionMotionDuration()
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.expansionMotionCurve()
+        }
+    }
+
+    Behavior on collapsedContentOpacity {
+        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
+        NumberAnimation {
+            duration: root.expansionMotionDuration()
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.expansionMotionCurve()
+        }
+    }
+
     color: {
         if (isGroupSelected && keyboardNavigationActive) {
             return Theme.primaryPressed;
@@ -100,7 +138,7 @@ Rectangle {
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
             return Theme.primaryHoverLight;
         }
-        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
+        return Theme.floatingSurfaceHigh;
     }
     border.color: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -112,7 +150,7 @@ Rectangle {
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
             return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
         }
-        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05);
+        return Theme.outlineMedium;
     }
     border.width: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -124,9 +162,33 @@ Rectangle {
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
             return 2;
         }
-        return 0;
+        return Theme.layerOutlineWidth;
     }
-    clip: false
+    clip: _clipAnimatedContent
+
+    onExpandedChanged: {
+        if (__initialized && userInitiatedExpansion && animateExpansion)
+            _clipAnimatedContent = true;
+        if (expanded) {
+            _retainedExpandedContent = false;
+            return;
+        }
+        if (__initialized && userInitiatedExpansion && animateExpansion)
+            _retainedExpandedContent = true;
+    }
+
+    onHeightChanged: {
+        if (Math.abs(height - targetHeight) > 0.5)
+            return;
+        _clipAnimatedContent = false;
+        if (!expanded && _retainedExpandedContent)
+            _retainedExpandedContent = false;
+    }
+
+    onExpandedContentOpacityChanged: {
+        if (!expanded && _retainedExpandedContent && expandedContentOpacity <= 0.01)
+            _retainedExpandedContent = false;
+    }
 
     HoverHandler {
         id: cardHoverHandler
@@ -146,7 +208,7 @@ Rectangle {
         shadowOffsetX: root.shadowOffsetXPx
         shadowOffsetY: root.shadowOffsetYPx
         shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
-        shadowEnabled: root.shadowsAllowed
+        shadowEnabled: root.shadowsAllowed && !root.connectedFrameMode
     }
 
     Rectangle {
@@ -186,7 +248,8 @@ Rectangle {
         anchors.leftMargin: Theme.spacingL
         anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
         height: collapsedContentHeight + extraHeight
-        visible: !expanded
+        visible: renderCollapsedContent
+        opacity: root.collapsedContentOpacity
 
         DankCircularImage {
             id: iconContainer
@@ -215,12 +278,10 @@ Rectangle {
                     return "";
                 const appIcon = notificationGroup?.latestNotification?.appIcon;
                 if (!appIcon)
-                    return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                    return "";
                 if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                     return appIcon;
-                if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                    return "";
-                return Paths.resolveIconPath(appIcon);
+                return "";
             }
 
             hasImage: hasNotificationImage
@@ -334,6 +395,7 @@ Rectangle {
                     property bool hasMoreText: truncated
 
                     text: fullText
+                    textFormat: Text.StyledText
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                     width: parent.width
@@ -351,6 +413,7 @@ Rectangle {
                         onClicked: mouse => {
                             if (!parent.hoveredLink && (parent.hasMoreText || descriptionExpanded)) {
                                 root.userInitiatedExpansion = true;
+                                root.isDescriptionToggleAnimation = true;
                                 const messageId = (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.notification && notificationGroup.latestNotification.notification.id) ? (notificationGroup.latestNotification.notification.id + "_desc") : "";
                                 NotificationService.toggleMessageExpansion(messageId);
                                 Qt.callLater(() => {
@@ -360,7 +423,7 @@ Rectangle {
                             }
                         }
 
-                        propagateComposedEvents: true
+                        propagateComposedEvents: false
                         onPressed: mouse => {
                             if (parent.hoveredLink)
                                 mouse.accepted = false;
@@ -385,7 +448,8 @@ Rectangle {
         anchors.leftMargin: Theme.spacingL
         anchors.rightMargin: Theme.spacingL
         spacing: compactMode ? Theme.spacingXS : Theme.spacingS
-        visible: expanded
+        visible: renderExpandedContent
+        opacity: root.expandedContentOpacity
 
         Item {
             width: parent.width
@@ -497,14 +561,14 @@ Rectangle {
                         height: {
                             if (!messageExpanded)
                                 return expandedBaseHeight;
-                            const twoLineHeight = bodyText.font.pixelSize * 1.2 * 2;
-                            if (bodyText.implicitHeight > twoLineHeight + 2)
-                                return expandedBaseHeight + bodyText.implicitHeight - twoLineHeight;
+                            const collapsedBodyHeight = bodyText.collapsedLineHeight;
+                            if (bodyText.implicitHeight > collapsedBodyHeight + 2)
+                                return expandedBaseHeight + bodyText.implicitHeight - collapsedBodyHeight;
                             return expandedBaseHeight;
                         }
                         radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primaryPressed : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                        border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05)
+                        color: isSelected ? Theme.primaryPressed : Theme.nestedSurface
+                        border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.outlineMedium
                         border.width: 1
 
                         Behavior on border.color {
@@ -516,7 +580,12 @@ Rectangle {
                         }
 
                         Behavior on height {
-                            enabled: false
+                            enabled: expandedDelegateWrapper.__delegateInitialized && root.animateExpansion && root.userInitiatedExpansion
+                            NumberAnimation {
+                                duration: root.expansionMotionDuration()
+                                easing.type: Easing.BezierSpline
+                                easing.bezierCurve: root.expansionMotionCurve()
+                            }
                         }
 
                         Item {
@@ -552,12 +621,10 @@ Rectangle {
                                         return "";
                                     const appIcon = modelData?.appIcon;
                                     if (!appIcon)
-                                        return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
+                                        return "";
                                     if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                                         return appIcon;
-                                    if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
-                                        return "";
-                                    return Paths.resolveIconPath(appIcon);
+                                    return "";
                                 }
 
                                 fallbackIcon: {
@@ -636,14 +703,17 @@ Rectangle {
 
                                     StyledText {
                                         id: bodyText
+                                        readonly property real collapsedLineCount: compactMode ? 1 : 2
+                                        readonly property real collapsedLineHeight: font.pixelSize * 1.2 * collapsedLineCount
                                         property bool hasMoreText: truncated
 
                                         text: modelData?.htmlBody || ""
+                                        textFormat: Text.StyledText
                                         color: Theme.surfaceVariantText
                                         font.pixelSize: Theme.fontSizeSmall
                                         width: parent.width
                                         elide: messageExpanded ? Text.ElideNone : Text.ElideRight
-                                        maximumLineCount: messageExpanded ? -1 : 2
+                                        maximumLineCount: messageExpanded ? -1 : collapsedLineCount
                                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                         visible: text.length > 0
                                         linkColor: Theme.primary
@@ -655,6 +725,7 @@ Rectangle {
                                             onClicked: mouse => {
                                                 if (!parent.hoveredLink && (bodyText.hasMoreText || messageExpanded)) {
                                                     root.userInitiatedExpansion = true;
+                                                    root.isDescriptionToggleAnimation = true;
                                                     NotificationService.toggleMessageExpansion(modelData?.notification?.id || "");
                                                     Qt.callLater(() => {
                                                         if (root && !root.isAnimating)
@@ -663,7 +734,7 @@ Rectangle {
                                                 }
                                             }
 
-                                            propagateComposedEvents: true
+                                            propagateComposedEvents: false
                                             onPressed: mouse => {
                                                 if (parent.hoveredLink) {
                                                     mouse.accepted = false;
@@ -732,8 +803,10 @@ Rectangle {
                                                     onEntered: parent.isHovered = true
                                                     onExited: parent.isHovered = false
                                                     onClicked: {
-                                                        if (modelData && modelData.invoke)
+                                                        if (modelData && modelData.invoke) {
                                                             modelData.invoke();
+                                                            PopoutService.closeNotificationCenter();
+                                                        }
                                                     }
                                                 }
                                             }
@@ -828,7 +901,8 @@ Rectangle {
     }
 
     Row {
-        visible: !expanded
+        visible: renderCollapsedContent
+        opacity: root.collapsedContentOpacity
         anchors.right: clearButton.visible ? clearButton.left : parent.right
         anchors.rightMargin: clearButton.visible ? contentSpacing : Theme.spacingL
         anchors.top: collapsedContent.bottom
@@ -871,6 +945,7 @@ Rectangle {
                     onClicked: {
                         if (modelData && modelData.invoke) {
                             modelData.invoke();
+                            PopoutService.closeNotificationCenter();
                         }
                     }
                 }
@@ -884,7 +959,8 @@ Rectangle {
         property bool isHovered: false
         readonly property int actionCount: (notificationGroup?.latestNotification?.actions || []).length
 
-        visible: !expanded && actionCount < 3
+        visible: renderCollapsedContent && actionCount < 3
+        opacity: root.collapsedContentOpacity
         anchors.right: parent.right
         anchors.rightMargin: Theme.spacingL
         anchors.top: collapsedContent.bottom
@@ -915,10 +991,11 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
-        visible: !expanded && (notificationGroup?.count || 0) > 1 && !descriptionExpanded
+        visible: renderCollapsedContent && (notificationGroup?.count || 0) > 1 && !descriptionExpanded
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             root.userInitiatedExpansion = true;
+            root.isDescriptionToggleAnimation = false;
             NotificationService.toggleGroupExpansion(notificationGroup?.key || "");
         }
         z: -1
@@ -942,6 +1019,7 @@ Rectangle {
             buttonSize: compactMode ? 24 : 28
             onClicked: {
                 root.userInitiatedExpansion = true;
+                root.isDescriptionToggleAnimation = false;
                 NotificationService.toggleGroupExpansion(notificationGroup?.key || "");
             }
         }
@@ -959,15 +1037,18 @@ Rectangle {
     Behavior on height {
         enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
-            duration: root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
+            duration: root.expansionMotionDuration()
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.emphasized
+            easing.bezierCurve: root.expansionMotionCurve()
             onRunningChanged: {
                 if (running) {
                     root.isAnimating = true;
                 } else {
                     root.isAnimating = false;
                     root.userInitiatedExpansion = false;
+                    root.isDescriptionToggleAnimation = false;
+                    root._retainedExpandedContent = false;
+                    root._clipAnimatedContent = false;
                 }
             }
         }

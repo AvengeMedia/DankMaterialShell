@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Effects
-import QtQuick.Shapes
 import Quickshell.Services.Mpris
 import qs.Common
 import qs.Services
@@ -10,24 +8,26 @@ Card {
     id: root
     clip: false
 
-    signal clicked()
+    signal clicked
 
     property MprisPlayer activePlayer: MprisController.activePlayer
     property real currentPosition: activePlayer?.positionSupported ? activePlayer.position : 0
     property real displayPosition: currentPosition
 
     readonly property real ratio: {
-        if (!activePlayer || activePlayer.length <= 0) return 0
-        const pos = displayPosition % Math.max(1, activePlayer.length)
-        const calculatedRatio = pos / activePlayer.length
-        return Math.max(0, Math.min(1, calculatedRatio))
+        const len = MprisController.activePlayerStableLength;
+        if (!activePlayer || !activePlayer.lengthSupported || len <= 0)
+            return 0;
+        const pos = displayPosition % Math.max(1, len);
+        const calculatedRatio = pos / len;
+        return Math.max(0, Math.min(1, calculatedRatio));
     }
 
     onActivePlayerChanged: {
         if (activePlayer?.positionSupported) {
-            currentPosition = Qt.binding(() => activePlayer?.position || 0)
+            currentPosition = Qt.binding(() => activePlayer?.position || 0);
         } else {
-            currentPosition = 0
+            currentPosition = 0;
         }
     }
 
@@ -126,73 +126,73 @@ Card {
                 spacing: Theme.spacingS
                 anchors.centerIn: parent
 
-            Rectangle {
-                width: 28
-                height: 28
-                radius: 14
-                anchors.verticalCenter: playPauseButton.verticalCenter
-                color: prevArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: 14
+                    anchors.verticalCenter: playPauseButton.verticalCenter
+                    color: prevArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
 
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: "skip_previous"
-                    size: 14
-                    color: Theme.surfaceText
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "skip_previous"
+                        size: 14
+                        color: Theme.surfaceText
+                    }
+
+                    MouseArea {
+                        id: prevArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: MprisController.previousOrRewind()
+                    }
                 }
 
-                MouseArea {
-                    id: prevArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: MprisController.previousOrRewind()
-                }
-            }
+                Rectangle {
+                    id: playPauseButton
+                    width: 32
+                    height: 32
+                    radius: 16
+                    color: Theme.primary
 
-            Rectangle {
-                id: playPauseButton
-                width: 32
-                height: 32
-                radius: 16
-                color: Theme.primary
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
+                        size: 16
+                        color: Theme.background
+                    }
 
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
-                    size: 16
-                    color: Theme.background
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: activePlayer?.togglePlaying()
-                }
-            }
-
-            Rectangle {
-                width: 28
-                height: 28
-                radius: 14
-                anchors.verticalCenter: playPauseButton.verticalCenter
-                color: nextArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: "skip_next"
-                    size: 14
-                    color: Theme.surfaceText
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: activePlayer?.togglePlaying()
+                    }
                 }
 
-                MouseArea {
-                    id: nextArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: activePlayer?.next()
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: 14
+                    anchors.verticalCenter: playPauseButton.verticalCenter
+                    color: nextArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "skip_next"
+                        size: 14
+                        color: Theme.surfaceText
+                    }
+
+                    MouseArea {
+                        id: nextArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: activePlayer?.next()
+                    }
                 }
-            }
             }
         }
     }

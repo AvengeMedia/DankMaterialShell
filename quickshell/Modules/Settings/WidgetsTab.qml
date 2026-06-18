@@ -25,20 +25,22 @@ Item {
     }
 
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
+    property int pluginCatalogRevision: 0
 
     DankTooltipV2 {
         id: sharedTooltip
     }
 
     property var baseWidgetDefinitions: {
+        pluginCatalogRevision;
         var coreWidgets = [
             {
                 "id": "layout",
                 "text": I18n.tr("Layout"),
-                "description": I18n.tr("Display and switch DWL layouts"),
+                "description": I18n.tr("Display and switch MangoWC layouts"),
                 "icon": "view_quilt",
-                "enabled": CompositorService.isDwl && DwlService.dwlAvailable,
-                "warning": !CompositorService.isDwl ? I18n.tr("Requires DWL compositor") : (!DwlService.dwlAvailable ? I18n.tr("DWL service not available") : undefined)
+                "enabled": CompositorService.isMango && MangoService.available,
+                "warning": !CompositorService.isMango ? I18n.tr("Requires MangoWC compositor") : (!MangoService.available ? I18n.tr("Mango service not available") : undefined)
             },
             {
                 "id": "launcherButton",
@@ -246,7 +248,8 @@ Item {
                 "text": I18n.tr("System Update"),
                 "description": I18n.tr("Check for system updates"),
                 "icon": "update",
-                "enabled": SystemUpdateService.distributionSupported
+                "enabled": SystemUpdateService.sysupdateAvailable,
+                "warning": SystemUpdateService.sysupdateAvailable ? undefined : I18n.tr("Requires DMS server with sysupdate capability")
             },
             {
                 "id": "powerMenuButton",
@@ -271,6 +274,30 @@ Item {
         }
 
         return coreWidgets;
+    }
+
+    Connections {
+        target: PluginService
+
+        function onPluginDataChanged() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginListUpdated() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginLoaded() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginStateChanged() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginUnloaded() {
+            widgetsTab.pluginCatalogRevision++;
+        }
     }
 
     property var defaultLeftWidgets: [
@@ -391,7 +418,9 @@ Item {
             widgetObj.showBatteryIcon = SettingsData.controlCenterShowBatteryIcon;
             widgetObj.showPrinterIcon = SettingsData.controlCenterShowPrinterIcon;
             widgetObj.showScreenSharingIcon = SettingsData.controlCenterShowScreenSharingIcon;
-            widgetObj.controlCenterGroupOrder = ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing"];
+            widgetObj.showIdleInhibitorIcon = SettingsData.controlCenterShowIdleInhibitorIcon;
+            widgetObj.showDoNotDisturbIcon = SettingsData.controlCenterShowDoNotDisturbIcon;
+            widgetObj.controlCenterGroupOrder = ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing", "idleInhibitor", "doNotDisturb"];
         }
         if (widgetId === "runningApps") {
             widgetObj.runningAppsCompactMode = SettingsData.runningAppsCompactMode;
@@ -402,8 +431,9 @@ Item {
         if (widgetId === "diskUsage") {
             widgetObj.mountPath = "/";
             widgetObj.diskUsageMode = 0;
+            widgetObj.showMountPath = true;
         }
-        if (widgetId === "cpuUsage" || widgetId === "memUsage" || widgetId === "cpuTemp" || widgetId === "gpuTemp")
+        if (widgetId === "cpuUsage" || widgetId === "memUsage" || widgetId === "cpuTemp" || widgetId === "gpuTemp" || widgetId === "diskUsage")
             widgetObj.minimumWidth = true;
         if (widgetId === "memUsage")
             widgetObj.showInGb = false;
@@ -430,7 +460,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems", "hideWhenIdle"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -543,6 +573,24 @@ Item {
         }
     }
 
+    function handleKeyboardLayoutNameSettingChanged(sectionId, widgetIndex, settingName, value) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+            setWidgetsForSection(sectionId, widgets);
+            return;
+        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+
+        switch (settingName) {
+        case "showIcon":
+            newWidget["keyboardLayoutNameShowIcon"] = value;
+            break;
+        }
+
+        widgets[widgetIndex] = newWidget;
+        setWidgetsForSection(sectionId, widgets);
+    }
+
     function handleMinimumWidthChanged(sectionId, widgetIndex, enabled) {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex < 0 || widgetIndex >= widgets.length) {
@@ -575,6 +623,17 @@ Item {
         }
         var newWidget = cloneWidgetData(widgets[widgetIndex]);
         newWidget.showInGb = enabled;
+        widgets[widgetIndex] = newWidget;
+        setWidgetsForSection(sectionId, widgets);
+    }
+
+    function handleHideWhenIdleChanged(sectionId, widgetIndex, enabled) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+            return;
+        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.hideWhenIdle = enabled;
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
@@ -613,9 +672,6 @@ Item {
 
             var newWidget = cloneWidgetData(widget);
             switch (widgetId) {
-            case "music":
-                newWidget.mediaSize = value;
-                break;
             case "clock":
                 newWidget.clockCompactMode = value;
                 break;
@@ -627,6 +683,29 @@ Item {
                 break;
             case "keyboard_layout_name":
                 newWidget.keyboardLayoutNameCompactMode = value;
+                break;
+            }
+            widgets[i] = newWidget;
+            break;
+        }
+        setWidgetsForSection(sectionId, widgets);
+    }
+
+    function handleWidgetSizeChanged(sectionId, widgetId, value) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        for (var i = 0; i < widgets.length; i++) {
+            var widget = widgets[i];
+            var currentId = typeof widget === "string" ? widget : widget.id;
+            if (currentId !== widgetId)
+                continue;
+
+            var newWidget = cloneWidgetData(widget);
+            switch (widgetId) {
+            case "music":
+                newWidget.mediaSize = value;
+                break;
+            case "focusedWindow":
+                newWidget.focusedWindowSize = value;
                 break;
             }
             widgets[i] = newWidget;
@@ -658,6 +737,8 @@ Item {
                     item.mountPath = widget.mountPath;
                 if (widget.diskUsageMode !== undefined)
                     item.diskUsageMode = widget.diskUsageMode;
+                if (widget.showMountPath !== undefined)
+                    item.showMountPath = widget.showMountPath;
                 if (widget.showNetworkIcon !== undefined)
                     item.showNetworkIcon = widget.showNetworkIcon;
                 if (widget.showBluetoothIcon !== undefined)
@@ -682,6 +763,10 @@ Item {
                     item.showPrinterIcon = widget.showPrinterIcon;
                 if (widget.showScreenSharingIcon !== undefined)
                     item.showScreenSharingIcon = widget.showScreenSharingIcon;
+                if (widget.showIdleInhibitorIcon !== undefined)
+                    item.showIdleInhibitorIcon = widget.showIdleInhibitorIcon;
+                if (widget.showDoNotDisturbIcon !== undefined)
+                    item.showDoNotDisturbIcon = widget.showDoNotDisturbIcon;
                 if (widget.controlCenterGroupOrder !== undefined)
                     item.controlCenterGroupOrder = widget.controlCenterGroupOrder;
                 if (widget.minimumWidth !== undefined)
@@ -696,6 +781,8 @@ Item {
                     item.clockCompactMode = widget.clockCompactMode;
                 if (widget.focusedWindowCompactMode !== undefined)
                     item.focusedWindowCompactMode = widget.focusedWindowCompactMode;
+                if (widget.focusedWindowSize !== undefined)
+                    item.focusedWindowSize = widget.focusedWindowSize;
                 if (widget.runningAppsCompactMode !== undefined)
                     item.runningAppsCompactMode = widget.runningAppsCompactMode;
                 if (widget.runningAppsGroupByApp !== undefined)
@@ -706,6 +793,8 @@ Item {
                     item.runningAppsCurrentMonitor = widget.runningAppsCurrentMonitor;
                 if (widget.keyboardLayoutNameCompactMode !== undefined)
                     item.keyboardLayoutNameCompactMode = widget.keyboardLayoutNameCompactMode;
+                if (widget.keyboardLayoutNameShowIcon !== undefined)
+                    item.keyboardLayoutNameShowIcon = widget.keyboardLayoutNameShowIcon;
                 if (widget.barMaxVisibleApps !== undefined)
                     item.barMaxVisibleApps = widget.barMaxVisibleApps;
                 if (widget.barMaxVisibleRunningApps !== undefined)
@@ -714,6 +803,14 @@ Item {
                     item.barShowOverflowBadge = widget.barShowOverflowBadge;
                 if (widget.trayUseInlineExpansion !== undefined)
                     item.trayUseInlineExpansion = widget.trayUseInlineExpansion;
+                if (widget.trayPopupSingleLine !== undefined)
+                    item.trayPopupSingleLine = widget.trayPopupSingleLine;
+                if (widget.trayAutoOverflow !== undefined)
+                    item.trayAutoOverflow = widget.trayAutoOverflow;
+                if (widget.trayMaxVisibleItems !== undefined)
+                    item.trayMaxVisibleItems = widget.trayMaxVisibleItems;
+                if (widget.hideWhenIdle !== undefined)
+                    item.hideWhenIdle = widget.hideWhenIdle;
             }
             widgets.push(item);
         });
@@ -985,6 +1082,9 @@ Item {
                         onPrivacySettingChanged: (sectionId, index, setting, value) => {
                             widgetsTab.handlePrivacySettingChanged(sectionId, index, setting, value);
                         }
+                        onKeyboardLayoutNameSettingChanged: (sectionId, index, setting, value) => {
+                            widgetsTab.handleKeyboardLayoutNameSettingChanged(sectionId, index, setting, value);
+                        }
                         onMinimumWidthChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleMinimumWidthChanged(sectionId, index, enabled);
                         }
@@ -1000,8 +1100,14 @@ Item {
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
+                        onWidgetSizeChanged: (widgetId, value) => {
+                            widgetsTab.handleWidgetSizeChanged(sectionId, widgetId, value);
+                        }
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
+                        }
+                        onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
+                            widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
                     }
                 }
@@ -1052,6 +1158,9 @@ Item {
                         onPrivacySettingChanged: (sectionId, index, setting, value) => {
                             widgetsTab.handlePrivacySettingChanged(sectionId, index, setting, value);
                         }
+                        onKeyboardLayoutNameSettingChanged: (sectionId, index, setting, value) => {
+                            widgetsTab.handleKeyboardLayoutNameSettingChanged(sectionId, index, setting, value);
+                        }
                         onMinimumWidthChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleMinimumWidthChanged(sectionId, index, enabled);
                         }
@@ -1067,8 +1176,14 @@ Item {
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
+                        onWidgetSizeChanged: (widgetId, value) => {
+                            widgetsTab.handleWidgetSizeChanged(sectionId, widgetId, value);
+                        }
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
+                        }
+                        onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
+                            widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
                     }
                 }
@@ -1119,6 +1234,9 @@ Item {
                         onPrivacySettingChanged: (sectionId, index, setting, value) => {
                             widgetsTab.handlePrivacySettingChanged(sectionId, index, setting, value);
                         }
+                        onKeyboardLayoutNameSettingChanged: (sectionId, index, setting, value) => {
+                            widgetsTab.handleKeyboardLayoutNameSettingChanged(sectionId, index, setting, value);
+                        }
                         onMinimumWidthChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleMinimumWidthChanged(sectionId, index, enabled);
                         }
@@ -1134,8 +1252,14 @@ Item {
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
+                        onWidgetSizeChanged: (widgetId, value) => {
+                            widgetsTab.handleWidgetSizeChanged(sectionId, widgetId, value);
+                        }
                         onOverflowSettingChanged: (sectionId, widgetIndex, settingName, value) => {
                             widgetsTab.handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value);
+                        }
+                        onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
+                            widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
                     }
                 }

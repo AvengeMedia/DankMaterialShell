@@ -1131,7 +1131,7 @@ Item {
                         }
 
                         StyledText {
-                            text: I18n.tr("24-hour format")
+                            text: I18n.tr("24-Hour Format")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             anchors.verticalCenter: parent.verticalCenter
@@ -1271,6 +1271,7 @@ Item {
                 tags: ["blur", "layer", "niri", "compositor"]
                 title: I18n.tr("Blur Wallpaper Layer")
                 settingKey: "blurWallpaper"
+                iconName: "blur_on"
                 visible: CompositorService.isNiri
 
                 SettingsToggleRow {

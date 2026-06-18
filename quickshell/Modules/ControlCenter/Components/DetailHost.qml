@@ -15,29 +15,11 @@ Item {
     property var pluginDetailInstance: null
     property var widgetModel: null
     property var collapseCallback: null
-    property real maxAvailableHeight: 9999
-
-    function getDetailHeight(section) {
-        switch (true) {
-        case section === "wifi":
-        case section === "bluetooth":
-        case section === "builtin_vpn":
-            return Math.min(350, maxAvailableHeight);
-        case section.startsWith("brightnessSlider_"):
-            return Math.min(400, maxAvailableHeight);
-        case section.startsWith("plugin_"):
-            if (pluginDetailInstance?.ccDetailHeight)
-                return Math.min(pluginDetailInstance.ccDetailHeight, maxAvailableHeight);
-            return Math.min(250, maxAvailableHeight);
-        default:
-            return Math.min(250, maxAvailableHeight);
-        }
-    }
 
     Loader {
         id: pluginDetailLoader
         width: parent.width
-        height: parent.height - Theme.spacingS
+        height: Math.max(0, parent.height - Theme.spacingS)
         y: Theme.spacingS
         active: false
         sourceComponent: null
@@ -46,7 +28,7 @@ Item {
     Loader {
         id: coreDetailLoader
         width: parent.width
-        height: parent.height - Theme.spacingS
+        height: Math.max(0, parent.height - Theme.spacingS)
         y: Theme.spacingS
         active: false
         sourceComponent: null
@@ -58,21 +40,19 @@ Item {
         ignoreUnknownSignals: true
 
         function onDeviceNameChanged(newDeviceName) {
-            if (root.expandedWidgetData && root.expandedWidgetData.id === "brightnessSlider") {
-                const widgets = SettingsData.controlCenterWidgets || [];
-                const newWidgets = widgets.map(w => {
-                    if (w.id === "brightnessSlider" && w.instanceId === root.expandedWidgetData.instanceId) {
-                        const updatedWidget = Object.assign({}, w);
-                        updatedWidget.deviceName = newDeviceName;
-                        return updatedWidget;
-                    }
-                    return w;
-                });
-                SettingsData.set("controlCenterWidgets", newWidgets);
-                if (root.collapseCallback) {
-                    root.collapseCallback();
-                }
+            if (!root.expandedWidgetData || root.expandedWidgetData.id !== "brightnessSlider") {
+                return;
             }
+            const widgets = SettingsData.controlCenterWidgets || [];
+            const newWidgets = widgets.map(w => {
+                if (w.id === "brightnessSlider" && w.instanceId === root.expandedWidgetData.instanceId) {
+                    const updatedWidget = Object.assign({}, w);
+                    updatedWidget.deviceName = newDeviceName;
+                    return updatedWidget;
+                }
+                return w;
+            });
+            SettingsData.set("controlCenterWidgets", newWidgets);
         }
     }
 
@@ -128,13 +108,25 @@ Item {
                 }
                 builtinInstance = widgetModel.cupsBuiltinInstance;
             }
+            if (builtinId === "builtin_tailscale") {
+                if (widgetModel?.tailscaleLoader) {
+                    widgetModel.tailscaleLoader.active = true;
+                }
+                builtinInstance = widgetModel.tailscaleBuiltinInstance;
+            }
+            if (builtinId === "builtin_display_profiles") {
+                if (widgetModel?.displayProfilesLoader) {
+                    widgetModel.displayProfilesLoader.active = true;
+                }
+                builtinInstance = widgetModel.displayProfilesBuiltinInstance;
+            }
 
             if (!builtinInstance || !builtinInstance.ccDetailContent) {
                 return;
             }
 
             pluginDetailLoader.sourceComponent = builtinInstance.ccDetailContent;
-            pluginDetailLoader.active = parent.height > 0;
+            pluginDetailLoader.active = true;
             return;
         }
 
@@ -155,19 +147,19 @@ Item {
             }
 
             pluginDetailLoader.sourceComponent = pluginDetailInstance.ccDetailContent;
-            pluginDetailLoader.active = parent.height > 0;
+            pluginDetailLoader.active = true;
             return;
         }
 
         if (root.expandedSection.startsWith("diskUsage_")) {
             coreDetailLoader.sourceComponent = diskUsageDetailComponent;
-            coreDetailLoader.active = parent.height > 0;
+            coreDetailLoader.active = true;
             return;
         }
 
         if (root.expandedSection.startsWith("brightnessSlider_")) {
             coreDetailLoader.sourceComponent = brightnessDetailComponent;
-            coreDetailLoader.active = parent.height > 0;
+            coreDetailLoader.active = true;
             return;
         }
 
@@ -195,7 +187,7 @@ Item {
             return;
         }
 
-        coreDetailLoader.active = parent.height > 0;
+        coreDetailLoader.active = true;
     }
 
     Component {

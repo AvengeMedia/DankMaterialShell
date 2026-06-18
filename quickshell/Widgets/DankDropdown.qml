@@ -28,6 +28,7 @@ Item {
     property var optionIcons: []
     property bool enableFuzzySearch: false
     property var optionIconMap: ({})
+    property var optionColorMap: ({})
 
     function rebuildIconMap() {
         const map = {};
@@ -48,14 +49,57 @@ Item {
     property bool alignPopupRight: false
     property int dropdownWidth: 200
     property bool compactMode: text === "" && description === ""
+    property bool showTrigger: true
+    property Item popupAnchorItem: null
     property bool addHorizontalPadding: false
     property string emptyText: ""
     property bool usePopupTransparency: !checkParentDisablesTransparency()
 
     signal valueChanged(string value)
 
+    property bool menuOpen: false
+
     function closeDropdownMenu() {
+        if (!root.menuOpen && !dropdownMenu.opened && !dropdownMenu.visible)
+            return;
+        root.menuOpen = false;
         dropdownMenu.close();
+    }
+
+    function positionDropdownMenu() {
+        let currentIndex = root.options.indexOf(root.currentValue);
+        listView.positionViewAtIndex(currentIndex >= 0 ? currentIndex : 0, ListView.Beginning);
+
+        const anchorItem = root.popupAnchorItem || dropdown;
+        const pos = anchorItem.mapToItem(Overlay.overlay, 0, 0);
+        const popupW = dropdownMenu.width;
+        const popupH = dropdownMenu.height;
+        const overlayH = Overlay.overlay.height;
+        const goUp = root.openUpwards || pos.y + anchorItem.height + popupH + 4 > overlayH;
+        dropdownMenu.x = root.alignPopupRight ? pos.x + anchorItem.width - popupW : pos.x - (root.popupWidthOffset / 2);
+        dropdownMenu.y = goUp ? pos.y - popupH - 4 : pos.y + anchorItem.height + 4;
+    }
+
+    function showDropdownMenu() {
+        if (root.options.length === 0)
+            return;
+        if (root.menuOpen)
+            return;
+
+        root.menuOpen = true;
+        dropdownMenu.open();
+        positionDropdownMenu();
+
+        if (root.enableFuzzySearch)
+            searchField.forceActiveFocus();
+    }
+
+    function openDropdownMenu() {
+        if (root.menuOpen) {
+            closeDropdownMenu();
+            return;
+        }
+        showDropdownMenu();
     }
 
     function resetSearch() {
@@ -65,11 +109,11 @@ Item {
         dropdownMenu.selectedIndex = -1;
     }
 
-    width: compactMode ? dropdownWidth : parent.width
-    implicitHeight: compactMode ? 40 : Math.max(60, labelColumn.implicitHeight + Theme.spacingM)
+    width: !showTrigger ? 0 : (compactMode ? dropdownWidth : parent.width)
+    implicitHeight: !showTrigger ? 0 : (compactMode ? 40 : Math.max(60, labelColumn.implicitHeight + Theme.spacingM))
 
     Component.onDestruction: {
-        if (dropdownMenu.visible)
+        if (root.menuOpen || dropdownMenu.opened || dropdownMenu.visible)
             dropdownMenu.close();
     }
 
@@ -82,7 +126,7 @@ Item {
         anchors.leftMargin: root.addHorizontalPadding ? Theme.spacingM : 0
         anchors.rightMargin: Theme.spacingL
         spacing: Theme.spacingXS
-        visible: !root.compactMode
+        visible: !root.compactMode && root.showTrigger
 
         StyledText {
             text: root.text
@@ -107,6 +151,7 @@ Item {
     Rectangle {
         id: dropdown
 
+        visible: root.showTrigger
         width: root.compactMode ? parent.width : (root.popupWidth === -1 ? undefined : (root.popupWidth > 0 ? root.popupWidth : root.dropdownWidth))
         height: 40
         anchors.right: parent.right
@@ -123,27 +168,7 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                if (dropdownMenu.visible) {
-                    dropdownMenu.close();
-                    return;
-                }
-
-                dropdownMenu.open();
-
-                let currentIndex = root.options.indexOf(root.currentValue);
-                listView.positionViewAtIndex(currentIndex, ListView.Beginning);
-
-                const pos = dropdown.mapToItem(Overlay.overlay, 0, 0);
-                const popupW = dropdownMenu.width;
-                const popupH = dropdownMenu.height;
-                const overlayH = Overlay.overlay.height;
-                const goUp = root.openUpwards || pos.y + dropdown.height + popupH + 4 > overlayH;
-                dropdownMenu.x = root.alignPopupRight ? pos.x + dropdown.width - popupW : pos.x - (root.popupWidthOffset / 2);
-                dropdownMenu.y = goUp ? pos.y - popupH - 4 : pos.y + dropdown.height + 4;
-                if (root.enableFuzzySearch)
-                    searchField.forceActiveFocus();
-            }
+            onClicked: root.openDropdownMenu()
         }
 
         Row {
@@ -156,7 +181,19 @@ Item {
             anchors.rightMargin: Theme.spacingS
             spacing: Theme.spacingS
 
+            DankColorSwatch {
+                id: triggerSwatch
+
+                width: 16
+                height: 16
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.optionColorMap[root.currentValue] !== undefined
+                swatchColor: visible ? root.optionColorMap[root.currentValue] : "transparent"
+            }
+
             DankIcon {
+                id: triggerIcon
+
                 name: root.optionIconMap[root.currentValue] ?? ""
                 size: 18
                 color: Theme.surfaceText
@@ -165,11 +202,11 @@ Item {
             }
 
             StyledText {
-                text: root.currentValue
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
                 anchors.verticalCenter: parent.verticalCenter
-                width: contentRow.width - (contentRow.children[0].visible ? contentRow.children[0].width + contentRow.spacing : 0)
+                text: root.currentValue !== "" ? root.currentValue : root.emptyText
+                font.pixelSize: Theme.fontSizeMedium
+                color: root.currentValue !== "" ? Theme.surfaceText : Theme.outline
+                width: contentRow.width - (triggerSwatch.visible ? triggerSwatch.width + contentRow.spacing : 0) - (triggerIcon.visible ? triggerIcon.width + contentRow.spacing : 0)
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
                 horizontalAlignment: Text.AlignLeft
@@ -242,6 +279,7 @@ Item {
         }
 
         onOpened: {
+            root.menuOpen = true;
             selectedIndex = -1;
             if (searchField.text.length > 0) {
                 initFinder();
@@ -251,6 +289,8 @@ Item {
                 searchQuery = "";
             }
         }
+
+        onClosed: root.menuOpen = false
 
         parent: Overlay.overlay
         width: root.popupWidth === -1 ? undefined : (root.popupWidth > 0 ? root.popupWidth : (dropdown.width + root.popupWidthOffset))
@@ -266,6 +306,40 @@ Item {
         modal: true
         dim: false
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        enter: Transition {
+            NumberAnimation {
+                property: "scale"
+                from: 0.9
+                to: 1
+                duration: Theme.shortDuration
+                easing.type: Theme.emphasizedEasing
+            }
+            NumberAnimation {
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        exit: Transition {
+            NumberAnimation {
+                property: "scale"
+                from: 1
+                to: 0.9
+                duration: Theme.shortDuration
+                easing.type: Theme.emphasizedEasing
+            }
+            NumberAnimation {
+                property: "opacity"
+                from: 1
+                to: 0
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
 
         background: Rectangle {
             color: "transparent"
@@ -402,6 +476,7 @@ Item {
                         property bool isSelected: dropdownMenu.selectedIndex === index
                         property bool isCurrentValue: root.currentValue === modelData
                         property string iconName: root.optionIconMap[modelData] ?? ""
+                        property var swatchColor: root.optionColorMap[modelData]
 
                         width: ListView.view.width
                         height: 32
@@ -416,6 +491,17 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingS
 
+                            DankColorSwatch {
+                                id: optionSwatch
+
+                                width: 16
+                                height: 16
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: delegateRoot.swatchColor !== undefined
+                                swatchColor: visible ? delegateRoot.swatchColor : "transparent"
+                                ringColor: delegateRoot.isCurrentValue ? Theme.primary : Theme.outline
+                            }
+
                             DankIcon {
                                 name: delegateRoot.iconName
                                 size: 18
@@ -429,7 +515,7 @@ Item {
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: delegateRoot.isCurrentValue ? Theme.primary : Theme.surfaceText
                                 font.weight: delegateRoot.isCurrentValue ? Font.Medium : Font.Normal
-                                width: root.popupWidth > 0 ? undefined : (delegateRoot.width - parent.x - Theme.spacingS * 2)
+                                width: root.popupWidth > 0 ? undefined : (delegateRoot.width - parent.x - Theme.spacingS * 2 - (optionSwatch.visible ? optionSwatch.width + parent.spacing : 0))
                                 elide: root.popupWidth > 0 ? Text.ElideNone : Text.ElideRight
                                 wrapMode: Text.NoWrap
                                 horizontalAlignment: Text.AlignLeft

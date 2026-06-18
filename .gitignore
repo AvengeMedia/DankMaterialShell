@@ -107,8 +107,13 @@ vim/
 
 bin/
 
+# Core dumps
+core.*
+
 # direnv
 .envrc
 .direnv/
 quickshell/dms-plugins
 __pycache__
+
+.vscode/

@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -78,6 +80,16 @@ func getRuntimeDir() string {
 		return runtime
 	}
 	return os.TempDir()
+}
+
+func appendLogEnv(env []string) []string {
+	if v := os.Getenv("DMS_LOG_LEVEL"); v != "" {
+		env = append(env, "DMS_LOG_LEVEL="+v)
+	}
+	if v := os.Getenv("DMS_LOG_FILE"); v != "" {
+		env = append(env, "DMS_LOG_FILE="+v)
+	}
+	return env
 }
 
 func hasSystemdRun() bool {
@@ -182,6 +194,7 @@ func runShellInteractive(session bool) {
 		}
 	}()
 
+	ensureFontCache()
 	log.Infof("Spawning quickshell with -p %s", configPath)
 
 	cmd := exec.CommandContext(ctx, "qs", "-p", configPath)
@@ -191,9 +204,6 @@ func runShellInteractive(session bool) {
 			cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)
 		}
 	}
-
-	// ! TODO - remove when QS 0.3 is up and we can use the pragma
-	cmd.Env = append(cmd.Env, "QS_APP_ID=com.danklinux.dms")
 
 	if isSessionManaged && hasSystemdRun() {
 		cmd.Env = append(cmd.Env, "DMS_DEFAULT_LAUNCH_PREFIX=systemd-run --user --scope")
@@ -216,10 +226,14 @@ func runShellInteractive(session bool) {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
 
+	cmd.Env = appendLogEnv(cmd.Env)
+
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	tracker := &stderrTracker{parent: os.Stderr}
+	cmd.Stderr = tracker
 
+	startTime := time.Now()
 	if err := cmd.Start(); err != nil {
 		log.Fatalf("Error starting quickshell: %v", err)
 	}
@@ -268,7 +282,9 @@ func runShellInteractive(session bool) {
 			case <-errChan:
 				cancel()
 				os.Remove(socketPath)
-				os.Exit(getProcessExitCode(cmd.ProcessState))
+				exitCode := getProcessExitCode(cmd.ProcessState)
+				logStartupFailure(startTime, exitCode, tracker)
+				os.Exit(exitCode)
 			case <-time.After(500 * time.Millisecond):
 			}
 
@@ -285,7 +301,9 @@ func runShellInteractive(session bool) {
 				cmd.Process.Signal(syscall.SIGTERM)
 			}
 			os.Remove(socketPath)
-			os.Exit(getProcessExitCode(cmd.ProcessState))
+			exitCode := getProcessExitCode(cmd.ProcessState)
+			logStartupFailure(startTime, exitCode, tracker)
+			os.Exit(exitCode)
 		}
 	}
 }
@@ -425,6 +443,7 @@ func runShellDaemon(session bool) {
 		}
 	}()
 
+	ensureFontCache()
 	log.Infof("Spawning quickshell with -p %s", configPath)
 
 	cmd := exec.CommandContext(ctx, "qs", "-p", configPath)
@@ -459,6 +478,8 @@ func runShellDaemon(session bool) {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
 
+	cmd.Env = appendLogEnv(cmd.Env)
+
 	devNull, err := os.OpenFile("/dev/null", os.O_RDWR, 0)
 	if err != nil {
 		log.Fatalf("Error opening /dev/null: %v", err)
@@ -467,8 +488,10 @@ func runShellDaemon(session bool) {
 
 	cmd.Stdin = devNull
 	cmd.Stdout = devNull
-	cmd.Stderr = devNull
+	tracker := &stderrTracker{parent: devNull}
+	cmd.Stderr = tracker
 
+	startTime := time.Now()
 	if err := cmd.Start(); err != nil {
 		log.Fatalf("Error starting daemon: %v", err)
 	}
@@ -517,7 +540,9 @@ func runShellDaemon(session bool) {
 			case <-errChan:
 				cancel()
 				os.Remove(socketPath)
-				os.Exit(getProcessExitCode(cmd.ProcessState))
+				exitCode := getProcessExitCode(cmd.ProcessState)
+				logStartupFailure(startTime, exitCode, tracker)
+				os.Exit(exitCode)
 			case <-time.After(500 * time.Millisecond):
 			}
 
@@ -532,7 +557,9 @@ func runShellDaemon(session bool) {
 				cmd.Process.Signal(syscall.SIGTERM)
 			}
 			os.Remove(socketPath)
-			os.Exit(getProcessExitCode(cmd.ProcessState))
+			exitCode := getProcessExitCode(cmd.ProcessState)
+			logStartupFailure(startTime, exitCode, tracker)
+			os.Exit(exitCode)
 		}
 	}
 }
@@ -574,12 +601,30 @@ func parseTargetsFromIPCShowOutput(output string) ipcTargets {
 	return targets
 }
 
-func getShellIPCCompletions(args []string, _ string) []string {
+func buildQsIPCBaseArgs() ([]string, error) {
 	cmdArgs := []string{"ipc"}
-	if qsHasAnyDisplay() {
-		cmdArgs = append(cmdArgs, "--any-display")
+	switch pid, ok := getFirstDMSPID(); {
+	case ok:
+		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
+	default:
+		if err := findConfig(nil, nil); err != nil {
+			return nil, err
+		}
+		if qsHasAnyDisplay() {
+			cmdArgs = append(cmdArgs, "--any-display")
+		}
+		cmdArgs = append(cmdArgs, "-p", configPath)
 	}
-	cmdArgs = append(cmdArgs, "-p", configPath, "show")
+	return cmdArgs, nil
+}
+
+func getShellIPCCompletions(args []string, _ string) []string {
+	baseArgs, err := buildQsIPCBaseArgs()
+	if err != nil {
+		log.Debugf("Error building IPC args for completions: %v", err)
+		return nil
+	}
+	cmdArgs := append(baseArgs, "show")
 	cmd := exec.Command("qs", cmdArgs...)
 	var targets ipcTargets
 
@@ -596,7 +641,7 @@ func getShellIPCCompletions(args []string, _ string) []string {
 
 	if len(args) == 0 {
 		targetNames := make([]string, 0)
-		targetNames = append(targetNames, "call")
+		targetNames = append(targetNames, "call", "list")
 		for k := range targets {
 			targetNames = append(targetNames, k)
 		}
@@ -669,23 +714,11 @@ func runShellIPCCommand(args []string) {
 		args = append([]string{"call"}, args...)
 	}
 
-	cmdArgs := []string{"ipc"}
-
-	switch pid, ok := getFirstDMSPID(); {
-	case ok:
-		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
-	default:
-		if err := findConfig(nil, nil); err != nil {
-			log.Fatalf("Error finding config: %v", err)
-		}
-		// ! TODO - remove check when QS 0.3 is released
-		if qsHasAnyDisplay() {
-			cmdArgs = append(cmdArgs, "--any-display")
-		}
-		cmdArgs = append(cmdArgs, "-p", configPath)
+	baseArgs, err := buildQsIPCBaseArgs()
+	if err != nil {
+		log.Fatalf("Error finding config: %v", err)
 	}
-
-	cmdArgs = append(cmdArgs, args...)
+	cmdArgs := append(baseArgs, args...)
 	cmd := exec.Command("qs", cmdArgs...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -697,19 +730,20 @@ func runShellIPCCommand(args []string) {
 }
 
 func printIPCHelp() {
-	fmt.Println("Usage: dms ipc <target> <function> [args...]")
+	fmt.Println("Usage: dms ipc call <target> <function> [args...]")
 	fmt.Println()
 
-	cmdArgs := []string{"ipc"}
-	if qsHasAnyDisplay() {
-		cmdArgs = append(cmdArgs, "--any-display")
+	baseArgs, err := buildQsIPCBaseArgs()
+	if err != nil {
+		printIPCHelpFailure(err)
+		return
 	}
-	cmdArgs = append(cmdArgs, "-p", configPath, "show")
+	cmdArgs := append(baseArgs, "show")
 	cmd := exec.Command("qs", cmdArgs...)
 
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println("Could not retrieve available IPC targets (is DMS running?)")
+		printIPCHelpFailure(err)
 		return
 	}
 
@@ -736,4 +770,144 @@ func printIPCHelp() {
 		slices.Sort(funcNames)
 		fmt.Printf("  %-16s %s\n", targetName, strings.Join(funcNames, ", "))
 	}
+}
+
+func printIPCHelpFailure(err error) {
+	fmt.Println("Could not retrieve IPC targets.")
+	if err != nil {
+		fmt.Printf("  %v\n", err)
+	}
+	fmt.Println()
+	fmt.Println("  Full docs:  https://danklinux.com/docs/dankmaterialshell/keybinds-ipc")
+	fmt.Println("  Try:        dms ipc call <target> <function>")
+}
+
+// ensureFontCache rebuilds the fontconfig cache if user-configured fonts are missing while skipping defaults
+func ensureFontCache() {
+	if _, err := exec.LookPath("fc-list"); err != nil {
+		return
+	}
+	if _, err := exec.LookPath("fc-cache"); err != nil {
+		return
+	}
+
+	var fontsToCheck []string
+
+	if configDir, err := os.UserConfigDir(); err == nil {
+		settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
+		if data, err := os.ReadFile(settingsPath); err == nil {
+			var settings struct {
+				FontFamily     string `json:"fontFamily"`
+				MonoFontFamily string `json:"monoFontFamily"`
+			}
+			if err := json.Unmarshal(data, &settings); err == nil {
+				if settings.FontFamily != "" && settings.FontFamily != "Inter Variable" {
+					fontsToCheck = append(fontsToCheck, settings.FontFamily)
+				}
+				if settings.MonoFontFamily != "" && settings.MonoFontFamily != "Fira Code" {
+					fontsToCheck = append(fontsToCheck, settings.MonoFontFamily)
+				}
+			}
+		}
+	}
+
+	if len(fontsToCheck) == 0 {
+		return
+	}
+
+	output, err := exec.Command("fc-list", ":", "family").Output()
+	if err != nil || len(strings.TrimSpace(string(output))) == 0 {
+		log.Warnf("Font cache appears empty or corrupt, rebuilding...")
+		rebuildFontCache()
+		return
+	}
+
+	cacheFonts := strings.ToLower(string(output))
+	var missing []string
+	for _, font := range fontsToCheck {
+		if !fontInCache(strings.ToLower(font), cacheFonts) {
+			missing = append(missing, font)
+		}
+	}
+
+	if len(missing) > 0 {
+		log.Warnf("Font(s) not found in cache: %s — rebuilding...", strings.Join(missing, ", "))
+		rebuildFontCache()
+	}
+}
+
+func fontInCache(target, cache string) bool {
+	for _, line := range strings.Split(cache, "\n") {
+		for _, fam := range strings.Split(strings.TrimSpace(line), ",") {
+			if strings.TrimSpace(fam) == target {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func rebuildFontCache() {
+	cmd := exec.Command("fc-cache", "-f")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		log.Warnf("Failed to rebuild font cache: %v\n%s", err, string(output))
+	} else {
+		log.Infof("Font cache rebuilt successfully")
+	}
+}
+
+type stderrTracker struct {
+	mu     sync.Mutex
+	buf    strings.Builder
+	parent io.Writer
+}
+
+func (s *stderrTracker) Write(p []byte) (n int, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.buf.Len() < 8192 {
+		s.buf.Write(p)
+	}
+	if s.parent != nil {
+		return s.parent.Write(p)
+	}
+	return len(p), nil
+}
+
+func (s *stderrTracker) String() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.buf.String()
+}
+
+// logStartupFailure logs diagnostic advice if qs crashes within 5s of launch.
+func logStartupFailure(startTime time.Time, exitCode int, tracker *stderrTracker) {
+	if time.Since(startTime) >= 5*time.Second || exitCode == 0 || exitCode > 128 {
+		return
+	}
+	if containsFontCrashSignature(tracker.String()) {
+		log.Errorf("DMS startup failed due to a potential font/rendering crash. Try running 'fc-cache -fv' and restarting DMS.")
+	} else {
+		log.Errorf("DMS startup failed (exit code %d). Run 'dms doctor' for more diagnostics.", exitCode)
+	}
+}
+
+func containsFontCrashSignature(logStr string) bool {
+	logStr = strings.ToLower(logStr)
+	signatures := []string{
+		"fontconfig",
+		"freetype",
+		"ft_load_glyph",
+		"ft_face",
+		"fc-list",
+		"fc-cache",
+		"glyph",
+		"typeface",
+	}
+	for _, sig := range signatures {
+		if strings.Contains(logStr, sig) {
+			return true
+		}
+	}
+	return false
 }

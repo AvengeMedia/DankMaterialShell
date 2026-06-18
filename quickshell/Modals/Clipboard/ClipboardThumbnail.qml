@@ -6,12 +6,14 @@ import qs.Widgets
 
 Item {
     id: thumbnail
+    readonly property var log: Log.scoped("ClipboardThumbnail")
 
     required property var entry
     required property string entryType
     required property var modal
     required property var listView
     required property int itemIndex
+    property bool disposed: false
 
     Image {
         id: thumbnailImage
@@ -19,6 +21,13 @@ Item {
         property bool isVisible: false
         property string cachedImageData: ""
         property bool loadQueued: false
+        property bool activeLoad: false
+        property bool completed: false
+        property int loadGeneration: 0
+        property var activeEntryId: null
+        property var activeRequest: null
+        property var currentEntryId: entry && entry.id !== undefined ? entry.id : null
+        property string currentEntryType: entryType
 
         anchors.fill: parent
         source: cachedImageData ? `data:image/png;base64,${cachedImageData}` : ""
@@ -30,29 +39,119 @@ Item {
         sourceSize.width: 128
         sourceSize.height: 128
 
+        onCurrentEntryIdChanged: {
+            if (thumbnailImage.completed) {
+                thumbnailImage.resetForEntry();
+            }
+        }
+
+        onCurrentEntryTypeChanged: {
+            if (thumbnailImage.completed) {
+                thumbnailImage.resetForEntry();
+            }
+        }
+
+        function hasValidEntryId() {
+            return entry && entry.id !== undefined && entry.id !== null;
+        }
+
+        function releaseActiveLoad() {
+            if (!thumbnailImage.activeLoad) {
+                return;
+            }
+            thumbnailImage.activeLoad = false;
+            if (modal && modal.activeImageLoads > 0) {
+                modal.activeImageLoads--;
+            }
+        }
+
+        function finishLoad(request) {
+            thumbnailImage.loadQueued = false;
+            thumbnailImage.activeEntryId = null;
+            if (!request || thumbnailImage.activeRequest === request) {
+                thumbnailImage.activeRequest = null;
+            }
+            thumbnailImage.releaseActiveLoad();
+        }
+
+        function cancelLoad() {
+            if (thumbnailImage.activeRequest) {
+                thumbnailImage.activeRequest.cancelled = true;
+                thumbnailImage.activeRequest = null;
+            }
+            retryTimer.stop();
+            visibilityTimer.stop();
+            thumbnailImage.loadQueued = false;
+            thumbnailImage.activeEntryId = null;
+            thumbnailImage.releaseActiveLoad();
+        }
+
+        function resetForEntry() {
+            thumbnailImage.loadGeneration++;
+            thumbnailImage.cachedImageData = "";
+            thumbnailImage.isVisible = false;
+            thumbnailImage.cancelLoad();
+            Qt.callLater(function () {
+                if (thumbnail.disposed) {
+                    return;
+                }
+                thumbnailImage.checkVisibility();
+            });
+        }
+
+        function startLoad() {
+            if (!modal) {
+                thumbnailImage.loadQueued = false;
+                return;
+            }
+            modal.activeImageLoads++;
+            thumbnailImage.activeLoad = true;
+            thumbnailImage.loadImage();
+        }
+
         function tryLoadImage() {
-            if (thumbnailImage.loadQueued || entryType !== "image" || thumbnailImage.cachedImageData) {
+            if (thumbnail.disposed || thumbnailImage.loadQueued || entryType !== "image" || thumbnailImage.cachedImageData || !thumbnailImage.hasValidEntryId()) {
                 return;
             }
             thumbnailImage.loadQueued = true;
-            if (modal.activeImageLoads < modal.maxConcurrentLoads) {
-                modal.activeImageLoads++;
-                thumbnailImage.loadImage();
+            if (modal && modal.activeImageLoads < modal.maxConcurrentLoads) {
+                thumbnailImage.startLoad();
             } else {
                 retryTimer.restart();
             }
         }
 
         function loadImage() {
+            if (!thumbnailImage.hasValidEntryId()) {
+                thumbnailImage.finishLoad();
+                return;
+            }
+            const requestedId = entry.id;
+            const generation = thumbnailImage.loadGeneration;
+            const request = {
+                "cancelled": false
+            };
+            thumbnailImage.activeEntryId = requestedId;
+            thumbnailImage.activeRequest = request;
             DMSService.sendRequest("clipboard.getEntry", {
-                "id": entry.id
+                "id": requestedId
             }, function (response) {
-                thumbnailImage.loadQueued = false;
-                if (modal.activeImageLoads > 0) {
-                    modal.activeImageLoads--;
+                if (request.cancelled) {
+                    return;
+                }
+                if (thumbnail.disposed || generation !== thumbnailImage.loadGeneration || thumbnailImage.activeRequest !== request || thumbnailImage.activeEntryId !== requestedId) {
+                    return;
+                }
+                thumbnailImage.finishLoad(request);
+                if (!entry || entry.id !== requestedId || entryType !== "image") {
+                    return;
                 }
                 if (response.error) {
-                    console.warn("ClipboardThumbnail: Failed to load image:", entry.id);
+                    log.warn("Failed to load image:", requestedId);
+                    return;
+                }
+                if (!response.result) {
+                    ClipboardService.refresh();
                     return;
                 }
                 const data = response.result?.data;
@@ -69,9 +168,8 @@ Item {
                 if (!thumbnailImage.loadQueued) {
                     return;
                 }
-                if (modal.activeImageLoads < modal.maxConcurrentLoads) {
-                    modal.activeImageLoads++;
-                    thumbnailImage.loadImage();
+                if (modal && modal.activeImageLoads < modal.maxConcurrentLoads) {
+                    thumbnailImage.startLoad();
                 } else {
                     retryTimer.restart();
                 }
@@ -79,7 +177,8 @@ Item {
         }
 
         Component.onCompleted: {
-            if (entryType !== "image" || listView.height <= 0) {
+            thumbnailImage.completed = true;
+            if (entryType !== "image" || listView.height <= 0 || !thumbnailImage.hasValidEntryId()) {
                 return;
             }
 
@@ -93,6 +192,11 @@ Item {
             }
         }
 
+        Component.onDestruction: {
+            thumbnail.disposed = true;
+            thumbnailImage.cancelLoad();
+        }
+
         Timer {
             id: visibilityTimer
             interval: 100
@@ -100,7 +204,7 @@ Item {
         }
 
         function checkVisibility() {
-            if (entryType !== "image" || listView.height <= 0 || isVisible) {
+            if (thumbnail.disposed || entryType !== "image" || listView.height <= 0 || isVisible || !thumbnailImage.hasValidEntryId()) {
                 return;
             }
             const itemY = itemIndex * (ClipboardConstants.itemHeight + listView.spacing);

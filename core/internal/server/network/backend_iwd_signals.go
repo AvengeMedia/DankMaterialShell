@@ -45,10 +45,40 @@ func (b *IWDBackend) StartMonitoring(onStateChange func()) error {
 		}
 	}
 
+	if err := b.conn.AddMatchSignal(
+		dbus.WithMatchInterface(dbusPropertiesInterface),
+		dbus.WithMatchMember("PropertiesChanged"),
+		dbus.WithMatchArg(0, iwdKnownNetworkInterface),
+	); err != nil {
+		return fmt.Errorf("failed to add known network signal match: %w", err)
+	}
+
+	if err := b.conn.AddMatchSignal(
+		dbus.WithMatchInterface(dbusObjectManager),
+		dbus.WithMatchMember("InterfacesAdded"),
+	); err != nil {
+		return fmt.Errorf("failed to add iwd interfaces-added signal match: %w", err)
+	}
+
+	if err := b.conn.AddMatchSignal(
+		dbus.WithMatchInterface(dbusObjectManager),
+		dbus.WithMatchMember("InterfacesRemoved"),
+	); err != nil {
+		return fmt.Errorf("failed to add iwd interfaces-removed signal match: %w", err)
+	}
+
 	b.sigWG.Add(1)
 	go b.signalHandler(sigChan)
 
 	return nil
+}
+
+func (b *IWDBackend) refreshWiFiNetworkState() bool {
+	_, err := b.updateWiFiNetworks()
+	if err == nil {
+		return true
+	}
+	return b.updateSavedWiFiNetworks() == nil
 }
 
 func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
@@ -66,11 +96,36 @@ func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
 				return
 			}
 
-			if sig.Name != dbusPropertiesInterface+".PropertiesChanged" {
+			if sig.Name == dbusObjectManager+".InterfacesAdded" {
+				if len(sig.Body) >= 2 {
+					if interfaces, ok := sig.Body[1].(map[string]map[string]dbus.Variant); ok {
+						if _, ok := interfaces[iwdKnownNetworkInterface]; ok {
+							if b.refreshWiFiNetworkState() && b.onStateChange != nil {
+								b.onStateChange()
+							}
+						}
+					}
+				}
 				continue
 			}
 
-			if len(sig.Body) < 2 {
+			if sig.Name == dbusObjectManager+".InterfacesRemoved" {
+				if len(sig.Body) >= 2 {
+					if interfaces, ok := sig.Body[1].([]string); ok {
+						for _, iface := range interfaces {
+							if iface == iwdKnownNetworkInterface {
+								if b.refreshWiFiNetworkState() && b.onStateChange != nil {
+									b.onStateChange()
+								}
+								break
+							}
+						}
+					}
+				}
+				continue
+			}
+
+			if sig.Name != dbusPropertiesInterface+".PropertiesChanged" || len(sig.Body) < 2 {
 				continue
 			}
 
@@ -87,6 +142,9 @@ func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
 			stateChanged := false
 
 			switch iface {
+			case iwdKnownNetworkInterface:
+				stateChanged = b.refreshWiFiNetworkState()
+
 			case iwdDeviceInterface:
 				if sig.Path == b.devicePath {
 					if poweredVar, ok := changed["Powered"]; ok {
@@ -105,13 +163,7 @@ func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
 				if sig.Path == b.stationPath {
 					if scanningVar, ok := changed["Scanning"]; ok {
 						if scanning, ok := scanningVar.Value().(bool); ok && !scanning {
-							networks, err := b.updateWiFiNetworks()
-							if err == nil {
-								b.stateMutex.Lock()
-								b.state.WiFiNetworks = networks
-								b.stateMutex.Unlock()
-								stateChanged = true
-							}
+							stateChanged = b.refreshWiFiNetworkState() || stateChanged
 
 							b.stateMutex.RLock()
 							wifiConnected := b.state.WiFiConnected
@@ -236,6 +288,7 @@ func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
 									}
 								}
 
+								b.refreshWiFiNetworkState()
 								stateChanged = true
 
 								if att != nil && isTarget {
@@ -282,6 +335,7 @@ func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
 									b.state.NetworkStatus = StatusDisconnected
 								}
 								b.stateMutex.Unlock()
+								b.refreshWiFiNetworkState()
 								stateChanged = true
 							}
 						}
@@ -342,6 +396,7 @@ func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
 								stateChanged = true
 							}
 							b.stateMutex.Unlock()
+							b.refreshWiFiNetworkState()
 						}
 					}
 				}

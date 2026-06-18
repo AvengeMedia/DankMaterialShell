@@ -2,6 +2,7 @@ package clipboard
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 
@@ -73,6 +74,10 @@ func handleGetEntry(conn net.Conn, req models.Request, m *Manager) {
 
 	entry, err := m.GetEntry(uint64(id))
 	if err != nil {
+		if errors.Is(err, errEntryNotFound) {
+			models.Respond[any](conn, req.ID, nil)
+			return
+		}
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}

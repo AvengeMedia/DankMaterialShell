@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -11,36 +10,39 @@ BasePill {
     property bool layoutPopupVisible: false
     property var popoutTarget: null
 
-    signal toggleLayoutPopup()
+    signal toggleLayoutPopup
 
-    visible: CompositorService.isDwl && DwlService.dwlAvailable
+    // mango shares dwl's tag/layout model; route to the right service.
+    readonly property bool isMango: CompositorService.isMango
 
-    property var outputState: parentScreen ? DwlService.getOutputState(parentScreen.name) : null
+    visible: layout.isMango && MangoService.available
+
+    property var outputState: parentScreen ? MangoService.getOutputState(parentScreen.name) : null
     property string currentLayoutSymbol: outputState?.layoutSymbol || ""
     property int currentLayoutIndex: outputState?.layout || 0
 
     readonly property var layoutIcons: ({
-        "CT": "view_compact",
-        "G": "grid_view",
-        "K": "layers",
-        "M": "fullscreen",
-        "RT": "view_sidebar",
-        "S": "view_carousel",
-        "T": "view_quilt",
-        "VG": "grid_on",
-        "VK": "view_day",
-        "VS": "scrollable_header",
-        "VT": "clarify"
-    })
+            "CT": "view_compact",
+            "G": "grid_view",
+            "K": "layers",
+            "M": "fullscreen",
+            "RT": "view_sidebar",
+            "S": "view_carousel",
+            "T": "view_quilt",
+            "VG": "grid_on",
+            "VK": "view_day",
+            "VS": "scrollable_header",
+            "VT": "clarify"
+        })
 
     function getLayoutIcon(symbol) {
-        return layoutIcons[symbol] || "view_quilt"
+        return layoutIcons[symbol] || "view_quilt";
     }
 
     Connections {
-        target: DwlService
+        target: MangoService
         function onStateChanged() {
-            outputState = parentScreen ? DwlService.getOutputState(parentScreen.name) : null
+            outputState = parentScreen ? MangoService.getOutputState(parentScreen.name) : null;
         }
     }
 
@@ -94,17 +96,17 @@ BasePill {
     }
 
     onClicked: {
-        toggleLayoutPopup()
+        toggleLayoutPopup();
     }
 
     onRightClicked: {
-        if (!parentScreen || !DwlService.dwlAvailable || DwlService.layouts.length === 0) {
-            return
+        if (!parentScreen || !MangoService.available || MangoService.layouts.length === 0) {
+            return;
         }
 
-        const currentIndex = layout.currentLayoutIndex
-        const nextIndex = (currentIndex + 1) % DwlService.layouts.length
+        const currentIndex = layout.currentLayoutIndex;
+        const nextIndex = (currentIndex + 1) % MangoService.layouts.length;
 
-        DwlService.setLayout(parentScreen.name, nextIndex)
+        MangoService.setLayout(parentScreen.name, nextIndex);
     }
 }

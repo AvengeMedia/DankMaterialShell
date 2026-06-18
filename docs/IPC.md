@@ -6,6 +6,18 @@ DankMaterialShell provides comprehensive IPC (Inter-Process Communication) funct
 dms ipc call <target> <function> [parameters...]
 ```
 
+## Discovering IPC commands
+
+List all available targets and functions while DMS is running:
+
+```bash
+dms ipc list
+dms ipc          # same
+dms ipc --help   # same, plus usage text
+```
+
+Live listing requires DMS to be running. If listing fails, use this document or the [Keybinds & IPC docs](https://danklinux.com/docs/dankmaterialshell/keybinds-ipc) as an offline reference.
+
 ## Target: `audio`
 
 Audio system control and information.
@@ -212,6 +224,52 @@ dms ipc call lock lock
 dms ipc call lock isLocked
 ```
 
+## Target: `sessions`
+
+Logind session enumeration and seat-local session switching. Wraps `loginctl list-sessions` and `loginctl activate`. Only switches between sessions that are *already running* on the current seat — creating a fresh login as another user requires a multi-session greeter setup (greetd-flexiserver / GDM / LightDM) and is out of scope.
+
+### Functions
+
+**`list`**
+- Print every session DMS knows about as tab-separated columns: `sessionId\tusername\tseat\ttty\ttype\tcurrent-marker`
+- Returns: Multi-line string. The current session is marked with `*current*`.
+
+**`refresh`**
+- Re-enumerate sessions in the background (the picker also refreshes itself on open)
+- Returns: `"ok"`
+
+**`open`**
+- Refresh and open the Switch User picker on the focused screen
+- Returns: `"ok"`
+
+**`activate <sessionId>`**
+- Activate a session by its numeric logind ID (the `Id=` field from `loginctl show-session`). Performs a VT switch
+- Parameters: `sessionId` - Numeric session ID
+- Returns: `"ok"` on dispatch, `"ERROR: missing session id"` if blank
+- Note: Failures from `loginctl activate` surface through the `switchFailed` QML signal and a Log warning — the IPC call returns success once the spawn is queued, not after activation completes
+
+**`switchTo <target>`**
+- Switch to another session by username *or* session ID. The first non-current session matching the username wins; if there's no match, the call fails through the same logging path as `activate`
+- Parameters: `target` - Username (e.g. `testuser2`) or numeric session ID
+- Returns: `"ok"` on dispatch, `"ERROR: missing target (username or session id)"` if blank
+
+### Examples
+```bash
+# Inspect what's switchable
+dms ipc call sessions list
+
+# Open the picker (useful for a keybind)
+dms ipc call sessions open
+
+# Jump straight to another logged-in user without the picker
+dms ipc call sessions switchTo testuser2
+
+# Or by session ID, when the user has multiple sessions
+dms ipc call sessions activate 4
+```
+
+The dedicated `dms switch-user [target]` CLI command wraps the same behavior with a friendlier error path (it prints the switchable list when no target matches).
+
 ## Target: `inhibit`
 
 Idle inhibitor control to prevent automatic sleep/lock.
@@ -234,6 +292,53 @@ Idle inhibitor control to prevent automatic sleep/lock.
 ```bash
 dms ipc call inhibit toggle
 dms ipc call inhibit enable
+```
+
+## Target: `powerprofile`
+
+Power profile control via `power-profiles-daemon`. Changes stay in sync with DMS UI and trigger the power profile OSD when enabled.
+
+Requires `power-profiles-daemon` to be installed and running. Works on all compositors.
+
+### Functions
+
+**`open`**
+- Show the power profile picker modal
+- Returns: Success confirmation or error if daemon unavailable
+
+**`close`**
+- Close the power profile picker modal
+- Returns: Success confirmation
+
+**`toggle`**
+- Toggle power profile picker modal visibility
+- Returns: Success confirmation or error if daemon unavailable
+
+**`list`**
+- List available profile slugs, one per line
+- Returns: `power-saver`, `balanced`, and `performance` when supported
+
+**`status`**
+- Get the currently active profile slug
+- Returns: `power-saver`, `balanced`, `performance`, or error if daemon unavailable
+
+**`set <profile>`**
+- Set the active power profile
+- Parameters: Profile slug or alias — `power-saver` (`powersaver`, `saver`, `0`), `balanced` (`1`), `performance` (`2`)
+- Returns: Success confirmation or error if profile unknown, unsupported, or write failed
+
+**`cycle`**
+- Cycle to the next available profile in order: power-saver → balanced → performance → power-saver
+- Returns: Success confirmation or error if daemon unavailable or write failed
+
+### Examples
+```bash
+dms ipc call powerprofile status
+dms ipc call powerprofile list
+dms ipc call powerprofile cycle
+dms ipc call powerprofile set balanced
+dms ipc call powerprofile set performance
+dms ipc call powerprofile toggle
 ```
 
 ## Target: `wallpaper`
@@ -396,6 +501,10 @@ Top bar visibility control.
 - Toggle top bar visibility
 - Returns: Success confirmation with current state
 
+**`toggleReveal`**
+- Toggle the runtime reveal/tuck state for an autohidden bar
+- Returns: Success confirmation with current reveal state
+
 **`status`**
 - Get current top bar visibility status
 - Returns: "visible" or "hidden"
@@ -403,23 +512,84 @@ Top bar visibility control.
 ### Examples
 ```bash
 dms ipc call bar toggle
+dms ipc call bar toggleReveal index 0
 dms ipc call bar hide
 dms ipc call bar status
 ```
 
 ## Target: `systemupdater`
 
-System updater external check request.
+System updater widget control and background update checks.
 
 ### Functions
 
+**`toggle`**
+- Toggle the system updater popout open/closed
+
+**`open`**
+- Open the system updater popout
+
+**`close`**
+- Close the system updater popout
+
 **`updatestatus`**
-- Trigger a system update check
+- Trigger a background update check
 - Returns: Success confirmation
 
 ### Examples
 ```bash
+dms ipc call systemupdater toggle
+dms ipc call systemupdater open
+dms ipc call systemupdater close
 dms ipc call systemupdater updatestatus
+```
+
+## Target: `defaultApp`
+
+Launch applications configured in Settings > Default Apps.
+
+### Functions
+
+**`browser`**
+- Launch the configured default web browser
+- Returns: Launch request confirmation
+
+**`fileManager`**
+- Launch the configured default file manager
+- Returns: Launch request confirmation
+
+**`textEditor`**
+- Launch the configured default text editor
+- Returns: Launch request confirmation
+
+**`pdfReader`**
+- Launch the configured default PDF reader
+- Returns: Launch request confirmation
+
+**`imageViewer`**
+- Launch the configured default image viewer
+- Returns: Launch request confirmation
+
+**`videoPlayer`**
+- Launch the configured default video player
+- Returns: Launch request confirmation
+
+**`musicPlayer`**
+- Launch the configured default music player
+- Returns: Launch request confirmation
+
+**`mail`**
+- Launch the configured default mail client
+- Returns: Launch request confirmation
+
+**`calendar`**
+- Launch the configured default calendar application
+- Returns: Launch request confirmation
+
+### Examples
+```bash
+dms ipc call defaultApp browser
+dms ipc call defaultApp fileManager
 ```
 
 ## Modal Controls
@@ -480,6 +650,18 @@ Power menu modal control for system power actions.
 - `close` - Hide power menu modal
 - `toggle` - Toggle power menu modal visibility
 
+### Target: `powerprofile`
+Power profile picker modal and profile control via `power-profiles-daemon`.
+
+**Functions:**
+- `open` - Show power profile picker modal
+- `close` - Hide power profile picker modal
+- `toggle` - Toggle power profile picker modal visibility
+- `list` - List available profile slugs
+- `status` - Get current profile slug
+- `set <profile>` - Set profile by slug or alias (`power-saver`, `balanced`, `performance`)
+- `cycle` - Cycle to the next available profile
+
 ### Target: `control-center`
 Control Center popout containing network, bluetooth, audio, power, and other quick settings.
 
@@ -537,7 +719,7 @@ File browser controls for selecting wallpapers and profile images.
   - Both browsers support common image formats (jpg, jpeg, png, bmp, gif, webp)
 
 ### Target: `color-picker`
-Color picker modal control.
+In-shell color picker modal for theme and settings color selection.
 
 **Functions:**
 - `open` - Show color picker modal
@@ -547,6 +729,14 @@ Color picker modal control.
 - `closeInstant` - Hide color picker modal without animation
 - `toggle` - Toggle color picker modal visibility
 - `toggleInstant` - Toggle color picker modal visibility without animation on hide
+
+**Note:** This controls the in-shell modal. To pick a pixel from the screen via CLI, use `dms color pick` instead (see [Color Picker CLI](https://danklinux.com/docs/dankmaterialshell/cli-color-picker)).
+
+**Examples:**
+```bash
+dms ipc call color-picker toggle
+dms ipc call color-picker openColor "#3f51b5"
+```
 
 ### Target: `hypr`
 Hyprland-specific controls including keybinds cheatsheet and workspace overview (Hyprland only).
@@ -609,6 +799,10 @@ dms ipc call processlist toggle
 
 # Show power menu
 dms ipc call powermenu toggle
+
+# Cycle or set power profile (requires power-profiles-daemon)
+dms ipc call powerprofile cycle
+dms ipc call powerprofile toggle
 
 # Open notepad
 dms ipc call notepad toggle

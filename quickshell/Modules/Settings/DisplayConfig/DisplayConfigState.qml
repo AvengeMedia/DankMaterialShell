@@ -4,11 +4,14 @@ pragma ComponentBehavior: Bound
 import QtCore
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DisplayConfigState")
 
     readonly property bool hasOutputBackend: WlrOutputService.wlrOutputAvailable
     readonly property var wlrOutputs: WlrOutputService.outputs
@@ -18,8 +21,11 @@ Singleton {
 
     property var includeStatus: ({
             "exists": false,
-            "included": false
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
         })
+    readonly property bool readOnly: CompositorService.isHyprland && includeStatus.readOnly === true
     property bool checkingInclude: false
     property bool fixingInclude: false
 
@@ -41,6 +47,16 @@ Singleton {
     property bool profilesLoading: false
     property var validatedProfiles: ({})
     property bool manualActivation: false
+    property bool profilesReady: false
+    property var monitorsCache: ({
+            "version": 1,
+            "configurations": []
+        })
+    property bool _monitorsSelfWrite: false
+    // Last config entry that was applied (set by applyConfigEntry / confirmChanges).
+    // Used to recover position, scale, and transform for disabled outputs that wlr
+    // no longer reports a logical viewport for.
+    property var lastAppliedEntry: null
 
     signal changesApplied(var changeDescriptions)
     signal changesConfirmed
@@ -70,224 +86,604 @@ Singleton {
         return outputName;
     }
 
-    function validateProfiles() {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profilesDir = getProfilesDir();
-        const ext = getProfileExtension();
+    FileView {
+        id: monitorsFile
 
-        if (!profilesDir) {
-            validatedProfiles = {};
-            return;
-        }
-
-        const profileIds = Object.keys(profiles);
-        if (profileIds.length === 0) {
-            validatedProfiles = {};
-            return;
-        }
-
-        const fileChecks = profileIds.map(id => profilesDir + "/" + id + ext).join(" ");
-        Proc.runCommand("validate-profiles", ["sh", "-c", `for f in ${fileChecks}; do [ -f "$f" ] && echo "$f"; done`], (output, exitCode) => {
-            const existingFiles = new Set(output.trim().split("\n").filter(f => f));
-            const validated = {};
-            for (const profileId of profileIds) {
-                const profileFile = profilesDir + "/" + profileId + ext;
-                if (existingFiles.has(profileFile))
-                    validated[profileId] = profiles[profileId];
-                else
-                    SettingsData.removeDisplayProfile(compositor, profileId);
+        path: Paths.strip(Paths.config) + "/monitors.json"
+        blockLoading: true
+        blockWrites: true
+        atomicWrites: true
+        watchChanges: true
+        printErrors: false
+        onLoaded: root._reparseMonitorsJson(monitorsFile.text())
+        onLoadFailed: root._reparseMonitorsJson("")
+        onFileChanged: {
+            if (root._monitorsSelfWrite) {
+                root._monitorsSelfWrite = false;
+                return;
             }
+            monitorsFile.reload();
+        }
+        onSaveFailed: error => {
+            root._monitorsSelfWrite = false;
+            log.warn("Failed to save monitors.json:", error);
+        }
+    }
+
+    function _reparseMonitorsJson(text) {
+        if (!text || !text.trim()) {
+            monitorsCache = {
+                "version": 1,
+                "configurations": []
+            };
+        } else {
+            try {
+                const parsed = JSON.parse(text);
+                if (!Array.isArray(parsed.configurations))
+                    parsed.configurations = [];
+                monitorsCache = parsed;
+            } catch (e) {
+                log.warn("Failed to parse monitors.json, using empty config");
+                monitorsCache = {
+                    "version": 1,
+                    "configurations": []
+                };
+            }
+        }
+        _initializeProfiles();
+    }
+
+    function _initializeProfiles() {
+        if (!profilesReady && _shouldMigrateLegacyProfiles()) {
+            _migrateLegacyProfiles();
+            return;
+        }
+        validateProfiles();
+    }
+
+    function _shouldMigrateLegacyProfiles() {
+        if ((monitorsCache.configurations || []).length > 0)
+            return false;
+        const legacy = SettingsData.displayProfiles || {};
+        for (const c in legacy) {
+            if (Object.keys(legacy[c] || {}).length > 0)
+                return true;
+        }
+        return false;
+    }
+
+    function _migrateLegacyProfiles() {
+        const legacy = SettingsData.displayProfiles || {};
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        const compositorDirs = {
+            "niri": configDir + "/niri/dms/profiles",
+            "hyprland": configDir + "/hypr/dms/profiles",
+            "dwl": configDir + "/mango/dms/profiles",
+            "mango": configDir + "/mango/dms/profiles"
+        };
+        const compositorExts = {
+            "niri": ".kdl",
+            "hyprland": ".conf",
+            "dwl": ".conf",
+            "mango": ".conf"
+        };
+
+        const tasks = [];
+        for (const compositor in legacy) {
+            const dir = compositorDirs[compositor];
+            const ext = compositorExts[compositor];
+            if (!dir || !ext)
+                continue;
+            for (const profileId in (legacy[compositor] || {})) {
+                tasks.push({
+                    compositor: compositor,
+                    id: profileId,
+                    name: legacy[compositor][profileId]?.name || "",
+                    file: dir + "/" + profileId + ext
+                });
+            }
+        }
+
+        if (tasks.length === 0) {
+            validateProfiles();
+            return;
+        }
+
+        log.info("Migrating", tasks.length, "legacy display profiles to monitors.json");
+
+        const migrated = [];
+        let pending = tasks.length;
+        const tryFinish = () => {
+            pending--;
+            if (pending > 0)
+                return;
+            const data = monitorsCache;
+            data.configurations = (data.configurations || []).concat(migrated);
+            writeMonitorsJson(data, success => {
+                if (success) {
+                    SettingsData.displayProfiles = {};
+                    SettingsData.saveSettings();
+                    log.info("Migrated", migrated.length, "of", tasks.length, "legacy profiles");
+                } else {
+                    log.warn("Failed to write migrated monitors.json");
+                }
+                validateProfiles();
+            });
+        };
+
+        for (const task of tasks) {
+            (function (t) {
+                    Proc.runCommand("migrate-read-" + t.id, ["cat", t.file], (content, exitCode) => {
+                        if (exitCode !== 0 || !content) {
+                            log.warn("Skipping migration of profile", t.id, "- can't read", t.file);
+                            tryFinish();
+                            return;
+                        }
+                        let parsed;
+                        switch (t.compositor) {
+                        case "niri":
+                            parsed = parseNiriOutputs(content);
+                            break;
+                        case "hyprland":
+                            parsed = parseHyprlandOutputs(content);
+                            break;
+                        case "dwl":
+                            parsed = parseMangoOutputs(content);
+                            break;
+                        default:
+                            parsed = {};
+                        }
+                        const niriSettings = SettingsData.niriOutputSettings || {};
+                        const hyprSettings = SettingsData.hyprlandOutputSettings || {};
+                        const profileOutputs = {};
+                        for (const outputName in parsed) {
+                            const od = parsed[outputName];
+                            profileOutputs[outputName] = extractOutputNeutralConfig(outputName, od, niriSettings, hyprSettings);
+                        }
+                        if (Object.keys(profileOutputs).length > 0)
+                            migrated.push({
+                                "id": t.id,
+                                "name": t.name,
+                                "outputs": profileOutputs
+                            });
+                        tryFinish();
+                    });
+                })(task);
+        }
+    }
+
+    function readMonitorsJson(callback) {
+        callback(monitorsCache);
+    }
+
+    function writeMonitorsJson(data, callback) {
+        monitorsCache = data;
+        _monitorsSelfWrite = true;
+        monitorsFile.setText(JSON.stringify(data, null, 2));
+        if (callback)
+            callback(true);
+    }
+
+    function generateProfileId() {
+        return "profile_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+    }
+
+    function generateAutoProfileId(outputIdentifiers) {
+        const fp = outputSetFingerprint(outputIdentifiers);
+        let hash = 0;
+        for (let i = 0; i < fp.length; i++) {
+            hash = ((hash << 5) - hash) + fp.charCodeAt(i);
+        }
+        const hashStr = (hash >>> 0).toString(16);
+        return "auto_" + hashStr;
+    }
+
+    function configFingerprint(configEntry) {
+        return Object.keys(configEntry.outputs || {}).sort().join("+");
+    }
+
+    function outputSetFingerprint(outputIdentifiers) {
+        return [...outputIdentifiers].sort().join("+");
+    }
+
+    function findConfigEntryById(data, id) {
+        const configs = data.configurations || [];
+        for (let i = 0; i < configs.length; i++) {
+            if (configs[i].id === id)
+                return {
+                    entry: configs[i],
+                    index: i
+                };
+        }
+        return null;
+    }
+
+    function findConfigEntryByFingerprint(data, outputIdentifiers, autoOnly) {
+        const targetKey = outputSetFingerprint(outputIdentifiers);
+        const configs = data.configurations || [];
+        for (let i = 0; i < configs.length; i++) {
+            if (configFingerprint(configs[i]) === targetKey) {
+                if (autoOnly && configs[i].name)
+                    continue;
+                return {
+                    entry: configs[i],
+                    index: i
+                };
+            }
+        }
+        return null;
+    }
+
+    function getProfileMonitorInclusion(profileId) {
+        const profile = validatedProfiles[profileId];
+        const profileOutputIds = new Set(Object.keys(profile?.outputs || {}));
+        const result = {};
+        for (const rawName in allOutputs) {
+            const od = allOutputs[rawName];
+            const id = od ? getOutputIdentifier(od, rawName) : rawName;
+            result[rawName] = profileOutputIds.has(id);
+        }
+        return result;
+    }
+
+    function updateProfileMonitors(profileId, enabledRawNames) {
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (!match) {
+                profileError(I18n.tr("Profile not found"));
+                return;
+            }
+            const profileName = match.entry.name;
+            const existingOutputs = match.entry.outputs || {};
+            const mergedAll = buildOutputsWithPendingChanges();
+            const niriSettings = buildMergedNiriSettings();
+            const hyprlandSettings = buildMergedHyprlandSettings();
+            const newOutputConfigs = {};
+            for (const rawName of enabledRawNames) {
+                const od = mergedAll[rawName] || allOutputs[rawName];
+                if (!od)
+                    continue;
+                const outputId = getOutputIdentifier(od, rawName);
+                newOutputConfigs[outputId] = existingOutputs[outputId] || extractOutputNeutralConfig(rawName, od, niriSettings, hyprlandSettings);
+            }
+            data.configurations[match.index] = {
+                "id": profileId,
+                "name": profileName,
+                "outputs": newOutputConfigs
+            };
+            writeMonitorsJson(data, success => {
+                if (!success)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                updated[profileId] = {
+                    id: profileId,
+                    name: profileName,
+                    outputs: newOutputConfigs
+                };
+                validatedProfiles = updated;
+                matchedProfile = findMatchingProfile();
+                profileSaved(profileId, profileName);
+            });
+        });
+    }
+
+    // Extract neutral per-output config from current live state
+    function extractOutputNeutralConfig(outputName, outputData, niriSettings, hyprlandSettings) {
+        const modeData = (outputData.modes && outputData.current_mode !== undefined) ? outputData.modes[outputData.current_mode] : null;
+        const modeStr = modeData ? modeData.width + "x" + modeData.height + "@" + (modeData.refresh_rate / 1000).toFixed(3) : null;
+        const cfg = {
+            "mode": modeStr,
+            "position": {
+                "x": outputData.logical?.x ?? 0,
+                "y": outputData.logical?.y ?? 0
+            },
+            "scale": outputData.logical?.scale || 1.0,
+            "transform": outputData.logical?.transform ?? "Normal",
+            "vrr": outputData.vrr_enabled ?? false,
+            "disabled": false
+        };
+        if (CompositorService.isNiri) {
+            cfg.niri = Object.assign({}, niriSettings?.[getNiriOutputIdentifier(outputData, outputName)] || {});
+            if (cfg.niri.disabled) {
+                delete cfg.niri.disabled;
+                cfg.disabled = true;
+            }
+        }
+        if (CompositorService.isHyprland) {
+            cfg.hyprland = Object.assign({}, hyprlandSettings?.[getHyprlandOutputIdentifier(outputData, outputName)] || {});
+            if (outputData.mirror)
+                cfg.hyprland.mirror = outputData.mirror;
+            if (cfg.hyprland.disabled) {
+                delete cfg.hyprland.disabled;
+                cfg.disabled = true;
+            }
+        }
+        return cfg;
+    }
+
+    // Convert monitors.json config entry → internal outputsData map
+    function generateOutputsDataFromConfig(configEntry) {
+        const result = {};
+        const cfgOutputs = configEntry.outputs || {};
+        for (const outputId in cfgOutputs) {
+            const cfg = cfgOutputs[outputId];
+            // Find matching live output to get modes list
+            let liveOutput = null;
+            for (const name in outputs) {
+                if (getOutputIdentifier(outputs[name], name) === outputId || name === outputId) {
+                    liveOutput = outputs[name];
+                    break;
+                }
+            }
+            const liveModes = liveOutput?.modes || [];
+            let currentMode = liveModes.findIndex(m => {
+                const s = m.width + "x" + m.height + "@" + (m.refresh_rate / 1000).toFixed(3);
+                return s === cfg.mode;
+            });
+            if (currentMode < 0 && liveModes.length > 0)
+                currentMode = 0;
+            const entry = {
+                "name": outputId,
+                "make": liveOutput?.make || "",
+                "model": liveOutput?.model || "",
+                "serial": liveOutput?.serial || "",
+                "modes": liveModes,
+                "current_mode": currentMode,
+                "vrr_supported": liveOutput?.vrr_supported ?? false,
+                "vrr_enabled": cfg.vrr ?? false,
+                "logical": {
+                    "x": cfg.position?.x ?? 0,
+                    "y": cfg.position?.y ?? 0,
+                    "scale": cfg.scale ?? 1.0,
+                    "transform": cfg.transform ?? "Normal"
+                }
+            };
+            if (cfg.hyprland?.mirror)
+                entry.mirror = cfg.hyprland.mirror;
+            result[outputId] = entry;
+        }
+        return result;
+    }
+
+    // Extract niri settings map from a neutral config entry.
+    function getNiriSettingsFromConfig(configEntry) {
+        const result = {};
+        for (const outputId in (configEntry.outputs || {})) {
+            const cfg = configEntry.outputs[outputId];
+            const settings = Object.assign({}, cfg.niri || {});
+            if (cfg.disabled)
+                settings.disabled = true;
+            if (Object.keys(settings).length > 0)
+                result[outputId] = settings;
+        }
+        return result;
+    }
+
+    // Extract hyprland settings map from neutral config entry
+    function getHyprlandSettingsFromConfig(configEntry) {
+        const result = {};
+        for (const outputId in (configEntry.outputs || {})) {
+            const cfg = configEntry.outputs[outputId];
+            const settings = Object.assign({}, cfg.hyprland || {});
+            if (cfg.disabled)
+                settings.disabled = true;
+            if (Object.keys(settings).length > 0)
+                result[outputId] = settings;
+        }
+        return result;
+    }
+
+    function backendSettingsFromConfig(configEntry) {
+        switch (CompositorService.compositor) {
+        case "niri":
+            return getNiriSettingsFromConfig(configEntry);
+        case "hyprland":
+            return getHyprlandSettingsFromConfig(configEntry);
+        default:
+            return null;
+        }
+    }
+
+    function backendMergedSettings() {
+        switch (CompositorService.compositor) {
+        case "niri":
+            return buildMergedNiriSettings();
+        case "hyprland":
+            return buildMergedHyprlandSettings();
+        default:
+            return null;
+        }
+    }
+
+    function ensureEnabledOutput(configEntry) {
+        const outputKeys = Object.keys(configEntry.outputs || {});
+        if (outputKeys.length === 0)
+            return false;
+        const hasEnabled = outputKeys.some(k => !configEntry.outputs[k].disabled);
+        if (hasEnabled)
+            return false;
+        delete configEntry.outputs[outputKeys[0]].disabled;
+        return true;
+    }
+
+    // Write compositor config from a neutral config entry and optionally reload
+    function applyConfigEntry(configEntry, configId, profileName, isManual) {
+        if (CompositorService.isHyprland && readOnly) {
+            if (isManual) {
+                profilesLoading = false;
+                manualActivation = false;
+                profileError(I18n.tr("Hyprland conf mode is read-only in Settings"));
+            }
+            showHyprlandReadOnlyWarning();
+            return;
+        }
+        ensureEnabledOutput(configEntry);
+        // Capture the entry being applied so disabled-output settings fields can read
+        // scale/position/transform back even when wlr reports no logical viewport.
+        root.lastAppliedEntry = JSON.parse(JSON.stringify(configEntry));
+        const outputsData = generateOutputsDataFromConfig(configEntry);
+
+        const onWriteFailed = () => {
+            if (isManual) {
+                profilesLoading = false;
+                manualActivation = false;
+                profileError(I18n.tr("Failed to apply profile"));
+            }
+        };
+        const onWriteSuccess = () => {
+            SettingsData.setActiveDisplayProfile(CompositorService.compositor, configId);
+            if (isManual) {
+                profilesLoading = false;
+                profileActivated(configId, profileName);
+                manualActivationTimer.restart();
+            }
+            WlrOutputService.requestState();
+        };
+
+        backendWriteOutputsConfig(outputsData, backendSettingsFromConfig(configEntry), success => {
+            if (success)
+                onWriteSuccess();
+            else
+                onWriteFailed();
+        });
+    }
+
+    // ── Profile management ─────────────────────────────────────────────────
+
+    function validateProfiles() {
+        log.info("Validating profiles against current outputs...");
+        readMonitorsJson(data => {
+            const validated = {};
+            let dirty = false;
+            for (const entry of (data.configurations || [])) {
+                const fp = configFingerprint(entry);
+                if (!fp)
+                    continue;
+                if (!entry.id) {
+                    entry.id = generateProfileId();
+                    dirty = true;
+                }
+                if (ensureEnabledOutput(entry))
+                    dirty = true;
+                validated[entry.id] = {
+                    id: entry.id,
+                    name: entry?.name || "",
+                    outputs: entry.outputs
+                };
+            }
+            if (dirty)
+                writeMonitorsJson(data, null);
             validatedProfiles = validated;
             matchedProfile = findMatchingProfile();
+            if (!profilesReady) {
+                profilesReady = true;
+                applyAutoConfig();
+            }
         });
     }
 
     function findMatchingProfile() {
-        const profiles = validatedProfiles;
-
-        console.log("[Profile Match] Current outputs:", JSON.stringify(currentOutputSet));
-
-        let bestMatch = "";
-        let bestScore = -1;
-        let bestUpdatedAt = 0;
-
-        for (const profileId in profiles) {
-            const profile = profiles[profileId];
-            const profileSet = new Set(profile.outputSet);
-
-            console.log("[Profile Match] Checking", profile.name, "outputSet:", JSON.stringify(profile.outputSet));
-
-            let allCurrentPresent = true;
-            for (const output of currentOutputSet) {
-                if (!profileSet.has(output)) {
-                    console.log("[Profile Match]  - Missing output:", output);
-                    allCurrentPresent = false;
-                    break;
-                }
-            }
-            if (!allCurrentPresent) {
-                console.log("[Profile Match]  - SKIP: not all current outputs present");
+        const currentKey = currentOutputSet.join("+");
+        for (const id in validatedProfiles) {
+            const p = validatedProfiles[id];
+            if (p.name === "")
                 continue;
-            }
-
-            const disconnectedCount = profile.outputSet.length - currentOutputSet.length;
-            const score = currentOutputSet.length * 100 - disconnectedCount;
-            const updatedAt = profile.updatedAt || profile.createdAt || 0;
-            console.log("[Profile Match]  - MATCH score:", score, "(disconnected:", disconnectedCount, "updatedAt:", updatedAt + ")");
-
-            if (score > bestScore || (score === bestScore && updatedAt > bestUpdatedAt)) {
-                bestScore = score;
-                bestMatch = profileId;
-                bestUpdatedAt = updatedAt;
-            }
+            if (Object.keys(p.outputs || {}).sort().join("+") === currentKey)
+                return id;
         }
-        console.log("[Profile Match] Best match:", bestMatch, "score:", bestScore);
-        return bestMatch;
+        return "";
     }
 
-    function getProfilesDir() {
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        switch (CompositorService.compositor) {
-        case "niri":
-            return configDir + "/niri/dms/profiles";
-        case "hyprland":
-            return configDir + "/hypr/dms/profiles";
-        case "dwl":
-            return configDir + "/mango/dms/profiles";
-        default:
-            return "";
-        }
-    }
-
-    function getProfileExtension() {
-        return CompositorService.compositor === "niri" ? ".kdl" : ".conf";
-    }
-
-    function createProfile(name) {
-        const compositor = CompositorService.compositor;
-        const profileId = "profile_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
-        const outputSet = buildCurrentOutputSet();
-        const now = Date.now();
-
-        const profileData = {
-            "id": profileId,
-            "name": name,
-            "outputSet": outputSet,
-            "createdAt": now,
-            "updatedAt": now
-        };
-
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
-        const paths = getConfigPaths();
-        if (!paths) {
-            profileError(I18n.tr("Compositor not supported"));
-            return;
-        }
+    function createProfile(profileName) {
+        const outputConfigs = buildCurrentOutputConfigs();
+        const id = generateProfileId();
 
         profilesLoading = true;
-        Proc.runCommand("create-profile-dir", ["mkdir", "-p", profilesDir], (output, exitCode) => {
-            if (exitCode !== 0) {
+        readMonitorsJson(data => {
+            data.configurations.push({
+                "id": id,
+                "name": profileName,
+                "outputs": outputConfigs
+            });
+
+            writeMonitorsJson(data, success => {
                 profilesLoading = false;
-                profileError(I18n.tr("Failed to create profiles directory"));
-                return;
-            }
-            Proc.runCommand("copy-profile", ["cp", "-L", paths.outputsFile, profileFile], (output2, exitCode2) => {
-                if (exitCode2 !== 0) {
-                    profilesLoading = false;
-                    profileError(I18n.tr("Failed to save profile file"));
+                if (!success) {
+                    profileError(I18n.tr("Failed to save profile"));
                     return;
                 }
-                SettingsData.setDisplayProfile(compositor, profileId, profileData);
-                SettingsData.setActiveDisplayProfile(compositor, profileId);
                 const updated = JSON.parse(JSON.stringify(validatedProfiles));
-                updated[profileId] = profileData;
+                updated[id] = {
+                    id: id,
+                    name: profileName,
+                    outputs: outputConfigs
+                };
                 validatedProfiles = updated;
-                Proc.runCommand("link-new-profile", ["ln", "-sf", profileFile, paths.outputsFile], () => {
-                    profilesLoading = false;
-                    currentOutputSet = outputSet;
-                    matchedProfile = profileId;
-                    profileSaved(profileId, name);
-                });
+                currentOutputSet = buildCurrentOutputSet();
+                matchedProfile = findMatchingProfile();
+                SettingsData.setActiveDisplayProfile(CompositorService.compositor, id);
+                profileSaved(id, profileName);
             });
         });
     }
 
     function renameProfile(profileId, newName) {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profile = profiles[profileId];
-        if (!profile) {
-            profileError(I18n.tr("Profile not found"));
-            return;
-        }
-        profile.name = newName;
-        profile.updatedAt = Date.now();
-        SettingsData.setDisplayProfile(compositor, profileId, profile);
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (!match) {
+                profileError(I18n.tr("Profile not found"));
+                return;
+            }
+            match.entry.name = newName;
+            data.configurations[match.index] = match.entry;
+            writeMonitorsJson(data, success => {
+                if (!success)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                if (updated[profileId])
+                    updated[profileId].name = newName;
+                validatedProfiles = updated;
+            });
+        });
     }
 
     function deleteProfile(profileId) {
         const compositor = CompositorService.compositor;
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
         const isActive = SettingsData.getActiveDisplayProfile(compositor) === profileId;
 
         profilesLoading = true;
-        Proc.runCommand("delete-profile", ["rm", "-f", profileFile], (output, exitCode) => {
-            profilesLoading = false;
-            SettingsData.removeDisplayProfile(compositor, profileId);
-            if (isActive) {
-                SettingsData.setActiveDisplayProfile(compositor, "");
-                backendWriteOutputsConfig(allOutputs);
-            }
-            const updated = JSON.parse(JSON.stringify(validatedProfiles));
-            delete updated[profileId];
-            validatedProfiles = updated;
-            matchedProfile = findMatchingProfile();
-            profileDeleted(profileId);
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (match)
+                data.configurations.splice(match.index, 1);
+            writeMonitorsJson(data, success => {
+                profilesLoading = false;
+                SettingsData.removeDisplayProfile(compositor, profileId);
+                if (isActive) {
+                    SettingsData.setActiveDisplayProfile(compositor, "");
+                    backendWriteOutputsConfig(allOutputs);
+                }
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                delete updated[profileId];
+                validatedProfiles = updated;
+                matchedProfile = findMatchingProfile();
+                profileDeleted(profileId);
+            });
         });
     }
 
     function activateProfile(profileId) {
-        const compositor = CompositorService.compositor;
-        const profiles = SettingsData.getDisplayProfiles(compositor);
-        const profile = profiles[profileId];
-        if (!profile) {
-            profileError(I18n.tr("Profile not found"));
-            return;
-        }
-
-        const profilesDir = getProfilesDir();
-        const profileFile = profilesDir + "/" + profileId + getProfileExtension();
-        const paths = getConfigPaths();
-        if (!paths)
-            return;
-
         manualActivation = true;
         profilesLoading = true;
-        Proc.runCommand("activate-profile", ["ln", "-sf", profileFile, paths.outputsFile], (output, exitCode) => {
-            if (exitCode !== 0) {
+        readMonitorsJson(data => {
+            const match = findConfigEntryById(data, profileId);
+            if (!match) {
                 profilesLoading = false;
                 manualActivation = false;
-                profileError(I18n.tr("Failed to activate profile - file not found"));
+                profileError(I18n.tr("Profile not found in monitors.json"));
                 return;
             }
-            SettingsData.setActiveDisplayProfile(compositor, profileId);
-
-            const reloadCmd = CompositorService.isNiri ? ["niri", "msg", "action", "reload-config-or-panic"] : CompositorService.isHyprland ? ["hyprctl", "reload"] : [];
-            if (reloadCmd.length > 0) {
-                Proc.runCommand("reload-compositor", reloadCmd, (output2, exitCode2) => {
-                    profilesLoading = false;
-                    WlrOutputService.requestState();
-                    profileActivated(profileId, profile.name);
-                    manualActivationTimer.restart();
-                });
-            } else {
-                profilesLoading = false;
-                profileActivated(profileId, profile.name);
-                manualActivationTimer.restart();
-            }
+            applyConfigEntry(match.entry, profileId, match.entry.name || profileId, true);
         });
     }
 
@@ -299,25 +695,69 @@ Singleton {
 
     Timer {
         id: autoSelectDebounceTimer
-        interval: 800
-        onTriggered: root.doAutoSelectProfile()
+        interval: 400
+        onTriggered: {
+            if (root.hasPendingChanges)
+                return;
+            root.applyAutoConfig();
+        }
     }
 
-    // ! TODO - auto profile switching is buggy on niri and other compositors, might need a longer debounce before updating output configuration idk
-    function autoSelectProfile() {
-        return; // disabled
-        autoSelectDebounceTimer.restart();
-    }
-
-    function doAutoSelectProfile() {
-        return; // disabled
-        if (!SettingsData.displayProfileAutoSelect || manualActivation)
+    function applyAutoConfig() {
+        if (!profilesReady || !SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
             return;
-        currentOutputSet = buildCurrentOutputSet();
-        const matched = findMatchingProfile();
-        matchedProfile = matched;
-        if (matched && matched !== SettingsData.getActiveDisplayProfile(CompositorService.compositor))
-            activateProfile(matched);
+
+        readMonitorsJson(data => {
+            const match = findConfigEntryByFingerprint(data, currentOutputSet, true);
+            if (match) {
+                applyConfigEntry(match.entry, match.entry.id, "", false);
+                return;
+            }
+
+            const outputConfigs = buildCurrentOutputConfigs();
+            const id = generateAutoProfileId(currentOutputSet);
+            const existingIdx = data.configurations.findIndex(c => c.id === id);
+            if (existingIdx >= 0)
+                data.configurations[existingIdx] = {
+                    "id": id,
+                    "name": "",
+                    "outputs": outputConfigs
+                };
+            else
+                data.configurations.push({
+                    "id": id,
+                    "name": "",
+                    "outputs": outputConfigs
+                });
+            writeMonitorsJson(data, success => {
+                if (!success)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                updated[id] = {
+                    id: id,
+                    name: "",
+                    outputs: outputConfigs
+                };
+                validatedProfiles = updated;
+                matchedProfile = "";
+                const match = findConfigEntryById(data, id);
+                if (match)
+                    applyConfigEntry(match.entry, id, "", false);
+            });
+        });
+    }
+
+    function buildCurrentOutputConfigs() {
+        const mergedAll = buildOutputsWithPendingChanges();
+        const niriSettings = buildMergedNiriSettings();
+        const hyprlandSettings = buildMergedHyprlandSettings();
+        const outputConfigs = {};
+        for (const name in outputs) {
+            const od = mergedAll[name];
+            if (od)
+                outputConfigs[getOutputIdentifier(od, name)] = extractOutputNeutralConfig(name, od, niriSettings, hyprlandSettings);
+        }
+        return outputConfigs;
     }
 
     function deleteDisconnectedOutput(outputName) {
@@ -345,22 +785,52 @@ Singleton {
             });
         }
         for (const name in outputs) {
-            result[name] = Object.assign({}, outputs[name], {
-                "connected": true
-            });
+            const entry = JSON.parse(JSON.stringify(outputs[name]));
+            entry.connected = true;
+            // For disabled outputs wlr reports scale=0 (no logical viewport).
+            // Overlay scale/position/transform from the last applied profile so
+            // the settings UI can display meaningful values.
+            if (!(entry.logical?.scale > 0)) {
+                const profileCfg = getProfileOutputConfig(name);
+                if (profileCfg) {
+                    if (!entry.logical)
+                        entry.logical = {};
+                    entry.logical.scale = profileCfg.scale ?? 1.0;
+                    entry.logical.x = profileCfg.position?.x ?? entry.logical.x ?? 0;
+                    entry.logical.y = profileCfg.position?.y ?? entry.logical.y ?? 0;
+                    if (profileCfg.transform)
+                        entry.logical.transform = profileCfg.transform;
+                } else if (entry.logical) {
+                    entry.logical.scale = entry.logical.scale || 1.0;
+                }
+            }
+            result[name] = entry;
         }
         return result;
     }
 
+    function getProfileOutputConfig(outputName) {
+        const sourceEntry = lastAppliedEntry || (matchedProfile ? validatedProfiles[matchedProfile] : null);
+        if (!sourceEntry)
+            return null;
+        const cfgOutputs = sourceEntry.outputs || {};
+        const outputId = getOutputIdentifier(outputs[outputName] || {}, outputName);
+        return Object.entries(cfgOutputs).find(([key]) => key === outputId)?.[1] ?? null;
+    }
+
     onOutputsChanged: {
         allOutputs = buildAllOutputsMap();
-        currentOutputSet = buildCurrentOutputSet();
-        matchedProfile = findMatchingProfile();
-        // ! TODO - auto profile switching disabled for now
-        // if (SettingsData.displayProfileAutoSelect)
-        //     Qt.callLater(autoSelectProfile);
+        const newOutputSet = buildCurrentOutputSet();
+        if (JSON.stringify(newOutputSet) === JSON.stringify(currentOutputSet))
+            return;
+        // Physical output set changed — pending tweaks belong to the previous setup
+        if (hasPendingChanges)
+            clearPendingChanges();
+        currentOutputSet = newOutputSet;
+        autoSelectDebounceTimer.restart();
     }
     onSavedOutputsChanged: allOutputs = buildAllOutputsMap()
+    onLastAppliedEntryChanged: allOutputs = buildAllOutputsMap()
 
     Connections {
         target: WlrOutputService
@@ -370,12 +840,17 @@ Singleton {
         }
     }
 
+    Connections {
+        target: CompositorService
+        function onCompositorChanged() {
+            root.checkIncludeStatus();
+        }
+    }
+
     Component.onCompleted: {
         outputs = buildOutputsMap();
         reloadSavedOutputs();
         checkIncludeStatus();
-        currentOutputSet = buildCurrentOutputSet();
-        validateProfiles();
     }
 
     function reloadSavedOutputs() {
@@ -397,9 +872,12 @@ Singleton {
             if (CompositorService.isHyprland) {
                 initHyprlandSettingsFromConfig(parsed);
                 syncHyprlandVrrFromConfig(parsed);
+                syncHyprlandDisabledFromConfig(parsed);
             }
-            if (CompositorService.isNiri)
+            if (CompositorService.isNiri) {
                 syncNiriVrrFromConfig(parsed);
+                syncNiriDisabledFromConfig(parsed);
+            }
         });
     }
 
@@ -476,6 +954,44 @@ Singleton {
             SettingsData.saveSettings();
     }
 
+    function syncHyprlandDisabledFromConfig(parsedOutputs) {
+        const current = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        let changed = false;
+        for (const outputName in parsedOutputs) {
+            const settings = parsedOutputs[outputName]?.hyprlandSettings;
+            const fromConfig = settings?.disabled ?? false;
+            const stored = current[outputName]?.disabled ?? false;
+            if (fromConfig === stored)
+                continue;
+            if (!current[outputName])
+                current[outputName] = {};
+            if (fromConfig)
+                current[outputName].disabled = true;
+            else
+                delete current[outputName].disabled;
+            changed = true;
+        }
+        if (changed) {
+            SettingsData.hyprlandOutputSettings = current;
+            SettingsData.saveSettings();
+        }
+    }
+
+    function syncNiriDisabledFromConfig(parsedOutputs) {
+        let changed = false;
+        for (const outputName in parsedOutputs) {
+            const output = parsedOutputs[outputName];
+            const fromConfig = output.disabled ?? false;
+            const current = SettingsData.getNiriOutputSetting(outputName, "disabled", false);
+            if (current === fromConfig)
+                continue;
+            SettingsData.setNiriOutputSetting(outputName, "disabled", fromConfig || undefined);
+            changed = true;
+        }
+        if (changed)
+            SettingsData.saveSettings();
+    }
+
     function filterDisconnectedOnly(parsedOutputs) {
         const result = {};
         const liveNames = Object.keys(outputs);
@@ -487,6 +1003,8 @@ Singleton {
                 const id = (o.make + " " + o.model + " " + serial).trim();
                 liveByIdentifier[id] = true;
                 liveByIdentifier[o.make + " " + o.model] = true;
+                if (CompositorService.isHyprland)
+                    liveByIdentifier[getHyprlandOutputIdentifier(o, name)] = true;
             }
             liveByIdentifier[name] = true;
         }
@@ -505,7 +1023,7 @@ Singleton {
             return parseNiriOutputs(content);
         case "hyprland":
             return parseHyprlandOutputs(content);
-        case "dwl":
+        case "mango":
             return parseMangoOutputs(content);
         default:
             return {};
@@ -519,6 +1037,20 @@ Singleton {
         while ((match = outputRegex.exec(content)) !== null) {
             const name = match[1];
             const body = match[2];
+
+            if (body.trim() === "off") {
+                result[name] = {
+                    "name": name,
+                    "disabled": true,
+                    "logical": {
+                        "x": 0,
+                        "y": 0,
+                        "scale": 1.0,
+                        "transform": "Normal"
+                    }
+                };
+                continue;
+            }
 
             const modeMatch = body.match(/mode\s+"(\d+)x(\d+)@([\d.]+)"/);
             const posMatch = body.match(/position\s+x=(-?\d+)\s+y=(-?\d+)/);
@@ -551,10 +1083,88 @@ Singleton {
         return result;
     }
 
+    function hyprLuaField(line, field) {
+        const re = new RegExp("\\b" + field + "\\s*=\\s*(\\\"(?:\\\\\\\\.|[^\\\"])*\\\"|'(?:\\\\\\\\.|[^'])*'|\\[\\[.*?\\]\\]|[^,}\\s]+)");
+        const match = line.match(re);
+        if (!match)
+            return undefined;
+        const raw = match[1].trim();
+        if (raw.startsWith("[[") && raw.endsWith("]]"))
+            return raw.slice(2, -2);
+        if (raw.startsWith("\"")) {
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return raw.slice(1, -1);
+            }
+        }
+        if (raw.startsWith("'") && raw.endsWith("'"))
+            return raw.slice(1, -1).replace(/\\'/g, "'");
+        if (raw === "true")
+            return true;
+        if (raw === "false")
+            return false;
+        const num = Number(raw);
+        return isNaN(num) ? raw : num;
+    }
+
+    function parseHyprlandLuaMonitorLine(line) {
+        if (!line.match(/^\s*hl\.monitor\s*\(/))
+            return null;
+        const name = hyprLuaField(line, "output");
+        if (name === undefined)
+            return null;
+        const disabled = hyprLuaField(line, "disabled") === true;
+        const mode = hyprLuaField(line, "mode") || "preferred";
+        const position = hyprLuaField(line, "position") || "0x0";
+        const scaleValue = hyprLuaField(line, "scale");
+        const transform = Number(hyprLuaField(line, "transform") ?? 0);
+        const vrrMode = Number(hyprLuaField(line, "vrr") ?? 0);
+        const posMatch = String(position).match(/^(-?\d+)x(-?\d+)$/);
+        const modeMatch = String(mode).match(/^(\d+)x(\d+)@([\d.]+)/);
+        const settings = {
+            "disabled": disabled || undefined,
+            "bitdepth": hyprLuaField(line, "bitdepth"),
+            "colorManagement": hyprLuaField(line, "cm"),
+            "sdrBrightness": hyprLuaField(line, "sdrbrightness"),
+            "sdrSaturation": hyprLuaField(line, "sdrsaturation"),
+            "supportsWideColor": hyprLuaField(line, "supports_wide_color"),
+            "supportsHdr": hyprLuaField(line, "supports_hdr"),
+            "vrrFullscreenOnly": vrrMode === 2 ? true : undefined
+        };
+        return {
+            "name": String(name),
+            "logical": {
+                "x": posMatch ? parseInt(posMatch[1]) : 0,
+                "y": posMatch ? parseInt(posMatch[2]) : 0,
+                "scale": typeof scaleValue === "number" ? scaleValue : 1.0,
+                "transform": hyprlandToTransform(transform)
+            },
+            "modes": modeMatch ? [
+                {
+                    "width": parseInt(modeMatch[1]),
+                    "height": parseInt(modeMatch[2]),
+                    "refresh_rate": Math.round(parseFloat(modeMatch[3]) * 1000)
+                }
+            ] : [],
+            "current_mode": modeMatch ? 0 : -1,
+            "vrr_enabled": vrrMode >= 1,
+            "vrr_supported": vrrMode > 0,
+            "hyprlandSettings": settings,
+            "mirror": hyprLuaField(line, "mirror") || ""
+        };
+    }
+
     function parseHyprlandOutputs(content) {
         const result = {};
         const lines = content.split("\n");
         for (const line of lines) {
+            const luaMonitor = parseHyprlandLuaMonitorLine(line);
+            if (luaMonitor) {
+                result[luaMonitor.name] = luaMonitor;
+                continue;
+            }
+
             const disableMatch = line.match(/^\s*monitor\s*=\s*([^,]+),\s*disable\s*$/);
             if (disableMatch) {
                 const name = disableMatch[1].trim();
@@ -684,7 +1294,7 @@ Singleton {
                 params[pair.substring(0, colonIdx).trim()] = pair.substring(colonIdx + 1).trim();
             }
 
-            const name = params.name;
+            const name = (params.name || "").replace(/^\^/, "").replace(/\$$/, "");
             if (!name)
                 continue;
 
@@ -746,12 +1356,12 @@ Singleton {
             };
         case "hyprland":
             return {
-                "configFile": configDir + "/hypr/hyprland.conf",
-                "outputsFile": configDir + "/hypr/dms/outputs.conf",
-                "grepPattern": 'source.*dms/outputs.conf',
-                "includeLine": "source = ./dms/outputs.conf"
+                "configFile": configDir + "/hypr/hyprland.lua",
+                "outputsFile": configDir + "/hypr/dms/outputs.lua",
+                "grepPattern": "dms.outputs",
+                "includeLine": "require(\"dms.outputs\")"
             };
-        case "dwl":
+        case "mango":
             return {
                 "configFile": configDir + "/mango/config.conf",
                 "outputsFile": configDir + "/mango/dms/outputs.conf",
@@ -765,16 +1375,18 @@ Singleton {
 
     function checkIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
             includeStatus = {
                 "exists": false,
-                "included": false
+                "included": false,
+                "configFormat": "",
+                "readOnly": false
             };
             return;
         }
 
-        const filename = (compositor === "niri") ? "outputs.kdl" : "outputs.conf";
-        const compositorArg = (compositor === "dwl") ? "mangowc" : compositor;
+        const filename = (compositor === "niri") ? "outputs.kdl" : ((compositor === "hyprland") ? "outputs.lua" : "outputs.conf");
+        const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
 
         checkingInclude = true;
         Proc.runCommand("check-outputs-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
@@ -782,7 +1394,9 @@ Singleton {
             if (exitCode !== 0) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
                 return;
             }
@@ -791,29 +1405,66 @@ Singleton {
             } catch (e) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
             }
         });
     }
 
     function fixOutputsInclude() {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
+        if (CompositorService.isHyprland && !HyprlandService.luaConfigActive) {
+            showHyprlandReadOnlyWarning();
+            checkIncludeStatus();
+            return;
+        }
         const paths = getConfigPaths();
         if (!paths)
             return;
 
         fixingInclude = true;
-        const outputsDir = paths.outputsFile.substring(0, paths.outputsFile.lastIndexOf("/"));
         const unixTime = Math.floor(Date.now() / 1000);
         const backupFile = paths.configFile + ".backup" + unixTime;
+        const script = ConfigIncludeResolve.buildRepairScript({
+            configFile: paths.configFile,
+            backupFile: backupFile,
+            fragmentFile: paths.outputsFile,
+            grepPattern: paths.grepPattern,
+            includeLine: paths.includeLine
+        });
 
-        Proc.runCommand("fix-outputs-include", ["sh", "-c", `cp "${paths.configFile}" "${backupFile}" 2>/dev/null; ` + `mkdir -p "${outputsDir}" && ` + `touch "${paths.outputsFile}" && ` + `if ! grep -v '^[[:space:]]*\\(//\\|#\\)' "${paths.configFile}" 2>/dev/null | grep -q '${paths.grepPattern}'; then ` + `echo '' >> "${paths.configFile}" && ` + `echo '${paths.includeLine}' >> "${paths.configFile}"; fi`], (output, exitCode) => {
-            fixingInclude = false;
-            if (exitCode !== 0)
+        Proc.runCommand("fix-outputs-include", ["sh", "-c", script], (output, exitCode) => {
+            if (exitCode !== 0) {
+                fixingInclude = false;
                 return;
+            }
+
+            const liveOutputs = buildOutputsMap();
+            if (Object.keys(liveOutputs).length > 0) {
+                outputs = liveOutputs;
+                backendWriteOutputsConfig(liveOutputs, backendMergedSettings(), success => {
+                    fixingInclude = false;
+                    if (!success)
+                        ToastService.showError(I18n.tr("Display setup failed"), I18n.tr("Failed to write outputs config."), "", "display-config");
+                    checkIncludeStatus();
+                    WlrOutputService.requestState();
+                });
+                return;
+            }
+
+            fixingInclude = false;
             checkIncludeStatus();
             WlrOutputService.requestState();
         });
+    }
+
+    function showHyprlandReadOnlyWarning() {
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing display settings."), "dms setup", "display-config");
     }
 
     function buildOutputsMap() {
@@ -840,7 +1491,7 @@ Singleton {
                     "y": output.y ?? 0,
                     "width": output.currentMode?.width ?? 1920,
                     "height": output.currentMode?.height ?? 1080,
-                    "scale": output.scale ?? 1.0,
+                    "scale": output.scale || 1.0,
                     "transform": mapWlrTransform(output.transform)
                 }
             };
@@ -898,21 +1549,148 @@ Singleton {
         WlrOutputService.requestState();
     }
 
-    function backendWriteOutputsConfig(outputsData) {
+    function backendWriteOutputsConfig(outputsData, settingsOrCallback, maybeCallback) {
+        const settings = typeof settingsOrCallback === "function" ? null : settingsOrCallback;
+        const callback = typeof settingsOrCallback === "function" ? settingsOrCallback : maybeCallback;
+        const hasExplicitSettings = settings !== null && settings !== undefined;
+
+        function finish(success) {
+            if (callback)
+                callback(success);
+        }
+
         switch (CompositorService.compositor) {
         case "niri":
-            NiriService.generateOutputsConfig(outputsData);
-            break;
+            {
+                const niriSettings = hasExplicitSettings ? settings : buildMergedNiriSettings();
+                NiriService.generateOutputsConfig(outputsData, niriSettings, success => {
+                    if (!success) {
+                        finish(false);
+                        return;
+                    }
+                    reloadAndApplyNiriLiveOutputsConfig(outputsData, niriSettings, finish);
+                });
+                break;
+            }
         case "hyprland":
-            HyprlandService.generateOutputsConfig(outputsData, buildMergedHyprlandSettings());
-            break;
-        case "dwl":
-            DwlService.generateOutputsConfig(outputsData);
+            {
+                if (readOnly) {
+                    showHyprlandReadOnlyWarning();
+                    finish(false);
+                    return false;
+                }
+                const hyprlandSettings = hasExplicitSettings ? settings : buildMergedHyprlandSettings();
+                HyprlandService.generateOutputsConfig(outputsData, hyprlandSettings, finish);
+                break;
+            }
+        case "mango":
+            MangoService.generateOutputsConfig(outputsData, finish);
             break;
         default:
             WlrOutputService.applyOutputsConfig(outputsData, outputs);
+            finish(true);
             break;
         }
+        return true;
+    }
+
+    function niriTransformArg(transform) {
+        switch (transform) {
+        case "90":
+            return "90";
+        case "180":
+            return "180";
+        case "270":
+            return "270";
+        case "Flipped":
+            return "flipped";
+        case "Flipped90":
+            return "flipped-90";
+        case "Flipped180":
+            return "flipped-180";
+        case "Flipped270":
+            return "flipped-270";
+        default:
+            return "normal";
+        }
+    }
+
+    function getLiveNiriOutputName(outputName, outputData) {
+        if (outputs[outputName])
+            return outputName;
+        const targetId = getNiriOutputIdentifier(outputData, outputName);
+        for (const liveName in outputs) {
+            if (getNiriOutputIdentifier(outputs[liveName], liveName) === targetId)
+                return liveName;
+        }
+        return "";
+    }
+
+    function applyNiriLiveOutputsConfig(outputsData, niriSettings, callback) {
+        const names = Object.keys(outputsData || {});
+        let pending = 0;
+        let failed = false;
+
+        function done(success) {
+            if (callback)
+                callback(success);
+        }
+
+        for (const outputName of names) {
+            const output = outputsData[outputName];
+            if (!output)
+                continue;
+            const liveName = getLiveNiriOutputName(outputName, output);
+            if (!liveName)
+                continue;
+
+            const identifier = getNiriOutputIdentifier(output, outputName);
+            const settings = niriSettings?.[outputName] || niriSettings?.[identifier] || {};
+            const config = {};
+
+            if (settings.disabled === true)
+                config.disabled = true;
+            else if (settings.disabled === false)
+                config.disabled = false;
+
+            if (!config.disabled) {
+                if (output.current_mode !== undefined && output.modes && output.modes[output.current_mode]) {
+                    const mode = output.modes[output.current_mode];
+                    config.mode = mode.width + "x" + mode.height + "@" + (mode.refresh_rate / 1000).toFixed(3);
+                }
+                if (output.logical) {
+                    config.scale = output.logical.scale ?? 1.0;
+                    config.position = {
+                        "x": output.logical.x ?? 0,
+                        "y": output.logical.y ?? 0
+                    };
+                    config.transform = niriTransformArg(output.logical.transform);
+                }
+                if (settings.vrrOnDemand !== undefined)
+                    config.vrrOnDemand = settings.vrrOnDemand;
+                else if (output.vrr_enabled !== undefined)
+                    config.vrr = output.vrr_enabled;
+            }
+
+            pending++;
+            NiriService.applyOutputConfig(liveName, config, success => {
+                failed = failed || !success;
+                pending--;
+                if (pending === 0) {
+                    WlrOutputService.requestState();
+                    done(!failed);
+                }
+            });
+        }
+
+        if (pending === 0)
+            done(true);
+    }
+
+    function reloadAndApplyNiriLiveOutputsConfig(outputsData, niriSettings, callback) {
+        Proc.runCommand("niri-reload-output-config", ["niri", "msg", "action", "load-config-file"], () => {
+            applyNiriLiveOutputsConfig(outputsData, niriSettings, callback);
+        });
     }
 
     function normalizeOutputPositions(outputsData) {
@@ -1019,14 +1797,7 @@ Singleton {
     }
 
     function getOutputDisplayName(output, outputName) {
-        if (SettingsData.displayNameMode === "model" && output?.make && output?.model) {
-            if (CompositorService.isNiri) {
-                const serial = output.serial || "Unknown";
-                return output.make + " " + output.model + " " + serial;
-            }
-            return output.make + " " + output.model;
-        }
-        return outputName;
+        return getOutputIdentifier(output, outputName);
     }
 
     function getNiriOutputIdentifier(output, outputName) {
@@ -1067,7 +1838,7 @@ Singleton {
 
     function getHyprlandOutputIdentifier(output, outputName) {
         if (SettingsData.displayNameMode === "model" && output?.make && output?.model)
-            return "desc:" + output.make + " " + output.model + " " + (output?.serial || "Unknown");
+            return ("desc:" + output.make + " " + output.model + " " + (output?.serial || "Unknown")).replace(/,/g, "");
         return outputName;
     }
 
@@ -1183,6 +1954,28 @@ Singleton {
         return pending !== undefined ? pending : originalValue;
     }
 
+    // Returns true if the given output can currently be disabled.
+    // Prevents disabling all outputs and prevents disabling the only output
+    // in a single-display configuration.
+    function canDisableOutput() {
+        if (!CompositorService.isNiri && !CompositorService.isHyprland)
+            return false;
+        const totalOutputs = Object.keys(outputs).length;
+        if (totalOutputs <= 1)
+            return false;
+        let enabledCount = 0;
+        for (const name in outputs) {
+            let disabled = false;
+            if (CompositorService.isNiri)
+                disabled = getNiriSetting(outputs[name], name, "disabled", false);
+            else if (CompositorService.isHyprland)
+                disabled = getHyprlandSetting(outputs[name], name, "disabled", false);
+            if (!disabled)
+                enabledCount++;
+        }
+        return enabledCount >= 2;
+    }
+
     function clearPendingChanges() {
         pendingChanges = {};
         pendingNiriChanges = {};
@@ -1205,6 +1998,10 @@ Singleton {
     function applyChanges() {
         if (!hasPendingChanges)
             return;
+        if (CompositorService.isHyprland && readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         const changeDescriptions = [];
 
         if (formatChanged) {
@@ -1283,7 +2080,7 @@ Singleton {
 
         const mergedOutputs = buildOutputsWithPendingChanges();
         const mergedNiriSettings = buildMergedNiriSettings();
-        const configContent = generateNiriOutputsKdl(mergedOutputs, mergedNiriSettings);
+        const configContent = NiriService.buildOutputsConfig(mergedOutputs, mergedNiriSettings);
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const tempFile = configDir + "/niri/dms/.outputs-validate-tmp.kdl";
@@ -1307,7 +2104,7 @@ Singleton {
                 if (formatChanged)
                     SettingsData.saveSettings();
                 commitNiriSettingsChanges();
-                backendWriteOutputsConfig(mergedOutputs);
+                backendWriteOutputsConfig(mergedOutputs, mergedNiriSettings);
             });
         });
     }
@@ -1321,6 +2118,11 @@ Singleton {
                 merged[outputId][key] = pendingNiriChanges[outputId][key];
             }
         }
+        // Never disable the only connected output — clear any stale flag
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in merged)
+                delete merged[id].disabled;
+        }
         return merged;
     }
 
@@ -1328,6 +2130,13 @@ Singleton {
         for (const outputId in pendingNiriChanges) {
             for (const key in pendingNiriChanges[outputId]) {
                 SettingsData.setNiriOutputSetting(outputId, key, pendingNiriChanges[outputId][key]);
+            }
+        }
+        // Clear stale disabled from SettingsData so NiriService reads clean state
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in SettingsData.niriOutputSettings) {
+                if (SettingsData.niriOutputSettings[id]?.disabled)
+                    SettingsData.setNiriOutputSetting(id, "disabled", null);
             }
         }
     }
@@ -1345,6 +2154,11 @@ Singleton {
                     merged[outputId][key] = val;
             }
         }
+        // Never disable the only connected output — clear any stale flag
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in merged)
+                delete merged[id].disabled;
+        }
         return merged;
     }
 
@@ -1358,111 +2172,35 @@ Singleton {
                     SettingsData.setHyprlandOutputSetting(outputId, key, val);
             }
         }
+        // Clear stale disabled from SettingsData so HyprlandService reads clean state
+        if (Object.keys(outputs).length <= 1) {
+            for (const id in SettingsData.hyprlandOutputSettings) {
+                if (SettingsData.hyprlandOutputSettings[id]?.disabled)
+                    SettingsData.removeHyprlandOutputSetting(id, "disabled");
+            }
+        }
     }
 
-    function generateNiriOutputsKdl(outputsData, niriSettings) {
-        let kdlContent = `// Auto-generated by DMS - do not edit manually\n\n`;
-        const sortedNames = Object.keys(outputsData).sort((a, b) => {
-            const la = outputsData[a].logical || {};
-            const lb = outputsData[b].logical || {};
-            return (la.x ?? 0) - (lb.x ?? 0) || (la.y ?? 0) - (lb.y ?? 0);
-        });
-        for (const outputName of sortedNames) {
-            const output = outputsData[outputName];
-            const identifier = getNiriOutputIdentifier(output, outputName);
-            const settings = niriSettings[identifier] || {};
-            kdlContent += `output "${identifier}" {\n`;
-            if (settings.disabled) {
-                kdlContent += `    off\n}\n\n`;
-                continue;
-            }
-            if (output.current_mode !== undefined && output.modes && output.modes[output.current_mode]) {
-                const mode = output.modes[output.current_mode];
-                kdlContent += `    mode "${mode.width}x${mode.height}@${(mode.refresh_rate / 1000).toFixed(3)}"\n`;
-            }
-            if (output.logical) {
-                kdlContent += `    scale ${output.logical.scale ?? 1.0}\n`;
-                if (output.logical.transform && output.logical.transform !== "Normal") {
-                    const transformMap = {
-                        "Normal": "normal",
-                        "90": "90",
-                        "180": "180",
-                        "270": "270",
-                        "Flipped": "flipped",
-                        "Flipped90": "flipped-90",
-                        "Flipped180": "flipped-180",
-                        "Flipped270": "flipped-270"
+    function confirmChanges(profileId) {
+        const outputConfigs = buildCurrentOutputConfigs();
+        lastAppliedEntry = {
+            outputs: outputConfigs
+        };
+
+        if (profileId) {
+            readMonitorsJson(data => {
+                const match = findConfigEntryById(data, profileId);
+                if (match) {
+                    data.configurations[match.index] = {
+                        "id": match.entry.id,
+                        "name": match.entry.name || "",
+                        "outputs": outputConfigs
                     };
-                    kdlContent += `    transform "${transformMap[output.logical.transform] || "normal"}"\n`;
+                    writeMonitorsJson(data, null);
                 }
-                if (output.logical.x !== undefined && output.logical.y !== undefined)
-                    kdlContent += `    position x=${output.logical.x} y=${output.logical.y}\n`;
-            }
-            if (settings.vrrOnDemand) {
-                kdlContent += `    variable-refresh-rate on-demand=true\n`;
-            } else if (output.vrr_enabled) {
-                kdlContent += `    variable-refresh-rate\n`;
-            }
-            if (settings.focusAtStartup)
-                kdlContent += `    focus-at-startup\n`;
-            if (settings.backdropColor)
-                kdlContent += `    backdrop-color "${settings.backdropColor}"\n`;
-            kdlContent += generateHotCornersBlock(settings);
-            kdlContent += generateLayoutBlock(settings);
-            kdlContent += `}\n\n`;
+            });
         }
-        return kdlContent;
-    }
 
-    function generateHotCornersBlock(settings) {
-        if (!settings.hotCorners)
-            return "";
-        const hc = settings.hotCorners;
-        if (hc.off)
-            return `    hot-corners {\n        off\n    }\n`;
-        const corners = hc.corners || [];
-        if (corners.length === 0)
-            return "";
-        let block = `    hot-corners {\n`;
-        for (const corner of corners)
-            block += `        ${corner}\n`;
-        block += `    }\n`;
-        return block;
-    }
-
-    function generateLayoutBlock(settings) {
-        if (!settings.layout)
-            return "";
-        const layout = settings.layout;
-        const hasSettings = layout.gaps !== undefined || layout.defaultColumnWidth || layout.presetColumnWidths || layout.alwaysCenterSingleColumn !== undefined;
-        if (!hasSettings)
-            return "";
-        let block = `    layout {\n`;
-        if (layout.gaps !== undefined)
-            block += `        gaps ${layout.gaps}\n`;
-        if (layout.defaultColumnWidth?.type === "proportion") {
-            const val = layout.defaultColumnWidth.value;
-            const formatted = Number.isInteger(val) ? val.toFixed(1) : val.toString();
-            block += `        default-column-width { proportion ${formatted}; }\n`;
-        }
-        if (layout.presetColumnWidths && layout.presetColumnWidths.length > 0) {
-            block += `        preset-column-widths {\n`;
-            for (const preset of layout.presetColumnWidths) {
-                if (preset.type === "proportion") {
-                    const val = preset.value;
-                    const formatted = Number.isInteger(val) ? val.toFixed(1) : val.toString();
-                    block += `            proportion ${formatted}\n`;
-                }
-            }
-            block += `        }\n`;
-        }
-        if (layout.alwaysCenterSingleColumn !== undefined)
-            block += layout.alwaysCenterSingleColumn ? `        always-center-single-column\n` : `        always-center-single-column false\n`;
-        block += `    }\n`;
-        return block;
-    }
-
-    function confirmChanges() {
         clearPendingChanges();
         changesConfirmed();
     }
@@ -1614,9 +2352,21 @@ Singleton {
         };
     }
 
+    function isOutputDisabled(outputName) {
+        if (!outputs[outputName])
+            return false;
+        if (CompositorService.isHyprland)
+            return getHyprlandSetting(outputs[outputName], outputName, "disabled", false);
+        if (CompositorService.isNiri)
+            return getNiriSetting(outputs[outputName], outputName, "disabled", false);
+        return false;
+    }
+
     function checkOverlap(testName, testX, testY, testW, testH) {
         for (const name in outputs) {
             if (name === testName)
+                continue;
+            if (isOutputDisabled(name))
                 continue;
             const output = outputs[name];
             if (!output.logical)
@@ -1639,6 +2389,8 @@ Singleton {
 
         for (const name in outputs) {
             if (name === testName)
+                continue;
+            if (isOutputDisabled(name))
                 continue;
             const output = outputs[name];
             if (!output.logical)
@@ -1716,7 +2468,7 @@ Singleton {
     }
 
     function findBestSnapPosition(testName, posX, posY, testW, testH) {
-        const outputNames = Object.keys(outputs).filter(n => n !== testName);
+        const outputNames = Object.keys(outputs).filter(n => n !== testName && !isOutputDisabled(n));
 
         if (outputNames.length === 0)
             return Qt.point(posX, posY);
@@ -1785,6 +2537,50 @@ Singleton {
         if (!mode)
             return "";
         return mode.width + "x" + mode.height + "@" + (mode.refresh_rate / 1000).toFixed(3);
+    }
+
+    function formatScaleLabel(scale) {
+        const value = Number(scale);
+        if (!isFinite(value))
+            return "1";
+        return parseFloat(value.toFixed(2)).toString();
+    }
+
+    function getScalePresetValues(outputName, outputData) {
+        if (!CompositorService.isHyprland)
+            return [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+
+        const candidates = [0.5, 2 / 3, 0.75, 0.8, 1, 4 / 3, 1.6, 2, 2.5, 8 / 3, 3.2, 4];
+        const mode = getModeForScalePresets(outputName, outputData);
+        if (!mode)
+            return candidates;
+
+        return candidates.filter(scale => scaleFitsMode(mode, scale));
+    }
+
+    function getModeForScalePresets(outputName, outputData) {
+        const pendingMode = getPendingValue(outputName, "mode");
+        const modes = outputData?.modes || [];
+        if (pendingMode) {
+            for (const mode of modes) {
+                if (formatMode(mode) === pendingMode)
+                    return mode;
+            }
+        }
+        const currentMode = outputData?.current_mode;
+        if (currentMode !== undefined && modes[currentMode])
+            return modes[currentMode];
+        return null;
+    }
+
+    function scaleFitsMode(mode, scale) {
+        const width = Number(mode?.width || 0);
+        const height = Number(mode?.height || 0);
+        if (width <= 0 || height <= 0 || scale <= 0)
+            return false;
+        const logicalWidth = width / scale;
+        const logicalHeight = height / scale;
+        return Math.abs(logicalWidth - Math.round(logicalWidth)) < 0.001 && Math.abs(logicalHeight - Math.round(logicalHeight)) < 0.001;
     }
 
     function getTransformLabel(transform) {

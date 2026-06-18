@@ -10,6 +10,9 @@ Singleton {
     property var currentPopoutsByScreen: ({})
     property var currentPopoutTriggers: ({})
 
+    // Set by the screenshot IPC handshake (dms screenshot region select); cleared by end() or any popout/modal open.
+    property bool screenshotActive: false
+
     signal popoutOpening
     signal popoutChanged
 
@@ -47,6 +50,7 @@ Singleton {
     function showPopout(popout) {
         if (!popout || !popout.screen)
             return;
+        screenshotActive = false;
         popoutOpening();
 
         const screenName = popout.screen.name;
@@ -94,9 +98,15 @@ Singleton {
         return currentPopoutsByScreen[screen.name] || null;
     }
 
+    function isCurrentPopout(popout, screenName) {
+        const name = screenName || popout?.screen?.name || "";
+        return !!name && currentPopoutsByScreen[name] === popout;
+    }
+
     function requestPopout(popout, tabIndex, triggerSource) {
         if (!popout || !popout.screen)
             return;
+        screenshotActive = false;
         const screenName = popout.screen.name;
         const currentPopout = currentPopoutsByScreen[screenName];
         const triggerId = triggerSource !== undefined ? triggerSource : tabIndex;

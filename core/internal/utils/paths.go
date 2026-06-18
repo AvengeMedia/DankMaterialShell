@@ -38,6 +38,36 @@ func XDGConfigHome() string {
 	return filepath.Join(home, ".config")
 }
 
+func XDGPicturesDir() string {
+	if dir := os.Getenv("XDG_PICTURES_DIR"); dir != "" {
+		if expanded, err := ExpandPath(dir); err == nil {
+			return expanded
+		}
+	}
+
+	data, err := os.ReadFile(filepath.Join(XDGConfigHome(), "user-dirs.dirs"))
+	if err != nil {
+		return ""
+	}
+
+	const prefix = "XDG_PICTURES_DIR="
+	for line := range strings.SplitSeq(string(data), "\n") {
+		if len(line) == 0 || line[0] == '#' {
+			continue
+		}
+		if !strings.HasPrefix(line, prefix) {
+			continue
+		}
+		path := strings.Trim(line[len(prefix):], "\"")
+		expanded, err := ExpandPath(path)
+		if err != nil {
+			return ""
+		}
+		return expanded
+	}
+	return ""
+}
+
 func EmacsConfigDir() string {
 	home, _ := os.UserHomeDir()
 

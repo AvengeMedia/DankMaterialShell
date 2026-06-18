@@ -18,13 +18,12 @@ Singleton {
     function registerWidget(widgetId, screenName, widgetRef) {
         if (!widgetId || !screenName || !widgetRef)
             return;
-        if (typeof widgetRegistry !== "object" || widgetRegistry === null)
-            widgetRegistry = ({});
 
-        if (!widgetRegistry[widgetId])
-            widgetRegistry[widgetId] = {};
-
-        widgetRegistry[widgetId][screenName] = widgetRef;
+        const nextRegistry = (typeof widgetRegistry === "object" && widgetRegistry !== null) ? Object.assign({}, widgetRegistry) : {};
+        const screenMap = (typeof nextRegistry[widgetId] === "object" && nextRegistry[widgetId] !== null) ? Object.assign({}, nextRegistry[widgetId]) : {};
+        screenMap[screenName] = widgetRef;
+        nextRegistry[widgetId] = screenMap;
+        widgetRegistry = nextRegistry;
         widgetRegistered(widgetId, screenName);
     }
 
@@ -36,15 +35,21 @@ Singleton {
         if (!widgetRegistry[widgetId])
             return;
 
-        delete widgetRegistry[widgetId][screenName];
-        if (Object.keys(widgetRegistry[widgetId]).length === 0)
-            delete widgetRegistry[widgetId];
+        const nextRegistry = Object.assign({}, widgetRegistry);
+        const screenMap = (typeof nextRegistry[widgetId] === "object" && nextRegistry[widgetId] !== null) ? Object.assign({}, nextRegistry[widgetId]) : {};
+        delete screenMap[screenName];
+        if (Object.keys(screenMap).length === 0) {
+            delete nextRegistry[widgetId];
+        } else {
+            nextRegistry[widgetId] = screenMap;
+        }
+        widgetRegistry = nextRegistry;
 
         widgetUnregistered(widgetId, screenName);
     }
 
     function getWidget(widgetId, screenName) {
-        if (!widgetRegistry[widgetId])
+        if (typeof widgetRegistry !== "object" || widgetRegistry === null || !widgetRegistry[widgetId])
             return null;
         if (screenName)
             return widgetRegistry[widgetId][screenName] || null;
@@ -54,7 +59,7 @@ Singleton {
     }
 
     function getWidgetOnFocusedScreen(widgetId) {
-        if (!widgetRegistry[widgetId])
+        if (typeof widgetRegistry !== "object" || widgetRegistry === null || !widgetRegistry[widgetId])
             return null;
 
         const focusedScreen = getFocusedScreenName();
@@ -78,10 +83,14 @@ Singleton {
     }
 
     function getRegisteredWidgetIds() {
+        if (typeof widgetRegistry !== "object" || widgetRegistry === null)
+            return [];
         return Object.keys(widgetRegistry);
     }
 
     function hasWidget(widgetId) {
+        if (typeof widgetRegistry !== "object" || widgetRegistry === null)
+            return false;
         return widgetRegistry[widgetId] && Object.keys(widgetRegistry[widgetId]).length > 0;
     }
 

@@ -1,0 +1,13 @@
+{
+    "id": "myDesktopWidget",
+    "name": "My Desktop Widget",
+    "description": "A custom desktop widget",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "type": "desktop",
+    "capabilities": ["desktop-widget"],
+    "component": "./Widget.qml",
+    "icon": "widgets",
+    "settings": "./Settings.qml",
+    "permissions": ["settings_read", "settings_write"]
+}

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Widgets
 
@@ -39,13 +38,15 @@ Row {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    root.currentSize = modelData
-                    root.sizeChanged(modelData)
+                    root.currentSize = modelData;
+                    root.sizeChanged(modelData);
                 }
             }
 
             Behavior on color {
-                ColorAnimation { duration: Theme.shortDuration }
+                ColorAnimation {
+                    duration: Theme.shortDuration
+                }
             }
         }
     }

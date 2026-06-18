@@ -56,7 +56,7 @@ func GetOSInfo() (*OSInfo, error) {
 		}
 
 		key := parts[0]
-		value := strings.Trim(parts[1], "\"")
+		value := strings.Trim(parts[1], "\"'")
 
 		switch key {
 		case "ID":

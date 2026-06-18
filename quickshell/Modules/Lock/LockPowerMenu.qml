@@ -36,6 +36,8 @@ Rectangle {
 
     signal closed
 
+    signal switchUserRequested
+
     function updateVisibleActions() {
         const allActions = powerMenuActionsOverride !== undefined ? powerMenuActionsOverride : ((typeof SettingsData !== "undefined" && SettingsData.powerMenuActions) ? SettingsData.powerMenuActions : ["logout", "suspend", "hibernate", "reboot", "poweroff"]);
         const hibernateSupported = (typeof SessionService !== "undefined" && SessionService.hibernateSupported) || false;
@@ -128,6 +130,12 @@ Rectangle {
                 "label": I18n.tr("Hibernate"),
                 "key": "H"
             };
+        case "switchuser":
+            return {
+                "icon": "switch_account",
+                "label": I18n.tr("Switch User"),
+                "key": "U"
+            };
         default:
             return {
                 "icon": "help",
@@ -183,6 +191,11 @@ Rectangle {
     function executeAction(action) {
         if (!action)
             return;
+        if (action === "switchuser") {
+            hide();
+            switchUserRequested();
+            return;
+        }
         if (typeof SessionService === "undefined")
             return;
         hide();
@@ -266,9 +279,11 @@ Rectangle {
             break;
         case Qt.Key_P:
             if (!(event.modifiers & Qt.ControlModifier)) {
-                const idx = visibleActions.indexOf("poweroff");
-                startHold("poweroff", idx);
-                event.accepted = true;
+                if (visibleActions.includes("poweroff")) {
+                    const idx = visibleActions.indexOf("poweroff");
+                    startHold("poweroff", idx);
+                    event.accepted = true;
+                }
             } else {
                 selectedIndex = (selectedIndex - 1 + visibleActions.length) % visibleActions.length;
                 event.accepted = true;
@@ -287,20 +302,28 @@ Rectangle {
             }
             break;
         case Qt.Key_R:
-            startHold("reboot", visibleActions.indexOf("reboot"));
-            event.accepted = true;
+            if (visibleActions.includes("reboot")) {
+                startHold("reboot", visibleActions.indexOf("reboot"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_X:
-            startHold("logout", visibleActions.indexOf("logout"));
-            event.accepted = true;
+            if (visibleActions.includes("logout")) {
+                startHold("logout", visibleActions.indexOf("logout"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_S:
-            startHold("suspend", visibleActions.indexOf("suspend"));
-            event.accepted = true;
+            if (visibleActions.includes("suspend")) {
+                startHold("suspend", visibleActions.indexOf("suspend"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_H:
-            startHold("hibernate", visibleActions.indexOf("hibernate"));
-            event.accepted = true;
+            if (visibleActions.includes("hibernate")) {
+                startHold("hibernate", visibleActions.indexOf("hibernate"));
+                event.accepted = true;
+            }
             break;
         }
     }
@@ -351,9 +374,11 @@ Rectangle {
             break;
         case Qt.Key_P:
             if (!(event.modifiers & Qt.ControlModifier)) {
-                const idx = visibleActions.indexOf("poweroff");
-                startHold("poweroff", idx);
-                event.accepted = true;
+                if (visibleActions.includes("poweroff")) {
+                    const idx = visibleActions.indexOf("poweroff");
+                    startHold("poweroff", idx);
+                    event.accepted = true;
+                }
             } else {
                 selectedCol = (selectedCol - 1 + gridColumns) % gridColumns;
                 selectedIndex = selectedRow * gridColumns + selectedCol;
@@ -375,20 +400,28 @@ Rectangle {
             }
             break;
         case Qt.Key_R:
-            startHold("reboot", visibleActions.indexOf("reboot"));
-            event.accepted = true;
+            if (visibleActions.includes("reboot")) {
+                startHold("reboot", visibleActions.indexOf("reboot"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_X:
-            startHold("logout", visibleActions.indexOf("logout"));
-            event.accepted = true;
+            if (visibleActions.includes("logout")) {
+                startHold("logout", visibleActions.indexOf("logout"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_S:
-            startHold("suspend", visibleActions.indexOf("suspend"));
-            event.accepted = true;
+            if (visibleActions.includes("suspend")) {
+                startHold("suspend", visibleActions.indexOf("suspend"));
+                event.accepted = true;
+            }
             break;
         case Qt.Key_H:
-            startHold("hibernate", visibleActions.indexOf("hibernate"));
-            event.accepted = true;
+            if (visibleActions.includes("hibernate")) {
+                startHold("hibernate", visibleActions.indexOf("hibernate"));
+                event.accepted = true;
+            }
             break;
         }
     }

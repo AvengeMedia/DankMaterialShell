@@ -1,4 +1,4 @@
 [templates.dmsmango]
 input_path = 'SHELL_DIR/matugen/templates/mango-colors.conf'
 output_path = 'CONFIG_DIR/mango/dms/colors.conf'
-post_hook = 'sh -c "mmsg -d reload_config 2>&1 || true"'
+post_hook = 'sh -c "mmsg dispatch reload_config 2>&1 || true"'

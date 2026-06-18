@@ -64,12 +64,13 @@ func SendNotification(result NotifyResult) {
 
 	summary := "Screenshot captured"
 	body := ""
-	if result.Clipboard && result.FilePath != "" {
-		body = fmt.Sprintf("Copied to clipboard\n%s", filepath.Base(result.FilePath))
-	} else if result.Clipboard {
-		body = "Copied to clipboard"
-	} else if result.FilePath != "" {
+	switch {
+	case result.FilePath != "" && result.Clipboard:
+		body = fmt.Sprintf("%s\nCopied to clipboard", filepath.Base(result.FilePath))
+	case result.FilePath != "":
 		body = filepath.Base(result.FilePath)
+	case result.Clipboard:
+		body = "Copied to clipboard"
 	}
 
 	obj := conn.Object(notifyDest, notifyPath)

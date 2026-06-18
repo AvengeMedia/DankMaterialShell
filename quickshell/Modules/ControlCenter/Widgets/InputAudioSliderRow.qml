@@ -11,6 +11,7 @@ Row {
 
     property var defaultSource: AudioService.source
     property color sliderTrackColor: "transparent"
+    property real sliderTrackOpacity: Theme.ccSliderTrackOpacity
 
     height: 40
     spacing: 0
@@ -73,7 +74,8 @@ Row {
         unit: "%"
         valueOverride: actualVolumePercent
         thumbOutlineColor: Theme.surfaceContainer
-        trackColor: root.sliderTrackColor.a > 0 ? root.sliderTrackColor : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+        trackColor: root.sliderTrackColor.a > 0 ? root.sliderTrackColor : Theme.ccSliderTrackColor
+        trackOpacity: root.sliderTrackOpacity
         onSliderValueChanged: function (newValue) {
             if (defaultSource?.audio) {
                 SessionData.suppressOSDTemporarily();

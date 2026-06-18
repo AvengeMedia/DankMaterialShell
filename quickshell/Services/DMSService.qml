@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DMSService")
 
     property bool dmsAvailable: false
     property var capabilities: []
@@ -21,7 +23,6 @@ Singleton {
     property bool isConnected: false
     property bool isConnecting: false
     property bool subscribeConnected: false
-    readonly property bool forceExtWorkspace: false
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -45,14 +46,11 @@ Singleton {
     signal networkStateUpdate(var data)
     signal cupsStateUpdate(var data)
     signal loginctlStateUpdate(var data)
-    signal loginctlEvent(var event)
     signal capabilitiesReceived
     signal credentialsRequest(var data)
     signal bluetoothPairingRequest(var data)
-    signal dwlStateUpdate(var data)
     signal brightnessStateUpdate(var data)
     signal brightnessDeviceUpdate(var device)
-    signal extWorkspaceStateUpdate(var data)
     signal wlrOutputStateUpdate(var data)
     signal evdevStateUpdate(var data)
     signal gammaStateUpdate(var data)
@@ -62,12 +60,14 @@ Singleton {
     signal screensaverStateUpdate(var data)
     signal clipboardStateUpdate(var data)
     signal locationStateUpdate(var data)
+    signal sysupdateStateUpdate(var data)
+    signal tailscaleStateUpdate(var data)
 
     property bool capsLockState: false
     property bool screensaverInhibited: false
     property var screensaverInhibitors: []
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location"]
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location", "sysupdate"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -198,14 +198,14 @@ Singleton {
                 try {
                     response = JSON.parse(line);
                 } catch (e) {
-                    console.warn("DMSService: Failed to parse request response:", line.substring(0, 100));
+                    log.warn("Failed to parse request response:", line.substring(0, 100));
                     return;
                 }
                 const isClipboard = clipboardRequestIds[response.id];
                 if (isClipboard)
                     delete clipboardRequestIds[response.id];
                 else
-                    console.log("DMSService: Request socket <<", line);
+                    log.debug("Request socket <<", line);
                 handleResponse(response);
             }
         }
@@ -232,11 +232,11 @@ Singleton {
                 try {
                     response = JSON.parse(line);
                 } catch (e) {
-                    console.warn("DMSService: Failed to parse subscription event:", line.substring(0, 100));
+                    log.warn("Failed to parse subscription event:", line.substring(0, 100));
                     return;
                 }
                 if (!line.includes("clipboard"))
-                    console.log("DMSService: Subscribe socket <<", line);
+                    log.debug("Subscribe socket <<", line);
                 handleSubscriptionEvent(response);
             }
         }
@@ -251,9 +251,9 @@ Singleton {
             request.params = {
                 "services": activeSubscriptions
             };
-            console.log("DMSService: Subscribing to services:", JSON.stringify(activeSubscriptions));
+            log.debug("Subscribing to services:", JSON.stringify(activeSubscriptions));
         } else {
-            console.log("DMSService: Subscribing to all services");
+            log.debug("Subscribing to all services");
         }
 
         subscribeSocket.send(request);
@@ -285,13 +285,13 @@ Singleton {
 
     function removeSubscription(service) {
         if (activeSubscriptions.includes("all")) {
-            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "extworkspace", "browser", "location"];
+            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "brightness", "browser", "location"];
             const filtered = allServices.filter(s => s !== service);
             subscribe(filtered);
         } else {
             const filtered = activeSubscriptions.filter(s => s !== service);
             if (filtered.length === 0) {
-                console.warn("DMSService: Cannot remove last subscription");
+                log.warn("Cannot remove last subscription");
                 return;
             }
             subscribe(filtered);
@@ -307,7 +307,7 @@ Singleton {
             excludeServices = [excludeServices];
         }
 
-        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "dwl", "brightness", "extworkspace", "browser", "dbus", "location"];
+        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "brightness", "browser", "dbus", "location"];
         const filtered = allServices.filter(s => !excludeServices.includes(s));
         subscribe(filtered);
     }
@@ -316,7 +316,7 @@ Singleton {
         if (response.error) {
             if (response.error.includes("unknown method") && response.error.includes("subscribe")) {
                 if (!shownOutdatedError) {
-                    console.error("DMSService: Server does not support subscribe method");
+                    log.error("Server does not support subscribe method");
                     ToastService.showError(I18n.tr("DMS out of date"), I18n.tr("To update, run the following command:"), updateCommand);
                     shownOutdatedError = true;
                 }
@@ -336,10 +336,10 @@ Singleton {
             cliVersion = data.cliVersion || "";
             capabilities = data.capabilities || [];
 
-            console.info("DMSService: Connected (API v" + apiVersion + ", CLI " + cliVersion + ") -", JSON.stringify(capabilities));
+            log.info("Connected (API v" + apiVersion + ", CLI " + cliVersion + ") -", JSON.stringify(capabilities));
 
             if (apiVersion < expectedApiVersion) {
-                ToastService.showError("DMS server is outdated (API v" + apiVersion + ", expected v" + expectedApiVersion + ")");
+                ToastService.showError(I18n.tr("DMS server is outdated (API v%1, expected v%2)").arg(apiVersion).arg(expectedApiVersion));
             }
 
             capabilitiesReceived();
@@ -348,25 +348,17 @@ Singleton {
         } else if (service === "network.credentials") {
             credentialsRequest(data);
         } else if (service === "loginctl") {
-            if (data.event) {
-                loginctlEvent(data);
-            } else {
-                loginctlStateUpdate(data);
-            }
+            loginctlStateUpdate(data);
         } else if (service === "bluetooth.pairing") {
             bluetoothPairingRequest(data);
         } else if (service === "cups") {
             cupsStateUpdate(data);
-        } else if (service === "dwl") {
-            dwlStateUpdate(data);
         } else if (service === "brightness") {
             brightnessStateUpdate(data);
         } else if (service === "brightness.update") {
             if (data.device) {
                 brightnessDeviceUpdate(data.device);
             }
-        } else if (service === "extworkspace") {
-            extWorkspaceStateUpdate(data);
         } else if (service === "wlroutput") {
             wlrOutputStateUpdate(data);
         } else if (service === "evdev") {
@@ -398,12 +390,16 @@ Singleton {
             clipboardStateUpdate(data);
         } else if (service === "location") {
             locationStateUpdate(data);
+        } else if (service === "sysupdate") {
+            sysupdateStateUpdate(data);
+        } else if (service === "tailscale") {
+            tailscaleStateUpdate(data);
         }
     }
 
     function sendRequest(method, params, callback) {
         if (!isConnected) {
-            console.warn("DMSService.sendRequest: Not connected, method:", method);
+            log.warn("DMSService.sendRequest: Not connected, method:", method);
             if (callback) {
                 callback({
                     "error": "not connected to DMS socket"
@@ -429,7 +425,7 @@ Singleton {
         if (method.startsWith("clipboard")) {
             clipboardRequestIds[id] = true;
         } else {
-            console.log("DMSService.sendRequest: Sending request id=" + id + " method=" + method);
+            log.debug("DMSService.sendRequest: Sending request id=" + id + " method=" + method);
         }
         requestSocket.send(request);
     }
@@ -749,9 +745,36 @@ Singleton {
         });
     }
 
-    function renameWorkspace(name, callback) {
-        sendRequest("extworkspace.renameWorkspace", {
-            "name": name
+    function sysupdateGetState(callback) {
+        sendRequest("sysupdate.getState", null, callback);
+    }
+
+    function sysupdateRefresh(force, callback) {
+        sendRequest("sysupdate.refresh", {
+            "force": force === true
         }, callback);
+    }
+
+    function sysupdateUpgrade(opts, callback) {
+        const params = opts || {};
+        sendRequest("sysupdate.upgrade", params, callback);
+    }
+
+    function sysupdateCancel(callback) {
+        sendRequest("sysupdate.cancel", null, callback);
+    }
+
+    function sysupdateSetInterval(seconds, callback) {
+        sendRequest("sysupdate.setInterval", {
+            "seconds": seconds
+        }, callback);
+    }
+
+    function sysupdateAcquire(callback) {
+        sendRequest("sysupdate.acquire", null, callback);
+    }
+
+    function sysupdateRelease(callback) {
+        sendRequest("sysupdate.release", null, callback);
     }
 }

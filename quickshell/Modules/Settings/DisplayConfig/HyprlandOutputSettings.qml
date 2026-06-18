@@ -70,10 +70,16 @@ Column {
             return DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "colorManagement", "auto");
         }
         property bool isHdrMode: currentCm === "hdr" || currentCm === "hdredid"
+        property bool isDisabled: {
+            void (DisplayConfigState.pendingHyprlandChanges);
+            return DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "disabled", false);
+        }
 
         DankToggle {
             width: parent.width
             text: I18n.tr("Disable Output")
+            enabled: checked || DisplayConfigState.canDisableOutput()
+            description: (!checked && !DisplayConfigState.canDisableOutput()) ? (Object.keys(DisplayConfigState.outputs).length <= 1 ? I18n.tr("Cannot disable the only output") : I18n.tr("At least one output must remain enabled")) : ""
             checked: DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "disabled", false)
             onToggled: checked => DisplayConfigState.setHyprlandSetting(root.outputData, root.outputName, "disabled", checked)
         }
@@ -81,6 +87,7 @@ Column {
         DankDropdown {
             width: parent.width
             text: I18n.tr("Mirror Display")
+            enabled: !settingsColumn.isDisabled
             addHorizontalPadding: true
 
             property var otherOutputs: {
@@ -110,6 +117,7 @@ Column {
             width: parent.width
             text: I18n.tr("10-bit Color")
             description: I18n.tr("Enable 10-bit color depth for wider color gamut and HDR support")
+            enabled: !settingsColumn.isDisabled
             checked: settingsColumn.is10Bit
             onToggled: checked => {
                 if (checked) {
@@ -137,6 +145,7 @@ Column {
                 width: parent.width
                 text: I18n.tr("Color Gamut")
                 addHorizontalPadding: true
+                enabled: !settingsColumn.isDisabled
                 currentValue: {
                     DisplayConfigState.pendingHyprlandChanges;
                     const val = DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "colorManagement", "auto");
@@ -252,6 +261,7 @@ Column {
                             width: parent.width
                             height: 40
                             placeholderText: "1.0 - 2.0"
+                            enabled: !settingsColumn.isDisabled
                             text: {
                                 DisplayConfigState.pendingHyprlandChanges;
                                 const val = DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "sdrBrightness", null);
@@ -285,6 +295,7 @@ Column {
                             width: parent.width
                             height: 40
                             placeholderText: "0.5 - 1.5"
+                            enabled: !settingsColumn.isDisabled
                             text: {
                                 DisplayConfigState.pendingHyprlandChanges;
                                 const val = DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "sdrSaturation", null);

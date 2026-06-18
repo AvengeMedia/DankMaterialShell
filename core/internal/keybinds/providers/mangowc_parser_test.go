@@ -71,9 +71,10 @@ func TestMangoWCAutogenerateComment(t *testing.T) {
 
 func TestMangoWCGetKeybindAtLine(t *testing.T) {
 	tests := []struct {
-		name     string
-		line     string
-		expected *MangoWCKeyBinding
+		name             string
+		line             string
+		precedingComment string
+		expected         *MangoWCKeyBinding
 	}{
 		{
 			name: "basic_keybind",
@@ -158,6 +159,41 @@ func TestMangoWCGetKeybindAtLine(t *testing.T) {
 			},
 		},
 		{
+			name: "bindp_flag",
+			line: "bindp=SUPER,p,spawn,pass-through",
+			expected: &MangoWCKeyBinding{
+				Mods:    []string{"SUPER"},
+				Key:     "p",
+				Command: "spawn",
+				Params:  "pass-through",
+				Comment: "pass-through",
+			},
+		},
+		{
+			name:             "preceding_comment",
+			line:             "bind=SUPER+SHIFT,S,spawn,dms screenshot",
+			precedingComment: "Screenshot: Interactive",
+			expected: &MangoWCKeyBinding{
+				Mods:    []string{"SUPER", "SHIFT"},
+				Key:     "S",
+				Command: "spawn",
+				Params:  "dms screenshot",
+				Comment: "Screenshot: Interactive",
+			},
+		},
+		{
+			name:             "section_header_not_description",
+			line:             "bind=none,XF86AudioRaiseVolume,spawn,dms ipc call audio increment 3",
+			precedingComment: "=== Audio Controls ===",
+			expected: &MangoWCKeyBinding{
+				Mods:    []string{},
+				Key:     "XF86AudioRaiseVolume",
+				Command: "spawn",
+				Params:  "dms ipc call audio increment 3",
+				Comment: "dms ipc call audio increment 3",
+			},
+		},
+		{
 			name: "keybind_with_spaces",
 			line: "bind = SUPER, r, reload_config",
 			expected: &MangoWCKeyBinding{
@@ -174,7 +210,7 @@ func TestMangoWCGetKeybindAtLine(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := NewMangoWCParser("")
 			parser.contentLines = []string{tt.line}
-			result := parser.getKeybindAtLine(0)
+			result := parser.getKeybindAtLine(0, tt.precedingComment)
 
 			if tt.expected == nil {
 				if result != nil {
@@ -421,7 +457,7 @@ func TestMangoWCInvalidBindLines(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := NewMangoWCParser("")
 			parser.contentLines = []string{tt.line}
-			result := parser.getKeybindAtLine(0)
+			result := parser.getKeybindAtLine(0, "")
 
 			if result != nil {
 				t.Errorf("expected nil for invalid line, got %+v", result)

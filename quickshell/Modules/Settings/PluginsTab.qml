@@ -16,6 +16,28 @@ FocusScope {
     property var installedPluginsData: ({})
     property bool isReloading: false
     property alias sharedTooltip: sharedTooltip
+    property bool isSearchExpanded: false
+    property string searchQuery: ""
+    property var filteredPlugins: []
+
+    function updateFilteredPlugins() {
+        var query = searchQuery.toLowerCase();
+        filteredPlugins = PluginService.availablePluginsList.filter(plugin => {
+            if (!query)
+                return true;
+            var name = (plugin.name || "").toLowerCase();
+            var desc = (plugin.description || "").toLowerCase();
+            var author = (plugin.author || "").toLowerCase();
+            return name.includes(query) || desc.includes(query) || author.includes(query);
+        });
+    }
+
+    Connections {
+        target: PluginService
+        function onAvailablePluginsListChanged() {
+            pluginsTab.updateFilteredPlugins();
+        }
+    }
 
     focus: true
 
@@ -194,7 +216,7 @@ FocusScope {
                         }
 
                         Connections {
-                            target: SystemUpdateService
+                            target: ShellVersionService
                             function onSemverVersionChanged() {
                                 incompatWarning.refresh();
                             }
@@ -228,11 +250,15 @@ FocusScope {
                         }
 
                         DankButton {
-                            text: I18n.tr("Create Dir")
-                            iconName: "create_new_folder"
+                            text: PluginService.pluginDirectoryExists ? I18n.tr("Open Dir") : I18n.tr("Create Dir")
+                            iconName: PluginService.pluginDirectoryExists ? "folder_open" : "create_new_folder"
                             onClicked: {
-                                PluginService.createPluginDirectory();
-                                ToastService.showInfo("Created plugin directory: " + PluginService.pluginDirectory);
+                                if (PluginService.pluginDirectoryExists) {
+                                    PluginService.openPluginDirectory();
+                                } else {
+                                    PluginService.createPluginDirectory();
+                                    ToastService.showInfo(I18n.tr("Created plugin directory: %1").arg(PluginService.pluginDirectory));
+                                }
                             }
                         }
                     }
@@ -296,13 +322,72 @@ FocusScope {
                     anchors.margins: Theme.spacingL
                     spacing: Theme.spacingM
 
-                    StyledText {
-                        text: I18n.tr("Available Plugins")
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
+                    Row {
                         width: parent.width
-                        horizontalAlignment: Text.AlignLeft
+                        spacing: Theme.spacingM
+
+                        StyledText {
+                            text: I18n.tr("Available Plugins")
+                            font.pixelSize: Theme.fontSizeLarge
+                            color: Theme.surfaceText
+                            font.weight: Font.Medium
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Item {
+                            width: parent.width - parent.children[0].implicitWidth - searchIconBtn.width - parent.spacing * 2
+                            height: 1
+                        }
+
+                        DankActionButton {
+                            id: searchIconBtn
+                            iconName: "search"
+                            iconSize: 20
+                            iconColor: pluginsTab.isSearchExpanded ? Theme.primary : Theme.surfaceVariantText
+                            anchors.verticalCenter: parent.verticalCenter
+                            onClicked: {
+                                pluginsTab.isSearchExpanded = !pluginsTab.isSearchExpanded;
+                                if (pluginsTab.isSearchExpanded) {
+                                    Qt.callLater(() => pluginSearchField.forceActiveFocus());
+                                } else {
+                                    pluginSearchField.text = "";
+                                    pluginsTab.searchQuery = "";
+                                    pluginsTab.updateFilteredPlugins();
+                                }
+                            }
+                        }
+                    }
+
+                    DankTextField {
+                        id: pluginSearchField
+                        width: parent.width
+                        visible: pluginsTab.isSearchExpanded || height > 0
+                        height: pluginsTab.isSearchExpanded ? 48 : 0
+                        opacity: pluginsTab.isSearchExpanded ? 1 : 0
+                        clip: true
+                        placeholderText: I18n.tr("Search installed plugins...")
+                        leftIconName: "search"
+                        showClearButton: true
+
+                        Behavior on height {
+                            enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
+
+                        Behavior on opacity {
+                            enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                            }
+                        }
+
+                        onTextEdited: {
+                            pluginsTab.searchQuery = text;
+                            pluginsTab.updateFilteredPlugins();
+                        }
                     }
 
                     Column {
@@ -311,7 +396,7 @@ FocusScope {
 
                         Repeater {
                             id: pluginRepeater
-                            model: PluginService.availablePluginsList
+                            model: pluginsTab.filteredPlugins
 
                             PluginListItem {
                                 pluginData: modelData
@@ -415,6 +500,7 @@ FocusScope {
     }
 
     Component.onCompleted: {
+        updateFilteredPlugins();
         if (DMSService.dmsAvailable && DMSService.apiVersion >= 8)
             DMSService.listInstalled();
         if (PopoutService.pendingPluginInstall)

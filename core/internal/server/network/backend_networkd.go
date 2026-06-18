@@ -1,6 +1,7 @@
 package network
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
@@ -18,10 +19,44 @@ const (
 )
 
 type linkInfo struct {
-	ifindex int32
-	name    string
-	path    dbus.ObjectPath
-	opState string
+	ifindex  int32
+	name     string
+	path     dbus.ObjectPath
+	opState  string
+	linkType string
+}
+
+func (l *linkInfo) isWired() bool {
+	if looksVirtual(l.name) {
+		return false
+	}
+	if l.linkType != "" {
+		return l.linkType == "ether"
+	}
+	return !strings.HasPrefix(l.name, "wlan") && !strings.HasPrefix(l.name, "wlp")
+}
+
+func (l *linkInfo) isWireless() bool {
+	if looksVirtual(l.name) {
+		return false
+	}
+	if l.linkType != "" {
+		return l.linkType == "wlan"
+	}
+	return strings.HasPrefix(l.name, "wlan") || strings.HasPrefix(l.name, "wlp")
+}
+
+func looksVirtual(name string) bool {
+	virtualPrefixes := []string{
+		"lo", "docker", "podman", "veth", "virbr", "br-", "vnet", "tun", "tap",
+		"vboxnet", "vmnet", "kube", "cni", "flannel", "cali",
+	}
+	for _, prefix := range virtualPrefixes {
+		if strings.HasPrefix(name, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 type SystemdNetworkdBackend struct {
@@ -78,6 +113,12 @@ func (b *SystemdNetworkdBackend) Close() {
 	}
 }
 
+type enumeratedLink struct {
+	ifindex int32
+	name    string
+	path    dbus.ObjectPath
+}
+
 func (b *SystemdNetworkdBackend) enumerateLinks() error {
 	obj := b.conn.Object(networkdBusName, b.managerPath)
 
@@ -91,19 +132,75 @@ func (b *SystemdNetworkdBackend) enumerateLinks() error {
 		return fmt.Errorf("ListLinks: %w", err)
 	}
 
-	b.linksMutex.Lock()
-	defer b.linksMutex.Unlock()
-
-	for _, l := range links {
-		b.links[l.Name] = &linkInfo{
-			ifindex: l.Ifindex,
-			name:    l.Name,
-			path:    l.Path,
-		}
-		log.Debugf("networkd: enumerated link %s (ifindex=%d, path=%s)", l.Name, l.Ifindex, l.Path)
+	fresh := make([]enumeratedLink, len(links))
+	for i, l := range links {
+		fresh[i] = enumeratedLink{ifindex: l.Ifindex, name: l.Name, path: l.Path}
 	}
 
+	b.linksMutex.Lock()
+	defer b.linksMutex.Unlock()
+	b.syncLinks(fresh)
+
 	return nil
+}
+
+// syncLinks reconciles the cached link map against the freshly enumerated set:
+// it adds links not seen before (querying their Type once), refreshes the
+// ifindex of survivors, and prunes links that no longer appear. Pruning is what
+// keeps torn-down container interfaces (podman bridges, veth pairs) from
+// lingering as routable and being mistaken for the wired uplink.
+// Callers must hold linksMutex.
+func (b *SystemdNetworkdBackend) syncLinks(fresh []enumeratedLink) {
+	present := make(map[string]bool, len(fresh))
+	for _, l := range fresh {
+		present[l.name] = true
+		if existing, ok := b.links[l.name]; ok && existing.path == l.path {
+			existing.ifindex = l.ifindex
+			continue
+		}
+		info := &linkInfo{
+			ifindex:  l.ifindex,
+			name:     l.name,
+			path:     l.path,
+			linkType: b.fetchLinkType(l.path),
+		}
+		b.links[l.name] = info
+		log.Debugf("networkd: enumerated link %s (ifindex=%d, path=%s, type=%q)", l.name, l.ifindex, l.path, info.linkType)
+	}
+
+	for name := range b.links {
+		if !present[name] {
+			log.Debugf("networkd: pruned stale link %s", name)
+			delete(b.links, name)
+		}
+	}
+}
+
+// fetchLinkType queries networkd's Describe method and extracts the link Type
+// (e.g. "ether", "wlan", "loopback", "none"). Returns empty on failure; callers
+// fall back to name-prefix heuristics in that case. The Type is fixed at link
+// creation by the kernel, so callers cache the result for the lifetime of the
+// linkInfo and only refetch when a link is re-created at a new D-Bus path.
+func (b *SystemdNetworkdBackend) fetchLinkType(path dbus.ObjectPath) string {
+	linkObj := b.conn.Object(networkdBusName, path)
+	var describeJSON string
+	if err := linkObj.Call(networkdLinkIface+".Describe", 0).Store(&describeJSON); err != nil {
+		return ""
+	}
+	return parseDescribeType(describeJSON)
+}
+
+// parseDescribeType extracts the top-level "Type" field from a networkd
+// Describe payload. Returns empty when the JSON is malformed or the field is
+// absent, signalling callers to fall back to name-prefix heuristics.
+func parseDescribeType(describeJSON string) string {
+	var parsed struct {
+		Type string `json:"Type"`
+	}
+	if err := json.Unmarshal([]byte(describeJSON), &parsed); err != nil {
+		return ""
+	}
+	return parsed.Type
 }
 
 func (b *SystemdNetworkdBackend) updateState() error {
@@ -113,8 +210,8 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	var wiredIface *linkInfo
 	var wifiIface *linkInfo
 
-	for name, link := range b.links {
-		if b.isVirtualInterface(name) {
+	for _, link := range b.links {
+		if !link.isWired() && !link.isWireless() {
 			continue
 		}
 
@@ -126,11 +223,11 @@ func (b *SystemdNetworkdBackend) updateState() error {
 			}
 		}
 
-		if strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wlp") {
+		if link.isWireless() {
 			if wifiIface == nil || link.opState == "routable" || link.opState == "carrier" {
 				wifiIface = link
 			}
-		} else if !b.isVirtualInterface(name) {
+		} else if link.isWired() {
 			if wiredIface == nil || link.opState == "routable" || link.opState == "carrier" {
 				wiredIface = link
 			}
@@ -140,7 +237,7 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	var wiredConns []WiredConnection
 	var ethernetDevices []EthernetDevice
 	for name, link := range b.links {
-		if b.isVirtualInterface(name) || strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wlp") {
+		if !link.isWired() {
 			continue
 		}
 
@@ -227,19 +324,6 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	}
 
 	return nil
-}
-
-func (b *SystemdNetworkdBackend) isVirtualInterface(name string) bool {
-	virtualPrefixes := []string{
-		"lo", "docker", "veth", "virbr", "br-", "vnet", "tun", "tap",
-		"vboxnet", "vmnet", "kube", "cni", "flannel", "cali",
-	}
-	for _, prefix := range virtualPrefixes {
-		if strings.HasPrefix(name, prefix) {
-			return true
-		}
-	}
-	return false
 }
 
 func (b *SystemdNetworkdBackend) getAddresses(ifname string) []string {

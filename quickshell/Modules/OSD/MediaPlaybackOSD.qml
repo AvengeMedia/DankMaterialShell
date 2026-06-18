@@ -11,7 +11,7 @@ DankOSD {
     readonly property bool useVertical: isVerticalLayout
     readonly property var player: MprisController.activePlayer
 
-    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(280, Screen.width - Theme.spacingM * 2)
+    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(280, screenWidth - Theme.spacingM * 2)
     osdHeight: useVertical ? (Theme.iconSize * 2) : (40 + Theme.spacingS * 2)
     autoHideInterval: 3000
     enableMouseInteraction: true
@@ -47,6 +47,9 @@ DankOSD {
     }
 
     property bool _pendingShow: false
+    property string _displayTitle: ""
+    property string _displayArtist: ""
+    property string _displayAlbum: ""
 
     Timer {
         id: iconDebounce
@@ -57,7 +60,7 @@ DankOSD {
 
     Image {
         id: artPreloader
-        source: TrackArtService._bgArtSource
+        source: TrackArtService.resolvedArtUrl
         visible: false
         asynchronous: true
         cache: true
@@ -75,7 +78,7 @@ DankOSD {
         function onLoadingChanged() {
             if (TrackArtService.loading || !root._pendingShow)
                 return;
-            if (!TrackArtService._bgArtSource || artPreloader.status === Image.Ready) {
+            if (!TrackArtService.resolvedArtUrl || artPreloader.status === Image.Ready) {
                 root._pendingShow = false;
                 root.show();
             }
@@ -105,11 +108,17 @@ DankOSD {
                 return;
             if (!SettingsData.osdMediaPlaybackEnabled)
                 return;
+            if (MprisController.isFirefoxYoutubeHoverPreview(player))
+                return;
+
+            root._displayTitle = player.trackTitle || "";
+            root._displayArtist = player.trackArtist || "";
+            root._displayAlbum = player.trackAlbum || "";
 
             root.updatePlaybackIcon();
-            TrackArtService.loadArtwork(player.trackArtUrl);
+            const resolvedArtUrl = TrackArtService.resolvedArtUrl;
 
-            if (!player.trackArtUrl || player.trackArtUrl === "") {
+            if (!resolvedArtUrl || resolvedArtUrl === "") {
                 root.show();
                 return;
             }
@@ -117,7 +126,7 @@ DankOSD {
                 root._pendingShow = true;
                 return;
             }
-            if (!TrackArtService._bgArtSource || artPreloader.status === Image.Ready) {
+            if (!TrackArtService.resolvedArtUrl || artPreloader.status === Image.Ready) {
                 root.show();
                 return;
             }
@@ -125,7 +134,10 @@ DankOSD {
         }
 
         function onTrackArtUrlChanged() {
-            TrackArtService.loadArtwork(player.trackArtUrl);
+            handleUpdate();
+        }
+        function onMetadataChanged() {
+            handleUpdate();
         }
         function onIsPlayingChanged() {
             handleUpdate();
@@ -159,14 +171,14 @@ DankOSD {
             Item {
                 id: bgContainer
                 anchors.fill: parent
-                visible: TrackArtService._bgArtSource !== ""
+                visible: TrackArtService.resolvedArtUrl !== ""
 
                 Image {
                     id: bgImage
                     anchors.centerIn: parent
                     width: Math.max(parent.width, parent.height)
                     height: width
-                    source: TrackArtService._bgArtSource
+                    source: TrackArtService.resolvedArtUrl
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     cache: true
@@ -254,7 +266,7 @@ DankOSD {
                 StyledText {
                     id: topText
                     width: parent.width
-                    text: player ? `${player.trackTitle || I18n.tr("Unknown Title")}` : ""
+                    text: player ? (root._displayTitle || I18n.tr("Unknown Title")) : ""
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -265,7 +277,7 @@ DankOSD {
                 StyledText {
                     id: bottomText
                     width: parent.width
-                    text: player ? ((player.trackArtist || I18n.tr("Unknown Artist")) + (player.trackAlbum ? ` • ${player.trackAlbum}` : "")) : ""
+                    text: player ? ((root._displayArtist || I18n.tr("Unknown Artist")) + (root._displayAlbum ? ` • ${root._displayAlbum}` : "")) : ""
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Light
                     color: Theme.surfaceText

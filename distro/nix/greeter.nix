@@ -3,6 +3,7 @@
   config,
   pkgs,
   dmsPkgs,
+  options,
   ...
 }:
 let
@@ -24,7 +25,7 @@ let
       lib.makeBinPath [
         cfg.quickshell.package
         compositorPackage
-        pkgs.glib  # provides gdbus, used by the fprintd hardware probe in GreeterContent.qml
+        pkgs.glib # provides gdbus, used by the fprintd hardware probe in GreeterContent.qml
       ]
     }
     ${
@@ -117,8 +118,24 @@ in
       '';
     };
     quickshell = {
-      package = lib.mkPackageOption dmsPkgs "quickshell" {
-        extraDescription = "The quickshell package to use (defaults to be built from source, in the commit 26531f due to unreleased features used by DMS).";
+      package = lib.mkOption {
+        default =
+          if (lib.hasAttrByPath [ "programs" "dank-material-shell" "quickshell" "package" ] options) then
+            config.programs.dank-material-shell.quickshell.package
+          else
+            pkgs.quickshell;
+
+        defaultText = ''
+          if (lib.hasAttrByPath [ "programs" "dank-material-shell" "quickshell" "package" ] options) then
+            config.programs.dank-material-shell.quickshell.package
+          else
+            pkgs.quickshell;
+        '';
+
+        description = ''
+          The quickshell package to use (we recommend at least 0.3.0, currently available in nixos-unstable).
+          Defaults to the same set in `programs.dank-material-shell.quickshell.package`, if using the NixOS module.";
+        '';
       };
     };
     logs.save = lib.mkEnableOption "saving logs from DMS greeter to file";

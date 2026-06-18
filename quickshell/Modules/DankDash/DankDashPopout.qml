@@ -16,7 +16,6 @@ DankPopout {
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 500
     triggerWidth: 80
     screen: triggerScreen
-    shouldBeVisible: dashVisible
 
     property bool __focusArmed: false
     property bool __contentReady: false
@@ -26,14 +25,14 @@ DankPopout {
     property int __dropdownType: 0
     property point __dropdownAnchor: Qt.point(0, 0)
     property bool __dropdownRightEdge: false
-    property var __dropdownPlayer: null
-    property var __dropdownPlayers: []
+    property var __dropdownPlayer: MprisController.activePlayer
+    property var __dropdownPlayers: MprisController.availablePlayers
 
     function __showVolumeDropdown(pos, rightEdge, player, players) {
         __dropdownAnchor = pos;
         __dropdownRightEdge = rightEdge;
-        __dropdownPlayer = player;
-        __dropdownPlayers = players;
+        __dropdownPlayer = Qt.binding(() => MprisController.activePlayer);
+        __dropdownPlayers = Qt.binding(() => MprisController.availablePlayers);
         __dropdownType = 1;
     }
 
@@ -46,15 +45,16 @@ DankPopout {
     function __showPlayersDropdown(pos, rightEdge, player, players) {
         __dropdownAnchor = pos;
         __dropdownRightEdge = rightEdge;
-        __dropdownPlayer = player;
-        __dropdownPlayers = players;
+        __dropdownPlayer = Qt.binding(() => MprisController.activePlayer);
+        __dropdownPlayers = Qt.binding(() => MprisController.availablePlayers);
         __dropdownType = 3;
     }
 
     function __hideDropdowns() {
         __volumeCloseTimer.stop();
         __dropdownType = 0;
-        __mediaTabRef?.resetDropdownStates();
+        if (__mediaTabRef && typeof __mediaTabRef.resetDropdownStates === "function")
+            __mediaTabRef.resetDropdownStates();
     }
 
     function __startCloseTimer() {
@@ -69,19 +69,24 @@ DankPopout {
         id: __volumeCloseTimer
         interval: 400
         onTriggered: {
-            if (__dropdownType === 1) {
+            if (__dropdownType !== 0) {
                 __hideDropdowns();
             }
         }
     }
 
-    overlayContent: Component {
+    overlayContent: shouldBeVisible ? mediaDropdownOverlayComponent : null
+
+    Component {
+        id: mediaDropdownOverlayComponent
+
         MediaDropdownOverlay {
             dropdownType: root.__dropdownType
             anchorPos: root.__dropdownAnchor
             isRightEdge: root.__dropdownRightEdge
             activePlayer: root.__dropdownPlayer
             allPlayers: root.__dropdownPlayers
+            targetWindow: root.backgroundWindow
             onCloseRequested: root.__hideDropdowns()
             onPanelEntered: root.__stopCloseTimer()
             onPanelExited: root.__startCloseTimer()
@@ -101,9 +106,6 @@ DankPopout {
                     currentPlayer.pause();
                 }
                 MprisController.setActivePlayer(player);
-                root.__hideDropdowns();
-            }
-            onDeviceSelected: device => {
                 root.__hideDropdowns();
             }
         }
@@ -182,11 +184,8 @@ DankPopout {
             Connections {
                 target: root
                 function onShouldBeVisibleChanged() {
-                    if (root.shouldBeVisible) {
-                        Qt.callLater(function () {
-                            mainContainer.forceActiveFocus();
-                        });
-                    }
+                    if (root.shouldBeVisible)
+                        mainContainer.forceActiveFocus();
                 }
             }
 
@@ -226,6 +225,20 @@ DankPopout {
                     }
                     event.accepted = true;
                     return;
+                }
+
+                if (root.currentTabIndex === 0 && overviewLoader.item?.handleKeyEvent) {
+                    if (overviewLoader.item.handleKeyEvent(event)) {
+                        event.accepted = true;
+                        return;
+                    }
+                }
+
+                if (root.currentTabIndex === 1 && mediaLoader.item?.handleKeyEvent) {
+                    if (mediaLoader.item.handleKeyEvent(event)) {
+                        event.accepted = true;
+                        return;
+                    }
                 }
 
                 if (root.currentTabIndex === 2 && wallpaperLoader.item?.handleKeyEvent) {
@@ -350,6 +363,7 @@ DankPopout {
                         sourceComponent: Component {
                             OverviewTab {
                                 onCloseDash: root.dashVisible = false
+                                onNavFocusRequested: mainContainer.forceActiveFocus()
                                 onSwitchToWeatherTab: {
                                     if (SettingsData.weatherEnabled) {
                                         root.currentTabIndex = 3;
@@ -378,6 +392,10 @@ DankPopout {
                                 section: root.triggerSection
                                 barPosition: root.effectiveBarPosition
                                 Component.onCompleted: root.__mediaTabRef = this
+                                Component.onDestruction: {
+                                    if (root.__mediaTabRef === this)
+                                        root.__mediaTabRef = null;
+                                }
                                 onShowVolumeDropdown: (pos, screen, rightEdge, player, players) => {
                                     root.__showVolumeDropdown(pos, rightEdge, player, players);
                                 }
@@ -388,7 +406,8 @@ DankPopout {
                                     root.__showPlayersDropdown(pos, rightEdge, player, players);
                                 }
                                 onHideDropdowns: root.__hideDropdowns()
-                                onVolumeButtonExited: root.__startCloseTimer()
+                                onDropdownButtonExited: root.__startCloseTimer()
+                                onDropdownButtonEntered: root.__stopCloseTimer()
                             }
                         }
                     }

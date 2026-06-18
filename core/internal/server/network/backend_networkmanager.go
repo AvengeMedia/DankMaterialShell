@@ -222,6 +222,10 @@ func (b *NetworkManagerBackend) Initialize() error {
 		log.Warnf("Failed to update WiFi state: %v", err)
 	}
 
+	if err := b.updateSavedWiFiNetworks(); err != nil {
+		log.Warnf("Failed to get initial saved WiFi networks: %v", err)
+	}
+
 	if wifiEnabled {
 		if _, err := b.updateWiFiNetworks(); err != nil {
 			log.Warnf("Failed to get initial networks: %v", err)
@@ -261,6 +265,7 @@ func (b *NetworkManagerBackend) GetCurrentState() (*BackendState, error) {
 
 	state := *b.state
 	state.WiFiNetworks = append([]WiFiNetwork(nil), b.state.WiFiNetworks...)
+	state.SavedWiFiNetworks = append([]WiFiNetwork(nil), b.state.SavedWiFiNetworks...)
 	state.WiFiDevices = append([]WiFiDevice(nil), b.state.WiFiDevices...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
 	state.EthernetDevices = append([]EthernetDevice(nil), b.state.EthernetDevices...)

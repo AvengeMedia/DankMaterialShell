@@ -4,9 +4,11 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("CupsService")
 
     property int refCount: 0
 
@@ -205,7 +207,7 @@ Singleton {
         enabled: DMSService.isConnected
 
         function onCupsStateUpdate(data) {
-            console.log("CupsService: Subscription update received");
+            log.debug("Subscription update received");
             getState();
         }
 

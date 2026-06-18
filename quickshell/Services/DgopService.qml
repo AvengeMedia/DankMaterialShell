@@ -5,9 +5,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("DgopService")
 
     property int refCount: 0
     property int updateInterval: refCount > 0 ? 3000 : 30000
@@ -643,7 +645,7 @@ Singleton {
         onStarted: dgopProcessPid = processId ?? 0
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("Dgop process failed with exit code:", exitCode);
+                log.warn("Dgop process failed with exit code:", exitCode);
                 isUpdating = false;
             }
         }
@@ -654,8 +656,8 @@ Singleton {
                         const data = JSON.parse(text.trim());
                         parseData(data);
                     } catch (e) {
-                        console.warn("Failed to parse dgop JSON:", e);
-                        console.warn("Raw text was:", text.substring(0, 200));
+                        log.warn("Failed to parse dgop JSON:", e);
+                        log.warn("Raw text was:", text.substring(0, 200));
                         isUpdating = false;
                     }
                 }
@@ -669,7 +671,7 @@ Singleton {
         running: false
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("GPU init process failed with exit code:", exitCode);
+                log.warn("GPU init process failed with exit code:", exitCode);
             }
         }
         stdout: StdioCollector {
@@ -679,7 +681,7 @@ Singleton {
                         const data = JSON.parse(text.trim());
                         parseData(data);
                     } catch (e) {
-                        console.warn("Failed to parse GPU init JSON:", e);
+                        log.warn("Failed to parse GPU init JSON:", e);
                     }
                 }
             }
@@ -692,7 +694,7 @@ Singleton {
         running: false
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("System init process failed with exit code:", exitCode);
+                log.warn("System init process failed with exit code:", exitCode);
             }
         }
         stdout: StdioCollector {
@@ -702,7 +704,7 @@ Singleton {
                         const data = JSON.parse(text.trim());
                         parseData(data);
                     } catch (e) {
-                        console.warn("Failed to parse system init JSON:", e);
+                        log.warn("Failed to parse system init JSON:", e);
                     }
                 }
             }
@@ -727,7 +729,7 @@ Singleton {
                     }
                 }
             } else {
-                console.warn("dgop is not installed or not in PATH");
+                log.warn("dgop is not installed or not in PATH");
             }
         }
     }
@@ -738,7 +740,7 @@ Singleton {
         running: false
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("Failed to read /etc/os-release");
+                log.warn("Failed to read /etc/os-release");
             }
         }
         stdout: StdioCollector {
@@ -761,9 +763,9 @@ Singleton {
                         // Prefer PRETTY_NAME, fallback to NAME
                         const distroName = prettyName || name || "Linux";
                         distribution = distroName;
-                        console.info("Detected distribution:", distroName);
+                        log.info("Detected distribution:", distroName);
                     } catch (e) {
-                        console.warn("Failed to parse /etc/os-release:", e);
+                        log.warn("Failed to parse /etc/os-release:", e);
                         distribution = "Linux";
                     }
                 }

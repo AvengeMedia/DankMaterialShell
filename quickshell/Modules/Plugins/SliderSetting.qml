@@ -20,32 +20,32 @@ Column {
     spacing: Theme.spacingS
 
     function loadValue() {
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings && settings.pluginService) {
-            value = settings.loadValue(settingKey, defaultValue)
+            value = settings.loadValue(settingKey, defaultValue);
         }
     }
 
     Component.onCompleted: {
-        loadValue()
+        loadValue();
     }
 
     onValueChanged: {
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings) {
-            settings.saveValue(settingKey, value)
+            settings.saveValue(settingKey, value);
         }
     }
 
     function findSettings() {
-        let item = parent
+        let item = parent;
         while (item) {
             if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item
+                return item;
             }
-            item = item.parent
+            item = item.parent;
         }
-        return null
+        return null;
     }
 
     StyledText {
@@ -75,7 +75,7 @@ Column {
         wheelEnabled: false
         thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
         onSliderValueChanged: newValue => {
-            root.value = newValue
+            root.value = newValue;
         }
     }
 }

@@ -12,7 +12,7 @@ PluginComponent {
         service: CupsService
     }
 
-    ccWidgetIcon: CupsService.cupsAvailable && CupsService.getPrintersNum() > 0 ? "print" : "print_disabled"
+    ccWidgetIcon: "print"
     ccWidgetPrimaryText: I18n.tr("Printers")
     ccWidgetSecondaryText: {
         if (CupsService.cupsAvailable && CupsService.getPrintersNum() > 0) {
@@ -34,7 +34,9 @@ PluginComponent {
             id: detailRoot
             implicitHeight: detailColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
+            border.width: Theme.layerOutlineWidth
 
             DankActionButton {
                 anchors.top: parent.top

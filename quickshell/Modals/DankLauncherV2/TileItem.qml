@@ -114,7 +114,7 @@ Rectangle {
                 color: Theme.withAlpha(Theme.surfaceContainer, 0.85)
                 visible: root.item?.name?.length > 0
 
-                Text {
+                StyledText {
                     id: labelText
                     anchors.fill: parent
                     anchors.margins: Theme.spacingXS
@@ -167,6 +167,15 @@ Rectangle {
                     source: root.item?.data?.attribution || ""
                     mipmap: true
                 }
+            }
+
+            SourceBadge {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: Theme.spacingXS
+                source: root.item?.type === "app" ? (root.item.source || "") : ""
+                glyphSize: 16
+                visible: !root.isSelected && !!source
             }
         }
     }

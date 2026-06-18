@@ -125,6 +125,8 @@ State updates are sent whenever network configuration changes:
 - `wifiConnected`: Whether associated with an access point
 - `wifiSSID`: Currently connected network name
 - `wifiIP`: Assigned IP address (empty until DHCP completes)
+- `savedWifiNetworks` (API v26+): Saved WiFi profiles exposed at SSID granularity. If a backend has multiple profiles for the same SSID, DMS merges them into one SSID-level entry. Clients talking to older servers should derive saved visible networks from `wifiNetworks` entries where `saved` is true.
+- `savedWifiNetworks[].outOfRange` (API v26+): Whether the saved profile is not currently visible in scan results. Fallback entries derived from `wifiNetworks` should be treated as visible (`outOfRange: false`).
 - `lastError`: Error message from last failed connection attempt
 
 ### network.credentials Service Events

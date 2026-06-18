@@ -164,22 +164,18 @@ func (b *IWDBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
 		return nil, fmt.Errorf("failed to get networks: %w", err)
 	}
 
-	knownNetworks, err := b.getKnownNetworks()
+	savedProfiles, err := b.getIWDSavedWiFiProfiles()
 	if err != nil {
-		knownNetworks = make(map[string]bool)
-	}
-
-	autoconnectMap, err := b.getAutoconnectSettings()
-	if err != nil {
-		autoconnectMap = make(map[string]bool)
+		savedProfiles = make(map[string]savedWiFiProfile)
 	}
 
 	b.stateMutex.RLock()
 	currentSSID := b.state.WiFiSSID
 	wifiConnected := b.state.WiFiConnected
+	wifiSignal := b.state.WiFiSignal
 	b.stateMutex.RUnlock()
 
-	networks := make([]WiFiNetwork, 0, len(orderedNetworks))
+	visibleNetworks := make([]WiFiNetwork, 0, len(orderedNetworks))
 	for _, netData := range orderedNetworks {
 		if len(netData) < 2 {
 			continue
@@ -225,23 +221,26 @@ func (b *IWDBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
 
 		secured := netType != "open"
 
-		network := WiFiNetwork{
-			SSID:        name,
-			Signal:      signal,
-			Secured:     secured,
-			Connected:   wifiConnected && name == currentSSID,
-			Saved:       knownNetworks[name],
-			Autoconnect: autoconnectMap[name],
-			Enterprise:  netType == "8021x",
-		}
-
-		networks = append(networks, network)
+		visibleNetworks = append(visibleNetworks, WiFiNetwork{
+			SSID:       name,
+			Signal:     signal,
+			Secured:    secured,
+			Enterprise: netType == "8021x",
+		})
 	}
+
+	networks := iwdWiFiNetworksFromVisible(visibleNetworks, savedProfiles, currentSSID, wifiConnected, wifiSignal)
+	visibleNetworkMap := make(map[string]WiFiNetwork, len(networks))
+	for _, network := range networks {
+		visibleNetworkMap[network.SSID] = network
+	}
+	savedNetworks := savedWiFiNetworksFromProfiles(savedProfiles, visibleNetworkMap, currentSSID, wifiConnected)
 
 	sortWiFiNetworks(networks)
 
 	b.stateMutex.Lock()
 	b.state.WiFiNetworks = networks
+	b.state.SavedWiFiNetworks = savedNetworks
 	b.stateMutex.Unlock()
 
 	now := time.Now()
@@ -254,30 +253,129 @@ func (b *IWDBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
 	return networks, nil
 }
 
-func (b *IWDBackend) getKnownNetworks() (map[string]bool, error) {
-	obj := b.conn.Object(iwdBusName, iwdObjectPath)
-
-	var objects map[dbus.ObjectPath]map[string]map[string]dbus.Variant
-	err := obj.Call(dbusObjectManager+".GetManagedObjects", 0).Store(&objects)
+func (b *IWDBackend) updateSavedWiFiNetworks() error {
+	savedProfiles, err := b.getIWDSavedWiFiProfiles()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	known := make(map[string]bool)
-	for _, interfaces := range objects {
-		if knownProps, ok := interfaces[iwdKnownNetworkInterface]; ok {
-			if nameVar, ok := knownProps["Name"]; ok {
-				if name, ok := nameVar.Value().(string); ok {
-					known[name] = true
-				}
-			}
-		}
-	}
+	b.stateMutex.RLock()
+	currentSSID := b.state.WiFiSSID
+	wifiConnected := b.state.WiFiConnected
+	wifiNetworks := append([]WiFiNetwork(nil), b.state.WiFiNetworks...)
+	b.stateMutex.RUnlock()
 
-	return known, nil
+	wifiNetworks, savedNetworks := refreshSavedWiFiState(wifiNetworks, savedProfiles, currentSSID, wifiConnected)
+
+	b.stateMutex.Lock()
+	b.state.WiFiNetworks = wifiNetworks
+	b.state.SavedWiFiNetworks = savedNetworks
+	b.stateMutex.Unlock()
+
+	return nil
 }
 
-func (b *IWDBackend) getAutoconnectSettings() (map[string]bool, error) {
+func iwdWiFiNetworksFromVisible(visibleNetworks []WiFiNetwork, savedProfiles map[string]savedWiFiProfile, currentSSID string, wifiConnected bool, wifiSignal uint8) []WiFiNetwork {
+	networks := make([]WiFiNetwork, 0, len(visibleNetworks)+1)
+	seenSSIDs := make(map[string]struct{}, len(visibleNetworks)+1)
+
+	for _, network := range visibleNetworks {
+		profile, saved := savedProfiles[network.SSID]
+		network.Connected = wifiConnected && network.SSID == currentSSID
+		network.Saved = saved
+		network.Autoconnect = profile.Autoconnect
+		network.Hidden = network.Hidden || profile.Hidden
+		network.Secured = network.Secured || profile.Secured
+		network.Enterprise = network.Enterprise || profile.Enterprise
+		if network.Mode == "" {
+			network.Mode = profile.Mode
+		}
+		networks = append(networks, network)
+		seenSSIDs[network.SSID] = struct{}{}
+	}
+
+	if wifiConnected && currentSSID != "" {
+		if _, exists := seenSSIDs[currentSSID]; !exists {
+			profile, saved := savedProfiles[currentSSID]
+			secured := profile.Secured
+			if !saved {
+				secured = true
+			}
+			mode := profile.Mode
+			if mode == "" {
+				mode = "infrastructure"
+			}
+
+			networks = append(networks, WiFiNetwork{
+				SSID:        currentSSID,
+				Signal:      wifiSignal,
+				Secured:     secured,
+				Enterprise:  profile.Enterprise,
+				Connected:   true,
+				Saved:       saved,
+				Autoconnect: profile.Autoconnect,
+				Hidden:      true,
+				Mode:        mode,
+			})
+		}
+	}
+
+	return networks
+}
+
+func iwdSavedWiFiProfilesFromManagedObjects(objects map[dbus.ObjectPath]map[string]map[string]dbus.Variant) map[string]savedWiFiProfile {
+	profiles := make(map[string]savedWiFiProfile)
+
+	for _, interfaces := range objects {
+		knownProps, ok := interfaces[iwdKnownNetworkInterface]
+		if !ok {
+			continue
+		}
+
+		nameVar, ok := knownProps["Name"]
+		if !ok {
+			continue
+		}
+		name, ok := nameVar.Value().(string)
+		if !ok || name == "" {
+			continue
+		}
+
+		profile := savedWiFiProfile{
+			Autoconnect: true,
+			Mode:        "infrastructure",
+		}
+		if acVar, ok := knownProps["AutoConnect"]; ok {
+			if autoconnect, ok := acVar.Value().(bool); ok {
+				profile.Autoconnect = autoconnect
+			}
+		}
+		if hiddenVar, ok := knownProps["Hidden"]; ok {
+			if hidden, ok := hiddenVar.Value().(bool); ok {
+				profile.Hidden = hidden
+			}
+		}
+		if typeVar, ok := knownProps["Type"]; ok {
+			if networkType, ok := typeVar.Value().(string); ok {
+				profile.Secured = networkType != "" && networkType != "open"
+				profile.Enterprise = networkType == "8021x"
+			}
+		}
+
+		if existing, ok := profiles[name]; ok {
+			profile.Autoconnect = profile.Autoconnect || existing.Autoconnect
+			profile.Hidden = profile.Hidden || existing.Hidden
+			profile.Secured = profile.Secured || existing.Secured
+			profile.Enterprise = profile.Enterprise || existing.Enterprise
+		}
+
+		profiles[name] = profile
+	}
+
+	return profiles
+}
+
+func (b *IWDBackend) getIWDSavedWiFiProfiles() (map[string]savedWiFiProfile, error) {
 	obj := b.conn.Object(iwdBusName, iwdObjectPath)
 
 	var objects map[dbus.ObjectPath]map[string]map[string]dbus.Variant
@@ -286,24 +384,7 @@ func (b *IWDBackend) getAutoconnectSettings() (map[string]bool, error) {
 		return nil, err
 	}
 
-	autoconnectMap := make(map[string]bool)
-	for _, interfaces := range objects {
-		if knownProps, ok := interfaces[iwdKnownNetworkInterface]; ok {
-			if nameVar, ok := knownProps["Name"]; ok {
-				if name, ok := nameVar.Value().(string); ok {
-					autoconnect := true
-					if acVar, ok := knownProps["AutoConnect"]; ok {
-						if ac, ok := acVar.Value().(bool); ok {
-							autoconnect = ac
-						}
-					}
-					autoconnectMap[name] = autoconnect
-				}
-			}
-		}
-	}
-
-	return autoconnectMap, nil
+	return iwdSavedWiFiProfilesFromManagedObjects(objects), nil
 }
 
 func (b *IWDBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfoResponse, error) {
@@ -613,6 +694,8 @@ func (b *IWDBackend) ForgetWiFiNetwork(ssid string) error {
 						b.state.NetworkStatus = StatusDisconnected
 						b.stateMutex.Unlock()
 					}
+
+					_, _ = b.updateWiFiNetworks()
 
 					if b.onStateChange != nil {
 						b.onStateChange()

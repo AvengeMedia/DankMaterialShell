@@ -9,6 +9,7 @@ import qs.Widgets
 
 BasePill {
     id: root
+    readonly property var log: Log.scoped("AppsDock")
 
     enableBackgroundHover: false
     enableCursor: false
@@ -550,9 +551,9 @@ BasePill {
                 showBadge: root.showOverflowBadge
                 z: 10
                 onClicked: {
-                    console.log("Overflow button clicked! Current state:", root.overflowExpanded);
+                    log.debug("Overflow button clicked! Current state:", root.overflowExpanded);
                     root.overflowExpanded = !root.overflowExpanded;
-                    console.log("New state:", root.overflowExpanded);
+                    log.debug("New state:", root.overflowExpanded);
                 }
             }
 
@@ -740,7 +741,7 @@ BasePill {
                         }
                     }
 
-                    Text {
+                    StyledText {
                         anchors.centerIn: parent
                         visible: !iconImg.visible && !coreIcon.visible && !Paths.isSteamApp(appItem.appId)
                         text: {
@@ -932,19 +933,17 @@ BasePill {
                         tooltipLoader.active = true;
                         if (tooltipLoader.item) {
                             if (root.isVerticalOrientation) {
-                                const globalPos = delegateItem.mapToGlobal(0, delegateItem.height / 2);
-                                const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                const screenY = root.parentScreen ? root.parentScreen.y : 0;
+                                const localPos = delegateItem.mapToItem(null, 0, delegateItem.height / 2);
                                 const isLeft = root.axis?.edge === "left";
                                 const tooltipX = isLeft ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
-                                const screenRelativeY = globalPos.y - screenY + root.minTooltipY;
-                                tooltipLoader.item.show(appItem.tooltipText, screenX + tooltipX, screenRelativeY, root.parentScreen, isLeft, !isLeft);
+                                const screenRelativeY = localPos.y + root.minTooltipY;
+                                tooltipLoader.item.show(appItem.tooltipText, tooltipX, screenRelativeY, root.parentScreen, isLeft, !isLeft);
                             } else {
-                                const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height);
+                                const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height);
                                 const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height;
                                 const isBottom = root.axis?.edge === "bottom";
                                 const tooltipY = isBottom ? (screenHeight - root.barThickness - root.barSpacing - Theme.spacingXS - 35) : (root.barThickness + root.barSpacing + Theme.spacingXS);
-                                tooltipLoader.item.show(appItem.tooltipText, globalPos.x, tooltipY, root.parentScreen, false, false);
+                                tooltipLoader.item.show(appItem.tooltipText, localPos.x, tooltipY, root.parentScreen, false, false);
                             }
                         }
                     }
@@ -966,14 +965,12 @@ BasePill {
                             contextMenuLoader.active = true;
 
                             if (contextMenuLoader.item) {
-                                const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
-                                const screenX = root.parentScreen ? root.parentScreen.x : 0;
-                                const screenY = root.parentScreen ? root.parentScreen.y : 0;
+                                const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, delegateItem.height / 2);
                                 const isBarVertical = root.axis?.isVertical ?? false;
                                 const barEdge = root.axis?.edge ?? "top";
 
-                                let x = globalPos.x - screenX;
-                                let y = globalPos.y - screenY;
+                                let x = localPos.x;
+                                let y = localPos.y;
 
                                 switch (barEdge) {
                                 case "bottom":

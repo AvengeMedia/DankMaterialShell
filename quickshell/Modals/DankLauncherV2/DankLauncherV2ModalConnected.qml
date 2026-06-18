@@ -1,0 +1,853 @@
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import Quickshell
+import Quickshell.Wayland
+import Quickshell.Hyprland
+import qs.Common
+import qs.Services
+import qs.Widgets
+
+Item {
+    id: root
+    readonly property var log: Log.scoped("DankLauncherV2ModalConnected")
+
+    property var modalHandle: root
+    property bool triggerUsesOverlayLayer: false
+
+    visible: false
+
+    property bool spotlightOpen: false
+    property bool keyboardActive: false
+    property bool contentVisible: false
+    readonly property bool launcherMotionVisible: frameOwnsConnectedChrome ? _motionActive : (Theme.isDirectionalEffect ? spotlightOpen : _motionActive)
+    property var spotlightContent: launcherContentLoader.item
+    property bool openedFromOverview: false
+    property bool isClosing: false
+    property bool _windowEnabled: true
+    property bool _pendingInitialize: false
+    property string _pendingQuery: ""
+    property string _pendingMode: ""
+    readonly property bool unloadContentOnClose: SettingsData.dankLauncherV2UnloadOnClose
+
+    property bool animationsEnabled: true
+    property bool _motionActive: false
+    property real _frozenMotionX: 0
+    property real _frozenMotionY: 0
+
+    readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
+    readonly property var effectiveScreen: contentWindow.screen
+    readonly property real screenWidth: effectiveScreen?.width ?? 1920
+    readonly property real screenHeight: effectiveScreen?.height ?? 1080
+    readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
+    readonly property bool usesOverlayLayer: SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
+    readonly property var effectiveLauncherLayer: LayerShell.fromEnv("DMS_MODAL_LAYER", root.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Top,
+        "label": "modals",
+        "error": true
+    })
+
+    readonly property int baseWidth: {
+        switch (SettingsData.dankLauncherV2Size) {
+        case "micro":
+            return 500;
+        case "medium":
+            return 720;
+        case "large":
+            return 860;
+        default:
+            return 620;
+        }
+    }
+    readonly property int baseHeight: {
+        switch (SettingsData.dankLauncherV2Size) {
+        case "micro":
+            return 480;
+        case "medium":
+            return 720;
+        case "large":
+            return 860;
+        default:
+            return 600;
+        }
+    }
+    readonly property int modalWidth: Math.min(baseWidth, screenWidth - 100)
+    readonly property int modalHeight: Math.min(baseHeight, screenHeight - 100)
+
+    readonly property string preferredConnectedBarSide: SettingsData.frameLauncherEmergeSide
+
+    readonly property bool frameConnectedMode: SettingsData.frameEnabled && Theme.isConnectedEffect && !!effectiveScreen && SettingsData.isScreenInPreferences(effectiveScreen, SettingsData.frameScreenPreferences)
+
+    readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
+
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
+    readonly property bool launcherArcExtenderActive: frameOwnsConnectedChrome && SettingsData.frameLauncherArcExtender && (resolvedConnectedBarSide === "top" || resolvedConnectedBarSide === "bottom")
+
+    function _dockOccupiesSide(side) {
+        if (!SettingsData.showDock)
+            return false;
+        switch (side) {
+        case "top":
+            return SettingsData.dockPosition === SettingsData.Position.Top;
+        case "bottom":
+            return SettingsData.dockPosition === SettingsData.Position.Bottom;
+        case "left":
+            return SettingsData.dockPosition === SettingsData.Position.Left;
+        case "right":
+            return SettingsData.dockPosition === SettingsData.Position.Right;
+        }
+        return false;
+    }
+    readonly property bool _dockBlocksEmergence: frameOwnsConnectedChrome && _dockOccupiesSide(resolvedConnectedBarSide)
+
+    function _frameEdgeInset(side) {
+        if (!effectiveScreen)
+            return 0;
+        return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
+    }
+
+    readonly property var _connectedModalPos: {
+        const fallback = {
+            "x": (screenWidth - modalWidth) / 2,
+            "y": (screenHeight - modalHeight) / 2
+        };
+        switch (resolvedConnectedBarSide) {
+        case "top":
+        case "bottom":
+            {
+                const insetL = _frameEdgeInset("left");
+                const insetR = _frameEdgeInset("right");
+                const insetT = _frameEdgeInset("top");
+                const insetB = _frameEdgeInset("bottom");
+                const usable = Math.max(0, screenWidth - insetL - insetR);
+                const usableH = Math.max(0, screenHeight - insetT - insetB);
+                return {
+                    "x": insetL + Math.max(0, (usable - modalWidth) / 2),
+                    "y": launcherArcExtenderActive ? insetT + Math.max(0, (usableH - modalHeight) / 2) : (resolvedConnectedBarSide === "top" ? insetT : screenHeight - modalHeight - insetB)
+                };
+            }
+        case "left":
+        case "right":
+            {
+                const insetT = _frameEdgeInset("top");
+                const insetB = _frameEdgeInset("bottom");
+                const usable = Math.max(0, screenHeight - insetT - insetB);
+                return {
+                    "x": resolvedConnectedBarSide === "left" ? _frameEdgeInset("left") : screenWidth - modalWidth - _frameEdgeInset("right"),
+                    "y": insetT + Math.max(0, (usable - modalHeight) / 2)
+                };
+            }
+        }
+        return fallback;
+    }
+
+    readonly property real modalX: frameOwnsConnectedChrome ? _connectedModalPos.x : ((screenWidth - modalWidth) / 2)
+    readonly property real modalY: frameOwnsConnectedChrome ? _connectedModalPos.y : ((screenHeight - modalHeight) / 2)
+
+    readonly property bool connectedSurfaceOverride: frameOwnsConnectedChrome
+    readonly property int launcherAnimationDuration: frameOwnsConnectedChrome ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
+    readonly property list<real> launcherEnterCurve: frameOwnsConnectedChrome ? Theme.variantPopoutEnterCurve : Theme.variantModalEnterCurve
+    readonly property list<real> launcherExitCurve: frameOwnsConnectedChrome ? Theme.variantPopoutExitCurve : Theme.variantModalExitCurve
+    readonly property color backgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    readonly property real cornerRadius: connectedSurfaceOverride ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+    readonly property color borderColor: {
+        if (!SettingsData.dankLauncherV2BorderEnabled)
+            return Theme.outlineMedium;
+        switch (SettingsData.dankLauncherV2BorderColor) {
+        case "primary":
+            return Theme.primary;
+        case "secondary":
+            return Theme.secondary;
+        case "outline":
+            return Theme.outline;
+        case "surfaceText":
+            return Theme.surfaceText;
+        default:
+            return Theme.primary;
+        }
+    }
+    readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
+    readonly property color effectiveBorderColor: connectedSurfaceOverride ? "transparent" : borderColor
+    readonly property int effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
+    readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
+
+    readonly property var shadowLevel: Theme.elevationLevel3
+    readonly property real shadowFallbackOffset: 6
+    readonly property real shadowRenderPadding: (!frameOwnsConnectedChrome && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
+    readonly property real shadowPad: Theme.snap(shadowRenderPadding, dpr)
+    readonly property real alignedWidth: Theme.px(modalWidth, dpr)
+    readonly property real alignedHeight: Theme.px(modalHeight, dpr)
+    readonly property real alignedX: Theme.snap(modalX, dpr)
+    readonly property real alignedY: Theme.snap(modalY, dpr)
+    readonly property real _connectedChromeX: alignedX
+    readonly property real _connectedChromeY: {
+        if (!launcherArcExtenderActive)
+            return alignedY;
+        return resolvedConnectedBarSide === "top" ? Theme.snap(_frameEdgeInset("top"), dpr) : alignedY;
+    }
+    readonly property real _connectedChromeWidth: alignedWidth
+    readonly property real _connectedChromeHeight: {
+        if (!launcherArcExtenderActive)
+            return alignedHeight;
+        if (resolvedConnectedBarSide === "top")
+            return Theme.snap(Math.max(alignedHeight, alignedY + alignedHeight - _frameEdgeInset("top")), dpr);
+        if (resolvedConnectedBarSide === "bottom")
+            return Theme.snap(Math.max(alignedHeight, screenHeight - _frameEdgeInset("bottom") - alignedY), dpr);
+        return alignedHeight;
+    }
+    readonly property real contentSurfaceHeight: launcherArcExtenderActive ? _connectedChromeHeight : alignedHeight
+
+    readonly property real _ccX: _connectedChromeX
+    readonly property real _ccY: _connectedChromeY
+
+    signal dialogClosed
+
+    Timer {
+        id: _syncTimer
+        interval: 0
+        onTriggered: root._flushSync()
+    }
+
+    property bool _fullSyncPending: false
+
+    function _currentScreenName() {
+        return effectiveScreen ? effectiveScreen.name : "";
+    }
+
+    ConnectedModalChrome {
+        id: modalChrome
+        modalHandle: root.modalHandle
+        claimPrefix: "dms:launcher-v2"
+        surfaceKind: "launcher"
+        screenName: root._currentScreenName()
+        enabled: root.frameOwnsConnectedChrome
+        active: root.spotlightOpen
+        presented: root.spotlightOpen || contentWindow.visible
+        dockBlocked: root._dockBlocksEmergence
+        dockSide: root.resolvedConnectedBarSide
+        onRecoveryRequested: root._queueFullSync()
+    }
+
+    function _publishModalChromeState() {
+        const presented = spotlightOpen || contentWindow.visible;
+        const phase = !presented ? "hidden" : (isClosing ? "closing" : (!contentWindow.visible ? "opening" : "open"));
+        const bodyRect = {
+            "x": _connectedChromeX,
+            "y": _connectedChromeY,
+            "width": _connectedChromeWidth,
+            "height": _connectedChromeHeight
+        };
+        const animationOffset = {
+            "x": contentContainer ? contentContainer.animX : 0,
+            "y": contentContainer ? contentContainer.animY : 0
+        };
+        const state = {
+            "kind": "launcher",
+            "screenName": root._currentScreenName(),
+            "phase": phase,
+            "visible": presented,
+            "presented": presented,
+            "barSide": resolvedConnectedBarSide,
+            "bodyRect": bodyRect,
+            "animationOffset": animationOffset,
+            "scale": 1,
+            "opacity": Theme.connectedSurfaceColor.a,
+            "bodyX": _connectedChromeX,
+            "bodyY": _connectedChromeY,
+            "bodyW": _connectedChromeWidth,
+            "bodyH": _connectedChromeHeight,
+            "animX": animationOffset.x,
+            "animY": animationOffset.y,
+            "omitStartConnector": false,
+            "omitEndConnector": false,
+            "dockRetractSide": root._dockBlocksEmergence ? resolvedConnectedBarSide : ""
+        };
+        return modalChrome.publish(state);
+    }
+
+    function _syncModalChromeState() {
+        _publishModalChromeState();
+    }
+
+    property bool _animSyncQueued: false
+    property bool _bodySyncQueued: false
+
+    function _queueFullSync() {
+        _fullSyncPending = true;
+        if (!_syncTimer.running)
+            _syncTimer.restart();
+    }
+    function _queueAnimSync() {
+        _animSyncQueued = true;
+        if (!_syncTimer.running)
+            _syncTimer.restart();
+    }
+    function _queueBodySync() {
+        _bodySyncQueued = true;
+        if (!_syncTimer.running)
+            _syncTimer.restart();
+    }
+    function _flushSync() {
+        const fullDirty = _fullSyncPending;
+        const animDirty = _animSyncQueued;
+        const bodyDirty = _bodySyncQueued;
+        _fullSyncPending = false;
+        _animSyncQueued = false;
+        _bodySyncQueued = false;
+        if (fullDirty)
+            _syncModalChromeState();
+        if (animDirty)
+            _syncModalAnim();
+        if (bodyDirty)
+            _syncModalBody();
+    }
+
+    function _syncModalAnim() {
+        if (!frameOwnsConnectedChrome)
+            return;
+        if (!contentContainer)
+            return;
+        modalChrome.updateAnim(contentContainer.animX, contentContainer.animY);
+    }
+
+    function _syncModalBody() {
+        if (!frameOwnsConnectedChrome)
+            return;
+        modalChrome.updateBody(_connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight);
+    }
+
+    function _releaseModalChrome() {
+        modalChrome.release();
+    }
+
+    onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
+    onLauncherArcExtenderActiveChanged: _queueFullSync()
+    onResolvedConnectedBarSideChanged: _queueFullSync()
+    onSpotlightOpenChanged: _queueFullSync()
+    onAlignedXChanged: _queueBodySync()
+    onAlignedYChanged: _queueBodySync()
+    onAlignedWidthChanged: _queueBodySync()
+    onAlignedHeightChanged: _queueBodySync()
+
+    Connections {
+        target: contentWindow
+        function onVisibleChanged() {
+            if (contentWindow.visible)
+                root._syncModalChromeState();
+            else
+                root._releaseModalChrome();
+        }
+    }
+
+    function _ensureContentLoadedAndInitialize(query, mode) {
+        _pendingQuery = query || "";
+        _pendingMode = mode || "";
+        _pendingInitialize = true;
+        contentVisible = true;
+        launcherContentLoader.active = true;
+
+        if (spotlightContent) {
+            _initializeAndShow(_pendingQuery, _pendingMode);
+            _pendingInitialize = false;
+        }
+    }
+
+    function _initializeAndShow(query, mode) {
+        if (!spotlightContent)
+            return;
+        contentVisible = true;
+        spotlightContent.closeTransientUi?.();
+
+        if (spotlightContent.searchField) {
+            spotlightContent.searchField.text = query;
+        }
+        if (spotlightContent.controller) {
+            var targetMode = mode || SessionData.getLauncherRestoreMode();
+            spotlightContent.controller.searchMode = targetMode;
+            spotlightContent.controller.activePluginId = "";
+            spotlightContent.controller.activePluginName = "";
+            spotlightContent.controller.pluginFilter = "";
+            spotlightContent.controller.fileSearchType = SessionData.launcherLastFileSearchType || "all";
+            spotlightContent.controller.fileSearchExt = "";
+            spotlightContent.controller.fileSearchFolder = "";
+            spotlightContent.controller.fileSearchSort = "score";
+            spotlightContent.controller.collapsedSections = {};
+            spotlightContent.controller.selectedFlatIndex = 0;
+            spotlightContent.controller.selectedItem = null;
+            if (query) {
+                spotlightContent.controller.setSearchQuery(query);
+            } else {
+                spotlightContent.controller.searchQuery = "";
+                spotlightContent.controller.performSearch();
+            }
+        }
+        if (spotlightContent.resetScroll) {
+            spotlightContent.resetScroll();
+        }
+        if (spotlightContent.actionPanel) {
+            spotlightContent.actionPanel.hide();
+        }
+    }
+
+    function _openCommon(query, mode) {
+        closeCleanupTimer.stop();
+        isClosing = false;
+        openedFromOverview = false;
+
+        animationsEnabled = false;
+
+        _frozenMotionX = contentContainer ? contentContainer.collapsedMotionX : 0;
+        _frozenMotionY = contentContainer ? contentContainer.collapsedMotionY : (Theme.isDirectionalEffect ? Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1) : -Theme.effectAnimOffset);
+
+        var focusedScreen = CompositorService.getFocusedScreen();
+        if (focusedScreen) {
+            contentWindow.screen = focusedScreen;
+        }
+
+        _motionActive = false;
+
+        ModalManager.openModal(modalHandle);
+        spotlightOpen = true;
+        contentWindow.visible = true;
+
+        _ensureContentLoadedAndInitialize(query || "", mode || "");
+
+        // Defer focus until after enter motion starts (avoids compositor IPC stalls).
+        Qt.callLater(() => {
+            root.animationsEnabled = true;
+            root._motionActive = true;
+
+            Qt.callLater(() => {
+                root.keyboardActive = true;
+                if (root.spotlightContent && root.spotlightContent.searchField)
+                    root.spotlightContent.searchField.forceActiveFocus();
+            });
+        });
+    }
+
+    function show() {
+        _openCommon("", "");
+    }
+
+    function showWithQuery(query) {
+        _openCommon(query, "");
+    }
+
+    function hide() {
+        if (!spotlightOpen)
+            return;
+        spotlightContent?.closeTransientUi?.();
+        openedFromOverview = false;
+        isClosing = true;
+        if (!Theme.isDirectionalEffect)
+            contentVisible = false;
+
+        _motionActive = false;
+
+        keyboardActive = false;
+        spotlightOpen = false;
+        ModalManager.closeModal(modalHandle);
+        closeCleanupTimer.start();
+    }
+
+    function toggle() {
+        spotlightOpen ? hide() : show();
+    }
+
+    function showWithMode(mode) {
+        _openCommon("", mode);
+    }
+
+    function toggleWithMode(mode) {
+        if (spotlightOpen) {
+            hide();
+        } else {
+            showWithMode(mode);
+        }
+    }
+
+    function toggleWithQuery(query) {
+        if (spotlightOpen) {
+            hide();
+        } else {
+            showWithQuery(query);
+        }
+    }
+
+    Timer {
+        id: closeCleanupTimer
+        interval: Theme.variantCloseInterval(root.launcherAnimationDuration)
+        repeat: false
+        onTriggered: {
+            isClosing = false;
+            contentVisible = false;
+            contentWindow.visible = false;
+            if (root.unloadContentOnClose)
+                launcherContentLoader.active = false;
+            dialogClosed();
+        }
+    }
+
+    Connections {
+        target: spotlightContent?.controller ?? null
+        function onModeChanged(mode, userInitiated) {
+            if (!userInitiated || !SettingsData.rememberLastMode)
+                return;
+            SessionData.setLauncherLastMode(mode);
+        }
+    }
+
+    HyprlandFocusGrab {
+        id: focusGrab
+        windows: [contentWindow]
+        active: root.useHyprlandFocusGrab && root.spotlightOpen
+
+        onCleared: {
+            if (spotlightOpen) {
+                hide();
+            }
+        }
+    }
+
+    Connections {
+        target: ModalManager
+        function onCloseAllModalsExcept(excludedModal) {
+            if (excludedModal !== modalHandle && spotlightOpen) {
+                hide();
+            }
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (Quickshell.screens.length === 0)
+                return;
+
+            const screen = contentWindow.screen;
+            const screenName = screen?.name;
+
+            let needsReset = !screen || !screenName;
+            if (!needsReset) {
+                needsReset = true;
+                for (let i = 0; i < Quickshell.screens.length; i++) {
+                    if (Quickshell.screens[i].name === screenName) {
+                        needsReset = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!needsReset) {
+                if (root.spotlightOpen)
+                    root._queueFullSync();
+                return;
+            }
+
+            const newScreen = CompositorService.getFocusedScreen() ?? Quickshell.screens[0];
+            if (!newScreen)
+                return;
+
+            root._releaseModalChrome();
+            root._windowEnabled = false;
+            contentWindow.screen = newScreen;
+            Qt.callLater(() => {
+                root._windowEnabled = true;
+            });
+        }
+    }
+
+    PanelWindow {
+        id: contentWindow
+        visible: false
+        color: "transparent"
+
+        WindowBlur {
+            targetWindow: contentWindow
+            blurEnabled: root.effectiveBlurEnabled && !root.frameOwnsConnectedChrome
+            readonly property real s: Math.min(1, contentContainer.scaleValue)
+            blurX: root._ccX + root.alignedWidth * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
+            blurY: root._ccY + root.alignedHeight * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+            blurWidth: (root.spotlightOpen || root.isClosing) && !root.frameOwnsConnectedChrome ? root.alignedWidth * s : 0
+            blurHeight: (root.spotlightOpen || root.isClosing) && !root.frameOwnsConnectedChrome ? root.alignedHeight * s : 0
+            blurRadius: root.cornerRadius
+        }
+
+        WlrLayershell.namespace: "dms:spotlight"
+        WlrLayershell.layer: root.effectiveLauncherLayer
+        WlrLayershell.exclusiveZone: -1
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(keyboardActive, null)
+
+        anchors {
+            left: true
+            top: true
+            right: true
+            bottom: true
+        }
+
+        mask: Region {
+            item: (root.spotlightOpen || root.isClosing) ? dismissArea : contentInputMask
+
+            Region {
+                item: (root.spotlightOpen || root.isClosing) ? contentInputMask : null
+            }
+        }
+
+        Item {
+            id: dismissArea
+            visible: false
+            anchors.fill: parent
+            anchors.topMargin: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
+            anchors.bottomMargin: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
+            anchors.leftMargin: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
+            anchors.rightMargin: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
+        }
+
+        Item {
+            id: contentInputMask
+            visible: false
+            x: contentContainer.x
+            y: contentContainer.y
+            width: root.alignedWidth
+            height: root.contentSurfaceHeight
+        }
+
+        MouseArea {
+            anchors.fill: dismissArea
+            enabled: root.spotlightOpen
+            z: -2
+            onClicked: root.hide()
+        }
+
+        Item {
+            id: contentContainer
+
+            x: root._ccX
+            y: root._ccY
+            width: root.alignedWidth
+            height: root.contentSurfaceHeight
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.spotlightOpen
+                hoverEnabled: false
+                acceptedButtons: Qt.AllButtons
+                onPressed: mouse.accepted = true
+                onClicked: mouse.accepted = true
+                z: -1
+            }
+
+            readonly property int dockEdge: typeof SettingsData !== "undefined" ? SettingsData.dockPosition : 1
+            readonly property bool dockTop: dockEdge === 0
+            readonly property bool dockBottom: dockEdge === 1
+            readonly property bool dockLeft: dockEdge === 2
+            readonly property bool dockRight: dockEdge === 3
+
+            readonly property real dockThickness: typeof SettingsData !== "undefined" && SettingsData.showDock ? Theme.px(SettingsData.dockIconSize + (SettingsData.dockMargin * 2) + SettingsData.dockSpacing + 8, root.dpr) : Theme.px(60, root.dpr)
+
+            readonly property bool directionalEffect: Theme.isDirectionalEffect
+            readonly property bool depthEffect: Theme.isDepthEffect
+            readonly property real _connectedTravelX: Math.max(Theme.effectAnimOffset, root.alignedWidth + Theme.spacingL)
+            readonly property real _connectedTravelY: root.launcherArcExtenderActive ? root._connectedChromeHeight : Math.max(Theme.effectAnimOffset, root.alignedHeight + Theme.spacingL)
+            readonly property real collapsedMotionX: {
+                if (root.frameOwnsConnectedChrome) {
+                    switch (root.resolvedConnectedBarSide) {
+                    case "left":
+                        return -_connectedTravelX;
+                    case "right":
+                        return _connectedTravelX;
+                    }
+                    return 0;
+                }
+                if (directionalEffect) {
+                    if (dockLeft)
+                        return -(root._ccX + root.alignedWidth + Theme.effectAnimOffset);
+                    if (dockRight)
+                        return root.screenWidth - root._ccX + Theme.effectAnimOffset;
+                }
+                if (depthEffect)
+                    return Theme.effectAnimOffset * 0.25;
+                return 0;
+            }
+            readonly property real collapsedMotionY: {
+                if (root.frameOwnsConnectedChrome) {
+                    switch (root.resolvedConnectedBarSide) {
+                    case "top":
+                        return -_connectedTravelY;
+                    case "bottom":
+                        return _connectedTravelY;
+                    }
+                    return 0;
+                }
+                if (directionalEffect) {
+                    if (dockTop)
+                        return -(root._ccY + root.alignedHeight + Theme.effectAnimOffset);
+                    if (dockBottom)
+                        return root.screenHeight - root._ccY + root.shadowPad + Theme.effectAnimOffset;
+                    return 0;
+                }
+                if (depthEffect)
+                    return -Math.max(Theme.effectAnimOffset * 0.85, 34);
+                return -Math.max((root.shadowPad || 0) + Theme.effectAnimOffset, 40);
+            }
+
+            QtObject {
+                id: morph
+                property real openProgress: root._motionActive ? 1 : 0
+                Behavior on openProgress {
+                    enabled: root.animationsEnabled
+                    DankAnim {
+                        duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
+                        easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
+                    }
+                }
+            }
+
+            readonly property real animX: root._frozenMotionX * (1 - morph.openProgress)
+            readonly property real animY: root._frozenMotionY * (1 - morph.openProgress)
+            readonly property real scaleValue: Theme.effectScaleCollapsed + (1.0 - Theme.effectScaleCollapsed) * morph.openProgress
+
+            onAnimXChanged: if (root.frameOwnsConnectedChrome)
+                root._queueAnimSync()
+            onAnimYChanged: if (root.frameOwnsConnectedChrome)
+                root._queueAnimSync()
+
+            Item {
+                id: directionalClipMask
+                readonly property bool shouldClip: Theme.isDirectionalEffect
+                readonly property real clipOversize: 2000
+                readonly property bool connectedClip: root.frameOwnsConnectedChrome
+                readonly property bool clipLeft: connectedClip ? root.resolvedConnectedBarSide === "left" : contentContainer.dockLeft
+                readonly property bool clipRight: connectedClip ? root.resolvedConnectedBarSide === "right" : contentContainer.dockRight
+                readonly property bool clipTop: connectedClip ? root.resolvedConnectedBarSide === "top" : contentContainer.dockTop
+                readonly property bool clipBottom: connectedClip ? root.resolvedConnectedBarSide === "bottom" : contentContainer.dockBottom
+
+                clip: shouldClip
+
+                x: shouldClip ? (clipLeft ? (connectedClip ? 0 : contentContainer.dockThickness - root._ccX) : -clipOversize) : 0
+                y: shouldClip ? (clipTop ? (connectedClip ? 0 : contentContainer.dockThickness - root._ccY) : -clipOversize) : 0
+
+                width: {
+                    if (!shouldClip)
+                        return parent.width;
+                    if (connectedClip && (clipLeft || clipRight))
+                        return parent.width + clipOversize;
+                    return parent.width + clipOversize + (clipRight ? (root.screenWidth - contentContainer.dockThickness - root._ccX - parent.width) : clipOversize);
+                }
+                height: {
+                    if (!shouldClip)
+                        return parent.height;
+                    if (connectedClip && (clipTop || clipBottom))
+                        return parent.height + clipOversize;
+                    return parent.height + clipOversize + (clipBottom ? (root.screenHeight - contentContainer.dockThickness - root._ccY - parent.height) : clipOversize);
+                }
+
+                Item {
+                    id: aligner
+                    x: directionalClipMask.x !== 0 ? -directionalClipMask.x : 0
+                    y: directionalClipMask.y !== 0 ? -directionalClipMask.y : 0
+                    width: contentContainer.width
+                    height: contentContainer.height
+
+                    ElevationShadow {
+                        id: launcherShadowLayer
+                        width: parent.width
+                        height: parent.height
+                        opacity: contentWrapper.publishedOpacity
+                        scale: contentWrapper.scale
+                        x: contentWrapper.x
+                        y: contentWrapper.y
+                        level: root.shadowLevel
+                        fallbackOffset: root.shadowFallbackOffset
+                        targetColor: root.frameOwnsConnectedChrome ? "transparent" : root.backgroundColor
+                        borderColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBorderColor
+                        borderWidth: root.frameOwnsConnectedChrome ? 0 : root.effectiveBorderWidth
+                        targetRadius: root.cornerRadius
+                        shadowEnabled: !root.frameOwnsConnectedChrome && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                    }
+
+                    Item {
+                        id: contentWrapper
+                        width: parent.width
+                        height: parent.height
+
+                        property bool _renderActive: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) || launcherMotionVisible
+                        property real publishedOpacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (launcherMotionVisible ? 1 : 0)
+
+                        opacity: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) ? 1 : (launcherMotionVisible ? 1 : 0)
+                        visible: _renderActive
+                        scale: contentContainer.scaleValue
+                        x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+                        y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
+
+                        Behavior on opacity {
+                            enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
+                            NumberAnimation {
+                                easing.type: Easing.BezierSpline
+                                duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                                easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
+                            }
+                        }
+
+                        Behavior on publishedOpacity {
+                            enabled: root.animationsEnabled && (!Theme.isDirectionalEffect || Theme.isConnectedEffect)
+                            NumberAnimation {
+                                easing.type: Easing.BezierSpline
+                                duration: Math.round(Theme.variantDuration(root.launcherAnimationDuration, launcherMotionVisible) * Theme.variantOpacityDurationScale)
+                                easing.bezierCurve: launcherMotionVisible ? root.launcherEnterCurve : root.launcherExitCurve
+                                onRunningChanged: if (!running && contentWrapper.publishedOpacity === 0)
+                                    contentWrapper._renderActive = false
+                            }
+                        }
+
+                        Connections {
+                            target: root
+                            function onLauncherMotionVisibleChanged() {
+                                if (root.launcherMotionVisible)
+                                    contentWrapper._renderActive = true;
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onPressed: mouse => mouse.accepted = true
+                        }
+
+                        FocusScope {
+                            anchors.fill: parent
+                            focus: keyboardActive
+
+                            Loader {
+                                id: launcherContentLoader
+                                anchors.fill: parent
+                                active: !root.unloadContentOnClose || root.spotlightOpen || root.isClosing || root.contentVisible || root._pendingInitialize
+                                asynchronous: false
+                                sourceComponent: LauncherContent {
+                                    focus: true
+                                    parentModal: root
+                                }
+
+                                onLoaded: {
+                                    if (root._pendingInitialize) {
+                                        root._initializeAndShow(root._pendingQuery, root._pendingMode);
+                                        root._pendingInitialize = false;
+                                    }
+                                }
+                            }
+
+                            Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
+                            Keys.onEscapePressed: event => {
+                                root.spotlightContent?.activeContextMenu?.handleKey(event);
+                                if (!event.accepted)
+                                    root.hide();
+                                event.accepted = true;
+                            }
+                        }
+                    } // contentWrapper
+                } // aligner
+            } // directionalClipMask
+        } // contentContainer
+    } // PanelWindow
+}

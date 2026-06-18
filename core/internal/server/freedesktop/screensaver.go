@@ -104,7 +104,7 @@ func (m *Manager) claimScreensaverName(handler *screensaverHandler, name, iface 
 		return false
 	}
 	if reply != dbus.RequestNameReplyPrimaryOwner {
-		log.Warnf("Screensaver name %s already owned by another process", name)
+		log.Infof("Screensaver name %s already owned by another process (e.g. hypridle/swayidle)", name)
 		return false
 	}
 	if err := m.exportScreensaverOnPaths(handler, iface, paths...); err != nil {

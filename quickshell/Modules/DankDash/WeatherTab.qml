@@ -7,6 +7,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("WeatherTab")
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -16,6 +17,9 @@ Item {
     property bool syncing: false
     property bool showHourly: false
     property bool available: WeatherService.weather.available
+
+    Component.onCompleted: WeatherService.addRef()
+    Component.onDestruction: WeatherService.removeRef()
 
     function syncFrom(type) {
         if (!dailyLoader.item || !hourlyLoader.item)
@@ -45,7 +49,7 @@ Item {
                 hourlyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 1) - 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date()).getHours()));
             }
         } catch (e) {
-            console.warn("Weather Date Sync Error:", e);
+            log.warn("Weather Date Sync Error:", e);
         }
 
         syncing = false;
@@ -145,6 +149,7 @@ Item {
                 color: Theme.withAlpha(Theme.surfaceText, 0.4)
                 anchors.top: parent.top
                 anchors.verticalCenter: parent.verticalCenter
+                smoothTransform: isRefreshing
 
                 property bool isRefreshing: false
                 enabled: !isRefreshing
@@ -191,7 +196,7 @@ Item {
                     onTriggered: refreshButtonTwo.isRefreshing = false
                 }
 
-                NumberAnimation on rotation {
+                RotationAnimator on rotation {
                     running: refreshButtonTwo.isRefreshing
                     from: 0
                     to: 360
@@ -213,8 +218,8 @@ Item {
             width: parent.width
             height: heroContent.height + Theme.spacingL * 2
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-            border.color: Theme.withAlpha(Theme.outline, 0.08)
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
             border.width: 1
 
             Column {
@@ -883,6 +888,7 @@ Item {
                 color: Theme.withAlpha(Theme.surfaceText, 0.4)
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
+                smoothTransform: isRefreshing
 
                 property bool isRefreshing: false
                 enabled: !isRefreshing
@@ -929,7 +935,7 @@ Item {
                     onTriggered: refreshButton.isRefreshing = false
                 }
 
-                NumberAnimation on rotation {
+                RotationAnimator on rotation {
                     running: refreshButton.isRefreshing
                     from: 0
                     to: 360
