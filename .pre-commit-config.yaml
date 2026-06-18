@@ -22,6 +22,14 @@ repos:
         pass_filenames: false
   - repo: local
     hooks:
+      - id: settings-search-index
+        name: settings search index is up to date
+        entry: bash -c 'python3 quickshell/translations/extract_settings_index.py >/dev/null || exit 1; if ! git diff --exit-code -- quickshell/translations/settings_search_index.json; then echo "settings_search_index.json is out of date; run quickshell/translations/extract_settings_index.py and stage the result" >&2; exit 1; fi'
+        language: system
+        files: ^quickshell/(Modules/Settings/.*\.qml|Modals/Settings/SettingsSidebar\.qml|translations/extract_settings_index\.py)$
+        pass_filenames: false
+  - repo: local
+    hooks:
       - id: no-console-in-qml
         name: no console.* in QML (use Log service)
         entry: bash -c 'if grep -nE "console\.(log|error|info|warn|debug)" "$@"; then echo "Use the Log service (log.info/warn/error/debug/fatal) instead of console.*" >&2; exit 1; fi' --
