@@ -599,6 +599,8 @@ Singleton {
     property int batteryPostLockMonitorTimeout: 0
     property int batteryChargeLimit: 100
     property bool batteryNotifyChargeLimit: false
+    property int batteryCriticalThreshold: 10
+    property bool batteryNotifyCritical: true
     property int batteryLowThreshold: 20
     property bool batteryNotifyLow: false
     property int batteryNotificationType: 0
