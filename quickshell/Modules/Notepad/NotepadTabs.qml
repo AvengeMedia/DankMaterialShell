@@ -236,7 +236,7 @@ Column {
                             }
 
                             onPositionChanged: mouse => {
-                                if (delegateItem.longPressing && !delegateItem.dragging) {
+                                if (!delegateItem.dragging) {
                                     var distance = Math.sqrt(Math.pow(mouse.x - delegateItem.dragStartPos.x, 2) + Math.pow(mouse.y - delegateItem.dragStartPos.y, 2));
                                     if (distance > 5) {
                                         delegateItem.dragging = true;
@@ -245,10 +245,8 @@ Column {
                                         root.draggedIndex = index;
                                         root.dropTargetIndex = index;
                                     }
-                                }
-
-                                if (!delegateItem.dragging)
                                     return;
+                                }
                                 var axisOffset = mouse.x - delegateItem.dragStartPos.x;
                                 delegateItem.dragAxisOffset = axisOffset;
 
@@ -262,6 +260,16 @@ Column {
                                     delegateItem.targetIndex = newTargetIndex;
                                     root.dropTargetIndex = newTargetIndex;
                                 }
+                            }
+
+                            onCanceled: {
+                                delegateItem.longPressing = false;
+                                delegateItem.dragging = false;
+                                delegateItem.dragAxisOffset = 0;
+                                delegateItem.targetIndex = -1;
+                                delegateItem.originalIndex = -1;
+                                root.draggedIndex = -1;
+                                root.dropTargetIndex = -1;
                             }
                         }
                     }
