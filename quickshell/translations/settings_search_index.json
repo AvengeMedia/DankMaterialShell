@@ -4586,27 +4586,6 @@
     "description": "Automatically lock the screen when DMS starts"
   },
   {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "automatic",
-      "automatically",
-      "before",
-      "lock",
-      "login",
-      "password",
-      "prepares",
-      "screen",
-      "security",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
-  },
-  {
     "section": "lockScreenNotificationMode",
     "label": "Notification Display",
     "tabIndex": 11,
@@ -6795,6 +6774,27 @@
     "description": "Gradually fade the screen before locking with a configurable grace period"
   },
   {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "automatically",
+      "before",
+      "energy",
+      "lock",
+      "power",
+      "prepares",
+      "screen",
+      "security",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
+  },
+  {
     "section": "fadeToLockGracePeriod",
     "label": "Lock fade grace period",
     "tabIndex": 21,
@@ -7194,6 +7194,29 @@
       "system"
     ],
     "description": "Maximum number of entries that can be saved"
+  },
+  {
+    "section": "clipboardRememberTypeFilter",
+    "label": "Remember Type Filter",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "behavior",
+      "clipboard",
+      "cliphist",
+      "copy",
+      "filter",
+      "history",
+      "keep",
+      "linux",
+      "os",
+      "paste",
+      "remember",
+      "reopening",
+      "system",
+      "type"
+    ],
+    "description": "Keep the clipboard type filter when reopening history"
   },
   {
     "section": "clipboardVisibleEntryActions",
@@ -8972,5 +8995,19 @@
       "wireguard"
     ],
     "icon": "vpn_key"
+  },
+  {
+    "section": "_tab_42",
+    "label": "Battery",
+    "tabIndex": 42,
+    "category": "Settings",
+    "keywords": [
+      "battery",
+      "charge",
+      "charging",
+      "power",
+      "settings"
+    ],
+    "icon": "battery_charging_full"
   }
 ]

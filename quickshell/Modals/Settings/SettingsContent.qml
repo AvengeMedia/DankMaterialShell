@@ -690,7 +690,7 @@ FocusScope {
         Loader {
             id: batteryLoader
             anchors.fill: parent
-            active: root.currentIndex === 37
+            active: root.currentIndex === 42
             visible: active
             focus: active
 

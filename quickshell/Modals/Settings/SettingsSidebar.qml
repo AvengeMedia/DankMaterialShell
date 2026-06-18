@@ -382,7 +382,7 @@ Rectangle {
                     "id": "battery",
                     "text": I18n.tr("Battery"),
                     "icon": "battery_charging_full",
-                    "tabIndex": 37
+                    "tabIndex": 42
                 }
             ]
         },
