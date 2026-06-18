@@ -61,16 +61,46 @@ FocusScope {
         }
     }
 
+    function releaseTextInputFocus() {
+        // Drop text-input focus before hiding the Wayland surface.
+        if (searchField) {
+            searchField.setFocus(false);
+        }
+        if (editorView) {
+            editorView.releaseTextInputFocus();
+        }
+        root.forceActiveFocus();
+    }
+
+    function requestClose(instant) {
+        releaseTextInputFocus();
+        if (instant) {
+            root.instantCloseRequested();
+        } else {
+            root.closeRequested();
+        }
+    }
+
     function hide() {
-        closeRequested();
+        requestClose(false);
     }
 
     function pasteSelected() {
-        ClipboardService.pasteSelected(() => root.instantCloseRequested());
+        const entry = selectedEntry();
+        if (!entry)
+            return;
+        ClipboardService.pasteEntry(entry, () => root.requestClose(true));
     }
 
     function copyEntry(entry) {
-        ClipboardService.copyEntry(entry, () => root.closeRequested());
+        ClipboardService.copyEntry(entry, () => root.requestClose(false));
+    }
+
+    function selectedEntry() {
+        const entries = activeTab === "saved" ? pinnedEntries : unpinnedEntries;
+        if (!entries || entries.length === 0 || selectedIndex < 0 || selectedIndex >= entries.length)
+            return null;
+        return entries[selectedIndex];
     }
 
     function deleteEntry(entry) {
