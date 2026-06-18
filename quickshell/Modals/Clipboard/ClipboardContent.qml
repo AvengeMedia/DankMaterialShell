@@ -19,7 +19,59 @@ Item {
         filterMenuLoader.active = true;
     }
 
+    function showContextMenu(entry, sceneX, sceneY) {
+        const localPos = mapFromItem(null, sceneX, sceneY);
+        contextMenu.show(localPos.x, localPos.y, entry);
+    }
+
+    function contextEntryAtScreen(screenX, screenY) {
+        const host = modal.surfaceHost ?? null;
+        const hostX = host?.alignedX;
+        const hostY = host?.renderedAlignedY ?? host?.alignedY;
+
+        if (!isNaN(hostX) && !isNaN(hostY))
+            return contextEntryAtLocal(screenX - hostX, screenY - hostY);
+
+        const screenRef = host?.effectiveScreen ?? host?.screen ?? modal.Window?.window?.screen ?? null;
+        const globalOrigin = mapToGlobal(0, 0);
+        const screenOriginX = screenRef?.x || 0;
+        const screenOriginY = screenRef?.y || 0;
+        return contextEntryAtLocal(screenOriginX + screenX - globalOrigin.x, screenOriginY + screenY - globalOrigin.y);
+    }
+
+    function contextEntryAtLocal(localX, localY) {
+        const listView = modal.activeTab === "saved" ? savedListView : clipboardListView;
+        const entries = modal.activeTab === "saved" ? modal.pinnedEntries : modal.unpinnedEntries;
+
+        if (!listView.visible || !entries)
+            return null;
+
+        const listPos = mapToItem(listView, localX, localY);
+        if (listPos.x < 0 || listPos.x > listView.width || listPos.y < 0 || listPos.y > listView.height)
+            return null;
+
+        const index = listView.indexAt(listPos.x + listView.contentX, listPos.y + listView.contentY);
+        if (index < 0 || index >= entries.length)
+            return null;
+
+        return {
+            entry: entries[index],
+            x: localX,
+            y: localY
+        };
+    }
+
+    function closeContextMenu() {
+        contextMenu.hide();
+    }
+
     anchors.fill: parent
+
+    ClipboardContextMenu {
+        id: contextMenu
+        modal: clipboardContent.modal
+        parentHandler: clipboardContent
+    }
 
     Column {
         id: headerColumn
@@ -206,6 +258,7 @@ Item {
                 onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
                 onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
+                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
             }
         }
 
@@ -280,6 +333,7 @@ Item {
                 onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
                 onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
+                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
             }
         }
 

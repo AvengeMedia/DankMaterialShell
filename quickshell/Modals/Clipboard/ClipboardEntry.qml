@@ -18,6 +18,7 @@ Rectangle {
     signal pinRequested(var targetEntry)
     signal unpinRequested(var targetEntry)
     signal editRequested
+    signal contextMenuRequested(real mouseX, real mouseY)
 
     readonly property string entryType: modal ? modal.getEntryType(entry) : "text"
     readonly property string entryPreview: modal ? modal.getEntryPreview(entry) : ""
@@ -199,10 +200,22 @@ Rectangle {
         anchors.bottom: parent.bottom
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton
         onPressed: mouse => {
-            const pos = mouseArea.mapToItem(root, mouse.x, mouse.y);
-            rippleLayer.trigger(pos.x, pos.y);
+            if (mouse.button === Qt.LeftButton) {
+                const pos = mouseArea.mapToItem(root, mouse.x, mouse.y);
+                rippleLayer.trigger(pos.x, pos.y);
+            }
         }
         onClicked: copyRequested()
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: mouse => {
+            const scenePos = mapToItem(null, mouse.x, mouse.y);
+            contextMenuRequested(scenePos.x, scenePos.y);
+        }
     }
 }

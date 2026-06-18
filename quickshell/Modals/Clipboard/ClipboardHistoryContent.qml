@@ -8,6 +8,7 @@ FocusScope {
     id: root
 
     property var clearConfirmDialog: null
+    property var surfaceHost: null
 
     property string activeTab: "recents"
     property bool showKeyboardHints: false
@@ -92,6 +93,10 @@ FocusScope {
         ClipboardService.pasteEntry(entry, () => root.requestClose(true));
     }
 
+    function pasteEntry(entry) {
+        ClipboardService.pasteEntry(entry, () => root.requestClose(true));
+    }
+
     function copyEntry(entry) {
         ClipboardService.copyEntry(entry, () => root.requestClose(false));
     }
@@ -159,6 +164,7 @@ FocusScope {
     function resetState() {
         activeImageLoads = 0;
         mode = "history";
+        historyContent.closeContextMenu();
         historyContent.closeFilterMenu();
         activeFilter = SettingsData.clipboardRememberTypeFilter ? SettingsData.clipboardTypeFilter : "all";
         ClipboardService.reset();

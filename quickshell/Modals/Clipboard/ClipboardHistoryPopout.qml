@@ -140,6 +140,7 @@ DankPopout {
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
+            surfaceHost: root
             clearConfirmDialog: clearConfirmDialog
             onCloseRequested: root.hide()
             onInstantCloseRequested: root.hide()
