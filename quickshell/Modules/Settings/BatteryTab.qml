@@ -244,7 +244,7 @@ done
                     settingKey: "batteryNotificationType"
                     text: I18n.tr("Notification Type")
                     description: I18n.tr("Choose how to be notified about battery alerts.")
-                    model: [I18n.tr("Toast Overlay"), I18n.tr("System Notification")]
+                    model: [I18n.tr("Toast"), I18n.tr("Notification")]
                     currentIndex: SettingsData.batteryNotificationType
                     onSelectionChanged: (index, selected) => {
                         if (selected) {
