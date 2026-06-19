@@ -9,7 +9,7 @@ QtObject {
 
     function reset() {
         ClipboardService.selectedIndex = 0;
-        ClipboardService.keyboardNavigationActive = false;
+        ClipboardService.keyboardNavigationActive = true;
         modal.showKeyboardHints = false;
     }
 
@@ -91,11 +91,7 @@ QtObject {
 
         switch (event.key) {
         case Qt.Key_Escape:
-            if (ClipboardService.keyboardNavigationActive) {
-                ClipboardService.keyboardNavigationActive = false;
-            } else {
-                modal.hide();
-            }
+            modal.hide();
             event.accepted = true;
             return;
         case Qt.Key_Down:

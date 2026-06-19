@@ -43,7 +43,7 @@ FocusScope {
             return;
         }
         ClipboardService.selectedIndex = 0;
-        ClipboardService.keyboardNavigationActive = false;
+        ClipboardService.keyboardNavigationActive = true;
     }
     onPinnedCountChanged: {
         if (activeTab === "saved" && pinnedCount === 0) {
@@ -55,7 +55,7 @@ FocusScope {
     onActiveFilterChanged: {
         ClipboardService.activeFilter = activeFilter;
         ClipboardService.selectedIndex = 0;
-        ClipboardService.keyboardNavigationActive = false;
+        ClipboardService.keyboardNavigationActive = true;
         ClipboardService.updateFilteredModel();
         if (SettingsData.clipboardRememberTypeFilter) {
             SettingsData.set("clipboardTypeFilter", activeFilter);

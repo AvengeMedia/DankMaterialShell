@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Widgets
+import qs.Services
 
 Item {
     id: clipboardContent
@@ -116,6 +117,12 @@ Item {
                 onTextChanged: {
                     modal.searchText = text;
                     modal.updateFilteredModel();
+                    ClipboardService.selectedIndex = 0;
+                    ClipboardService.keyboardNavigationActive = true;
+                    Qt.callLater(function () {
+                        clipboardListView.positionViewAtBeginning();
+                        savedListView.positionViewAtBeginning();
+                    });
                 }
 
                 Keys.onEscapePressed: function (event) {
