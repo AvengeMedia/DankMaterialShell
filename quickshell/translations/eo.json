@@ -1,7 +1,7 @@
 [
   {
     "term": "%1 (+%2 more)",
-    "translation": "",
+    "translation": "%1 (+%2 pli)",
     "context": "%1 (+%2 more)",
     "reference": "Modules/Settings/WindowRulesTab.qml:89, Modules/Settings/WindowRulesTab.qml:947",
     "comment": ""
@@ -71,7 +71,7 @@
   },
   {
     "term": "%1 copied",
-    "translation": "",
+    "translation": "%1 kopiita",
     "context": "%1 copied",
     "reference": "Modals/DankColorPickerModal.qml:676",
     "comment": ""
@@ -134,14 +134,14 @@
   },
   {
     "term": "%1 h %2 m left",
-    "translation": "",
+    "translation": "%1 h %2 m restas",
     "context": "%1 h %2 m left",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:39, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:52",
     "comment": ""
   },
   {
     "term": "%1 h left",
-    "translation": "",
+    "translation": "Restas %1 h",
     "context": "%1 h left",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:38, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:51",
     "comment": ""
@@ -169,7 +169,7 @@
   },
   {
     "term": "%1 min left",
-    "translation": "",
+    "translation": "Restas %1 min",
     "context": "%1 min left",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:34, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:47",
     "comment": ""
@@ -183,14 +183,14 @@
   },
   {
     "term": "%1 online",
-    "translation": "",
+    "translation": "%1 interrete",
     "context": "%1 online",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:24",
     "comment": "Number of online Tailscale peers"
   },
   {
     "term": "%1 tasks",
-    "translation": "",
+    "translation": "%1 taskoj",
     "context": "%1 tasks",
     "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:343",
     "comment": "task count next to a date, %1 is the number of tasks"
@@ -260,7 +260,7 @@
   },
   {
     "term": "%command%",
-    "translation": "",
+    "translation": "% komando%",
     "context": "%command%",
     "reference": "Modules/Settings/AutoStartTab.qml:486",
     "comment": ""
@@ -316,7 +316,7 @@
   },
   {
     "term": "1 day before",
-    "translation": "",
+    "translation": "1 tagon antaŭe",
     "context": "1 day before",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
@@ -337,7 +337,7 @@
   },
   {
     "term": "1 hour before",
-    "translation": "",
+    "translation": "1 horon antaŭe",
     "context": "1 hour before",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
@@ -365,14 +365,14 @@
   },
   {
     "term": "1 task",
-    "translation": "",
+    "translation": "1 tasko",
     "context": "1 task",
     "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:343",
     "comment": "task count next to a date"
   },
   {
     "term": "10 min before",
-    "translation": "",
+    "translation": "10 minutojn antaŭe",
     "context": "10 min before",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
@@ -414,14 +414,14 @@
   },
   {
     "term": "15 min",
-    "translation": "",
+    "translation": "15 min",
     "context": "15 min",
     "reference": "Modules/ControlCenter/Details/DoNotDisturbDetail.qml:63",
     "comment": ""
   },
   {
     "term": "15 min before",
-    "translation": "",
+    "translation": "15 min antaŭe",
     "context": "15 min before",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
@@ -554,14 +554,14 @@
   },
   {
     "term": "30 min",
-    "translation": "",
+    "translation": "30 min",
     "context": "30 min",
     "reference": "Modules/ControlCenter/Details/DoNotDisturbDetail.qml:67",
     "comment": ""
   },
   {
     "term": "30 min before",
-    "translation": "",
+    "translation": "30 minutojn antaŭe",
     "context": "30 min before",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
@@ -624,7 +624,7 @@
   },
   {
     "term": "5 min before",
-    "translation": "",
+    "translation": "5 min antaŭe",
     "context": "5 min before",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
@@ -736,21 +736,21 @@
   },
   {
     "term": "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.",
-    "translation": "",
+    "translation": "Aparta minimuma lanĉila ago, kiu funkcias en Memstara, Aparta Kadra Reĝimo kaj Konektita Kadra Reĝimo.",
     "context": "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.",
     "reference": "Modules/Settings/LauncherTab.qml:190",
     "comment": ""
   },
   {
     "term": "A user with that name already exists.",
-    "translation": "",
+    "translation": "Uzanto kun tiu nomo jam ekzistas.",
     "context": "A user with that name already exists.",
     "reference": "Modules/Settings/UsersTab.qml:390",
     "comment": ""
   },
   {
     "term": "AC Adapter (Plugged In)",
-    "translation": "",
+    "translation": "Kurentprovizilo (konektita)",
     "context": "AC Adapter (Plugged In)",
     "reference": "Modules/Settings/BatteryTab.qml:68",
     "comment": ""
@@ -771,7 +771,7 @@
   },
   {
     "term": "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.",
-    "translation": "",
+    "translation": "AUR-helpantoj estas interagaj — vidu la terminalfenestron por invitoj. ",
     "context": "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.",
     "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:432",
     "comment": ""
@@ -841,14 +841,14 @@
   },
   {
     "term": "Action performed when scrolling horizontally on the bar",
-    "translation": "",
+    "translation": "Ago farita dum rulumado horizontale sur la stango",
     "context": "Action performed when scrolling horizontally on the bar",
     "reference": "Modules/Settings/DankBarTab.qml:1789",
     "comment": ""
   },
   {
     "term": "Action performed when scrolling vertically on the bar",
-    "translation": "",
+    "translation": "Ago farita dum rulumado vertikale sur la stango",
     "context": "Action performed when scrolling vertically on the bar",
     "reference": "Modules/Settings/DankBarTab.qml:1749",
     "comment": ""
@@ -904,14 +904,14 @@
   },
   {
     "term": "Active VPN",
-    "translation": "",
+    "translation": "Aktiva VPN",
     "context": "Active VPN",
     "reference": "Services/DMSNetworkService.qml:109",
     "comment": ""
   },
   {
     "term": "Active in Column",
-    "translation": "",
+    "translation": "Aktiva en Kolumno",
     "context": "Active in Column",
     "reference": "Modals/WindowRuleModal.qml:887, Modules/Settings/WindowRulesTab.qml:50",
     "comment": ""
@@ -967,14 +967,14 @@
   },
   {
     "term": "Add \"%1\" to the %2 group?",
-    "translation": "",
+    "translation": "Ĉu aldoni \"%1\" al la grupo %2?",
     "context": "Add \"%1\" to the %2 group?",
     "reference": "Modules/Settings/UsersTab.qml:294",
     "comment": ""
   },
   {
     "term": "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.",
-    "translation": "",
+    "translation": "Ĉu aldoni \"%1\" al la grupo %2? ",
     "context": "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.",
     "reference": "Modules/Settings/UsersTab.qml:266",
     "comment": ""
@@ -995,7 +995,7 @@
   },
   {
     "term": "Add Entry",
-    "translation": "",
+    "translation": "Aldoni elementon",
     "context": "Add Entry",
     "reference": "Modules/Settings/AutoStartTab.qml:348",
     "comment": ""
@@ -1023,14 +1023,14 @@
   },
   {
     "term": "Add Widget to %1",
-    "translation": "",
+    "translation": "Aldoni fenestraĵon al %1",
     "context": "Add Widget to %1",
     "reference": "Modules/Settings/WidgetSelectionPopup.qml:236",
     "comment": ""
   },
   {
     "term": "Add Window Rule",
-    "translation": "",
+    "translation": "Aldoni fenestran regulon",
     "context": "Add Window Rule",
     "reference": "Modules/Settings/WindowRulesTab.qml:424",
     "comment": ""
@@ -1051,7 +1051,7 @@
   },
   {
     "term": "Add a task...",
-    "translation": "",
+    "translation": "Aldoni taskon...",
     "context": "Add a task...",
     "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:1163",
     "comment": "placeholder in the new-task input field"
@@ -1072,49 +1072,49 @@
   },
   {
     "term": "Add location",
-    "translation": "",
+    "translation": "Aldoni lokon",
     "context": "Add location",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:303",
     "comment": ""
   },
   {
     "term": "Add match",
-    "translation": "",
+    "translation": "Aldoni kongruon",
     "context": "Add match",
     "reference": "Modals/WindowRuleModal.qml:835",
     "comment": ""
   },
   {
     "term": "Add notes",
-    "translation": "",
+    "translation": "Aldoni noto-blokon",
     "context": "Add notes",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:313",
     "comment": ""
   },
   {
     "term": "Add the new user to the %1 group so they can run dms greeter sync --profile.",
-    "translation": "",
+    "translation": "Aldonu la novan uzanton al la grupo %1 por ke ili povu ruli dms greeter sync --profile.",
     "context": "Add the new user to the %1 group so they can run dms greeter sync --profile.",
     "reference": "Modules/Settings/UsersTab.qml:467",
     "comment": ""
   },
   {
     "term": "Add the new user to the %1 group so they can use sudo.",
-    "translation": "",
+    "translation": "Aldonu la novan uzanton al la grupo %1 por ke ili povu uzi sudo.",
     "context": "Add the new user to the %1 group so they can use sudo.",
     "reference": "Modules/Settings/UsersTab.qml:458",
     "comment": ""
   },
   {
     "term": "Add to Autostart",
-    "translation": "",
+    "translation": "Aldoni al memlanĉo",
     "context": "Add to Autostart",
     "reference": "Modules/Settings/AutoStartTab.qml:576",
     "comment": ""
   },
   {
     "term": "Adjust the bar height via inner padding",
-    "translation": "",
+    "translation": "Alĝustigu la baran altecon per interna remburaĵo",
     "context": "Adjust the bar height via inner padding",
     "reference": "Modules/Settings/DankBarTab.qml:915",
     "comment": ""
@@ -1142,7 +1142,7 @@
   },
   {
     "term": "Administrator group:",
-    "translation": "",
+    "translation": "Administra grupo:",
     "context": "Administrator group:",
     "reference": "Modules/Settings/UsersTab.qml:102",
     "comment": ""
@@ -1198,21 +1198,21 @@
   },
   {
     "term": "Allow",
-    "translation": "",
+    "translation": "Permesi",
     "context": "Allow",
     "reference": "Modules/Settings/UsersTab.qml:267",
     "comment": ""
   },
   {
     "term": "Allow LAN access",
-    "translation": "",
+    "translation": "Permesu LAN-aliron",
     "context": "Allow LAN access",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:206",
     "comment": "Tailscale allow LAN access toggle"
   },
   {
     "term": "Allow adjusting device volume by scrolling on the right half of items in the device list",
-    "translation": "",
+    "translation": "Permesu ĝustigi aparatan volumon per movo sur la dekstra duono de eroj en la aparatolisto",
     "context": "Allow adjusting device volume by scrolling on the right half of items in the device list",
     "reference": "Modules/Settings/MediaPlayerTab.qml:119",
     "comment": ""
@@ -1226,28 +1226,28 @@
   },
   {
     "term": "Allow greeter access?",
-    "translation": "",
+    "translation": "Ĉu permesi aliro al salutilo?",
     "context": "Allow greeter access?",
     "reference": "Modules/Settings/UsersTab.qml:265",
     "comment": ""
   },
   {
     "term": "Allow greeter login access",
-    "translation": "",
+    "translation": "Permesu salutan aliron",
     "context": "Allow greeter login access",
     "reference": "Modules/Settings/UsersTab.qml:258, Modules/Settings/UsersTab.qml:466",
     "comment": ""
   },
   {
     "term": "Already on that session",
-    "translation": "",
+    "translation": "Jam en tiu sesio",
     "context": "Already on that session",
     "reference": "Services/SessionsService.qml:112, Services/SessionsService.qml:133",
     "comment": ""
   },
   {
     "term": "Also group repeated application icons on the active workspace",
-    "translation": "",
+    "translation": "Ankaŭ grupigu ripetajn aplikajn ikonojn sur la aktiva laborspaco",
     "context": "Also group repeated application icons on the active workspace",
     "reference": "Modules/Settings/WorkspacesTab.qml:134",
     "comment": ""
@@ -1310,7 +1310,7 @@
   },
   {
     "term": "Always use this app for %1",
-    "translation": "",
+    "translation": "Ĉiam uzu ĉi tiun programon por %1",
     "context": "Always use this app for %1",
     "reference": "Modals/AppPickerModal.qml:514",
     "comment": ""
@@ -1345,7 +1345,7 @@
   },
   {
     "term": "Anchor",
-    "translation": "",
+    "translation": "ankro",
     "context": "Anchor",
     "reference": "Modals/WindowRuleModal.qml:1387",
     "comment": ""
@@ -1366,7 +1366,7 @@
   },
   {
     "term": "Animation Style",
-    "translation": "",
+    "translation": "Animacia Stilo",
     "context": "Animation Style",
     "reference": "Modules/Settings/TypographyMotionTab.qml:61",
     "comment": ""
@@ -1387,7 +1387,7 @@
   },
   {
     "term": "Any window",
-    "translation": "",
+    "translation": "Ajna fenestro",
     "context": "Any window",
     "reference": "Modules/Settings/WindowRulesTab.qml:87, Modules/Settings/WindowRulesTab.qml:1043",
     "comment": ""
@@ -1401,14 +1401,14 @@
   },
   {
     "term": "App ID",
-    "translation": "",
+    "translation": "App ID",
     "context": "App ID",
     "reference": "Modules/Settings/WindowRulesTab.qml:45",
     "comment": ""
   },
   {
     "term": "App ID (e.g. firefox)",
-    "translation": "",
+    "translation": "App ID (ekz. Firefox)",
     "context": "App ID (e.g. firefox)",
     "reference": "Modals/WindowRuleModal.qml:711",
     "comment": ""
@@ -1422,7 +1422,7 @@
   },
   {
     "term": "App ID regex",
-    "translation": "",
+    "translation": "Ap ID regex",
     "context": "App ID regex",
     "reference": "Modals/WindowRuleModal.qml:778",
     "comment": ""
@@ -1464,7 +1464,7 @@
   },
   {
     "term": "Application",
-    "translation": "",
+    "translation": "aplikaĵo",
     "context": "Application",
     "reference": "Modules/Settings/AutoStartTab.qml:376",
     "comment": ""
@@ -1485,7 +1485,7 @@
   },
   {
     "term": "Applications and commands to start automatically when you log in",
-    "translation": "",
+    "translation": "Aplikoj kaj komandoj por komenci aŭtomate kiam vi ensalutas",
     "context": "Applications and commands to start automatically when you log in",
     "reference": "Modules/Settings/AutoStartTab.qml:601",
     "comment": ""
@@ -1499,7 +1499,7 @@
   },
   {
     "term": "Apply Flatpak updates alongside system updates when running 'Update All'.",
-    "translation": "",
+    "translation": "Apliki Flatpak-ĝisdatigojn kune kun sistemaj ĝisdatigoj kiam vi ruliĝas 'Ĝisdatigu Ĉion'.",
     "context": "Apply Flatpak updates alongside system updates when running 'Update All'.",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:105",
     "comment": ""
@@ -1520,21 +1520,21 @@
   },
   {
     "term": "Apply compositor blur behind the frame border",
-    "translation": "",
+    "translation": "Apliki kompostan malklaraĵon malantaŭ la kadra rando",
     "context": "Apply compositor blur behind the frame border",
     "reference": "Modules/Settings/FrameTab.qml:166",
     "comment": ""
   },
   {
     "term": "Apply inverse concave corner cutouts to the bar",
-    "translation": "",
+    "translation": "Apliki inversajn konkavajn angulojn eltranĉaĵojn al la stango",
     "context": "Apply inverse concave corner cutouts to the bar",
     "reference": "Modules/Settings/DankBarTab.qml:1145",
     "comment": ""
   },
   {
     "term": "Apply to Hardware",
-    "translation": "",
+    "translation": "Apliki al Aparataro",
     "context": "Apply to Hardware",
     "reference": "Modules/Settings/BatteryTab.qml:199",
     "comment": ""
@@ -1555,7 +1555,7 @@
   },
   {
     "term": "Applying auto-login on startup...",
-    "translation": "",
+    "translation": "Aplikanta aŭtomatan ensaluto ĉe ekfunkciigo...",
     "context": "Applying auto-login on startup...",
     "reference": "Common/settings/Processes.qml:573",
     "comment": ""
@@ -1611,7 +1611,7 @@
   },
   {
     "term": "Arc Extender",
-    "translation": "",
+    "translation": "Arko-Etendilo",
     "context": "Arc Extender",
     "reference": "Modules/Settings/FrameTab.qml:331",
     "comment": ""
@@ -1639,21 +1639,21 @@
   },
   {
     "term": "At Startup",
-    "translation": "",
+    "translation": "Ĉe Ekfunkciigo",
     "context": "At Startup",
     "reference": "Modals/WindowRuleModal.qml:902, Modules/Settings/WindowRulesTab.qml:53",
     "comment": ""
   },
   {
     "term": "At least one output must remain enabled",
-    "translation": "",
+    "translation": "Almenaŭ unu eligo devas resti ebligita",
     "context": "At least one output must remain enabled",
     "reference": "Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:82, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:70",
     "comment": ""
   },
   {
     "term": "At start",
-    "translation": "",
+    "translation": "Komence",
     "context": "At start",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
@@ -1870,7 +1870,7 @@
   },
   {
     "term": "Auto Compositor Gaps",
-    "translation": "",
+    "translation": "Aŭtomata Komponisto Interspacoj",
     "context": "Auto Compositor Gaps",
     "reference": "Modules/Notepad/NotepadSettings.qml:449",
     "comment": ""
@@ -1884,7 +1884,7 @@
   },
   {
     "term": "Auto Overflow",
-    "translation": "",
+    "translation": "Aŭtomata Superfluo",
     "context": "Auto Overflow",
     "reference": "Modules/Settings/WidgetsTabSection.qml:1204",
     "comment": ""
@@ -1898,21 +1898,21 @@
   },
   {
     "term": "Auto Power Saver",
-    "translation": "",
+    "translation": "Aŭtomata Energio-Ŝparo",
     "context": "Auto Power Saver",
     "reference": "Modules/Settings/BatteryTab.qml:258",
     "comment": ""
   },
   {
     "term": "Auto mode is on. Manual profile selection is disabled.",
-    "translation": "",
+    "translation": "Aŭtomata reĝimo estas ŝaltita. ",
     "context": "Auto mode is on. Manual profile selection is disabled.",
     "reference": "Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:139",
     "comment": ""
   },
   {
     "term": "Auto saved",
-    "translation": "",
+    "translation": "Aŭtomate konservita",
     "context": "Auto saved",
     "reference": "Modules/Notepad/NotepadTextEditor.qml:1041",
     "comment": ""
@@ -1961,35 +1961,35 @@
   },
   {
     "term": "Auto-login",
-    "translation": "",
+    "translation": "Aŭtomata ensaluto",
     "context": "Auto-login",
     "reference": "Modules/Greetd/GreeterContent.qml:1512",
     "comment": ""
   },
   {
     "term": "Auto-login disabled",
-    "translation": "",
+    "translation": "Aŭtomata ensaluto malŝaltita",
     "context": "Auto-login disabled",
     "reference": "Common/settings/Processes.qml:376",
     "comment": ""
   },
   {
     "term": "Auto-login enabled",
-    "translation": "",
+    "translation": "Aŭtomata ensaluto ebligita",
     "context": "Auto-login enabled",
     "reference": "Common/settings/Processes.qml:374",
     "comment": ""
   },
   {
     "term": "Auto-login on startup",
-    "translation": "",
+    "translation": "Aŭtomata ensaluto ĉe ekfunkciigo",
     "context": "Auto-login on startup",
     "reference": "Modules/Settings/GreeterTab.qml:750",
     "comment": ""
   },
   {
     "term": "Auto-save to disk",
-    "translation": "",
+    "translation": "Aŭtomate konservu al disko",
     "context": "Auto-save to disk",
     "reference": "Modules/Notepad/NotepadSettings.qml:173",
     "comment": ""
@@ -2045,7 +2045,7 @@
   },
   {
     "term": "Automatically calculate popup gap based on bar spacing",
-    "translation": "",
+    "translation": "Aŭtomate kalkulu ŝprucfenestron surbaze de trinkinterspaco",
     "context": "Automatically calculate popup gap based on bar spacing",
     "reference": "Modules/Settings/DankBarTab.qml:968",
     "comment": ""
@@ -2080,7 +2080,7 @@
   },
   {
     "term": "Automatically hide the bar when the pointer moves away",
-    "translation": "",
+    "translation": "Aŭtomate kaŝu la stangon kiam la montrilo malproksimiĝas",
     "context": "Automatically hide the bar when the pointer moves away",
     "reference": "Modules/Settings/DankBarTab.qml:646",
     "comment": ""
@@ -2108,14 +2108,14 @@
   },
   {
     "term": "Automatically save changes to opened files as you type",
-    "translation": "",
+    "translation": "Aŭtomate konservu ŝanĝojn al malfermitaj dosieroj dum vi tajpas",
     "context": "Automatically save changes to opened files as you type",
     "reference": "Modules/Notepad/NotepadSettings.qml:174",
     "comment": ""
   },
   {
     "term": "Automatically turn on Power Saver profile when battery is low.",
-    "translation": "",
+    "translation": "Aŭtomate ŝaltu la profilon de Power Saver kiam la kuirilaro estas malalta.",
     "context": "Automatically turn on Power Saver profile when battery is low.",
     "reference": "Modules/Settings/BatteryTab.qml:259",
     "comment": ""
@@ -2129,14 +2129,14 @@
   },
   {
     "term": "Autostart Apps",
-    "translation": "",
+    "translation": "Memlanĉaj aplikaĵoj",
     "context": "Autostart Apps",
     "reference": "Modals/Settings/SettingsSidebar.qml:290",
     "comment": ""
   },
   {
     "term": "Autostart Entries",
-    "translation": "",
+    "translation": "Aŭtostartaj Enskriboj",
     "context": "Autostart Entries",
     "reference": "Modules/Settings/AutoStartTab.qml:590",
     "comment": ""
@@ -2199,7 +2199,7 @@
   },
   {
     "term": "Back to user list",
-    "translation": "",
+    "translation": "Reen al listo de uzantoj",
     "context": "Back to user list",
     "reference": "Modules/Greetd/GreeterContent.qml:1343",
     "comment": "greeter link to return from manual username entry to user picker"
@@ -2213,7 +2213,7 @@
   },
   {
     "term": "Backends: %1",
-    "translation": "",
+    "translation": "Backends: %1",
     "context": "Backends: %1",
     "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:175",
     "comment": ""
@@ -2234,7 +2234,7 @@
   },
   {
     "term": "Background Effect",
-    "translation": "",
+    "translation": "Fona Efekto",
     "context": "Background Effect",
     "reference": "Modals/WindowRuleModal.qml:1228",
     "comment": ""
@@ -2290,14 +2290,14 @@
   },
   {
     "term": "Bar",
-    "translation": "",
+    "translation": "breto",
     "context": "Bar",
     "reference": "Modules/Settings/DankBarTab.qml:44",
     "comment": "fallback name for an unnamed bar"
   },
   {
     "term": "Bar %1",
-    "translation": "",
+    "translation": "Trinkejo %1",
     "context": "Bar %1",
     "reference": "Modules/Settings/DankBarTab.qml:45, Modules/Settings/DankBarTab.qml:245",
     "comment": "numbered name for an unnamed bar, %1 is its position"
@@ -2311,7 +2311,7 @@
   },
   {
     "term": "Bar Opacity",
-    "translation": "",
+    "translation": "Opakeco de breto",
     "context": "Bar Opacity",
     "reference": "Modules/Settings/DankBarTab.qml:809, Modules/Settings/DankBarTab.qml:856",
     "comment": ""
@@ -2325,14 +2325,14 @@
   },
   {
     "term": "Bar corners and background",
-    "translation": "",
+    "translation": "Trinkejo anguloj kaj fono",
     "context": "Bar corners and background",
     "reference": "Modules/Settings/DankBarTab.qml:1085",
     "comment": ""
   },
   {
     "term": "Bar shadow, border, and corners",
-    "translation": "",
+    "translation": "Barombro, limo kaj anguloj",
     "context": "Bar shadow, border, and corners",
     "reference": "Modules/Settings/DankBarTab.qml:1497",
     "comment": ""
@@ -2374,28 +2374,28 @@
   },
   {
     "term": "Battery Health",
-    "translation": "",
+    "translation": "Bateria sano",
     "context": "Battery Health",
     "reference": "Modules/Settings/BatteryTab.qml:158",
     "comment": ""
   },
   {
     "term": "Battery Power",
-    "translation": "",
+    "translation": "Bateria elektro",
     "context": "Battery Power",
     "reference": "Modules/Settings/BatteryTab.qml:68",
     "comment": ""
   },
   {
     "term": "Battery Protection & Charging",
-    "translation": "",
+    "translation": "Bateria Protekto kaj Ŝargado",
     "context": "Battery Protection & Charging",
     "reference": "Modules/Settings/BatteryTab.qml:178",
     "comment": ""
   },
   {
     "term": "Battery Status",
-    "translation": "",
+    "translation": "Bateria stato",
     "context": "Battery Status",
     "reference": "Modules/Settings/BatteryTab.qml:52",
     "comment": ""
@@ -2409,21 +2409,21 @@
   },
   {
     "term": "Battery has charged to your set limit of %1%",
-    "translation": "",
+    "translation": "Baterio ŝargis ĝis via fiksita limo de %1%",
     "context": "Battery has charged to your set limit of %1%",
     "reference": "Services/BatteryService.qml:128",
     "comment": ""
   },
   {
     "term": "Battery is at %1% - Connect charger immediately!",
-    "translation": "",
+    "translation": "Baterio estas ĉe %1% - Konektu ŝargilon tuj!",
     "context": "Battery is at %1% - Connect charger immediately!",
     "reference": "Services/BatteryService.qml:144",
     "comment": ""
   },
   {
     "term": "Battery is at %1% - Consider charging soon",
-    "translation": "",
+    "translation": "Baterio estas je %1% - Konsideru ŝargi baldaŭ",
     "context": "Battery is at %1% - Consider charging soon",
     "reference": "Services/BatteryService.qml:157",
     "comment": ""
@@ -2437,7 +2437,7 @@
   },
   {
     "term": "Battery percentage to trigger a critical alert.",
-    "translation": "",
+    "translation": "Bateria procento por ekigi kritikan alarmon.",
     "context": "Battery percentage to trigger a critical alert.",
     "reference": "Modules/Settings/BatteryTab.qml:282",
     "comment": ""
@@ -2458,14 +2458,14 @@
   },
   {
     "term": "Bind the spotlight IPC action in your compositor config.",
-    "translation": "",
+    "translation": "Ligu la spotlight IPC-agon en via kompostista agordo.",
     "context": "Bind the spotlight IPC action in your compositor config.",
     "reference": "Modules/Settings/LauncherTab.qml:142",
     "comment": ""
   },
   {
     "term": "Bind the spotlight-bar IPC action in your compositor config.",
-    "translation": "",
+    "translation": "Ligu la agadon de spotlight-bar IPC en via kompostista agordo.",
     "context": "Bind the spotlight-bar IPC action in your compositor config.",
     "reference": "Modules/Settings/LauncherTab.qml:236",
     "comment": ""
@@ -2493,14 +2493,14 @@
   },
   {
     "term": "Black",
-    "translation": "",
+    "translation": "Nigra",
     "context": "Black",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:274, Modules/Settings/TypographyMotionTab.qml:306",
     "comment": "font weight"
   },
   {
     "term": "Blend between Surface High and the selected custom color",
-    "translation": "",
+    "translation": "Miksu inter Surface High kaj la elektita kutima koloro",
     "context": "Blend between Surface High and the selected custom color",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1587",
     "comment": ""
@@ -2563,7 +2563,7 @@
   },
   {
     "term": "Blur",
-    "translation": "",
+    "translation": "Malklarigo",
     "context": "Blur",
     "reference": "Modals/WindowRuleModal.qml:1248, Modules/Settings/WindowRulesTab.qml:130",
     "comment": ""
@@ -2598,7 +2598,7 @@
   },
   {
     "term": "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.",
-    "translation": "",
+    "translation": "Malklarigu la fonon malantaŭ kradoj, popouts, modaloj kaj sciigoj. ",
     "context": "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1728",
     "comment": ""
@@ -2619,14 +2619,14 @@
   },
   {
     "term": "Body Font Size",
-    "translation": "",
+    "translation": "Teksta tipara grando",
     "context": "Body Font Size",
     "reference": "Modules/Settings/NotificationsTab.qml:227",
     "comment": ""
   },
   {
     "term": "Bold",
-    "translation": "",
+    "translation": "Grasa",
     "context": "Bold",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:270, Modules/Settings/TypographyMotionTab.qml:300",
     "comment": "font weight"
@@ -2647,7 +2647,7 @@
   },
   {
     "term": "Border Off",
-    "translation": "",
+    "translation": "Border Off",
     "context": "Border Off",
     "reference": "Modules/Settings/WindowRulesTab.qml:140",
     "comment": ""
@@ -2661,7 +2661,7 @@
   },
   {
     "term": "Border Radius",
-    "translation": "",
+    "translation": "Angula radiuso",
     "context": "Border Radius",
     "reference": "Modules/Settings/FrameTab.qml:85",
     "comment": ""
@@ -2682,7 +2682,7 @@
   },
   {
     "term": "Border Width",
-    "translation": "",
+    "translation": "Borda larĝo",
     "context": "Border Width",
     "reference": "Modules/Settings/FrameTab.qml:105",
     "comment": ""
@@ -2696,14 +2696,14 @@
   },
   {
     "term": "Border w/ Bg",
-    "translation": "",
+    "translation": "Limo kun Bg",
     "context": "Border w/ Bg",
     "reference": "Modules/Settings/WindowRulesTab.qml:129",
     "comment": ""
   },
   {
     "term": "Border with Background",
-    "translation": "",
+    "translation": "Limo kun Fono",
     "context": "Border with Background",
     "reference": "Modals/WindowRuleModal.qml:1127",
     "comment": ""
@@ -2892,14 +2892,14 @@
   },
   {
     "term": "Calendar",
-    "translation": "",
+    "translation": "kalendaro",
     "context": "Calendar",
     "reference": "Modules/Settings/DefaultAppsTab.qml:302, Modules/DankDash/Overview/CalendarEventEditor.qml:273",
     "comment": "Calendar"
   },
   {
     "term": "Calendar Backend",
-    "translation": "",
+    "translation": "Kalendaro Backend",
     "context": "Calendar Backend",
     "reference": "Modules/Settings/TimeWeatherTab.qml:122",
     "comment": ""
@@ -2934,28 +2934,28 @@
   },
   {
     "term": "Cannot delete the only administrator",
-    "translation": "",
+    "translation": "Ne povas forigi la solan administranton",
     "context": "Cannot delete the only administrator",
     "reference": "Services/UsersService.qml:159, Modules/Settings/UsersTab.qml:314",
     "comment": ""
   },
   {
     "term": "Cannot disable the only output",
-    "translation": "",
+    "translation": "Ne povas malŝalti la nuran eligon",
     "context": "Cannot disable the only output",
     "reference": "Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:82, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:70",
     "comment": ""
   },
   {
     "term": "Cannot open trash: '%1' is not installed",
-    "translation": "",
+    "translation": "Ne povas malfermi rubujon: '%1' ne estas instalita",
     "context": "Cannot open trash: '%1' is not installed",
     "reference": "Services/TrashService.qml:98",
     "comment": ""
   },
   {
     "term": "Cannot open trash: no custom command set",
-    "translation": "",
+    "translation": "Ne povas malfermi rubujon: neniu kutima komando aro",
     "context": "Cannot open trash: no custom command set",
     "reference": "Services/TrashService.qml:107",
     "comment": ""
@@ -2969,7 +2969,7 @@
   },
   {
     "term": "Cannot remove the only administrator",
-    "translation": "",
+    "translation": "Ne povas forigi la solan administranton",
     "context": "Cannot remove the only administrator",
     "reference": "Services/UsersService.qml:173, Modules/Settings/UsersTab.qml:286",
     "comment": ""
@@ -3011,14 +3011,14 @@
   },
   {
     "term": "Cast Target",
-    "translation": "",
+    "translation": "Rolantaro Celo",
     "context": "Cast Target",
     "reference": "Modals/WindowRuleModal.qml:892, Modules/Settings/WindowRulesTab.qml:51",
     "comment": ""
   },
   {
     "term": "Category",
-    "translation": "",
+    "translation": "kategorio",
     "context": "Category",
     "reference": "Modules/Settings/PluginBrowser.qml:58",
     "comment": "plugin browser sort option"
@@ -3088,21 +3088,21 @@
   },
   {
     "term": "Charge Level",
-    "translation": "",
+    "translation": "Ŝarga Nivelo",
     "context": "Charge Level",
     "reference": "Modules/Settings/BatteryTab.qml:86",
     "comment": ""
   },
   {
     "term": "Charge Limit Reached",
-    "translation": "",
+    "translation": "Ŝarĝlimo Atingita",
     "context": "Charge Limit Reached",
     "reference": "Services/BatteryService.qml:128",
     "comment": ""
   },
   {
     "term": "Charge limit applied successfully",
-    "translation": "",
+    "translation": "Ŝarĝlimo sukcese aplikita",
     "context": "Charge limit applied successfully",
     "reference": "Modules/Settings/BatteryTab.qml:30",
     "comment": ""
@@ -3123,28 +3123,28 @@
   },
   {
     "term": "Check interval",
-    "translation": "",
+    "translation": "Kontrolu intervalon",
     "context": "Check interval",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:85",
     "comment": ""
   },
   {
     "term": "Check on startup",
-    "translation": "",
+    "translation": "Kontrolu dum ekfunkciigo",
     "context": "Check on startup",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:97",
     "comment": ""
   },
   {
     "term": "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.",
-    "translation": "",
+    "translation": "Kontrolu sinkronigan staton laŭpeto. ",
     "context": "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.",
     "reference": "Modules/Settings/GreeterTab.qml:449",
     "comment": ""
   },
   {
     "term": "Check your custom command in Settings → Dock → Trash.",
-    "translation": "",
+    "translation": "Kontrolu vian kutiman komandon en Agordoj → Doko → Rubujo.",
     "context": "Check your custom command in Settings → Dock → Trash.",
     "reference": "Services/TrashService.qml:112",
     "comment": ""
@@ -3221,7 +3221,7 @@
   },
   {
     "term": "Choose a power profile",
-    "translation": "",
+    "translation": "Elektu potencoprofilon",
     "context": "Choose a power profile",
     "reference": "Modals/PowerProfileModal.qml:138",
     "comment": ""
@@ -3242,7 +3242,7 @@
   },
   {
     "term": "Choose how to be notified about battery alerts.",
-    "translation": "",
+    "translation": "Elektu kiel esti sciigita pri bateriaj alarmoj.",
     "context": "Choose how to be notified about battery alerts.",
     "reference": "Modules/Settings/BatteryTab.qml:246",
     "comment": ""
@@ -3256,14 +3256,14 @@
   },
   {
     "term": "Choose monochrome or a theme color tint for system tray icons",
-    "translation": "",
+    "translation": "Elektu monokroman aŭ teman kolornuancon por sistempletaj ikonoj",
     "context": "Choose monochrome or a theme color tint for system tray icons",
     "reference": "Modules/Settings/DankBarTab.qml:1212",
     "comment": ""
   },
   {
     "term": "Choose neutral or accent-colored widget text",
-    "translation": "",
+    "translation": "Elektu neŭtralan aŭ akcentkoloran fenestraĵtekston",
     "context": "Choose neutral or accent-colored widget text",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1555",
     "comment": ""
@@ -3305,14 +3305,14 @@
   },
   {
     "term": "Choose whether to launch a desktop app or a command",
-    "translation": "",
+    "translation": "Elektu ĉu lanĉi labortablan apon aŭ komandon",
     "context": "Choose whether to launch a desktop app or a command",
     "reference": "Modules/Settings/AutoStartTab.qml:353",
     "comment": ""
   },
   {
     "term": "Choose which action buttons appear on clipboard entries",
-    "translation": "",
+    "translation": "Elektu kiuj agbutonoj aperas sur tondujo enskriboj",
     "context": "Choose which action buttons appear on clipboard entries",
     "reference": "Modules/Settings/ClipboardTab.qml:482",
     "comment": ""
@@ -3347,7 +3347,7 @@
   },
   {
     "term": "Class regex",
-    "translation": "",
+    "translation": "Klaso regex",
     "context": "Class regex",
     "reference": "Modals/WindowRuleModal.qml:778",
     "comment": ""
@@ -3515,7 +3515,7 @@
   },
   {
     "term": "Clipboard Saved",
-    "translation": "",
+    "translation": "Tondujo Konservita",
     "context": "Clipboard Saved",
     "reference": "Modals/Clipboard/ClipboardHeader.qml:35",
     "comment": ""
@@ -3578,7 +3578,7 @@
   },
   {
     "term": "Color %1 copied",
-    "translation": "",
+    "translation": "Koloro %1 kopiita",
     "context": "Color %1 copied",
     "reference": "Modals/DankColorPickerModal.qml:70",
     "comment": ""
@@ -3725,7 +3725,7 @@
   },
   {
     "term": "Command Line",
-    "translation": "",
+    "translation": "komanda linio",
     "context": "Command Line",
     "reference": "Modules/Settings/AutoStartTab.qml:354, Modules/Settings/AutoStartTab.qml:355",
     "comment": ""
@@ -3865,7 +3865,7 @@
   },
   {
     "term": "Configure one in Settings → Dock → Trash.",
-    "translation": "",
+    "translation": "Agordu unu en Agordoj → Doko → Rubujo.",
     "context": "Configure one in Settings → Dock → Trash.",
     "reference": "Services/TrashService.qml:107",
     "comment": ""
@@ -3914,7 +3914,7 @@
   },
   {
     "term": "Confirm password",
-    "translation": "",
+    "translation": "Konfirmi pasvorton",
     "context": "Confirm password",
     "reference": "Modules/Settings/UsersTab.qml:425",
     "comment": ""
@@ -3977,21 +3977,21 @@
   },
   {
     "term": "Connected Frame Mode uses the connected launcher for default launcher shortcuts.",
-    "translation": "",
+    "translation": "Konektita Kadra Reĝimo uzas la konektitan lanĉilon por defaŭltaj lanĉilaj ŝparvojoj.",
     "context": "Connected Frame Mode uses the connected launcher for default launcher shortcuts.",
     "reference": "Modules/Settings/LauncherTab.qml:76",
     "comment": ""
   },
   {
     "term": "Connected Options",
-    "translation": "",
+    "translation": "Konektitaj Opcioj",
     "context": "Connected Options",
     "reference": "Modules/Settings/FrameTab.qml:299",
     "comment": ""
   },
   {
     "term": "Connected to %1",
-    "translation": "",
+    "translation": "Konektita al %1",
     "context": "Connected to %1",
     "reference": "Services/DMSNetworkService.qml:384, Services/LegacyNetworkService.qml:334",
     "comment": ""
@@ -4047,7 +4047,7 @@
   },
   {
     "term": "Contributor",
-    "translation": "",
+    "translation": "kontribuanto",
     "context": "Contributor",
     "reference": "Modules/Settings/PluginBrowser.qml:53",
     "comment": "plugin browser sort option"
@@ -4103,63 +4103,63 @@
   },
   {
     "term": "Controls how much original icon color is removed before applying tint",
-    "translation": "",
+    "translation": "Kontrolas kiom da originala ikonokoloro estas forigita antaŭ apliki nuancon",
     "context": "Controls how much original icon color is removed before applying tint",
     "reference": "Modules/Settings/DankBarTab.qml:1260",
     "comment": ""
   },
   {
     "term": "Controls how strongly the selected tint color is applied",
-    "translation": "",
+    "translation": "Kontrolas kiom forte aplikas la elektita nuanca koloro",
     "context": "Controls how strongly the selected tint color is applied",
     "reference": "Modules/Settings/DankBarTab.qml:1283",
     "comment": ""
   },
   {
     "term": "Controls opacity of shell surfaces, popouts, and modals",
-    "translation": "",
+    "translation": "Kontrolas opakecon de ŝelsurfacoj, popouts, kaj modaloj",
     "context": "Controls opacity of shell surfaces, popouts, and modals",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1691",
     "comment": ""
   },
   {
     "term": "Controls opacity of the bar background",
-    "translation": "",
+    "translation": "Kontrolas opakecon de la stangofono",
     "context": "Controls opacity of the bar background",
     "reference": "Modules/Settings/DankBarTab.qml:810",
     "comment": ""
   },
   {
     "term": "Controls opacity of the border",
-    "translation": "",
+    "translation": "Kontrolas opakecon de la limo",
     "context": "Controls opacity of the border",
     "reference": "Modules/Settings/DankBarTab.qml:1355",
     "comment": ""
   },
   {
     "term": "Controls opacity of the shadow layer",
-    "translation": "",
+    "translation": "Kontrolas opakecon de la ombrotavolo",
     "context": "Controls opacity of the shadow layer",
     "reference": "Modules/Settings/DankBarTab.qml:1559",
     "comment": ""
   },
   {
     "term": "Controls opacity of the widget outline",
-    "translation": "",
+    "translation": "Kontrolas opakecon de la fenestraĵo",
     "context": "Controls opacity of the widget outline",
     "reference": "Modules/Settings/DankBarTab.qml:1450",
     "comment": ""
   },
   {
     "term": "Controls opacity of widget backgrounds",
-    "translation": "",
+    "translation": "Kontrolas opakecon de fenestraĵfonoj",
     "context": "Controls opacity of widget backgrounds",
     "reference": "Modules/Settings/DankBarTab.qml:833",
     "comment": ""
   },
   {
     "term": "Controls outlines around blurred foreground cards, pills, and notification cards",
-    "translation": "",
+    "translation": "Kontrolas konturojn ĉirkaŭ neklaraj malklaraj kartoj, piloloj kaj sciigaj kartoj",
     "context": "Controls outlines around blurred foreground cards, pills, and notification cards",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1751",
     "comment": ""
@@ -4180,14 +4180,14 @@
   },
   {
     "term": "Controls the opacity of the shadow",
-    "translation": "",
+    "translation": "Kontrolas la opakecon de la ombro",
     "context": "Controls the opacity of the shadow",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1852",
     "comment": ""
   },
   {
     "term": "Controls the outer edge of protocol-blurred windows",
-    "translation": "",
+    "translation": "Kontrolas la eksteran randon de protokol-malklaraj fenestroj",
     "context": "Controls the outer edge of protocol-blurred windows",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1804",
     "comment": ""
@@ -4201,7 +4201,7 @@
   },
   {
     "term": "Convert to DMS",
-    "translation": "",
+    "translation": "Konverti al DMS",
     "context": "Convert to DMS",
     "reference": "Modules/Settings/WindowRulesTab.qml:1011",
     "comment": ""
@@ -4299,7 +4299,7 @@
   },
   {
     "term": "Couldn't open a terminal for the auto-login update.",
-    "translation": "",
+    "translation": "Ne eblis malfermi terminalon por la aŭtomata ensaluta ĝisdatigo.",
     "context": "Couldn't open a terminal for the auto-login update.",
     "reference": "Common/settings/Processes.qml:595",
     "comment": ""
@@ -4341,7 +4341,7 @@
   },
   {
     "term": "Create User",
-    "translation": "",
+    "translation": "Krei Uzanton",
     "context": "Create User",
     "reference": "Modules/Settings/UsersTab.qml:349, Modules/Settings/UsersTab.qml:477",
     "comment": ""
@@ -4376,7 +4376,7 @@
   },
   {
     "term": "Created plugin directory: %1",
-    "translation": "",
+    "translation": "Kreita aldonaĵa dosierujo: %1",
     "context": "Created plugin directory: %1",
     "reference": "Modules/Settings/PluginsTab.qml:260",
     "comment": ""
@@ -4390,21 +4390,21 @@
   },
   {
     "term": "Critical Battery",
-    "translation": "",
+    "translation": "Kritika Baterio",
     "context": "Critical Battery",
     "reference": "Services/BatteryService.qml:144",
     "comment": ""
   },
   {
     "term": "Critical Battery Alert",
-    "translation": "",
+    "translation": "Kritika Bateria Averto",
     "context": "Critical Battery Alert",
     "reference": "Modules/Settings/BatteryTab.qml:272",
     "comment": ""
   },
   {
     "term": "Critical Battery Notifications",
-    "translation": "",
+    "translation": "Kritikaj Bateria Sciigoj",
     "context": "Critical Battery Notifications",
     "reference": "Modules/Settings/BatteryTab.qml:292",
     "comment": ""
@@ -4418,42 +4418,42 @@
   },
   {
     "term": "Critical Threshold",
-    "translation": "",
+    "translation": "Kritika sojlo",
     "context": "Critical Threshold",
     "reference": "Modules/Settings/BatteryTab.qml:281",
     "comment": ""
   },
   {
     "term": "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close",
-    "translation": "",
+    "translation": "Ctrl+A: Elektu ĉion • Ctrl+P: Antaŭrigardo • Enigu/Shift+Enigu: Trovu Sekvan/Antaŭan • Esc: Fermi",
     "context": "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close",
     "reference": "Modules/Notepad/NotepadSettings.qml:553",
     "comment": ""
   },
   {
     "term": "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find",
-    "translation": "",
+    "translation": "Ctrl+S: Konservi • Ctrl+O: Malfermi • Ctrl+N: Nova • Ctrl+F: Trovi",
     "context": "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find",
     "reference": "Modules/Notepad/NotepadSettings.qml:544",
     "comment": ""
   },
   {
     "term": "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close",
-    "translation": "",
+    "translation": "Ctrl+Tab: Ŝaltilo Tab • Ctrl+S: Alpingli/Malfiksi • Shift+Del: Forviŝi ĉion • Esc: Fermi",
     "context": "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:12",
     "comment": ""
   },
   {
     "term": "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close",
-    "translation": "",
+    "translation": "Ctrl+Tab: Ŝalti langetojn • Ctrl+S: Alpingli/Malfiksi • Maj+Enigi: Kopiu • Maj+Del: Forviŝi ĉiujn • F10: Helpo • Esc: Fermi",
     "context": "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:13",
     "comment": "Keyboard hints when enter-to-paste is enabled"
   },
   {
     "term": "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close",
-    "translation": "",
+    "translation": "Ctrl+Tab: Ŝalti langetojn • Ctrl+S: Alpingli/Malfiksi • Maj+Enigi: Alglui • Maj+Del: Forviŝi ĉion • F10: Helpo • Esc: Fermi",
     "context": "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:13",
     "comment": ""
@@ -4579,14 +4579,14 @@
   },
   {
     "term": "Curve",
-    "translation": "",
+    "translation": "kurbo",
     "context": "Curve",
     "reference": "Modules/Settings/TypographyMotionTab.qml:350",
     "comment": ""
   },
   {
     "term": "Curve: curve rasterizer.",
-    "translation": "",
+    "translation": "Kurbo: kurba rasterigilo.",
     "context": "Curve: curve rasterizer.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:421",
     "comment": ""
@@ -4600,7 +4600,7 @@
   },
   {
     "term": "Custom Blend",
-    "translation": "",
+    "translation": "Propra Miksaĵo",
     "context": "Custom Blend",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1586",
     "comment": ""
@@ -4698,14 +4698,14 @@
   },
   {
     "term": "Custom command and terminal params are split on whitespace; paths with spaces will break.",
-    "translation": "",
+    "translation": "Propra komando kaj finaj parametroj estas dividitaj sur blankspaco; ",
     "context": "Custom command and terminal params are split on whitespace; paths with spaces will break.",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:156",
     "comment": ""
   },
   {
     "term": "Custom open-trash command",
-    "translation": "",
+    "translation": "Propra malferma-rubo-komando",
     "context": "Custom open-trash command",
     "reference": "Modules/Settings/DockTab.qml:563",
     "comment": ""
@@ -4726,7 +4726,7 @@
   },
   {
     "term": "Custom update command",
-    "translation": "",
+    "translation": "Propra ĝisdatiga komando",
     "context": "Custom update command",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:176",
     "comment": ""
@@ -4775,7 +4775,7 @@
   },
   {
     "term": "DMS Chooser",
-    "translation": "",
+    "translation": "DMS Elektilo",
     "context": "DMS Chooser",
     "reference": "Modules/Settings/DefaultAppsTab.qml:86",
     "comment": ""
@@ -4789,14 +4789,14 @@
   },
   {
     "term": "DMS Settings",
-    "translation": "",
+    "translation": "DMS-agordoj",
     "context": "DMS Settings",
     "reference": "Services/AppSearchService.qml:217",
     "comment": ""
   },
   {
     "term": "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.",
-    "translation": "",
+    "translation": "DMS Agordoj skribas Lua klavbindojn. ",
     "context": "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.",
     "reference": "Services/KeybindsService.qml:544",
     "comment": ""
@@ -4817,7 +4817,7 @@
   },
   {
     "term": "DMS needs administrator access. The terminal closes automatically when done.",
-    "translation": "",
+    "translation": "DMS bezonas aliron de administranto. ",
     "context": "DMS needs administrator access. The terminal closes automatically when done.",
     "reference": "Common/settings/Processes.qml:364",
     "comment": ""
@@ -4831,7 +4831,7 @@
   },
   {
     "term": "DMS server is outdated (API v%1, expected v%2)",
-    "translation": "",
+    "translation": "DMS-servilo estas malaktuala (API v%1, atendata v%2)",
     "context": "DMS server is outdated (API v%1, expected v%2)",
     "reference": "Services/DMSService.qml:342",
     "comment": ""
@@ -4894,21 +4894,21 @@
   },
   {
     "term": "DankCalendar",
-    "translation": "",
+    "translation": "DankCalendar",
     "context": "DankCalendar",
     "reference": "Modules/Settings/TimeWeatherTab.qml:135",
     "comment": "calendar backend option"
   },
   {
     "term": "DankCalendar isn't installed",
-    "translation": "",
+    "translation": "DankCalendar ne estas instalita",
     "context": "DankCalendar isn't installed",
     "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:254",
     "comment": ""
   },
   {
     "term": "DankCalendar isn't running",
-    "translation": "",
+    "translation": "DankCalendar ne funkcias",
     "context": "DankCalendar isn't running",
     "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:254",
     "comment": ""
@@ -5041,42 +5041,42 @@
   },
   {
     "term": "Default (Global)",
-    "translation": "",
+    "translation": "Defaŭlta (Tutmonda)",
     "context": "Default (Global)",
     "reference": "Modules/Notepad/NotepadSettings.qml:246",
     "comment": ""
   },
   {
     "term": "Default Apps",
-    "translation": "",
+    "translation": "Defaŭltaj aplikaĵoj",
     "context": "Default Apps",
     "reference": "Modals/Settings/SettingsSidebar.qml:277",
     "comment": ""
   },
   {
     "term": "Default Launcher",
-    "translation": "",
+    "translation": "Defaŭlta Lanĉilo",
     "context": "Default Launcher",
     "reference": "Modules/Settings/LauncherTab.qml:69, Modules/Settings/LauncherTab.qml:75",
     "comment": ""
   },
   {
     "term": "Default Launcher Shortcut",
-    "translation": "",
+    "translation": "Defaŭlta Lanĉilo Ŝparvojo",
     "context": "Default Launcher Shortcut",
     "reference": "Modules/Settings/LauncherTab.qml:133",
     "comment": ""
   },
   {
     "term": "Default Mode",
-    "translation": "",
+    "translation": "Defaŭlta Reĝimo",
     "context": "Default Mode",
     "reference": "Modules/Notepad/NotepadSettings.qml:403",
     "comment": ""
   },
   {
     "term": "Default Opens",
-    "translation": "",
+    "translation": "Defaŭlte Malfermiĝas",
     "context": "Default Opens",
     "reference": "Modules/Settings/LauncherTab.qml:92",
     "comment": ""
@@ -5090,14 +5090,14 @@
   },
   {
     "term": "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.",
-    "translation": "",
+    "translation": "Defaŭltaj lanĉilaj ŝparvojoj malfermas la plenan lanĉilon kun reĝimlangetoj, kradvido kaj agadpanelo.",
     "context": "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.",
     "reference": "Modules/Settings/LauncherTab.qml:82",
     "comment": ""
   },
   {
     "term": "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.",
-    "translation": "",
+    "translation": "Defaŭltaj lanĉilaj ŝparvojoj malfermas la minimuman Spotlight Bar. ",
     "context": "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.",
     "reference": "Modules/Settings/LauncherTab.qml:82",
     "comment": ""
@@ -5139,7 +5139,7 @@
   },
   {
     "term": "Delete \"%1\" and remove the home directory? This cannot be undone.",
-    "translation": "",
+    "translation": "Ĉu forigi \"%1\" kaj forigi la hejman dosierujon? ",
     "context": "Delete \"%1\" and remove the home directory? This cannot be undone.",
     "reference": "Modules/Settings/UsersTab.qml:321",
     "comment": ""
@@ -5167,7 +5167,7 @@
   },
   {
     "term": "Delete Rule",
-    "translation": "",
+    "translation": "Forigi Regulon",
     "context": "Delete Rule",
     "reference": "Modules/Settings/WindowRulesTab.qml:745",
     "comment": ""
@@ -5202,21 +5202,21 @@
   },
   {
     "term": "Delete user",
-    "translation": "",
+    "translation": "Forigi uzanton",
     "context": "Delete user",
     "reference": "Modules/Settings/UsersTab.qml:314",
     "comment": ""
   },
   {
     "term": "Delete user?",
-    "translation": "",
+    "translation": "Ĉu forigi uzanton?",
     "context": "Delete user?",
     "reference": "Modules/Settings/UsersTab.qml:320",
     "comment": ""
   },
   {
     "term": "Demi Bold",
-    "translation": "",
+    "translation": "Demi Bold",
     "context": "Demi Bold",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:268, Modules/Settings/TypographyMotionTab.qml:297",
     "comment": "font weight"
@@ -5230,14 +5230,14 @@
   },
   {
     "term": "Depth",
-    "translation": "",
+    "translation": "profundeco",
     "context": "Depth",
     "reference": "Modules/Settings/TypographyMotionTab.qml:145",
     "comment": ""
   },
   {
     "term": "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.",
-    "translation": "",
+    "translation": "Profundo: Paneloj pligrandiĝas de malgrandaj dum ili glitas enen - drameca pop-antaŭa profunda efiko.",
     "context": "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:187",
     "comment": ""
@@ -5265,7 +5265,7 @@
   },
   {
     "term": "Desktop Application",
-    "translation": "",
+    "translation": "Labortabla Apliko",
     "context": "Desktop Application",
     "reference": "Modules/Settings/AutoStartTab.qml:354, Modules/Settings/AutoStartTab.qml:355, Modules/Settings/AutoStartTab.qml:357",
     "comment": ""
@@ -5314,7 +5314,7 @@
   },
   {
     "term": "Detected backends: %1",
-    "translation": "",
+    "translation": "Detektitaj backends: %1",
     "context": "Detected backends: %1",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:77",
     "comment": ""
@@ -5342,7 +5342,7 @@
   },
   {
     "term": "Device list scroll volume",
-    "translation": "",
+    "translation": "Volumo de la listo de aparatoj",
     "context": "Device list scroll volume",
     "reference": "Modules/Settings/MediaPlayerTab.qml:118",
     "comment": ""
@@ -5377,14 +5377,14 @@
   },
   {
     "term": "Directional",
-    "translation": "",
+    "translation": "unudirekta",
     "context": "Directional",
     "reference": "Modules/Settings/TypographyMotionTab.qml:145",
     "comment": ""
   },
   {
     "term": "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.",
-    "translation": "",
+    "translation": "Direkte: Paneloj glitas enen de pli granda distanco je plena grandeco - neniu skaloŝanĝo, pura pura moviĝo.",
     "context": "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:185",
     "comment": ""
@@ -5426,7 +5426,7 @@
   },
   {
     "term": "Disabled by Frame Mode",
-    "translation": "",
+    "translation": "Malŝaltita de Kadra Reĝimo",
     "context": "Disabled by Frame Mode",
     "reference": "Modules/Settings/ThemeColorsTab.qml:2017",
     "comment": ""
@@ -5440,7 +5440,7 @@
   },
   {
     "term": "Disabling auto-login on startup...",
-    "translation": "",
+    "translation": "Malŝaltante aŭtomatan ensaluti ĉe ekfunkciigo...",
     "context": "Disabling auto-login on startup...",
     "reference": "Common/settings/Processes.qml:573",
     "comment": ""
@@ -5594,7 +5594,7 @@
   },
   {
     "term": "Display and switch MangoWC layouts",
-    "translation": "",
+    "translation": "Montru kaj ŝanĝu MangoWC-aranĝojn",
     "context": "Display and switch MangoWC layouts",
     "reference": "Modules/Settings/WidgetsTab.qml:40",
     "comment": ""
@@ -5629,14 +5629,14 @@
   },
   {
     "term": "Display line numbers in editor",
-    "translation": "",
+    "translation": "Montru linionumeroj en redaktilo",
     "context": "Display line numbers in editor",
     "reference": "Modules/Notepad/NotepadSettings.qml:162",
     "comment": ""
   },
   {
     "term": "Display name for this entry",
-    "translation": "",
+    "translation": "Montrnomo por ĉi tiu eniro",
     "context": "Display name for this entry",
     "reference": "Modules/Settings/AutoStartTab.qml:514",
     "comment": ""
@@ -5664,7 +5664,7 @@
   },
   {
     "term": "Display setup failed",
-    "translation": "",
+    "translation": "Agordo de ekrano malsukcesis",
     "context": "Display setup failed",
     "reference": "Modules/Settings/DisplayConfig/DisplayConfigState.qml:1453",
     "comment": ""
@@ -5741,7 +5741,7 @@
   },
   {
     "term": "Dock Opacity",
-    "translation": "",
+    "translation": "Doko Opakeco",
     "context": "Dock Opacity",
     "reference": "Modules/Settings/DockTab.qml:658",
     "comment": ""
@@ -5755,14 +5755,14 @@
   },
   {
     "term": "Dock margin, opacity, and border",
-    "translation": "",
+    "translation": "Doka marĝeno, opakeco kaj limo",
     "context": "Dock margin, opacity, and border",
     "reference": "Modules/Settings/DockTab.qml:646",
     "comment": ""
   },
   {
     "term": "Dock window",
-    "translation": "",
+    "translation": "Doko fenestro",
     "context": "Dock window",
     "reference": "Modals/KeybindsContent.qml:85, Modals/KeybindsModalWindow.qml:103",
     "comment": ""
@@ -5839,7 +5839,7 @@
   },
   {
     "term": "Draw a connected picture-frame border around the entire display",
-    "translation": "",
+    "translation": "Desegnu ligitan bild-kadran randon ĉirkaŭ la tuta ekrano",
     "context": "Draw a connected picture-frame border around the entire display",
     "reference": "Modules/Settings/FrameTab.qml:38",
     "comment": ""
@@ -5860,7 +5860,7 @@
   },
   {
     "term": "Drop your override for %1 so the DMS default action re-applies?",
-    "translation": "",
+    "translation": "Forigi vian anstataŭigon por %1 do la defaŭlta ago de DMS denove aplikas?",
     "context": "Drop your override for %1 so the DMS default action re-applies?",
     "reference": "Modules/Settings/KeybindsTab.qml:121",
     "comment": ""
@@ -5937,7 +5937,7 @@
   },
   {
     "term": "Dynamic colors parse error: %1",
-    "translation": "",
+    "translation": "Eraro de analizado de dinamikaj koloroj: %1",
     "context": "Dynamic colors parse error: %1",
     "reference": "Common/Theme.qml:2197",
     "comment": ""
@@ -5951,7 +5951,7 @@
   },
   {
     "term": "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.",
-    "translation": "",
+    "translation": "Dinamika: Printempa bezier kun superfluo — eniro nelonge superas sian celon kaj poste ekloĝas. ",
     "context": "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:118",
     "comment": ""
@@ -5965,14 +5965,14 @@
   },
   {
     "term": "Edge the launcher slides from",
-    "translation": "",
+    "translation": "Rando la lanĉilo glitas de",
     "context": "Edge the launcher slides from",
     "reference": "Modules/Settings/FrameTab.qml:318",
     "comment": ""
   },
   {
     "term": "Edit",
-    "translation": "",
+    "translation": "Redakti",
     "context": "Edit",
     "reference": "Modules/Settings/ClipboardTab.qml:156, Modules/DankDash/Overview/CalendarEventDetail.qml:293",
     "comment": ""
@@ -5986,14 +5986,14 @@
   },
   {
     "term": "Edit Clipboard",
-    "translation": "",
+    "translation": "Redaktu Tondujo",
     "context": "Edit Clipboard",
     "reference": "Modals/Clipboard/ClipboardEditor.qml:217",
     "comment": ""
   },
   {
     "term": "Edit Rule",
-    "translation": "",
+    "translation": "Redakti Regulon",
     "context": "Edit Rule",
     "reference": "Modules/Settings/WindowRulesTab.qml:730",
     "comment": ""
@@ -6007,21 +6007,21 @@
   },
   {
     "term": "Edit clipboard text",
-    "translation": "",
+    "translation": "Redaktu tekston de la tondujo",
     "context": "Edit clipboard text",
     "reference": "Modals/Clipboard/ClipboardEditor.qml:297",
     "comment": ""
   },
   {
     "term": "Edit event",
-    "translation": "",
+    "translation": "Redaktu eventon",
     "context": "Edit event",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:186",
     "comment": ""
   },
   {
     "term": "Editing changes on %1",
-    "translation": "",
+    "translation": "Redaktante ŝanĝojn ĉe %1",
     "context": "Editing changes on %1",
     "reference": "Modules/Settings/DankBarTab.qml:244",
     "comment": ""
@@ -6042,21 +6042,21 @@
   },
   {
     "term": "Empty Trash",
-    "translation": "",
+    "translation": "malplenigi rubujon",
     "context": "Empty Trash",
     "reference": "Modules/Dock/DockTrashContextMenu.qml:32",
     "comment": ""
   },
   {
     "term": "Empty Trash (%1)",
-    "translation": "",
+    "translation": "Malplenigi Rubujon (%1)",
     "context": "Empty Trash (%1)",
     "reference": "Modules/Dock/DockTrashContextMenu.qml:32",
     "comment": ""
   },
   {
     "term": "Empty Trash?",
-    "translation": "",
+    "translation": "Malplenigi Rubujon?",
     "context": "Empty Trash?",
     "reference": "DMSShell.qml:563",
     "comment": ""
@@ -6091,7 +6091,7 @@
   },
   {
     "term": "Enable Frame",
-    "translation": "",
+    "translation": "Ebligu Kadron",
     "context": "Enable Frame",
     "reference": "Modules/Settings/FrameTab.qml:37",
     "comment": ""
@@ -6294,7 +6294,7 @@
   },
   {
     "term": "End must be after start",
-    "translation": "",
+    "translation": "Fino devas esti post komenco",
     "context": "End must be after start",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:95",
     "comment": ""
@@ -6441,7 +6441,7 @@
   },
   {
     "term": "Entry Type",
-    "translation": "",
+    "translation": "tipo de enigo",
     "context": "Entry Type",
     "reference": "Modules/Settings/AutoStartTab.qml:352",
     "comment": ""
@@ -6483,7 +6483,7 @@
   },
   {
     "term": "Estimated Time",
-    "translation": "",
+    "translation": "Estimata Tempo",
     "context": "Estimated Time",
     "reference": "Modules/Settings/BatteryTab.qml:134",
     "comment": ""
@@ -6497,35 +6497,35 @@
   },
   {
     "term": "Event title",
-    "translation": "",
+    "translation": "Titolo de la evento",
     "context": "Event title",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:198",
     "comment": ""
   },
   {
     "term": "Every 15 minutes",
-    "translation": "",
+    "translation": "Ĉiujn 15 minutojn",
     "context": "Every 15 minutes",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:12",
     "comment": ""
   },
   {
     "term": "Every 30 minutes",
-    "translation": "",
+    "translation": "Ĉiujn 30 minutojn",
     "context": "Every 30 minutes",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:16",
     "comment": ""
   },
   {
     "term": "Every 4 hours",
-    "translation": "",
+    "translation": "Ĉiujn 4 horojn",
     "context": "Every 4 hours",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:24",
     "comment": ""
   },
   {
     "term": "Every hour",
-    "translation": "",
+    "translation": "ĉiuhore",
     "context": "Every hour",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:20",
     "comment": ""
@@ -6546,14 +6546,14 @@
   },
   {
     "term": "Existing Users",
-    "translation": "",
+    "translation": "Ekzistantaj Uzantoj",
     "context": "Existing Users",
     "reference": "Modules/Settings/UsersTab.qml:93",
     "comment": ""
   },
   {
     "term": "Exit node",
-    "translation": "",
+    "translation": "Eliro nodo",
     "context": "Exit node",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:185",
     "comment": "Tailscale exit node selector label"
@@ -6581,7 +6581,7 @@
   },
   {
     "term": "Expose the Arcs",
-    "translation": "",
+    "translation": "Malkovru la Arkojn",
     "context": "Expose the Arcs",
     "reference": "Modules/Settings/FrameTab.qml:308",
     "comment": ""
@@ -6623,14 +6623,14 @@
   },
   {
     "term": "Extra Bold",
-    "translation": "",
+    "translation": "Ekstra Aŭdaca",
     "context": "Extra Bold",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:272, Modules/Settings/TypographyMotionTab.qml:303",
     "comment": "font weight"
   },
   {
     "term": "Extra Light",
-    "translation": "",
+    "translation": "Ekstra Lumo",
     "context": "Extra Light",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:260, Modules/Settings/TypographyMotionTab.qml:285",
     "comment": "font weight"
@@ -6686,28 +6686,28 @@
   },
   {
     "term": "Failed to apply GTK colors",
-    "translation": "",
+    "translation": "Malsukcesis apliki GTK-kolorojn",
     "context": "Failed to apply GTK colors",
     "reference": "Common/Theme.qml:1950",
     "comment": ""
   },
   {
     "term": "Failed to apply Qt colors",
-    "translation": "",
+    "translation": "Malsukcesis apliki Qt-kolorojn",
     "context": "Failed to apply Qt colors",
     "reference": "Common/Theme.qml:1971",
     "comment": ""
   },
   {
     "term": "Failed to apply charge limit to system",
-    "translation": "",
+    "translation": "Malsukcesis apliki ŝarĝlimon al sistemo",
     "context": "Failed to apply charge limit to system",
     "reference": "Modules/Settings/BatteryTab.qml:28",
     "comment": ""
   },
   {
     "term": "Failed to apply profile",
-    "translation": "",
+    "translation": "Malsukcesis apliki profilon",
     "context": "Failed to apply profile",
     "reference": "Modules/Settings/DisplayConfig/DisplayConfigState.qml:530",
     "comment": ""
@@ -6798,7 +6798,7 @@
   },
   {
     "term": "Failed to disable plugin: %1",
-    "translation": "",
+    "translation": "Malsukcesis malŝalti kromprogramon: %1",
     "context": "Failed to disable plugin: %1",
     "reference": "Modules/Settings/PluginListItem.qml:332",
     "comment": ""
@@ -6826,7 +6826,7 @@
   },
   {
     "term": "Failed to empty trash",
-    "translation": "",
+    "translation": "Malsukcesis malplenigi rubujon",
     "context": "Failed to empty trash",
     "reference": "Services/TrashService.qml:126",
     "comment": ""
@@ -6861,21 +6861,21 @@
   },
   {
     "term": "Failed to enable plugin: %1",
-    "translation": "",
+    "translation": "Malsukcesis ebligi kromprogramon: %1",
     "context": "Failed to enable plugin: %1",
     "reference": "Modules/Settings/PluginListItem.qml:323",
     "comment": ""
   },
   {
     "term": "Failed to fetch network QR code: %1",
-    "translation": "",
+    "translation": "Malsukcesis alporti retan QR-kodon: %1",
     "context": "Failed to fetch network QR code: %1",
     "reference": "Modals/WifiQRCodeModal.qml:55",
     "comment": ""
   },
   {
     "term": "Failed to generate systemd override",
-    "translation": "",
+    "translation": "Malsukcesis generi sisteman anstataŭigon",
     "context": "Failed to generate systemd override",
     "reference": "Modules/Settings/AutoStartTab.qml:281, Modules/Settings/AutoStartTab.qml:295",
     "comment": ""
@@ -6917,7 +6917,7 @@
   },
   {
     "term": "Failed to move to trash",
-    "translation": "",
+    "translation": "Malsukcesis movi al rubujo",
     "context": "Failed to move to trash",
     "reference": "Services/TrashService.qml:80",
     "comment": ""
@@ -6966,21 +6966,21 @@
   },
   {
     "term": "Failed to read theme file: %1",
-    "translation": "",
+    "translation": "Malsukcesis legi etosieron: %1",
     "context": "Failed to read theme file: %1",
     "reference": "Common/Theme.qml:2152",
     "comment": ""
   },
   {
     "term": "Failed to reload plugin: %1",
-    "translation": "",
+    "translation": "Malsukcesis reŝargi kromprogramon: %1",
     "context": "Failed to reload plugin: %1",
     "reference": "Modules/Settings/PluginListItem.qml:296",
     "comment": ""
   },
   {
     "term": "Failed to remove QR code at %1: %2",
-    "translation": "",
+    "translation": "Malsukcesis forigi QR-kodon ĉe %1: %2",
     "context": "Failed to remove QR code at %1: %2",
     "reference": "Modals/WifiQRCodeModal.qml:69",
     "comment": ""
@@ -7057,7 +7057,7 @@
   },
   {
     "term": "Failed to save profile",
-    "translation": "",
+    "translation": "Malsukcesis konservi profilon",
     "context": "Failed to save profile",
     "reference": "Modules/Settings/DisplayConfig/DisplayConfigState.qml:612",
     "comment": ""
@@ -7141,7 +7141,7 @@
   },
   {
     "term": "Failed to update clipboard",
-    "translation": "",
+    "translation": "Malsukcesis ĝisdatigi la tondujo",
     "context": "Failed to update clipboard",
     "reference": "Modals/Clipboard/ClipboardEditor.qml:136",
     "comment": ""
@@ -7169,14 +7169,14 @@
   },
   {
     "term": "Failed to write autostart entry",
-    "translation": "",
+    "translation": "Malsukcesis skribi aŭtomatan enskribon",
     "context": "Failed to write autostart entry",
     "reference": "Modules/Settings/AutoStartTab.qml:165",
     "comment": ""
   },
   {
     "term": "Failed to write outputs config.",
-    "translation": "",
+    "translation": "Malsukcesis skribi eligojn agordon.",
     "context": "Failed to write outputs config.",
     "reference": "Modules/Settings/DisplayConfig/DisplayConfigState.qml:1453",
     "comment": ""
@@ -7190,7 +7190,7 @@
   },
   {
     "term": "Failed: %1",
-    "translation": "",
+    "translation": "Malsukcesis: %1",
     "context": "Failed: %1",
     "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:297",
     "comment": ""
@@ -7253,21 +7253,21 @@
   },
   {
     "term": "File Manager",
-    "translation": "",
+    "translation": "dosiermastrumilo",
     "context": "File Manager",
     "reference": "Modules/Settings/DefaultAppsTab.qml:290",
     "comment": "File Manager"
   },
   {
     "term": "File changed on disk",
-    "translation": "",
+    "translation": "Dosiero ŝanĝita sur disko",
     "context": "File changed on disk",
     "reference": "Modules/Notepad/Notepad.qml:308",
     "comment": ""
   },
   {
     "term": "File manager used to open the trash. Pick \"custom\" to enter your own command.",
-    "translation": "",
+    "translation": "Dosieradministranto kutimis malfermi la rubujon. ",
     "context": "File manager used to open the trash. Pick \"custom\" to enter your own command.",
     "reference": "Modules/Settings/DockTab.qml:543",
     "comment": ""
@@ -7281,7 +7281,7 @@
   },
   {
     "term": "File search unavailable",
-    "translation": "",
+    "translation": "Dosiera serĉo ne disponebla",
     "context": "File search unavailable",
     "reference": "Modals/DankLauncherV2/SpotlightResultsList.qml:160",
     "comment": ""
@@ -7309,14 +7309,14 @@
   },
   {
     "term": "Filter",
-    "translation": "",
+    "translation": "filtri",
     "context": "Filter",
     "reference": "Modules/Settings/PluginBrowser.qml:713",
     "comment": "plugin browser category filter label"
   },
   {
     "term": "Filter by type",
-    "translation": "",
+    "translation": "Filtru laŭ tipo",
     "context": "Filter by type",
     "reference": "Modals/Clipboard/ClipboardContent.qml:90",
     "comment": "Clipboard history type filter button tooltip"
@@ -7337,7 +7337,7 @@
   },
   {
     "term": "Fine-tune the space reserved for the bar from the screen edge",
-    "translation": "",
+    "translation": "Agordi la spacon rezervitan por la stango de la ekranrando",
     "context": "Fine-tune the space reserved for the bar from the screen edge",
     "reference": "Modules/Settings/DankBarTab.qml:893",
     "comment": ""
@@ -7463,49 +7463,49 @@
   },
   {
     "term": "Float Anchor",
-    "translation": "",
+    "translation": "Flosilo Ankro",
     "context": "Float Anchor",
     "reference": "Modules/Settings/WindowRulesTab.qml:136",
     "comment": ""
   },
   {
     "term": "Float X",
-    "translation": "",
+    "translation": "Flosilo X",
     "context": "Float X",
     "reference": "Modules/Settings/WindowRulesTab.qml:134",
     "comment": ""
   },
   {
     "term": "Float Y",
-    "translation": "",
+    "translation": "Flosilo Y",
     "context": "Float Y",
     "reference": "Modules/Settings/WindowRulesTab.qml:135",
     "comment": ""
   },
   {
     "term": "Floating",
-    "translation": "",
+    "translation": "glita",
     "context": "Floating",
     "reference": "Modals/WindowRuleModal.qml:873, Modules/Settings/WindowRulesTab.qml:47",
     "comment": ""
   },
   {
     "term": "Floating Position",
-    "translation": "",
+    "translation": "Flosanta Pozicio",
     "context": "Floating Position",
     "reference": "Modals/WindowRuleModal.qml:1310",
     "comment": ""
   },
   {
     "term": "Fluent",
-    "translation": "",
+    "translation": "rutinhava",
     "context": "Fluent",
     "reference": "Modules/Settings/TypographyMotionTab.qml:76",
     "comment": ""
   },
   {
     "term": "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.",
-    "translation": "",
+    "translation": "Flua: Glata kuba malrapidiĝo enen, rapida klakado - puraj, elegantaj kurboj.",
     "context": "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:116",
     "comment": ""
@@ -7519,14 +7519,14 @@
   },
   {
     "term": "Focus Ring Color",
-    "translation": "",
+    "translation": "Fokuso Ringa Koloro",
     "context": "Focus Ring Color",
     "reference": "Modules/Settings/WindowRulesTab.qml:138",
     "comment": ""
   },
   {
     "term": "Focus Ring Off",
-    "translation": "",
+    "translation": "Fokuso Ringo Malŝaltita",
     "context": "Focus Ring Off",
     "reference": "Modules/Settings/WindowRulesTab.qml:139",
     "comment": ""
@@ -7540,7 +7540,7 @@
   },
   {
     "term": "Focused",
-    "translation": "",
+    "translation": "fokusita",
     "context": "Focused",
     "reference": "Modals/WindowRuleModal.qml:882, Modules/Settings/WindowRulesTab.qml:49",
     "comment": ""
@@ -7617,7 +7617,7 @@
   },
   {
     "term": "Follows the default launcher choice selected above.",
-    "translation": "",
+    "translation": "Sekvas la defaŭltan lanĉilan elekton elektitan supre.",
     "context": "Follows the default launcher choice selected above.",
     "reference": "Modules/Settings/LauncherTab.qml:142",
     "comment": ""
@@ -7666,49 +7666,49 @@
   },
   {
     "term": "For 1 hour",
-    "translation": "",
+    "translation": "Dum 1 horo",
     "context": "For 1 hour",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:73",
     "comment": ""
   },
   {
     "term": "For 15 minutes",
-    "translation": "",
+    "translation": "Dum 15 minutoj",
     "context": "For 15 minutes",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:65",
     "comment": ""
   },
   {
     "term": "For 3 hours",
-    "translation": "",
+    "translation": "Dum 3 horoj",
     "context": "For 3 hours",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:77",
     "comment": ""
   },
   {
     "term": "For 30 minutes",
-    "translation": "",
+    "translation": "Dum 30 minutoj",
     "context": "For 30 minutes",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:69",
     "comment": ""
   },
   {
     "term": "For 8 hours",
-    "translation": "",
+    "translation": "Dum 8 horoj",
     "context": "For 8 hours",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:81",
     "comment": ""
   },
   {
     "term": "For editing plain text files",
-    "translation": "",
+    "translation": "Por redaktado de simplaj tekstaj dosieroj",
     "context": "For editing plain text files",
     "reference": "Modules/Settings/DefaultAppsTab.qml:317",
     "comment": "For editing plain text files"
   },
   {
     "term": "For reading PDF files",
-    "translation": "",
+    "translation": "Por legi PDF-dosierojn",
     "context": "For reading PDF files",
     "reference": "Modules/Settings/DefaultAppsTab.qml:323",
     "comment": "For reading PDF files"
@@ -7729,7 +7729,7 @@
   },
   {
     "term": "Force RGBX",
-    "translation": "",
+    "translation": "Forto RGBX",
     "context": "Force RGBX",
     "reference": "Modules/Settings/WindowRulesTab.qml:141",
     "comment": ""
@@ -7757,7 +7757,7 @@
   },
   {
     "term": "Foreground Layers",
-    "translation": "",
+    "translation": "Antaŭplanaj Tavoloj",
     "context": "Foreground Layers",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1738",
     "comment": ""
@@ -7813,28 +7813,28 @@
   },
   {
     "term": "Frame",
-    "translation": "",
+    "translation": "ŝipripo",
     "context": "Frame",
     "reference": "Modules/Settings/FrameTab.qml:31, Modals/Settings/SettingsSidebar.qml:146",
     "comment": ""
   },
   {
     "term": "Frame Blur",
-    "translation": "",
+    "translation": "Kadro Blur",
     "context": "Frame Blur",
     "reference": "Modules/Settings/FrameTab.qml:165",
     "comment": ""
   },
   {
     "term": "Frame Blur follows Background Blur in Theme & Colors",
-    "translation": "",
+    "translation": "Kadra Malklariĝo sekvas Fona Malklaraĵo en Temo kaj Koloroj",
     "context": "Frame Blur follows Background Blur in Theme & Colors",
     "reference": "Modules/Settings/FrameTab.qml:194",
     "comment": ""
   },
   {
     "term": "Frame Border Color",
-    "translation": "",
+    "translation": "Kadro Bordo Koloro",
     "context": "Frame Border Color",
     "reference": "Modules/Settings/FrameTab.qml:284",
     "comment": ""
@@ -7869,7 +7869,7 @@
   },
   {
     "term": "Full",
-    "translation": "",
+    "translation": "plena",
     "context": "Full",
     "reference": "Modules/Settings/LauncherTab.qml:93",
     "comment": ""
@@ -7897,7 +7897,7 @@
   },
   {
     "term": "Full command to execute",
-    "translation": "",
+    "translation": "Plena komando por ekzekuti",
     "context": "Full command to execute",
     "reference": "Modules/Settings/AutoStartTab.qml:545",
     "comment": ""
@@ -7974,7 +7974,7 @@
   },
   {
     "term": "GTK colors applied successfully",
-    "translation": "",
+    "translation": "GTK-koloroj aplikitaj sukcese",
     "context": "GTK colors applied successfully",
     "reference": "Common/Theme.qml:1946",
     "comment": ""
@@ -8009,7 +8009,7 @@
   },
   {
     "term": "Generate Override",
-    "translation": "",
+    "translation": "Generu Override",
     "context": "Generate Override",
     "reference": "Modules/Settings/AutoStartTab.qml:743",
     "comment": ""
@@ -8044,7 +8044,7 @@
   },
   {
     "term": "Global fonts can be configured in Settings → Personalization",
-    "translation": "",
+    "translation": "Tutmondaj tiparoj povas esti agorditaj en Agordoj → Personigo",
     "context": "Global fonts can be configured in Settings → Personalization",
     "reference": "Modules/Notepad/NotepadSettings.qml:486",
     "comment": ""
@@ -8100,35 +8100,35 @@
   },
   {
     "term": "Grant",
-    "translation": "",
+    "translation": "doni permeson",
     "context": "Grant",
     "reference": "Modules/Settings/UsersTab.qml:295",
     "comment": ""
   },
   {
     "term": "Grant admin?",
-    "translation": "",
+    "translation": "Doni administranton?",
     "context": "Grant admin?",
     "reference": "Modules/Settings/UsersTab.qml:293",
     "comment": ""
   },
   {
     "term": "Grant administrator privileges",
-    "translation": "",
+    "translation": "Donu administrantajn privilegiojn",
     "context": "Grant administrator privileges",
     "reference": "Modules/Settings/UsersTab.qml:457",
     "comment": ""
   },
   {
     "term": "Granted administrator privileges",
-    "translation": "",
+    "translation": "Koncedis privilegiojn de administranto",
     "context": "Granted administrator privileges",
     "reference": "Services/UsersService.qml:409",
     "comment": ""
   },
   {
     "term": "Granted greeter login access",
-    "translation": "",
+    "translation": "Koncedis salutan aliron",
     "context": "Granted greeter login access",
     "reference": "Services/UsersService.qml:379",
     "comment": ""
@@ -8191,14 +8191,14 @@
   },
   {
     "term": "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.",
-    "translation": "",
+    "translation": "Greeter-grupanoj povas sinkronigi sian ensalut-ekranan temon kun dms greeter sync --profile post elsalutiĝo kaj reeniro.",
     "context": "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.",
     "reference": "Modules/Settings/UsersTab.qml:151",
     "comment": ""
   },
   {
     "term": "Greeter group:",
-    "translation": "",
+    "translation": "Salutgrupo:",
     "context": "Greeter group:",
     "reference": "Modules/Settings/UsersTab.qml:122",
     "comment": ""
@@ -8254,7 +8254,7 @@
   },
   {
     "term": "Group Active Workspace",
-    "translation": "",
+    "translation": "Grupo Aktiva Laborspaco",
     "context": "Group Active Workspace",
     "reference": "Modules/Settings/WorkspacesTab.qml:133",
     "comment": ""
@@ -8331,7 +8331,7 @@
   },
   {
     "term": "HSV %1 copied",
-    "translation": "",
+    "translation": "HSV %1 kopiita",
     "context": "HSV %1 copied",
     "reference": "Modals/DankColorPickerModal.qml:741",
     "comment": ""
@@ -8345,14 +8345,14 @@
   },
   {
     "term": "Handles links and opens HTML files",
-    "translation": "",
+    "translation": "Pritraktas ligilojn kaj malfermas HTML-dosierojn",
     "context": "Handles links and opens HTML files",
     "reference": "Modules/Settings/DefaultAppsTab.qml:274",
     "comment": "Handles links and opens HTML files"
   },
   {
     "term": "Handles mailto links",
-    "translation": "",
+    "translation": "Pritraktas mailto-ligilojn",
     "context": "Handles mailto links",
     "reference": "Modules/Settings/DefaultAppsTab.qml:281",
     "comment": "Handles mailto links"
@@ -8422,7 +8422,7 @@
   },
   {
     "term": "Hibernate failed",
-    "translation": "",
+    "translation": "Hibernado malsukcesis",
     "context": "Hibernate failed",
     "reference": "Services/SessionService.qml:118",
     "comment": ""
@@ -8555,14 +8555,14 @@
   },
   {
     "term": "Hide the bar when the pointer leaves even if a popout is still open",
-    "translation": "",
+    "translation": "Kaŝu la stangon kiam la montrilo foriras eĉ se popout ankoraŭ malfermita",
     "context": "Hide the bar when the pointer leaves even if a popout is still open",
     "reference": "Modules/Settings/DankBarTab.qml:696",
     "comment": ""
   },
   {
     "term": "High",
-    "translation": "",
+    "translation": "Alte",
     "context": "High",
     "reference": "Modules/Settings/TypographyMotionTab.qml:458",
     "comment": ""
@@ -8660,7 +8660,7 @@
   },
   {
     "term": "Horizontal and vertical bar thickness",
-    "translation": "",
+    "translation": "Horizontala kaj vertikala stanga dikeco",
     "context": "Horizontal and vertical bar thickness",
     "reference": "Modules/Settings/FrameTab.qml:126",
     "comment": ""
@@ -8709,7 +8709,7 @@
   },
   {
     "term": "How often the server polls for new updates.",
-    "translation": "",
+    "translation": "Kiom ofte la servilo sondas por novaj ĝisdatigoj.",
     "context": "How often the server polls for new updates.",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:86",
     "comment": ""
@@ -8765,21 +8765,21 @@
   },
   {
     "term": "Hyprland conf mode",
-    "translation": "",
+    "translation": "Hyprland konf-reĝimo",
     "context": "Hyprland conf mode",
     "reference": "Services/KeybindsService.qml:548, Modules/Settings/KeybindsTab.qml:384, Modules/Settings/ThemeColorsTab.qml:130, Modules/Settings/WindowRulesTab.qml:344, Modules/Settings/WindowRulesTab.qml:502, Modules/Settings/DisplayConfig/IncludeWarningBox.qml:49, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1467",
     "comment": ""
   },
   {
     "term": "Hyprland conf mode is read-only in Settings",
-    "translation": "",
+    "translation": "Hyprland-konf-reĝimo estas nurlegebla en Agordoj",
     "context": "Hyprland conf mode is read-only in Settings",
     "reference": "Modules/Settings/KeybindsTab.qml:299, Modules/Settings/DisplayConfig/DisplayConfigState.qml:515",
     "comment": ""
   },
   {
     "term": "Hyprland config include missing",
-    "translation": "",
+    "translation": "Hyprland-agordo inkluzivas mankantajn",
     "context": "Hyprland config include missing",
     "reference": "Services/KeybindsService.qml:544",
     "comment": ""
@@ -8856,14 +8856,14 @@
   },
   {
     "term": "Identical alerts show as one popup instead of stacking",
-    "translation": "",
+    "translation": "Identaj atentigoj montriĝas kiel unu ŝprucfenestro anstataŭ stakiĝi",
     "context": "Identical alerts show as one popup instead of stacking",
     "reference": "Modules/Settings/NotificationsTab.qml:318",
     "comment": ""
   },
   {
     "term": "Identical alerts stack as separate notification cards",
-    "translation": "",
+    "translation": "Identaj atentigoj stakiĝas kiel apartaj sciigaj kartoj",
     "context": "Identical alerts stack as separate notification cards",
     "reference": "Modules/Settings/NotificationsTab.qml:319",
     "comment": ""
@@ -8877,7 +8877,7 @@
   },
   {
     "term": "Idle Inhibit",
-    "translation": "",
+    "translation": "Idle Inhibit",
     "context": "Idle Inhibit",
     "reference": "Modules/Settings/WindowRulesTab.qml:142",
     "comment": ""
@@ -8898,7 +8898,7 @@
   },
   {
     "term": "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps",
-    "translation": "",
+    "translation": "Se la piktogramoj de aŭtomata starta aplikaĵo ne aperas en la sistempleto, generu systemd-anstataŭigon por certigi ke DMS komenciĝas antaŭ aŭtomata lanĉado de aplikaĵoj.",
     "context": "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps",
     "reference": "Modules/Settings/AutoStartTab.qml:735",
     "comment": ""
@@ -8926,7 +8926,7 @@
   },
   {
     "term": "Image Viewer",
-    "translation": "",
+    "translation": "bildmontrilo",
     "context": "Image Viewer",
     "reference": "Modules/Settings/DefaultAppsTab.qml:331",
     "comment": "Image Viewer"
@@ -8961,7 +8961,7 @@
   },
   {
     "term": "Include AUR updates",
-    "translation": "",
+    "translation": "Inkluzivi AUR-ĝisdatigojn",
     "context": "Include AUR updates",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:112",
     "comment": ""
@@ -8975,7 +8975,7 @@
   },
   {
     "term": "Include Flatpak updates",
-    "translation": "",
+    "translation": "Inkluzivi ĝisdatigojn de Flatpak",
     "context": "Include Flatpak updates",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:104",
     "comment": ""
@@ -9087,21 +9087,21 @@
   },
   {
     "term": "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.",
-    "translation": "",
+    "translation": "Komenca pozicio por flosantaj fenestroj. ",
     "context": "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.",
     "reference": "Modals/WindowRuleModal.qml:1317",
     "comment": ""
   },
   {
     "term": "Initialised",
-    "translation": "",
+    "translation": "Iniciatigita",
     "context": "Initialised",
     "reference": "Modals/WindowRuleModal.qml:922, Modules/Settings/WindowRulesTab.qml:57",
     "comment": ""
   },
   {
     "term": "Inner padding applied to each widget",
-    "translation": "",
+    "translation": "Interna remburaĵo aplikita al ĉiu fenestraĵo",
     "context": "Inner padding applied to each widget",
     "reference": "Modules/Settings/DankBarTab.qml:937",
     "comment": ""
@@ -9129,7 +9129,7 @@
   },
   {
     "term": "Inset the Notepad from screen edges using the compositor's configured gaps",
-    "translation": "",
+    "translation": "Enmetu la Notepad de ekranaj randoj uzante la agorditajn interspacojn de la kompostisto",
     "context": "Inset the Notepad from screen edges using the compositor's configured gaps",
     "reference": "Modules/Notepad/NotepadSettings.qml:450",
     "comment": ""
@@ -9178,7 +9178,7 @@
   },
   {
     "term": "Install dsearch to search files.",
-    "translation": "",
+    "translation": "Instalu dsearch por serĉi dosierojn.",
     "context": "Install dsearch to search files.",
     "reference": "Modals/DankLauncherV2/SpotlightResultsList.qml:178",
     "comment": ""
@@ -9255,7 +9255,7 @@
   },
   {
     "term": "Integrations",
-    "translation": "",
+    "translation": "Integriĝoj",
     "context": "Integrations",
     "reference": "Modules/Settings/FrameTab.qml:341",
     "comment": ""
@@ -9304,7 +9304,7 @@
   },
   {
     "term": "Invalid JSON format: %1",
-    "translation": "",
+    "translation": "Nevalida JSON-formato: %1",
     "context": "Invalid JSON format: %1",
     "reference": "Common/Theme.qml:2138",
     "comment": ""
@@ -9318,14 +9318,14 @@
   },
   {
     "term": "Invalid password for %1",
-    "translation": "",
+    "translation": "Nevalida pasvorto por %1",
     "context": "Invalid password for %1",
     "reference": "Services/LegacyNetworkService.qml:316",
     "comment": ""
   },
   {
     "term": "Invalid username",
-    "translation": "",
+    "translation": "Nevalida uzantnomo",
     "context": "Invalid username",
     "reference": "Services/UsersService.qml:127",
     "comment": ""
@@ -9339,7 +9339,7 @@
   },
   {
     "term": "Invert touchpad scroll direction",
-    "translation": "",
+    "translation": "Inversu la ruldirekton de la tuŝopad",
     "context": "Invert touchpad scroll direction",
     "reference": "Modules/Settings/ThemeColorsTab.qml:2168",
     "comment": ""
@@ -9388,28 +9388,28 @@
   },
   {
     "term": "Keep My Edits",
-    "translation": "",
+    "translation": "Konservu Miajn Redaktojn",
     "context": "Keep My Edits",
     "reference": "Modules/Notepad/Notepad.qml:356",
     "comment": ""
   },
   {
     "term": "Keep in Bar",
-    "translation": "",
+    "translation": "Konservu en Trinkejo",
     "context": "Keep in Bar",
     "reference": "Modules/DankBar/Widgets/SystemTrayBar.qml:1871",
     "comment": ""
   },
   {
     "term": "Keep the clipboard type filter when reopening history",
-    "translation": "",
+    "translation": "Konservu la filtrilon de tipo de tondujo kiam remalfermas historion",
     "context": "Keep the clipboard type filter when reopening history",
     "reference": "Modules/Settings/ClipboardTab.qml:472",
     "comment": "Clipboard behavior setting description"
   },
   {
     "term": "Keep typing",
-    "translation": "",
+    "translation": "Daŭre tajpu",
     "context": "Keep typing",
     "reference": "Modals/DankLauncherV2/SpotlightResultsList.qml:162",
     "comment": ""
@@ -9640,14 +9640,14 @@
   },
   {
     "term": "Launcher Emerge Side",
-    "translation": "",
+    "translation": "Lanĉilo Emerge Flanko",
     "context": "Launcher Emerge Side",
     "reference": "Modules/Settings/FrameTab.qml:317",
     "comment": ""
   },
   {
     "term": "Layer Outline Opacity",
-    "translation": "",
+    "translation": "Tavolo Skizo Opakeco",
     "context": "Layer Outline Opacity",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1750",
     "comment": ""
@@ -9696,7 +9696,7 @@
   },
   {
     "term": "Light",
-    "translation": "",
+    "translation": "Hela",
     "context": "Light",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:262, Modules/Settings/TypographyMotionTab.qml:288",
     "comment": "font weight"
@@ -9752,14 +9752,14 @@
   },
   {
     "term": "Limit set to %1%",
-    "translation": "",
+    "translation": "Limo agordita al %1%",
     "context": "Limit set to %1%",
     "reference": "Modules/Settings/BatteryTab.qml:30",
     "comment": ""
   },
   {
     "term": "Limit the maximum battery charge level to extend lifespan.",
-    "translation": "",
+    "translation": "Limigu la maksimuman ŝargan nivelon por plilongigi vivdaŭron.",
     "context": "Limit the maximum battery charge level to extend lifespan.",
     "reference": "Modules/Settings/BatteryTab.qml:184",
     "comment": ""
@@ -9843,7 +9843,7 @@
   },
   {
     "term": "Local Weather",
-    "translation": "",
+    "translation": "Loka Vetero",
     "context": "Local Weather",
     "reference": "Services/WeatherService.qml:470, Services/WeatherService.qml:554",
     "comment": ""
@@ -10011,28 +10011,28 @@
   },
   {
     "term": "Low",
-    "translation": "",
+    "translation": "Malalte",
     "context": "Low",
     "reference": "Modules/Settings/TypographyMotionTab.qml:458",
     "comment": ""
   },
   {
     "term": "Low Battery",
-    "translation": "",
+    "translation": "Malalta Baterio",
     "context": "Low Battery",
     "reference": "Services/BatteryService.qml:157",
     "comment": ""
   },
   {
     "term": "Low Battery Notifications",
-    "translation": "",
+    "translation": "Sciigoj de Malalta Bateria",
     "context": "Low Battery Notifications",
     "reference": "Modules/Settings/BatteryTab.qml:237",
     "comment": ""
   },
   {
     "term": "Low Battery Threshold",
-    "translation": "",
+    "translation": "Malalta Bateria Sojlo",
     "context": "Low Battery Threshold",
     "reference": "Modules/Settings/BatteryTab.qml:226",
     "comment": ""
@@ -10060,21 +10060,21 @@
   },
   {
     "term": "Mail",
-    "translation": "",
+    "translation": "retpoŝti",
     "context": "Mail",
     "reference": "Modules/Settings/DefaultAppsTab.qml:278",
     "comment": "Mail"
   },
   {
     "term": "Make admin",
-    "translation": "",
+    "translation": "Faru administranton",
     "context": "Make admin",
     "reference": "Modules/Settings/UsersTab.qml:286",
     "comment": ""
   },
   {
     "term": "Make the bar background fully transparent",
-    "translation": "",
+    "translation": "Faru la barfonon plene travidebla",
     "context": "Make the bar background fully transparent",
     "reference": "Modules/Settings/DankBarTab.qml:1101",
     "comment": ""
@@ -10095,14 +10095,14 @@
   },
   {
     "term": "Managed by Frame",
-    "translation": "",
+    "translation": "Administrita de Frame",
     "context": "Managed by Frame",
     "reference": "Modules/Settings/DankBarTab.qml:857, Modules/Settings/DankBarTab.qml:1086",
     "comment": ""
   },
   {
     "term": "Managed by Frame in Connected Mode",
-    "translation": "",
+    "translation": "Administrita de Frame en Konektita Reĝimo",
     "context": "Managed by Frame in Connected Mode",
     "reference": "Modules/Settings/DankBarTab.qml:1498, Modules/Settings/DockTab.qml:647, Modules/Settings/ThemeColorsTab.qml:1683",
     "comment": ""
@@ -10116,28 +10116,28 @@
   },
   {
     "term": "Manages calendar events",
-    "translation": "",
+    "translation": "Administras kalendarajn eventojn",
     "context": "Manages calendar events",
     "reference": "Modules/Settings/DefaultAppsTab.qml:305",
     "comment": "Manages calendar events"
   },
   {
     "term": "Manages files and directories",
-    "translation": "",
+    "translation": "Administras dosierojn kaj dosierujojn",
     "context": "Manages files and directories",
     "reference": "Modules/Settings/DefaultAppsTab.qml:293",
     "comment": "Manages files and directories"
   },
   {
     "term": "Mango Options",
-    "translation": "",
+    "translation": "Mango-Ebloj",
     "context": "Mango Options",
     "reference": "Modals/WindowRuleModal.qml:1696",
     "comment": ""
   },
   {
     "term": "Mango service not available",
-    "translation": "",
+    "translation": "Mango-servo ne havebla",
     "context": "Mango service not available",
     "reference": "Modules/Settings/WidgetsTab.qml:43",
     "comment": ""
@@ -10179,7 +10179,7 @@
   },
   {
     "term": "Manual Gaps",
-    "translation": "",
+    "translation": "Manaj Interspacoj",
     "context": "Manual Gaps",
     "reference": "Modules/Notepad/NotepadSettings.qml:459",
     "comment": ""
@@ -10193,7 +10193,7 @@
   },
   {
     "term": "Manual config",
-    "translation": "",
+    "translation": "Mana agordo",
     "context": "Manual config",
     "reference": "Modules/Settings/LauncherTab.qml:32",
     "comment": ""
@@ -10242,14 +10242,14 @@
   },
   {
     "term": "Match (%1)",
-    "translation": "",
+    "translation": "Kongruo (%1)",
     "context": "Match (%1)",
     "reference": "Modules/Settings/WindowRulesTab.qml:1029",
     "comment": ""
   },
   {
     "term": "Match Conditions",
-    "translation": "",
+    "translation": "Matĉaj Kondiĉoj",
     "context": "Match Conditions",
     "reference": "Modals/WindowRuleModal.qml:853",
     "comment": ""
@@ -10263,7 +10263,7 @@
   },
   {
     "term": "Material",
-    "translation": "",
+    "translation": "ŝtofo",
     "context": "Material",
     "reference": "Modules/Settings/TypographyMotionTab.qml:76",
     "comment": ""
@@ -10298,7 +10298,7 @@
   },
   {
     "term": "Material: Material Design 3 Expressive bezier curves. The DMS default feel.",
-    "translation": "",
+    "translation": "Materialo: Materiala Dezajno 3 Esprimplenaj bezier-kurboj. ",
     "context": "Material: Material Design 3 Expressive bezier curves. The DMS default feel.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:120",
     "comment": ""
@@ -10382,7 +10382,7 @@
   },
   {
     "term": "Max Visible",
-    "translation": "",
+    "translation": "Maksimumo Videbla",
     "context": "Max Visible",
     "reference": "Modules/Settings/WidgetsTabSection.qml:1255",
     "comment": ""
@@ -10809,7 +10809,7 @@
   },
   {
     "term": "Monitors in \"%1\":",
-    "translation": "",
+    "translation": "Monitoroj en \"%1\":",
     "context": "Monitors in \"%1\":",
     "reference": "Modules/Settings/DisplayConfigTab.qml:355",
     "comment": ""
@@ -10851,7 +10851,7 @@
   },
   {
     "term": "Motion Effects",
-    "translation": "",
+    "translation": "Moviĝaj Efikoj",
     "context": "Motion Effects",
     "reference": "Modules/Settings/TypographyMotionTab.qml:130",
     "comment": ""
@@ -10865,7 +10865,7 @@
   },
   {
     "term": "Mouse clicks pass through the bar to windows behind it",
-    "translation": "",
+    "translation": "Musklakoj pasas tra la trinkejo al fenestroj malantaŭ ĝi",
     "context": "Mouse clicks pass through the bar to windows behind it",
     "reference": "Modules/Settings/DankBarTab.qml:748",
     "comment": ""
@@ -10900,7 +10900,7 @@
   },
   {
     "term": "Move to Trash",
-    "translation": "",
+    "translation": "movi rubujen",
     "context": "Move to Trash",
     "reference": "Modals/FileBrowser/FileBrowserItemContextMenu.qml:21",
     "comment": ""
@@ -10921,7 +10921,7 @@
   },
   {
     "term": "Multimedia",
-    "translation": "",
+    "translation": "plurmedio",
     "context": "Multimedia",
     "reference": "Modules/Settings/DefaultAppsTab.qml:328",
     "comment": "Multimedia"
@@ -10956,14 +10956,14 @@
   },
   {
     "term": "Music Player",
-    "translation": "",
+    "translation": "Muzikludanto",
     "context": "Music Player",
     "reference": "Modules/Settings/DefaultAppsTab.qml:343",
     "comment": "Music Player"
   },
   {
     "term": "Mute During Playback",
-    "translation": "",
+    "translation": "Mute Dum Reproduktado",
     "context": "Mute During Playback",
     "reference": "Modules/Settings/SoundsTab.qml:146",
     "comment": ""
@@ -11005,7 +11005,7 @@
   },
   {
     "term": "My Online",
-    "translation": "",
+    "translation": "Mia Interreta",
     "context": "My Online",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:246",
     "comment": "Tailscale filter: my online devices"
@@ -11033,21 +11033,21 @@
   },
   {
     "term": "Native",
-    "translation": "",
+    "translation": "operaciuma",
     "context": "Native",
     "reference": "Modules/Settings/TypographyMotionTab.qml:350",
     "comment": ""
   },
   {
     "term": "Native: platform renderer (FreeType).",
-    "translation": "",
+    "translation": "Denaska: platforma bildilo (FreeType).",
     "context": "Native: platform renderer (FreeType).",
     "reference": "Modules/Settings/TypographyMotionTab.qml:423",
     "comment": ""
   },
   {
     "term": "Natural Touchpad Scrolling",
-    "translation": "",
+    "translation": "Natura Tuŝpad Scrolling",
     "context": "Natural Touchpad Scrolling",
     "reference": "Modules/Settings/ThemeColorsTab.qml:2167",
     "comment": ""
@@ -11124,7 +11124,7 @@
   },
   {
     "term": "Network not found",
-    "translation": "",
+    "translation": "Reto ne trovita",
     "context": "Network not found",
     "reference": "Services/LegacyNetworkService.qml:353",
     "comment": ""
@@ -11201,7 +11201,7 @@
   },
   {
     "term": "New event",
-    "translation": "",
+    "translation": "Nova evento",
     "context": "New event",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:186",
     "comment": ""
@@ -11257,7 +11257,7 @@
   },
   {
     "term": "Night mode failed: DMS gamma control not available",
-    "translation": "",
+    "translation": "Nokta reĝimo malsukcesis: DMS gama-kontrolo ne havebla",
     "context": "Night mode failed: DMS gamma control not available",
     "reference": "Services/DisplayService.qml:447",
     "comment": ""
@@ -11439,7 +11439,7 @@
   },
   {
     "term": "No active session found for %1",
-    "translation": "",
+    "translation": "Neniu aktiva sesio trovita por %1",
     "context": "No active session found for %1",
     "reference": "Services/SessionsService.qml:129",
     "comment": ""
@@ -11467,7 +11467,7 @@
   },
   {
     "term": "No application selected",
-    "translation": "",
+    "translation": "Neniu aplikaĵo elektita",
     "context": "No application selected",
     "reference": "Modules/Settings/AutoStartTab.qml:445",
     "comment": ""
@@ -11495,7 +11495,7 @@
   },
   {
     "term": "No autostart entries",
-    "translation": "",
+    "translation": "Neniuj aŭtomataj enskriboj",
     "context": "No autostart entries",
     "reference": "Modules/Settings/AutoStartTab.qml:714",
     "comment": ""
@@ -11516,7 +11516,7 @@
   },
   {
     "term": "No calendar source available",
-    "translation": "",
+    "translation": "Neniu kalendarfonto havebla",
     "context": "No calendar source available",
     "reference": "Modules/Settings/TimeWeatherTab.qml:131",
     "comment": "calendar backend status"
@@ -11572,7 +11572,7 @@
   },
   {
     "term": "No display profiles found. Create them in Settings > Displays.",
-    "translation": "",
+    "translation": "Neniuj montraj profiloj trovitaj. ",
     "context": "No display profiles found. Create them in Settings > Displays.",
     "reference": "Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:148",
     "comment": ""
@@ -11628,7 +11628,7 @@
   },
   {
     "term": "No human user accounts found.",
-    "translation": "",
+    "translation": "Neniuj homaj uzantkontoj trovitaj.",
     "context": "No human user accounts found.",
     "reference": "Modules/Settings/UsersTab.qml:340",
     "comment": ""
@@ -11698,7 +11698,7 @@
   },
   {
     "term": "No matching devices",
-    "translation": "",
+    "translation": "Neniuj kongruaj aparatoj",
     "context": "No matching devices",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:317",
     "comment": "No Tailscale devices match search"
@@ -11726,7 +11726,7 @@
   },
   {
     "term": "No other active sessions on this seat",
-    "translation": "",
+    "translation": "Neniuj aliaj aktivaj sesioj sur ĉi tiu sidloko",
     "context": "No other active sessions on this seat",
     "reference": "Modals/SwitchUserModal.qml:221",
     "comment": ""
@@ -11747,7 +11747,7 @@
   },
   {
     "term": "No peers found",
-    "translation": "",
+    "translation": "Neniuj kunuloj trovitaj",
     "context": "No peers found",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:317",
     "comment": "No Tailscale peers found"
@@ -11810,14 +11810,14 @@
   },
   {
     "term": "No reminder",
-    "translation": "",
+    "translation": "Neniu memorigilo",
     "context": "No reminder",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:31",
     "comment": ""
   },
   {
     "term": "No results",
-    "translation": "",
+    "translation": "Neniu rezulto",
     "context": "No results",
     "reference": "Modals/DankLauncherV2/SpotlightResultsList.qml:163",
     "comment": ""
@@ -11838,7 +11838,7 @@
   },
   {
     "term": "No session selected",
-    "translation": "",
+    "translation": "Neniu sesio elektita",
     "context": "No session selected",
     "reference": "Services/SessionsService.qml:108",
     "comment": ""
@@ -11859,14 +11859,14 @@
   },
   {
     "term": "No supported package manager found.",
-    "translation": "",
+    "translation": "Neniu subtenata pakadministranto trovita.",
     "context": "No supported package manager found.",
     "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:299",
     "comment": ""
   },
   {
     "term": "No terminal configured",
-    "translation": "",
+    "translation": "Neniu terminalo agordita",
     "context": "No terminal configured",
     "reference": "Services/SystemUpdateService.qml:170",
     "comment": ""
@@ -11894,7 +11894,7 @@
   },
   {
     "term": "No user specified",
-    "translation": "",
+    "translation": "Neniu uzanto specifita",
     "context": "No user specified",
     "reference": "Services/SessionsService.qml:122",
     "comment": ""
@@ -11964,14 +11964,14 @@
   },
   {
     "term": "No writable calendar available",
-    "translation": "",
+    "translation": "Neniu skribebla kalendaro havebla",
     "context": "No writable calendar available",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:78",
     "comment": ""
   },
   {
     "term": "Noise",
-    "translation": "",
+    "translation": "bruo",
     "context": "Noise",
     "reference": "Modals/WindowRuleModal.qml:1270, Modules/Settings/WindowRulesTab.qml:132",
     "comment": ""
@@ -11985,7 +11985,7 @@
   },
   {
     "term": "None active",
-    "translation": "",
+    "translation": "Neniu aktiva",
     "context": "None active",
     "reference": "Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:34",
     "comment": ""
@@ -12048,7 +12048,7 @@
   },
   {
     "term": "Not bound",
-    "translation": "",
+    "translation": "Ne ligita",
     "context": "Not bound",
     "reference": "Modules/Settings/LauncherTab.qml:35",
     "comment": ""
@@ -12069,7 +12069,7 @@
   },
   {
     "term": "Not listed?",
-    "translation": "",
+    "translation": "Ĉu ne en listo?",
     "context": "Not listed?",
     "reference": "Modules/Greetd/GreeterContent.qml:1343",
     "comment": "greeter link to switch to manual username entry"
@@ -12090,7 +12090,7 @@
   },
   {
     "term": "Notepad Settings",
-    "translation": "",
+    "translation": "Agordoj de Notepad",
     "context": "Notepad Settings",
     "reference": "Modules/Notepad/NotepadSettings.qml:132",
     "comment": ""
@@ -12104,7 +12104,7 @@
   },
   {
     "term": "Notes",
-    "translation": "",
+    "translation": "Notoj",
     "context": "Notes",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:310",
     "comment": ""
@@ -12125,7 +12125,7 @@
   },
   {
     "term": "Notification",
-    "translation": "",
+    "translation": "sciigo",
     "context": "Notification",
     "reference": "Modules/Settings/BatteryTab.qml:247",
     "comment": ""
@@ -12181,7 +12181,7 @@
   },
   {
     "term": "Notification Type",
-    "translation": "",
+    "translation": "Sciiga Tipo",
     "context": "Notification Type",
     "reference": "Modules/Settings/BatteryTab.qml:245",
     "comment": ""
@@ -12202,7 +12202,7 @@
   },
   {
     "term": "Notify when limit is reached",
-    "translation": "",
+    "translation": "Sciigi kiam limo estas atingita",
     "context": "Notify when limit is reached",
     "reference": "Modules/Settings/BatteryTab.qml:211",
     "comment": ""
@@ -12293,7 +12293,7 @@
   },
   {
     "term": "On indefinitely",
-    "translation": "",
+    "translation": "Sur senfine",
     "context": "On indefinitely",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:154, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:126",
     "comment": ""
@@ -12314,14 +12314,14 @@
   },
   {
     "term": "Once a day",
-    "translation": "",
+    "translation": "Unufoje tage",
     "context": "Once a day",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:28",
     "comment": ""
   },
   {
     "term": "Online",
-    "translation": "",
+    "translation": "rektlinee",
     "context": "Online",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:250",
     "comment": "Tailscale filter: all online devices"
@@ -12377,21 +12377,21 @@
   },
   {
     "term": "Open Dir",
-    "translation": "",
+    "translation": "Malferma Dir",
     "context": "Open Dir",
     "reference": "Modules/Settings/PluginsTab.qml:253",
     "comment": ""
   },
   {
     "term": "Open Frame",
-    "translation": "",
+    "translation": "Malfermu Kadron",
     "context": "Open Frame",
     "reference": "Modules/Settings/Widgets/SettingsControlledByFrame.qml:67",
     "comment": ""
   },
   {
     "term": "Open From",
-    "translation": "",
+    "translation": "Malfermu De",
     "context": "Open From",
     "reference": "Modules/Notepad/NotepadSettings.qml:427",
     "comment": ""
@@ -12405,14 +12405,14 @@
   },
   {
     "term": "Open Trash",
-    "translation": "",
+    "translation": "Malfermu Rubujon",
     "context": "Open Trash",
     "reference": "Modules/Dock/DockTrashContextMenu.qml:20",
     "comment": ""
   },
   {
     "term": "Open Trash With",
-    "translation": "",
+    "translation": "Malfermu Rubujon Kun",
     "context": "Open Trash With",
     "reference": "Modules/Settings/DockTab.qml:542",
     "comment": ""
@@ -12426,14 +12426,14 @@
   },
   {
     "term": "Open a terminal and run a custom command instead of the in-shell upgrade flow.",
-    "translation": "",
+    "translation": "Malfermu terminalon kaj rulu kutiman komandon anstataŭ la enŝela ĝisdatiga fluo.",
     "context": "Open a terminal and run a custom command instead of the in-shell upgrade flow.",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:130",
     "comment": ""
   },
   {
     "term": "Open as window",
-    "translation": "",
+    "translation": "Malfermu kiel fenestron",
     "context": "Open as window",
     "reference": "Modals/KeybindsContent.qml:85",
     "comment": ""
@@ -12468,7 +12468,7 @@
   },
   {
     "term": "Opening terminal to update greetd",
-    "translation": "",
+    "translation": "Malferma terminalo por ĝisdatigi greetd",
     "context": "Opening terminal to update greetd",
     "reference": "Common/settings/Processes.qml:364",
     "comment": ""
@@ -12482,21 +12482,21 @@
   },
   {
     "term": "Opens a picker of other active sessions on this seat",
-    "translation": "",
+    "translation": "Malfermas elektilon de aliaj aktivaj sesioj sur ĉi tiu sidloko",
     "context": "Opens a picker of other active sessions on this seat",
     "reference": "Modules/Settings/PowerSleepTab.qml:461",
     "comment": ""
   },
   {
     "term": "Opens image files",
-    "translation": "",
+    "translation": "Malfermas bilddosierojn",
     "context": "Opens image files",
     "reference": "Modules/Settings/DefaultAppsTab.qml:334",
     "comment": "Opens image files"
   },
   {
     "term": "Opens the connected launcher in Connected Frame Mode.",
-    "translation": "",
+    "translation": "Malfermas la konektitan lanĉilon en Konektita Kadro-Reĝimo.",
     "context": "Opens the connected launcher in Connected Frame Mode.",
     "reference": "Modules/Settings/LauncherTab.qml:142",
     "comment": ""
@@ -12517,7 +12517,7 @@
   },
   {
     "term": "Optional state-based conditions applied to the first match.",
-    "translation": "",
+    "translation": "Laŭvolaj ŝtat-bazitaj kondiĉoj aplikitaj al la unua matĉo.",
     "context": "Optional state-based conditions applied to the first match.",
     "reference": "Modals/WindowRuleModal.qml:860",
     "comment": ""
@@ -12657,7 +12657,7 @@
   },
   {
     "term": "Override global transparency for Notepad",
-    "translation": "",
+    "translation": "Anstataŭigi tutmondan travideblecon por Notepad",
     "context": "Override global transparency for Notepad",
     "reference": "Modules/Notepad/NotepadSettings.qml:356",
     "comment": ""
@@ -12678,7 +12678,7 @@
   },
   {
     "term": "Override the popup gap size when auto is disabled",
-    "translation": "",
+    "translation": "Anstataŭigi la ŝprucfenestran grandecon kiam aŭtomata estas malŝaltita",
     "context": "Override the popup gap size when auto is disabled",
     "reference": "Modules/Settings/DankBarTab.qml:994",
     "comment": ""
@@ -12713,7 +12713,7 @@
   },
   {
     "term": "Owner: %1",
-    "translation": "",
+    "translation": "Posedanto: %1",
     "context": "Owner: %1",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:456",
     "comment": "Tailscale device owner"
@@ -12755,7 +12755,7 @@
   },
   {
     "term": "PDF Reader",
-    "translation": "",
+    "translation": "PDF-Leganto",
     "context": "PDF Reader",
     "reference": "Modules/Settings/DefaultAppsTab.qml:320",
     "comment": "PDF Reader"
@@ -12853,28 +12853,28 @@
   },
   {
     "term": "Password cannot be empty",
-    "translation": "",
+    "translation": "Pasvorto ne povas esti malplena",
     "context": "Password cannot be empty",
     "reference": "Services/UsersService.qml:131, Services/UsersService.qml:147",
     "comment": ""
   },
   {
     "term": "Password change failed (exit %1)",
-    "translation": "",
+    "translation": "Pasvortŝanĝo malsukcesis (eliro %1)",
     "context": "Password change failed (exit %1)",
     "reference": "Services/UsersService.qml:307",
     "comment": ""
   },
   {
     "term": "Password set",
-    "translation": "",
+    "translation": "Pasvorto fiksita",
     "context": "Password set",
     "reference": "Services/UsersService.qml:318",
     "comment": ""
   },
   {
     "term": "Password updated",
-    "translation": "",
+    "translation": "Pasvorto ĝisdatigita",
     "context": "Password updated",
     "reference": "Services/UsersService.qml:320",
     "comment": ""
@@ -12888,7 +12888,7 @@
   },
   {
     "term": "Passwords do not match.",
-    "translation": "",
+    "translation": "Pasvortoj ne kongruas.",
     "context": "Passwords do not match.",
     "reference": "Modules/Settings/UsersTab.qml:448",
     "comment": ""
@@ -12902,7 +12902,7 @@
   },
   {
     "term": "Path copied to clipboard",
-    "translation": "",
+    "translation": "Vojo kopiita al tondujo",
     "context": "Path copied to clipboard",
     "reference": "Modules/Notepad/NotepadTextEditor.qml:995",
     "comment": ""
@@ -12993,7 +12993,7 @@
   },
   {
     "term": "Permanently delete %1 item(s)? This cannot be undone.",
-    "translation": "",
+    "translation": "Ĉu konstante forigi %1 elemento(j)n? ",
     "context": "Permanently delete %1 item(s)? This cannot be undone.",
     "reference": "DMSShell.qml:564",
     "comment": ""
@@ -13014,7 +13014,7 @@
   },
   {
     "term": "Pick a different file manager in Settings → Dock → Trash.",
-    "translation": "",
+    "translation": "Elektu alian dosieradministranton en Agordoj → Doko → Rubujo.",
     "context": "Pick a different file manager in Settings → Dock → Trash.",
     "reference": "Services/TrashService.qml:98",
     "comment": ""
@@ -13028,14 +13028,14 @@
   },
   {
     "term": "Pick a terminal in Settings → Launcher (or set $TERMINAL).",
-    "translation": "",
+    "translation": "Elektu terminalon en Agordoj → Lanĉilo (aŭ starigu $TERMINAL).",
     "context": "Pick a terminal in Settings → Launcher (or set $TERMINAL).",
     "reference": "Services/SystemUpdateService.qml:170",
     "comment": ""
   },
   {
     "term": "Pick how long to pause notifications",
-    "translation": "",
+    "translation": "Elektu kiom longe paŭzi sciigojn",
     "context": "Pick how long to pause notifications",
     "reference": "Modules/ControlCenter/Details/DoNotDisturbDetail.qml:124",
     "comment": ""
@@ -13084,7 +13084,7 @@
   },
   {
     "term": "Place a trash bin at the end of the dock",
-    "translation": "",
+    "translation": "Metu rubujon ĉe la fino de la doko",
     "context": "Place a trash bin at the end of the dock",
     "reference": "Modules/Settings/DockTab.qml:533",
     "comment": ""
@@ -13105,14 +13105,14 @@
   },
   {
     "term": "Place the bar on the Wayland overlay layer",
-    "translation": "",
+    "translation": "Metu la stangon sur la Wayland-kovrantan tavolon",
     "context": "Place the bar on the Wayland overlay layer",
     "reference": "Modules/Settings/DankBarTab.qml:788",
     "comment": ""
   },
   {
     "term": "Place the dock on the Wayland overlay layer",
-    "translation": "",
+    "translation": "Metu la dokon sur la Wayland-kovrotavolo",
     "context": "Place the dock on the Wayland overlay layer",
     "reference": "Modules/Settings/DockTab.qml:96",
     "comment": ""
@@ -13175,14 +13175,14 @@
   },
   {
     "term": "Plays audio files",
-    "translation": "",
+    "translation": "Ludas sondosierojn",
     "context": "Plays audio files",
     "reference": "Modules/Settings/DefaultAppsTab.qml:346",
     "comment": "Plays audio files"
   },
   {
     "term": "Plays video files",
-    "translation": "",
+    "translation": "Ludas videodosierojn",
     "context": "Plays video files",
     "reference": "Modules/Settings/DefaultAppsTab.qml:340",
     "comment": "Plays video files"
@@ -13238,14 +13238,14 @@
   },
   {
     "term": "Plugin disabled: %1",
-    "translation": "",
+    "translation": "Kromaĵo malŝaltita: %1",
     "context": "Plugin disabled: %1",
     "reference": "Modules/Settings/PluginListItem.qml:327",
     "comment": ""
   },
   {
     "term": "Plugin enabled: %1",
-    "translation": "",
+    "translation": "Kromaĵo ebligita: %1",
     "context": "Plugin enabled: %1",
     "reference": "Modules/Settings/PluginListItem.qml:320",
     "comment": ""
@@ -13259,21 +13259,21 @@
   },
   {
     "term": "Plugin reloaded: %1",
-    "translation": "",
+    "translation": "Kromaĵo reŝargita: %1",
     "context": "Plugin reloaded: %1",
     "reference": "Modules/Settings/PluginListItem.qml:293",
     "comment": ""
   },
   {
     "term": "Plugin uninstalled: %1",
-    "translation": "",
+    "translation": "Kromaĵo malinstalita: %1",
     "context": "Plugin uninstalled: %1",
     "reference": "Modules/Settings/PluginListItem.qml:252",
     "comment": ""
   },
   {
     "term": "Plugin updated: %1",
-    "translation": "",
+    "translation": "Kromaĵo ĝisdatigita: %1",
     "context": "Plugin updated: %1",
     "reference": "Modules/Settings/PluginListItem.qml:209",
     "comment": ""
@@ -13294,14 +13294,14 @@
   },
   {
     "term": "Polkit integration is disabled. User management requires Polkit to elevate privileges.",
-    "translation": "",
+    "translation": "Polkit-integriĝo estas malŝaltita. ",
     "context": "Polkit integration is disabled. User management requires Polkit to elevate privileges.",
     "reference": "Modules/Settings/UsersTab.qml:84",
     "comment": ""
   },
   {
     "term": "Popout",
-    "translation": "",
+    "translation": "Popout",
     "context": "Popout",
     "reference": "Modules/Notepad/NotepadSettings.qml:410",
     "comment": ""
@@ -13427,7 +13427,7 @@
   },
   {
     "term": "Power Mode",
-    "translation": "",
+    "translation": "Elektro-reĝimo",
     "context": "Power Mode",
     "reference": "Modals/PowerProfileModal.qml:131",
     "comment": ""
@@ -13462,7 +13462,7 @@
   },
   {
     "term": "Power Profiles Auto-Switching",
-    "translation": "",
+    "translation": "Potencaj Profiloj Aŭtomata Ŝanĝado",
     "context": "Power Profiles Auto-Switching",
     "reference": "Modules/Settings/BatteryTab.qml:303",
     "comment": ""
@@ -13497,14 +13497,14 @@
   },
   {
     "term": "Power profile to use when AC power is connected.",
-    "translation": "",
+    "translation": "Potenca profilo por uzi kiam AC-potenco estas konektita.",
     "context": "Power profile to use when AC power is connected.",
     "reference": "Modules/Settings/BatteryTab.qml:309",
     "comment": ""
   },
   {
     "term": "Power profile to use when running on battery power.",
-    "translation": "",
+    "translation": "Potenca profilo por uzi kiam funkcias per kuirilaro.",
     "context": "Power profile to use when running on battery power.",
     "reference": "Modules/Settings/BatteryTab.qml:327",
     "comment": ""
@@ -13735,7 +13735,7 @@
   },
   {
     "term": "Process exited with code %1",
-    "translation": "",
+    "translation": "Procezo eliris kun kodo %1",
     "context": "Process exited with code %1",
     "reference": "Modules/Settings/BatteryTab.qml:28",
     "comment": ""
@@ -13812,7 +13812,7 @@
   },
   {
     "term": "Profile not found in monitors.json",
-    "translation": "",
+    "translation": "Profilo ne trovita en monitors.json",
     "context": "Profile not found in monitors.json",
     "reference": "Modules/Settings/DisplayConfig/DisplayConfigState.qml:683",
     "comment": ""
@@ -13826,14 +13826,14 @@
   },
   {
     "term": "Profile when Plugged In (AC)",
-    "translation": "",
+    "translation": "Profilo kiam Konektita (AC)",
     "context": "Profile when Plugged In (AC)",
     "reference": "Modules/Settings/BatteryTab.qml:308",
     "comment": ""
   },
   {
     "term": "Profile when on Battery",
-    "translation": "",
+    "translation": "Profilo kiam sur Baterio",
     "context": "Profile when on Battery",
     "reference": "Modules/Settings/BatteryTab.qml:326",
     "comment": ""
@@ -13847,21 +13847,21 @@
   },
   {
     "term": "Qt",
-    "translation": "",
+    "translation": "Qt",
     "context": "Qt",
     "reference": "Modules/Settings/TypographyMotionTab.qml:350",
     "comment": ""
   },
   {
     "term": "Qt colors applied successfully",
-    "translation": "",
+    "translation": "Qt-koloroj aplikitaj sukcese",
     "context": "Qt colors applied successfully",
     "reference": "Common/Theme.qml:1967",
     "comment": ""
   },
   {
     "term": "Qt: distance-field renderer.",
-    "translation": "",
+    "translation": "Qt: distanca-kampa bildilo.",
     "context": "Qt: distance-field renderer.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:419",
     "comment": ""
@@ -13882,7 +13882,7 @@
   },
   {
     "term": "Quality",
-    "translation": "",
+    "translation": "kvalito",
     "context": "Quality",
     "reference": "Modules/Settings/TypographyMotionTab.qml:444",
     "comment": ""
@@ -13980,21 +13980,21 @@
   },
   {
     "term": "Re-enter password",
-    "translation": "",
+    "translation": "Reenigu pasvorton",
     "context": "Re-enter password",
     "reference": "Modules/Settings/UsersTab.qml:433",
     "comment": ""
   },
   {
     "term": "Reach local network devices while using an exit node",
-    "translation": "",
+    "translation": "Atingu lokajn retajn aparatojn dum vi uzas elirnodon",
     "context": "Reach local network devices while using an exit node",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:207",
     "comment": "Tailscale allow LAN access description"
   },
   {
     "term": "Read-only legacy config",
-    "translation": "",
+    "translation": "Nurlegebla hereda agordo",
     "context": "Read-only legacy config",
     "reference": "Widgets/KeybindItem.qml:1851",
     "comment": ""
@@ -14022,7 +14022,7 @@
   },
   {
     "term": "Recent",
-    "translation": "",
+    "translation": "lastaj",
     "context": "Recent",
     "reference": "Modals/Clipboard/ClipboardHeader.qml:55",
     "comment": ""
@@ -14064,7 +14064,7 @@
   },
   {
     "term": "Refreshing...",
-    "translation": "",
+    "translation": "Refreŝigante...",
     "context": "Refreshing...",
     "reference": "Modules/Settings/UsersTab.qml:142",
     "comment": ""
@@ -14078,7 +14078,7 @@
   },
   {
     "term": "Regular",
-    "translation": "",
+    "translation": "regula",
     "context": "Regular",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:264, Modules/Settings/TypographyMotionTab.qml:276, Modules/Settings/TypographyMotionTab.qml:291",
     "comment": "font weight"
@@ -14099,7 +14099,7 @@
   },
   {
     "term": "Reload From Disk",
-    "translation": "",
+    "translation": "Reŝargi De Disko",
     "context": "Reload From Disk",
     "reference": "Modules/Notepad/Notepad.qml:381",
     "comment": ""
@@ -14127,7 +14127,7 @@
   },
   {
     "term": "Remember Last Mode",
-    "translation": "",
+    "translation": "Memoru Lastan Reĝimon",
     "context": "Remember Last Mode",
     "reference": "Modules/Settings/LauncherTab.qml:1127",
     "comment": ""
@@ -14141,7 +14141,7 @@
   },
   {
     "term": "Remember Type Filter",
-    "translation": "",
+    "translation": "Memoru Tipon Filtrilon",
     "context": "Remember Type Filter",
     "reference": "Modules/Settings/ClipboardTab.qml:471",
     "comment": "Clipboard behavior setting title"
@@ -14162,7 +14162,7 @@
   },
   {
     "term": "Reminder",
-    "translation": "",
+    "translation": "memorigo",
     "context": "Reminder",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:288",
     "comment": ""
@@ -14176,14 +14176,14 @@
   },
   {
     "term": "Remove \"%1\" from the %2 group?",
-    "translation": "",
+    "translation": "Ĉu forigi \"%1\" el la grupo %2?",
     "context": "Remove \"%1\" from the %2 group?",
     "reference": "Modules/Settings/UsersTab.qml:266, Modules/Settings/UsersTab.qml:294",
     "comment": ""
   },
   {
     "term": "Remove Shortcut?",
-    "translation": "",
+    "translation": "Ĉu forigi ŝparvojon?",
     "context": "Remove Shortcut?",
     "reference": "Modules/Settings/KeybindsTab.qml:107",
     "comment": ""
@@ -14197,21 +14197,21 @@
   },
   {
     "term": "Remove admin",
-    "translation": "",
+    "translation": "Forigi administranton",
     "context": "Remove admin",
     "reference": "Modules/Settings/UsersTab.qml:286",
     "comment": ""
   },
   {
     "term": "Remove admin?",
-    "translation": "",
+    "translation": "Ĉu forigi administranton?",
     "context": "Remove admin?",
     "reference": "Modules/Settings/UsersTab.qml:293",
     "comment": ""
   },
   {
     "term": "Remove corner rounding from the bar",
-    "translation": "",
+    "translation": "Forigu angulon de la stango",
     "context": "Remove corner rounding from the bar",
     "reference": "Modules/Settings/DankBarTab.qml:1091",
     "comment": ""
@@ -14225,56 +14225,56 @@
   },
   {
     "term": "Remove greeter access?",
-    "translation": "",
+    "translation": "Ĉu forigi salutan aliron?",
     "context": "Remove greeter access?",
     "reference": "Modules/Settings/UsersTab.qml:265",
     "comment": ""
   },
   {
     "term": "Remove greeter login access",
-    "translation": "",
+    "translation": "Forigi salutan aliron",
     "context": "Remove greeter login access",
     "reference": "Modules/Settings/UsersTab.qml:258",
     "comment": ""
   },
   {
     "term": "Remove inner padding from all widgets",
-    "translation": "",
+    "translation": "Forigu internan remburaĵon de ĉiuj fenestraĵoj",
     "context": "Remove inner padding from all widgets",
     "reference": "Modules/Settings/DankBarTab.qml:1129",
     "comment": ""
   },
   {
     "term": "Remove match",
-    "translation": "",
+    "translation": "Forigi matĉon",
     "context": "Remove match",
     "reference": "Modals/WindowRuleModal.qml:810",
     "comment": ""
   },
   {
     "term": "Remove the shortcut %1?",
-    "translation": "",
+    "translation": "Ĉu forigi la ŝparvojon %1?",
     "context": "Remove the shortcut %1?",
     "reference": "Modules/Settings/KeybindsTab.qml:108",
     "comment": ""
   },
   {
     "term": "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.",
-    "translation": "",
+    "translation": "Ĉu forigi la ŝparvojon %1? ",
     "context": "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.",
     "reference": "Modules/Settings/KeybindsTab.qml:108",
     "comment": ""
   },
   {
     "term": "Removed administrator privileges",
-    "translation": "",
+    "translation": "Forigis administrantajn privilegiojn",
     "context": "Removed administrator privileges",
     "reference": "Services/UsersService.qml:409",
     "comment": ""
   },
   {
     "term": "Removed greeter login access",
-    "translation": "",
+    "translation": "Forigita saluta ensaluta aliro",
     "context": "Removed greeter login access",
     "reference": "Services/UsersService.qml:379",
     "comment": ""
@@ -14358,14 +14358,14 @@
   },
   {
     "term": "Requires DMS server with sysupdate capability",
-    "translation": "",
+    "translation": "Postulas DMS-servilon kun sysupdate-kapablo",
     "context": "Requires DMS server with sysupdate capability",
     "reference": "Modules/Settings/WidgetsTab.qml:252",
     "comment": ""
   },
   {
     "term": "Requires MangoWC compositor",
-    "translation": "",
+    "translation": "Postulas MangoWC-komponiston",
     "context": "Requires MangoWC compositor",
     "reference": "Modules/Settings/WidgetsTab.qml:43",
     "comment": ""
@@ -14386,7 +14386,7 @@
   },
   {
     "term": "Requires remembering the last user and session. Enable those options first.",
-    "translation": "",
+    "translation": "Necesas memori la lastan uzanton kaj sesion. ",
     "context": "Requires remembering the last user and session. Enable those options first.",
     "reference": "Modules/Settings/GreeterTab.qml:751",
     "comment": ""
@@ -14414,14 +14414,14 @@
   },
   {
     "term": "Reset to Default?",
-    "translation": "",
+    "translation": "Restarigi al Defaŭlta?",
     "context": "Reset to Default?",
     "reference": "Modules/Settings/KeybindsTab.qml:120",
     "comment": ""
   },
   {
     "term": "Reset to default",
-    "translation": "",
+    "translation": "Restarigi al defaŭlta",
     "context": "Reset to default",
     "reference": "Widgets/KeybindItem.qml:1838",
     "comment": ""
@@ -14442,14 +14442,14 @@
   },
   {
     "term": "Resize on Border",
-    "translation": "",
+    "translation": "Regrandigi sur Limo",
     "context": "Resize on Border",
     "reference": "Modules/Settings/CompositorLayoutTab.qml:219",
     "comment": ""
   },
   {
     "term": "Resize windows by dragging their edges with the mouse",
-    "translation": "",
+    "translation": "Regrandigi fenestrojn trenante iliajn randojn per la muso",
     "context": "Resize windows by dragging their edges with the mouse",
     "reference": "Modules/Settings/CompositorLayoutTab.qml:220",
     "comment": ""
@@ -14498,7 +14498,7 @@
   },
   {
     "term": "Restore the last selected mode (tab) when the launcher is opened",
-    "translation": "",
+    "translation": "Restarigu la lastan elektitan reĝimon (langeto) kiam la lanĉilo estas malfermita",
     "context": "Restore the last selected mode (tab) when the launcher is opened",
     "reference": "Modules/Settings/LauncherTab.qml:1128",
     "comment": ""
@@ -14512,7 +14512,7 @@
   },
   {
     "term": "Reveal the arcs where surfaces meet the frame",
-    "translation": "",
+    "translation": "Malkaŝu la arkojn kie surfacoj renkontas la kadron",
     "context": "Reveal the arcs where surfaces meet the frame",
     "reference": "Modules/Settings/FrameTab.qml:309",
     "comment": ""
@@ -14631,7 +14631,7 @@
   },
   {
     "term": "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.",
-    "translation": "",
+    "translation": "Reguloj trovitaj en via kompostista agordo. ",
     "context": "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.",
     "reference": "Modules/Settings/WindowRulesTab.qml:847",
     "comment": ""
@@ -14673,7 +14673,7 @@
   },
   {
     "term": "Run paru/yay with AUR enabled when 'Update All' is clicked.",
-    "translation": "",
+    "translation": "Rulu paru/yay kun AUR ebligita kiam 'Ĝisdatigi Ĉion' estas klakita.",
     "context": "Run paru/yay with AUR enabled when 'Update All' is clicked.",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:113",
     "comment": ""
@@ -14701,7 +14701,7 @@
   },
   {
     "term": "Running in terminal",
-    "translation": "",
+    "translation": "Kurante en terminalo",
     "context": "Running in terminal",
     "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:423",
     "comment": ""
@@ -14722,7 +14722,7 @@
   },
   {
     "term": "Saturation",
-    "translation": "",
+    "translation": "satureco",
     "context": "Saturation",
     "reference": "Modals/WindowRuleModal.qml:1293, Modules/Settings/WindowRulesTab.qml:133",
     "comment": ""
@@ -14750,14 +14750,14 @@
   },
   {
     "term": "Save and close",
-    "translation": "",
+    "translation": "Konservu kaj fermu",
     "context": "Save and close",
     "reference": "Modals/Clipboard/ClipboardEditor.qml:476",
     "comment": ""
   },
   {
     "term": "Save and paste",
-    "translation": "",
+    "translation": "Konservu kaj algluu",
     "context": "Save and paste",
     "reference": "Modals/Clipboard/ClipboardEditor.qml:515",
     "comment": ""
@@ -14820,7 +14820,7 @@
   },
   {
     "term": "Saved Networks",
-    "translation": "",
+    "translation": "Konservitaj retoj",
     "context": "Saved Networks",
     "reference": "Modules/Settings/NetworkWifiTab.qml:831",
     "comment": ""
@@ -14995,14 +14995,14 @@
   },
   {
     "term": "Search applications...",
-    "translation": "",
+    "translation": "Serĉu aplikaĵojn...",
     "context": "Search applications...",
     "reference": "Modules/Settings/Widgets/AppBrowserPopup.qml:155",
     "comment": ""
   },
   {
     "term": "Search devices...",
-    "translation": "",
+    "translation": "Serĉu aparatojn...",
     "context": "Search devices...",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:221",
     "comment": "Tailscale device search placeholder"
@@ -15016,7 +15016,7 @@
   },
   {
     "term": "Search installed plugins...",
-    "translation": "",
+    "translation": "Serĉu instalitajn kromaĵojn...",
     "context": "Search installed plugins...",
     "reference": "Modules/Settings/PluginsTab.qml:368",
     "comment": ""
@@ -15072,7 +15072,7 @@
   },
   {
     "term": "Searching",
-    "translation": "",
+    "translation": "Serĉante",
     "context": "Searching",
     "reference": "Modals/DankLauncherV2/SpotlightResultsList.qml:158",
     "comment": ""
@@ -15093,7 +15093,7 @@
   },
   {
     "term": "Secondary Container",
-    "translation": "",
+    "translation": "Malĉefa Ujo",
     "context": "Secondary Container",
     "reference": "Modules/Settings/WorkspaceAppearanceCard.qml:26, Modules/Settings/WorkspaceAppearanceCard.qml:67, Modules/Settings/WorkspaceAppearanceCard.qml:137, Modules/Settings/WorkspaceAppearanceCard.qml:172, Modules/Settings/ThemeColorsTab.qml:40",
     "comment": "widget background color option | workspace color option"
@@ -15219,7 +15219,7 @@
   },
   {
     "term": "Select a desktop application",
-    "translation": "",
+    "translation": "Elektu labortablan aplikaĵon",
     "context": "Select a desktop application",
     "reference": "Modules/Settings/AutoStartTab.qml:383",
     "comment": ""
@@ -15247,7 +15247,7 @@
   },
   {
     "term": "Select an active session to switch to. The current session stays running in the background.",
-    "translation": "",
+    "translation": "Elektu aktivan sesion al kiu ŝanĝi. ",
     "context": "Select an active session to switch to. The current session stays running in the background.",
     "reference": "Modals/SwitchUserModal.qml:107",
     "comment": ""
@@ -15338,7 +15338,7 @@
   },
   {
     "term": "Select user...",
-    "translation": "",
+    "translation": "Elektu uzanton...",
     "context": "Select user...",
     "reference": "Modules/Greetd/GreeterContent.qml:1001",
     "comment": "greeter user picker placeholder"
@@ -15366,7 +15366,7 @@
   },
   {
     "term": "Separate",
-    "translation": "",
+    "translation": "apartigi",
     "context": "Separate",
     "reference": "Modules/Settings/FrameTab.qml:56",
     "comment": ""
@@ -15436,7 +15436,7 @@
   },
   {
     "term": "Set initial password",
-    "translation": "",
+    "translation": "Agordu komencan pasvorton",
     "context": "Set initial password",
     "reference": "Modules/Settings/UsersTab.qml:410",
     "comment": ""
@@ -15457,28 +15457,28 @@
   },
   {
     "term": "Set the font size for notification body text (htmlBody)",
-    "translation": "",
+    "translation": "Agordu la tiparon por la korpa teksto de la sciiga (htmlBody)",
     "context": "Set the font size for notification body text (htmlBody)",
     "reference": "Modules/Settings/NotificationsTab.qml:228",
     "comment": ""
   },
   {
     "term": "Set the font size for notification summary text",
-    "translation": "",
+    "translation": "Agordu la tiparon por sciiga resuma teksto",
     "context": "Set the font size for notification summary text",
     "reference": "Modules/Settings/NotificationsTab.qml:215",
     "comment": ""
   },
   {
     "term": "Set the percentage at which the battery is considered low.",
-    "translation": "",
+    "translation": "Fiksu la procenton je kiu la baterio estas konsiderata malalta.",
     "context": "Set the percentage at which the battery is considered low.",
     "reference": "Modules/Settings/BatteryTab.qml:227",
     "comment": ""
   },
   {
     "term": "Setting",
-    "translation": "",
+    "translation": "agordo",
     "context": "Setting",
     "reference": "Services/AppSearchService.qml:325, Modals/DankLauncherV2/ResultItem.qml:226, Modals/DankLauncherV2/SpotlightResultRow.qml:66",
     "comment": ""
@@ -15492,7 +15492,7 @@
   },
   {
     "term": "Settings Search",
-    "translation": "",
+    "translation": "Agordoj Serĉu",
     "context": "Settings Search",
     "reference": "Services/AppSearchService.qml:215",
     "comment": ""
@@ -15541,7 +15541,7 @@
   },
   {
     "term": "Shadow blur radius in pixels",
-    "translation": "",
+    "translation": "Ombra malklara radiuso en pikseloj",
     "context": "Shadow blur radius in pixels",
     "reference": "Modules/Settings/DankBarTab.qml:1545",
     "comment": ""
@@ -15590,7 +15590,7 @@
   },
   {
     "term": "Shift+Enter to copy",
-    "translation": "",
+    "translation": "Shift+Enter por kopii",
     "context": "Shift+Enter to copy",
     "reference": "Modals/DankLauncherV2/Controller.qml:1223",
     "comment": ""
@@ -15653,7 +15653,7 @@
   },
   {
     "term": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.",
-    "translation": "",
+    "translation": "Montru Ĉion, Apojn, Dosirojn kaj Kromaĵojn apud la enigo de Spotlight Bar.",
     "context": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.",
     "reference": "Modules/Settings/LauncherTab.qml:270",
     "comment": ""
@@ -15744,7 +15744,7 @@
   },
   {
     "term": "Show Icon",
-    "translation": "",
+    "translation": "Montri Ikonon",
     "context": "Show Icon",
     "reference": "Modules/Settings/WidgetsTabSection.qml:1364",
     "comment": ""
@@ -15814,7 +15814,7 @@
   },
   {
     "term": "Show Mode Chips",
-    "translation": "",
+    "translation": "Montru Mode Blatojn",
     "context": "Show Mode Chips",
     "reference": "Modules/Settings/LauncherTab.qml:269",
     "comment": ""
@@ -15919,7 +15919,7 @@
   },
   {
     "term": "Show Switch User",
-    "translation": "",
+    "translation": "Montru Ŝanĝi Uzanton",
     "context": "Show Switch User",
     "reference": "Modules/Settings/PowerSleepTab.qml:460",
     "comment": ""
@@ -15954,7 +15954,7 @@
   },
   {
     "term": "Show Trash in Dock",
-    "translation": "",
+    "translation": "Montru Rubujon en Doko",
     "context": "Show Trash in Dock",
     "reference": "Modules/Settings/DockTab.qml:532",
     "comment": ""
@@ -15982,28 +15982,28 @@
   },
   {
     "term": "Show a bar that drains as the popup's auto-dismiss timer runs",
-    "translation": "",
+    "translation": "Montru trinkejon, kiu dreniĝas dum la aŭtomata forĵeta tempigilo de la ŝprucfenestro funkcias",
     "context": "Show a bar that drains as the popup's auto-dismiss timer runs",
     "reference": "Modules/Settings/NotificationsTab.qml:308",
     "comment": ""
   },
   {
     "term": "Show a notification when battery reaches the charge limit.",
-    "translation": "",
+    "translation": "Montru sciigon kiam baterio atingas la ŝarglimon.",
     "context": "Show a notification when battery reaches the charge limit.",
     "reference": "Modules/Settings/BatteryTab.qml:212",
     "comment": ""
   },
   {
     "term": "Show a warning popup when battery is running low.",
-    "translation": "",
+    "translation": "Montru avertan ŝprucfenestron kiam baterio malfunkcias.",
     "context": "Show a warning popup when battery is running low.",
     "reference": "Modules/Settings/BatteryTab.qml:238",
     "comment": ""
   },
   {
     "term": "Show all 9 tags instead of only occupied tags",
-    "translation": "",
+    "translation": "Montru ĉiujn 9 etikedojn anstataŭ nur okupatajn etikedojn",
     "context": "Show all 9 tags instead of only occupied tags",
     "reference": "Modules/Settings/WorkspacesTab.qml:194",
     "comment": ""
@@ -16017,7 +16017,7 @@
   },
   {
     "term": "Show an urgent alert when battery reaches critical level.",
-    "translation": "",
+    "translation": "Montru urĝan alarmon kiam baterio atingas kritikan nivelon.",
     "context": "Show an urgent alert when battery reaches critical level.",
     "reference": "Modules/Settings/BatteryTab.qml:293",
     "comment": ""
@@ -16059,14 +16059,14 @@
   },
   {
     "term": "Show during Niri overview",
-    "translation": "",
+    "translation": "Montru dum Niri-superrigardo",
     "context": "Show during Niri overview",
     "reference": "Modules/Settings/FrameTab.qml:351",
     "comment": ""
   },
   {
     "term": "Show foreground surfaces on blurred panels for stronger contrast",
-    "translation": "",
+    "translation": "Montru malklarajn surfacojn sur neklaraj paneloj por pli forta kontrasto",
     "context": "Show foreground surfaces on blurred panels for stronger contrast",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1739",
     "comment": ""
@@ -16094,7 +16094,7 @@
   },
   {
     "term": "Show mount path",
-    "translation": "",
+    "translation": "Montru montovojon",
     "context": "Show mount path",
     "reference": "Modules/ControlCenter/Components/DiskUsageWidgetConfigMenu.qml:31",
     "comment": "toggle in control center disk usage widget to turn mount path display on or off"
@@ -16220,14 +16220,14 @@
   },
   {
     "term": "Show the bar only when no windows are open",
-    "translation": "",
+    "translation": "Montru la trinkejon nur kiam neniuj fenestroj estas malfermitaj",
     "context": "Show the bar only when no windows are open",
     "reference": "Modules/Settings/DankBarTab.qml:710",
     "comment": ""
   },
   {
     "term": "Show the bar when niri overview is active",
-    "translation": "",
+    "translation": "Montru la stangon kiam niri-superrigardo estas aktiva",
     "context": "Show the bar when niri overview is active",
     "reference": "Modules/Settings/DankBarTab.qml:768",
     "comment": ""
@@ -16325,28 +16325,28 @@
   },
   {
     "term": "Silence for a while",
-    "translation": "",
+    "translation": "Silentu dum momento",
     "context": "Silence for a while",
     "reference": "Modules/Notifications/Center/NotificationHeader.qml:92",
     "comment": ""
   },
   {
     "term": "Silence notifications",
-    "translation": "",
+    "translation": "Silentigi sciigojn",
     "context": "Silence notifications",
     "reference": "Modules/ControlCenter/Details/DoNotDisturbDetail.qml:113",
     "comment": ""
   },
   {
     "term": "Silence system sounds while media is playing",
-    "translation": "",
+    "translation": "Silenta sistemo sonas dum amaskomunikilaro ludas",
     "context": "Silence system sounds while media is playing",
     "reference": "Modules/Settings/SoundsTab.qml:147",
     "comment": ""
   },
   {
     "term": "Single-Line Popup",
-    "translation": "",
+    "translation": "Unulinia Ŝprucfenestro",
     "context": "Single-Line Popup",
     "reference": "Modules/Settings/WidgetsTabSection.qml:1151",
     "comment": ""
@@ -16402,14 +16402,14 @@
   },
   {
     "term": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
-    "translation": "",
+    "translation": "Preterpasu la salutan pasvorton post lanĉo ĝis vi elsaluti. ",
     "context": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
     "reference": "Modules/Settings/GreeterTab.qml:751",
     "comment": ""
   },
   {
     "term": "Slideout",
-    "translation": "",
+    "translation": "Glitilo",
     "context": "Slideout",
     "reference": "Modules/Notepad/NotepadSettings.qml:410",
     "comment": ""
@@ -16486,14 +16486,14 @@
   },
   {
     "term": "Source: %1",
-    "translation": "",
+    "translation": "Fonto: %1",
     "context": "Source: %1",
     "reference": "Modules/Settings/WindowRulesTab.qml:1072",
     "comment": ""
   },
   {
     "term": "Space between the bar and screen edges",
-    "translation": "",
+    "translation": "Spaco inter la stango kaj ekranaj randoj",
     "context": "Space between the bar and screen edges",
     "reference": "Modules/Settings/DankBarTab.qml:871",
     "comment": ""
@@ -16542,28 +16542,28 @@
   },
   {
     "term": "Spotlight",
-    "translation": "",
+    "translation": "spoto",
     "context": "Spotlight",
     "reference": "Modules/Settings/LauncherTab.qml:93",
     "comment": ""
   },
   {
     "term": "Spotlight Bar",
-    "translation": "",
+    "translation": "Spotlight Bar",
     "context": "Spotlight Bar",
     "reference": "Modules/Settings/LauncherTab.qml:185",
     "comment": ""
   },
   {
     "term": "Spotlight Bar Shortcut",
-    "translation": "",
+    "translation": "Spotlight Bar Ŝparvojo",
     "context": "Spotlight Bar Shortcut",
     "reference": "Modules/Settings/LauncherTab.qml:227",
     "comment": ""
   },
   {
     "term": "Spotlight Search",
-    "translation": "",
+    "translation": "Spotlight Serĉo",
     "context": "Spotlight Search",
     "reference": "Modals/DankLauncherV2/SpotlightLauncherContent.qml:372",
     "comment": ""
@@ -16591,7 +16591,7 @@
   },
   {
     "term": "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.",
-    "translation": "",
+    "translation": "Normo: Klasika Materiala Dezajno 3 - paneloj leviĝas de malsupre kun subtila skalo. ",
     "context": "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.",
     "reference": "Modules/Settings/TypographyMotionTab.qml:189",
     "comment": ""
@@ -16654,21 +16654,21 @@
   },
   {
     "term": "Stretch widget icons to fill the available bar height",
-    "translation": "",
+    "translation": "Etendi fenestraĵajn ikonojn por plenigi la disponeblan stangeton",
     "context": "Stretch widget icons to fill the available bar height",
     "reference": "Modules/Settings/DankBarTab.qml:1111",
     "comment": ""
   },
   {
     "term": "Stretch widget text to fill the available bar height",
-    "translation": "",
+    "translation": "Etendi tekston de la fenestraĵo por plenigi la disponeblan stangeton",
     "context": "Stretch widget text to fill the available bar height",
     "reference": "Modules/Settings/DankBarTab.qml:1120",
     "comment": ""
   },
   {
     "term": "Strict auto-hide",
-    "translation": "",
+    "translation": "Strikta aŭtomata kaŝado",
     "context": "Strict auto-hide",
     "reference": "Modules/Settings/DankBarTab.qml:695",
     "comment": "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open"
@@ -16682,7 +16682,7 @@
   },
   {
     "term": "Subtle Overlay",
-    "translation": "",
+    "translation": "Subtila Overlay",
     "context": "Subtle Overlay",
     "reference": "Modules/Settings/ThemeColorsTab.qml:25",
     "comment": "widget background color option"
@@ -16696,7 +16696,7 @@
   },
   {
     "term": "Summary Font Size",
-    "translation": "",
+    "translation": "Resumo Tiparo Grandeco",
     "context": "Summary Font Size",
     "reference": "Modules/Settings/NotificationsTab.qml:214",
     "comment": ""
@@ -16717,7 +16717,7 @@
   },
   {
     "term": "Suppress Duplicate Notifications",
-    "translation": "",
+    "translation": "Subpremi Duplikatajn Sciigojn",
     "context": "Suppress Duplicate Notifications",
     "reference": "Modules/Settings/NotificationsTab.qml:316",
     "comment": ""
@@ -16738,42 +16738,42 @@
   },
   {
     "term": "Surface Behavior",
-    "translation": "",
+    "translation": "Surfaca Konduto",
     "context": "Surface Behavior",
     "reference": "Modules/Settings/FrameTab.qml:54",
     "comment": ""
   },
   {
     "term": "Surface Container",
-    "translation": "",
+    "translation": "Surfaca Ujo",
     "context": "Surface Container",
     "reference": "Modules/Settings/WorkspaceAppearanceCard.qml:38, Modules/Settings/WorkspaceAppearanceCard.qml:79, Modules/Settings/WorkspaceAppearanceCard.qml:111, Modules/Settings/WorkspaceAppearanceCard.qml:149, Modules/Settings/ThemeColorsTab.qml:31",
     "comment": "widget background color option | workspace color option"
   },
   {
     "term": "Surface High",
-    "translation": "",
+    "translation": "Surfaco Alta",
     "context": "Surface High",
     "reference": "Modules/Settings/WorkspaceAppearanceCard.qml:41, Modules/Settings/WorkspaceAppearanceCard.qml:82, Modules/Settings/WorkspaceAppearanceCard.qml:114, Modules/Settings/WorkspaceAppearanceCard.qml:152, Modules/Settings/ThemeColorsTab.qml:34",
     "comment": "widget background color option | workspace color option"
   },
   {
     "term": "Surface Highest",
-    "translation": "",
+    "translation": "Surfaco Plej Alta",
     "context": "Surface Highest",
     "reference": "Modules/Settings/WorkspaceAppearanceCard.qml:44, Modules/Settings/WorkspaceAppearanceCard.qml:85, Modules/Settings/WorkspaceAppearanceCard.qml:117",
     "comment": "workspace color option"
   },
   {
     "term": "Surface Opacity",
-    "translation": "",
+    "translation": "Surfaca Opakeco",
     "context": "Surface Opacity",
     "reference": "Modules/Settings/FrameTab.qml:146, Modules/Settings/ThemeColorsTab.qml:1682, Modules/Settings/ThemeColorsTab.qml:1690, Modules/Notepad/NotepadSettings.qml:355",
     "comment": ""
   },
   {
     "term": "Surface Text",
-    "translation": "",
+    "translation": "Surfaca Teksto",
     "context": "Surface Text",
     "reference": "Modules/Settings/WorkspaceAppearanceCard.qml:96, Modules/Settings/WorkspaceAppearanceCard.qml:160",
     "comment": "workspace color option"
@@ -16787,14 +16787,14 @@
   },
   {
     "term": "Surfaces emerge flush from the bar",
-    "translation": "",
+    "translation": "Surfacoj eliras flue el la trinkejo",
     "context": "Surfaces emerge flush from the bar",
     "reference": "Modules/Settings/FrameTab.qml:55",
     "comment": ""
   },
   {
     "term": "Surfaces float independently of the frame",
-    "translation": "",
+    "translation": "Surfacoj flosas sendepende de la kadro",
     "context": "Surfaces float independently of the frame",
     "reference": "Modules/Settings/FrameTab.qml:55",
     "comment": ""
@@ -16843,7 +16843,7 @@
   },
   {
     "term": "Switch between display configurations",
-    "translation": "",
+    "translation": "Ŝanĝu inter ekranaj agordoj",
     "context": "Switch between display configurations",
     "reference": "Modules/ControlCenter/Models/WidgetModel.qml:278",
     "comment": ""
@@ -16976,7 +16976,7 @@
   },
   {
     "term": "System Tray Icon Tint",
-    "translation": "",
+    "translation": "Sistempleto Ikono Nuanco",
     "context": "System Tray Icon Tint",
     "reference": "Modules/Settings/DankBarTab.qml:1207",
     "comment": ""
@@ -17032,7 +17032,7 @@
   },
   {
     "term": "Systemd Override generated",
-    "translation": "",
+    "translation": "Systemd Override generita",
     "context": "Systemd Override generated",
     "reference": "Modules/Settings/AutoStartTab.qml:272, Modules/Settings/AutoStartTab.qml:277",
     "comment": ""
@@ -17053,42 +17053,42 @@
   },
   {
     "term": "Tags",
-    "translation": "",
+    "translation": "Etikedoj",
     "context": "Tags",
     "reference": "Modals/WindowRuleModal.qml:1737",
     "comment": ""
   },
   {
     "term": "Tags: %1",
-    "translation": "",
+    "translation": "Etikedoj: %1",
     "context": "Tags: %1",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:449",
     "comment": "Tailscale device tags"
   },
   {
     "term": "Tailscale",
-    "translation": "",
+    "translation": "Vostoskalo",
     "context": "Tailscale",
     "reference": "Modules/ControlCenter/Models/WidgetModel.qml:267, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:17",
     "comment": "Tailscale mesh VPN widget title"
   },
   {
     "term": "Tailscale Network",
-    "translation": "",
+    "translation": "Tailscale Reto",
     "context": "Tailscale Network",
     "reference": "Modules/ControlCenter/Models/WidgetModel.qml:268",
     "comment": "Tailscale control center widget description"
   },
   {
     "term": "Tailscale action failed",
-    "translation": "",
+    "translation": "Vostoskala ago malsukcesis",
     "context": "Tailscale action failed",
     "reference": "Services/TailscaleService.qml:178",
     "comment": "Toast shown when a Tailscale write action is rejected"
   },
   {
     "term": "Tailscale not available",
-    "translation": "",
+    "translation": "Vostoskalo ne havebla",
     "context": "Tailscale not available",
     "reference": "Modules/ControlCenter/Models/WidgetModel.qml:272, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:77",
     "comment": "Warning when Tailscale service is not running"
@@ -17102,7 +17102,7 @@
   },
   {
     "term": "Terminal additional parameters",
-    "translation": "",
+    "translation": "Finaj kromaj parametroj",
     "context": "Terminal additional parameters",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:221",
     "comment": ""
@@ -17165,14 +17165,14 @@
   },
   {
     "term": "Tertiary",
-    "translation": "",
+    "translation": "triaranga",
     "context": "Tertiary",
     "reference": "Modules/Settings/WorkspaceAppearanceCard.qml:29, Modules/Settings/WorkspaceAppearanceCard.qml:70, Modules/Settings/WorkspaceAppearanceCard.qml:105, Modules/Settings/WorkspaceAppearanceCard.qml:140, Modules/Settings/WorkspaceAppearanceCard.qml:175",
     "comment": "workspace color option"
   },
   {
     "term": "Tertiary Container",
-    "translation": "",
+    "translation": "Terciara Ujo",
     "context": "Tertiary Container",
     "reference": "Modules/Settings/WorkspaceAppearanceCard.qml:32, Modules/Settings/WorkspaceAppearanceCard.qml:73, Modules/Settings/WorkspaceAppearanceCard.qml:143, Modules/Settings/WorkspaceAppearanceCard.qml:178, Modules/Settings/ThemeColorsTab.qml:43",
     "comment": "widget background color option | workspace color option"
@@ -17221,14 +17221,14 @@
   },
   {
     "term": "Text Editor",
-    "translation": "",
+    "translation": "tekstredaktilo",
     "context": "Text Editor",
     "reference": "Modules/Settings/DefaultAppsTab.qml:314",
     "comment": "Text Editor"
   },
   {
     "term": "Text Rendering",
-    "translation": "",
+    "translation": "Teksta Reprezentado",
     "context": "Text Rendering",
     "reference": "Modules/Settings/TypographyMotionTab.qml:335",
     "comment": ""
@@ -17270,7 +17270,7 @@
   },
   {
     "term": "The rule applies to any window matching one of these.",
-    "translation": "",
+    "translation": "La regulo validas por iu ajn fenestro kongrua kun unu el ĉi tiuj.",
     "context": "The rule applies to any window matching one of these.",
     "reference": "Modals/WindowRuleModal.qml:757",
     "comment": ""
@@ -17298,21 +17298,21 @@
   },
   {
     "term": "Theme color used for the border",
-    "translation": "",
+    "translation": "Temokoloro uzata por la limo",
     "context": "Theme color used for the border",
     "reference": "Modules/Settings/DankBarTab.qml:1317",
     "comment": ""
   },
   {
     "term": "Theme color used for the widget outline",
-    "translation": "",
+    "translation": "Temokoloro uzata por la fenestraĵo skizo",
     "context": "Theme color used for the widget outline",
     "reference": "Modules/Settings/DankBarTab.qml:1412",
     "comment": ""
   },
   {
     "term": "Theme worker failed (%1)",
-    "translation": "",
+    "translation": "Temo-laboristo malsukcesis (%1)",
     "context": "Theme worker failed (%1)",
     "reference": "Common/Theme.qml:2112",
     "comment": ""
@@ -17326,7 +17326,7 @@
   },
   {
     "term": "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)",
-    "translation": "",
+    "translation": "Ĉi tiuj aldonas enskribojn al la XDG-aŭtomata dosierujo (~/.config/autostart/*.desktop)",
     "context": "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)",
     "reference": "Modules/Settings/AutoStartTab.qml:562",
     "comment": ""
@@ -17340,7 +17340,7 @@
   },
   {
     "term": "Thin",
-    "translation": "",
+    "translation": "Maldika",
     "context": "Thin",
     "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:258, Modules/Settings/TypographyMotionTab.qml:282",
     "comment": "font weight"
@@ -17368,35 +17368,35 @@
   },
   {
     "term": "This device",
-    "translation": "",
+    "translation": "Ĉi tiu aparato",
     "context": "This device",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:372",
     "comment": "Label for the user's own device in Tailscale"
   },
   {
     "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.",
-    "translation": "",
+    "translation": "Ĉi tiu instalo ankoraŭ uzas hyprland.conf. ",
     "context": "This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.",
     "reference": "Modules/Settings/ThemeColorsTab.qml:130",
     "comment": ""
   },
   {
     "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.",
-    "translation": "",
+    "translation": "Ĉi tiu instalo ankoraŭ uzas hyprland.conf. ",
     "context": "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.",
     "reference": "Modules/Settings/DisplayConfig/IncludeWarningBox.qml:66, Modules/Settings/DisplayConfig/DisplayConfigState.qml:1467",
     "comment": ""
   },
   {
     "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.",
-    "translation": "",
+    "translation": "Ĉi tiu instalo ankoraŭ uzas hyprland.conf. ",
     "context": "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.",
     "reference": "Services/KeybindsService.qml:548, Modules/Settings/KeybindsTab.qml:402",
     "comment": ""
   },
   {
     "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.",
-    "translation": "",
+    "translation": "Ĉi tiu instalo ankoraŭ uzas hyprland.conf. ",
     "context": "This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.",
     "reference": "Modules/Settings/WindowRulesTab.qml:344, Modules/Settings/WindowRulesTab.qml:512",
     "comment": ""
@@ -17410,7 +17410,7 @@
   },
   {
     "term": "This output is disabled in the current profile",
-    "translation": "",
+    "translation": "Ĉi tiu eligo estas malŝaltita en la nuna profilo",
     "context": "This output is disabled in the current profile",
     "reference": "Modules/Settings/DisplayConfig/OutputCard.qml:175",
     "comment": ""
@@ -17543,7 +17543,7 @@
   },
   {
     "term": "Time to wait before hiding after the pointer leaves",
-    "translation": "",
+    "translation": "Tempo por atendi antaŭ kaŝi post kiam la montrilo foriras",
     "context": "Time to wait before hiding after the pointer leaves",
     "reference": "Modules/Settings/DankBarTab.qml:673",
     "comment": ""
@@ -17564,7 +17564,7 @@
   },
   {
     "term": "Timeout Progress Bar",
-    "translation": "",
+    "translation": "Progresa Trinkejo",
     "context": "Timeout Progress Bar",
     "reference": "Modules/Settings/NotificationsTab.qml:307",
     "comment": ""
@@ -17592,14 +17592,14 @@
   },
   {
     "term": "Tint Saturation",
-    "translation": "",
+    "translation": "Nuanco Saturado",
     "context": "Tint Saturation",
     "reference": "Modules/Settings/DankBarTab.qml:1259",
     "comment": ""
   },
   {
     "term": "Tint Strength",
-    "translation": "",
+    "translation": "Nuanco Forto",
     "context": "Tint Strength",
     "reference": "Modules/Settings/DankBarTab.qml:1282",
     "comment": ""
@@ -17613,14 +17613,14 @@
   },
   {
     "term": "Title (optional)",
-    "translation": "",
+    "translation": "Titolo (laŭvola)",
     "context": "Title (optional)",
     "reference": "Modals/WindowRuleModal.qml:729",
     "comment": ""
   },
   {
     "term": "Title is required",
-    "translation": "",
+    "translation": "Titolo estas postulata",
     "context": "Title is required",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:69",
     "comment": ""
@@ -17641,7 +17641,7 @@
   },
   {
     "term": "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).",
-    "translation": "",
+    "translation": "Por ensaluti kiel malsama uzanto, elsalutu kaj elektu la konton el la salutilo. ",
     "context": "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).",
     "reference": "Modals/SwitchUserModal.qml:229",
     "comment": ""
@@ -17662,7 +17662,7 @@
   },
   {
     "term": "Toast",
-    "translation": "",
+    "translation": "rostpano",
     "context": "Toast",
     "reference": "Modules/Settings/BatteryTab.qml:247",
     "comment": ""
@@ -17683,14 +17683,14 @@
   },
   {
     "term": "Toggle bar visibility manually via IPC",
-    "translation": "",
+    "translation": "Ŝaltigu la videblecon permane per IPC",
     "context": "Toggle bar visibility manually via IPC",
     "reference": "Modules/Settings/DankBarTab.qml:729",
     "comment": ""
   },
   {
     "term": "Toggle fonts",
-    "translation": "",
+    "translation": "Ŝaltu tiparojn",
     "context": "Toggle fonts",
     "reference": "Modules/Notepad/NotepadSettings.qml:150",
     "comment": ""
@@ -17858,21 +17858,21 @@
   },
   {
     "term": "Trash",
-    "translation": "",
+    "translation": "rubujo",
     "context": "Trash",
     "reference": "Modules/Settings/DockTab.qml:526, Modules/Dock/DockTrashButton.qml:20, Modules/Dock/DockTrashButton.qml:20",
     "comment": ""
   },
   {
     "term": "Trash command failed (exit %1)",
-    "translation": "",
+    "translation": "Ruba komando malsukcesis (eliro %1)",
     "context": "Trash command failed (exit %1)",
     "reference": "Services/TrashService.qml:112",
     "comment": ""
   },
   {
     "term": "Tray Icon Fix",
-    "translation": "",
+    "translation": "Pleto Ikono Fix",
     "context": "Tray Icon Fix",
     "reference": "Modules/Settings/AutoStartTab.qml:726",
     "comment": ""
@@ -17907,21 +17907,21 @@
   },
   {
     "term": "Try a different search or switch filters.",
-    "translation": "",
+    "translation": "Provu alian serĉon aŭ ŝanĝu filtrilojn.",
     "context": "Try a different search or switch filters.",
     "reference": "Modals/DankLauncherV2/SpotlightResultsList.qml:181",
     "comment": ""
   },
   {
     "term": "Turn off",
-    "translation": "",
+    "translation": "malŝalti",
     "context": "Turn off",
     "reference": "Modules/ControlCenter/Details/DoNotDisturbDetail.qml:241",
     "comment": ""
   },
   {
     "term": "Turn off Do Not Disturb",
-    "translation": "",
+    "translation": "Malŝaltu Ne ĝenu",
     "context": "Turn off Do Not Disturb",
     "reference": "Modules/Notifications/Center/NotificationHeader.qml:77",
     "comment": ""
@@ -17942,14 +17942,14 @@
   },
   {
     "term": "Turn off monitors after lock",
-    "translation": "",
+    "translation": "Malŝaltu monitorojn post seruro",
     "context": "Turn off monitors after lock",
     "reference": "Modules/Settings/PowerSleepTab.qml:267",
     "comment": ""
   },
   {
     "term": "Turn off now",
-    "translation": "",
+    "translation": "Malŝaltu nun",
     "context": "Turn off now",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:234",
     "comment": ""
@@ -17970,7 +17970,7 @@
   },
   {
     "term": "Type at least 2 characters to search files.",
-    "translation": "",
+    "translation": "Tajpu almenaŭ 2 signojn por serĉi dosierojn.",
     "context": "Type at least 2 characters to search files.",
     "reference": "Modals/DankLauncherV2/SpotlightResultsList.qml:180",
     "comment": ""
@@ -18005,7 +18005,7 @@
   },
   {
     "term": "Uncategorized",
-    "translation": "",
+    "translation": "senkategoria",
     "context": "Uncategorized",
     "reference": "Modules/Settings/PluginBrowser.qml:109",
     "comment": "plugin browser category filter"
@@ -18201,35 +18201,35 @@
   },
   {
     "term": "Unset",
-    "translation": "",
+    "translation": "malŝalti",
     "context": "Unset",
     "reference": "Modules/Settings/NotificationsTab.qml:216, Modules/Settings/NotificationsTab.qml:217, Modules/Settings/NotificationsTab.qml:219, Modules/Settings/NotificationsTab.qml:229, Modules/Settings/NotificationsTab.qml:230, Modules/Settings/NotificationsTab.qml:232, Modules/Settings/DefaultAppsTab.qml:229",
     "comment": "Unset"
   },
   {
     "term": "Until %1",
-    "translation": "",
+    "translation": "Ĝis %1",
     "context": "Until %1",
     "reference": "Modules/ControlCenter/Widgets/DndPill.qml:22, Modules/ControlCenter/Widgets/DndPill.qml:25",
     "comment": ""
   },
   {
     "term": "Until 8 AM",
-    "translation": "",
+    "translation": "Ĝis 8 AM",
     "context": "Until 8 AM",
     "reference": "Modules/ControlCenter/Details/DoNotDisturbDetail.qml:83",
     "comment": ""
   },
   {
     "term": "Until I turn it off",
-    "translation": "",
+    "translation": "Ĝis mi malŝaltas ĝin",
     "context": "Until I turn it off",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:89, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:203",
     "comment": ""
   },
   {
     "term": "Until tomorrow, 8:00 AM",
-    "translation": "",
+    "translation": "Ĝis morgaŭ, 8:00 AM",
     "context": "Until tomorrow, 8:00 AM",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:85",
     "comment": ""
@@ -18278,14 +18278,14 @@
   },
   {
     "term": "Update failed: %1",
-    "translation": "",
+    "translation": "Ĝisdatigo malsukcesis: %1",
     "context": "Update failed: %1",
     "reference": "Modules/Settings/PluginListItem.qml:206",
     "comment": ""
   },
   {
     "term": "Upgrading...",
-    "translation": "",
+    "translation": "Ĝisdatigante...",
     "context": "Upgrading...",
     "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:121",
     "comment": ""
@@ -18306,7 +18306,7 @@
   },
   {
     "term": "Urgent",
-    "translation": "",
+    "translation": "urĝa",
     "context": "Urgent",
     "reference": "Modals/WindowRuleModal.qml:897, Modules/Settings/WindowRulesTab.qml:52",
     "comment": ""
@@ -18341,7 +18341,7 @@
   },
   {
     "term": "Use HH:MM time format",
-    "translation": "",
+    "translation": "Uzu HH:MM-hora formato",
     "context": "Use HH:MM time format",
     "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:89",
     "comment": ""
@@ -18383,7 +18383,7 @@
   },
   {
     "term": "Use Overlay Layer",
-    "translation": "",
+    "translation": "Uzu Overlay Tavolo",
     "context": "Use Overlay Layer",
     "reference": "Modules/Settings/DankBarTab.qml:787, Modules/Settings/LauncherTab.qml:175, Modules/Settings/DockTab.qml:95",
     "comment": "bar layer toggle: use Wayland overlay layer | dock layer toggle: use Wayland overlay layer | launcher layer toggle: use Wayland overlay layer"
@@ -18404,7 +18404,7 @@
   },
   {
     "term": "Use a custom radius for goth corner cutouts",
-    "translation": "",
+    "translation": "Uzu kutiman radiuson por gotaj anguleltranĉaĵoj",
     "context": "Use a custom radius for goth corner cutouts",
     "reference": "Modules/Settings/DankBarTab.qml:1155",
     "comment": ""
@@ -18481,7 +18481,7 @@
   },
   {
     "term": "Use keys 1-3 or arrows, Enter/Space to select",
-    "translation": "",
+    "translation": "Uzu klavojn 1-3 aŭ sagojn, Enigu/Spaco por elekti",
     "context": "Use keys 1-3 or arrows, Enter/Space to select",
     "reference": "Modals/PowerProfileModal.qml:269",
     "comment": ""
@@ -18516,14 +18516,14 @@
   },
   {
     "term": "Use the extended surface for launcher content",
-    "translation": "",
+    "translation": "Uzu la plilongigitan surfacon por lanĉila enhavo",
     "context": "Use the extended surface for launcher content",
     "reference": "Modules/Settings/FrameTab.qml:332",
     "comment": ""
   },
   {
     "term": "Use the overlay layer when opening the launcher",
-    "translation": "",
+    "translation": "Uzu la tegmentan tavolon kiam vi malfermas la lanĉilon",
     "context": "Use the overlay layer when opening the launcher",
     "reference": "Modules/Settings/LauncherTab.qml:176",
     "comment": ""
@@ -18537,7 +18537,7 @@
   },
   {
     "term": "Used for xdg-terminal-exec",
-    "translation": "",
+    "translation": "Uzite por xdg-terminal-exec",
     "context": "Used for xdg-terminal-exec",
     "reference": "Modules/Settings/DefaultAppsTab.qml:299",
     "comment": "Used for xdg-terminal-exec"
@@ -18551,56 +18551,56 @@
   },
   {
     "term": "User Window Rules (%1)",
-    "translation": "",
+    "translation": "Uzantaj Fenestraj Reguloj (%1)",
     "context": "User Window Rules (%1)",
     "reference": "Modules/Settings/WindowRulesTab.qml:839",
     "comment": ""
   },
   {
     "term": "User already exists",
-    "translation": "",
+    "translation": "Uzanto jam ekzistas",
     "context": "User already exists",
     "reference": "Services/UsersService.qml:135",
     "comment": ""
   },
   {
     "term": "User created",
-    "translation": "",
+    "translation": "Uzanto kreita",
     "context": "User created",
     "reference": "Services/UsersService.qml:213",
     "comment": ""
   },
   {
     "term": "User created with administrator and greeter login access",
-    "translation": "",
+    "translation": "Uzanto kreita kun administranto kaj salutisto ensaluta aliro",
     "context": "User created with administrator and greeter login access",
     "reference": "Services/UsersService.qml:208",
     "comment": ""
   },
   {
     "term": "User created with administrator privileges",
-    "translation": "",
+    "translation": "Uzanto kreita kun administranto-privilegioj",
     "context": "User created with administrator privileges",
     "reference": "Services/UsersService.qml:210",
     "comment": ""
   },
   {
     "term": "User created with greeter login access",
-    "translation": "",
+    "translation": "Uzanto kreita kun greeter ensaluta aliro",
     "context": "User created with greeter login access",
     "reference": "Services/UsersService.qml:212",
     "comment": ""
   },
   {
     "term": "User deleted",
-    "translation": "",
+    "translation": "Uzanto forigita",
     "context": "User deleted",
     "reference": "Services/UsersService.qml:349",
     "comment": ""
   },
   {
     "term": "User not found",
-    "translation": "",
+    "translation": "Uzanto ne trovita",
     "context": "User not found",
     "reference": "Services/UsersService.qml:143, Services/UsersService.qml:155, Services/UsersService.qml:167, Services/UsersService.qml:182",
     "comment": ""
@@ -18614,7 +18614,7 @@
   },
   {
     "term": "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.",
-    "translation": "",
+    "translation": "Uzantnomo devas komenci per minuskla litero aŭ substreko kaj enhavi nur minusklajn literojn, ciferojn, streketojn aŭ substrekojn.",
     "context": "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.",
     "reference": "Modules/Settings/UsersTab.qml:381",
     "comment": ""
@@ -18628,7 +18628,7 @@
   },
   {
     "term": "Users",
-    "translation": "",
+    "translation": "Uzantoj",
     "context": "Users",
     "reference": "Modals/Settings/SettingsSidebar.qml:351",
     "comment": ""
@@ -18649,28 +18649,28 @@
   },
   {
     "term": "Uses the spotlight-bar IPC action and always opens the minimal bar.",
-    "translation": "",
+    "translation": "Uzas la agadon de spotlight-bar IPC kaj ĉiam malfermas la minimuman trinkejon.",
     "context": "Uses the spotlight-bar IPC action and always opens the minimal bar.",
     "reference": "Modules/Settings/LauncherTab.qml:236",
     "comment": ""
   },
   {
     "term": "Using DankCalendar%1",
-    "translation": "",
+    "translation": "Uzante DankCalendar%1",
     "context": "Using DankCalendar%1",
     "reference": "Modules/Settings/TimeWeatherTab.qml:127",
     "comment": "calendar backend status"
   },
   {
     "term": "Using global monospace font from Settings → Personalization",
-    "translation": "",
+    "translation": "Uzante tutmondan monospacan tiparon de Agordoj → Personigo",
     "context": "Using global monospace font from Settings → Personalization",
     "reference": "Modules/Notepad/NotepadSettings.qml:486",
     "comment": ""
   },
   {
     "term": "Using khal",
-    "translation": "",
+    "translation": "Uzante khal",
     "context": "Using khal",
     "reference": "Modules/Settings/TimeWeatherTab.qml:129",
     "comment": "calendar backend status"
@@ -18803,7 +18803,7 @@
   },
   {
     "term": "Very High",
-    "translation": "",
+    "translation": "Tre Alta",
     "context": "Very High",
     "reference": "Modules/Settings/TypographyMotionTab.qml:458",
     "comment": ""
@@ -18831,7 +18831,7 @@
   },
   {
     "term": "Video Player",
-    "translation": "",
+    "translation": "filmetospektilo",
     "context": "Video Player",
     "reference": "Modules/Settings/DefaultAppsTab.qml:337",
     "comment": "Video Player"
@@ -18859,7 +18859,7 @@
   },
   {
     "term": "Visible Entry Actions",
-    "translation": "",
+    "translation": "Videblaj Eniraj Agoj",
     "context": "Visible Entry Actions",
     "reference": "Modules/Settings/ClipboardTab.qml:481",
     "comment": ""
@@ -19013,7 +19013,7 @@
   },
   {
     "term": "Web Browser",
-    "translation": "",
+    "translation": "retumilo",
     "context": "Web Browser",
     "reference": "Modules/Settings/DefaultAppsTab.qml:271",
     "comment": "Web Browser"
@@ -19048,7 +19048,7 @@
   },
   {
     "term": "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.",
-    "translation": "",
+    "translation": "Kiam ĝi estas ebligita, kontrolas ĝisdatigojn ĉe ekfunkciigo. ",
     "context": "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.",
     "reference": "Modules/Settings/SystemUpdaterTab.qml:98",
     "comment": ""
@@ -19146,7 +19146,7 @@
   },
   {
     "term": "Widget Opacity",
-    "translation": "",
+    "translation": "Fenestraĵo Opakeco",
     "context": "Widget Opacity",
     "reference": "Modules/Settings/DankBarTab.qml:832",
     "comment": ""
@@ -19167,7 +19167,7 @@
   },
   {
     "term": "Widget Text Style",
-    "translation": "",
+    "translation": "Fenestraĵo Teksta Stilo",
     "context": "Widget Text Style",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1554",
     "comment": ""
@@ -19195,7 +19195,7 @@
   },
   {
     "term": "Widgets & Notifications",
-    "translation": "",
+    "translation": "Fenestraĵoj kaj Sciigoj",
     "context": "Widgets & Notifications",
     "reference": "Modals/Settings/SettingsSidebar.qml:154, Modals/Settings/SettingsSidebar.qml:640",
     "comment": ""
@@ -19216,21 +19216,21 @@
   },
   {
     "term": "Width of the border in pixels",
-    "translation": "",
+    "translation": "Larĝo de la limo en pikseloj",
     "context": "Width of the border in pixels",
     "reference": "Modules/Settings/DankBarTab.qml:1378",
     "comment": ""
   },
   {
     "term": "Width of the widget outline in pixels",
-    "translation": "",
+    "translation": "Larĝo de la fenestraĵo konturo en pikseloj",
     "context": "Width of the widget outline in pixels",
     "reference": "Modules/Settings/DankBarTab.qml:1473",
     "comment": ""
   },
   {
     "term": "Width of window border",
-    "translation": "",
+    "translation": "Larĝo de fenestra rando",
     "context": "Width of window border",
     "reference": "Modules/Settings/CompositorLayoutTab.qml:206, Modules/Settings/CompositorLayoutTab.qml:312",
     "comment": ""
@@ -19328,7 +19328,7 @@
   },
   {
     "term": "Working...",
-    "translation": "",
+    "translation": "Laborante...",
     "context": "Working...",
     "reference": "Modules/Settings/UsersTab.qml:477",
     "comment": ""
@@ -19398,7 +19398,7 @@
   },
   {
     "term": "Wrap the app command. %command% is replaced with the actual executable",
-    "translation": "",
+    "translation": "Envolvu la aplikan komandon. ",
     "context": "Wrap the app command. %command% is replaced with the actual executable",
     "reference": "Modules/Settings/AutoStartTab.qml:477",
     "comment": ""
@@ -19412,7 +19412,7 @@
   },
   {
     "term": "X",
-    "translation": "",
+    "translation": "X",
     "context": "X",
     "reference": "Modals/WindowRuleModal.qml:1333",
     "comment": ""
@@ -19426,28 +19426,28 @@
   },
   {
     "term": "X-Ray",
-    "translation": "",
+    "translation": "x-rada",
     "context": "X-Ray",
     "reference": "Modals/WindowRuleModal.qml:1257, Modules/Settings/WindowRulesTab.qml:131",
     "comment": ""
   },
   {
     "term": "XWayland",
-    "translation": "",
+    "translation": "XWayland",
     "context": "XWayland",
     "reference": "Modals/WindowRuleModal.qml:907, Modules/Settings/WindowRulesTab.qml:54",
     "comment": ""
   },
   {
     "term": "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).",
-    "translation": "",
+    "translation": "Xray malklarigas nur la tapeton (efika) kaj estas la defaŭlta kiam Blur estas ŝaltita. ",
     "context": "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).",
     "reference": "Modals/WindowRuleModal.qml:1235",
     "comment": ""
   },
   {
     "term": "Y",
-    "translation": "",
+    "translation": "ipsilono",
     "context": "Y",
     "reference": "Modals/WindowRuleModal.qml:1360",
     "comment": ""
@@ -19510,14 +19510,14 @@
   },
   {
     "term": "You'll enter your password at the greeter after the next reboot.",
-    "translation": "",
+    "translation": "Vi enigos vian pasvorton ĉe la salutilo post la sekva rekomenco.",
     "context": "You'll enter your password at the greeter after the next reboot.",
     "reference": "Common/settings/Processes.qml:376",
     "comment": ""
   },
   {
     "term": "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.",
-    "translation": "",
+    "translation": "Vi preterlasos la salutan pasvorton post la sekva rekomenco. ",
     "context": "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.",
     "reference": "Common/settings/Processes.qml:374",
     "comment": ""
@@ -19531,7 +19531,7 @@
   },
   {
     "term": "Your compositor does not support background blur (ext-background-effect-v1)",
-    "translation": "",
+    "translation": "Via kompostisto ne subtenas fonmalklarigon (ext-background-effect-v1)",
     "context": "Your compositor does not support background blur (ext-background-effect-v1)",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1728",
     "comment": ""
@@ -19552,7 +19552,7 @@
   },
   {
     "term": "admin",
-    "translation": "",
+    "translation": "admin",
     "context": "admin",
     "reference": "Modules/Settings/UsersTab.qml:210",
     "comment": ""
@@ -19601,7 +19601,7 @@
   },
   {
     "term": "direct",
-    "translation": "",
+    "translation": "senpera",
     "context": "direct",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:406",
     "comment": "Tailscale direct connection"
@@ -19629,21 +19629,21 @@
   },
   {
     "term": "e.g. /usr/bin/my-script --flag",
-    "translation": "",
+    "translation": "ekz. ",
     "context": "e.g. /usr/bin/my-script --flag",
     "reference": "Modules/Settings/AutoStartTab.qml:554",
     "comment": ""
   },
   {
     "term": "e.g. My Script",
-    "translation": "",
+    "translation": "ekz. ",
     "context": "e.g. My Script",
     "reference": "Modules/Settings/AutoStartTab.qml:523",
     "comment": ""
   },
   {
     "term": "e.g. alice",
-    "translation": "",
+    "translation": "ekz. ",
     "context": "e.g. alice",
     "reference": "Modules/Settings/UsersTab.qml:366",
     "comment": ""
@@ -19664,7 +19664,7 @@
   },
   {
     "term": "e.g., hl.dsp.focus({ workspace = \"3\" })",
-    "translation": "",
+    "translation": "ekz., hl.dsp.focus({ laborspaco = \"3\" })",
     "context": "e.g., hl.dsp.focus({ workspace = \"3\" })",
     "reference": "Widgets/KeybindItem.qml:1447",
     "comment": ""
@@ -19699,14 +19699,14 @@
   },
   {
     "term": "khal",
-    "translation": "",
+    "translation": "khal",
     "context": "khal",
     "reference": "Modules/Settings/TimeWeatherTab.qml:135",
     "comment": "calendar backend option"
   },
   {
     "term": "last seen %1",
-    "translation": "",
+    "translation": "laste vidita %1",
     "context": "last seen %1",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:408",
     "comment": "Tailscale peer last seen time"
@@ -19720,7 +19720,7 @@
   },
   {
     "term": "loginctl activate failed (exit %1)",
-    "translation": "",
+    "translation": "loginctl-aktivigo malsukcesis (eliro %1)",
     "context": "loginctl activate failed (exit %1)",
     "reference": "Services/SessionsService.qml:173",
     "comment": ""
@@ -19734,14 +19734,14 @@
   },
   {
     "term": "mango: config reloaded",
-    "translation": "",
+    "translation": "mango: agordo reŝargita",
     "context": "mango: config reloaded",
     "reference": "Services/MangoService.qml:429",
     "comment": ""
   },
   {
     "term": "mango: failed to reload config",
-    "translation": "",
+    "translation": "mango: malsukcesis reŝargi agordon",
     "context": "mango: failed to reload config",
     "reference": "Services/MangoService.qml:425",
     "comment": ""
@@ -19762,14 +19762,14 @@
   },
   {
     "term": "matugen not available or disabled - cannot apply GTK colors",
-    "translation": "",
+    "translation": "matugen ne havebla aŭ malŝaltita - ne povas apliki GTK-kolorojn",
     "context": "matugen not available or disabled - cannot apply GTK colors",
     "reference": "Common/Theme.qml:1937",
     "comment": ""
   },
   {
     "term": "matugen not available or disabled - cannot apply Qt colors",
-    "translation": "",
+    "translation": "matugen ne havebla aŭ malŝaltita - ne povas apliki Qt-kolorojn",
     "context": "matugen not available or disabled - cannot apply Qt colors",
     "reference": "Common/Theme.qml:1959",
     "comment": ""
@@ -19832,14 +19832,14 @@
   },
   {
     "term": "niri: config reloaded",
-    "translation": "",
+    "translation": "niri: agordo reŝargita",
     "context": "niri: config reloaded",
     "reference": "Services/NiriService.qml:571",
     "comment": ""
   },
   {
     "term": "niri: failed to load config",
-    "translation": "",
+    "translation": "niri: malsukcesis ŝargi agordon",
     "context": "niri: failed to load config",
     "reference": "Services/NiriService.qml:111",
     "comment": ""
@@ -19937,14 +19937,14 @@
   },
   {
     "term": "relay: %1",
-    "translation": "",
+    "translation": "relajso: %1",
     "context": "relay: %1",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:406",
     "comment": "Tailscale relay server name"
   },
   {
     "term": "remote",
-    "translation": "",
+    "translation": "fora",
     "context": "remote",
     "reference": "Modals/SwitchUserModal.qml:29",
     "comment": ""
@@ -19958,7 +19958,7 @@
   },
   {
     "term": "session %1",
-    "translation": "",
+    "translation": "sesio %1",
     "context": "session %1",
     "reference": "Modals/SwitchUserModal.qml:161",
     "comment": ""
@@ -19979,7 +19979,7 @@
   },
   {
     "term": "until %1",
-    "translation": "",
+    "translation": "ĝis %1",
     "context": "until %1",
     "reference": "Modules/Notifications/Center/DndDurationMenu.qml:152, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:128",
     "comment": ""
@@ -20000,21 +20000,21 @@
   },
   {
     "term": "useradd failed (exit %1)",
-    "translation": "",
+    "translation": "useradd malsukcesis (eliro %1)",
     "context": "useradd failed (exit %1)",
     "reference": "Services/UsersService.qml:258",
     "comment": ""
   },
   {
     "term": "userdel failed (exit %1)",
-    "translation": "",
+    "translation": "userdel malsukcesis (eliro %1)",
     "context": "userdel failed (exit %1)",
     "reference": "Services/UsersService.qml:346",
     "comment": ""
   },
   {
     "term": "usermod failed (exit %1)",
-    "translation": "",
+    "translation": "uzantmodo malsukcesis (eliro %1)",
     "context": "usermod failed (exit %1)",
     "reference": "Services/UsersService.qml:376, Services/UsersService.qml:406",
     "comment": ""
@@ -20133,14 +20133,14 @@
   },
   {
     "term": "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help",
-    "translation": "",
+    "translation": "↑/↓: Navigi • Enigu/Ctrl+C: Kopiu • Del: Forigi • Ctrl+E: Redakti • Ctrl+S: Alpingli/Malpingli • F10: Helpo",
     "context": "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:30",
     "comment": ""
   },
   {
     "term": "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help",
-    "translation": "",
+    "translation": "↑/↓: Navigi • Enigu: Alglui • Ctrl+C: Kopiu • Del: Forigi • Ctrl+E: Redakti • Ctrl+S: Alpingli/Malpingli • F10: Helpo",
     "context": "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help",
     "reference": "Modals/Clipboard/ClipboardKeyboardHints.qml:30",
     "comment": "Keyboard hints when enter-to-paste is enabled"
